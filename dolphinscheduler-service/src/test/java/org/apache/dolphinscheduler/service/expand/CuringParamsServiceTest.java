@@ -72,17 +72,19 @@ public class CuringParamsServiceTest {
     private TimePlaceholderResolverExpandServiceImpl timePlaceholderResolverExpandServiceImpl;
 
     private final Map<String, String> globalParamMap = new HashMap<>();
+    private final Map<String, Property> paramMap = new HashMap<>();
 
     @BeforeEach
     public void init() {
         globalParamMap.put("globalParams1", "Params1");
+        paramMap.put("globalParams1", new Property("globalParams1", Direct.IN, DataType.VARCHAR, "Params1"));
     }
 
     @Test
     public void testConvertParameterPlaceholders() {
-        Mockito.when(curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, globalParamMap))
+        Mockito.when(curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, paramMap))
                 .thenReturn("2022-06-26");
-        String result = curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, globalParamMap);
+        String result = curingGlobalParamsService.convertParameterPlaceholders(placeHolderName, paramMap);
         Assertions.assertNotNull(result);
     }
 
