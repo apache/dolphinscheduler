@@ -25,6 +25,6 @@ WORKDIR $DOLPHINSCHEDULER_HOME
 
 ADD ./target/master-server $DOLPHINSCHEDULER_HOME
 
-EXPOSE 12345
+EXPOSE 5678 5679
 
 CMD [ "/bin/bash", "./bin/start.sh" ]

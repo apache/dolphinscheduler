@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_QUEUE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_QUEUE_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -30,8 +30,11 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,7 +72,6 @@ public class QueueController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return queueService.queryList(loginUser);
     }
@@ -92,7 +94,6 @@ public class QueueController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryQueueListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam("pageNo") Integer pageNo,
                                        @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -123,7 +124,6 @@ public class QueueController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
@@ -148,12 +148,31 @@ public class QueueController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @PathVariable(value = "id") int id,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {
         return queueService.updateQueue(loginUser, id, queue, queueName);
+    }
+
+    /**
+     *  delete queue by id
+     *
+     * @param loginUser login user
+     * @param id        queue id
+     * @return update result code
+     */
+    @Operation(summary = "deleteQueueById", description = "DELETE_QUEUE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_QUEUE_BY_ID_ERROR)
+    public Result deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                  @PathVariable(value = "id") int id) throws Exception {
+        Map<String, Object> result = queueService.deleteQueueById(loginUser, id);
+        return returnDataList(result);
     }
 
     /**
@@ -172,7 +191,6 @@ public class QueueController extends BaseController {
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_QUEUE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "queue") String queue,
                               @RequestParam(value = "queueName") String queueName) {

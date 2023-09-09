@@ -167,7 +167,7 @@ class TaskCacheUtilsTest {
         // task definition version is changed, so cache key changed
         Assertions.assertNotEquals(cacheKeyD, cacheKeyE);
 
-        taskInstance.setEnvironmentConfig("export PYTHON_HOME=/bin/python3");
+        taskInstance.setEnvironmentConfig("export PYTHON_LAUNCHER=/bin/python3");
         String cacheKeyF = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // EnvironmentConfig is changed, so cache key changed
         Assertions.assertNotEquals(cacheKeyE, cacheKeyF);

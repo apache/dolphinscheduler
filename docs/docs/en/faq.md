@@ -220,16 +220,16 @@ A: 1, in **the process definition list**, click the **Start** button.
 
 ## Q : Python task setting Python version
 
-A: 1，**for the version after 1.0.3** only need to modify PYTHON_HOME in `bin/env/dolphinscheduler_env.sh`
+A: 1，**for the version after 1.0.3** only need to modify `$PYTHON_LAUNCHER` in `bin/env/dolphinscheduler_env.sh`
 
 ```
-export PYTHON_HOME=/bin/python
+export PYTHON_LAUNCHER=/bin/python/bin/python3
 ```
 
-Note: This is **PYTHON_HOME** , which is the absolute path of the python command, not the simple PYTHON_HOME. Also note that when exporting the PATH, you need to directly
+Note: This is **PYTHON_LAUNCHER** , which is the absolute path of the python command, not the simple PYTHON_LAUNCHER. Also note that when exporting the PATH, you need to directly
 
 ```
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
 ```
 
 ​ 2，For versions prior to 1.0.3, the Python task only supports the Python version of the system. It does not support specifying the Python version.

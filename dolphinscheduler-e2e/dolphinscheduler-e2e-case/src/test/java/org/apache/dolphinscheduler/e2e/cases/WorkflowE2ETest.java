@@ -33,6 +33,8 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTa
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -43,7 +45,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
+
+import java.time.Duration;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowE2ETest {
@@ -73,7 +76,7 @@ class WorkflowE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
@@ -125,7 +128,7 @@ class WorkflowE2ETest {
             .submit()
         ;
 
-        await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
+        Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(
                         it -> it.getText().contains(workflow)
@@ -157,7 +160,7 @@ class WorkflowE2ETest {
             .submit()
         ;
 
-        await().untilAsserted(() -> assertThat(
+        Awaitility.await().untilAsserted(() -> assertThat(
             workflowDefinitionPage.workflowList()
         ).anyMatch(it -> it.getText().contains(workflow)));
         workflowDefinitionPage.publish(workflow);
@@ -179,7 +182,7 @@ class WorkflowE2ETest {
                 .run(workflow)
                 .submit();
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage
@@ -201,7 +204,7 @@ class WorkflowE2ETest {
                 .next()
                 .rerun();
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             final Row row = projectPage

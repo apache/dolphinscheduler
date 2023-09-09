@@ -1,7 +1,7 @@
 # 资源中心配置详情
 
 - 资源中心通常用于上传文件、UDF 函数，以及任务组管理等操作。
-- 资源中心可以对接分布式的文件存储系统，如[Hadoop](https://hadoop.apache.org/docs/r2.7.0/)（2.6+）或者[MinIO](https://github.com/minio/minio)集群，也可以对接远端的对象存储，如[AWS S3](https://aws.amazon.com/s3/)或者[阿里云 OSS](https://www.aliyun.com/product/oss)等。
+- 资源中心可以对接分布式的文件存储系统，如[Hadoop](https://hadoop.apache.org/docs/r2.7.0/)（2.6+）或者[MinIO](https://github.com/minio/minio)集群，也可以对接远端的对象存储，如[AWS S3](https://aws.amazon.com/s3/)或者[阿里云 OSS](https://www.aliyun.com/product/oss)，[华为云 OBS](https://support.huaweicloud.com/obs/index.html) 等。
 - 资源中心也可以直接对接本地文件系统。在单机模式下，您无需依赖`Hadoop`或`S3`一类的外部存储系统，可以方便地对接本地文件系统进行体验。
 - 除此之外，对于集群模式下的部署，您可以通过使用[S3FS-FUSE](https://github.com/s3fs-fuse/s3fs-fuse)将`S3`挂载到本地，或者使用[JINDO-FUSE](https://help.aliyun.com/document_detail/187410.html)将`OSS`挂载到本地等，再用资源中心对接本地文件系统方式来操作远端对象存储中的文件。
 
@@ -79,7 +79,7 @@ resource.aws.s3.endpoint=
 # user data local directory path, please make sure the directory exists and have read write permissions
 data.basedir.path=/tmp/dolphinscheduler
 
-# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS
+# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS, OBS
 resource.storage.type=LOCAL
 
 # resource store on HDFS/S3/OSS path, resource file will store to this hadoop hdfs path, self configuration,
@@ -107,6 +107,15 @@ resource.alibaba.cloud.region=cn-hangzhou
 resource.alibaba.cloud.oss.bucket.name=dolphinscheduler
 # oss bucket endpoint, required if you set resource.storage.type=OSS
 resource.alibaba.cloud.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
+
+# alibaba cloud access key id, required if you set resource.storage.type=OBS
+resource.huawei.cloud.access.key.id=<your-access-key-id>
+# alibaba cloud access key secret, required if you set resource.storage.type=OBS
+resource.huawei.cloud.access.key.secret=<your-access-key-secret>
+# oss bucket name, required if you set resource.storage.type=OBS
+resource.huawei.cloud.obs.bucket.name=dolphinscheduler
+# oss bucket endpoint, required if you set resource.storage.type=OBS
+resource.huawei.cloud.obs.endpoint=obs.cn-southwest-2.huaweicloud.com
 
 # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
 resource.hdfs.root.user=root
