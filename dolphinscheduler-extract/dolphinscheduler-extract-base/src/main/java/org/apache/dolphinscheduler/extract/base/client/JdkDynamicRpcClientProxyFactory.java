@@ -21,8 +21,15 @@ import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import java.lang.reflect.Proxy;
+import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.SneakyThrows;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 /**
  * This class is used to create a proxy client which will transform local method invocation to remove invocation.
@@ -31,21 +38,34 @@ public class JdkDynamicRpcClientProxyFactory implements IRpcClientProxyFactory {
 
     private final NettyRemotingClient nettyRemotingClient;
 
-    // todo: use guava cache to avoid memory leak
-    private final Map<String, Map<String, Object>> proxyClientCache = new ConcurrentHashMap<>();
+    private static final LoadingCache<String, Map<String, Object>> proxyClientCache = CacheBuilder.newBuilder()
+            // expire here to remove dead host
+            .expireAfterAccess(Duration.ofHours(1))
+            .build(new CacheLoader<String, Map<String, Object>>() {
+
+                @Override
+                public Map<String, Object> load(String key) {
+                    return new ConcurrentHashMap<>();
+                }
+            });
 
     public JdkDynamicRpcClientProxyFactory(NettyRemotingClient nettyRemotingClient) {
         this.nettyRemotingClient = nettyRemotingClient;
     }
 
+    @SneakyThrows
     @SuppressWarnings("unchecked")
     @Override
     public <T> T getProxyClient(String serverHost, Class<T> clientInterface) {
-        return (T) proxyClientCache
-                .computeIfAbsent(serverHost, key -> new ConcurrentHashMap<>())
-                .computeIfAbsent(clientInterface.getName(),
-                        key -> Proxy.newProxyInstance(
-                                clientInterface.getClassLoader(), new Class[]{clientInterface},
-                                new ClientInvocationHandler(Host.of(serverHost), nettyRemotingClient)));
+        return (T) proxyClientCache.get(serverHost)
+                .computeIfAbsent(clientInterface.getName(), key -> newProxyClient(serverHost, clientInterface));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> T newProxyClient(String serverHost, Class<T> clientInterface) {
+        return (T) Proxy.newProxyInstance(
+                clientInterface.getClassLoader(),
+                new Class[]{clientInterface},
+                new ClientInvocationHandler(Host.of(serverHost), nettyRemotingClient));
     }
 }
