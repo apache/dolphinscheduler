@@ -34,8 +34,8 @@ public class LogicTaskInstanceExecuteRunningEventSender
     @Override
     public void sendMessage(TaskInstanceExecutionRunningEvent taskInstanceExecutionRunningEvent) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
-                        .getProxyClient(taskInstanceExecutionRunningEvent.getHost(),
+                SingletonJdkDynamicRpcClientProxyFactory
+                        .getProxyClient(taskInstanceExecutionRunningEvent.getWorkflowInstanceHost(),
                                 ITaskInstanceExecutionEventListener.class);
         iTaskInstanceExecutionEventListener.onTaskInstanceExecutionRunning(taskInstanceExecutionRunningEvent);
     }
@@ -47,7 +47,8 @@ public class LogicTaskInstanceExecuteRunningEventSender
         taskExecuteRunningMessage.setProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         taskExecuteRunningMessage.setStatus(taskExecutionContext.getCurrentExecutionStatus());
         taskExecuteRunningMessage.setLogPath(taskExecutionContext.getLogPath());
-        taskExecuteRunningMessage.setHost(taskExecutionContext.getHost());
+        taskExecuteRunningMessage.setWorkflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost());
+        taskExecuteRunningMessage.setTaskInstanceHost(taskExecutionContext.getHost());
         taskExecuteRunningMessage.setStartTime(taskExecutionContext.getStartTime());
         taskExecuteRunningMessage.setExecutePath(taskExecutionContext.getExecutePath());
         taskExecuteRunningMessage.setAppIds(taskExecutionContext.getAppIds());

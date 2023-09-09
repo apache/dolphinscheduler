@@ -49,4 +49,11 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
     void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes);
 
     List<TaskDefinition> queryByCodes(Collection<Long> taskDefinitionCodes);
+
+    /**
+     * Query task definition by code
+     * @param taskCode task code
+     * @return task definition
+     */
+    TaskDefinition queryByCode(long taskCode);
 }

@@ -876,6 +876,10 @@ export default {
     child_node_instance: 'child node instance',
     yarn_queue: 'Yarn Queue',
     yarn_queue_tips: 'Please input yarn queue(optional)',
+    dependent_type: 'Dependency Type',
+    dependent_on_workflow: 'Dependent on workflow',
+    dependent_on_task: 'Dependent on task',
+
   },
   menu: {
     fav: 'Favorites',
