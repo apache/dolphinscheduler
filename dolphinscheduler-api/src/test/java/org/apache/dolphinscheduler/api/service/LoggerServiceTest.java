@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.service.log.LogClient;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -74,9 +73,6 @@ public class LoggerServiceTest {
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    private LogClient logClient;
 
     @Test
     public void testQueryLog() {
@@ -134,6 +130,7 @@ public class LoggerServiceTest {
         User loginUser = new User();
         loginUser.setId(1);
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
         taskInstance.setExecutorId(loginUser.getId() + 1);
         Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
 
@@ -179,11 +176,9 @@ public class LoggerServiceTest {
 
         // SUCCESS
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
-        Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
-                .thenReturn(new byte[0]);
         Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         byte[] result = loggerService.getLogBytes(loginUser, 1);
-        Assertions.assertEquals(62, result.length);
+        Assertions.assertEquals(47, result.length);
     }
 
     @Test
@@ -238,8 +233,6 @@ public class LoggerServiceTest {
                 .thenReturn(result);
         Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        Mockito.when(logClient.getLogBytes(Mockito.anyString(), Mockito.anyInt(), Mockito.anyString()))
-                .thenReturn(new byte[0]);
         loggerService.getLogBytes(loginUser, projectCode, 1);
     }
 

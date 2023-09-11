@@ -166,6 +166,12 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                             log.info("WorkflowName: {}", processDefinition.getName());
                             log.info("TaskName: {}", "ALL");
                             log.info("DependentKey: {}", dependentItem.getKey());
+                        } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
+                            log.info("Add dependent task:");
+                            log.info("DependentRelation: {}", dependentTaskModel.getRelation());
+                            log.info("ProjectName: {}", project.getName());
+                            log.info("WorkflowName: {}", processDefinition.getName());
+                            log.info("DependentKey: {}", dependentItem.getKey());
                         } else {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(dependentItem.getDepTaskCode());
                             if (taskDefinition == null) {

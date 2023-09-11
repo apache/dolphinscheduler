@@ -851,6 +851,9 @@ export default {
     child_node_instance: '子节点实例',
     yarn_queue: 'Yarn队列',
     yarn_queue_tips: '请输入Yarn队列(选填)',
+    dependent_type: '依赖类型',
+    dependent_on_workflow: '依赖于工作流',
+    dependent_on_task: '依赖于任务',
   },
   menu: {
     fav: '收藏组件',
@@ -884,6 +887,8 @@ export default {
     preference_manage: '项目偏好管理',
     instruction_tips: '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
     success: '成功',
-    submit: '提交'
+    submit: '提交',
+    enabled: '启用',
+    disabled: '未启用'
   },
 }

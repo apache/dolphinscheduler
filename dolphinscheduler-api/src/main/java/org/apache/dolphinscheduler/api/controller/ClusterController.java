@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_CLUSTER_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ClusterService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -79,7 +78,6 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_CLUSTER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("name") String name,
                                 @RequestParam("config") String config,
@@ -109,7 +107,6 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_CLUSTER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("code") Long code,
                                 @RequestParam("name") String name,
@@ -132,7 +129,6 @@ public class ClusterController extends BaseController {
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_CLUSTER_BY_CODE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryClusterByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam("clusterCode") Long clusterCode) {
 
@@ -157,7 +153,6 @@ public class ClusterController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_CLUSTER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryClusterListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
@@ -186,7 +181,6 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_CLUSTER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("clusterCode") Long clusterCode) {
 
@@ -204,7 +198,6 @@ public class ClusterController extends BaseController {
     @GetMapping(value = "/query-cluster-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_CLUSTER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllClusterList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = clusterService.queryAllClusterList();
         return returnDataList(result);
@@ -224,7 +217,6 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/verify-cluster")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_CLUSTER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "clusterName") String clusterName) {
         Map<String, Object> result = clusterService.verifyCluster(clusterName);

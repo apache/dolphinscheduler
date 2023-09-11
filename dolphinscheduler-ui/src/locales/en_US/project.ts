@@ -877,6 +877,10 @@ export default {
     child_node_instance: 'child node instance',
     yarn_queue: 'Yarn Queue',
     yarn_queue_tips: 'Please input yarn queue(optional)',
+    dependent_type: 'Dependency Type',
+    dependent_on_workflow: 'Dependent on workflow',
+    dependent_on_task: 'Dependent on task',
+
   },
   menu: {
     fav: 'Favorites',
@@ -910,6 +914,8 @@ export default {
     preference_manage: 'Project Preference Management',
     instruction_tips: 'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
     success: 'Success',
-    submit: 'Submit'
+    submit: 'Submit',
+    enabled: 'Enabled',
+    disabled: 'Disabled'
   },
 }

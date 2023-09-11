@@ -47,6 +47,7 @@ export function useTaskEdit(options: Options) {
     getSources,
     getTargets,
     setNodeName,
+    setNodeFillColor,
     setNodeEdge
   } = useCellUpdate({
     graph
@@ -167,6 +168,11 @@ export function useTaskEdit(options: Options) {
       processDefinition.value.taskDefinitionList.map((task) => {
         if (task.code === currTask.value?.code) {
           setNodeName(task.code + '', taskDef.name)
+          let fillColor = '#ffffff'
+          if (task.flag === 'YES') {
+            fillColor = 'var(--custom-disable-bg)'
+          }
+          setNodeFillColor(task.code + '', fillColor)
 
           setNodeEdge(String(task.code), data.preTasks)
           updatePreTasks(data.preTasks, task.code)
