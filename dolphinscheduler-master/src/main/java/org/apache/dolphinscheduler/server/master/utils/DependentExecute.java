@@ -180,6 +180,7 @@ public class DependentExecute {
             return DependResult.WAITING;
         }
         if (processInstance.getState().isSuccess()) {
+            addItemVarPool(processInstance.getVarPool(), processInstance.getEndTime().getTime());
             return DependResult.SUCCESS;
         }
         log.warn(
@@ -240,42 +241,6 @@ public class DependentExecute {
     }
 
     /**
-     * get depend task result
-     *
-     * @param taskCode
-     * @param processInstance
-     * @return
-     */
-    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance, int testFlag) {
-        DependResult result;
-        TaskInstance taskInstance = null;
-        List<TaskInstance> taskInstanceList =
-                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(), testFlag);
-
-        for (TaskInstance task : taskInstanceList) {
-            if (task.getTaskCode() == taskCode) {
-                taskInstance = task;
-                break;
-            }
-        }
-
-        if (taskInstance == null) {
-            // cannot find task in the process instance
-            // maybe because process instance is running or failed.
-            if (processInstance.getState().isFinished()) {
-                result = DependResult.FAILED;
-            } else {
-                return DependResult.WAITING;
-            }
-        } else {
-            addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
-            result = getDependResultByState(taskInstance.getState());
-        }
-
-        return result;
-    }
-
-    /**
      * depend type = depend_task
      *
      * @param processInstance last process instance in the date interval
@@ -317,6 +282,7 @@ public class DependentExecute {
                 log.info(
                         "The dependent task is a streaming task, so return depend success. Task code: {}, task name: {}.",
                         taskInstance.getTaskCode(), taskInstance.getName());
+                addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
                 return DependResult.SUCCESS;
             }
             return getDependResultByState(taskInstance.getState());
