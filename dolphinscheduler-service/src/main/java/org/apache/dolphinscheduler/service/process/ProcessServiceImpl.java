@@ -939,32 +939,33 @@ public class ProcessServiceImpl implements ProcessService {
                 return null;
             }
         }
-        if (cmdParam != null) {
-            CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
-            // reset global params while repeat running and recover tolerance fault process is needed by cmdParam
-            if (commandTypeIfComplement == CommandType.REPEAT_RUNNING ||
-                    commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS) {
-                setGlobalParamIfCommanded(processDefinition, cmdParam);
-            }
 
-            // time zone
-            String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
-
-            // Recalculate global parameters after rerun.
-            String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
-                    processDefinition.getGlobalParamMap(),
-                    processDefinition.getGlobalParamList(),
-                    commandTypeIfComplement,
-                    processInstance.getScheduleTime(), timezoneId);
-            processInstance.setGlobalParams(globalParams);
-            processInstance.setProcessDefinition(processDefinition);
+        CommandType commandTypeIfComplement = getCommandTypeIfComplement(processInstance, command);
+        // reset global params while repeat running and recover tolerance fault process is needed by cmdParam
+        if (commandTypeIfComplement == CommandType.REPEAT_RUNNING ||
+                commandTypeIfComplement == CommandType.RECOVER_TOLERANCE_FAULT_PROCESS) {
+            setGlobalParamIfCommanded(processDefinition, cmdParam);
         }
+
+        // time zone
+        String timezoneId = cmdParam.get(Constants.SCHEDULE_TIMEZONE);
+
+        // Recalculate global parameters after rerun.
+        String globalParams = curingGlobalParamsService.curingGlobalParams(processInstance.getId(),
+                processDefinition.getGlobalParamMap(),
+                processDefinition.getGlobalParamList(),
+                commandTypeIfComplement,
+                processInstance.getScheduleTime(), timezoneId);
+        processInstance.setGlobalParams(globalParams);
+        processInstance.setProcessDefinition(processDefinition);
+
         // reset command parameter
         if (processInstance.getCommandParam() != null) {
             Map<String, String> processCmdParam = JSONUtils.toMap(processInstance.getCommandParam());
+            Map<String, String> finalCmdParam = cmdParam;
             processCmdParam.forEach((key, value) -> {
-                if (!cmdParam.containsKey(key)) {
-                    cmdParam.put(key, value);
+                if (!finalCmdParam.containsKey(key)) {
+                    finalCmdParam.put(key, value);
                 }
             });
         }
