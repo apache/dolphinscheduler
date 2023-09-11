@@ -137,6 +137,11 @@ export function useDatasource(
       id: 23,
       code: 'DORIS',
       disabled: false
+    },
+    {
+      id: 24,
+      code: 'XUGU',
+      disabled: false
     }
   ]
 

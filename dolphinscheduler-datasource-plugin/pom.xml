@@ -52,6 +52,7 @@
         <module>dolphinscheduler-datasource-snowflake</module>
         <module>dolphinscheduler-datasource-vertica</module>
         <module>dolphinscheduler-datasource-doris</module>
+        <module>dolphinscheduler-datasource-xugu</module>
     </modules>
 
     <dependencyManagement>
@@ -70,6 +71,11 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.xugu</groupId>
+            <artifactId>xugu-jdbc</artifactId>
         </dependency>
     </dependencies>
 </project>

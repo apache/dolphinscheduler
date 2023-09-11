@@ -406,6 +406,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'DORIS',
     label: 'DORIS',
     defaultPort: 9030
+  },
+  XUGU: {
+    value: 'XUGU',
+    label: 'XUGU',
+    defaultPort: 5138
   }
 }
 

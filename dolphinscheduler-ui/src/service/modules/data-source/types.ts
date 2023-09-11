@@ -38,6 +38,7 @@ type IDataBase =
   | 'SNOWFLAKE'
   | 'HANA'
   | 'DORIS'
+  | 'XUGU'
 
 type IDataBaseLabel =
   | 'MYSQL'
