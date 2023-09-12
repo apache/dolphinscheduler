@@ -69,6 +69,17 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
   }
   const selectOptions = ref([] as IDependTaskOptions[])
 
+  const DependentTypeOptions = [
+    {
+      value: 'DEPENDENT_ON_WORKFLOW',
+      label: t('project.node.dependent_on_workflow')
+    },
+    {
+      value: 'DEPENDENT_ON_TASK',
+      label: t('project.node.dependent_on_task')
+    }
+  ]
+
   const CYCLE_LIST = [
     {
       value: 'month',
@@ -229,7 +240,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
       filterLabel: item.name
     }))
     taskList.unshift({
-      value: 0,
+      value: -1,
       label: 'ALL',
       filterLabel: 'ALL'
     })
@@ -267,6 +278,13 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         item.dependItemList?.forEach(
           async (dependItem: IDependentItem, itemIndex: number) => {
             itemListOptions.value[itemIndex] = {}
+
+            if (!dependItem.dependentType) {
+              if (dependItem.depTaskCode == 0)
+                dependItem.dependentType = 'DEPENDENT_ON_WORKFLOW'
+              else
+                dependItem.dependentType = 'DEPENDENT_ON_TASK'
+            }
             if (dependItem.projectCode) {
               itemListOptions.value[itemIndex].definitionCodeOptions =
                 await getProcessList(dependItem.projectCode)
@@ -299,6 +317,21 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
         field: 'dependItemList',
         span: 18,
         children: [
+          (j = 0) => ({
+            type: 'select',
+            field: 'dependentType',
+            name: t('project.node.dependent_type'),
+            span: 24,
+            props: {
+              onUpdateValue: (dependentType: string) => {
+                const item = model.dependTaskList[i].dependItemList[j]
+                if (item.definitionCode)
+                  item.depTaskCode = dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
+              }
+            },
+            options: DependentTypeOptions,
+            value: 'DEPENDENT_ON_WORKFLOW'
+          }),
           (j = 0) => ({
             type: 'select',
             field: 'projectCode',
@@ -354,7 +387,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 const item = model.dependTaskList[i].dependItemList[j]
                 selectOptions.value[i].dependItemList[j].depTaskCodeOptions =
                   await getTaskList(item.projectCode, processCode)
-                item.depTaskCode = 0
+                item.depTaskCode = item.dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
               }
             },
             options:
@@ -374,7 +407,10 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
           (j = 0) => ({
             type: 'select',
             field: 'depTaskCode',
-            span: 24,
+            span: computed(() => {
+              const item = model.dependTaskList[i].dependItemList[j]
+              return item.dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : 24
+            }),
             name: t('project.node.task_name'),
             props: {
               filterable: true,

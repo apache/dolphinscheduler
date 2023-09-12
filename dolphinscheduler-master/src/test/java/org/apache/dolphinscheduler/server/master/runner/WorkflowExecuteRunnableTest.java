@@ -35,10 +35,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -127,7 +128,6 @@ public class WorkflowExecuteRunnableTest {
 
         stateWheelExecuteThread = Mockito.mock(StateWheelExecuteThread.class);
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
-        MasterRpcClient masterRpcClient = Mockito.mock(MasterRpcClient.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
         WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
         Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
@@ -141,7 +141,6 @@ public class WorkflowExecuteRunnableTest {
                         commandService,
                         processService,
                         processInstanceDao,
-                        masterRpcClient,
                         processAlertManager,
                         config,
                         stateWheelExecuteThread,
@@ -374,4 +373,20 @@ public class WorkflowExecuteRunnableTest {
         return schedulerList;
     }
 
+    @Test
+    void testTryToDispatchTaskInstance() {
+        // task instance already finished, not dispatch
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.PAUSE);
+        Mockito.when(processInstance.isBlocked()).thenReturn(true);
+        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
+        workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
+        Mockito.verify(taskExecuteRunnable, Mockito.never()).dispatch();
+
+        // submit success should dispatch
+        taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
+        workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
+        Mockito.verify(taskExecuteRunnable).dispatch();
+    }
 }
