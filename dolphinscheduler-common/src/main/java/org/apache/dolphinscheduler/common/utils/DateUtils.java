@@ -75,16 +75,7 @@ public final class DateUtils {
      * @return local datetime
      */
     private static LocalDateTime date2LocalDateTime(Date date, ZoneId zoneId) {
-        // In the internal implementation of JDK, java.sql.Date is inherited from java.util.Date, and java.sql.Date has
-        // not been implemented toInstant() method. If call this method, it will throw new
-        // java.lang.UnsupportedOperationException(). Here just convert java.sql.Date to java.util.Date
-        // to avoid the error.
-        if (date instanceof java.sql.Date) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-            date = calendar.getTime();
-        }
-        return LocalDateTime.ofInstant(date.toInstant(), zoneId);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
     }
 
     /**
