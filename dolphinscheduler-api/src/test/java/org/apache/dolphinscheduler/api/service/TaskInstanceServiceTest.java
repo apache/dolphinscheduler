@@ -191,7 +191,7 @@ public class TaskInstanceServiceTest {
         // executor name empty
         when(taskInstanceMapper.queryTaskInstanceListPaging(
                 Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""), null,
+                eq(""), eq(""), eq(""), eq(null),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), eq(start), eq(end)))
                         .thenReturn(pageReturn);
         Result executorEmptyRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
@@ -211,7 +211,7 @@ public class TaskInstanceServiceTest {
 
         // start/end date null
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""), null,
+                eq(""), eq(""), eq(""), eq(null),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(pageReturn);
         Result executorNullDateRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
@@ -220,7 +220,7 @@ public class TaskInstanceServiceTest {
 
         // start date error format
         when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
-                eq(""), eq(""), eq(""), null,
+                eq(""), eq(""), eq(""), eq(null),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(pageReturn);
 
