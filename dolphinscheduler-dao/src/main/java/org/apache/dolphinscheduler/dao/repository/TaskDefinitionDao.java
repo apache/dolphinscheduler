@@ -26,10 +26,11 @@ import java.util.Set;
 /**
  * Task Instance DAO
  */
-public interface TaskDefinitionDao {
+public interface TaskDefinitionDao extends IDao<TaskDefinition> {
 
     /**
      * Get list of task definition by process definition code
+     *
      * @param processDefinitionCode process definition code
      * @return list of task definition
      */
@@ -48,4 +49,11 @@ public interface TaskDefinitionDao {
     void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes);
 
     List<TaskDefinition> queryByCodes(Collection<Long> taskDefinitionCodes);
+
+    /**
+     * Query task definition by code
+     * @param taskCode task code
+     * @return task definition
+     */
+    TaskDefinition queryByCode(long taskCode);
 }

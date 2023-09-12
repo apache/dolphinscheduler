@@ -26,16 +26,27 @@ import {
   NDropdown,
   NPopconfirm
 } from 'naive-ui'
-import { EditOutlined, DeleteOutlined, UserOutlined } from '@vicons/antd'
+import {
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  KeyOutlined
+} from '@vicons/antd'
 import {
   COLUMN_WIDTH_CONFIG,
   calculateTableWidth,
   DefaultTableWidth
 } from '@/common/column-width-config'
 import type { TableColumns, InternalRowData } from './types'
+import { useUserStore } from '@/store/user/user'
+import { UserInfoRes } from './types'
 
 export function useColumns(onCallback: Function) {
   const { t } = useI18n()
+
+  const userStore = useUserStore()
+  const userInfo = userStore.getUserInfo as UserInfoRes
+  const IS_ADMIN = userInfo.userType === 'ADMIN_USER'
 
   const columnsRef = ref({
     columns: [] as TableColumns,
@@ -116,8 +127,8 @@ export function useColumns(onCallback: Function) {
       {
         title: t('security.user.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](3),
-        render: (rowData: any, unused: number) => {
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
+        render: (rowData: InternalRowData, unused: number) => {
           return h(NSpace, null, {
             default: () => [
               h(
@@ -158,7 +169,7 @@ export function useColumns(onCallback: Function) {
                           NButton,
                           {
                             circle: true,
-                            type: 'warning',
+                            type: 'info',
                             size: 'small',
                             class: 'authorize'
                           },
@@ -189,6 +200,27 @@ export function useColumns(onCallback: Function) {
                   default: () => t('security.user.edit')
                 }
               ),
+              IS_ADMIN &&
+                h(
+                  NTooltip,
+                  { trigger: 'hover' },
+                  {
+                    trigger: () =>
+                      h(
+                        NButton,
+                        {
+                          circle: true,
+                          type: 'error',
+                          size: 'small',
+                          class: 'edit',
+                          onClick: () =>
+                            void onCallback({ rowData }, 'resetPassword')
+                        },
+                        () => h(NIcon, null, () => h(KeyOutlined))
+                      ),
+                    default: () => t('security.user.reset_password')
+                  }
+                ),
               h(
                 NPopconfirm,
                 {

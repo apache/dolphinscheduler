@@ -102,12 +102,27 @@ export function useDataList() {
         icon: renderIcon(ProfileOutlined),
         children: [
           {
-            label:
-              t('menu.project_overview') +
-              (projectName ? `[${projectName}]` : ''),
+            label: t('menu.project') + (projectName ? `[${projectName}]` : ''),
             key: `/projects/${projectCode}`,
             icon: renderIcon(FundProjectionScreenOutlined),
-            payload: { projectName: projectName }
+            payload: { projectName: projectName },
+            children: [
+              {
+                label: t('menu.project_overview'),
+                key: `/projects/${projectCode}`,
+                payload: { projectName: projectName },
+              },
+              {
+                label: t('menu.project_parameter'),
+                key: `/projects/${projectCode}/parameter`,
+                payload: { projectName: projectName },
+              },
+              {
+                label: t('menu.project_preferences'),
+                key: `/projects/${projectCode}/preferences`,
+                payload: { projectName: projectName },
+              },
+            ]
           },
           {
             label: t('menu.workflow'),

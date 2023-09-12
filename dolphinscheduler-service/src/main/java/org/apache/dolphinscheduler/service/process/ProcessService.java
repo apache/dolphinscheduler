@@ -56,13 +56,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
 
     @Transactional
+    @Nullable
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
+
+    ProcessInstance constructProcessInstance(Command command,
+                                             String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
     Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
@@ -168,7 +174,7 @@ public interface ProcessService {
 
     boolean isTaskOnline(long taskCode);
 
-    DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
+    DAG<Long, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
 
     DagData genDagData(ProcessDefinition processDefinition);
 
@@ -227,8 +233,6 @@ public interface ProcessService {
     public String findConfigYamlByName(String clusterName);
 
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
-
-    Integer queryTestDataSourceId(Integer onlineDataSourceId);
 
     void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 }

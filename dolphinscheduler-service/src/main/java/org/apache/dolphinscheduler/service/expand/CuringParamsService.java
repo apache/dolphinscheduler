@@ -53,7 +53,7 @@ public interface CuringParamsService {
      * @param allParamMap
      * @return
      */
-    String convertParameterPlaceholders(String val, Map<String, String> allParamMap);
+    String convertParameterPlaceholders(String val, Map<String, Property> allParamMap);
 
     /**
      * curing global params
@@ -86,4 +86,6 @@ public interface CuringParamsService {
      * @return
      */
     Map<String, Property> preBuildBusinessParams(ProcessInstance processInstance);
+
+    Map<String, Property> getProjectParameterMap(long projectCode);
 }

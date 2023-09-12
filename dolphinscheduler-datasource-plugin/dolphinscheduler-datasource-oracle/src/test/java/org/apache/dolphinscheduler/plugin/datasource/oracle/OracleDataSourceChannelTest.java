@@ -32,8 +32,10 @@ public class OracleDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         OracleDataSourceChannel sourceChannel = Mockito.mock(OracleDataSourceChannel.class);
-        OracleDataSourceClient dataSourceClient = Mockito.mock(OracleDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
+        OraclePooledDataSourceClient dataSourceClient = Mockito.mock(OraclePooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions
+                .assertNotNull(sourceChannel.createPooledDataSourceClient(new OracleConnectionParam(), DbType.ORACLE));
     }
 }

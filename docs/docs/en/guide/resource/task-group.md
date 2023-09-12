@@ -1,6 +1,6 @@
 # Task Group Settings
 
-The task group is mainly used to control the concurrency of task instances, and is designed to control the pressure of other resources (it can also control the pressure of the Hadoop cluster, the cluster will have queue control it). When creating a new task definition, you can configure the corresponding task group and configure the priority of the task running in the task group.
+The task group is mainly used to control the concurrency of task instances, and is designed to control the pressure of other resources (it can also control the pressure of the Hadoop cluster, the cluster will have queue control it). When creating a new task definition, you can configure the corresponding task group and configure the priority of the task running in the task group. The user can only view the task groups belongs to authorized projects, and can create or update task groups belongs to one project only if they have write permission.
 
 ## Task Group Configuration
 

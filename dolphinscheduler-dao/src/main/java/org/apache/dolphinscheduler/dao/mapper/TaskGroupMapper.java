@@ -53,13 +53,12 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      * select task groups paging
      *
      * @param page   page
-     * @param userId user id
      * @param name   name
      * @param status status
      * @return result page
      */
-    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("ids") List<Integer> ids,
-                                          @Param("name") String name, @Param("status") Integer status);
+    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("name") String name,
+                                          @Param("status") Integer status);
 
     /**
      * query by task group name
@@ -77,8 +76,7 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
     int selectCountByIdStatus(@Param("id") int id, @Param("status") int status);
 
-    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("ids") List<Integer> ids,
-                                                       @Param("projectCode") Long projectCode);
+    IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("projectCode") Long projectCode);
 
     /**
      * listAuthorizedResource

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteRespo
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.RunMode;
@@ -28,7 +29,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 
 import java.util.Map;
 
@@ -58,6 +59,7 @@ public interface ExecutorService {
      * @param timeout timeout
      * @param startParams the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
+     * @param executionOrder the execution order when complementing data
      * @return execute process instance code
      */
     Map<String, Object> execProcessInstance(User loginUser, long projectCode,
@@ -72,7 +74,7 @@ public interface ExecutorService {
                                             Map<String, String> startParams, Integer expectedParallelismNumber,
                                             int dryRun, int testFlag,
                                             ComplementDependentMode complementDependentMode, Integer version,
-                                            boolean allLevelDependent);
+                                            boolean allLevelDependent, ExecutionOrder executionOrder);
 
     /**
      * check whether the process definition can be executed

@@ -18,6 +18,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -134,6 +135,9 @@ public interface ProcessInstanceService {
     Map<String, Object> querySubProcessInstanceByTaskId(User loginUser,
                                                         long projectCode,
                                                         Integer taskId);
+
+    List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser,
+                                                                 Integer taskId);
 
     /**
      * update process instance

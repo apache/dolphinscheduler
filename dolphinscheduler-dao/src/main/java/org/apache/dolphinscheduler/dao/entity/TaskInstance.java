@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SEC_2_MINUT
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DYNAMIC;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 
@@ -346,7 +347,8 @@ public class TaskInstance implements Serializable {
 
         return this.getState().isSuccess()
                 || this.getState().isKill()
-                || (this.getState().isFailure() && !taskCanRetry());
+                || (this.getState().isFailure() && !taskCanRetry())
+                || this.getState().isForceSuccess();
     }
 
     public boolean isSubProcess() {
@@ -355,6 +357,10 @@ public class TaskInstance implements Serializable {
 
     public boolean isDependTask() {
         return TASK_TYPE_DEPENDENT.equalsIgnoreCase(this.taskType);
+    }
+
+    public boolean isDynamic() {
+        return TASK_TYPE_DYNAMIC.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isConditionsTask() {

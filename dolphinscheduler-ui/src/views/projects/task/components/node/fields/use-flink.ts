@@ -16,7 +16,7 @@
  */
 import { computed, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCustomParams, useMainJar, useResources } from '.'
+import { useCustomParams, useMainJar, useResources, useYarnQueue } from '.'
 import type { IJsonItem } from '../types'
 
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
@@ -282,6 +282,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       value: model.parallelism
     },
+    useYarnQueue(),
     {
       type: 'input',
       field: 'mainArgs',

@@ -54,6 +54,28 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/parameter',
+      name: 'projects-parameter',
+      component: components['projects-parameter'],
+      meta: {
+        title: '项目级参数',
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/projects/:projectCode/preferences',
+      name: 'projects-preference',
+      component: components['projects-preference'],
+      meta: {
+        title: '项目偏好设置',
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/projects/:projectCode/workflow/relation',
       name: 'workflow-relation',
       component: components['projects-workflow-relation'],
