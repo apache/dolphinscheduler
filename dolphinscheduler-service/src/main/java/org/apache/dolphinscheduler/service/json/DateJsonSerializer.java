@@ -17,14 +17,16 @@
 
 package org.apache.dolphinscheduler.service.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.springframework.boot.jackson.JsonComponent;
 
 import java.io.IOException;
 import java.util.Date;
+
+import org.springframework.boot.jackson.JsonComponent;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 
 @JsonComponent
 public class DateJsonSerializer extends JsonSerializer<Date> {
