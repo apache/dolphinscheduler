@@ -66,10 +66,10 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     private ProcessInstanceMapper processInstanceMapper;
 
     @Autowired
-    private DefinedParamMapper definedParamMapper;
+    private ProcessInstanceMapDao processInstanceMapDao;
 
     @Autowired
-    private ProcessInstanceMapDao processInstanceMapDao;
+    private DefinedParamMapper definedParamMapper;
 
     @Override
     public boolean upsertTaskInstance(TaskInstance taskInstance) {
@@ -118,6 +118,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
         // New DATAX task custom parameters
         if ("DATAX".equals(taskInstance.getTaskType())) {
             try {
+                // get all definedParam
                 List<DefinedParam> definedParams = this.definedParamMapper
                         .queryDefinedParambyKeys(this.extractStringsInDollarParentheses(taskInstance.getTaskParams()));
                 ArrayNode paramTranArrayNode = this.tranParam(definedParams);
@@ -127,12 +128,12 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
                 taskInstance.setTaskParams(node.toString());
                 TaskDefinition taskDefine = taskInstance.getTaskDefine();
                 taskDefine.setTaskParams(node.toString());
+
                 taskInstance.setTaskDefine(taskDefine);
             } catch (Exception var9) {
                 log.warn("Failed to add the configuration parameters: {}", var9);
             }
         }
-
 
         return upsertTaskInstance(taskInstance);
     }
