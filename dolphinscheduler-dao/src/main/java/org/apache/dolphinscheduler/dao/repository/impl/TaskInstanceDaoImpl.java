@@ -17,11 +17,20 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DefinedParam;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.mapper.DefinedParamMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
@@ -33,7 +42,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,6 +64,9 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private DefinedParamMapper definedParamMapper;
 
     @Autowired
     private ProcessInstanceMapDao processInstanceMapDao;
@@ -99,7 +114,68 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
         if (taskInstance.getFirstSubmitTime() == null) {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
+
+        // New DATAX task custom parameters
+        if ("DATAX".equals(taskInstance.getTaskType())) {
+            try {
+                List<DefinedParam> definedParams = this.definedParamMapper
+                        .queryDefinedParambyKeys(this.extractStringsInDollarParentheses(taskInstance.getTaskParams()));
+                ArrayNode paramTranArrayNode = this.tranParam(definedParams);
+                JsonNode node = JSONUtils.parseObject(taskInstance.getTaskParams());
+                ArrayNode arrayNode = (ArrayNode) node.get("localParams");
+                arrayNode.addAll(paramTranArrayNode);
+                taskInstance.setTaskParams(node.toString());
+                TaskDefinition taskDefine = taskInstance.getTaskDefine();
+                taskDefine.setTaskParams(node.toString());
+                taskInstance.setTaskDefine(taskDefine);
+            } catch (Exception var9) {
+                log.warn("Failed to add the configuration parameters: {}", var9);
+            }
+        }
+
+
         return upsertTaskInstance(taskInstance);
+    }
+
+
+    private ArrayList<String> extractStringsInDollarParentheses(String json) {
+        ArrayList results = new ArrayList();
+
+        try {
+            Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
+            Matcher matcher = pattern.matcher(json);
+
+            while (matcher.find()) {
+                results.add(matcher.group(1));
+            }
+
+            return results;
+        } catch (Exception var5) {
+            return results;
+        }
+    }
+
+    private ArrayNode tranParam(List<DefinedParam> definedParams) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ArrayNode paramArrayNode = objectMapper.createArrayNode();
+
+        try {
+            Iterator var4 = definedParams.iterator();
+
+            while (var4.hasNext()) {
+                DefinedParam definedParam = (DefinedParam) var4.next();
+                ObjectNode objectNode = JsonNodeFactory.instance.objectNode();
+                objectNode.put("prop", definedParam.getKey());
+                objectNode.put("value", definedParam.getValue());
+                objectNode.put("direct", "IN");
+                objectNode.put("type", "VARCHAR");
+                paramArrayNode.add(objectNode);
+            }
+
+            return paramArrayNode;
+        } catch (Exception var7) {
+            return paramArrayNode;
+        }
     }
 
     private TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance) {
