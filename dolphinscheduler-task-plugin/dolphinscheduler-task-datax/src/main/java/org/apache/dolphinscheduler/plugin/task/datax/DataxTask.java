@@ -34,9 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilder
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.datax.content.BuildDataxJobContentJsonFactory;
 import org.apache.dolphinscheduler.plugin.task.datax.content.reader.AbstractBuildDataxJobContentJsonReader;
-import org.apache.dolphinscheduler.plugin.task.datax.content.reader.BuildDataxJobContentJsonDefaultReader;
 import org.apache.dolphinscheduler.plugin.task.datax.content.writer.AbstractBuildDataxJobContentJsonWriter;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 
 import org.apache.commons.io.FileUtils;
@@ -215,12 +213,13 @@ public class DataxTask extends AbstractTask {
      */
     private List<ObjectNode> buildDataxJobContentJson() {
         buildDataxJobContentJsonFactory = new BuildDataxJobContentJsonFactory();
-        AbstractBuildDataxJobContentJsonReader reader = buildDataxJobContentJsonFactory.getReader(dataxTaskExecutionContext.getSourcetype());
-        AbstractBuildDataxJobContentJsonWriter writer = buildDataxJobContentJsonFactory.getWriter(dataxTaskExecutionContext.getTargetType());
+        AbstractBuildDataxJobContentJsonReader reader =
+                buildDataxJobContentJsonFactory.getReader(dataxTaskExecutionContext.getSourcetype());
+        AbstractBuildDataxJobContentJsonWriter writer =
+                buildDataxJobContentJsonFactory.getWriter(dataxTaskExecutionContext.getTargetType());
 
-        reader.init(dataxTaskExecutionContext,dataXParameters);
-        writer.init(dataxTaskExecutionContext,dataXParameters);
-
+        reader.init(dataxTaskExecutionContext, dataXParameters);
+        writer.init(dataxTaskExecutionContext, dataXParameters);
 
         List<ObjectNode> contentList = new ArrayList<>();
         ObjectNode content = JSONUtils.createObjectNode();

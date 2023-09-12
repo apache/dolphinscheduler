@@ -1,6 +1,5 @@
 package org.apache.dolphinscheduler.plugin.task.datax.content;
 
-
 import org.apache.dolphinscheduler.plugin.task.datax.content.reader.AbstractBuildDataxJobContentJsonReader;
 import org.apache.dolphinscheduler.plugin.task.datax.content.reader.BuildDataxJobContentJsonDefaultReader;
 import org.apache.dolphinscheduler.plugin.task.datax.content.writer.AbstractBuildDataxJobContentJsonWriter;
@@ -8,16 +7,19 @@ import org.apache.dolphinscheduler.plugin.task.datax.content.writer.BuildDataxJo
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class BuildDataxJobContentJsonFactory {
-    public AbstractBuildDataxJobContentJsonReader getReader(DbType dbType){
-        switch (dbType){
-            default: new BuildDataxJobContentJsonDefaultReader();
+
+    public AbstractBuildDataxJobContentJsonReader getReader(DbType dbType) {
+        switch (dbType) {
+            default:
+                new BuildDataxJobContentJsonDefaultReader();
         }
         return null;
     }
 
-    public AbstractBuildDataxJobContentJsonWriter getWriter(DbType dbType){
-        switch (dbType){
-            default: new BuildDataxJobContentJsonDefaultWriter();
+    public AbstractBuildDataxJobContentJsonWriter getWriter(DbType dbType) {
+        switch (dbType) {
+            default:
+                new BuildDataxJobContentJsonDefaultWriter();
         }
         return null;
     }

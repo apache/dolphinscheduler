@@ -1,8 +1,7 @@
 package org.apache.dolphinscheduler.plugin.task.datax.content.reader;
 
+import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.datax.DataxParameters;
@@ -14,9 +13,10 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-public class BuildDataxJobContentJsonDefaultReader extends AbstractBuildDataxJobContentJsonReader{
+public class BuildDataxJobContentJsonDefaultReader extends AbstractBuildDataxJobContentJsonReader {
 
     @Override
     public void init(DataxTaskExecutionContext dataxTaskExecutionContext, DataxParameters dataXParameters) {
