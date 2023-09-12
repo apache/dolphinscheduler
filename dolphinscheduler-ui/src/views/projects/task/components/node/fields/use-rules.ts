@@ -88,6 +88,7 @@ export function useRules(
       props: responseItem.props,
       value: responseItem.value
     }
+    item.props.filterable = true
     const name = responseItem.name?.replace('$t(', '').replace(')', '')
     item.name = name ? t(`project.node.${name}`) : ''
 
@@ -285,6 +286,7 @@ export function useRules(
       name: t('project.node.rule_name'),
       props: {
         loading: ruleLoading,
+        filterable: true,
         onUpdateValue: getRuleById
       },
       options: rules
