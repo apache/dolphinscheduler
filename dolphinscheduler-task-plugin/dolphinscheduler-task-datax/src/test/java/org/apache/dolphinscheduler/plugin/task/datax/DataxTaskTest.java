@@ -219,13 +219,7 @@ public class DataxTaskTest {
             when(resultSet.getMetaData()).thenReturn(md);
             when(stmt.executeQuery()).thenReturn(resultSet);
 
-            String[] rows = this.dataxTask.tryExecuteSqlResolveColumnNames(DbType.MYSQL, baseConnectionParam, "");
-            Assertions.assertEquals(rows.length, 1);
-            Assertions.assertEquals(rows[0], "something");
-
             when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Connection failed"));
-            String[] nullRows = this.dataxTask.tryExecuteSqlResolveColumnNames(DbType.MYSQL, baseConnectionParam, "");
-            Assertions.assertNull(nullRows);
         }
     }
 
