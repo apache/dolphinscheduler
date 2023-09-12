@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -122,7 +121,7 @@ public class ClusterServiceTest {
     }
 
     @Test
-    public void testUpdateClusterByCode() throws RemotingException {
+    public void testUpdateClusterByCode() {
         User loginUser = getGeneralUser();
         Map<String, Object> result =
                 clusterService.updateClusterByCode(loginUser, 1L, clusterName, getConfig(), getDesc());

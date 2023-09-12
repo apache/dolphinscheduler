@@ -79,7 +79,7 @@ resource.aws.s3.endpoint=
 # user data local directory path, please make sure the directory exists and have read write permissions
 data.basedir.path=/tmp/dolphinscheduler
 
-# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS, OBS, NONE
+# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS, OBS
 resource.storage.type=LOCAL
 
 # resource store on HDFS/S3/OSS path, resource file will store to this hadoop hdfs path, self configuration,

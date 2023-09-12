@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -55,7 +54,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -360,34 +358,15 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
         Result<Object> result = new Result<>();
-        if (type == DbType.SSH) {
-            DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
-            if (sshDataSourceProcessor.testConnection(connectionParam)) {
-                putMsg(result, Status.SUCCESS);
-            } else {
-                putMsg(result, Status.CONNECT_DATASOURCE_FAILURE);
-            }
-            return result;
-        }
-        try (Connection connection = DataSourceClientProvider.getAdHocConnection(type, connectionParam)) {
-            if (connection == null) {
-                log.error("Connection test to {} datasource failed, connectionParam:{}.", type.getDescp(),
-                        connectionParam);
-                putMsg(result, Status.CONNECTION_TEST_FAILURE);
-                return result;
-            }
-            log.info("Connection test to {} datasource success, connectionParam:{}", type.getDescp(),
-                    connectionParam);
+        DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
+        boolean connectivity = sshDataSourceProcessor.checkDataSourceConnectivity(connectionParam);
+        if (connectivity) {
             putMsg(result, Status.SUCCESS);
-            return result;
-        } catch (Exception e) {
-            String message = Optional.of(e).map(Throwable::getCause)
-                    .map(Throwable::getMessage)
-                    .orElse(e.getMessage());
-            log.error("Datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type,
-                    connectionParam, message);
-            return new Result<>(Status.CONNECTION_TEST_FAILURE);
+        } else {
+            putMsg(result, Status.CONNECTION_TEST_FAILURE);
         }
+        log.info("Connection test to {} datasource success, connectionParam:{}", type.name(), connectionParam);
+        return result;
     }
 
     /**
