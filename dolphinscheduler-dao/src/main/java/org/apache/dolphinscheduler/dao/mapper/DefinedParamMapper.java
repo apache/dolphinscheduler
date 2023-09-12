@@ -10,6 +10,5 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface DefinedParamMapper extends BaseMapper<DefinedParam> {
-
     List<DefinedParam> queryDefinedParambyKeys(@Param("keys") List<String> var1);
 }

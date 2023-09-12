@@ -1536,7 +1536,7 @@ public class ProcessServiceImpl implements ProcessService {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
 
-        // 新增 DATAX 任务自定参数
+        // New DATAX task custom parameters
         if ("DATAX".equals(taskInstance.getTaskType())) {
             try {
                 List<DefinedParam> definedParams = this.definedParamMapper
@@ -1550,7 +1550,7 @@ public class ProcessServiceImpl implements ProcessService {
                 taskDefine.setTaskParams(node.toString());
                 taskInstance.setTaskDefine(taskDefine);
             } catch (Exception var9) {
-                this.logger.error("增加配置参数 失败: {}", var9);
+                this.logger.error("Failed to add the configuration parameters: {}", var9);
             }
         }
 

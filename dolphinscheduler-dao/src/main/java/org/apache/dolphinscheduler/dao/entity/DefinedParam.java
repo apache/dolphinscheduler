@@ -8,14 +8,31 @@ package org.apache.dolphinscheduler.dao.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
+@Data
 @TableName("t_ds_defined_param")
 public class DefinedParam {
-
+    /**
+     * id
+     */
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
+
+    /**
+     * key
+     */
     private String key;
+
+
+    /**
+     * value
+     */
     private String value;
+
+    /**
+     * description
+     */
     private String description;
 
     public DefinedParam(String key, String value) {
@@ -26,11 +43,11 @@ public class DefinedParam {
     public DefinedParam() {
     }
 
-    public int getId() {
-        return this.id;
+    public Integer getId() {
+        return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
