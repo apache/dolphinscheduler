@@ -17,32 +17,20 @@
 
 package org.apache.dolphinscheduler.service.json;
 
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.springframework.boot.jackson.JsonComponent;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.springframework.boot.jackson.JsonComponent;
+
+import java.io.IOException;
+import java.util.Date;
 
 @JsonComponent
 public class DateJsonSerializer extends JsonSerializer<Date> {
 
     @Override
     public void serialize(Date value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        Date temp = value;
-        // In the internal implementation of JDK, java.sql.Date is inherited from java.util.Date, and java.sql.Date has
-        // rewritten many methods in java.util.Date, but it has not been implemented.
-        // Later, when formatting, you need to call the method in Date to report an error.
-        if (value instanceof java.sql.Date) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(value);
-            temp = calendar.getTime();
-        }
-        gen.writeString(DateUtils.dateToString(temp));
+        gen.writeString(DateUtils.dateToString(value));
     }
 }
