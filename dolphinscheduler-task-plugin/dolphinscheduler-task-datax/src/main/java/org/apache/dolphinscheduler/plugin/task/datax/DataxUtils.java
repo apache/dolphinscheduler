@@ -94,8 +94,8 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
             case DATABEND:
                 return DATAX_WRITER_PLUGIN_DATABEND;
-            case XUGU:
-                return DATAX_WRITER_PLUGIN_XUGU;
+//            case XUGU:
+//                return DATAX_WRITER_PLUGIN_XUGU;
             case HIVE:
             case PRESTO:
             default:
