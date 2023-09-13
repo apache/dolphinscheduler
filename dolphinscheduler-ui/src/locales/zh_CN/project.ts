@@ -241,6 +241,7 @@ export default {
     online: '已上线',
     offline: '已下线',
     task_name: '任务名称',
+    task_code: '任务编码',
     task_type: '任务类型',
     task_instance: '任务实例',
     create_task: '创建任务',

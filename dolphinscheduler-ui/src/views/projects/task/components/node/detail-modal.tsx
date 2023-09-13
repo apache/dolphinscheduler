@@ -158,9 +158,8 @@ const NodeDetailModal = defineComponent({
           action: () => {
             router.push({
               name: 'task-instance',
-              params: {
-                processInstanceId: processInstance.id,
-                taskName: props.data.name
+              query: {
+                taskCode: props.data.code
               }
             })
           },

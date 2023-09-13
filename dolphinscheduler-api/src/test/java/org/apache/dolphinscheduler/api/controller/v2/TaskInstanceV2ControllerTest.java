@@ -74,7 +74,8 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(taskInstanceQueryReq.getProcessInstanceId()),
                 eq(taskInstanceQueryReq.getProcessInstanceName()), eq(taskInstanceQueryReq.getProcessInstanceName()),
-                eq(taskInstanceQueryReq.getTaskName()), eq(taskInstanceQueryReq.getExecutorName()), any(), any(),
+                eq(taskInstanceQueryReq.getTaskName()), Mockito.any(), eq(taskInstanceQueryReq.getExecutorName()),
+                any(), any(),
                 eq(taskInstanceQueryReq.getSearchVal()), Mockito.any(), eq(taskInstanceQueryReq.getHost()),
                 eq(taskInstanceQueryReq.getTaskExecuteType()), any(), any())).thenReturn(result);
         Result taskResult = taskInstanceV2Controller.queryTaskListPaging(null, 1L, taskInstanceQueryReq);

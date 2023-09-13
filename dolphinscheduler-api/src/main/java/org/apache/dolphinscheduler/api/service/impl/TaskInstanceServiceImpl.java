@@ -117,6 +117,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @param processInstanceId process instance id
      * @param searchVal         search value
      * @param taskName          task name
+     * @param taskCode          task code
      * @param stateType         state type
      * @param host              host
      * @param startDate         start time
@@ -132,6 +133,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                       String processInstanceName,
                                       String processDefinitionName,
                                       String taskName,
+                                      Long taskCode,
                                       String executorName,
                                       String startDate,
                                       String endDate,
@@ -162,6 +164,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     processDefinitionName,
                     searchVal,
                     taskName,
+                    taskCode,
                     executorName,
                     statusArray,
                     host,
@@ -176,6 +179,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     processInstanceName,
                     searchVal,
                     taskName,
+                    taskCode,
                     executorName,
                     statusArray,
                     host,
