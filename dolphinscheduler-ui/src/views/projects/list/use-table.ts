@@ -25,7 +25,7 @@ import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import {
-  NButton,
+  NButton, NDropdown,
   NEllipsis,
   NIcon,
   NPopconfirm,
@@ -39,7 +39,7 @@ import {
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import { DeleteOutlined, EditOutlined } from '@vicons/antd'
+import {DeleteOutlined, EditOutlined, UserOutlined} from '@vicons/antd'
 
 export function useTable() {
   const { t } = useI18n()
@@ -141,6 +141,44 @@ export function useTable() {
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
+              h(
+                  NDropdown,
+                  {
+                    trigger: 'click',
+                    options: [
+                      {
+                        label: t('security.user.project'),
+                        key: 'authorize_project'
+                      },
+                    ],
+                    onSelect: (key) => {
+                      console.log(key)
+                    }
+                  },
+                  () =>
+                      h(
+                          NTooltip,
+                          {
+                            trigger: 'hover'
+                          },
+                          {
+                            trigger: () =>
+                                h(
+                                    NButton,
+                                    {
+                                      circle: true,
+                                      type: 'info',
+                                      size: 'small',
+                                      class: 'authorize'
+                                    },
+                                    {
+                                      icon: () => h(NIcon, null, () => h(UserOutlined))
+                                    }
+                                ),
+                            default: () => t('security.user.authorize')
+                          }
+                      )
+              ),
               h(
                 NTooltip,
                 {},
