@@ -85,17 +85,17 @@ public class MasterSlotManager {
             try {
                 this.masterPriorityQueue.clear();
                 this.masterPriorityQueue.putAll(masterNodes);
-                int index = masterPriorityQueue.getIndex(masterConfig.getMasterAddress());
-                if (index >= 0) {
-                    // update slot info
-                    totalSlot = masterNodes.size();
-                    currentSlot = index;
-                } else {
+                int tempCurrentSlot = masterPriorityQueue.getIndex(masterConfig.getMasterAddress());
+                int tempTotalSlot = masterNodes.size();
+                if (tempCurrentSlot < 0) {
                     totalSlot = 0;
                     currentSlot = 0;
                     log.warn("Current master is not in active master list");
+                } else if (tempCurrentSlot != currentSlot || tempTotalSlot != totalSlot) {
+                    totalSlot = tempTotalSlot;
+                    currentSlot = tempCurrentSlot;
+                    log.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
                 }
-                log.debug("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
             } finally {
                 slotLock.unlock();
             }
