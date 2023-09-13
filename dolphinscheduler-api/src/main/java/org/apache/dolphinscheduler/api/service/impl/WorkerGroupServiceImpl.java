@@ -224,7 +224,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     .map(schedule -> processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode()).getName())
                     .collect(Collectors.toList());
 
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(), JSONUtils.toJsonString(processNames));
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
+                    JSONUtils.toJsonString(processNames));
             return true;
         }
 
