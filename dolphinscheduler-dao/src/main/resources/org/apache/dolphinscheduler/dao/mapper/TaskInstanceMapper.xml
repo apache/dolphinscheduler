@@ -267,6 +267,9 @@
         <if test="taskName != null and taskName != ''">
             and name = #{taskName}
         </if>
+        <if test="taskCode != null">
+            and task_code = #{taskCode}
+        </if>
         <if test="states != null and states.length != 0">
             and state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
@@ -303,6 +306,9 @@
         </if>
         <if test="taskName != null and taskName != ''">
             and name=#{taskName}
+        </if>
+        <if test="taskCode != null">
+            and task_code = #{taskCode}
         </if>
         <if test="states != null and states.length != 0">
             and state in

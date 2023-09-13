@@ -243,6 +243,7 @@ export default {
     online: 'Online',
     offline: 'Offline',
     task_name: 'Task Name',
+    task_code: 'Task Code',
     task_type: 'Task Type',
     create_task: 'Create Task',
     workflow_instance: 'Workflow Instance',

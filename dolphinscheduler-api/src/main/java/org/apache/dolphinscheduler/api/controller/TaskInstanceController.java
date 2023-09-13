@@ -82,16 +82,17 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "queryTaskListPaging", description = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = false, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskName", description = "TASK_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", schema = @Schema(implementation = Long.class)),
             @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema = @Schema(implementation = TaskExecutionStatus.class)),
             @Parameter(name = "host", description = "HOST", schema = @Schema(implementation = String.class)),
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", required = false, schema = @Schema(implementation = TaskExecuteType.class, example = "STREAM")),
+            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", schema = @Schema(implementation = TaskExecuteType.class, example = "STREAM")),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
     })
@@ -106,6 +107,7 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
+                                      @RequestParam(value = "taskCode", required = false) Long taskCode,
                                       @RequestParam(value = "executorName", required = false) String executorName,
                                       @RequestParam(value = "stateType", required = false) TaskExecutionStatus stateType,
                                       @RequestParam(value = "host", required = false) String host,
@@ -126,6 +128,7 @@ public class TaskInstanceController extends BaseController {
                 processInstanceName,
                 processDefinitionName,
                 taskName,
+                taskCode,
                 executorName,
                 startTime,
                 endTime,
