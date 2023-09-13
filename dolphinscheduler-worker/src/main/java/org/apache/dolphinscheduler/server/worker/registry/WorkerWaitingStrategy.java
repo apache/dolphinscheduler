@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
+import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueue;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 
 import java.time.Duration;
@@ -51,13 +51,13 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     private WorkerRpcServer workerRpcServer;
 
     @Autowired
-    private WorkerRpcClient workerRpcClient;
-
-    @Autowired
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
     private WorkerManagerThread workerManagerThread;
+
+    @Autowired
+    private GlobalTaskInstanceDispatchQueue globalTaskInstanceDispatchQueue;
 
     @Override
     public void disconnect() {
@@ -120,9 +120,8 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
         // close the worker resource, if close failed should stop the worker server
         workerRpcServer.close();
         log.warn("Worker server close the RPC server due to lost connection from registry");
-        workerRpcClient.close();
-        log.warn("Worker server close the RPC client due to lost connection from registry");
         workerManagerThread.clearTask();
+        globalTaskInstanceDispatchQueue.clearTask();
         log.warn("Worker server clear the tasks due to lost connection from registry");
         messageRetryRunner.clearMessage();
         log.warn("Worker server clear the retry message due to lost connection from registry");
@@ -133,7 +132,5 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
         // reopen the resource, if reopen failed should stop the worker server
         workerRpcServer.start();
         log.warn("Worker server restart PRC server due to reconnect to registry");
-        workerRpcClient.start();
-        log.warn("Worker server restart PRC client due to reconnect to registry");
     }
 }

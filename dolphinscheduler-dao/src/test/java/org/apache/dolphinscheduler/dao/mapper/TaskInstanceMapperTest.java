@@ -375,6 +375,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 "",
                 "",
                 "",
+                null,
                 "",
                 new int[0],
                 "",

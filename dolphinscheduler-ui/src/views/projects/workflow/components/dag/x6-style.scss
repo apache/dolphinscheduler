@@ -32,3 +32,11 @@ $BG_WHITE: #ffffff;
     }
   }
 }
+
+[class*="dag-light"] {
+  --custom-disable-bg: #f3f3f5
+}
+
+[class*="dag-dark"] {
+  --custom-disable-bg: #d3d3d3
+}

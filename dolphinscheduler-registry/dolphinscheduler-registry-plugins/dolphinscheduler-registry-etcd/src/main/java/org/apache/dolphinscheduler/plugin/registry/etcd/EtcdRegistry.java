@@ -151,7 +151,8 @@ public class EtcdRegistry implements Registry {
     public boolean subscribe(String path, SubscribeListener listener) {
         try {
             ByteSequence watchKey = byteSequence(path);
-            WatchOption watchOption = WatchOption.newBuilder().isPrefix(true).build();
+            WatchOption watchOption =
+                    WatchOption.newBuilder().withPrevKV(true).isPrefix(true).build();
             watcherMap.computeIfAbsent(path,
                     $ -> client.getWatchClient().watch(watchKey, watchOption, watchResponse -> {
                         for (WatchEvent event : watchResponse.getEvents()) {
@@ -352,7 +353,11 @@ public class EtcdRegistry implements Registry {
 
             switch (event.getEventType()) {
                 case PUT:
-                    type(Type.ADD);
+                    if (event.getPrevKV().getKey().isEmpty()) {
+                        type(Type.ADD);
+                    } else {
+                        type(Type.UPDATE);
+                    }
                     break;
                 case DELETE:
                     type(Type.REMOVE);

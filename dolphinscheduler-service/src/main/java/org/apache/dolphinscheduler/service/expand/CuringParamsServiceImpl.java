@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.expand;
 
+import static java.util.Objects.nonNull;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_CODE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_PROJECT_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_TASK_DEFINITION_CODE;
@@ -69,8 +70,13 @@ public class CuringParamsServiceImpl implements CuringParamsService {
     private ProjectParameterMapper projectParameterMapper;
 
     @Override
-    public String convertParameterPlaceholders(String val, Map<String, String> allParamMap) {
-        return ParameterUtils.convertParameterPlaceholders(val, allParamMap);
+    public String convertParameterPlaceholders(String val, Map<String, Property> allParamMap) {
+        Map<String, String> paramMap = allParamMap
+                .entrySet()
+                .stream()
+                .filter(entry -> nonNull(entry.getValue().getValue()))
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getValue()));
+        return ParameterUtils.convertParameterPlaceholders(val, paramMap);
     }
 
     @Override
@@ -212,6 +218,10 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 // whether external scaling calculation is required
                 if (timeFunctionNeedExpand(val)) {
                     val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
+                } else {
+                    // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to
+                    // `{"var1": 1, "var2": 1}`
+                    val = convertParameterPlaceholders(val, prepareParamsMap);
                 }
                 property.setValue(val);
             }

@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
@@ -184,10 +183,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
 
         Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.isResourceStorageStartup()) {
-            storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
-        }
+        storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
 
         log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
@@ -228,7 +224,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /***
-     * create User for ldap and sso login
+     * create User for ldap、Casdoor SSO and OAuth2.0 login
      */
     @Override
     @Transactional
@@ -242,6 +238,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setUserType(userType);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        user.setTenantId(-1);
         user.setQueue("");
         user.setState(Flag.YES.getCode());
 
@@ -1085,6 +1082,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (StringUtils.isEmpty(user.getTimeZone())) {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
+
+        // remove password
+        user.setUserPassword(null);
 
         result.put(Constants.DATA_LIST, user);
 
