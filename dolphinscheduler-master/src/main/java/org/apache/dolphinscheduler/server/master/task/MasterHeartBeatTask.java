@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.task;
 
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
@@ -60,6 +61,7 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
                 .memoryUsage(OSUtils.memoryUsagePercentage())
                 .diskAvailable(OSUtils.diskAvailable())
                 .processId(processId)
+                .serverStatus(getServerStatus())
                 .host(NetUtils.getHost())
                 .port(masterConfig.getListenPort())
                 .build();
@@ -71,5 +73,11 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
         registryClient.persistEphemeral(heartBeatPath, masterHeartBeatJson);
         log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, masterHeartBeatJson);
+    }
+
+    private ServerStatus getServerStatus() {
+        return OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory())
+                ? ServerStatus.ABNORMAL
+                : ServerStatus.NORMAL;
     }
 }
