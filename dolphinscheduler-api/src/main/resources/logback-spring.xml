@@ -57,6 +57,7 @@
             </then>
         </if>
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUT"/>
         <appender-ref ref="APILOGFILE"/>
     </root>
 </configuration>
