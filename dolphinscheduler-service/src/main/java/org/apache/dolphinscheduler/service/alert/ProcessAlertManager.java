@@ -445,9 +445,7 @@ public class ProcessAlertManager {
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        Map<Integer, String> userMap = userMapper.selectList(new QueryWrapper<>()).stream()
-                .collect(Collectors.toMap(User::getId, User::getUserName));
-        String modifyBy = userMap.get(processDefinitionLog.getOperator());
+        User operator = userMapper.selectById(processDefinitionLog.getOperator());
 
         ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
@@ -457,7 +455,7 @@ public class ProcessAlertManager {
                 .processName(processInstance.getName())
                 .processType(processInstance.getCommandType())
                 .processState(processInstance.getState())
-                .modifyBy(modifyBy)
+                .modifyBy(operator.getUserName())
                 .runTimes(processInstance.getRunTimes())
                 .processStartTime(processInstance.getStartTime())
                 .processEndTime(processInstance.getEndTime())
