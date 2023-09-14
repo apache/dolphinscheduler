@@ -40,14 +40,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import java.util.Set;
 
 
 import lombok.NonNull;
@@ -131,7 +127,6 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
 
     private ArrayList<String> extractStringsInDollarParentheses(String json) {
         ArrayList results = new ArrayList();
-
         try {
             Pattern pattern = Pattern.compile("\\$\\{(.*?)\\}");
             Matcher matcher = pattern.matcher(json);
