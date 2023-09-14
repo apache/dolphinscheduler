@@ -21,12 +21,11 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
-import org.apache.dolphinscheduler.plugin.datasource.zeppelin.ZeppelinUtils;
+import org.apache.dolphinscheduler.plugin.datasource.zeppelin.ZeppelinClientWrapper;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.zeppelin.client.ZeppelinClient;
 
 import java.sql.Connection;
 import java.text.MessageFormat;
@@ -108,17 +107,14 @@ public class ZeppelinDataSourceProcessor implements DataSourceProcessor {
     }
 
     @Override
-    public boolean testConnection(ConnectionParam connectionParam) {
+    public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
         ZeppelinConnectionParam baseConnectionParam = (ZeppelinConnectionParam) connectionParam;
-        try {
-            // If the login fails, an exception will be thrown directly
-            ZeppelinClient zeppelinClient = ZeppelinUtils.getZeppelinClient(baseConnectionParam);
-            zeppelinClient.login(baseConnectionParam.username, baseConnectionParam.password);
-            String version = zeppelinClient.getVersion();
-            log.info("zeppelin client connects to server successfully, version is {}", version);
-            return true;
+        try (
+                ZeppelinClientWrapper zeppelinClientWrapper =
+                        new ZeppelinClientWrapper(baseConnectionParam.getRestEndpoint())) {
+            return zeppelinClientWrapper.checkConnect(baseConnectionParam.username, baseConnectionParam.password);
         } catch (Exception e) {
-            log.info("zeppelin client failed to connect to the server");
+            log.error("zeppelin client failed to connect to the server", e);
             return false;
         }
     }

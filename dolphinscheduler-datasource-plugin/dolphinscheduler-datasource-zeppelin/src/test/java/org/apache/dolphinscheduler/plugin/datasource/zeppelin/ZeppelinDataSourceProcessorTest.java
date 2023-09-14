@@ -17,21 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.zeppelin;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
-
 import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinDataSourceProcessor;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.zeppelin.client.ZeppelinClient;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -93,22 +88,20 @@ public class ZeppelinDataSourceProcessorTest {
     }
 
     @Test
-    void testTestConnection() throws Exception {
+    void testTestConnection() {
         ZeppelinDataSourceParamDTO zeppelinDataSourceParamDTO =
                 (ZeppelinDataSourceParamDTO) zeppelinDataSourceProcessor.createDatasourceParamDTO(connectJson);
         ZeppelinConnectionParam connectionParam =
                 zeppelinDataSourceProcessor.createConnectionParams(zeppelinDataSourceParamDTO);
-
-        MockedStatic<ZeppelinUtils> zeppelinConnectionUtilsMockedStatic =
-                Mockito.mockStatic(ZeppelinUtils.class);
-        zeppelinConnectionUtilsMockedStatic.when(() -> ZeppelinUtils.getZeppelinClient(Mockito.any())).thenReturn(null);
-        Assertions.assertFalse(zeppelinDataSourceProcessor.testConnection(connectionParam));
-
-        ZeppelinClient zeppelinClient = Mockito.mock(ZeppelinClient.class, RETURNS_DEEP_STUBS);
-        zeppelinConnectionUtilsMockedStatic.when(() -> ZeppelinUtils.getZeppelinClient(Mockito.any()))
-                .thenReturn(zeppelinClient);
-        Mockito.doNothing().when(zeppelinClient).login(Mockito.any(), Mockito.any());
-        when(zeppelinClient.getVersion()).thenReturn("1.0");
-        Assertions.assertTrue(zeppelinDataSourceProcessor.testConnection(connectionParam));
+        Assertions.assertFalse(zeppelinDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
+        try (
+                MockedConstruction<ZeppelinClientWrapper> sshClientWrapperMockedConstruction =
+                        Mockito.mockConstruction(ZeppelinClientWrapper.class, (mock, context) -> {
+                            Mockito.when(
+                                    mock.checkConnect(connectionParam.getUsername(), connectionParam.getPassword()))
+                                    .thenReturn(true);
+                        })) {
+            Assertions.assertTrue(zeppelinDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
+        }
     }
 }
