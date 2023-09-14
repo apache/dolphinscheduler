@@ -52,6 +52,19 @@ export function useCellUpdate(options: Options) {
   }
 
   /**
+   * Set the node's fill color by id
+   * @param {string} id
+   * @param {string} color
+   */
+  function setNodeFillColor(id: string, color: string) {
+    const node = graph.value?.getCellById(id)
+    if (!node) {
+      return false
+    }
+    node.attr('rect/fill', color)
+  }
+
+  /**
    * Add a node to the graph
    * @param {string} id
    * @param {string} taskType
@@ -124,6 +137,7 @@ export function useCellUpdate(options: Options) {
 
   return {
     setNodeName,
+    setNodeFillColor,
     setNodeEdge,
     addNode,
     removeNode,

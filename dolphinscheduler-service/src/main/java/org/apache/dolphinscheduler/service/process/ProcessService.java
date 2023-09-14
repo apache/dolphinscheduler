@@ -56,11 +56,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
 
     @Transactional
+    @Nullable
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 

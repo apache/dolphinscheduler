@@ -114,4 +114,9 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
         return mybatisMapper.queryByCodeList(taskDefinitionCodes);
     }
 
+    @Override
+    public TaskDefinition queryByCode(long taskCode) {
+        return mybatisMapper.queryByCode(taskCode);
+    }
+
 }

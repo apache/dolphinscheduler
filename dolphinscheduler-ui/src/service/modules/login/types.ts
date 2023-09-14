@@ -25,4 +25,12 @@ interface LoginRes {
   sessionId: string
 }
 
-export { LoginReq, LoginRes }
+interface OAuth2Provider {
+  clientId: string,
+  redirectUri: string,
+  provider: string,
+  authorizationUri: string,
+  iconUri: string
+}
+
+export { LoginReq, LoginRes, OAuth2Provider }

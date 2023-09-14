@@ -194,11 +194,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
             @Override
             public void eventReceived(Action action, Job job) {
-                try (
-                        final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath())) {
+                try {
+                    LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                     log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
-                    if (action != Action.ADDED) {
+                    if (action == Action.DELETED) {
+                        log.error("[K8sJobExecutor-{}] fail in k8s", job.getMetadata().getName());
+                        taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+                        countDownLatch.countDown();
+                    } else if (action != Action.ADDED) {
                         int jobStatus = getK8sJobStatus(job);
                         log.info("job {} status {}", job.getMetadata().getName(), jobStatus);
                         if (jobStatus == TaskConstants.RUNNING_CODE) {
@@ -207,6 +210,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                         setTaskStatus(jobStatus, taskInstanceId, taskResponse);
                         countDownLatch.countDown();
                     }
+                } finally {
+                    LogUtils.removeTaskInstanceLogFullPathMDC();
                 }
             }
 
@@ -245,10 +250,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
             try (
-                    final LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), containerName)) {
+                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
@@ -258,6 +262,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
                 podLogOutputIsFinished = true;
             }
         });
