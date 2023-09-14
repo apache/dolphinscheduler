@@ -121,9 +121,7 @@ public class ProcessAlertManager {
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        Map<Integer, String> userMap = userMapper.selectList(new QueryWrapper<>()).stream()
-                .collect(Collectors.toMap(User::getId, User::getUserName));
-        String modifyBy = userMap.get(processDefinitionLog.getOperator());
+        User operator = userMapper.selectById(processDefinitionLog.getOperator());
 
         if (processInstance.getState().isSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
@@ -136,7 +134,7 @@ public class ProcessAlertManager {
                     .processName(processInstance.getName())
                     .processType(processInstance.getCommandType())
                     .processState(processInstance.getState())
-                    .modifyBy(modifyBy)
+                    .modifyBy(operator.getUserName())
                     .recovery(processInstance.getRecovery())
                     .runTimes(processInstance.getRunTimes())
                     .processStartTime(processInstance.getStartTime())
@@ -191,16 +189,14 @@ public class ProcessAlertManager {
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        Map<Integer, String> userMap = userMapper.selectList(new QueryWrapper<>()).stream()
-                .collect(Collectors.toMap(User::getId, User::getUserName));
-        String modifyBy = userMap.get(processDefinitionLog.getOperator());
+        User operator = userMapper.selectById(processDefinitionLog.getOperator());
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                     .processId(processInstance.getId())
                     .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
-                    .modifyBy(modifyBy)
+                    .modifyBy(operator.getUserName())
                     .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
