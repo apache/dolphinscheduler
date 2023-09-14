@@ -20,13 +20,13 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TokenPage;
 
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ public class TokenE2ETest {
         TokenPage page = new TokenPage(browser);
         page.create(userName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
@@ -72,7 +72,7 @@ public class TokenE2ETest {
         String oldToken = page.getToken(userName);
         page.update(userName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
@@ -88,7 +88,7 @@ public class TokenE2ETest {
         TokenPage page = new TokenPage(browser);
         page.delete(userName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())

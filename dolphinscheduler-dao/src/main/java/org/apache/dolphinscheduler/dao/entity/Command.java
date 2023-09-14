@@ -61,9 +61,11 @@ public class Command {
     private String commandParam;
 
     @TableField("task_depend_type")
+    @Builder.Default
     private TaskDependType taskDependType = TaskDependType.TASK_POST;
 
     @TableField("failure_strategy")
+    @Builder.Default
     private FailureStrategy failureStrategy = FailureStrategy.CONTINUE;
 
     @TableField("warning_type")
@@ -82,6 +84,7 @@ public class Command {
     private Priority processInstancePriority;
 
     @TableField("update_time")
+    @Builder.Default
     private Date updateTime = new Date();
 
     @TableField("worker_group")

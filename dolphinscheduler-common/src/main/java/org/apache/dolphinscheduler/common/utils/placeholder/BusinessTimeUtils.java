@@ -59,6 +59,7 @@ public class BusinessTimeUtils {
             case RECOVER_SUSPENDED_PROCESS:
             case START_FAILURE_TASK_PROCESS:
             case REPEAT_RUNNING:
+            case DYNAMIC_GENERATION:
             case SCHEDULER:
             default:
                 businessDate = addDays(new Date(), -1);

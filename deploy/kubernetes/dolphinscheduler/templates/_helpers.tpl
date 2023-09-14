@@ -175,6 +175,46 @@ Create a database environment variables.
       name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
       {{- end }}
+- name: SPRING_DATASOURCE_DRIVER-CLASS-NAME
+  {{- if .Values.postgresql.enabled }}
+  value: {{ .Values.postgresql.driverClassName }}
+  {{- else if .Values.mysql.enabled }}
+  value: {{ .Values.mysql.driverClassName }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.driverClassName | quote }}
+  {{- end }}
+{{- end -}}
+
+{{/*
+Create a security environment variables.
+*/}}
+{{- define "dolphinscheduler.security.env_vars" -}}
+- name: SECURITY_AUTHENTICATION_TYPE
+  value: {{ .Values.security.authentication.type | quote }}
+{{- if eq .Values.security.authentication.type "LDAP" }}
+- name: SECURITY_AUTHENTICATION_LDAP_URLS
+  value: {{ .Values.security.authentication.ldap.urls | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_BASE_DN
+  value: {{ .Values.security.authentication.ldap.basedn | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USERNAME
+  value: {{ .Values.security.authentication.ldap.username | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_PASSWORD
+  value: {{ .Values.security.authentication.ldap.password | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN
+  value: {{ .Values.security.authentication.ldap.user.admin | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_IDENTITY_ATTRIBUTE
+  value: {{ .Values.security.authentication.ldap.user.identityattribute | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_EMAIL_ATTRIBUTE
+  value: {{ .Values.security.authentication.ldap.user.emailattribute | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_NOT_EXIST_ACTION
+  value: {{ .Values.security.authentication.ldap.user.notexistaction | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_SSL_ENABLE
+  value: {{ .Values.security.authentication.ldap.ssl.enable | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_SSL_TRUST_STORE
+  value: {{ .Values.security.authentication.ldap.ssl.truststore | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_SSL_TRUST_STORE_PASSWORD
+  value: {{ .Values.security.authentication.ldap.ssl.truststorepassword | quote }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -212,15 +252,36 @@ Create a registry environment variables.
 - name: REGISTRY_TYPE
   {{- if .Values.zookeeper.enabled }}
   value: "zookeeper"
+  {{- else if .Values.etcd.enabled }}
+  value: "etcd"
   {{- else }}
   value: {{ .Values.externalRegistry.registryPluginName }}
   {{- end }}
+{{- if .Values.etcd.enabled }}
+- name: REGISTRY_ENDPOINTS
+  value: {{ .Values.etcd.endpoints }}
+- name: REGISTRY_NAMESPACE
+  value: {{ .Values.etcd.namespace }}
+- name: REGISTRY_USER
+  value: {{ .Values.etcd.user }}
+- name: REGISTRY_PASSWORD
+  value: {{ .Values.etcd.passWord }}
+- name: REGISTRY_AUTHORITY
+  value: {{ .Values.etcd.authority }}
+- name: REGISTRY_CERT_FILE
+  value: {{ .Values.etcd.ssl.certFile }}
+- name: REGISTRY_KEY_CERT_CHAIN_FILE
+  value: {{ .Values.etcd.ssl.keyCertChainFile }}
+- name: REGISTRY_KEY_FILE
+  value: {{ .Values.etcd.ssl.keyFile }}
+{{- else }}
 - name: REGISTRY_ZOOKEEPER_CONNECT_STRING
   {{- if .Values.zookeeper.enabled }}
   value: {{ template "dolphinscheduler.zookeeper.quorum" . }}
   {{- else }}
   value: {{ .Values.externalRegistry.registryServers }}
   {{- end }}
+{{- end }}
 {{- end -}}
 
 {{/*
@@ -262,5 +323,55 @@ Create a fsFileResourcePersistence volumeMount.
 {{- if .Values.common.fsFileResourcePersistence.enabled -}}
 - mountPath: {{ default "/dolphinscheduler" .Values.common.configmap.RESOURCE_UPLOAD_PATH | quote }}
   name: {{ include "dolphinscheduler.fullname" . }}-fs-file
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a etcd ssl volume.
+*/}}
+{{- define "dolphinscheduler.etcd.ssl.volume" -}}
+{{- if .Values.etcd.ssl.enabled -}}
+- name: etcd-ssl
+  secret:
+    secretName: {{ include "dolphinscheduler.fullname" . }}-etcd-ssl
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a etcd ssl volumeMount.
+*/}}
+{{- define "dolphinscheduler.etcd.ssl.volumeMount" -}}
+{{- if .Values.etcd.ssl.enabled -}}
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.certFile }}
+  name: etcd-ssl
+  subPath: cert-file
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyCertChainFile  }}
+  name: etcd-ssl
+  subPath: key-cert-chain-file
+- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyFile }}
+  name: etcd-ssl
+  subPath: key-file
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a ldap ssl volume.
+*/}}
+{{- define "dolphinscheduler.ldap.ssl.volume" -}}
+{{- if .Values.security.authentication.ldap.ssl.enable -}}
+- name: jks-file
+  secret:
+    secretName: {{ include "dolphinscheduler.fullname" . }}-ldap-ssl
+{{- end -}}
+{{- end -}}
+
+{{/*
+Create a ldap ssl volumeMount.
+*/}}
+{{- define "dolphinscheduler.ldap.ssl.volumeMount" -}}
+{{- if .Values.security.authentication.ldap.ssl.enable -}}
+- mountPath: {{ .Values.security.authentication.ldap.ssl.truststore }}
+  name: jks-file
+  subPath: jks-file
 {{- end -}}
 {{- end -}}

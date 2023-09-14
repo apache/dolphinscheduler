@@ -1,6 +1,6 @@
 # 认证方式
 
-* 目前我们支持三种认证方式，Apache DolphinScheduler自身账号密码登录，LDAP和通过Casdoor实现的SSO登录。
+* 目前我们支持四种认证方式，Apache DolphinScheduler自身账号密码登录，LDAP, 通过Casdoor实现的SSO登录和通过Oauth2授权登录，并且oauth2授权登录方式可以和其他认证方式同时使用。
 
 ## 修改认证方式
 
@@ -25,11 +25,55 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: "password"
+    casdoor:
+      user:
+        admin: ""
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
+casdoor:
+   # Your Casdoor server url
+   endpoint: ""
+   client-id: ""
+   client-secret: ""
+   # The certificate may be multi-line, you can use `|-` for ease
+   certificate: ""
+   # Your organization name added in Casdoor
+   organization-name: ""
+   # Your application name added in Casdoor
+   application-name: ""
+   # Doplhinscheduler login url
+   redirect-url: ""
 ```
 
 具体字段解释详见：[Api-server相关配置](../../architecture/configuration.md)
 
-## LDAP测试
+## 开发者LDAP测试
 
 我们提供了一个单元测试类，可以在不启动项目的情况下测试DolphinScheduler与LDAP的集成。
 
@@ -40,6 +84,17 @@ security:
 - 修改`ldapLogin`方法中的userId和userPwd为你的账号密码;
 - 修改`ldapLogin`方法中的expected email为正常登陆的返回值;
 - 执行`ldapLogin`方法，判断LDAP登陆结果是否为预期;
+
+如果你要启用ssl，请修改`TestPropertySource`配置中ssl相关参数为：
+
+```
+security.authentication.ldap.ssl.enable=false
+// absolute path
+security.authentication.ldap.ssl.trust-store=/ldapkeystore.jks 
+security.authentication.ldap.ssl.trust-store-password=yourpassword
+```
+
+运行`ldapLoginSSL`方法，判断email是否为预期的返回值。
 
 ## 通过 Casdoor 实现 SSO 登录
 
@@ -90,3 +145,66 @@ casdoor:
   redirect-url: http://localhost:5173/login 
 ```
 
+## 通过OAuth2授权认证登录
+
+dolphinscheduler可以同时支持多种OAuth2的provider，只需要在配置文件中打开Oauth2的开关并进行简单的配置即可。
+
+### 步骤1. 获取OAuth2客户端凭据
+
+![create-client-credentials-1](../../../../img/security/authentication/create-client-credentials-1.png)
+
+![create-client-credentials-2](../../../../img/security/authentication/create-client-credentials-2.png)
+
+### 步骤2. 在api的配置文件中开启oauth2登录
+
+```yaml
+security:
+  authentication:
+    …… # 省略
+    oauth2:
+      # 将enable设置为true 开启oauth2登录模式
+      enable: true
+      provider:
+        github:
+          # 设置provider的授权地址，例如https://github.com/login/oauth/authorize
+          authorizationUri: ""
+          # dolphinscheduler的后端重定向接口地址，例如http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2
+          redirectUri: ""
+          # oauth2的 clientId
+          clientId: ""
+          # oauth2的 clientSecret
+          clientSecret: ""
+          # 设置provider的请求token的地址
+          tokenUri: ""
+          # 设置provider的请求用户信息的地址
+          userInfoUri: ""
+          # 登录成功后的重定向地址, http://{ip}:{port}/login
+          callbackUrl: ""
+          # 登录页跳转按钮的图片url，不填写则会展示一个文字按钮
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
+          iconUri: ""
+          provider: gitee
+```
+
+### 步骤3.使用oauth2登录
+
+![login-with-oauth2](../../../../img/security/authentication/login-with-oauth2.png)

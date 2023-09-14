@@ -45,7 +45,7 @@
 
 - dolphinscheduler-dao 提供数据库访问等操作。
 
-- dolphinscheduler-remote 基于 netty 的客户端、服务端
+- dolphinscheduler-extract extract模块，包含master/worker/alert的sdk
 
 - dolphinscheduler-service service模块，包含Quartz、Zookeeper、日志客户端访问服务，便于server模块和api模块调用
 

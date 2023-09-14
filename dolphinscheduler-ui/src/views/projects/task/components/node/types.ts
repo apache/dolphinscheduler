@@ -83,6 +83,7 @@ interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
 }
 
 interface IDependentItemOptions {
+  dependentTypeOptions?: IOption[]
   definitionCodeOptions?: IOption[]
   depTaskCodeOptions?: IOption[]
   dateOptions?: IOption[]
@@ -99,6 +100,7 @@ interface IDependentItem {
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
   dateValue?: string
+  dependentType?: 'DEPENDENT_ON_WORKFLOW' | 'DEPENDENT_ON_TASK'
 }
 
 interface IDependTask {
@@ -223,6 +225,8 @@ interface ISparkParameters {
   executorMemory?: string
   numExecutors?: number
   others?: string
+  yarnQueue?: string
+  sqlExecutionType?: string
 }
 
 interface IRuleParameters {
@@ -234,6 +238,7 @@ interface IRuleParameters {
   operator?: string
   src_connector_type?: number
   src_datasource_id?: number
+  src_database?: string
   src_table?: string
   field_length?: number
   begin_time?: string
@@ -248,6 +253,7 @@ interface IRuleParameters {
   statistics_name?: string
   target_connector_type?: number
   target_datasource_id?: number
+  target_database?: string
   target_table?: string
   threshold?: string
   mapping_columns?: string
@@ -345,6 +351,7 @@ interface ITaskParams {
   hiveCliOptions?: string
   hiveSqlScript?: string
   hiveCliTaskExecutionType?: string
+  sqlExecutionType?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
@@ -370,6 +377,7 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  imagePullPolicy?: string
   command?: string
   args?: string
   customizedLabels?: ILabel[]
@@ -436,6 +444,11 @@ interface ITaskParams {
   factoryName?: string
   resourceGroupName?: string
   pipelineName?: string
+  maxNumOfSubWorkflowInstances?: number
+  degreeOfParallelism?: number
+  filterCondition?: string
+  listParameters?: Array<any>
+  yarnQueue?: string
 }
 
 interface INodeData

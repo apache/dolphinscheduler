@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_P
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
 import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
@@ -106,7 +105,6 @@ public class SchedulerController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                  @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
@@ -152,7 +150,7 @@ public class SchedulerController extends BaseController {
     @Operation(summary = "updateSchedule", description = "UPDATE_SCHEDULE_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
+            @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}")),
             @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
@@ -164,13 +162,12 @@ public class SchedulerController extends BaseController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                  @PathVariable(value = "id") Integer id,
                                  @RequestParam(value = "schedule") String schedule,
                                  @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
-                                 @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
+                                 @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
                                  @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                  @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
                                  @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
@@ -197,7 +194,6 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result publishScheduleOnline(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable("id") Integer id) {
@@ -219,7 +215,6 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result offlineSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                   @PathVariable("id") Integer id) {
@@ -247,7 +242,6 @@ public class SchedulerController extends BaseController {
     })
     @GetMapping()
     @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleListPaging(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "processDefinitionCode", required = false, defaultValue = "0") long processDefinitionCode,
@@ -280,7 +274,6 @@ public class SchedulerController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                      @PathVariable("id") Integer id) {
@@ -298,7 +291,6 @@ public class SchedulerController extends BaseController {
     @Operation(summary = "queryScheduleList", description = "QUERY_SCHEDULE_LIST_NOTES")
     @PostMapping("/list")
     @ApiException(QUERY_SCHEDULE_LIST_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryScheduleList(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         Map<String, Object> result = schedulerService.queryScheduleList(loginUser, projectCode);
@@ -319,7 +311,6 @@ public class SchedulerController extends BaseController {
     @PostMapping("/preview")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(PREVIEW_SCHEDULE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result previewSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                   @RequestParam(value = "schedule") String schedule) {
         Map<String, Object> result = schedulerService.previewSchedule(loginUser, schedule);
@@ -355,7 +346,6 @@ public class SchedulerController extends BaseController {
     @PutMapping("/update/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateScheduleByProcessDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                         @PathVariable(value = "code") long processDefinitionCode,

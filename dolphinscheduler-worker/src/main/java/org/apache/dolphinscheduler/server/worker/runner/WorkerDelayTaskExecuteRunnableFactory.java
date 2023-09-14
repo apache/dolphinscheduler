@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import javax.annotation.Nullable;
 
@@ -36,7 +35,6 @@ public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDela
     protected final @NonNull TaskExecutionContext taskExecutionContext;
     protected final @NonNull WorkerConfig workerConfig;
     protected final @NonNull WorkerMessageSender workerMessageSender;
-    protected final @NonNull WorkerRpcClient workerRpcClient;
     protected final @NonNull TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
     protected final @NonNull WorkerRegistryClient workerRegistryClient;
@@ -45,14 +43,12 @@ public abstract class WorkerDelayTaskExecuteRunnableFactory<T extends WorkerDela
                                                     @NonNull TaskExecutionContext taskExecutionContext,
                                                     @NonNull WorkerConfig workerConfig,
                                                     @NonNull WorkerMessageSender workerMessageSender,
-                                                    @NonNull WorkerRpcClient workerRpcClient,
                                                     @NonNull TaskPluginManager taskPluginManager,
                                                     @Nullable StorageOperate storageOperate,
                                                     @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.workerRpcClient = workerRpcClient;
         this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         this.workerRegistryClient = workerRegistryClient;

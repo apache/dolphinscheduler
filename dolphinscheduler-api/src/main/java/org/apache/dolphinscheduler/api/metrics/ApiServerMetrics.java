@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.api.metrics;
 
+import java.util.concurrent.TimeUnit;
+
 import lombok.experimental.UtilityClass;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.Timer;
 
 @UtilityClass
 public class ApiServerMetrics {
@@ -70,13 +73,12 @@ public class ApiServerMetrics {
                     .description("size of download resource files on api")
                     .register(Metrics.globalRegistry);
 
-    private final DistributionSummary apiResponseTimeDistribution =
-            DistributionSummary.builder("ds.api.response.time")
-                    .baseUnit("milliseconds")
-                    .publishPercentiles(0.5, 0.75, 0.95, 0.99)
-                    .publishPercentileHistogram()
-                    .description("response time on api")
-                    .register(Metrics.globalRegistry);
+    static {
+        Timer.builder("ds.api.response.time")
+                .tag("user.id", "dummy")
+                .description("response time on api")
+                .register(Metrics.globalRegistry);
+    }
 
     public void incApiRequestCount() {
         apiRequestCounter.increment();
@@ -106,7 +108,16 @@ public class ApiServerMetrics {
         apiResourceDownloadSizeDistribution.record(size);
     }
 
-    public void recordApiResponseTime(final long milliseconds) {
-        apiResponseTimeDistribution.record(milliseconds);
+    public void recordApiResponseTime(final long milliseconds, final int userId) {
+        Metrics.globalRegistry.timer(
+                "ds.api.response.time",
+                "user.id", String.valueOf(userId)).record(milliseconds, TimeUnit.MILLISECONDS);
+    }
+
+    public void cleanUpApiResponseTimeMetricsByUserId(final int userId) {
+        Metrics.globalRegistry.remove(
+                Metrics.globalRegistry.timer(
+                        "ds.api.response.time",
+                        "user.id", String.valueOf(userId)));
     }
 }

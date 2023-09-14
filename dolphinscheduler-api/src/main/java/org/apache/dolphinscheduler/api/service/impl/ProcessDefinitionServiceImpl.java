@@ -19,14 +19,12 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_MOVE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VERSION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VERSION_LIST;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_EXPORT;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_EXPORT;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_IMPORT;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
@@ -283,8 +281,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Project project = projectMapper.queryByCode(projectCode);
 
         // check if user have write perm for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
+        Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -698,7 +695,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                int workflowDefinitionVersion) {
         ProcessDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null || workflowDefinition.getVersion() != workflowDefinitionVersion) {
-            workflowDefinition = processDefinitionLogDao.queryProcessDefinitionLog(workflowDefinitionCode,
+            workflowDefinition = processDefinitionLogDao.queryByDefinitionCodeAndVersion(workflowDefinitionCode,
                     workflowDefinitionVersion);
         }
         return Optional.ofNullable(workflowDefinition);
@@ -766,8 +763,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                        ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         // check if user have write perm for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
+        Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -988,7 +984,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         for (ProcessDefinition process : processDefinitionList) {
             try {
                 this.deleteProcessDefinitionByCode(loginUser, process.getCode());
-                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(process.getCode()));
+                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(process.getCode());
             } catch (Exception e) {
                 throw new ServiceException(Status.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
             }
@@ -1073,7 +1069,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         // we delete the workflow definition at last to avoid using transaction here.
         // If delete error, we can call this interface again.
         processDefinitionDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
-        metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(String.valueOf(code));
+        metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
     }
 
@@ -1259,7 +1255,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         String dagDataScheduleJson = FileUtils.file2String(file);
         List<DagDataSchedule> dagDataScheduleList = JSONUtils.toList(dagDataScheduleJson, DagDataSchedule.class);
         Project project = projectMapper.queryByCode(projectCode);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_EXPORT);
+        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_IMPORT);
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
@@ -1857,15 +1853,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<DependentSimplifyDefinition> processDefinitions = processDefinitionMapper
                 .queryDefinitionListByProjectCodeAndProcessDefinitionCodes(projectCode, definitionCodesSet);
 
-        // query process task relation
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryProcessTaskRelationsByProcessDefinitionCode(
-                        processDefinitions.get(0).getCode(),
-                        processDefinitions.get(0).getVersion());
-
         // query task definition log
-        List<TaskDefinitionLog> taskDefinitionLogsList =
-                taskDefinitionLogDao.getTaskDefineLogList(processTaskRelations);
+        List<TaskDefinitionLog> taskDefinitionLogsList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                processDefinitions.get(0).getCode(), processDefinitions.get(0).getVersion());
 
         List<DependentSimplifyDefinition> taskDefinitionList = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogsList) {
@@ -1904,19 +1894,19 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(code));
             return result;
         }
-        DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
         // nodes that are running
-        Map<String, List<TreeViewDto>> runningNodeMap = new ConcurrentHashMap<>();
+        Map<Long, List<TreeViewDto>> runningNodeMap = new ConcurrentHashMap<>();
 
         // nodes that are waiting to run
-        Map<String, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
+        Map<Long, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
 
         // List of process instances
         List<ProcessInstance> processInstanceList = processInstanceService.queryByProcessDefineCode(code, limit);
         processInstanceList.forEach(processInstance -> processInstance
                 .setDuration(DateUtils.format2Duration(processInstance.getStartTime(), processInstance.getEndTime())));
-        List<TaskDefinitionLog> taskDefinitionList = taskDefinitionLogDao.getTaskDefineLogList(processTaskRelationMapper
-                .queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode()));
+        List<TaskDefinitionLog> taskDefinitionList = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                processDefinition.getCode(), processDefinition.getVersion());
         Map<Long, TaskDefinitionLog> taskDefinitionMap = taskDefinitionList.stream()
                 .collect(Collectors.toMap(TaskDefinitionLog::getCode, taskDefinitionLog -> taskDefinitionLog));
 
@@ -1939,7 +1929,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             parentTreeViewDto.getInstances()
                     .add(new Instance(processInstance.getId(), processInstance.getName(),
                             processInstance.getProcessDefinitionCode(),
-                            "", processInstance.getState().toString(), processInstance.getStartTime(), endTime,
+                            "", processInstance.getState().name(), processInstance.getStartTime(), endTime,
                             processInstance.getHost(),
                             DateUtils.format2Readable(endTime.getTime() - processInstance.getStartTime().getTime())));
         }
@@ -1947,16 +1937,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TreeViewDto> parentTreeViewDtoList = new ArrayList<>();
         parentTreeViewDtoList.add(parentTreeViewDto);
         // Here is the encapsulation task instance
-        for (String startNode : dag.getBeginNode()) {
+        for (Long startNode : dag.getBeginNode()) {
             runningNodeMap.put(startNode, parentTreeViewDtoList);
         }
 
         while (!ServerLifeCycleManager.isStopped()) {
-            Set<String> postNodeList;
-            Iterator<Map.Entry<String, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
+            Set<Long> postNodeList;
+            Iterator<Map.Entry<Long, List<TreeViewDto>>> iter = runningNodeMap.entrySet().iterator();
             while (iter.hasNext()) {
-                Map.Entry<String, List<TreeViewDto>> en = iter.next();
-                String nodeCode = en.getKey();
+                Map.Entry<Long, List<TreeViewDto>> en = iter.next();
+                Long nodeCode = en.getKey();
                 parentTreeViewDtoList = en.getValue();
 
                 TreeViewDto treeViewDto = new TreeViewDto();
@@ -1967,8 +1957,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 // set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
                     ProcessInstance processInstance = processInstanceList.get(i);
-                    TaskInstance taskInstance = taskInstanceMapper.queryByInstanceIdAndCode(processInstance.getId(),
-                            Long.parseLong(nodeCode));
+                    TaskInstance taskInstance =
+                            taskInstanceMapper.queryByInstanceIdAndCode(processInstance.getId(), nodeCode);
                     if (taskInstance == null) {
                         treeViewDto.getInstances().add(new Instance(-1, "not running", 0, "null"));
                     } else {
@@ -1984,7 +1974,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         }
                         treeViewDto.getInstances().add(new Instance(taskInstance.getId(), taskInstance.getName(),
                                 taskInstance.getTaskCode(),
-                                taskInstance.getTaskType(), taskInstance.getState().toString(),
+                                taskInstance.getTaskType(), taskInstance.getState().name(),
                                 taskInstance.getStartTime(), taskInstance.getEndTime(),
                                 taskInstance.getHost(),
                                 DateUtils.format2Readable(endTime.getTime() - startTime.getTime()), subProcessCode));
@@ -1995,7 +1985,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 postNodeList = dag.getSubsequentNodes(nodeCode);
                 if (CollectionUtils.isNotEmpty(postNodeList)) {
-                    for (String nextNodeCode : postNodeList) {
+                    for (Long nextNodeCode : postNodeList) {
                         List<TreeViewDto> treeViewDtoList = waitingRunningNodeMap.get(nextNodeCode);
                         if (CollectionUtils.isEmpty(treeViewDtoList)) {
                             treeViewDtoList = new ArrayList<>();
@@ -2154,7 +2144,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             if (isCopy) {
                 log.info("Copy process definition...");
                 List<TaskDefinitionLog> taskDefinitionLogs =
-                        taskDefinitionLogDao.getTaskDefineLogList(processTaskRelations);
+                        taskDefinitionLogDao.queryTaskDefineLogList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     try {
@@ -2404,8 +2394,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                               int version) {
         Project project = projectMapper.queryByCode(projectCode);
         // check if user have write perm for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_DELETE);
+        Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -2466,8 +2455,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                             ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         // check if user have write perm for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
+        Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;
@@ -2602,8 +2590,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                 ProcessExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         // check if user have write perm for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_UPDATE);
+        Map<String, Object> result = new HashMap<>();
         boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
         if (!hasProjectAndWritePerm) {
             return result;

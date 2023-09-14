@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import javax.annotation.Nullable;
 
@@ -36,14 +35,12 @@ public class DefaultWorkerDelayTaskExecuteRunnableFactory
     protected DefaultWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
                                                            @NonNull WorkerConfig workerConfig,
                                                            @NonNull WorkerMessageSender workerMessageSender,
-                                                           @NonNull WorkerRpcClient workerRpcClient,
                                                            @NonNull TaskPluginManager taskPluginManager,
                                                            @Nullable StorageOperate storageOperate,
                                                            @NonNull WorkerRegistryClient workerRegistryClient) {
         super(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                workerRpcClient,
                 taskPluginManager,
                 storageOperate,
                 workerRegistryClient);
@@ -55,7 +52,6 @@ public class DefaultWorkerDelayTaskExecuteRunnableFactory
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                workerRpcClient,
                 taskPluginManager,
                 storageOperate,
                 workerRegistryClient);

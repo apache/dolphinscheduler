@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheM
 import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.operator.TaskOperatorManager;
+import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,7 +40,7 @@ public class DefaultTaskExecuteRunnableFactory implements TaskExecuteRunnableFac
     private TaskExecutionContextFactory taskExecutionContextFactory;
 
     @Autowired
-    private TaskOperatorManager taskOperatorManager;
+    private TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 
     @Override
     public DefaultTaskExecuteRunnable createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException {
@@ -48,10 +48,10 @@ public class DefaultTaskExecuteRunnableFactory implements TaskExecuteRunnableFac
                 processInstanceExecCacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
         try {
             return new DefaultTaskExecuteRunnable(
-                    workflowExecuteRunnable.getProcessInstance(),
+                    workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance(),
                     taskInstance,
                     taskExecutionContextFactory.createTaskExecutionContext(taskInstance),
-                    taskOperatorManager);
+                    taskExecuteRunnableOperatorManager);
         } catch (TaskExecutionContextCreateException ex) {
             throw new TaskExecuteRunnableCreateException("Create DefaultTaskExecuteRunnable failed", ex);
         }

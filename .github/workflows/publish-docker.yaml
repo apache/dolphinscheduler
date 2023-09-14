@@ -38,9 +38,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-docker
+          restore-keys: ${{ runner.os }}-maven-
       - name: Set environment variables
         run: |
           if [[ ${{ github.event_name }} == "release" ]]; then
@@ -71,7 +70,7 @@ jobs:
           ./mvnw -B clean deploy \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
+          -Dspotless.skip=true \
           -Dmaven.deploy.skip \
           -Ddocker.tag=${{ env.DOCKER_TAG }} \
           -Ddocker.hub=${{ env.HUB }} \

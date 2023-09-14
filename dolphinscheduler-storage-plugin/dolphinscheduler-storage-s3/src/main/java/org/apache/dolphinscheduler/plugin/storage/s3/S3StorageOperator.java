@@ -59,7 +59,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
@@ -110,7 +109,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     .standard()
                     .withPathStyleAccessEnabled(true)
                     .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
-                            endPoint, Regions.fromName(region).getName()))
+                            endPoint, region))
                     .withCredentials(
                             new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
                     .build();
@@ -119,7 +118,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     .standard()
                     .withCredentials(
                             new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
-                    .withRegion(Regions.fromName(region))
+                    .withRegion(region)
                     .build();
         }
     }
@@ -494,7 +493,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(summary.getKey());
                     entity.setDirectory(false);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(summary.getSize());
@@ -516,7 +514,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(commonPrefix);
                 entity.setDirectory(true);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -565,7 +562,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription("");
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -585,7 +581,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(summary.getKey());
                 entity.setDirectory(false);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(summary.getSize());

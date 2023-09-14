@@ -136,6 +136,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("processInstanceName") String processInstanceName,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("taskName") String taskName,
+                                                    @Param("taskCode") Long taskCode,
                                                     @Param("executorName") String executorName,
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
@@ -148,6 +149,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                           @Param("processDefinitionName") String processDefinitionName,
                                                           @Param("searchVal") String searchVal,
                                                           @Param("taskName") String taskName,
+                                                          @Param("taskCode") Long taskCode,
                                                           @Param("executorName") String executorName,
                                                           @Param("states") int[] statusArray,
                                                           @Param("host") String host,
@@ -161,4 +163,23 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 
     List<TaskInstance> findByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
+
+    /**
+     * find last task instance list in the date interval
+     *
+     * @param taskCodes taskCodes
+     * @param startTime startTime
+     * @param endTime endTime
+     * @param testFlag testFlag
+     * @return task instance list
+     */
+    List<TaskInstance> findLastTaskInstances(@Param("taskCodes") Set<Long> taskCodes,
+                                             @Param("startTime") Date startTime,
+                                             @Param("endTime") Date endTime,
+                                             @Param("testFlag") int testFlag);
+
+    TaskInstance findLastTaskInstance(@Param("taskCode") long depTaskCode,
+                                      @Param("startTime") Date startTime,
+                                      @Param("endTime") Date endTime,
+                                      @Param("testFlag") int testFlag);
 }
