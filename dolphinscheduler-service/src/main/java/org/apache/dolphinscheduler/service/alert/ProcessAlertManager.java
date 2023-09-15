@@ -44,15 +44,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 /**
  * process alert manager
@@ -157,7 +153,7 @@ public class ProcessAlertManager {
                         .processId(processInstance.getId())
                         .processDefinitionCode(processInstance.getProcessDefinitionCode())
                         .processName(processInstance.getName())
-                        .modifyBy(modifyBy)
+                        .modifyBy(operator.getUserName())
                         .taskCode(task.getTaskCode())
                         .taskName(task.getName())
                         .taskType(task.getTaskType())
