@@ -38,7 +38,9 @@ public abstract class AbstractTask {
 
     protected final Logger log = LoggerFactory.getLogger(AbstractTask.class);
 
-    public String rgex = "['\"]\\$\\{(.*?)}['\"]|\\$\\{(.*?)}";
+    private static String groupName1 = "paramName1";
+    private static String groupName2 = "paramName2";
+    public String rgex = String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", groupName1, groupName2);
 
     /**
      * varPool string
@@ -198,7 +200,11 @@ public abstract class AbstractTask {
         int index = 1;
         while (m.find()) {
 
-            String paramName = m.group(1);
+            String paramName = m.group(groupName1);
+            if (paramName == null) {
+                paramName = m.group(groupName2);
+            }
+
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {
