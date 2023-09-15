@@ -74,6 +74,22 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
+      field: 'username',
+      name: t('project.node.zeppelin_username'),
+      props: {
+        placeholder: t('project.node.zeppelin_username_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'password',
+      name: t('project.node.zeppelin_password'),
+      props: {
+        placeholder: t('project.node.zeppelin_password_tips')
+      }
+    },
+    {
+      type: 'input',
       field: 'parameters',
       name: t('project.node.zeppelin_parameters'),
       props: {

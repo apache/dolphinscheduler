@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTA
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.RunMode;
@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.remote.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -101,6 +101,7 @@ public class ExecutorController extends BaseController {
      * @param timeout timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @param testFlag testFlag
+     * @param executionOrder complement data in some kind of order
      * @return start process result code
      */
     @Operation(summary = "startProcessInstance", description = "RUN_PROCESS_INSTANCE_NOTES")
@@ -116,17 +117,19 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
             @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
             @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
             @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class))
+            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class)),
+            @Parameter(name = "allLevelDependent", description = "ALL_LEVEL_DEPENDENT", schema = @Schema(implementation = boolean.class, example = "false")),
+            @Parameter(name = "executionOrder", description = "EXECUTION_ORDER", schema = @Schema(implementation = ExecutionOrder.class))
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
@@ -140,6 +143,7 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "runMode", required = false) RunMode runMode,
                                        @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                        @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                       @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                        @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                        @RequestParam(value = "timeout", required = false) Integer timeout,
                                        @RequestParam(value = "startParams", required = false) String startParams,
@@ -147,7 +151,9 @@ public class ExecutorController extends BaseController {
                                        @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                        @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
                                        @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
-                                       @RequestParam(value = "version", required = false) Integer version) {
+                                       @RequestParam(value = "version", required = false) Integer version,
+                                       @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
+                                       @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
 
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
@@ -164,8 +170,9 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
-                complementDependentMode, version);
+                workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                testFlag,
+                complementDependentMode, version, allLevelDependent, executionOrder);
         return returnDataList(result);
     }
 
@@ -187,9 +194,11 @@ public class ExecutorController extends BaseController {
      * @param runMode run mode
      * @param processInstancePriority process instance priority
      * @param workerGroup worker group
+     * @param tenantCode tenant code
      * @param timeout timeout
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @param testFlag testFlag
+     * @param executionOrder complement data in some kind of order
      * @return start process result code
      */
     @Operation(summary = "batchStartProcessInstance", description = "BATCH_RUN_PROCESS_INSTANCE_NOTES")
@@ -205,17 +214,19 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
             @Parameter(name = "processInstancePriority", description = "PROCESS_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = Long.class, example = "-1")),
             @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "expectedParallelismNumber", description = "EXPECTED_PARALLELISM_NUMBER", schema = @Schema(implementation = int.class, example = "8")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
             @Parameter(name = "testFlag", description = "TEST_FLAG", schema = @Schema(implementation = int.class, example = "0")),
-            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class))
+            @Parameter(name = "complementDependentMode", description = "COMPLEMENT_DEPENDENT_MODE", schema = @Schema(implementation = ComplementDependentMode.class)),
+            @Parameter(name = "allLevelDependent", description = "ALL_LEVEL_DEPENDENT", schema = @Schema(implementation = boolean.class, example = "false")),
+            @Parameter(name = "executionOrder", description = "EXECUTION_ORDER", schema = @Schema(implementation = ExecutionOrder.class))
     })
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchStartProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
@@ -229,13 +240,16 @@ public class ExecutorController extends BaseController {
                                             @RequestParam(value = "runMode", required = false) RunMode runMode,
                                             @RequestParam(value = "processInstancePriority", required = false) Priority processInstancePriority,
                                             @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                            @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                             @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                             @RequestParam(value = "timeout", required = false) Integer timeout,
                                             @RequestParam(value = "startParams", required = false) String startParams,
                                             @RequestParam(value = "expectedParallelismNumber", required = false) Integer expectedParallelismNumber,
                                             @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun,
                                             @RequestParam(value = "testFlag", defaultValue = "0") int testFlag,
-                                            @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode) {
+                                            @RequestParam(value = "complementDependentMode", required = false) ComplementDependentMode complementDependentMode,
+                                            @RequestParam(value = "allLevelDependent", required = false, defaultValue = "false") boolean allLevelDependent,
+                                            @RequestParam(value = "executionOrder", required = false) ExecutionOrder executionOrder) {
 
         if (timeout == null) {
             log.debug("Parameter timeout set to {} due to null.", Constants.MAX_TASK_TIMEOUT);
@@ -263,8 +277,9 @@ public class ExecutorController extends BaseController {
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime,
                     execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                    workerGroup, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun, testFlag,
-                    complementDependentMode, null);
+                    workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                    testFlag,
+                    complementDependentMode, null, allLevelDependent, executionOrder);
 
             if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
                 log.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
@@ -301,7 +316,6 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
@@ -328,7 +342,6 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
@@ -377,7 +390,6 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startCheckProcessDefinition(@RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
         Map<String, Object> result = execService.startCheckByProcessDefinedCode(processDefinitionCode);
         return returnDataList(result);
@@ -393,7 +405,6 @@ public class ExecutorController extends BaseController {
     @GetMapping(value = "/query-executing-workflow")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
-    @AccessLogAnnotation
     public Result queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
         WorkflowExecuteDto workflowExecuteDto =
                 execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
@@ -419,6 +430,7 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
+            @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "environmentCode", description = "ENVIRONMENT_CODE", schema = @Schema(implementation = long.class, example = "-1")),
             @Parameter(name = "timeout", description = "TIMEOUT", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "dryRun", description = "DRY_RUN", schema = @Schema(implementation = int.class, example = "0")),
@@ -426,13 +438,13 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result startStreamTaskInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
                                           @RequestParam(value = "version", required = true) int version,
                                           @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
                                           @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                          @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                           @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                           @RequestParam(value = "startParams", required = false) String startParams,
                                           @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
@@ -445,7 +457,7 @@ public class ExecutorController extends BaseController {
         log.info("Start to execute stream task instance, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}.",
                 projectCode, code, version);
         Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
-                warningGroupId, workerGroup, environmentCode, startParamMap, dryRun);
+                warningGroupId, workerGroup, tenantCode, environmentCode, startParamMap, dryRun);
         return returnDataList(result);
     }
 
@@ -468,7 +480,6 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute-task")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result executeTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                               @RequestParam("processInstanceId") Integer processInstanceId,

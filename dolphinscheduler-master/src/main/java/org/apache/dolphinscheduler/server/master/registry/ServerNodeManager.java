@@ -17,25 +17,21 @@
 
 package org.apache.dolphinscheduler.server.master.registry;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
-import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.extract.base.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
-import org.apache.dolphinscheduler.remote.utils.NamedThreadFactory;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.service.queue.MasterPriorityQueue;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,10 +39,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,7 +49,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -72,8 +65,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ServerNodeManager implements InitializingBean {
 
-    private final Lock masterLock = new ReentrantLock();
-
     private final ReentrantReadWriteLock workerGroupLock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.ReadLock workerGroupReadLock = workerGroupLock.readLock();
     private final ReentrantReadWriteLock.WriteLock workerGroupWriteLock = workerGroupLock.writeLock();
@@ -82,12 +73,14 @@ public class ServerNodeManager implements InitializingBean {
     private final ReentrantReadWriteLock.ReadLock workerNodeInfoReadLock = workerNodeInfoLock.readLock();
     private final ReentrantReadWriteLock.WriteLock workerNodeInfoWriteLock = workerNodeInfoLock.writeLock();
 
+    private final ReentrantLock masterNodeInfoLock = new ReentrantLock();
+
     /**
      * worker group nodes, workerGroup -> ips, combining registryWorkerGroupNodes and dbWorkerGroupNodes
      */
     private final ConcurrentHashMap<String, Set<String>> workerGroupNodes = new ConcurrentHashMap<>();
 
-    private final Set<String> masterNodes = new HashSet<>();
+    private final Map<String, MasterHeartBeat> masterNodeInfo = new HashMap<>();
 
     private final Map<String, WorkerHeartBeat> workerNodeInfo = new HashMap<>();
 
@@ -102,8 +95,6 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private WorkerGroupMapper workerGroupMapper;
 
-    private final MasterPriorityQueue masterPriorityQueue = new MasterPriorityQueue();
-
     @Autowired
     private AlertDao alertDao;
 
@@ -112,24 +103,13 @@ public class ServerNodeManager implements InitializingBean {
 
     private final List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
 
-    private volatile int currentSlot = 0;
-
-    private volatile int totalSlot = 0;
-
-    public int getSlot() {
-        return currentSlot;
-    }
-
-    public int getMasterSize() {
-        return totalSlot;
-    }
+    private final List<MasterInfoChangeListener> masterInfoChangeListeners = new ArrayList<>();
 
     @Override
     public void afterPropertiesSet() {
 
         // load nodes from zookeeper
-        updateMasterNodes();
-        refreshWorkerNodesAndGroupMappings();
+        refreshNodesAndGroupMappings();
 
         // init executor service
         executorService =
@@ -140,11 +120,8 @@ public class ServerNodeManager implements InitializingBean {
                 masterConfig.getWorkerGroupRefreshInterval().getSeconds(),
                 TimeUnit.SECONDS);
 
-        // init MasterNodeListener listener
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_MASTERS, new MasterDataListener());
-
-        // init WorkerNodeListener listener
-        registryClient.subscribe(REGISTRY_DOLPHINSCHEDULER_WORKERS, new WorkerDataListener());
+        registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), new MasterDataListener());
+        registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), new WorkerDataListener());
     }
 
     class WorkerNodeInfoAndGroupDbSyncTask implements Runnable {
@@ -153,7 +130,7 @@ public class ServerNodeManager implements InitializingBean {
         public void run() {
             try {
                 // sync worker node info
-                refreshWorkerNodesAndGroupMappings();
+                refreshNodesAndGroupMappings();
             } catch (Exception e) {
                 log.error("WorkerNodeInfoAndGroupDbSyncTask error:", e);
             }
@@ -161,12 +138,15 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     /**
-     * Refresh worker nodes and worker group mapping information
+     * Refresh master/worker nodes and worker group mapping information
      */
-    private void refreshWorkerNodesAndGroupMappings() {
+    private void refreshNodesAndGroupMappings() {
         updateWorkerNodes();
         updateWorkerGroupMappings();
         notifyWorkerInfoChangeListeners();
+
+        updateMasterNodes();
+        notifyMasterInfoChangeListeners();
     }
 
     /**
@@ -220,11 +200,8 @@ public class ServerNodeManager implements InitializingBean {
                 try {
                     if (type.equals(Type.ADD)) {
                         log.info("master node : {} added.", path);
-                        updateMasterNodes();
-                    }
-                    if (type.equals(Type.REMOVE)) {
+                    } else if (type.equals(Type.REMOVE)) {
                         log.info("master node : {} down.", path);
-                        updateMasterNodes();
                         alertDao.sendServerStoppedAlert(1, path, "MASTER");
                     }
                 } catch (Exception ex) {
@@ -235,19 +212,17 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void updateMasterNodes() {
-        currentSlot = 0;
-        totalSlot = 0;
-        this.masterNodes.clear();
-        String nodeLock = Constants.REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS;
+        masterNodeInfoLock.lock();
         try {
-            registryClient.getLock(nodeLock);
-            Collection<String> currentNodes = registryClient.getMasterNodesDirectly();
-            List<Server> masterNodeList = registryClient.getServerList(NodeType.MASTER);
-            syncMasterNodes(currentNodes, masterNodeList);
+            masterNodeInfo.clear();
+            Map<String, String> masterNodeMaps = registryClient.getServerMaps(RegistryNodeType.MASTER);
+            for (Map.Entry<String, String> entry : masterNodeMaps.entrySet()) {
+                masterNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), MasterHeartBeat.class));
+            }
         } catch (Exception e) {
             log.error("update master nodes error", e);
         } finally {
-            registryClient.releaseLock(nodeLock);
+            masterNodeInfoLock.unlock();
         }
 
     }
@@ -255,7 +230,7 @@ public class ServerNodeManager implements InitializingBean {
     private void updateWorkerNodes() {
         workerGroupWriteLock.lock();
         try {
-            Map<String, String> workerNodeMaps = registryClient.getServerMaps(NodeType.WORKER);
+            Map<String, String> workerNodeMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
             for (Map.Entry<String, String> entry : workerNodeMaps.entrySet()) {
                 workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
             }
@@ -292,30 +267,6 @@ public class ServerNodeManager implements InitializingBean {
             workerGroupNodes.putAll(tmpWorkerGroupMappings);
         } finally {
             workerGroupWriteLock.unlock();
-        }
-    }
-
-    /**
-     * sync master nodes
-     *
-     * @param nodes master nodes
-     */
-    private void syncMasterNodes(Collection<String> nodes, List<Server> masterNodes) {
-        masterLock.lock();
-        try {
-            this.masterNodes.addAll(nodes);
-            this.masterPriorityQueue.clear();
-            this.masterPriorityQueue.putList(masterNodes);
-            int index = masterPriorityQueue.getIndex(masterConfig.getMasterAddress());
-            if (index >= 0) {
-                totalSlot = nodes.size();
-                currentSlot = index;
-            } else {
-                log.warn("Current master is not in active master list");
-            }
-            log.info("Update master nodes, total master size: {}, current slot: {}", totalSlot, currentSlot);
-        } finally {
-            masterLock.unlock();
         }
     }
 
@@ -366,6 +317,10 @@ public class ServerNodeManager implements InitializingBean {
         }
     }
 
+    public Map<String, MasterHeartBeat> getMasterNodeInfo() {
+        return Collections.unmodifiableMap(masterNodeInfo);
+    }
+
     /**
      * Add the resource change listener, when the resource changed, the listener will be notified.
      *
@@ -380,6 +335,17 @@ public class ServerNodeManager implements InitializingBean {
         Map<String, WorkerHeartBeat> workerNodeInfoMap = getWorkerNodeInfo();
         for (WorkerInfoChangeListener listener : workerInfoChangeListeners) {
             listener.notify(workerGroupNodeMap, workerNodeInfoMap);
+        }
+    }
+
+    public synchronized void addMasterInfoChangeListener(MasterInfoChangeListener listener) {
+        masterInfoChangeListeners.add(listener);
+    }
+
+    private void notifyMasterInfoChangeListeners() {
+        Map<String, MasterHeartBeat> masterNodeInfoMap = getMasterNodeInfo();
+        for (MasterInfoChangeListener listener : masterInfoChangeListeners) {
+            listener.notify(masterNodeInfoMap);
         }
     }
 

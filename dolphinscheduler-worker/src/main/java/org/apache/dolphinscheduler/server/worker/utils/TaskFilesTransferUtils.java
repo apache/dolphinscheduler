@@ -101,9 +101,9 @@ public class TaskFilesTransferUtils {
             try {
                 // upload file to storage
                 String resourceWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 String resourceCRCWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourceCRCPath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourceCRCPath);
                 log.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
                 storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
                 log.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
@@ -176,10 +176,9 @@ public class TaskFilesTransferUtils {
 
             try {
                 String resourceWholePath =
-                        storageOperate.getResourceFileName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
                 log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
-                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, false,
-                        true);
+                storageOperate.download(taskExecutionContext.getTenantCode(), resourceWholePath, downloadPath, true);
             } catch (IOException ex) {
                 throw new TaskException("Download file from storage error", ex);
             }

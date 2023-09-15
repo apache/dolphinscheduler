@@ -19,7 +19,6 @@ import {
   defineComponent,
   PropType,
   ref,
-  computed,
   onMounted,
   watch,
   getCurrentInstance
@@ -34,9 +33,10 @@ import {
   NSwitch,
   NInputNumber,
   NDynamicInput,
-  NCheckbox
+  NCheckbox,
+  NGridItem,
+  NGrid
 } from 'naive-ui'
-import { queryTenantList } from '@/service/modules/tenants'
 import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/process-definition'
 import './x6-style.scss'
@@ -59,11 +59,6 @@ const props = {
   }
 }
 
-interface Tenant {
-  tenantCode: string
-  id: number
-}
-
 export default defineComponent({
   name: 'dag-save-modal',
   props,
@@ -73,28 +68,10 @@ export default defineComponent({
     const { t } = useI18n()
 
     const projectCode = Number(route.params.projectCode)
-    const tenants = ref<Tenant[]>([])
-    const tenantsDropdown = computed(() => {
-      if (tenants.value) {
-        return tenants.value
-          .map((t) => ({
-            label: t.tenantCode,
-            value: t.tenantCode
-          }))
-          .concat({ label: 'default', value: 'default' })
-      }
-      return []
-    })
-    onMounted(() => {
-      queryTenantList().then((res: any) => {
-        tenants.value = res
-      })
-    })
 
     const formValue = ref<SaveForm>({
       name: '',
       description: '',
-      tenantCode: 'default',
       executionType: 'PARALLEL',
       timeoutFlag: false,
       timeout: 0,
@@ -131,7 +108,8 @@ export default defineComponent({
 
           for (const param of formValue.value.globalParams) {
             const prop = param.value
-            if (!prop) {
+            const direct = param.direct
+            if (direct === 'IN' && !prop) {
               return new Error(t('project.dag.prop_empty'))
             }
 
@@ -168,7 +146,6 @@ export default defineComponent({
       if (process) {
         formValue.value.name = process.name
         formValue.value.description = process.description
-        formValue.value.tenantCode = process.tenantCode || 'default'
         formValue.value.executionType = process.executionType || 'PARALLEL'
         if (process.timeout && process.timeout > 0) {
           formValue.value.timeoutFlag = true
@@ -176,7 +153,8 @@ export default defineComponent({
         }
         formValue.value.globalParams = process.globalParamList.map((param) => ({
           key: param.prop,
-          value: param.value
+          value: param.value,
+          direct: param.direct
         }))
       }
     }
@@ -212,13 +190,6 @@ export default defineComponent({
               type='textarea'
               v-model:value={formValue.value.description}
               class='input-description'
-            />
-          </NFormItem>
-          <NFormItem label={t('project.dag.tenant')} path='tenantCode'>
-            <NSelect
-              options={tenantsDropdown.value}
-              v-model:value={formValue.value.tenantCode}
-              class='btn-select-tenant-code'
             />
           </NFormItem>
           <NFormItem label={t('project.dag.timeout_alert')} path='timeoutFlag'>
@@ -264,11 +235,46 @@ export default defineComponent({
           >
             <NDynamicInput
               v-model:value={formValue.value.globalParams}
-              preset='pair'
-              key-placeholder={t('project.dag.key')}
-              value-placeholder={t('project.dag.value')}
+              onCreate={() => {
+                return {
+                  key: '',
+                  direct: 'IN',
+                  value: ''
+                }
+              }}
               class='input-global-params'
-            />
+            >
+              {{
+                default: (param: {
+                  value: { key: string; direct: string; value: string }
+                }) => (
+                  <NGrid xGap={12} cols={24}>
+                    <NGridItem span={9}>
+                      <NInput
+                        v-model:value={param.value.key}
+                        placeholder={t('project.dag.key')}
+                      />
+                    </NGridItem>
+                    <NGridItem span={6}>
+                      <NSelect
+                        options={[
+                          { value: 'IN', label: 'IN' },
+                          { value: 'OUT', label: 'OUT' }
+                        ]}
+                        v-model:value={param.value.direct}
+                        defaultValue={'IN'}
+                      />
+                    </NGridItem>
+                    <NGridItem span={9}>
+                      <NInput
+                        v-model:value={param.value.value}
+                        placeholder={t('project.dag.value')}
+                      />
+                    </NGridItem>
+                  </NGrid>
+                )
+              }}
+            </NDynamicInput>
           </NFormItem>
           {props.definition && !props.instance && (
             <NFormItem path='timeoutFlag' showLabel={false}>

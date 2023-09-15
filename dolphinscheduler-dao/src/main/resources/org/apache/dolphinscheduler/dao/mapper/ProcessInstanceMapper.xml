@@ -24,18 +24,8 @@
         command_type, command_param, task_depend_type, max_try_times, failure_strategy, warning_type,
         warning_group_id, schedule_time, command_start_time, global_params, flag,
         update_time, is_sub_process, executor_id, history_cmd,
-        process_instance_priority, worker_group,environment_code, timeout, tenant_id, tenant_code, var_pool,
+        process_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
         dry_run, test_flag, next_process_instance_id, restart_time, state_history
-    </sql>
-
-    <sql id="baseSqlV2">
-        ${alias}.id
-        , ${alias}.name, ${alias}.process_definition_version, ${alias}.process_definition_code, ${alias}.project_code, ${alias}.state, ${alias}.recovery, ${alias}.start_time, ${alias}.end_time, ${alias}.run_times,host,
-        command_type, ${alias}.command_param, ${alias}.task_depend_type, ${alias}.max_try_times, ${alias}.failure_strategy, ${alias}.warning_type,
-        warning_group_id, ${alias}.schedule_time, ${alias}.command_start_time, ${alias}.global_params, ${alias}.flag,
-        update_time, ${alias}.is_sub_process, ${alias}.executor_id, ${alias}.history_cmd,
-        process_instance_priority, ${alias}.worker_group,environment_code, ${alias}.timeout, ${alias}.tenant_id, ${alias}.tenant_code, ${alias}.var_pool,
-        dry_run, ${alias}.test_flag, ${alias}.next_process_instance_id, ${alias}.restart_time, ${alias}.state_history
     </sql>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
@@ -85,13 +75,13 @@
         limit #{size}
     </select>
 
-    <select id="queryByTenantIdAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+    <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
         from t_ds_process_instance
         where 1=1
-        <if test="tenantId != -1">
-            and tenant_id =#{tenantId}
+        <if test="tenantCode != ''">
+            and tenant_code =#{tenantCode}
         </if>
         <if test="states != null and states.length != 0">
             and state in
@@ -168,10 +158,10 @@
         where state = #{originState}
     </update>
 
-    <update id="updateProcessInstanceByTenantId">
+    <update id="updateProcessInstanceByTenantCode">
         update t_ds_process_instance
-        set tenant_id = #{destTenantId}
-        where tenant_id = #{originTenantId}
+        set tenant_code = #{destTenantCode}
+        where tenant_code = #{originTenantCode}
     </update>
 
     <update id="updateProcessInstanceByWorkerGroupName">
@@ -242,6 +232,25 @@
         </if>
         order by end_time desc limit 1
     </select>
+
+    <select id="queryFirstScheduleProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code = #{processDefinitionCode} and schedule_time is not null
+        order by schedule_time
+        limit 1
+    </select>
+
+    <select id="queryFirstStartProcessInstance" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code = #{processDefinitionCode} and start_time is not null
+        order by start_time
+        limit 1
+    </select>
+
     <select id="queryByProcessDefineCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>
@@ -347,13 +356,14 @@
           and next_process_instance_id = 0
     </update>
 
+<!-- There are some columns with the same names in both tables, we use a sub-query here to avoid ambiguity-->
     <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="b"/>
-        </include>
-        from t_ds_trigger_relation a
-        join   t_ds_process_instance b on a.job_id  = b.id
-        where a.trigger_type = 0 and a.trigger_code = #{triggerCode}
+        <include refid="baseSql"/>
+        from t_ds_process_instance a
+        join
+            (select trigger_type, job_id, trigger_code from t_ds_trigger_relation) b
+        on a.id = b.job_id
+        where b.trigger_type = 0 and b.trigger_code = #{triggerCode}
     </select>
 </mapper>

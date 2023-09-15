@@ -74,6 +74,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     Integer queryMaxVersionForDefinition(@Param("code") long code);
 
     /**
+     * todo: rename to query by code and version
      * @param taskDefinitions taskDefinition list
      * @return list
      */

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 
 import org.apache.commons.lang3.StringUtils;
 

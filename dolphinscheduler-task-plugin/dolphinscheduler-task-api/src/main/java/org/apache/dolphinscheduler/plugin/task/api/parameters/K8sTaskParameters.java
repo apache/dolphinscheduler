@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.Label;
+import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,8 +37,12 @@ public class K8sTaskParameters extends AbstractParameters {
     private String image;
     private String namespace;
     private String command;
+    private String args;
+    private String imagePullPolicy;
     private double minCpuCores;
     private double minMemorySpace;
+    private List<Label> customizedLabels;
+    private List<NodeSelectorExpression> nodeSelectors;
 
     @Override
     public boolean checkParameters() {

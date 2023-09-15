@@ -26,6 +26,9 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
   jetty:
     max-http-form-post-size: 5000000
+    accesslog:
+      enabled: true
+      custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 spring:
   banner:
@@ -115,38 +118,49 @@ registry:
     block-until-connected: 600ms
     digest: ~
 
-audit:
-  enabled: false
+api:
+  audit-enable: false
+  # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
+  # global max request number per second
+  # default tenant-level max request number
+  traffic-control:
+      global-switch: false
+      max-global-qps-rate: 300
+      tenant-switch: false
+      default-tenant-qps-rate: 10
+        #customize-tenant-qps-rate:
+        # eg.
+      #tenant1: 11
+      #tenant2: 20
+  python-gateway:
+    # Weather enable python gateway server or not. The default value is true.
+    enabled: true
+    # Authentication token for connection from python api to python gateway server. Should be changed the default value
+    # when you deploy in public network.
+    auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
+    # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
+    # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
+    gateway-server-address: 0.0.0.0
+    # The port of Python gateway server start. Define which port you could connect to Python gateway server from
+    # Python API side.
+    gateway-server-port: 25333
+    # The address of Python callback client.
+    python-address: 127.0.0.1
+    # The port of Python callback client.
+    python-port: 25334
+    # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
+    # and socket server would never close even though no requests accept
+    connect-timeout: 0
+    # Close each active connection of socket server if python program not active after x milliseconds. Define value is
+    # (0 = infinite), and socket server would never close even though no requests accept
+    read-timeout: 0
 
 metrics:
   enabled: true
 
-python-gateway:
-  # Weather enable python gateway server or not. The default value is true.
-  enabled: true
-  # Authentication token for connection from python api to python gateway server. Should be changed the default value
-  # when you deploy in public network.
-  auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
-  # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
-  # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
-  gateway-server-address: 0.0.0.0
-  # The port of Python gateway server start. Define which port you could connect to Python gateway server from
-  # Python API side.
-  gateway-server-port: 25333
-  # The address of Python callback client.
-  python-address: 127.0.0.1
-  # The port of Python callback client.
-  python-port: 25334
-  # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
-  # and socket server would never close even though no requests accept
-  connect-timeout: 0
-  # Close each active connection of socket server if python program not active after x milliseconds. Define value is
-  # (0 = infinite), and socket server would never close even though no requests accept
-  read-timeout: 0
-
 security:
   authentication:
-    # Authentication types (supported types: PASSWORD,LDAP)
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
@@ -162,20 +176,50 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
-
-# Traffic control, if you turn on this config, the maximum number of request/s will be limited.
-# global max request number per second
-# default tenant-level max request number
-traffic:
-  control:
-    global-switch: false
-    max-global-qps-rate: 300
-    tenant-switch: false
-    default-tenant-qps-rate: 10
-    #customize-tenant-qps-rate:
-      # eg.
-      #tenant1: 11
-      #tenant2: 20
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: "password"
+    casdoor:
+      user:
+        admin: ""
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google
+casdoor:
+  # Your Casdoor server url
+  endpoint: ""
+  client-id: ""
+  client-secret: ""
+  # The certificate may be multi-line, you can use `|-` for ease
+  certificate: ""
+  # Your organization name added in Casdoor
+  organization-name: ""
+  # Your application name added in Casdoor
+  application-name: ""
+  # Doplhinscheduler login url
+  redirect-url: ""
 
 
 # Override by profile

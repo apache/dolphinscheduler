@@ -24,6 +24,7 @@ import lombok.Getter;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -34,6 +35,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
@@ -68,17 +71,18 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         createDirectoryBox = new CreateDirectoryBox();
     }
 
-    public UdfManagePage createDirectory(String name, String description) {
+    public UdfManagePage createDirectory(String name) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
         return this;
     }
 
     public UdfManagePage uploadFile(String filePath) {
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonUploadUdf));
+
         buttonUploadUdf().click();
 
         driver.setFileDetector(new LocalFileDetector());
@@ -146,12 +150,6 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         })
         private WebElement inputName;
 
-        @FindBys({
-            @FindBy(className = "input-description"),
-            @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
-
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
 
@@ -189,12 +187,6 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(tagName = "input"),
         })
         private WebElement inputDirectoryName;
-
-        @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;

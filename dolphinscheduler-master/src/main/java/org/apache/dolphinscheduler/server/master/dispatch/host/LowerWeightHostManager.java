@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWeight;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
@@ -70,20 +69,13 @@ public class LowerWeightHostManager extends CommonHostManager {
         serverNodeManager.addWorkerInfoChangeListener(new WorkerWeightListener());
     }
 
-    /**
-     * select host
-     *
-     * @param context context
-     * @return host
-     * @throws WorkerGroupNotFoundException If the worker group not found
-     */
     @Override
-    public Host select(ExecutionContext context) throws WorkerGroupNotFoundException {
-        Set<HostWeight> workerHostWeights = getWorkerHostWeights(context.getWorkerGroup());
+    public Optional<Host> select(String workerGroup) throws WorkerGroupNotFoundException {
+        Set<HostWeight> workerHostWeights = getWorkerHostWeights(workerGroup);
         if (CollectionUtils.isNotEmpty(workerHostWeights)) {
-            return selector.select(workerHostWeights).getHost();
+            return Optional.ofNullable(selector.select(workerHostWeights).getHost());
         }
-        return new Host();
+        return Optional.empty();
     }
 
     @Override
@@ -143,12 +135,12 @@ public class LowerWeightHostManager extends CommonHostManager {
             log.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
             return Optional.empty();
         }
-        if (Constants.ABNORMAL_NODE_STATUS == heartBeat.getServerStatus()) {
+        if (ServerStatus.ABNORMAL == heartBeat.getServerStatus()) {
             log.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
                     addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
             return Optional.empty();
         }
-        if (Constants.BUSY_NODE_STATUE == heartBeat.getServerStatus()) {
+        if (ServerStatus.BUSY == heartBeat.getServerStatus()) {
             log.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
                     addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
             return Optional.empty();

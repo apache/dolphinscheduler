@@ -38,7 +38,9 @@ public abstract class AbstractTask {
 
     protected final Logger log = LoggerFactory.getLogger(AbstractTask.class);
 
-    public String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+    private static String groupName1 = "paramName1";
+    private static String groupName2 = "paramName2";
+    public String rgex = String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", groupName1, groupName2);
 
     /**
      * varPool string
@@ -54,11 +56,6 @@ public abstract class AbstractTask {
      * SHELL process pid
      */
     protected int processId;
-
-    /**
-     * SHELL result string
-     */
-    protected String resultString;
 
     /**
      * other resource manager appId , for example : YARN etc
@@ -89,10 +86,7 @@ public abstract class AbstractTask {
     public void init() {
     }
 
-    public String getPreScript() {
-        return null;
-    }
-
+    // todo: return TaskResult rather than store the result in Task
     public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
     public abstract void cancel() throws TaskException;
@@ -124,14 +118,6 @@ public abstract class AbstractTask {
 
     public void setProcessId(int processId) {
         this.processId = processId;
-    }
-
-    public String getResultString() {
-        return resultString;
-    }
-
-    public void setResultString(String resultString) {
-        this.resultString = resultString;
     }
 
     public String getAppIds() {
@@ -171,19 +157,14 @@ public abstract class AbstractTask {
      * @return exit status
      */
     public TaskExecutionStatus getExitStatus() {
-        TaskExecutionStatus status;
         switch (getExitStatusCode()) {
             case TaskConstants.EXIT_CODE_SUCCESS:
-                status = TaskExecutionStatus.SUCCESS;
-                break;
+                return TaskExecutionStatus.SUCCESS;
             case TaskConstants.EXIT_CODE_KILL:
-                status = TaskExecutionStatus.KILL;
-                break;
+                return TaskExecutionStatus.KILL;
             default:
-                status = TaskExecutionStatus.FAILURE;
-                break;
+                return TaskExecutionStatus.FAILURE;
         }
-        return status;
     }
 
     /**
@@ -219,7 +200,11 @@ public abstract class AbstractTask {
         int index = 1;
         while (m.find()) {
 
-            String paramName = m.group(1);
+            String paramName = m.group(groupName1);
+            if (paramName == null) {
+                paramName = m.group(groupName2);
+            }
+
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {

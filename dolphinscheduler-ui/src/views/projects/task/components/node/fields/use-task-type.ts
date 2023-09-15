@@ -37,7 +37,8 @@ export function useTaskType(
     span: 24,
     name: t('project.node.task_type'),
     props: {
-      disabled: readonly || ['CONDITIONS', 'SWITCH'].includes(model.taskType)
+      disabled: readonly || ['CONDITIONS', 'SWITCH'].includes(model.taskType),
+      filterable: true
     },
     options: options,
     validate: {

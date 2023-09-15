@@ -27,26 +27,33 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
-import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.PutObjectRequest;
 
 @Slf4j
 public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
 
-    private static final int OBJECT_NAME_COUNT = 2;
-
     private OSS ossClient;
 
     private String bucketName;
 
-    public OssRemoteLogHandler() {
+    private static OssRemoteLogHandler instance;
+
+    private OssRemoteLogHandler() {
+
+    }
+
+    public static synchronized OssRemoteLogHandler getInstance() {
+        if (instance == null) {
+            instance = new OssRemoteLogHandler();
+            instance.init();
+        }
+
+        return instance;
     }
 
     public void init() {
@@ -61,7 +68,7 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
 
     @Override
     public void sendRemoteLog(String logPath) {
-        String objectName = getObjectNameFromLogPath(logPath);
+        String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
 
         try {
             log.info("send remote log {} to OSS {}", logPath, objectName);
@@ -74,7 +81,7 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
 
     @Override
     public void getRemoteLog(String logPath) {
-        String objectName = getObjectNameFromLogPath(logPath);
+        String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
 
         try {
             log.info("get remote log on OSS {} to {}", objectName, logPath);
@@ -91,34 +98,18 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
         }
     }
 
-    private String getObjectNameFromLogPath(String logPath) {
-        Path path = Paths.get(logPath);
-        int nameCount = path.getNameCount();
-
-        if (nameCount < OBJECT_NAME_COUNT) {
-            return Paths.get(readOssBaseDir(), logPath).toString();
-        } else {
-            return Paths.get(readOssBaseDir(), path.subpath(nameCount - OBJECT_NAME_COUNT, nameCount).toString())
-                    .toString();
-        }
-    }
-
     private void checkBucketNameExists(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException(Constants.REMOTE_LOGGING_OSS_BUCKET_NAME + " is empty");
         }
 
-        Bucket existsBucket = ossClient.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " does not exist, you need to create them by yourself");
-                });
+        boolean existsBucket = ossClient.doesBucketExist(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        log.info("bucketName: {} has been found", existsBucket.getName());
+        log.info("bucketName: {} has been found", bucketName);
     }
 
     private String readOssAccessKeyId() {
@@ -135,9 +126,5 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
 
     private String readOssBucketName() {
         return PropertyUtils.getString(Constants.REMOTE_LOGGING_OSS_BUCKET_NAME);
-    }
-
-    private String readOssBaseDir() {
-        return PropertyUtils.getString(Constants.REMOTE_LOGGING_BASE_DIR);
     }
 }

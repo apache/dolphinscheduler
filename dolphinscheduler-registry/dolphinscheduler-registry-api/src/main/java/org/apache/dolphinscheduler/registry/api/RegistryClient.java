@@ -21,11 +21,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
+import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -71,22 +72,8 @@ public class RegistryClient {
         registry.connectUntilTimeout(duration);
     }
 
-    public int getActiveMasterNum() {
-        Collection<String> childrenList = new ArrayList<>();
-        try {
-            // read master node parent path from conf
-            if (exists(rootNodePath(NodeType.MASTER))) {
-                childrenList = getChildrenKeys(rootNodePath(NodeType.MASTER));
-            }
-        } catch (Exception e) {
-            log.error("getActiveMasterNum error", e);
-        }
-        return childrenList.size();
-    }
-
-    public List<Server> getServerList(NodeType nodeType) {
-        Map<String, String> serverMaps = getServerMaps(nodeType);
-        String parentPath = rootNodePath(nodeType);
+    public List<Server> getServerList(RegistryNodeType registryNodeType) {
+        Map<String, String> serverMaps = getServerMaps(registryNodeType);
 
         List<Server> serverList = new ArrayList<>();
         for (Map.Entry<String, String> entry : serverMaps.entrySet()) {
@@ -97,29 +84,39 @@ public class RegistryClient {
                 continue;
             }
             Server server = new Server();
-            switch (nodeType) {
+            switch (registryNodeType) {
                 case MASTER:
                     MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(heartBeatJson, MasterHeartBeat.class);
                     server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
                     server.setId(masterHeartBeat.getProcessId());
+                    server.setHost(masterHeartBeat.getHost());
+                    server.setPort(masterHeartBeat.getPort());
                     break;
                 case WORKER:
                     WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
                     server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
                     server.setId(workerHeartBeat.getProcessId());
+                    server.setHost(workerHeartBeat.getHost());
+                    server.setPort(workerHeartBeat.getPort());
                     break;
+                case ALERT_SERVER:
+                    AlertServerHeartBeat alertServerHeartBeat =
+                            JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
+                    server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
+                    server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
+                    server.setId(alertServerHeartBeat.getProcessId());
+                    server.setHost(alertServerHeartBeat.getHost());
+                    server.setPort(alertServerHeartBeat.getPort());
+                    break;
+                default:
+                    log.warn("unknown registry node type: {}", registryNodeType);
             }
 
             server.setResInfo(heartBeatJson);
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
-            server.setZkDirectory(parentPath + "/" + serverPath);
-            // set host and port
-            String[] hostAndPort = serverPath.split(Constants.COLON);
-            // fetch the last one
-            server.setHost(hostAndPort[0]);
-            server.setPort(Integer.parseInt(hostAndPort[1]));
+            server.setZkDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
             serverList.add(server);
         }
         return serverList;
@@ -128,13 +125,12 @@ public class RegistryClient {
     /**
      * Return server host:port -> value
      */
-    public Map<String, String> getServerMaps(NodeType nodeType) {
+    public Map<String, String> getServerMaps(RegistryNodeType nodeType) {
         Map<String, String> serverMap = new HashMap<>();
         try {
-            String path = rootNodePath(nodeType);
             Collection<String> serverList = getServerNodes(nodeType);
             for (String server : serverList) {
-                serverMap.putIfAbsent(server, get(path + Constants.SINGLE_SLASH + server));
+                serverMap.putIfAbsent(server, get(nodeType.getRegistryPath() + Constants.SINGLE_SLASH + server));
             }
         } catch (Exception e) {
             log.error("get server list failed", e);
@@ -143,14 +139,14 @@ public class RegistryClient {
         return serverMap;
     }
 
-    public boolean checkNodeExists(String host, NodeType nodeType) {
+    public boolean checkNodeExists(String host, RegistryNodeType nodeType) {
         return getServerMaps(nodeType).keySet()
                 .stream()
                 .anyMatch(it -> it.contains(host));
     }
 
     public Collection<String> getMasterNodesDirectly() {
-        return getChildrenKeys(Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS);
+        return getChildrenKeys(RegistryNodeType.MASTER.getRegistryPath());
     }
 
     /**
@@ -214,18 +210,18 @@ public class RegistryClient {
     }
 
     public boolean isMasterPath(String path) {
-        return path != null && path.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS);
+        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS);
+        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public Collection<String> getChildrenKeys(final String key) {
         return registry.children(key);
     }
 
-    public Set<String> getServerNodeSet(NodeType nodeType) {
+    public Set<String> getServerNodeSet(RegistryNodeType nodeType) {
         try {
             return new HashSet<>(getServerNodes(nodeType));
         } catch (Exception e) {
@@ -234,24 +230,13 @@ public class RegistryClient {
     }
 
     private void initNodes() {
-        registry.put(Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS, EMPTY, false);
-        registry.put(Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS, EMPTY, false);
+        registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
+        registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
+        registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
     }
 
-    private String rootNodePath(NodeType type) {
-        switch (type) {
-            case MASTER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_MASTERS;
-            case WORKER:
-                return Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS;
-            default:
-                throw new IllegalStateException("Should not reach here");
-        }
-    }
-
-    private Collection<String> getServerNodes(NodeType nodeType) {
-        final String path = rootNodePath(nodeType);
-        return getChildrenKeys(path);
+    private Collection<String> getServerNodes(RegistryNodeType nodeType) {
+        return getChildrenKeys(nodeType.getRegistryPath());
     }
 
 }

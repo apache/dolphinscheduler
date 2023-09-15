@@ -2,24 +2,20 @@
 
 ## 基础内置参数
 
-<table>
-    <tr><th>变量名</th><th>声明方式</th><th>含义</th></tr>
-    <tr>
-        <td>system.biz.date</td>
-        <td>${system.biz.date}</td>
-        <td>日常调度实例定时的定时时间前一天，格式为 yyyyMMdd</td>
-    </tr>
-    <tr>
-        <td>system.biz.curdate</td>
-        <td>${system.biz.curdate}</td>
-        <td>日常调度实例定时的定时时间，格式为 yyyyMMdd</td>
-    </tr>
-    <tr>
-        <td>system.datetime</td>
-        <td>${system.datetime}</td>
-        <td>日常调度实例定时的定时时间，格式为 yyyyMMddHHmmss</td>
-    </tr>
-</table>
+|               变量名               |                 声明方式                 |                含义                |
+|---------------------------------|--------------------------------------|----------------------------------|
+| system.biz.date                 | `${system.biz.date}`                 | 日常调度实例定时的定时时间前一天，格式为 yyyyMMdd    |
+| system.biz.curdate              | `${system.biz.curdate}`              | 日常调度实例定时的定时时间，格式为 yyyyMMdd       |
+| system.datetime                 | `${system.datetime}`                 | 日常调度实例定时的定时时间，格式为 yyyyMMddHHmmss |
+| system.task.execute.path        | `${system.task.execute.path}`        | 当前任务执行的绝对路径                      |
+| system.task.instance.id         | `${system.task.instance.id}`         | 当前任务实例的ID                        |
+| system.task.definition.name     | `${system.task.definition.name}`     | 当前任务所属任务定义的名称                    |
+| system.task.definition.code     | `${system.task.definition.code}`     | 当前任务所属任务定义的code                  |
+| system.workflow.instance.id     | `${system.workflow.instance.id}`     | 当前任务所属工作流实例ID                    |
+| system.workflow.definition.name | `${system.workflow.definition.name}` | 当前任务所属工作流定义的名称                   |
+| system.workflow.definition.code | `${system.workflow.definition.code}` | 当前任务所属工作流定义的code                 |
+| system.project.name             | `${system.project.name}`             | 当前任务所在项目的名称                      |
+| system.project.code             | `${system.project.code}`             | 当前任务所在项目的code                    |
 
 ## 衍生内置参数
 

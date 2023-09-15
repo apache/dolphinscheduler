@@ -20,25 +20,29 @@ package org.apache.dolphinscheduler.server.worker.message;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.command.BaseCommand;
-import org.apache.dolphinscheduler.remote.command.CommandType;
 
 import org.apache.commons.collections4.MapUtils;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+
+import com.google.common.base.Objects;
 
 @Component
 @Slf4j
@@ -48,15 +52,16 @@ public class MessageRetryRunner extends BaseDaemonThread {
         super("WorkerMessageRetryRunnerThread");
     }
 
-    private static long MESSAGE_RETRY_WINDOW = Duration.ofMinutes(5L).toMillis();
+    private static final long MESSAGE_RETRY_WINDOW = Duration.ofMinutes(5L).toMillis();
 
     @Lazy
     @Autowired
-    private List<MessageSender> messageSenders;
+    private List<TaskInstanceExecutionEventSender> messageSenders;
 
-    private Map<CommandType, MessageSender<BaseCommand>> messageSenderMap = new HashMap<>();
+    private final Map<ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender<ITaskInstanceExecutionEvent>> messageSenderMap =
+            new HashMap<>();
 
-    private Map<Integer, Map<CommandType, BaseCommand>> needToRetryMessages = new ConcurrentHashMap<>();
+    private final Map<Integer, List<TaskInstanceMessage>> needToRetryMessages = new ConcurrentHashMap<>();
 
     @Override
     public synchronized void start() {
@@ -69,15 +74,17 @@ public class MessageRetryRunner extends BaseDaemonThread {
         log.info("Message retry runner started");
     }
 
-    public void addRetryMessage(int taskInstanceId, @NonNull CommandType messageType, BaseCommand baseCommand) {
-        needToRetryMessages.computeIfAbsent(taskInstanceId, k -> new ConcurrentHashMap<>()).put(messageType,
-                baseCommand);
+    public void addRetryMessage(int taskInstanceId, @NonNull ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent) {
+        needToRetryMessages.computeIfAbsent(taskInstanceId, k -> Collections.synchronizedList(new ArrayList<>()))
+                .add(TaskInstanceMessage.of(taskInstanceId, iTaskInstanceExecutionEvent.getEventType(),
+                        iTaskInstanceExecutionEvent));
     }
 
-    public void removeRetryMessage(int taskInstanceId, @NonNull CommandType messageType) {
-        Map<CommandType, BaseCommand> retryMessages = needToRetryMessages.get(taskInstanceId);
-        if (retryMessages != null) {
-            retryMessages.remove(messageType);
+    public void removeRetryMessage(int taskInstanceId,
+                                   @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType) {
+        List<TaskInstanceMessage> taskInstanceMessages = needToRetryMessages.get(taskInstanceId);
+        if (taskInstanceMessages != null) {
+            taskInstanceMessages.remove(TaskInstanceMessage.of(taskInstanceId, eventType, null));
         }
     }
 
@@ -86,10 +93,10 @@ public class MessageRetryRunner extends BaseDaemonThread {
     }
 
     public void updateMessageHost(int taskInstanceId, String messageReceiverHost) {
-        Map<CommandType, BaseCommand> needToRetryMessages = this.needToRetryMessages.get(taskInstanceId);
-        if (needToRetryMessages != null) {
-            needToRetryMessages.values().forEach(baseMessage -> {
-                baseMessage.setMessageReceiverAddress(messageReceiverHost);
+        List<TaskInstanceMessage> taskInstanceMessages = this.needToRetryMessages.get(taskInstanceId);
+        if (taskInstanceMessages != null) {
+            taskInstanceMessages.forEach(taskInstanceMessage -> {
+                taskInstanceMessage.getEvent().setWorkflowInstanceHost(messageReceiverHost);
             });
         }
     }
@@ -102,26 +109,27 @@ public class MessageRetryRunner extends BaseDaemonThread {
                 }
 
                 long now = System.currentTimeMillis();
-                Iterator<Map.Entry<Integer, Map<CommandType, BaseCommand>>> iterator =
+                Iterator<Map.Entry<Integer, List<TaskInstanceMessage>>> iterator =
                         needToRetryMessages.entrySet().iterator();
                 while (iterator.hasNext()) {
-                    Map.Entry<Integer, Map<CommandType, BaseCommand>> taskEntry = iterator.next();
+                    Map.Entry<Integer, List<TaskInstanceMessage>> taskEntry = iterator.next();
                     Integer taskInstanceId = taskEntry.getKey();
-                    Map<CommandType, BaseCommand> retryMessageMap = taskEntry.getValue();
-                    if (retryMessageMap.isEmpty()) {
+                    List<TaskInstanceMessage> taskInstanceMessages = taskEntry.getValue();
+                    if (taskInstanceMessages.isEmpty()) {
                         iterator.remove();
                         continue;
                     }
                     LogUtils.setTaskInstanceIdMDC(taskInstanceId);
                     try {
-                        for (Map.Entry<CommandType, BaseCommand> messageEntry : retryMessageMap.entrySet()) {
-                            CommandType messageType = messageEntry.getKey();
-                            BaseCommand message = messageEntry.getValue();
-                            if (now - message.getMessageSendTime() > MESSAGE_RETRY_WINDOW) {
-                                log.info("Begin retry send message to master, message: {}", message);
-                                message.setMessageSendTime(now);
-                                messageSenderMap.get(messageType).sendMessage(message);
-                                log.info("Success send message to master, message: {}", message);
+                        for (TaskInstanceMessage taskInstanceMessage : taskInstanceMessages) {
+                            ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType =
+                                    taskInstanceMessage.getEventType();
+                            ITaskInstanceExecutionEvent event = taskInstanceMessage.getEvent();
+                            if (now - event.getEventSendTime() > MESSAGE_RETRY_WINDOW) {
+                                log.info("Begin retry send message to master, event: {}", event);
+                                event.setEventSendTime(now);
+                                messageSenderMap.get(eventType).sendEvent(event);
+                                log.info("Success send message to master, event: {}", event);
                             }
                         }
                     } catch (Exception e) {
@@ -143,5 +151,43 @@ public class MessageRetryRunner extends BaseDaemonThread {
 
     public void clearMessage() {
         needToRetryMessages.clear();
+    }
+
+    /**
+     * If two message has the same taskInstanceId and messageType they will be considered as the same message
+     */
+    @Data
+    public static class TaskInstanceMessage {
+
+        private long taskInstanceId;
+        private ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType;
+        private ITaskInstanceExecutionEvent event;
+
+        public static TaskInstanceMessage of(long taskInstanceId,
+                                             ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType,
+                                             ITaskInstanceExecutionEvent event) {
+            TaskInstanceMessage taskInstanceMessage = new TaskInstanceMessage();
+            taskInstanceMessage.setTaskInstanceId(taskInstanceId);
+            taskInstanceMessage.setEventType(eventType);
+            taskInstanceMessage.setEvent(event);
+            return taskInstanceMessage;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            TaskInstanceMessage that = (TaskInstanceMessage) o;
+            return taskInstanceId == that.taskInstanceId && eventType == that.eventType;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(taskInstanceId, eventType);
+        }
     }
 }

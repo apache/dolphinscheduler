@@ -75,7 +75,7 @@ public final class DateUtils {
      * @return local datetime
      */
     private static LocalDateTime date2LocalDateTime(Date date, ZoneId zoneId) {
-        return LocalDateTime.ofInstant(date.toInstant(), zoneId);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
     }
 
     /**
@@ -581,6 +581,14 @@ public final class DateUtils {
             return 0;
         }
         long usedTime = (System.currentTimeMillis() - baseTime.getTime()) / 1000;
+        return intervalSeconds - usedTime;
+    }
+
+    public static long getRemainTime(Long baseTime, long intervalSeconds) {
+        if (baseTime == null) {
+            return 0;
+        }
+        long usedTime = (System.currentTimeMillis() - baseTime) / 1000;
         return intervalSeconds - usedTime;
     }
 

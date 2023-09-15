@@ -171,7 +171,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         Mockito.when(resourcesService
-                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(),
+                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
