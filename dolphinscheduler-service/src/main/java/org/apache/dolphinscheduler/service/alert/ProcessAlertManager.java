@@ -144,6 +144,7 @@ public class ProcessAlertManager {
                         .taskStartTime(task.getStartTime())
                         .taskEndTime(task.getEndTime())
                         .taskHost(task.getHost())
+                        .taskPriority(task.getTaskInstancePriority().getDescp())
                         .logPath(task.getLogPath())
                         .build();
                 failedTaskList.add(processAlertContent);
@@ -173,6 +174,7 @@ public class ProcessAlertManager {
                     .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
+                    .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
                     .retryTimes(taskInstance.getRetryTimes())
                     .build();
             toleranceTaskInstanceList.add(processAlertContent);
@@ -387,6 +389,7 @@ public class ProcessAlertManager {
                 .startTime(taskInstance.getStartTime())
                 .endTime(taskInstance.getEndTime())
                 .host(taskInstance.getHost())
+                .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
                 .logPath(taskInstance.getLogPath())
                 .build();
 

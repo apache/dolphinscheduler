@@ -60,6 +60,8 @@ public class TaskAlertContent implements Serializable {
     private Date endTime;
     @JsonProperty("host")
     private String host;
+    @JsonProperty("taskPriority")
+    private String taskPriority;
     @JsonProperty("logPath")
     private String logPath;
 
