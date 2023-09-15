@@ -42,6 +42,13 @@ CREATE TABLE if not exists "t_ds_fav_task" (
     "user_id" integer NOT NULL,
     PRIMARY KEY ("id")
 );
+
+ALTER TABLE t_ds_process_definition ADD COLUMN IF NOT EXISTS execution_type int NULL DEFAULT '0';
+
+ALTER TABLE t_ds_process_definition_log ADD COLUMN IF NOT EXISTS execution_type int NULL DEFAULT '0';
+
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS next_process_instance_id int NULL DEFAULT '0';
+
 CREATE TABLE if not exists "t_ds_project_preference" (
     "id" int NOT NULL,
     "code" bigint NOT NULL,
