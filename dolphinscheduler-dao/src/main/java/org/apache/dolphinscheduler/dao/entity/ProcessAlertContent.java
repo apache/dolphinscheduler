@@ -93,6 +93,8 @@ public class ProcessAlertContent implements Serializable {
     private Date taskEndTime;
     @JsonProperty("taskHost")
     private String taskHost;
+    @JsonProperty("taskPriority")
+    private String taskPriority;
     @JsonProperty("logPath")
     private String logPath;
 
