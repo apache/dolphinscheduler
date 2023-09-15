@@ -15,31 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.registry;
 
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.Map;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MasterHeartBeat implements HeartBeat {
+/**
+ * The listener used in {@link ServerNodeManager} to notify the change of master info.
+ */
+public interface MasterInfoChangeListener {
 
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double memoryUsage;
-    private double availablePhysicalMemorySize;
-    private double reservedMemory;
-    private double diskAvailable;
-    private int processId;
-    private ServerStatus serverStatus;
-
-    private String host;
-    private int port;
+    /**
+     * Used to notify the change of master info.
+     *
+     * @param masterNodeInfo master node info map, key is master address, value is master info.
+     */
+    void notify(Map<String, MasterHeartBeat> masterNodeInfo);
 }

@@ -93,17 +93,16 @@ public interface DataSourceProcessor {
      * @param connectionParam connectionParam
      * @return {@link Connection}
      */
+    // todo: Change to return a ConnectionWrapper
     Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException;
 
     /**
-     * test connection, use for not jdbc datasource
+     * test connection
      *
      * @param connectionParam connectionParam
      * @return true if connection is valid
      */
-    default boolean testConnection(ConnectionParam connectionParam) {
-        return false;
-    }
+    boolean checkDataSourceConnectivity(ConnectionParam connectionParam);
 
     /**
      * @return {@link DbType}
