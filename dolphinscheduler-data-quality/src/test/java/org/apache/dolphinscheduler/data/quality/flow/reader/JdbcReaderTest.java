@@ -56,7 +56,7 @@ public class JdbcReaderTest extends FlowTestBase {
     private Config buildReaderConfig() {
         Map<String, Object> config = new HashMap<>();
         config.put(DATABASE, "test");
-        config.put(TABLE, "test.test1");
+        config.put(TABLE, "test1");
         config.put(URL, url);
         config.put(USER, "test");
         config.put(PASSWORD, "123456");

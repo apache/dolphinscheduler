@@ -43,12 +43,17 @@ import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.IMasterLogService;
+import org.apache.dolphinscheduler.extract.worker.IStreamingTaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.command.TaskKillRequestCommand;
-import org.apache.dolphinscheduler.remote.command.TaskSavePointRequestCommand;
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClient;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -99,12 +104,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private StateEventCallbackService stateEventCallbackService;
-
-    @Autowired
-    private LogClient logClient;
-
-    @Autowired
     private DqExecuteResultDao dqExecuteResultDao;
 
     @Autowired
@@ -118,6 +117,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @param processInstanceId process instance id
      * @param searchVal         search value
      * @param taskName          task name
+     * @param taskCode          task code
      * @param stateType         state type
      * @param host              host
      * @param startDate         start time
@@ -133,6 +133,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                       String processInstanceName,
                                       String processDefinitionName,
                                       String taskName,
+                                      Long taskCode,
                                       String executorName,
                                       String startDate,
                                       String endDate,
@@ -163,6 +164,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     processDefinitionName,
                     searchVal,
                     taskName,
+                    taskCode,
                     executorName,
                     statusArray,
                     host,
@@ -177,6 +179,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     processInstanceName,
                     searchVal,
                     taskName,
+                    taskCode,
                     executorName,
                     statusArray,
                     host,
@@ -290,13 +293,13 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
-
-        TaskSavePointRequestCommand command = new TaskSavePointRequestCommand(taskInstanceId);
-
-        Host host = new Host(taskInstance.getHost());
-        stateEventCallbackService.sendResult(host, command.convert2Command());
+        IStreamingTaskInstanceOperator streamingTaskInstanceOperator =
+                SingletonJdkDynamicRpcClientProxyFactory
+                        .getProxyClient(taskInstance.getHost(), IStreamingTaskInstanceOperator.class);
+        TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse =
+                streamingTaskInstanceOperator.triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
+        log.info("StreamingTaskInstance trigger savepoint response: {}", taskInstanceTriggerSavepointResponse);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -322,11 +325,14 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return result;
         }
 
-        TaskKillRequestCommand command = new TaskKillRequestCommand(taskInstanceId);
-        Host host = new Host(taskInstance.getHost());
-        stateEventCallbackService.sendResult(host, command.convert2Command());
-        putMsg(result, Status.SUCCESS);
+        // todo: we only support streaming task for now
+        ITaskInstanceOperator iTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
+                .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
+        TaskInstanceKillResponse taskInstanceKillResponse =
+                iTaskInstanceOperator.killTask(new TaskInstanceKillRequest(taskInstanceId));
+        log.info("TaskInstance kill response: {}", taskInstanceKillResponse);
 
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -371,14 +377,22 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Override
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {
         List<TaskInstance> needToDeleteTaskInstances =
-                taskInstanceDao.findTaskInstanceByWorkflowInstanceId(workflowInstanceId);
+                taskInstanceDao.queryByWorkflowInstanceId(workflowInstanceId);
         if (org.apache.commons.collections4.CollectionUtils.isEmpty(needToDeleteTaskInstances)) {
             return;
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
             // delete log
             if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
-                logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskInstance.getLogPath());
+                if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
+                    IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
+                            .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
+                    masterLogService.removeLogicTaskInstanceLog(taskInstance.getLogPath());
+                } else {
+                    IWorkerLogService workerLogService = SingletonJdkDynamicRpcClientProxyFactory
+                            .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
+                    workerLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+                }
             }
         }
 

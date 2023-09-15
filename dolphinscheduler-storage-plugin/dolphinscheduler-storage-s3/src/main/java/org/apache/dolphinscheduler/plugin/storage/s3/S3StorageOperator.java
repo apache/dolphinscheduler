@@ -46,7 +46,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,11 +59,9 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
-import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
@@ -76,7 +73,6 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.services.s3.transfer.MultipleFileDownload;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
-import com.google.common.base.Joiner;
 
 @Slf4j
 @Data
@@ -113,7 +109,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     .standard()
                     .withPathStyleAccessEnabled(true)
                     .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
-                            endPoint, Regions.fromName(region).getName()))
+                            endPoint, region))
                     .withCredentials(
                             new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
                     .build();
@@ -122,7 +118,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     .standard()
                     .withCredentials(
                             new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
-                    .withRegion(Regions.fromName(region))
+                    .withRegion(region)
                     .build();
         }
     }
@@ -182,7 +178,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fileName) {
+    public String getResourceFullName(String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
@@ -190,23 +186,9 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String fullName) {
-        // here is a quick fix here to get fileName. We get the resource upload path and
-        // get the index of the first appearance of resource upload path. The index is put
-        // in the start index of the substring function and get the result substring containing
-        // tenantcode and "resource" directory and the fileName.
-        // Then we split the result substring
-        // with "/" and join all elements except the first two elements because they are
-        // tenantCode and "resource" directory.
-        String resourceUploadPath =
-                RESOURCE_UPLOAD_PATH.endsWith(FOLDER_SEPARATOR) ? StringUtils.chop(RESOURCE_UPLOAD_PATH)
-                        : RESOURCE_UPLOAD_PATH;
-        // +1 because we want to skip the "/" after resource upload path as well.
-        String pathContainingTenantNResource = fullName.substring(
-                fullName.indexOf(resourceUploadPath)
-                        + resourceUploadPath.length() + 1);
-        String[] fileNameArr = pathContainingTenantNResource.split(FOLDER_SEPARATOR);
-        return Joiner.on(FOLDER_SEPARATOR).join(Arrays.stream(fileNameArr).skip(2).collect(Collectors.toList()));
+    public String getResourceFileName(String tenantCode, String fullName) {
+        String resDir = getResDir(tenantCode);
+        return fullName.replaceFirst(resDir, "");
     }
 
     @Override
@@ -218,7 +200,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
+    public void download(String tenantCode, String srcFilePath, String dstFilePath,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
@@ -279,7 +261,9 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         s3Client.copyObject(bucketName, srcPath, bucketName, dstPath);
-        s3Client.deleteObject(bucketName, srcPath);
+        if (deleteSource) {
+            s3Client.deleteObject(bucketName, srcPath);
+        }
         return true;
     }
 
@@ -290,6 +274,8 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 return getUdfDir(tenantCode);
             case FILE:
                 return getResDir(tenantCode);
+            case ALL:
+                return getS3DataBasePath();
             default:
                 return "";
         }
@@ -301,6 +287,10 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                           boolean overwrite) throws IOException {
         try {
             s3Client.putObject(bucketName, dstPath, new File(srcFile));
+
+            if (deleteSource) {
+                Files.delete(Paths.get(srcFile));
+            }
             return true;
         } catch (AmazonServiceException e) {
             log.error("upload failed,the bucketName is {},the filePath is {}", bucketName, dstPath);
@@ -412,17 +402,13 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             throw new IllegalArgumentException("resource.aws.s3.bucket.name is blank");
         }
 
-        Bucket existsBucket = s3Client.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
-                });
+        boolean existsBucket = s3Client.doesBucketExistV2(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        log.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(),
+        log.info("bucketName: {} has been found, the current regionName is {}", bucketName,
                 s3Client.getRegionName());
     }
 
@@ -507,7 +493,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                     entity.setFileName(fileName);
                     entity.setFullName(summary.getKey());
                     entity.setDirectory(false);
-                    entity.setDescription("");
                     entity.setUserName(tenantCode);
                     entity.setType(type);
                     entity.setSize(summary.getSize());
@@ -529,7 +514,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(commonPrefix);
                 entity.setDirectory(true);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(0);
@@ -578,7 +562,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
             entity.setFileName(fileName);
             entity.setFullName(path);
             entity.setDirectory(true);
-            entity.setDescription("");
             entity.setUserName(tenantCode);
             entity.setType(type);
             entity.setSize(0);
@@ -598,7 +581,6 @@ public class S3StorageOperator implements Closeable, StorageOperate {
                 entity.setFileName(fileName);
                 entity.setFullName(summary.getKey());
                 entity.setDirectory(false);
-                entity.setDescription("");
                 entity.setUserName(tenantCode);
                 entity.setType(type);
                 entity.setSize(summary.getSize());

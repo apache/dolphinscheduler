@@ -32,6 +32,8 @@ public final class Constants {
      */
     public static final String REQUEST_CONTENT_TYPE = "application/x-www-form-urlencoded";
 
+    public static final String MULTIPART_FORM_DATA = "application/x-www-form-urlencoded";
+
     /**
      * header's session id's key
      */

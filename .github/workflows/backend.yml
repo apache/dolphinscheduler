@@ -42,6 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
+      db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
@@ -50,6 +51,8 @@ jobs:
           filters: |
             not-ignore:
               - '!(docs/**)'
+            db-schema:
+              - 'dolphinscheduler-dao/src/main/resources/sql/**'
   build:
     name: Backend-Build
     needs: paths-filter
@@ -75,13 +78,14 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
+          restore-keys: ${{ runner.os }}-maven-
       - name: Build and Package on ${{ matrix.java }}
         run: |
           ./mvnw -B clean install \
-                 -Prelease,docker \
+                 -Prelease \
                  -Dmaven.test.skip=true \
-                 -Dcheckstyle.skip=true \
+                 -Dspotless.skip=true \
                  -Dhttp.keepAlive=false \
                  -Dmaven.wagon.http.pool=false \
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
@@ -119,16 +123,147 @@ jobs:
       - name: Running cluster test
         run: |
           /bin/bash ${{ matrix.case.script }}
+  schema-check:
+    runs-on: ubuntu-latest
+    if: ${{ (needs.paths-filter.outputs.db-schema == 'true') || (github.event_name == 'push') }}
+    timeout-minutes: 20
+    needs: build
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: mysql
+          MYSQL_DATABASE: dolphinscheduler_dev
+        ports:
+          - 3306:3306
+        options: --name=mysql --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: dolphinscheduler_dev
+        ports:
+          - 5432:5432
+        options: --name=postgres --health-cmd=pg_isready --health-interval=10s --health-timeout=5s --health-retries=5
+    strategy:
+      fail-fast: false
+      matrix:
+        db: ["mysql", "postgresql"]
+        version: ["2.0.9", "3.0.6", "3.1.8"]
+    steps:
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'adopt'
+      - name: Install Atlas and Create Dir
+        run: |
+          mkdir -p dolphinscheduler/dev dolphinscheduler/${{ matrix.version }}
+          curl -sSf https://atlasgo.sh | sh
+      - name: Download Tarball
+        uses: actions/download-artifact@v2
+        with:
+          name: binary-package-8
+          path: dolphinscheduler/dev
+      - name: Set Env
+        run: |
+          VERSION=${{ matrix.version }}
+          echo "DATABASE_VERSION=${VERSION//\./}" >> $GITHUB_ENV
+      - name: Prepare
+        run: |
+          wget https://dlcdn.apache.org/dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -P dolphinscheduler/${{ matrix.version }}
+          tar -xzf dolphinscheduler/${{ matrix.version }}/apache-dolphinscheduler-${{ matrix.version }}-bin.tar.gz -C dolphinscheduler/${{ matrix.version }} --strip-components 1
+          tar -xzf dolphinscheduler/dev/apache-dolphinscheduler-*-bin.tar.gz -C dolphinscheduler/dev --strip-components 1
+
+          if [[ ${{ matrix.db }} == "mysql" ]]; then
+            MYSQL_JDBC_URL="https://repo.maven.apache.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar"
+            MYSQL_JDBC_JAR="mysql-connector-java-8.0.16.jar"
+            wget ${MYSQL_JDBC_URL} -O /tmp/${MYSQL_JDBC_JAR}
+            for base_dir in dolphinscheduler/dev dolphinscheduler/${{ matrix.version }}; do
+              if [[ $base_dir == *"dolphinscheduler/2"* ]]; then
+                cp /tmp/${MYSQL_JDBC_JAR} ${base_dir}/lib
+              else
+                for d in alert-server api-server master-server worker-server tools; do
+                  cp /tmp/${MYSQL_JDBC_JAR} ${base_dir}/${d}/libs
+                done
+              fi
+            done
+            docker exec -i mysql mysql -uroot -pmysql -e "create database dolphinscheduler_${{ env.DATABASE_VERSION }}"; 
+          else
+            docker exec -i postgres psql -U postgres -c "create database dolphinscheduler_${{ env.DATABASE_VERSION }};"
+          fi
+      - name: Check
+        run: |
+          if [[ $DATABASE_VERSION -lt 300 ]]; then
+            chmod +x dolphinscheduler/dev/tools/bin/upgrade-schema.sh dolphinscheduler/${{ matrix.version }}/script/create-dolphinscheduler.sh
+          else
+            chmod +x dolphinscheduler/dev/tools/bin/upgrade-schema.sh dolphinscheduler/${{ matrix.version }}/tools/bin/upgrade-schema.sh
+          fi
+          if [[ ${{ matrix.db }} == "mysql" ]]; then
+            export DATABASE="mysql"
+            export SPRING_DATASOURCE_DRIVER_CLASS_NAME="com.mysql.cj.jdbc.Driver"
+            export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_dev?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
+            export SPRING_DATASOURCE_USERNAME="root"
+            export SPRING_DATASOURCE_PASSWORD="mysql"
+            bash dolphinscheduler/dev/tools/bin/upgrade-schema.sh
+
+            export SPRING_DATASOURCE_URL="jdbc:mysql://127.0.0.1:3306/dolphinscheduler_${{ env.DATABASE_VERSION }}?useUnicode=true&characterEncoding=UTF-8&allowMultiQueries=true&useSSL=false"
+            if [[ $DATABASE_VERSION -lt 300 ]]; then
+              bash dolphinscheduler/${{ matrix.version }}/script/create-dolphinscheduler.sh
+            else
+              bash dolphinscheduler/${{ matrix.version }}/tools/bin/upgrade-schema.sh
+            fi
+            bash dolphinscheduler/dev/tools/bin/upgrade-schema.sh
+
+            atlas_result=$(atlas schema diff \
+              --from "mysql://root:mysql@127.0.0.1:3306/dolphinscheduler_${{ env.DATABASE_VERSION }}" \
+              --to "mysql://root:mysql@127.0.0.1:3306/dolphinscheduler_dev")
+            if [[ ${atlas_result} != *"Schemas are synced"* ]]; then
+              echo "================================================================================================"
+              echo "                                !!!!! For Contributors !!!!!"
+              echo "================================================================================================"
+              echo "Database schema not sync, please add below change in the latest version of dolphinscheduler-dao/src/main/resources/sql/upgrade directory"
+              echo "${atlas_result}"
+              exit 1
+            fi
+          else
+            export DATABASE="postgresql"
+            export SPRING_DATASOURCE_DRIVER_CLASS_NAME="org.postgresql.Driver"
+            export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_dev"
+            export SPRING_DATASOURCE_USERNAME="postgres"
+            export SPRING_DATASOURCE_PASSWORD="postgres"
+            bash dolphinscheduler/dev/tools/bin/upgrade-schema.sh
+          
+            export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler_${{ env.DATABASE_VERSION }}"
+            if [[ $DATABASE_VERSION -lt 300 ]]; then
+              bash dolphinscheduler/${{ matrix.version }}/script/create-dolphinscheduler.sh
+            else
+              bash dolphinscheduler/${{ matrix.version }}/tools/bin/upgrade-schema.sh
+            fi
+            bash dolphinscheduler/dev/tools/bin/upgrade-schema.sh
+          
+            atlas_result=$(atlas schema diff \
+              --from "postgres://postgres:postgres@127.0.0.1:5432/dolphinscheduler_${{ env.DATABASE_VERSION }}?search_path=public&sslmode=disable" \
+              --to "postgres://postgres:postgres@127.0.0.1:5432/dolphinscheduler_dev?search_path=public&sslmode=disable")
+            if [[ ${atlas_result} != *"Schemas are synced"* ]]; then
+              echo "================================================================================================"
+              echo "                                !!!!! For Contributors !!!!!"
+              echo "================================================================================================"
+              echo "Database schema not sync, please add below change in the latest version in dolphinscheduler-dao/src/main/resources/sql/upgrade directory"
+              echo "${atlas_result}"
+              exit 1
+            fi
+          fi
   result:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ build, paths-filter, cluster-test ]
+    needs: [ build, paths-filter, cluster-test, schema-check ]
     if: always()
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ needs.paths-filter.outputs.db-schema }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
             echo "Skip Build!"
             exit 0
           fi

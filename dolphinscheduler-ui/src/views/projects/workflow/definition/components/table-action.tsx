@@ -189,16 +189,25 @@ export default defineComponent({
                 type={releaseState === 'ONLINE' ? 'warning' : 'error'}
                 tag='div'
                 circle
-                onClick={this.handleReleaseWorkflow}
                 class='btn-publish'
               >
-                <NIcon>
-                  {releaseState === 'ONLINE' ? (
-                    <DownloadOutlined />
-                  ) : (
-                    <UploadOutlined />
-                  )}
-                </NIcon>
+                <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
+                  {{
+                    default: () =>
+                      releaseState === 'ONLINE'
+                        ? t('project.workflow.confirm_to_offline')
+                        : t('project.workflow.confirm_to_online'),
+                    trigger: () => (
+                      <NIcon>
+                        {releaseState === 'ONLINE' ? (
+                          <DownloadOutlined />
+                        ) : (
+                          <UploadOutlined />
+                        )}
+                      </NIcon>
+                    )
+                  }}
+                </NPopconfirm>
               </NButton>
             )
           }}

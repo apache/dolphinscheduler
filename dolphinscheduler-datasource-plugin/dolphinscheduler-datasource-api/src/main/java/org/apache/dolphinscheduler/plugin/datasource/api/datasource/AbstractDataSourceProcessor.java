@@ -26,15 +26,19 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 
+@Slf4j
 public abstract class AbstractDataSourceProcessor implements DataSourceProcessor {
 
     private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\,]+$");
@@ -43,7 +47,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
 
     private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
 
-    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.]+$");
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.\\:]+$");
 
     private static final Set<String> POSSIBLE_MALICIOUS_KEYS = Sets.newHashSet("allowLoadLocalInfile");
 
@@ -110,5 +114,15 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getUser(),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()), baseConnectionParam.getJdbcUrl());
+    }
+
+    @Override
+    public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
+        try (Connection connection = getConnection(connectionParam)) {
+            return true;
+        } catch (Exception e) {
+            log.error("Check datasource connectivity for: {} error", getDbType().name(), e);
+            return false;
+        }
     }
 }

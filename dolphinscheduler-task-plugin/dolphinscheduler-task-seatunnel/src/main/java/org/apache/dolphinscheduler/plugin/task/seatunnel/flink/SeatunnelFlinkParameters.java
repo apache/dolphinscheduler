@@ -19,41 +19,30 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel.flink;
 
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
 public class SeatunnelFlinkParameters extends SeatunnelParameters {
 
     private RunModeEnum runMode;
 
     private String others;
 
-    public static enum RunModeEnum {
+    @Getter
+    public enum RunModeEnum {
 
-        RUN("--run-mode run"),
-        RUN_APPLICATION("--run-mode run-application");
+        NONE("none"),
+        RUN("--deploy-mode run"),
+        RUN_APPLICATION("--deploy-mode run-application");
 
-        private String command;
+        private final String command;
 
         RunModeEnum(String command) {
             this.command = command;
         }
-
-        public String getCommand() {
-            return command;
-        }
-    }
-
-    public RunModeEnum getRunMode() {
-        return runMode;
-    }
-
-    public void setRunMode(RunModeEnum runMode) {
-        this.runMode = runMode;
-    }
-
-    public String getOthers() {
-        return others;
-    }
-
-    public void setOthers(String others) {
-        this.others = others;
     }
 }

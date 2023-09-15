@@ -29,8 +29,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
+import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueueLooper;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -62,9 +62,6 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private WorkerManagerThread workerManagerThread;
 
-    /**
-     * worker registry
-     */
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
@@ -75,13 +72,13 @@ public class WorkerServer implements IStoppable {
     private WorkerRpcServer workerRpcServer;
 
     @Autowired
-    private WorkerRpcClient workerRpcClient;
-
-    @Autowired
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
     private WorkerConfig workerConfig;
+
+    @Autowired
+    private GlobalTaskInstanceDispatchQueueLooper globalTaskInstanceDispatchQueueLooper;
 
     /**
      * worker server startup, not use web service
@@ -96,7 +93,6 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         this.workerRpcServer.start();
-        this.workerRpcClient.start();
         this.taskPluginManager.loadPlugin();
 
         this.workerRegistryClient.setRegistryStoppable(this);
@@ -105,6 +101,7 @@ public class WorkerServer implements IStoppable {
         this.workerManagerThread.start();
 
         this.messageRetryRunner.start();
+        this.globalTaskInstanceDispatchQueueLooper.start();
 
         /*
          * registry hooks, which are called before the process exits
@@ -141,9 +138,6 @@ public class WorkerServer implements IStoppable {
         close(cause);
     }
 
-    /**
-     * kill all tasks which are running
-     */
     public void killAllRunningTasks() {
         Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
         if (CollectionUtils.isEmpty(taskRequests)) {

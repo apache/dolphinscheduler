@@ -18,7 +18,7 @@
 import { reactive, ref, unref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FormRules } from 'naive-ui'
-import { IUploadDefaultValue } from "@/views/resource/components/resource/types";
+import { IUploadDefaultValue } from '@/views/resource/components/resource/types'
 
 const defaultValue: IUploadDefaultValue = () => ({
   isReupload: false,
@@ -26,7 +26,6 @@ const defaultValue: IUploadDefaultValue = () => ({
   user_name: '',
   name: '',
   file: '',
-  description: '',
   type: undefined!,
   pid: -1,
   currentDir: '/'

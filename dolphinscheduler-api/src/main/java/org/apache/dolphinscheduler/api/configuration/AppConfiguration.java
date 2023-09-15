@@ -44,13 +44,13 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 public class AppConfiguration implements WebMvcConfigurer {
 
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
-    public static final String LOGIN_PATH_PATTERN = "/login";
+    public static final String LOGIN_PATH_PATTERN = "/login/**";
     public static final String REGISTER_PATH_PATTERN = "/users/register";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
 
     @Autowired
-    private TrafficConfiguration trafficConfiguration;
+    private ApiConfig apiConfig;
 
     @Bean
     public CorsFilter corsFilter() {
@@ -90,21 +90,23 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     @Bean
     public RateLimitInterceptor createRateLimitInterceptor() {
-        return new RateLimitInterceptor(trafficConfiguration);
+        return new RateLimitInterceptor(apiConfig.getTrafficControl());
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // i18n
         registry.addInterceptor(localeChangeInterceptor());
-        if (trafficConfiguration.isGlobalSwitch() || trafficConfiguration.isTenantSwitch()) {
+        ApiConfig.TrafficConfiguration trafficControl = apiConfig.getTrafficControl();
+        if (trafficControl.isGlobalSwitch() || trafficControl.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
                         "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
-                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error");
+                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error", "/oauth2-provider",
+                        "/redirect/login/oauth2", "/cookies");
     }
 
     @Override

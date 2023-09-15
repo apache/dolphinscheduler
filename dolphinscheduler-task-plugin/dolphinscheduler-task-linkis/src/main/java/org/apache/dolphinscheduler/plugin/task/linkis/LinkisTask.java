@@ -26,11 +26,11 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -101,8 +100,10 @@ public class LinkisTask extends AbstractRemoteTask {
     public void submitApplication() throws TaskException {
         try {
             // construct process
-            String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, null);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .appendScript(buildCommand());
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, null);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(findTaskId(commandExecuteResult.getResultString()));
             setProcessId(commandExecuteResult.getProcessId());
@@ -128,7 +129,9 @@ public class LinkisTask extends AbstractRemoteTask {
             args.add(Constants.STATUS_OPTIONS);
             args.add(taskId);
             String command = String.join(Constants.SPACE, args);
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, null);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .appendScript(command);
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, null);
             String status = findStatus(commandExecuteResult.getResultString());
             LinkisJobStatus jobStatus = LinkisJobStatus.convertFromJobStatusString(status);
             switch (jobStatus) {
@@ -161,7 +164,10 @@ public class LinkisTask extends AbstractRemoteTask {
             args.add(Constants.KILL_OPTIONS);
             args.add(taskId);
             String command = String.join(Constants.SPACE, args);
-            shellCommandExecutor.run(command, null);
+
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .appendScript(command);
+            shellCommandExecutor.run(shellActuatorBuilder, null);
             setExitStatusCode(EXIT_CODE_KILL);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -177,7 +183,7 @@ public class LinkisTask extends AbstractRemoteTask {
         List<String> args = new ArrayList<>();
         args.addAll(buildOptions());
 
-        String command = String.join(Constants.SPACE, args);
+        String command = String.join(" ", args);
         log.info("Linkis task command: {}", command);
 
         return command;
@@ -188,18 +194,11 @@ public class LinkisTask extends AbstractRemoteTask {
         args.add(Constants.SHELL_CLI_OPTIONS);
         args.add(Constants.ASYNC_OPTIONS);
         if (BooleanUtils.isTrue(linkisParameters.getUseCustom())) {
-            args.add(buildCustomConfigContent());
+            args.add(linkisParameters.getRawScript());
         } else {
             args.add(buildParamConfigContent());
         }
         return args;
-    }
-
-    private String buildCustomConfigContent() {
-        log.info("raw custom config content : {}", linkisParameters.getRawScript());
-        String script = linkisParameters.getRawScript().replaceAll("\\r\\n", "\n");
-        script = parseScript(script);
-        return script;
     }
 
     private String buildParamConfigContent() {
@@ -211,7 +210,6 @@ public class LinkisTask extends AbstractRemoteTask {
                     .concat(Constants.SPACE)
                     .concat(param.getValue());
         }
-        script = parseScript(script);
         return script;
     }
 
@@ -249,9 +247,4 @@ public class LinkisTask extends AbstractRemoteTask {
         return linkisParameters;
     }
 
-    private String parseScript(String script) {
-        // combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
 }

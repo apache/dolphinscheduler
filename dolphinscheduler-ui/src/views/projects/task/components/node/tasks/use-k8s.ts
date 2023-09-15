@@ -38,6 +38,8 @@ export function useK8s({
     description: '',
     timeoutFlag: false,
     localParams: [],
+    customizedLabels: [],
+    nodeSelectors: [],
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,

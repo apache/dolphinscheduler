@@ -39,6 +39,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -252,6 +253,11 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAVA)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("/opt/share/jar/resource2.jar", "opt/share/jar/resource2.jar");
+        map.put("/opt/share/jar/main.jar", "opt/share/jar/main.jar");
+        map.put("/JavaTaskTest.java", "JavaTaskTest.java");
+        taskExecutionContext.setResources(map);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;
@@ -267,6 +273,10 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAR)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
+        HashMap<String, String> map = new HashMap<>();
+        map.put("/opt/share/jar/resource2.jar", "opt/share/jar/resource2.jar");
+        map.put("/opt/share/jar/main.jar", "opt/share/jar/main.jar");
+        taskExecutionContext.setResources(map);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;

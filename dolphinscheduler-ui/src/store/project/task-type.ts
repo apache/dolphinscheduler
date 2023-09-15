@@ -32,6 +32,9 @@ export const TASK_TYPES_MAP = {
   SUB_PROCESS: {
     alias: 'SUB_PROCESS'
   },
+  DYNAMIC: {
+    alias: 'DYNAMIC'
+  },
   PROCEDURE: {
     alias: 'PROCEDURE'
   },
@@ -152,6 +155,10 @@ export const TASK_TYPES_MAP = {
   },
   DATA_FACTORY: {
     alias: 'DATA_FACTORY',
+    helperLinkDisable: true
+  },
+  REMOTESHELL: {
+    alias: 'REMOTESHELL',
     helperLinkDisable: true
   }
 } as {

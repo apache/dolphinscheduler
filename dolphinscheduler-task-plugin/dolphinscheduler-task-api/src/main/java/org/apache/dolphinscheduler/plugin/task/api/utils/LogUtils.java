@@ -26,11 +26,8 @@ import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -45,11 +42,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
@@ -61,69 +58,95 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 @UtilityClass
 public class LogUtils {
 
-    private static final String LOG_TAILFIX = ".log";
+    private static Path TASK_INSTANCE_LOG_BASE_PATH = getTaskInstanceLogBasePath();
+    public static final String TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY = "taskInstanceLogFullPath";
+
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
-    public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
+    /**
+     * Get application_id from log file.
+     *
+     * @param logPath     log file path
+     * @param appInfoPath appInfo file path
+     * @param fetchWay    fetch way
+     * @return application id list.
+     */
+    public List<String> getAppIds(String logPath, String appInfoPath, String fetchWay) {
         if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
-            log.info("Start finding appId in {}, fetch way: {} ", appInfoPath);
-            return getAppIdsFromAppInfoFile(appInfoPath, log);
+            log.info("Start finding appId in {}, fetch way: {} ", appInfoPath, fetchWay);
+            return getAppIdsFromAppInfoFile(appInfoPath);
         } else {
-            log.info("Start finding appId in {}, fetch way: {} ", logPath);
-            return getAppIdsFromLogFile(logPath, log);
+            log.info("Start finding appId in {}, fetch way: {} ", logPath, fetchWay);
+            return getAppIdsFromLogFile(logPath);
         }
     }
 
-    public static String getTaskLogPath(TaskExecutionContext taskExecutionContext) {
-        return getTaskLogPath(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+    /**
+     * Get task instance log full path.
+     *
+     * @param taskExecutionContext task execution context.
+     * @return task instance log full path.
+     */
+    public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext) {
+        return getTaskInstanceLogFullPath(
+                DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getProcessDefineCode(),
                 taskExecutionContext.getProcessDefineVersion(),
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
     }
 
-    public static String getTaskLogPath(Date firstSubmitTime,
-                                        Long processDefineCode,
-                                        int processDefineVersion,
-                                        int processInstanceId,
-                                        int taskInstanceId) {
-        // format /logs/YYYYMMDD/defintion-code_defintion_version-processInstanceId-taskInstanceId.log
-        final String taskLogFileName = new StringBuilder(String.valueOf(processDefineCode))
-                .append(Constants.UNDERLINE)
-                .append(processDefineVersion)
-                .append(Constants.SUBTRACT_CHAR)
-                .append(processInstanceId)
-                .append(Constants.SUBTRACT_CHAR)
-                .append(taskInstanceId)
-                .append(LOG_TAILFIX)
+    /**
+     * todo: Remove the submitTime parameter?
+     * The task instance log full path, the path is like:{log.base}/{taskSubmitTime}/{workflowDefinitionCode}/{workflowDefinitionVersion}/{}workflowInstance}/{taskInstance}.log
+     *
+     * @param taskFirstSubmitTime       task first submit time
+     * @param workflowDefinitionCode    workflow definition code
+     * @param workflowDefinitionVersion workflow definition version
+     * @param workflowInstanceId        workflow instance id
+     * @param taskInstanceId            task instance id.
+     * @return task instance log full path.
+     */
+    public static String getTaskInstanceLogFullPath(Date taskFirstSubmitTime,
+                                                    Long workflowDefinitionCode,
+                                                    int workflowDefinitionVersion,
+                                                    int workflowInstanceId,
+                                                    int taskInstanceId) {
+        if (TASK_INSTANCE_LOG_BASE_PATH == null) {
+            throw new IllegalArgumentException(
+                    "Cannot find the task instance log base path, please check your logback.xml file");
+        }
+        final String taskLogFileName = Paths.get(
+                String.valueOf(workflowDefinitionCode),
+                String.valueOf(workflowDefinitionVersion),
+                String.valueOf(workflowInstanceId),
+                String.format("%s.log", taskInstanceId)).toString();
+        return TASK_INSTANCE_LOG_BASE_PATH
+                .resolve(DateUtils.format(taskFirstSubmitTime, DateConstants.YYYYMMDD, null))
+                .resolve(taskLogFileName)
                 .toString();
-        // Optional.map will be skipped if null
+    }
+
+    /**
+     * Get task instance log base absolute path, this is defined in logback.xml
+     *
+     * @return
+     */
+    public static Path getTaskInstanceLogBasePath() {
         return Optional.of(LoggerFactory.getILoggerFactory())
                 .map(e -> (AppenderAttachable<ILoggingEvent>) (e.getLogger("ROOT")))
                 .map(e -> (SiftingAppender) (e.getAppender("TASKLOGFILE")))
                 .map(e -> ((TaskLogDiscriminator) (e.getDiscriminator())))
                 .map(TaskLogDiscriminator::getLogBase)
-                .map(e -> Paths.get(e)
-                        .toAbsolutePath()
-                        .resolve(DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null))
-                        .resolve(taskLogFileName))
-                .map(Path::toString)
-                .orElse("");
+                .map(e -> Paths.get(e).toAbsolutePath())
+                .orElse(null);
     }
 
-    public static String buildTaskId(Date firstSubmitTime,
-                                     Long processDefineCode,
-                                     int processDefineVersion,
-                                     int processInstId,
-                                     int taskId) {
-        // like TaskAppId=TASK-20211107-798_1-4084-15210
-        String firstSubmitTimeStr = DateUtils.format(firstSubmitTime, DateConstants.YYYYMMDD, null);
-        return String.format("%s=%s-%s-%s_%s-%s-%s",
-                TaskConstants.TASK_APPID_LOG_FORMAT, TaskConstants.TASK_LOGGER_INFO_PREFIX, firstSubmitTimeStr,
-                processDefineCode, processDefineVersion, processInstId, taskId);
-    }
-
-    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath, Logger logger) {
+    public List<String> getAppIdsFromAppInfoFile(String appInfoPath) {
+        if (StringUtils.isEmpty(appInfoPath)) {
+            log.warn("appInfoPath is empty");
+            return Collections.emptyList();
+        }
         File appInfoFile = new File(appInfoPath);
         if (!appInfoFile.exists() || !appInfoFile.isFile()) {
             return Collections.emptyList();
@@ -133,54 +156,54 @@ public class LogUtils {
             stream.forEach(appIds::add);
             return new ArrayList<>(appIds);
         } catch (IOException e) {
-            logger.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
+            log.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
             return Collections.emptyList();
         }
     }
 
-    public List<String> getAppIdsFromLogFile(@NonNull String logPath, Logger logger) {
+    public List<String> getAppIdsFromLogFile(@NonNull String logPath) {
         File logFile = new File(logPath);
         if (!logFile.exists() || !logFile.isFile()) {
             return Collections.emptyList();
         }
         Set<String> appIds = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
-            stream.filter(line -> {
-                Matcher matcher = APPLICATION_REGEX.matcher(line);
-                return matcher.find();
-            }).forEach(line -> {
+            stream.forEach(line -> {
                 Matcher matcher = APPLICATION_REGEX.matcher(line);
                 if (matcher.find()) {
                     String appId = matcher.group();
                     if (appIds.add(appId)) {
-                        logger.info("Find appId: {} from {}", appId, logPath);
+                        log.info("Find appId: {} from {}", appId, logPath);
                     }
                 }
             });
             return new ArrayList<>(appIds);
         } catch (IOException e) {
-            logger.error("Get appId from log file error, logPath: {}", logPath, e);
+            log.error("Get appId from log file error, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
     }
 
-    public static String readWholeFileContentFromLocal(String filePath) {
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\r\n");
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            log.error("read file error", e);
-        }
-        return "";
+    public static String getTaskInstanceLogFullPathMdc() {
+        return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId, Integer taskInstanceId) {
-        setWorkflowInstanceIdMDC(workflowInstanceId);
-        setTaskInstanceIdMDC(taskInstanceId);
+    public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+        if (taskInstanceLogFullPath == null) {
+            log.warn("taskInstanceLogFullPath is null");
+            return;
+        }
+        MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, taskInstanceLogFullPath);
+    }
+
+    public static void removeTaskInstanceLogFullPathMDC() {
+        MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+    }
+
+    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
+                                                       Integer taskInstanceId) {
+        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
+        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
     }
 
     public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
@@ -202,5 +225,16 @@ public class LogUtils {
 
     public static void removeTaskInstanceIdMDC() {
         MDC.remove(Constants.TASK_INSTANCE_ID_MDC_KEY);
+    }
+
+    @AllArgsConstructor
+    public static class MDCAutoClosableContext implements AutoCloseable {
+
+        private final Runnable closeAction;
+
+        @Override
+        public void close() {
+            closeAction.run();
+        }
     }
 }

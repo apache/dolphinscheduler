@@ -30,6 +30,7 @@ DolphinScheduler的目录结构如下：
 ├── alert-server                                DolphinScheduler alert-server命令、配置和依赖存放目录
 │   ├── bin
 │   │   └── start.sh                            DolphinScheduler alert-server启动脚本
+│   │   └── jvm_args_env.sh                     DolphinScheduler alert-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    alert-server配置文件
 │   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
@@ -41,6 +42,7 @@ DolphinScheduler的目录结构如下：
 ├── api-server                                  DolphinScheduler api-server命令、配置和依赖存放目录
 │   ├── bin
 │   │   └── start.sh                            DolphinScheduler api-server启动脚本
+│   │   └── jvm_args_env.sh                     DolphinScheduler api-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    api-server配置文件
 │   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
@@ -53,6 +55,7 @@ DolphinScheduler的目录结构如下：
 ├── master-server                               DolphinScheduler master-server命令、配置和依赖存放目录
 │   ├── bin
 │   │   └── start.sh                            DolphinScheduler master-server启动脚本
+│   │   └── jvm_args_env.sh                     DolphinScheduler master-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    master-server配置文件
 │   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
@@ -64,6 +67,7 @@ DolphinScheduler的目录结构如下：
 ├── standalone-server                           DolphinScheduler standalone-server命令、配置和依赖存放目录
 │   ├── bin
 │   │   └── start.sh                            DolphinScheduler standalone-server启动脚本
+│   │   └── jvm_args_env.sh                     DolphinScheduler standalone-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    standalone-server配置文件
 │   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
@@ -74,6 +78,7 @@ DolphinScheduler的目录结构如下：
 │   ├── libs                                    standalone-server依赖jar包存放目录
 │   └── ui                                      standalone-server相关前端WEB资源存放目录
 │  
+|
 ├── tools                                       DolphinScheduler元数据工具命令、配置和依赖存放目录
 │   ├── bin
 │   │   └── upgrade-schema.sh                   DolphinScheduler元数据创建/升级脚本
@@ -83,16 +88,18 @@ DolphinScheduler的目录结构如下：
 │   ├── libs                                    元数据工具依赖jar包存放目录
 │   └── sql                                     DolphinScheduler元数据创建/升级sql文件
 │  
+|
 ├── worker-server                               DolphinScheduler worker-server命令、配置和依赖存放目录
-│       ├── bin
-│       │   └── start.sh                        DolphinScheduler worker-server启动脚本
-│       ├── conf
-│       │   ├── application.yaml                worker-server配置文件
-│       │   ├── bootstrap.yaml                  Spring Cloud 启动阶段配置文件, 通常不需要修改
-│       │   ├── common.properties               公共服务（存储等信息）配置文件
-│       │   ├── dolphinscheduler_env.sh         worker-server环境变量配置加载脚本
-│       │   └── logback-spring.xml              worker-service日志配置文件
-│       └── libs                                worker-server依赖jar包存放目录
+│   ├── bin
+│   │   └── start.sh                        DolphinScheduler worker-server 启动脚本
+│   │   └── jvm_args_env.sh                 DolphinScheduler worker-server jvm参数配置脚本
+│   ├── conf
+│   │   ├── application.yaml                worker-server配置文件
+│   │   ├── bootstrap.yaml                  Spring Cloud 启动阶段配置文件, 通常不需要修改
+│   │   ├── common.properties               公共服务（存储等信息）配置文件
+│   │   ├── dolphinscheduler_env.sh         worker-server环境变量配置加载脚本
+│   │   └── logback-spring.xml              worker-service日志配置文件
+│   └── libs                                worker-server依赖jar包存放目录
 │
 └── ui                                          前端WEB资源目录
 ```
@@ -122,6 +129,8 @@ export DOLPHINSCHEDULER_OPTS="
 ```
 
 > 不建议设置"-XX:DisableExplicitGC" , DolphinScheduler使用Netty进行通讯,设置该参数,可能会导致内存泄漏.
+>
+>> 如果设置"-Djava.net.preferIPv6Addresses=true" 将会使用ipv6的IP地址， 如果设置"-Djava.net.preferIPv4Addresses=true"将会使用ipv4的IP地址, 如果都不设置，将会随机使用ipv4或者ipv6.
 
 ## 数据库连接相关配置
 
@@ -191,37 +200,38 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 默认配置如下：
 
-| 参数 | 默认值 | 描述 |
-|--|--|--|
-|data.basedir.path | /tmp/dolphinscheduler | 本地工作目录,用于存放临时文件|
-|resource.storage.type | NONE | 资源文件存储类型: HDFS,S3,NONE|
-|resource.upload.path | /dolphinscheduler | 资源文件存储路径|
-|aws.access.key.id | minioadmin | S3 access key|
-|aws.secret.access.key | minioadmin | S3 secret access key|
-|aws.region | us-east-1 | S3 区域|
-|aws.s3.endpoint | http://minio:9000 | S3 endpoint地址|
-|hdfs.root.user | hdfs | 如果存储类型为HDFS,需要配置拥有对应操作权限的用户|
-|fs.defaultFS | hdfs://mycluster:8020 | 请求地址如果resource.storage.type=S3,该值类似为: s3a://dolphinscheduler. 如果resource.storage.type=HDFS, 如果 hadoop 配置了 HA,需要复制core-site.xml 和 hdfs-site.xml 文件到conf目录|
-|hadoop.security.authentication.startup.state | false | hadoop是否开启kerberos权限|
-|java.security.krb5.conf.path | /opt/krb5.conf | kerberos配置目录|
-|login.user.keytab.username | hdfs-mycluster@ESZ.COM | kerberos登录用户|
-|login.user.keytab.path | /opt/hdfs.headless.keytab | kerberos登录用户keytab|
-|kerberos.expire.time | 2 | kerberos过期时间,整数,单位为小时|
-|yarn.resourcemanager.ha.rm.ids | 192.168.xx.xx,192.168.xx.xx | yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可|
-|yarn.application.status.address | http://ds1:8088/ws/v1/cluster/apps/%s | 如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname|
-|development.state | false | 是否处于开发模式|
-|dolphin.scheduler.network.interface.preferred | NONE | 网卡名称|
-|dolphin.scheduler.network.priority.strategy | default | ip获取策略 default优先获取内网|
-|resource.manager.httpaddress.port | 8088 | resource manager的端口|
-|yarn.job.history.status.address | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | yarn的作业历史状态URL|
-|datasource.encryption.enable | false | 是否启用datasource 加密|
-|datasource.encryption.salt | !@#$%^&* | datasource加密使用的salt|
-|data-quality.jar.name | dolphinscheduler-data-quality-dev-SNAPSHOT.jar | 配置数据质量使用的jar包|
-|support.hive.oneSession | false | 设置hive SQL是否在同一个session中执行|
-|sudo.enable | true | 是否开启sudo|
-|alert.rpc.port | 50052 | Alert Server的RPC端口|
-|zeppelin.rest.url | http://localhost:8080 | zeppelin RESTful API 接口地址|
-|appId.collect | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，并将`bin/env/dolphinscheduler_env.sh`自动收集applicationId相关环境变量配置的注释取消掉，注意：aop不支持远程主机提交yarn作业的方式比如Beeline客户端提交，且如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效|
+| 参数                                            | 默认值 | 描述                                                                                                                                                                                                                   |
+|-----------------------------------------------|--|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| data.basedir.path                             | /tmp/dolphinscheduler | 本地工作目录,用于存放临时文件                                                                                                                                                                                                      |
+| resource.storage.type                         | NONE | 资源文件存储类型: HDFS,S3,OSS,GCS,ABS,NONE                                                                                                                                                                                   |
+| resource.upload.path                          | /dolphinscheduler | 资源文件存储路径                                                                                                                                                                                                             |
+| aws.access.key.id                             | minioadmin | S3 access key                                                                                                                                                                                                        |
+| aws.secret.access.key                         | minioadmin | S3 secret access key                                                                                                                                                                                                 |
+| aws.region                                    | us-east-1 | S3 区域                                                                                                                                                                                                                |
+| aws.s3.endpoint                               | http://minio:9000 | S3 endpoint地址                                                                                                                                                                                                        |
+| hdfs.root.user                                | hdfs | 如果存储类型为HDFS,需要配置拥有对应操作权限的用户                                                                                                                                                                                          |
+| fs.defaultFS                                  | hdfs://mycluster:8020 | 请求地址如果resource.storage.type=S3,该值类似为: s3a://dolphinscheduler. 如果resource.storage.type=HDFS, 如果 hadoop 配置了 HA,需要复制core-site.xml 和 hdfs-site.xml 文件到conf目录                                                             |
+| hadoop.security.authentication.startup.state  | false | hadoop是否开启kerberos权限                                                                                                                                                                                                 |
+| java.security.krb5.conf.path                  | /opt/krb5.conf | kerberos配置目录                                                                                                                                                                                                         |
+| login.user.keytab.username                    | hdfs-mycluster@ESZ.COM | kerberos登录用户                                                                                                                                                                                                         |
+| login.user.keytab.path                        | /opt/hdfs.headless.keytab | kerberos登录用户keytab                                                                                                                                                                                                   |
+| kerberos.expire.time                          | 2 | kerberos过期时间,整数,单位为小时                                                                                                                                                                                                |
+| yarn.resourcemanager.ha.rm.ids                | 192.168.xx.xx,192.168.xx.xx | yarn resourcemanager 地址, 如果resourcemanager开启了HA, 输入HA的IP地址(以逗号分隔),如果resourcemanager为单节点, 该值为空即可                                                                                                                      |
+| yarn.application.status.address               | http://ds1:8088/ws/v1/cluster/apps/%s | 如果resourcemanager开启了HA或者没有使用resourcemanager,保持默认值即可. 如果resourcemanager为单节点,你需要将ds1 配置为resourcemanager对应的hostname                                                                                                     |
+| development.state                             | false | 是否处于开发模式                                                                                                                                                                                                             |
+| dolphin.scheduler.network.interface.preferred | NONE | 将会被使用的网卡名称                                                                                                                                                                                                           |
+| dolphin.scheduler.network.interface.restrict  | NONE | 禁止使用的网卡名称                                                                                                                                                                                                            |
+| dolphin.scheduler.network.priority.strategy   | default | ip获取策略 default优先获取内网                                                                                                                                                                                                 |
+| resource.manager.httpaddress.port             | 8088 | resource manager的端口                                                                                                                                                                                                  |
+| yarn.job.history.status.address               | http://ds1:19888/ws/v1/history/mapreduce/jobs/%s | yarn的作业历史状态URL                                                                                                                                                                                                       |
+| datasource.encryption.enable                  | false | 是否启用datasource 加密                                                                                                                                                                                                    |
+| datasource.encryption.salt                    | !@#$%^&* | datasource加密使用的salt                                                                                                                                                                                                  |
+| data-quality.jar.name                         | dolphinscheduler-data-quality-dev-SNAPSHOT.jar | 配置数据质量使用的jar包                                                                                                                                                                                                        |
+| support.hive.oneSession                       | false | 设置hive SQL是否在同一个session中执行                                                                                                                                                                                           |
+| sudo.enable                                   | true | 是否开启sudo                                                                                                                                                                                                             |
+| alert.rpc.port                                | 50052 | Alert Server的RPC端口                                                                                                                                                                                                   |
+| zeppelin.rest.url                             | http://localhost:8080 | zeppelin RESTful API 接口地址                                                                                                                                                                                            |
+| appId.collect                                 | log | 收集applicationId方式， 如果用aop方法，将配置log替换为aop，并将`bin/env/dolphinscheduler_env.sh`自动收集applicationId相关环境变量配置的注释取消掉，注意：aop不支持远程主机提交yarn作业的方式比如Beeline客户端提交，且如果用户环境覆盖了dolphinscheduler_env.sh收集applicationId相关环境变量配置，aop方法会失效 |
 
 ## Api-server相关配置
 
@@ -247,11 +257,22 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |security.authentication.ldap.user.identity-attribute|uid|LDAP用户身份标识字段名|
 |security.authentication.ldap.user.email-attribute|mail|LDAP邮箱字段名|
 |security.authentication.ldap.user.not-exist-action|CREATE|当通过LDAP登陆时用户不存在的操作，默认值是: CREATE，可选值:CREATE、DENY|
-|traffic.control.global.switch|false|流量控制全局开关|
-|traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
-|traffic.control.tenant-switch|false|流量控制租户开关|
-|traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制|
-|traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
+|security.authentication.ldap.ssl.enable|false|LDAP ssl开关|
+|security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks文件绝对路径|
+|security.authentication.ldap.ssl.trust-store-password|password|LDAP jks密码|
+|security.authentication.casdoor.user.admin||Casdoor登陆时，系统管理员账号|
+|casdoor.endpoint||Casdoor服务器URL|
+|casdoor.client-id||Casdoor中的ID|
+|casdoor.client-secret||Casdoor中的密钥|
+|casdoor.certificate||Casdoor中的证书|
+|casdoor.organization-name||Casdoor中的组织名称|
+|casdoor.application-name||Casdoor中的应用名称|
+|casdoor.redirect-url||dolphinscheduler登录URL|
+|api.traffic.control.global.switch|false|流量控制全局开关|
+|api.traffic.control.max-global-qps-rate|300|全局最大请求数/秒|
+|api.traffic.control.tenant-switch|false|流量控制租户开关|
+|api.traffic.control.default-tenant-qps-rate|10|默认租户最大请求数/秒限制|
+|api.traffic.control.customize-tenant-qps-rate||自定义租户最大请求数/秒限制|
 
 ## Master Server相关配置
 
@@ -268,8 +289,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |master.task-commit-retry-times|5|任务重试次数|
 |master.task-commit-interval|1000|任务提交间隔,单位为毫秒|
 |master.state-wheel-interval|5|轮询检查状态时间|
-|master.max-cpu-load-avg|-1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为-1: cpu cores * 2|
-|master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务,单位为G|
+|master.max-cpu-load-avg|1|master最大cpuload均值,只有高于系统cpuload均值时,master服务才能调度任务. 默认值为1: 会使用100%的CPU|
+|master.reserved-memory|0.3|master预留内存,只有低于系统可用内存时,master服务才能调度任务. 默认值为0.3：当系统内存低于30%时会停止调度新的工作流|
 |master.failover-interval|10|failover间隔，单位为分钟|
 |master.kill-application-when-task-failover|true|当任务实例failover时，是否kill掉yarn或k8s application|
 |master.registry-disconnect-strategy.strategy|stop|当Master与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
@@ -286,8 +307,8 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 |worker.heartbeat-interval|10|worker心跳间隔,单位为秒|
 |worker.host-weight|100|派发任务时，worker主机的权重|
 |worker.tenant-auto-create|true|租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。|
-|worker.max-cpu-load-avg|-1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为-1: cpu cores * 2|
-|worker.reserved-memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务,单位为G|
+|worker.max-cpu-load-avg|1|worker最大cpuload均值,只有高于系统cpuload均值时,worker服务才能被派发任务. 默认值为1: 会使用100%的CPU|
+|worker.reserved-memory|0.3|worker预留内存,只有低于系统可用内存时,worker服务才能被派发任务. 默认值为0.3：当系统内存低于30%时会停止调度新的工作流|
 |worker.alert-listen-host|localhost|alert监听host|
 |worker.alert-listen-port|50052|alert监听端口|
 |worker.registry-disconnect-strategy.strategy|stop|当Worker与注册中心失联之后采取的策略, 默认值是: stop. 可选值包括： stop, waiting|
@@ -355,12 +376,12 @@ export JAVA_HOME=${JAVA_HOME:-/opt/soft/java}
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/datax.py}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 
 # applicationId auto collection related configuration, the following configurations are unnecessary if setting appId.collect=log
 export HADOOP_CLASSPATH=`hadoop classpath`:${DOLPHINSCHEDULER_HOME}/tools/libs/*

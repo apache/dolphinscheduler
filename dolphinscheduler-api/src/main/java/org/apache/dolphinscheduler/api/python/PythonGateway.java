@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -93,6 +95,7 @@ public class PythonGateway {
 
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
+    private static final ExecutionOrder DEFAULT_EXECUTION_ORDER = ExecutionOrder.DESC_ORDER;
     private static final int DEFAULT_DRY_RUN = 0;
     private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
@@ -142,7 +145,7 @@ public class PythonGateway {
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
-    private PythonGatewayConfiguration pythonGatewayConfiguration;
+    private ApiConfig apiConfig;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -220,6 +223,7 @@ public class PythonGateway {
      * @param globalParams global params
      * @param schedule schedule for workflow, will not set schedule if null,
      * and if would always fresh exists schedule if not null
+     * @param onlineSchedule Whether set the workflow's schedule to online state
      * @param warningType warning type
      * @param warningGroupId warning group id
      * @param timeout timeout for workflow working, if running time longer than timeout,
@@ -236,6 +240,7 @@ public class PythonGateway {
                                        String description,
                                        String globalParams,
                                        String schedule,
+                                       boolean onlineSchedule,
                                        String warningType,
                                        int warningGroupId,
                                        int timeout,
@@ -264,20 +269,25 @@ public class PythonGateway {
                     ReleaseState.OFFLINE);
             processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
-                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
                     description, globalParams,
-                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                log.error(result.get(Constants.MSG).toString());
+                throw new ServiceException(result.get(Constants.MSG).toString());
+            }
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
 
         // Fresh workflow schedule
         if (schedule != null) {
-            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, workerGroup, warningType,
+            createOrUpdateSchedule(user, projectCode, processDefinitionCode, schedule, onlineSchedule, workerGroup,
+                    warningType,
                     warningGroupId);
         }
         processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
@@ -319,6 +329,7 @@ public class PythonGateway {
      * @param projectCode project which workflow belongs to
      * @param workflowCode workflow code
      * @param schedule schedule expression
+     * @param onlineSchedule Whether set the workflow's schedule to online state
      * @param workerGroup work group
      * @param warningType warning type
      * @param warningGroupId warning group id
@@ -327,6 +338,7 @@ public class PythonGateway {
                                         long projectCode,
                                         long workflowCode,
                                         String schedule,
+                                        boolean onlineSchedule,
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
@@ -338,18 +350,22 @@ public class PythonGateway {
                     ReleaseState.ONLINE);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, workflowCode,
                     schedule, WarningType.valueOf(warningType),
-                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
+                    DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
             processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode,
                     ReleaseState.OFFLINE);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
-                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
+                    DEFAULT_ENVIRONMENT_CODE);
         }
-        // Always set workflow online to set schedule online
-        processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
-        schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
+        if (onlineSchedule) {
+            // set workflow online to make sure we can set schedule online
+            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
+            schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
+        }
     }
 
     public void execWorkflowInstance(String userName,
@@ -382,6 +398,7 @@ public class PythonGateway {
                 DEFAULT_RUN_MODE,
                 DEFAULT_PRIORITY,
                 workerGroup,
+                user.getTenantCode(),
                 DEFAULT_ENVIRONMENT_CODE,
                 timeout,
                 null,
@@ -389,7 +406,9 @@ public class PythonGateway {
                 DEFAULT_DRY_RUN,
                 DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE,
-                processDefinition.getVersion());
+                processDefinition.getVersion(),
+                false,
+                DEFAULT_EXECUTION_ORDER);
     }
 
     // side object
@@ -434,7 +453,7 @@ public class PythonGateway {
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {
         User user = usersService.queryUser(userName);
-        projectService.update(user, projectCode, projectName, desc, userName);
+        projectService.update(user, projectCode, projectName, desc);
     }
 
     public void deleteProject(String userName, Long projectCode) {
@@ -490,29 +509,37 @@ public class PythonGateway {
     }
 
     /**
-     * Get datasource by given datasource name. It return map contain datasource id, type, name.
-     * Useful in Python API create sql task which need datasource information.
+     * Get single datasource by given datasource name. if type is not null,
+     * it will return the datasource match the type.
      *
-     * @param datasourceName user who create or update schedule
+     * @param datasourceName datasource name of datasource
+     * @param type datasource type
      */
-    public Map<String, Object> getDatasourceInfo(String datasourceName) {
-        Map<String, Object> result = new HashMap<>();
+    public DataSource getDatasource(String datasourceName, String type) {
+
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             String msg = String.format("Can not find any datasource by name %s", datasourceName);
             log.error(msg);
             throw new IllegalArgumentException(msg);
-        } else if (dataSourceList.size() > 1) {
+        }
+
+        List<DataSource> dataSourceListMatchType = dataSourceList.stream()
+                .filter(dataSource -> type == null || StringUtils.equalsIgnoreCase(dataSource.getType().name(), type))
+                .collect(Collectors.toList());
+
+        log.info("Get the datasource list match the type are: {}", dataSourceListMatchType);
+        if (dataSourceListMatchType.size() > 1) {
             String msg = String.format("Get more than one datasource by name %s", datasourceName);
             log.error(msg);
             throw new IllegalArgumentException(msg);
-        } else {
-            DataSource dataSource = dataSourceList.get(0);
-            result.put("id", dataSource.getId());
-            result.put("type", dataSource.getType().name());
-            result.put("name", dataSource.getName());
         }
-        return result;
+
+        return dataSourceListMatchType.stream().findFirst().orElseThrow(() -> {
+            String msg = String.format("Can not find any datasource by name %s and type %s", datasourceName, type);
+            log.error(msg);
+            return new IllegalArgumentException(msg);
+        });
     }
 
     /**
@@ -662,13 +689,14 @@ public class PythonGateway {
 
     @PostConstruct
     public void init() {
-        if (pythonGatewayConfiguration.isEnabled()) {
+        if (apiConfig.getPythonGateway().isEnabled()) {
             this.start();
         }
     }
 
     private void start() {
         try {
+            ApiConfig.PythonGatewayConfiguration pythonGatewayConfiguration = apiConfig.getPythonGateway();
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
             GatewayServerBuilder serverBuilder = new GatewayServer.GatewayServerBuilder()
                     .entryPoint(this)

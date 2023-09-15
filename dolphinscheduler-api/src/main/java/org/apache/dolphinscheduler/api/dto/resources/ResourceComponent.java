@@ -40,7 +40,6 @@ public abstract class ResourceComponent {
         this.pid = pid;
         this.name = name;
         this.fullName = fullName;
-        this.description = description;
         this.isDirctory = isDirctory;
         int directoryFlag = isDirctory ? 1 : 0;
         this.idValue = String.format("%s_%s", id, directoryFlag);

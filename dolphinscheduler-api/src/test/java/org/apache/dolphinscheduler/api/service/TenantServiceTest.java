@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_UPDATE;
+import static org.mockito.ArgumentMatchers.any;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -31,13 +32,13 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -46,6 +47,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +88,7 @@ public class TenantServiceTest {
     private TenantMapper tenantMapper;
 
     @Mock
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private ScheduleMapper scheduleMapper;
 
     @Mock
     private ProcessInstanceMapper processInstanceMapper;
@@ -171,7 +173,7 @@ public class TenantServiceTest {
         ids.add(1);
         Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT,
                 getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
-        Mockito.when(tenantMapper.queryTenantPaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq(tenantDesc)))
+        Mockito.when(tenantMapper.queryTenantPaging(any(Page.class), Mockito.anyList(), Mockito.eq(tenantDesc)))
                 .thenReturn(page);
         Result result = tenantService.queryTenantList(getLoginUser(), tenantDesc, 1, 10);
         PageInfo<Tenant> pageInfo = (PageInfo<Tenant>) result.getData();
@@ -209,10 +211,10 @@ public class TenantServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
         Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        Mockito.when(processInstanceMapper.queryByTenantIdAndStatus(1,
+        Mockito.when(processInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
                 .thenReturn(getInstanceList());
-        Mockito.when(processDefinitionMapper.queryDefinitionListByTenant(2)).thenReturn(getDefinitionsList());
+        Mockito.when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
         Mockito.when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
         // TENANT_NOT_EXIST
@@ -241,6 +243,10 @@ public class TenantServiceTest {
         Assertions.assertTrue(exception.getMessage().contains(prefix));
 
         // success
+        Mockito.when(processInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
+                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+                .thenReturn(Collections.emptyList());
+        Mockito.when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
         Mockito.when(tenantMapper.queryById(4)).thenReturn(getTenant(4));
         Mockito.when(tenantMapper.deleteById(4)).thenReturn(1);
         Map<String, Object> result = tenantService.deleteTenantById(getLoginUser(), 4);
@@ -326,11 +332,11 @@ public class TenantServiceTest {
         return processInstances;
     }
 
-    private List<ProcessDefinition> getDefinitionsList() {
-        List<ProcessDefinition> processDefinitions = new ArrayList<>();
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinitions.add(processDefinition);
-        return processDefinitions;
+    private List<Schedule> getScheduleList() {
+        List<Schedule> schedules = new ArrayList<>();
+        Schedule schedule = new Schedule();
+        schedules.add(schedule);
+        return schedules;
     }
 
     private Queue getQueue() {

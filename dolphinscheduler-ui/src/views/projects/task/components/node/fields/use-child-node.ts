@@ -72,7 +72,8 @@ export function useChildNode({
     span: 24,
     name: t('project.node.child_node'),
     props: {
-      loading: loading
+      loading: loading,
+      filterable: true
     },
     options: options,
     class: 'select-child-node',

@@ -31,14 +31,13 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -77,7 +76,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private ProcessInstanceMapper processInstanceMapper;
 
     @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
+    private ScheduleMapper scheduleMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -160,10 +159,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
 
-        // if storage startup
-        if (PropertyUtils.getResUploadStartupState()) {
-            storageOperate.createTenantDirIfNotExists(tenantCode);
-        }
+        storageOperate.createTenantDirIfNotExists(tenantCode);
         permissionPostHandle(AuthorizationType.TENANT, loginUser.getId(), Collections.singletonList(tenant.getId()),
                 log);
         result.put(Constants.DATA_LIST, tenant);
@@ -233,8 +229,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
 
         // updateProcessInstance tenant
         // if the tenant code is modified, the original resource needs to be copied to the new tenant.
-        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
-                && PropertyUtils.getResUploadStartupState()) {
+        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())) {
             storageOperate.createTenantDirIfNotExists(tenantCode);
         }
         int update = tenantMapper.updateById(updateTenant);
@@ -278,12 +273,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
         }
 
-        List<ProcessDefinition> processDefinitions =
-                processDefinitionMapper.queryDefinitionListByTenant(tenant.getId());
-        if (CollectionUtils.isNotEmpty(processDefinitions)) {
-            log.warn("Delete tenant failed, because there are {} process definitions using it.",
-                    processDefinitions.size());
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, processDefinitions.size());
+        List<Schedule> schedules =
+                scheduleMapper.queryScheduleListByTenant(tenant.getTenantCode());
+        if (CollectionUtils.isNotEmpty(schedules)) {
+            log.warn("Delete tenant failed, because there are {} schedule using it.",
+                    schedules.size());
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, schedules.size());
         }
 
         List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
@@ -292,14 +287,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }
 
-        // if resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
-            storageOperate.deleteTenant(tenant.getTenantCode());
-        }
+        storageOperate.deleteTenant(tenant.getTenantCode());
 
         int delete = tenantMapper.deleteById(id);
         if (delete > 0) {
-            processInstanceMapper.updateProcessInstanceByTenantId(id, -1);
+            processInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
             log.info("Tenant is deleted and id is {}.", id);
             putMsg(result, Status.SUCCESS);
         } else {
@@ -311,7 +303,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     }
 
     private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {
-        return processInstanceMapper.queryByTenantIdAndStatus(tenant.getId(),
+        return processInstanceMapper.queryByTenantCodeAndStatus(tenant.getTenantCode(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
     }
 

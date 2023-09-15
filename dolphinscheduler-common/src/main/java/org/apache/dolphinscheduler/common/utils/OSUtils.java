@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import oshi.SystemInfo;
@@ -34,7 +35,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -58,14 +58,15 @@ public class OSUtils {
 
     /**
      * return -1 when the function can not get hardware env info
-     * e.g {@link OSUtils#loadAverage()} {@link OSUtils#cpuUsage()}
+     * e.g {@link OSUtils#cpuUsagePercentage()}
      */
     public static final double NEGATIVE_ONE = -1;
 
     private static final HardwareAbstractionLayer hal = SI.getHardware();
     private static long[] prevTicks = new long[CentralProcessor.TickType.values().length];
     private static long prevTickTime = 0L;
-    private static double cpuUsage = 0.0D;
+    private static volatile double cpuUsage = 0.0D;
+    private static final double TOTAL_MEMORY = hal.getMemory().getTotal() / 1024.0 / 1024 / 1024;
 
     private OSUtils() {
         throw new UnsupportedOperationException("Construct OSUtils");
@@ -76,21 +77,6 @@ public class OSUtils {
      * avoid the thread safety problem of multi-thread operation
      */
     private static final Pattern PATTERN = Pattern.compile("\\s+");
-
-    /**
-     * get memory usage
-     * Keep 2 decimal
-     *
-     * @return percent %
-     */
-    public static double memoryUsage() {
-        GlobalMemory memory = hal.getMemory();
-        double memoryUsage = (memory.getTotal() - memory.getAvailable()) * 1.0 / memory.getTotal();
-
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(memoryUsage));
-    }
 
     /**
      * get disk usage
@@ -126,33 +112,11 @@ public class OSUtils {
     }
 
     /**
-     * load average
-     *
-     * @return load average
-     */
-    public static double loadAverage() {
-        double loadAverage;
-        try {
-            OperatingSystemMXBean osBean = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
-            loadAverage = osBean.getSystemLoadAverage();
-        } catch (Exception e) {
-            log.error("get operation system load average exception, try another method ", e);
-            loadAverage = hal.getProcessor().getSystemLoadAverage(1)[0];
-            if (Double.isNaN(loadAverage)) {
-                return NEGATIVE_ONE;
-            }
-        }
-        DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
-        df.setRoundingMode(RoundingMode.HALF_UP);
-        return Double.parseDouble(df.format(loadAverage));
-    }
-
-    /**
      * get cpu usage
      *
      * @return cpu usage
      */
-    public static double cpuUsage() {
+    public static double cpuUsagePercentage() {
         CentralProcessor processor = hal.getProcessor();
 
         // Check if > ~ 0.95 seconds since last tick count.
@@ -171,6 +135,10 @@ public class OSUtils {
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(cpuUsage));
+    }
+
+    public static double memoryUsagePercentage() {
+        return (TOTAL_MEMORY - availablePhysicalMemorySize()) / TOTAL_MEMORY;
     }
 
     public static List<String> getUserList() {
@@ -419,6 +387,8 @@ public class OSUtils {
         if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
+        tenantCode = TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER
+                : tenantCode;
         return String.format("sudo -u %s %s", tenantCode, command);
     }
 
@@ -466,26 +436,32 @@ public class OSUtils {
     /**
      * Check memory and cpu usage is overload the given thredshod.
      *
-     * @param maxCpuLoadAvg  maxCpuLoadAvg
-     * @param reservedMemory reservedMemory
+     * @param maxCpuLoadAvgThreshold  maxCpuLoadAvg
+     * @param reservedMemoryThreshold reservedMemory
      * @return True, if the cpu or memory exceed the given thredshod.
      */
-    public static Boolean isOverload(double maxCpuLoadAvg, double reservedMemory) {
+    public static Boolean isOverload(double maxCpuLoadAvgThreshold, double reservedMemoryThreshold) {
         // system load average
-        double loadAverage = loadAverage();
+        double freeCPUPercentage = 1 - cpuUsagePercentage();
         // system available physical memory
-        double availablePhysicalMemorySize = availablePhysicalMemorySize();
-        if (loadAverage > maxCpuLoadAvg) {
-            log.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", loadAverage, maxCpuLoadAvg);
+        double freeMemoryPercentage = 1 - memoryUsagePercentage();
+        if (freeCPUPercentage > maxCpuLoadAvgThreshold) {
+            log.warn("Current cpu load average {} is too high, max.cpuLoad.avg={}", freeCPUPercentage,
+                    maxCpuLoadAvgThreshold);
             return true;
         }
 
-        if (availablePhysicalMemorySize < reservedMemory) {
+        if (freeMemoryPercentage < reservedMemoryThreshold) {
             log.warn(
-                    "Current available memory {}G is too low, reserved.memory={}G", maxCpuLoadAvg, reservedMemory);
+                    "Current available memory percentage{} is too low, reserved.memory={}", freeMemoryPercentage,
+                    reservedMemoryThreshold);
             return true;
         }
         return false;
+    }
+
+    public static Boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
     }
 
 }

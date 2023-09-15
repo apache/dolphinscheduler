@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.security.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.security.AuthenticationType;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.security.SecurityConfig;
 import org.apache.dolphinscheduler.api.service.SessionService;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -64,9 +66,15 @@ public abstract class AbstractAuthenticator implements Authenticator {
         Result<Map<String, String>> result = new Result<>();
         User user = login(userId, password, extra);
         if (user == null) {
-            log.error("Username or password entered incorrectly.");
-            result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
-            result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
+            if (Objects.equals(securityConfig.getType(), AuthenticationType.CASDOOR_SSO.name())) {
+                log.error("State or code entered incorrectly.");
+                result.setCode(Status.STATE_CODE_ERROR.getCode());
+                result.setMsg(Status.STATE_CODE_ERROR.getMsg());
+            } else {
+                log.error("Username or password entered incorrectly.");
+                result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
+                result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
+            }
             return result;
         }
 

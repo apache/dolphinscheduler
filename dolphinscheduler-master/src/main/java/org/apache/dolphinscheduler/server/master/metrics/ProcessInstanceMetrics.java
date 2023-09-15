@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -33,21 +32,18 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 
 @UtilityClass
+@Slf4j
 public class ProcessInstanceMetrics {
-
-    private final Map<String, Counter> processInstanceCounters = new HashMap<>();
 
     private final Set<String> processInstanceStates = ImmutableSet.of(
             "submit", "timeout", "finish", "failover", "success", "fail", "stop");
 
     static {
         for (final String state : processInstanceStates) {
-            processInstanceCounters.put(
-                    state,
-                    Counter.builder("ds.workflow.instance.count")
-                            .tag("state", state)
-                            .description(String.format("Process instance %s total count", state))
-                            .register(Metrics.globalRegistry));
+            Counter.builder("ds.workflow.instance.count")
+                    .tags("state", state, "process.definition.code", "dummy")
+                    .description(String.format("Process instance total count by state and definition code"))
+                    .register(Metrics.globalRegistry);
         }
 
     }
@@ -82,8 +78,26 @@ public class ProcessInstanceMetrics {
                 .register(Metrics.globalRegistry);
     }
 
-    public void incProcessInstanceByState(final String state) {
-        processInstanceCounters.get(state).increment();
+    public void incProcessInstanceByStateAndProcessDefinitionCode(final String state,
+                                                                  final String processDefinitionCode) {
+        // When tags need to be determined from local context,
+        // you have no choice but to construct or lookup the Meter inside your method body.
+        // The lookup cost is just a single hash lookup, so it is acceptable for most use cases.
+        Metrics.globalRegistry.counter(
+                "ds.workflow.instance.count",
+                "state", state,
+                "process.definition.code", processDefinitionCode)
+                .increment();
+    }
+
+    public void cleanUpProcessInstanceCountMetricsByDefinitionCode(final Long processDefinitionCode) {
+        for (final String state : processInstanceStates) {
+            final Counter counter = Metrics.globalRegistry.counter(
+                    "ds.workflow.instance.count",
+                    "state", state,
+                    "process.definition.code", String.valueOf(processDefinitionCode));
+            Metrics.globalRegistry.remove(counter);
+        }
     }
 
 }
