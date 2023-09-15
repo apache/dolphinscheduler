@@ -33,6 +33,9 @@ CREATE TABLE IF NOT EXISTS t_ds_relation_sub_workflow (
     sub_workflow_instance_id BIGINT NOT NULL,
     PRIMARY KEY (id)
 );
+
+ALTER TABLE IF EXISTS t_ds_fav RENAME TO t_ds_fav_task;
+
 CREATE TABLE if not exists "t_ds_fav_task" (
     "id" serial NOT NULL,
     "task_type" VARCHAR(64) NOT NULL,
