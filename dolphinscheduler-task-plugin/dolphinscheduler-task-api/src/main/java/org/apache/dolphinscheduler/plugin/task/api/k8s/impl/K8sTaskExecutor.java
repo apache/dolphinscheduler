@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -257,6 +258,12 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
+
+                        if (line.contains(VarPoolUtils.VAR_PREFIX_DOLLAR)
+                                || line.contains(VarPoolUtils.VAR_PREFIX_HASH)) {
+                            varPool.append(VarPoolUtils.findVarPool(line));
+                            varPool.append(VarPoolUtils.VAR_DELIMITER);
+                        }
                     }
                 }
             } catch (Exception e) {

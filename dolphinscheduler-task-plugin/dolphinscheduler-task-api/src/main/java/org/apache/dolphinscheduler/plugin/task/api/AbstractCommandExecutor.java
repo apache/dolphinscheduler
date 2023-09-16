@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilde
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -46,7 +47,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
@@ -303,9 +303,10 @@ public abstract class AbstractCommandExecutor {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 while ((line = inReader.readLine()) != null) {
-                    if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
-                        varPool.append(findVarPool(line));
-                        varPool.append("$VarPool$");
+                    if (line.startsWith(VarPoolUtils.VAR_PREFIX_DOLLAR)
+                            || line.startsWith(VarPoolUtils.VAR_PREFIX_HASH)) {
+                        varPool.append(VarPoolUtils.findVarPool(line));
+                        varPool.append(VarPoolUtils.VAR_DELIMITER);
                     } else {
                         logBuffer.add(line);
                     }
@@ -350,13 +351,6 @@ public abstract class AbstractCommandExecutor {
      * @param line
      * @return
      */
-    private String findVarPool(String line) {
-        Matcher matcher = SETVALUE_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
-    }
 
     /**
      * get remain time（s）

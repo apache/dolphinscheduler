@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.sshd.client.SshClient;
@@ -36,8 +37,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,8 +45,6 @@ public class RemoteExecutor {
 
     protected final Logger logger =
             LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOGGER_THREAD_NAME, getClass()));
-
-    protected static final Pattern SETVALUE_REGEX = Pattern.compile(TaskConstants.SETVALUE_REGEX);
 
     static final String REMOTE_SHELL_HOME = "/tmp/dolphinscheduler-remote-shell-%s/";
     static final String STATUS_TAG_MESSAGE = "DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-";
@@ -127,19 +124,11 @@ public class RemoteExecutor {
     private void setVarPool(String log) {
         String[] lines = log.split("\n");
         for (String line : lines) {
-            if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
-                varPool.append(findVarPool(line));
-                varPool.append("$VarPool$");
+            if (line.startsWith(VarPoolUtils.VAR_PREFIX_DOLLAR) || line.startsWith(VarPoolUtils.VAR_PREFIX_HASH)) {
+                varPool.append(VarPoolUtils.findVarPool(line));
+                varPool.append(VarPoolUtils.VAR_DELIMITER);
             }
         }
-    }
-
-    private String findVarPool(String line) {
-        Matcher matcher = SETVALUE_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
     }
 
     public Integer getTaskExitCode(String taskId) throws IOException {
