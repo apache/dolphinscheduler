@@ -40,6 +40,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
@@ -129,24 +131,14 @@ public abstract class AbstractCommandExecutor {
             return result;
         }
         // the task instance needs fault tolerance
-        if(Objects.nonNull(taskRequest.getProcessId()) || StringUtils.isNotEmpty(taskRequest.getAppIds())){
+        if(taskRequest.getTaskName().equals("NEED_FAULT_TOLERANCE")){
 
-            int pid = taskRequest.getProcessId();
-            // Yarn task is determined by parsing whether the task log contains the content of the application
-            String applicationId  = String.join(TaskConstants.COMMA, LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
-                    PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY)));
-            boolean isRunningTaskFaultTolerance = false;
-            if(applicationId.isEmpty()){
-                // not a Yarn task
-                isRunningTaskFaultTolerance = isProcessRunning(pid);
-            }else {
-                // is a Yarn task
-                isRunningTaskFaultTolerance = isApplicationRunning(applicationId);
-            }
-            //determines whether the task is running
+            //determine whether the task is running
+            boolean isRunningTaskFaultTolerance = determineWhetherTaskIsRunning();
+
             if(Boolean.TRUE.equals(isRunningTaskFaultTolerance)){
                 logger.warn(
-                        "Can not recover tolerance fault task instance: {} , the task may be running and does not need to be repeated",
+                        "Cannot recover tolerance fault task instance: {} , the task may be running and does not need to be repeated",
                         taskInstanceId);
                 result.setExitStatusCode(EXIT_CODE_KILL);
                 cancelApplication();
@@ -430,15 +422,15 @@ public abstract class AbstractCommandExecutor {
      * @param pid process_id
      * @return boolean
      */
-    public boolean isProcessRunning(int pid) throws Exception {
+    public boolean isProcessRunning(String pid) throws Exception {
 
-        String processPath = String.valueOf(pid);
+        String processPath = pid;
 
         // build shell commands, use ps-ef to list all processes, and use GREP filters to match the process id
-        String[] command = { "/bin/sh", "-c", "ps -ef | grep " + processPath };
+        String command = "/bin/sh -c \"ps -ef | grep " + processPath + " | grep -v grep\"";
 
         // use the ProcessBuilder class to create a new process and set its command
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", command);
 
         // start the process
         Process process = processBuilder.start();
@@ -446,22 +438,18 @@ public abstract class AbstractCommandExecutor {
         // reads the output of the command and gets the standard input stream for the process
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-        String line;
-        StringBuilder output = new StringBuilder();
         // reads each line in the process input stream
+        String line;
         while ((line = reader.readLine()) != null) {
-            output.append(line);
+            if (line.contains(processPath)) {
+                return true;
+            }
         }
         try {
             // gets the exit code for the command.
             int exitCode = process.waitFor();
             // if the exit code is 0, and the output contains process id, the process exists.
-            if (exitCode == 0 && output.toString().contains(processPath)) {
-                // process is running
-                return true;
-            } else {
-                return false;
-            }
+            return exitCode == 0;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -514,5 +502,29 @@ public abstract class AbstractCommandExecutor {
         return false;
 
     }
+    public boolean determineWhetherTaskIsRunning() throws Exception {
+        String pidPath = taskRequest.getExecutePath();
+        String pid = getDesiredPath(pidPath);
 
+        // Yarn task is determined by parsing whether the task log contains the content of the application
+        String applicationId  = String.join(TaskConstants.COMMA, LogUtils.getAppIds(taskRequest.getLogPath(), taskRequest.getAppInfoPath(),
+                PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY)));
+        if(applicationId.isEmpty()){
+            // not a Yarn task
+            return isProcessRunning(pid);
+        }else {
+            // is a Yarn task
+            return isApplicationRunning(applicationId);
+        }
+    }
+
+    public String getDesiredPath(String filePath) {
+        String desiredPath = filePath;
+        for (int i = 0; i < 2; i++) {
+            int endIndex = desiredPath.lastIndexOf("/");
+            desiredPath = filePath.substring(0, endIndex);
+
+        }
+        return desiredPath;
+    }
 }
