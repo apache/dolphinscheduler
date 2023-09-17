@@ -59,8 +59,8 @@ public class StopExecuteFunction implements ExecuteFunction<StopRequest, StopRes
             try {
                 // todo: direct call the workflow instance stop method
                 ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                        SingletonJdkDynamicRpcClientProxyFactory.getInstance()
-                                .getProxyClient(workflowInstance.getHost(), ITaskInstanceExecutionEventListener.class);
+                        SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(workflowInstance.getHost(),
+                                ITaskInstanceExecutionEventListener.class);
                 iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(
                         new WorkflowInstanceStateChangeEvent(
                                 workflowInstance.getId(), 0, workflowInstance.getState(), workflowInstance.getId(), 0));

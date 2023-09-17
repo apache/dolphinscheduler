@@ -243,6 +243,7 @@ export default {
     online: 'Online',
     offline: 'Offline',
     task_name: 'Task Name',
+    task_code: 'Task Code',
     task_type: 'Task Type',
     create_task: 'Create Task',
     workflow_instance: 'Workflow Instance',
@@ -876,6 +877,10 @@ export default {
     child_node_instance: 'child node instance',
     yarn_queue: 'Yarn Queue',
     yarn_queue_tips: 'Please input yarn queue(optional)',
+    dependent_type: 'Dependency Type',
+    dependent_on_workflow: 'Dependent on workflow',
+    dependent_on_task: 'Dependent on task',
+
   },
   menu: {
     fav: 'Favorites',

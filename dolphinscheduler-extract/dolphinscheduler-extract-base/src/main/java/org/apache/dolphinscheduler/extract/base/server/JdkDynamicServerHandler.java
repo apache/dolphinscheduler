@@ -96,7 +96,7 @@ public class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
                     StandardRpcRequest standardRpcRequest =
                             JsonSerializer.deserialize(transporter.getBody(), StandardRpcRequest.class);
                     Object[] args;
-                    if (standardRpcRequest.getArgs().length == 0) {
+                    if (standardRpcRequest.getArgs() == null || standardRpcRequest.getArgs().length == 0) {
                         args = null;
                     } else {
                         args = new Object[standardRpcRequest.getArgs().length];

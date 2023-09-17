@@ -225,7 +225,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
         String logContent = null;
         if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-            IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
             try {
                 LogicTaskInstanceLogPageQueryRequest logicTaskInstanceLogPageQueryRequest =
@@ -237,7 +237,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 log.error("Query LogicTaskInstance log error", ex);
             }
         } else {
-            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(host, IWorkerLogService.class);
             try {
                 TaskInstanceLogPageQueryRequest taskInstanceLogPageQueryRequest =
@@ -282,7 +282,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
         byte[] logBytes = new byte[0];
         if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-            IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
             try {
                 LogicTaskInstanceLogFileDownloadRequest logicTaskInstanceLogFileDownloadRequest =
@@ -294,7 +294,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 log.error("Query LogicTaskInstance log error", ex);
             }
         } else {
-            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(host, IWorkerLogService.class);
             try {
                 TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest =

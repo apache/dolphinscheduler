@@ -50,7 +50,7 @@ public class MetricsCleanUpServiceImpl implements MetricsCleanUpService {
     private void cleanUpWorkflowMetrics(Server server, Long workflowDefinitionCode) {
         try {
             IWorkflowInstanceService iWorkflowInstanceService =
-                    SingletonJdkDynamicRpcClientProxyFactory.getInstance().getProxyClient(
+                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(
                             String.format("%s:%s", server.getHost(), server.getPort()), IWorkflowInstanceService.class);
             iWorkflowInstanceService.clearWorkflowMetrics(workflowDefinitionCode);
         } catch (Exception e) {
