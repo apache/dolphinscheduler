@@ -27,6 +27,7 @@ import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -60,6 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.common.base.Strings;
+import org.postgresql.jdbc.PgArray;
 
 /**
  * json utils
@@ -78,7 +80,8 @@ public class JSONUtils {
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
-                    .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
+                    .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer())
+                    .addSerializer(PgArray.class, new PgArraySerializer()))
             .defaultTimeZone(TimeZone.getDefault())
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();
@@ -419,4 +422,28 @@ public class JSONUtils {
             return LocalDateTime.parse(p.getValueAsString(), formatter);
         }
     }
+
+    public static class PgArraySerializer extends JsonSerializer<PgArray> {
+        @Override
+        public void serialize(PgArray pgArray, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
+            try {
+                Object[] array = (Object[]) pgArray.getArray();
+
+                // 将 array 转换为合适的类型（List 或数组）
+                // 然后进行序列化
+                // ...
+
+                // 示例：将 array 序列化为 JSON 数组
+                jsonGenerator.writeStartArray();
+                for (Object item : array) {
+                    jsonGenerator.writeObject(item);
+                }
+                jsonGenerator.writeEndArray();
+            } catch (SQLException e) {
+                // 处理异常
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
