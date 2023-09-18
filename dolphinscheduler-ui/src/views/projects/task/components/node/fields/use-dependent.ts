@@ -258,8 +258,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
       return null
     const key = `${item.definitionCode}-${item.depTaskCode}-${item.cycle}-${item.dateValue}`
     const state: ITaskState = dependentResult[key]
-    return h(NIcon, { size: 24, color: TasksStateConfig[state].color }, () =>
-      h(TasksStateConfig[state].icon)
+    return h(NIcon, { size: 24, color: TasksStateConfig[state]?.color }, () =>
+      h(TasksStateConfig[state]?.icon)
     )
   }
 
