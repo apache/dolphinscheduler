@@ -233,9 +233,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 log.error("Error while getting log from remote target", e);
             }
         }
-
-        sb.append(logContent);
-
+        if (logContent != null) {
+            sb.append(logContent);
+        }
         return sb.toString();
     }
 
