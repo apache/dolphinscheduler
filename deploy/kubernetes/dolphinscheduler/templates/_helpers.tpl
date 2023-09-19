@@ -291,7 +291,7 @@ Create a registry environment variables.
 - name: REGISTRY_HIKARI_CONFIG_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ include "dolphinscheduler.fullname" . }}-externaldb
+      name: {{ include "dolphinscheduler.fullname" . }}-registry-db
       key: registry-password
 {{- end }}
 {{- else }}
