@@ -350,7 +350,7 @@ Create a fsFileResourcePersistence volumeMount.
 Create a etcd ssl volume.
 */}}
 {{- define "dolphinscheduler.etcd.ssl.volume" -}}
-{{- if .Values.etcd.ssl.enabled -}}
+{{- if .Values.registryEtcd.ssl.enabled -}}
 - name: etcd-ssl
   secret:
     secretName: {{ include "dolphinscheduler.fullname" . }}-etcd-ssl
@@ -361,14 +361,14 @@ Create a etcd ssl volume.
 Create a etcd ssl volumeMount.
 */}}
 {{- define "dolphinscheduler.etcd.ssl.volumeMount" -}}
-{{- if .Values.etcd.ssl.enabled -}}
-- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.certFile }}
+{{- if .Values.registryEtcd.ssl.enabled -}}
+- mountPath: /opt/dolphinscheduler/{{ .Values.registryEtcd.ssl.certFile }}
   name: etcd-ssl
   subPath: cert-file
-- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyCertChainFile  }}
+- mountPath: /opt/dolphinscheduler/{{ .Values.registryEtcd.ssl.keyCertChainFile  }}
   name: etcd-ssl
   subPath: key-cert-chain-file
-- mountPath: /opt/dolphinscheduler/{{ .Values.etcd.ssl.keyFile }}
+- mountPath: /opt/dolphinscheduler/{{ .Values.registryEtcd.ssl.keyFile }}
   name: etcd-ssl
   subPath: key-file
 {{- end -}}
