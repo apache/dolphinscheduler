@@ -703,6 +703,9 @@ export default {
     zeppelin_username_tips: '请输入zeppelin server的登陆用户名',
     zeppelin_password: 'zeppelinPassword',
     zeppelin_password_tips: '请输入zeppelin server的登陆密码',
+    sql_execution_type: 'SQL来源',
+    sql_execution_type_from_file: '选择资源中心文件',
+    sql_execution_type_from_script: '脚本输入',
     hive_cli_task_execution_type: 'Hive Cli 任务类型',
     hive_sql_script: 'Hive SQL 脚本',
     hive_cli_options: 'Hive Cli 选项',
@@ -820,7 +823,7 @@ export default {
     pytorch_python_path: 'python项目地址',
     pytorch_is_create_environment: '是否创建新环境',
     pytorch_python_command: 'python命令路径',
-    pytorch_python_command_tips: '若为空，则使用$PYTHON_HOME',
+    pytorch_python_command_tips: '若为空，则使用$PYTHON_LAUNCHER',
     pytorch_python_env_tool: 'python环境管理工具',
     pytorch_requirements: '依赖文件',
     pytorch_conda_python_version: 'python版本',
@@ -874,5 +877,14 @@ export default {
     delete: '删除',
     delete_confirm: '确定删除吗?',
     success: '成功',
+  },
+  preference: {
+    edit_preference: '修改项目偏好设置',
+    preference_manage: '项目偏好管理',
+    instruction_tips: '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
+    success: '成功',
+    submit: '提交',
+    enabled: '启用',
+    disabled: '未启用'
   },
 }

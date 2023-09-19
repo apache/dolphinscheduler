@@ -515,34 +515,6 @@ The Apache Software Foundation (http://www.apache.org/).
 
 --------------------------------------------------------------------------------
 
-==============================================================
- protostuff
- Copyright 2009 David Yu dyuproject@gmail.com
-==============================================================
-
-protobuf is copyright Google inc unless otherwise noted.
-It is licensed under the BSD license.
-
-jackson-core-asl is copyright FasterXml unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
-antlr is copyright Terence Parr unless otherwise noted.
-It is licensed under the BSD license.
-
-stringtemplate is copyright Terence Parr unless otherwise noted.
-It is licensed under the BSD license.
-
-velocity is licensed under the apache 2.0 license.
-
-B64Code.java is copyright Mort Bay Consulting Pty Ltd unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
-jarjar is copyright Google inc unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
-guava is copyright Google inc unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
 This product includes parquet-tools, initially developed at ARRIS, Inc. with
 the following copyright notice:
 

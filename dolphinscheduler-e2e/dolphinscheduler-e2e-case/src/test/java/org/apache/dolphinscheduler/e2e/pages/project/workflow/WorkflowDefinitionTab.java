@@ -20,20 +20,22 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.Getter;
 
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
@@ -133,7 +135,7 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     }
 
     public WorkflowDefinitionTab delete(String workflow) {
-        await().untilAsserted(() -> assertThat(workflowList())
+        Awaitility.await().untilAsserted(() -> assertThat(workflowList())
             .as("Workflow list should contain newly-created workflow")
             .anyMatch(
                 it -> it.getText().contains(workflow)

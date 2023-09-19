@@ -175,6 +175,14 @@ Create a database environment variables.
       name: {{ include "dolphinscheduler.fullname" . }}-externaldb
       key: database-password
       {{- end }}
+- name: SPRING_DATASOURCE_DRIVER-CLASS-NAME
+  {{- if .Values.postgresql.enabled }}
+  value: {{ .Values.postgresql.driverClassName }}
+  {{- else if .Values.mysql.enabled }}
+  value: {{ .Values.mysql.driverClassName }}
+  {{- else }}
+  value: {{ .Values.externalDatabase.driverClassName | quote }}
+  {{- end }}
 {{- end -}}
 
 {{/*

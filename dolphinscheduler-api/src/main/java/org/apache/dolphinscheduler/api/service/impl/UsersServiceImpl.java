@@ -185,7 +185,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Tenant tenant = tenantMapper.queryById(tenantId);
         // resource upload startup
-        if (PropertyUtils.getResUploadStartupState()) {
+        if (PropertyUtils.isResourceStorageStartup()) {
             storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
         }
 
@@ -1086,6 +1086,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
+        // remove password
+        user.setUserPassword(null);
+
         result.put(Constants.DATA_LIST, user);
 
         putMsg(result, Status.SUCCESS);
@@ -1336,7 +1339,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
-        User user = createUser(userName, userPassword, email, 1, "", "", Flag.NO.ordinal());
+        User user = createUser(userName, userPassword, email, -1, "", "", Flag.NO.ordinal());
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, user);
         return result;

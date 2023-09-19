@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 
 import org.junit.jupiter.api.Assertions;
@@ -84,33 +85,33 @@ public class NetUtilsTest {
     @Test
     public void testIsValidAddress() {
         Assertions.assertFalse(NetUtils.isValidV4Address(null));
-        InetAddress address = mock(InetAddress.class);
+        Inet4Address address = mock(Inet4Address.class);
         when(address.isLoopbackAddress()).thenReturn(true);
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("localhost");
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("0.0.0.0");
         when(address.isAnyLocalAddress()).thenReturn(true);
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("127.0.0.1");
         when(address.isLoopbackAddress()).thenReturn(true);
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("1.2.3.4");
         Assertions.assertTrue(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("1.2.3.4:80");
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("256.0.0.1");
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("127.0.0.0.1");
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
-        address = mock(InetAddress.class);
+        address = mock(Inet4Address.class);
         when(address.getHostAddress()).thenReturn("-1.2.3.4");
         Assertions.assertFalse(NetUtils.isValidV4Address(address));
     }

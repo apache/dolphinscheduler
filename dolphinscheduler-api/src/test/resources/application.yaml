@@ -63,3 +63,50 @@ api:
     # Close each active connection of socket server if python program not active after x milliseconds. Define value is
     # (0 = infinite), and socket server would never close even though no requests accept
     read-timeout: 0
+
+security:
+  authentication:
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
+    type: PASSWORD
+    # IF you set type `LDAP`, below config will be effective
+    ldap:
+      # ldap server config
+      urls: ldap://ldap.forumsys.com:389/
+      base-dn: dc=example,dc=com
+      username: cn=read-only-admin,dc=example,dc=com
+      password: password
+      user:
+        # admin userId when you use LDAP login
+        admin: read-only-admin
+        identity-attribute: uid
+        email-attribute: mail
+        # action when ldap user is not exist (supported types: CREATE,DENY)
+        not-exist-action: CREATE
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: "password"
+    oauth2:
+      enable: true
+      provider:
+        github:
+          authorizationUri: http://oauth2-test
+          redirectUri: http://oauth2-test
+          clientId: ""
+          clientSecret: ""
+          tokenUri: http://oauth2-token-url-test
+          userInfoUri: http://oauth2-user-info-url-test
+          callbackUrl: ""
+          iconUri: ""
+          provider: github
+        google:
+          authorizationUri: ""
+          redirectUri: ""
+          clientId: ""
+          clientSecret: ""
+          tokenUri: ""
+          userInfoUri: ""
+          callbackUrl: ""
+          iconUri: ""
+          provider: google

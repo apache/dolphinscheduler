@@ -68,7 +68,7 @@ public class PytorchTaskTest {
         envManager.setPythonEnvTool(PythonEnvManager.ENV_TOOL_VENV);
         String venvEnvCommand = envManager.getBuildEnvCommand(requirementPath);
         Assertions.assertEquals(venvEnvCommand,
-                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r "
+                "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r "
                         + requirementPath);
 
     }
@@ -103,15 +103,15 @@ public class PytorchTaskTest {
         PytorchTask task1 = initTask(parameters);
         Assertions.assertEquals(task1.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
-                        "${PYTHON_HOME} main.py --epochs=1 --dry-run");
+                        "${PYTHON_LAUNCHER} main.py --epochs=1 --dry-run");
 
-        parameters.setPythonCommand("");
+        parameters.setPythonLauncher("");
         PytorchTask task2 = initTask(parameters);
         Assertions.assertEquals(task2.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
-                        "${PYTHON_HOME} main.py --epochs=1 --dry-run");
+                        "${PYTHON_LAUNCHER} main.py --epochs=1 --dry-run");
 
-        parameters.setPythonCommand("/usr/bin/python");
+        parameters.setPythonLauncher("/usr/bin/python");
         PytorchTask task3 = initTask(parameters);
         Assertions.assertEquals(task3.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
@@ -151,7 +151,7 @@ public class PytorchTaskTest {
         PytorchTask task = initTask(parameters);
         Assertions.assertEquals(task.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
-                        "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r requirements.txt\n"
+                        "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r requirements.txt\n"
                         +
                         "./venv/bin/python main.py --epochs=1 --dry-run");
 
@@ -178,7 +178,7 @@ public class PytorchTaskTest {
         createFile(scriptFile);
 
         String expected = "export PYTHONPATH=%s\n" +
-                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r %s\n"
+                "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r %s\n"
                 +
                 "./venv/bin/python %s";
         System.out.println(task.buildPythonExecuteCommand());
