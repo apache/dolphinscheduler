@@ -1043,7 +1043,7 @@ DROP TABLE IF EXISTS t_ds_relation_project_worker_group CASCADE;
 CREATE TABLE t_ds_relation_project_worker_group
 (
     id            int(11) NOT NULL AUTO_INCREMENT,
-    project_code  bigint(20 NOT NULL,
+    project_code  bigint(20) NOT NULL,
     worker_group  varchar(255) DEFAULT NULL,
     create_time   datetime DEFAULT NULL,
     update_time   datetime DEFAULT NULL,
