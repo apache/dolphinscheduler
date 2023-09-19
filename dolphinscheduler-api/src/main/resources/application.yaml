@@ -113,9 +113,9 @@ registry:
       base-sleep-time: 60ms
       max-sleep: 300ms
       max-retries: 5
-    session-timeout: 35s
-    connection-timeout: 35s
-    block-until-connected: 30s
+    session-timeout: 60s
+    connection-timeout: 15s
+    block-until-connected: 15s
     digest: ~
 
 api:
