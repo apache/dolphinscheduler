@@ -281,13 +281,7 @@ Create a registry environment variables.
   value: {{ .Values.registryJdbc.termRefreshInterval }}
 - name: REGISTRY_TERM_EXPIRE_TIMES
   value: {{ .Values.registryJdbc.termExpireTimes | quote}}
-{{- if .Values.registryJdbc.hikariConfig.username }}
-- name: REGISTRY_HIKARI_CONFIG_MAXIMUM_POOL_SIZE
-  value: {{ .Values.registryJdbc.hikariConfig.maximumPoolSize | quote}}
-- name: REGISTRY_HIKARI_CONFIG_CONNECTION_TIMEOUT
-  value: {{ .Values.registryJdbc.hikariConfig.connectionTimeout | quote}}
-- name: REGISTRY_HIKARI_CONFIG_IDLE_TIMEOUT
-  value: {{ .Values.registryJdbc.hikariConfig.idleTimeout | quote}}
+{{- if .Values.registryJdbc.hikariConfig.enabled }}
 - name: REGISTRY_HIKARI_CONFIG_DRIVER_CLASS_NAME
   value: {{ .Values.registryJdbc.hikariConfig.driverClassName }}
 - name: REGISTRY_HIKARI_CONFIG_JDBC_URL

@@ -115,15 +115,13 @@ registryJdbc:
   enabled: false
   termRefreshInterval: 2s
   termExpireTimes: 3
-  # Default use same Dolphinscheduler's database if you don't change below config
   hikariConfig:
+    # Default use same Dolphinscheduler's database, if you want to use other database please change `enabled` to `true` and change other configs
+    enabled: false
     driverClassName: com.mysql.cj.jdbc.Driver
     jdbcurl: jdbc:mysql://
     username: ""
     password: ""
-    maximumPoolSize: 5
-    connectionTimeout: 9000
-    idleTimeout: 600000
 
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
