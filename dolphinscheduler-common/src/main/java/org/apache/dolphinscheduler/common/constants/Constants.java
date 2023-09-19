@@ -147,6 +147,9 @@ public final class Constants {
 
     public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
 
+    public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
+    public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
+
     /**
      * fetch applicationId way
      */
@@ -485,7 +488,8 @@ public final class Constants {
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
-    public static final long DEPENDENT_ALL_TASK_CODE = 0;
+    public static final long DEPENDENT_ALL_TASK_CODE = -1;
+    public static final long DEPENDENT_WORKFLOW_CODE = 0;
 
     /**
      * preview schedule execute count
@@ -647,10 +651,6 @@ public final class Constants {
      * authorize readable perm
      */
     public static final int AUTHORIZE_READABLE_PERM = 4;
-
-    public static final int NORMAL_NODE_STATUS = 0;
-    public static final int ABNORMAL_NODE_STATUS = 1;
-    public static final int BUSY_NODE_STATUE = 2;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";

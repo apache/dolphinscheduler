@@ -1,7 +1,7 @@
 # Resource Center Configuration
 
 - You could use `Resource Center` to upload text files, UDFs and other task-related files.
-- You could configure `Resource Center` to use distributed file system like [Hadoop](https://hadoop.apache.org/docs/r2.7.0/) (2.6+), [MinIO](https://github.com/minio/minio) cluster or remote storage products like [AWS S3](https://aws.amazon.com/s3/), [Alibaba Cloud OSS](https://www.aliyun.com/product/oss), etc.
+- You could configure `Resource Center` to use distributed file system like [Hadoop](https://hadoop.apache.org/docs/r2.7.0/) (2.6+), [MinIO](https://github.com/minio/minio) cluster or remote storage products like [AWS S3](https://aws.amazon.com/s3/), [Alibaba Cloud OSS](https://www.aliyun.com/product/oss), [Huawei Cloud OBS](https://support.huaweicloud.com/obs/index.html) etc.
 - You could configure `Resource Center` to use local file system. If you deploy `DolphinScheduler` in `Standalone` mode, you could configure it to use local file system for `Resouce Center` without the need of an external `HDFS` system or `S3`.
 - Furthermore, if you deploy `DolphinScheduler` in `Cluster` mode, you could use [S3FS-FUSE](https://github.com/s3fs-fuse/s3fs-fuse) to mount `S3` or [JINDO-FUSE](https://help.aliyun.com/document_detail/187410.html) to mount `OSS` to your machines and use the local file system for `Resouce Center`. In this way, you could operate remote files as if on your local machines.
 
@@ -80,8 +80,8 @@ data.basedir.path=/tmp/dolphinscheduler
 # resource view suffixs
 #resource.view.suffixs=txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js
 
-# resource storage type: HDFS, S3, OSS, GCS, ABS, NONE
-resource.storage.type=NONE
+# resource storage type: LOCAL, HDFS, S3, OSS, GCS, ABS, OBS
+resource.storage.type=LOCAL
 # resource store on HDFS/S3/OSS path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
 resource.storage.upload.base.path=/tmp/dolphinscheduler
 
@@ -106,6 +106,15 @@ resource.alibaba.cloud.region=cn-hangzhou
 resource.alibaba.cloud.oss.bucket.name=dolphinscheduler
 # oss bucket endpoint, required if you set resource.storage.type=OSS
 resource.alibaba.cloud.oss.endpoint=https://oss-cn-hangzhou.aliyuncs.com
+
+# alibaba cloud access key id, required if you set resource.storage.type=OBS
+resource.huawei.cloud.access.key.id=<your-access-key-id>
+# alibaba cloud access key secret, required if you set resource.storage.type=OBS
+resource.huawei.cloud.access.key.secret=<your-access-key-secret>
+# oss bucket name, required if you set resource.storage.type=OBS
+resource.huawei.cloud.obs.bucket.name=dolphinscheduler
+# oss bucket endpoint, required if you set resource.storage.type=OBS
+resource.huawei.cloud.obs.endpoint=obs.cn-southwest-2.huaweicloud.com
 
 # if resource.storage.type=HDFS, the user must have the permission to create directories under the HDFS root path
 resource.hdfs.root.user=hdfs
