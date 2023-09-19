@@ -397,8 +397,8 @@ export default {
     image_tips: 'Please enter image',
     image_pull_policy: 'Image pull policy',
     image_pull_policy_tips: 'Please select a image pull policy (required)',
-    secret: 'Secret',
-    secret_tips: 'Please enter secret',
+    pull_secret: 'Pull secret',
+    pull_secret_tips: 'Please enter pull secret',
     command: 'Command',
     command_tips:
       'Please enter the container execution command, for example: ["printenv"]',

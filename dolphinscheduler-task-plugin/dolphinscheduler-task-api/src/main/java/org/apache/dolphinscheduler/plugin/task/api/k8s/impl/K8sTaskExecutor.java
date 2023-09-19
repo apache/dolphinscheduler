@@ -95,7 +95,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String image = k8STaskMainParameters.getImage();
-        String secret = k8STaskMainParameters.getSecret();
+        String pullSecret = k8STaskMainParameters.getPullSecret();
         String namespaceName = k8STaskMainParameters.getNamespaceName();
         String imagePullPolicy = k8STaskMainParameters.getImagePullPolicy();
         Map<String, String> otherParams = k8STaskMainParameters.getParamsMap();
@@ -180,7 +180,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withEnv(envVars)
                 .endContainer()
                 .addNewImagePullSecret()
-                .withName(secret)
+                .withName(pullSecret)
                 .endImagePullSecret()
                 .withRestartPolicy(RESTART_POLICY)
                 .withAffinity(affinity)

@@ -67,20 +67,6 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
-      type: 'input',
-      field: 'secret',
-      name: t('project.node.secret'),
-      span: 18,
-      props: {
-        placeholder: t('project.node.secret_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: false,
-        message: t('project.node.secret_tips')
-      }
-    },
-    {
       type: 'select',
       field: 'imagePullPolicy',
       name: t('project.node.image_pull_policy'),
@@ -92,6 +78,14 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
         message: t('project.node.image_pull_policy_tips')
       },
       value: 'IfNotPresent'
+    },
+    {
+      type: 'input',
+      field: 'pullSecret',
+      name: t('project.node.pull_secret'),
+      props: {
+        placeholder: t('project.node.pull_secret_tips')
+      }
     },
     {
       type: 'input',

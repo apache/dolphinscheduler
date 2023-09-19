@@ -107,7 +107,7 @@ public class K8sTaskTest {
     @Test
     public void testGetParametersNormal() {
         String expectedStr =
-                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], args=[\"echo hello world\"], imagePullPolicy=IfNotPresent, minCpuCores=2.0, minMemorySpace=10.0, customizedLabels=[Label(label=test, value=1234)], nodeSelectors=[NodeSelectorExpression(key=node-label, operator=In, values=1234,12345)])";
+                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], args=[\"echo hello world\"], pullSecret=null, imagePullPolicy=IfNotPresent, minCpuCores=2.0, minMemorySpace=10.0, customizedLabels=[Label(label=test, value=1234)], nodeSelectors=[NodeSelectorExpression(key=node-label, operator=In, values=1234,12345)])";
         String result = k8sTask.getParameters().toString();
         Assertions.assertEquals(expectedStr, result);
     }
