@@ -95,7 +95,6 @@ public class ProjectWorkerGroupMapperTest extends BaseDaoTest {
             .eq(ProjectWorkerGroup::getWorkerGroup,projectWorkerGroup.getWorkerGroup()));
 
         Assertions.assertTrue(delete >= 1);
-
     }
 
     /**

@@ -205,4 +205,14 @@ public interface ProjectService {
      * @return project list
      */
     Result queryAllProjectListForDependent();
+
+
+    /**
+     * query all assigned worker groups for this project
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return worker groups which worker groups are assigned to the project
+     */
+    Result queryAssignedWorkerGroup(User loginUser, Long projectCode);
 }

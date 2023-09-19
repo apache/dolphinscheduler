@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -35,10 +36,12 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateEx
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.apache.commons.lang3.StringUtils;
@@ -89,6 +92,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ProjectWorkerGroupMapper projectWorkerGroupMapper;
 
     /**
      * create project
@@ -810,6 +816,35 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 projectMapper.queryAllProjectForDependent();
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query all assigned worker groups for this project
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @return worker groups which worker groups are assigned to the project
+     */
+    @Override
+    public Result queryAssignedWorkerGroup(User loginUser, Long projectCode) {
+        Result result = new Result();
+
+        // 1. check read permission
+        Project project = this.projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result, PROJECT);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
+
+        List<ProjectWorkerGroup> workerGroups = this.projectWorkerGroupMapper.
+            selectList(new QueryWrapper<ProjectWorkerGroup>().
+                lambda().
+                eq(ProjectWorkerGroup::getProjectCode, project.getCode())
+            );
+
+        result.setData(workerGroups);
+        this.putMsg(result, Status.SUCCESS);
         return result;
     }
 }
