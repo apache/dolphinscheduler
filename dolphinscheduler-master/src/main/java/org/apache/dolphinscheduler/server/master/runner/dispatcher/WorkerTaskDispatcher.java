@@ -56,7 +56,7 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
     protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
         TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
         try {
-            ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+            ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskExecutionContext.getHost(), ITaskInstanceOperator.class);
             TaskInstanceDispatchResponse taskInstanceDispatchResponse = taskInstanceOperator
                     .dispatchTask(new TaskInstanceDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));

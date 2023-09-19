@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.NOT_SUPPORT_SSO;
 import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -107,7 +107,6 @@ public class LoginController extends BaseController {
     })
     @PostMapping(value = "/login")
     @ApiException(USER_LOGIN_FAILURE)
-    @AccessLogAnnotation(ignoreRequestArgs = {"userPassword", "request", "response"})
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
@@ -171,7 +170,6 @@ public class LoginController extends BaseController {
     @Operation(summary = "signOut", description = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
     @ApiException(SIGN_OUT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = {"loginUser", "request"})
     public Result signOut(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
@@ -244,7 +242,7 @@ public class LoginController extends BaseController {
             String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
             User user = usersService.getUserByUserName(username);
             if (user == null) {
-                user = usersService.createUser(username, null, null, 0, null, null, 1);
+                user = usersService.createUser(UserType.GENERAL_USER, username, null);
             }
             String sessionId = sessionService.createSession(user, null);
             if (sessionId == null) {

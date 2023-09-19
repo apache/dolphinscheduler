@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.ssh;
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.when;
-
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHDataSourceParamDTO;
@@ -27,15 +24,11 @@ import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHDataSourceProc
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import org.apache.sshd.client.session.ClientSession;
-
-import java.io.IOException;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -100,20 +93,19 @@ public class SSHDataSourceProcessorTest {
     }
 
     @Test
-    void testTestConnection() throws IOException {
+    void testTestConnection() {
         SSHDataSourceParamDTO sshDataSourceParamDTO =
                 (SSHDataSourceParamDTO) sshDataSourceProcessor.createDatasourceParamDTO(connectJson);
         ConnectionParam connectionParam = sshDataSourceProcessor.createConnectionParams(sshDataSourceParamDTO);
-        MockedStatic<SSHUtils> sshConnectionUtilsMockedStatic = org.mockito.Mockito.mockStatic(SSHUtils.class);
-        sshConnectionUtilsMockedStatic.when(() -> SSHUtils.getSession(Mockito.any(), Mockito.any())).thenReturn(null);
-        Assertions.assertFalse(sshDataSourceProcessor.testConnection(connectionParam));
+        Assertions.assertFalse(sshDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
 
-        ClientSession clientSession = Mockito.mock(ClientSession.class, RETURNS_DEEP_STUBS);
-        sshConnectionUtilsMockedStatic.when(() -> SSHUtils.getSession(Mockito.any(), Mockito.any()))
-                .thenReturn(clientSession);
-        when(clientSession.auth().verify().isSuccess()).thenReturn(true);
-        Assertions.assertTrue(sshDataSourceProcessor.testConnection(connectionParam));
-
+        try (
+                MockedConstruction<SshClientWrapper> sshClientWrapperMockedConstruction =
+                        Mockito.mockConstruction(SshClientWrapper.class, (mock, context) -> {
+                            Mockito.when(mock.isAuth()).thenReturn(true);
+                        })) {
+            Assertions.assertTrue(sshDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
+        }
     }
 
 }
