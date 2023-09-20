@@ -20,26 +20,20 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-alert</artifactId>
+        <artifactId>dolphinscheduler-alert-plugins</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <artifactId>dolphinscheduler-alert-plugins</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dolphinscheduler-alert-dingtalk-personalwork</artifactId>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>dolphinscheduler-alert-all</module>
-        <module>dolphinscheduler-alert-api</module>
-        <module>dolphinscheduler-alert-email</module>
-        <module>dolphinscheduler-alert-wechat</module>
-        <module>dolphinscheduler-alert-dingtalk</module>
-        <module>dolphinscheduler-alert-dingtalk-personalwork</module>
-        <module>dolphinscheduler-alert-script</module>
-        <module>dolphinscheduler-alert-http</module>
-        <module>dolphinscheduler-alert-feishu</module>
-        <module>dolphinscheduler-alert-slack</module>
-        <module>dolphinscheduler-alert-pagerduty</module>
-        <module>dolphinscheduler-alert-webexteams</module>
-        <module>dolphinscheduler-alert-telegram</module>
-    </modules>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+    </dependencies>
 </project>

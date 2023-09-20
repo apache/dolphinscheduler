@@ -267,7 +267,12 @@ export default {
     AtUserIds: 'At User Ids',
     MsgType: 'Msg Type',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}All"
+    IsAtAll: "{'@'}All",
+    AppKey: 'AppKey',
+    AppSecret: 'AppSecret',
+    robotCode: 'RobotCode',
+    userIds: 'UserIds',
+    msgKey: 'MsgKey'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',

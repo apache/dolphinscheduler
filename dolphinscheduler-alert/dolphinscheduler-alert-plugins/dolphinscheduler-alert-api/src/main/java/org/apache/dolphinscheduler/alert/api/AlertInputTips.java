@@ -50,6 +50,10 @@ public enum AlertInputTips {
     SECRET("please input secret", "请输入secret"),
     WECHAT_MENTION_USERS("use `|` to separate userIds and `@all` to everyone", "使用`|`来分割userId或使用`@all`来提到所有人"),
     WECHAT_AGENT_ID("please input agent id or chat id", "请输入agent id或chat id"),
+    APP_KEY("please input app key", "请输入app key"),
+    APP_SECRET("please input app secret", "请输入app secret"),
+    ROBOT_CODE("please input robot code", "请输入robot code"),
+    USER_IDS("please input user ids, use ',' to split ids, like '111,222'", "请输入user ids, 使用','去分割id, 类似'111,222'"),
     ;
 
     private final String enMsg;
