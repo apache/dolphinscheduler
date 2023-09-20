@@ -50,6 +50,9 @@ public class TaskInstanceQueryRequest extends PageQueryDto {
     @Schema(name = "taskName", example = "TASK-NAME")
     String taskName;
 
+    @Schema(name = "taskCode", example = "TASK-CODE")
+    Long taskCode;
+
     @Schema(name = "executorName", example = "EXECUTOR-NAME")
     String executorName;
 
