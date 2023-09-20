@@ -29,17 +29,16 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.auto.service.AutoService;
+
 @AutoService(DataSourceProcessor.class)
 public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
 
@@ -55,7 +54,7 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
 
         xuguDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         xuguDatasourceParamDTO.setUserName(connectionParams.getUser());
-        xuguDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        xuguDatasourceParamDTO.setOther(connectionParams.getOther());
 
         String address = connectionParams.getAddress();
         String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
@@ -68,24 +67,20 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
-        XuguDataSourceParamDTO xuguParam = (XuguDataSourceParamDTO) datasourceParam;
-        String address;
-        String jdbcUrl;
-
-        address = String.format("%s%s:%s",
-                DataSourceConstants.JDBC_XUGU, xuguParam.getHost(), xuguParam.getPort());
-        jdbcUrl = address + "/" + xuguParam.getDatabase();
+        XuguDataSourceParamDTO xgDataSourceParamDTO = (XuguDataSourceParamDTO) datasourceParam;
+        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_XUGU, xgDataSourceParamDTO.getHost(),
+                xgDataSourceParamDTO.getPort());
+        String jdbcUrl = String.format("%s/%s", address, xgDataSourceParamDTO.getDatabase());
 
         XuguConnectionParam xuguConnectionParam = new XuguConnectionParam();
-        xuguConnectionParam.setUser(xuguParam.getUserName());
-        xuguConnectionParam.setPassword(PasswordUtils.encodePassword(xuguParam.getPassword()));
+        xuguConnectionParam.setUser(xgDataSourceParamDTO.getUserName());
+        xuguConnectionParam.setPassword(PasswordUtils.encodePassword(xgDataSourceParamDTO.getPassword()));
         xuguConnectionParam.setAddress(address);
         xuguConnectionParam.setJdbcUrl(jdbcUrl);
-        xuguConnectionParam.setDatabase(xuguParam.getDatabase());
+        xuguConnectionParam.setDatabase(xgDataSourceParamDTO.getDatabase());
         xuguConnectionParam.setDriverClassName(getDatasourceDriver());
         xuguConnectionParam.setValidationQuery(getValidationQuery());
-        xuguConnectionParam.setOther(transformOther(xuguParam.getOther()));
-        xuguConnectionParam.setProps(xuguParam.getOther());
+        xuguConnectionParam.setOther(xgDataSourceParamDTO.getOther());
 
         return xuguConnectionParam;
     }
@@ -108,18 +103,19 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         XuguConnectionParam xuguConnectionParam = (XuguConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(xuguConnectionParam.getOther())) {
-            return String.format("%s?%s", xuguConnectionParam.getJdbcUrl(), xuguConnectionParam.getOther());
+        String jdbcUrl = xuguConnectionParam.getJdbcUrl();
+        if (MapUtils.isNotEmpty(xuguConnectionParam.getOther())) {
+            return String.format("%s?%s", jdbcUrl, transformOther(xuguConnectionParam.getOther()));
         }
-        return xuguConnectionParam.getJdbcUrl();
+        return jdbcUrl;
     }
 
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         XuguConnectionParam xuguConnectionParam = (XuguConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                xuguConnectionParam.getUser(), PasswordUtils.decodePassword(xuguConnectionParam.getPassword()));
+        return DriverManager.getConnection(getJdbcUrl(connectionParam), xuguConnectionParam.getUser(),
+                PasswordUtils.decodePassword(xuguConnectionParam.getPassword()));
     }
 
     @Override
@@ -132,24 +128,13 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
         return new XuguDataSourceProcessor();
     }
 
-    private String transformOther(Map<String, String> otherMap) {
-        if (MapUtils.isEmpty(otherMap)) {
+    private String transformOther(Map<String, String> paramMap) {
+        if (MapUtils.isEmpty(paramMap)) {
             return null;
         }
-        List<String> list = new ArrayList<>();
-        otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
-        return String.join("&", list);
+        List<String> otherList = new ArrayList<>();
+        paramMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (StringUtils.isEmpty(other)) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

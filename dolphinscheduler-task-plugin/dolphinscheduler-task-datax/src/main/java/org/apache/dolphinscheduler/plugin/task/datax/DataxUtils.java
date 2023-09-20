@@ -42,9 +42,6 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_RDBMS = "rdbmsreader";
 
-    public static final String DATAX_READER_PLUGIN_XUGU = "xugureader";
-
-
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
     public static final String DATAX_WRITER_PLUGIN_POSTGRESQL = "postgresqlwriter";
@@ -57,9 +54,6 @@ public class DataxUtils {
     public static final String DATAX_WRITER_PLUGIN_DATABEND = "databendwriter";
 
     public static final String DATAX_WRITER_PLUGIN_RDBMS = "rdbmswriter";
-
-    public static final String DATAX_WRITER_PLUGIN_XUGU = "xuguwriter";
-
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -94,8 +88,6 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
             case DATABEND:
                 return DATAX_WRITER_PLUGIN_DATABEND;
-//            case XUGU:
-//                return DATAX_WRITER_PLUGIN_XUGU;
             case HIVE:
             case PRESTO:
             default:

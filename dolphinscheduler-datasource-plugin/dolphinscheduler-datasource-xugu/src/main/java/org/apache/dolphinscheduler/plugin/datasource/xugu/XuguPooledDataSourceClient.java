@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.xugu;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class XuguDataSourceClient extends CommonDataSourceClient {
+public class XuguPooledDataSourceClient extends BasePooledDataSourceClient {
 
-    public XuguDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+    public XuguPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
 

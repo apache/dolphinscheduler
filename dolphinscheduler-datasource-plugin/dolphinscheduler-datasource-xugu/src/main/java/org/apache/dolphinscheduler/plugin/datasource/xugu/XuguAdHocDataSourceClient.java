@@ -15,28 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.xugu.param;
+package org.apache.dolphinscheduler.plugin.datasource.xugu;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-public class XuguDataSourceParamDTO extends BaseDataSourceParamDTO {
+public class XuguAdHocDataSourceClient extends BaseAdHocDataSourceClient {
 
-    @Override
-    public String toString() {
-        return "XuguDataSourceParamDTO{"
-                + "name='" + name + '\''
-                + ", note='" + note + '\''
-                + ", host='" + host + '\''
-                + ", port=" + port
-                + ", database='" + database + '\''
-                + ", userName='" + userName + '\''
-                + ", other='" + other + '\''
-                + '}';
-    }
-
-    @Override
-    public DbType getType() {
-        return DbType.XUGU;
+    public XuguAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
 }

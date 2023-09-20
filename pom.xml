@@ -94,7 +94,6 @@
         <skipDepCheck>true</skipDepCheck>
         <build.ui.skip>false</build.ui.skip>
         <spotless.skip>false</spotless.skip>
-        <xugu-jdbc.version>12.1.11</xugu-jdbc.version>
     </properties>
 
     <dependencyManagement>
@@ -331,15 +330,6 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- https://mvnrepository.com/artifact/com.xugudb/xugu-jdbc -->
-        <dependency>
-            <groupId>com.xugudb</groupId>
-            <artifactId>xugu-jdbc</artifactId>
-            <version>${xugu-jdbc.version}</version>
-        </dependency>
-
-
     </dependencies>
 
     <build>

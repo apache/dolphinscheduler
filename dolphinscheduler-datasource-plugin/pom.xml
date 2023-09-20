@@ -72,10 +72,5 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.xugu</groupId>
-            <artifactId>xugu-jdbc</artifactId>
-        </dependency>
     </dependencies>
 </project>

@@ -25,7 +25,6 @@ public class XuguConnectionParam extends BaseConnectionParam {
     public String toString() {
         return "XuguConnectionParam{"
                 + "user='" + user + '\''
-                + ", password='" + password + '\''
                 + ", address='" + address + '\''
                 + ", database='" + database + '\''
                 + ", jdbcUrl='" + jdbcUrl + '\''
