@@ -26,11 +26,15 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 - SEATUNNEL_ENGINE
 - Deployment mode: specify the deployment mode, `cluster` `local`
 
-          > Click [here](https://seatunnel.apache.org/docs/2.1.2/command/usage) for more information on the usage of `Apache SeaTunnel command`
+          > Click [here](https://seatunnel.apache.org/docs/2.3.3/command/usage) for more information on the usage of 
+
+`Apache SeaTunnel command`
 
 - Custom Configuration: Supports custom configuration or select configuration file from Resource Center
 
-  > Click [here](https://seatunnel.apache.org/docs/2.1.2/concept/config) for more information about `Apache SeaTunnel config` file
+  > Click [here](https://seatunnel.apache.org/docs/2.3.3/concept/config) for more information about `Apache
+  >
+  >> SeaTunnel config` file
 
 - Script: Customize configuration information on the task node, including four parts: `env` `source` `transform` `sink`
 
@@ -76,4 +80,10 @@ sink {
 }
 
 ```
+
+### Support SeaTunnel Version
+
+- v2.3.1
+- v2.3.2
+- v2.3.3
 
