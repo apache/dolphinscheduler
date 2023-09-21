@@ -581,6 +581,9 @@ public enum Status {
     WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS(1401002,
             "You can not modify or remove this worker group, cause it has [{0}] dependent environments.",
             "不能修改或删除该Worker组，有 [{0}] 个环境配置正在使用"),
+
+    WORKER_GROUP_NOT_EXIST(1402001, "The Worker group [{0}] not exists", "Worker组[{0}]不存在."),
+    ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR(1402002, "Failed to assign these worker groups to the project[{0}]", "给项目[{0}]分配工作组失败"),
             ;
     private final int code;
     private final String enMsg;
