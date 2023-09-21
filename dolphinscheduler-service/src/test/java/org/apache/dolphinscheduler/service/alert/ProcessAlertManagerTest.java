@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,6 +38,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * ProcessAlertManager Test
@@ -50,6 +53,12 @@ public class ProcessAlertManagerTest {
 
     @Mock
     private AlertDao alertDao;
+
+    @Mock
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Mock
+    private UserMapper userMapper;
 
     /**
      * send worker alert fault tolerance
@@ -81,6 +90,8 @@ public class ProcessAlertManagerTest {
         processInstance.setState(WorkflowExecutionStatus.SUCCESS);
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         processInstance.setWarningGroupId(1);
+        processInstance.setProcessDefinitionCode(1L);
+        processInstance.setProcessDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
         TaskInstance taskInstance = new TaskInstance();
@@ -106,6 +117,8 @@ public class ProcessAlertManagerTest {
         processInstance.setEndTime(new Date());
         processInstance.setHost("127.0.0.1");
         processInstance.setWarningGroupId(1);
+        processInstance.setProcessDefinitionCode(1L);
+        processInstance.setProcessDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
 

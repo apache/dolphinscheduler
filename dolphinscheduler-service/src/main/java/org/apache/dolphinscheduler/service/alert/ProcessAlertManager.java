@@ -117,7 +117,12 @@ public class ProcessAlertManager {
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        User operator = userMapper.selectById(processDefinitionLog.getOperator());
+
+        String modifyBy = "";
+        if (processDefinitionLog != null) {
+            User operator = userMapper.selectById(processDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
 
         if (processInstance.getState().isSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
@@ -130,7 +135,7 @@ public class ProcessAlertManager {
                     .processName(processInstance.getName())
                     .processType(processInstance.getCommandType())
                     .processState(processInstance.getState())
-                    .modifyBy(operator.getUserName())
+                    .modifyBy(modifyBy)
                     .recovery(processInstance.getRecovery())
                     .runTimes(processInstance.getRunTimes())
                     .processStartTime(processInstance.getStartTime())
@@ -153,7 +158,7 @@ public class ProcessAlertManager {
                         .processId(processInstance.getId())
                         .processDefinitionCode(processInstance.getProcessDefinitionCode())
                         .processName(processInstance.getName())
-                        .modifyBy(operator.getUserName())
+                        .modifyBy(modifyBy)
                         .taskCode(task.getTaskCode())
                         .taskName(task.getName())
                         .taskType(task.getTaskType())
@@ -186,14 +191,18 @@ public class ProcessAlertManager {
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        User operator = userMapper.selectById(processDefinitionLog.getOperator());
+        String modifyBy = "";
+        if (processDefinitionLog != null) {
+            User operator = userMapper.selectById(processDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
 
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                     .processId(processInstance.getId())
                     .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
-                    .modifyBy(operator.getUserName())
+                    .modifyBy(modifyBy)
                     .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
@@ -440,7 +449,12 @@ public class ProcessAlertManager {
         ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
                 .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
                         processInstance.getProcessDefinitionVersion());
-        User operator = userMapper.selectById(processDefinitionLog.getOperator());
+
+        String modifyBy = "";
+        if (processDefinitionLog != null) {
+            User operator = userMapper.selectById(processDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
 
         ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
@@ -450,7 +464,7 @@ public class ProcessAlertManager {
                 .processName(processInstance.getName())
                 .processType(processInstance.getCommandType())
                 .processState(processInstance.getState())
-                .modifyBy(operator.getUserName())
+                .modifyBy(modifyBy)
                 .runTimes(processInstance.getRunTimes())
                 .processStartTime(processInstance.getStartTime())
                 .processEndTime(processInstance.getEndTime())
