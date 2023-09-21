@@ -14,3 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+ALTER TABLE t_ds_process_definition ADD COLUMN IF NOT EXISTS execution_type int NULL DEFAULT '0';
+
+ALTER TABLE t_ds_process_definition_log ADD COLUMN IF NOT EXISTS execution_type int NULL DEFAULT '0';
+
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS next_process_instance_id int NULL DEFAULT '0';
