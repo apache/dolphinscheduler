@@ -44,7 +44,7 @@ export function useDms({
     delayTime: 0,
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
-    isRestartTask: false,
+    isRestartTask: false
   } as INodeData)
 
   let extra: IJsonItem[] = []
@@ -70,7 +70,7 @@ export function useDms({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),
-      Fields.useEnvironmentName(model, !model.id),
+      Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       ...Fields.useResourceLimit(),

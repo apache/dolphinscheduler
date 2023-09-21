@@ -54,6 +54,7 @@ const BatchTaskInstance = defineComponent({
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal,
+        taskCode: variables.taskCode,
         processInstanceId: variables.processInstanceId,
         host: variables.host,
         stateType: variables.stateType,
@@ -71,6 +72,11 @@ const BatchTaskInstance = defineComponent({
     const onSearch = () => {
       variables.page = 1
       requestTableData()
+    }
+
+    const onClearSearchTaskCode = () => {
+      variables.taskCode = null
+      onSearch()
     }
 
     const onClearSearchTaskName = () => {
@@ -107,7 +113,7 @@ const BatchTaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    var getLogsID: number
+    let getLogsID: number
 
     const getLogs = (row: any, logTimer: number) => {
       const { state } = useAsyncState(
@@ -182,6 +188,7 @@ const BatchTaskInstance = defineComponent({
       requestTableData,
       onUpdatePageSize,
       onSearch,
+      onClearSearchTaskCode,
       onClearSearchTaskName,
       onClearSearchProcessInstanceName,
       onClearSearchExecutorName,
@@ -208,6 +215,14 @@ const BatchTaskInstance = defineComponent({
       <NSpace vertical>
         <Card>
           <NSpace justify='end' wrap={false}>
+            <NInput
+              allowInput={this.trim}
+              v-model={[this.taskCode, 'value']}
+              size='small'
+              placeholder={t('project.task.task_code')}
+              clearable
+              onClear={this.onClearSearchTaskCode}
+            />
             <NInput
               allowInput={this.trim}
               v-model={[this.searchVal, 'value']}

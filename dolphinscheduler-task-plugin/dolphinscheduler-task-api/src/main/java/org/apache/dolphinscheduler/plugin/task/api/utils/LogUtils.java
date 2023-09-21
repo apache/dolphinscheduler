@@ -26,11 +26,8 @@ import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,7 +71,7 @@ public class LogUtils {
      * @param fetchWay    fetch way
      * @return application id list.
      */
-    public List<String> getAppIds(@NonNull String logPath, @NonNull String appInfoPath, String fetchWay) {
+    public List<String> getAppIds(String logPath, String appInfoPath, String fetchWay) {
         if (!StringUtils.isEmpty(fetchWay) && fetchWay.equals("aop")) {
             log.info("Start finding appId in {}, fetch way: {} ", appInfoPath, fetchWay);
             return getAppIdsFromAppInfoFile(appInfoPath);
@@ -145,7 +142,11 @@ public class LogUtils {
                 .orElse(null);
     }
 
-    public List<String> getAppIdsFromAppInfoFile(@NonNull String appInfoPath) {
+    public List<String> getAppIdsFromAppInfoFile(String appInfoPath) {
+        if (StringUtils.isEmpty(appInfoPath)) {
+            log.warn("appInfoPath is empty");
+            return Collections.emptyList();
+        }
         File appInfoFile = new File(appInfoPath);
         if (!appInfoFile.exists() || !appInfoFile.isFile()) {
             return Collections.emptyList();
@@ -167,10 +168,7 @@ public class LogUtils {
         }
         Set<String> appIds = new HashSet<>();
         try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
-            stream.filter(line -> {
-                Matcher matcher = APPLICATION_REGEX.matcher(line);
-                return matcher.find();
-            }).forEach(line -> {
+            stream.forEach(line -> {
                 Matcher matcher = APPLICATION_REGEX.matcher(line);
                 if (matcher.find()) {
                     String appId = matcher.group();
@@ -186,48 +184,34 @@ public class LogUtils {
         }
     }
 
-    public static String readWholeFileContentFromLocal(String filePath) {
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\r\n");
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            log.error("read file error", e);
-        }
-        return "";
-    }
-
     public static String getTaskInstanceLogFullPathMdc() {
         return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static MDCAutoClosableContext setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+    public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
+        if (taskInstanceLogFullPath == null) {
+            log.warn("taskInstanceLogFullPath is null");
+            return;
+        }
         MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, taskInstanceLogFullPath);
-        return new MDCAutoClosableContext(LogUtils::removeTaskInstanceLogFullPathMDC);
     }
 
     public static void removeTaskInstanceLogFullPathMDC() {
         MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
-    public static MDCAutoClosableContext setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
-                                                                         Integer taskInstanceId) {
+    public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,
+                                                       Integer taskInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
-        return new MDCAutoClosableContext(LogUtils::removeWorkflowAndTaskInstanceIdMDC);
     }
 
-    public static MDCAutoClosableContext setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
+    public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
         MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
-        return new MDCAutoClosableContext(LogUtils::removeWorkflowInstanceIdMDC);
     }
 
-    public static MDCAutoClosableContext setTaskInstanceIdMDC(Integer taskInstanceId) {
+    public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
-        return new MDCAutoClosableContext(LogUtils::removeTaskInstanceIdMDC);
     }
 
     public static void removeWorkflowAndTaskInstanceIdMDC() {

@@ -20,9 +20,7 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -33,6 +31,17 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Comparator;
+
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -43,16 +52,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
-import java.util.Objects;
+import lombok.SneakyThrows;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class UdfManageE2ETest {
@@ -86,7 +86,7 @@ public class UdfManageE2ETest {
             .goToTab(TenantPage.class)
             .create(tenant);
 
-        await().untilAsserted(() -> assertThat(tenantPage.tenantList())
+        Awaitility.await().untilAsserted(() -> assertThat(tenantPage.tenantList())
             .as("Tenant list should contain newly-created tenant")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(tenant)));
@@ -94,7 +94,7 @@ public class UdfManageE2ETest {
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), 20).until(ExpectedConditions.visibilityOfElementLocated(
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
@@ -118,10 +118,10 @@ public class UdfManageE2ETest {
     void testCreateDirectory() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        new WebDriverWait(page.driver(), 10)
+        new WebDriverWait(page.driver(), Duration.ofSeconds(20))
             .until(ExpectedConditions.urlContains("/resource-manage"));
-        page.createDirectory(testDirectoryName, "test_desc");
-        await().untilAsserted(() -> assertThat(page.udfList())
+        page.createDirectory(testDirectoryName);
+        Awaitility.await().untilAsserted(() -> assertThat(page.udfList())
             .as("File list should contain newly-created file")
             .extracting(WebElement::getText)
             .anyMatch(it -> it.contains(testDirectoryName)));
@@ -151,7 +151,7 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
         page.delete(testDirectoryName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(
@@ -170,7 +170,7 @@ public class UdfManageE2ETest {
 
         downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
         page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             assertThat(page.udfList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
@@ -202,7 +202,7 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
         page.rename(testUploadUdfFileName, testUploadUdfRenameFileName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             assertThat(page.udfList())
                 .as("File list should contain newly-created file")
                 .extracting(WebElement::getText)
@@ -216,7 +216,7 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
         page.delete(testUploadUdfRenameFileName);
 
-        await().untilAsserted(() -> {
+        Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
 
             assertThat(

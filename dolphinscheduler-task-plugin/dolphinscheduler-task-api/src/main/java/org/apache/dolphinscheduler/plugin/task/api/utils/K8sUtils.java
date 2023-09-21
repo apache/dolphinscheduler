@@ -29,8 +29,8 @@ import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobList;
 import io.fabric8.kubernetes.client.Config;
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 
@@ -96,7 +96,7 @@ public class K8sUtils {
             String podName = null;
             for (Pod pod : podList) {
                 podName = pod.getMetadata().getName();
-                if (jobName.equals(podName.substring(0, pod.getMetadata().getName().lastIndexOf("-")))) {
+                if (podName.contains("-") && jobName.equals(podName.substring(0, podName.lastIndexOf("-")))) {
                     break;
                 }
             }
@@ -114,7 +114,7 @@ public class K8sUtils {
     public void buildClient(String configYaml) {
         try {
             Config config = Config.fromKubeconfig(configYaml);
-            client = new DefaultKubernetesClient(config);
+            client = new KubernetesClientBuilder().withConfig(config).build();
         } catch (Exception e) {
             throw new TaskException("fail to build k8s ApiClient", e);
         }

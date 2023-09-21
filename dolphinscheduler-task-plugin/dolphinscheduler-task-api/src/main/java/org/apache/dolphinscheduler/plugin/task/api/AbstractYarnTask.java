@@ -21,33 +21,18 @@ import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLE
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
 
-/**
- * abstract yarn task
- */
 public abstract class AbstractYarnTask extends AbstractRemoteTask {
 
-    /**
-     * process task
-     */
     private ShellCommandExecutor shellCommandExecutor;
 
-    /**
-     * rules for extracting application ID
-     */
-    protected static final Pattern YARN_APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
-
-    /**
-     * Abstract Yarn Task
-     *
-     * @param taskRequest taskRequest
-     */
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
@@ -59,8 +44,12 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
+            IShellInterceptorBuilder shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(getProperties())
+                    // todo: do we need to move the replace to subclass?
+                    .appendScript(getScript().replaceAll("\\r\\n", System.lineSeparator()));
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand(), taskCallBack);
+            TaskResponse response = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(response.getExitStatusCode());
             // set appIds
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
@@ -116,31 +105,12 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     }
 
     /**
-     * create command
-     *
-     * @return String
+     * Get the script used to bootstrap the task
      */
-    protected abstract String buildCommand();
+    protected abstract String getScript();
 
     /**
-     * set main jar name
+     * Get the properties of the task used to replace the placeholders in the script.
      */
-    protected abstract void setMainJarName();
-
-    /**
-     * Get name of jar resource.
-     *
-     * @param mainJar
-     * @return
-     */
-    protected String getResourceNameOfMainJar(ResourceInfo mainJar) {
-        if (null == mainJar) {
-            throw new RuntimeException("The jar for the task is required.");
-        }
-
-        return mainJar.getId() == null
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst("/", "");
-    }
+    protected abstract Map<String, String> getProperties();
 }

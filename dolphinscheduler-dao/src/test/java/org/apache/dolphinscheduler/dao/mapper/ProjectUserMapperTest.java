@@ -77,7 +77,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
         ProjectUser projectUser = insertOne();
         // query
         List<ProjectUser> projectUsers = projectUserMapper.selectList(null);
-        Assertions.assertNotEquals(projectUsers.size(), 0);
+        Assertions.assertNotEquals(0, projectUsers.size());
     }
 
     /**
@@ -100,7 +100,7 @@ public class ProjectUserMapperTest extends BaseDaoTest {
         ProjectUser projectUser = insertOne();
         ProjectUser projectUser1 =
                 projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        Assertions.assertNotEquals(projectUser1, null);
+        Assertions.assertNotEquals(null, projectUser1);
 
     }
 }

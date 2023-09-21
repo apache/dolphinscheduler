@@ -60,16 +60,15 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - name: Build Image
         run: |
           ./mvnw -B clean install \
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
-          -Dcheckstyle.skip=true \
-          -Pdocker,release -Ddocker.tag=ci \
-          -pl dolphinscheduler-standalone-server -am
+          -Dspotless.skip=true \
+          -Pdocker,release -Ddocker.tag=ci
       - name: Export Docker Images
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
@@ -90,6 +89,18 @@ jobs:
         case:
           - name: Tenant
             class: org.apache.dolphinscheduler.api.test.cases.TenantAPITest
+          - name: WorkerGroup
+            class: org.apache.dolphinscheduler.api.test.cases.WorkerGroupAPITest
+          - name: Project
+            class: org.apache.dolphinscheduler.api.test.cases.ProjectAPITest
+          - name: Workflow
+            class: org.apache.dolphinscheduler.api.test.cases.ProcessDefinitionAPITest
+          - name: Scheduler
+            class: org.apache.dolphinscheduler.api.test.cases.SchedulerAPITest
+          - name: Executor
+            class: org.apache.dolphinscheduler.api.test.cases.ExecutorAPITest
+          - name: ProcessInstance
+            class: org.apache.dolphinscheduler.api.test.cases.ProcessInstanceAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
@@ -100,7 +111,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
       - uses: actions/download-artifact@v2
         name: Download Docker Images
@@ -114,7 +125,7 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
-            -Dcheckstyle.skip=false \
+            -Dspotless.skip=false \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v2
         if: always()

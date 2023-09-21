@@ -58,7 +58,6 @@ interface ProcessDefinitionReq {
   locations: string
   taskDefinitionJson: string
   taskRelationJson: string
-  tenantCode: string
   executionType: string
   description?: string
   globalParams?: string

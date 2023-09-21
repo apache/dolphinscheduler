@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import javax.annotation.Nullable;
 
@@ -34,18 +34,16 @@ public class DefaultWorkerDelayTaskExecuteRunnable extends WorkerDelayTaskExecut
 
     public DefaultWorkerDelayTaskExecuteRunnable(@NonNull TaskExecutionContext taskExecutionContext,
                                                  @NonNull WorkerConfig workerConfig,
-                                                 @NonNull String workflowMaster,
                                                  @NonNull WorkerMessageSender workerMessageSender,
-                                                 @NonNull WorkerRpcClient workerRpcClient,
                                                  @NonNull TaskPluginManager taskPluginManager,
-                                                 @Nullable StorageOperate storageOperate) {
+                                                 @Nullable StorageOperate storageOperate,
+                                                 @NonNull WorkerRegistryClient workerRegistryClient) {
         super(taskExecutionContext,
                 workerConfig,
-                workflowMaster,
                 workerMessageSender,
-                workerRpcClient,
                 taskPluginManager,
-                storageOperate);
+                storageOperate,
+                workerRegistryClient);
     }
 
     @Override

@@ -32,8 +32,13 @@ public class KubernetesApplicationManagerContext implements ApplicationManagerCo
     private final K8sTaskExecutionContext k8sTaskExecutionContext;
 
     /**
-     * driver pod label value
+     * pod label value
      */
     private final String labelValue;
+
+    /**
+     * container name (optional)
+     */
+    private final String containerName;
 
 }

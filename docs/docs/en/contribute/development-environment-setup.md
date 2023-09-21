@@ -65,12 +65,12 @@ cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
        -Dmaven.javadoc.skip \
-       -Dmaven.checkstyle.skip \
+       -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
        -Pdocker,release
 ```
 
-When the command is finished you could find them by command `docker imaegs`.
+When the command is finished you could find them by command `docker images`.
 
 - If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can run when finished the modification
 
@@ -79,7 +79,7 @@ cd dolphinscheduler
 ./mvnw -B clean deploy \
        -Dmaven.test.skip \
        -Dmaven.javadoc.skip \
-       -Dmaven.checkstyle.skip \
+       -Dspotless.skip = true \
        -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \

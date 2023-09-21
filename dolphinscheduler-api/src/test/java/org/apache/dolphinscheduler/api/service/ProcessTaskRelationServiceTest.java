@@ -255,7 +255,6 @@ public class ProcessTaskRelationServiceTest {
         processDefinition.setId(1);
         processDefinition.setProjectCode(1L);
         processDefinition.setName("test_pdf");
-        processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(1L);
         processDefinition.setVersion(1);

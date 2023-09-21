@@ -22,6 +22,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import { queryTenantList } from '@/service/modules/tenants'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
 import type { EnvironmentItem } from '@/service/modules/environment/types'
@@ -40,6 +41,7 @@ export const useStart = (
       warningType: 'NONE',
       warningGroupId: null,
       workerGroup: 'default',
+      tenantCode: 'default',
       environmentCode: null,
       startParams: null as null | string,
       dryRun: 0
@@ -47,6 +49,7 @@ export const useStart = (
     startState: {
       projectCode: Number(route.params.projectCode),
       workerGroups: [],
+      tenantList: [],
       alertGroups: [],
       environmentList: [],
       startParamsList: []
@@ -63,6 +66,15 @@ export const useStart = (
       variables.startState.workerGroups = res.map((item: string) => ({
         label: item,
         value: item
+      }))
+    })
+  }
+
+  const getTenantList = () => {
+    queryTenantList().then((res: any) => {
+      variables.startState.tenantList = res.map((item: any) => ({
+        label: item.tenantCode,
+        value: item.tenantCode
       }))
     })
   }
@@ -135,6 +147,7 @@ export const useStart = (
   return {
     variables,
     getWorkerGroups,
+    getTenantList,
     getEnvironmentList,
     getAlertGroups,
     getStartParamsList,

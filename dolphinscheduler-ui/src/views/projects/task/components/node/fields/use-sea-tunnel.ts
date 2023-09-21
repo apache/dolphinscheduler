@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDeployMode, useResources, useCustomParams } from '.'
 import type { IJsonItem } from '../types'
@@ -24,30 +24,59 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
   const resourceEditorSpan = computed(() => (model.useCustom ? 0 : 24))
-  const flinkSpan = computed(() => (model.engine === 'FLINK' ? 24 : 0))
-  const deployModeSpan = computed(() => (model.engine === 'SPARK' ? 24 : 0))
+  const flinkSpan = computed(() =>
+    model.startupScript.includes('flink') ? 24 : 0
+  )
+  const deployModeSpan = computed(() =>
+    model.startupScript.includes('spark') ||
+    model.startupScript === 'seatunnel.sh'
+      ? 24
+      : 0
+  )
   const masterSpan = computed(() =>
-    model.engine === 'SPARK' && model.deployMode !== 'local' ? 12 : 0
+    model.startupScript.includes('spark') && model.deployMode !== 'local'
+      ? 12
+      : 0
   )
   const masterUrlSpan = computed(() =>
-    model.engine === 'SPARK' &&
+    model.startupScript.includes('spark') &&
     model.deployMode !== 'local' &&
     (model.master === 'SPARK' || model.master === 'MESOS')
       ? 12
+      : 0
+  )
+  const showClient = computed(() => model.startupScript.includes('spark'))
+  const showLocal = computed(() => model.startupScript === 'seatunnel.sh')
+  const othersSpan = computed(() =>
+    model.startupScript.includes('flink') ||
+    model.startupScript === 'seatunnel.sh'
+      ? 24
       : 0
   )
 
   return [
     {
       type: 'select',
-      field: 'engine',
-      span: 12,
-      name: t('project.node.engine'),
-      options: ENGINE,
+      field: 'startupScript',
+      span: 15,
+      name: t('project.node.startup_script'),
+      options: STARTUP_SCRIPT,
       validate: {
         trigger: ['input', 'blur'],
         required: true,
-        message: t('project.node.engine_tips')
+        message: t('project.node.startup_script_tips')
+      },
+      props: {
+        'on-update:value': (value: boolean) => {
+          if (value) {
+            if (model.startupScript === 'seatunnel.sh') {
+              model.deployMode = 'local'
+            }
+            if (model.startupScript.includes('spark')) {
+              model.deployMode = 'client'
+            }
+          }
+        }
       }
     },
 
@@ -64,7 +93,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'others',
       name: t('project.node.option_parameters'),
-      span: flinkSpan,
+      span: othersSpan,
       props: {
         type: 'textarea',
         placeholder: t('project.node.option_parameters_tips')
@@ -72,7 +101,7 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
     },
 
     // SeaTunnel spark parameter
-    useDeployMode(deployModeSpan),
+    useDeployMode(deployModeSpan, showClient, ref(true), showLocal),
     {
       type: 'select',
       field: 'master',
@@ -127,18 +156,50 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   ]
 }
 
-export const ENGINE = [
+export const STARTUP_SCRIPT = [
   {
-    label: 'SPARK',
-    value: 'SPARK'
+    label: 'seatunnel.sh',
+    value: 'seatunnel.sh'
   },
   {
-    label: 'FLINK',
-    value: 'FLINK'
+    label: 'start-seatunnel-flink-13-connector-v2.sh',
+    value: 'start-seatunnel-flink-13-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-flink-15-connector-v2.sh',
+    value: 'start-seatunnel-flink-15-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-flink-connector-v2.sh',
+    value: 'start-seatunnel-flink-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-flink.sh',
+    value: 'start-seatunnel-flink.sh'
+  },
+  {
+    label: 'start-seatunnel-spark-2-connector-v2.sh',
+    value: 'start-seatunnel-spark-2-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-spark-3-connector-v2.sh',
+    value: 'start-seatunnel-spark-3-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-spark-connector-v2.sh',
+    value: 'start-seatunnel-spark-connector-v2.sh'
+  },
+  {
+    label: 'start-seatunnel-spark.sh',
+    value: 'start-seatunnel-spark.sh'
   }
 ]
 
 export const FLINK_RUN_MODE = [
+  {
+    label: 'none',
+    value: 'NONE'
+  },
   {
     label: 'run',
     value: 'RUN'

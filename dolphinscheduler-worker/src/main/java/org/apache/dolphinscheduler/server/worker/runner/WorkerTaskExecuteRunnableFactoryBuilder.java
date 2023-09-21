@@ -21,8 +21,8 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcClient;
 
 import javax.annotation.Nullable;
 
@@ -34,18 +34,16 @@ public class WorkerTaskExecuteRunnableFactoryBuilder {
 
     public static WorkerDelayTaskExecuteRunnableFactory<?> createWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
                                                                                                        @NonNull WorkerConfig workerConfig,
-                                                                                                       @NonNull String workflowMasterAddress,
                                                                                                        @NonNull WorkerMessageSender workerMessageSender,
-                                                                                                       @NonNull WorkerRpcClient workerRpcClient,
                                                                                                        @NonNull TaskPluginManager taskPluginManager,
-                                                                                                       @Nullable StorageOperate storageOperate) {
+                                                                                                       @Nullable StorageOperate storageOperate,
+                                                                                                       @NonNull WorkerRegistryClient workerRegistryClient) {
         return new DefaultWorkerDelayTaskExecuteRunnableFactory(taskExecutionContext,
                 workerConfig,
-                workflowMasterAddress,
                 workerMessageSender,
-                workerRpcClient,
                 taskPluginManager,
-                storageOperate);
+                storageOperate,
+                workerRegistryClient);
     }
 
 }
