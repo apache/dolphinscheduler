@@ -4,13 +4,13 @@
 
 ## Datasource Parameters
 
-|       **Datasource**       |                     **Description**                     |
+|       **Datasource**       | **Description**                                         |
 |----------------------------|---------------------------------------------------------|
 | Datasource                 | Select XUGU.                                            |
 | Datasource name            | Enter the name of the DataSource.                       |
 | Description                | Enter a description of the DataSource.                  |
 | IP/Host Name               | Enter the XUGU service IP.                              |
-| Port                       | Enter the XUGU service port.                            |
+| Port                       | Enter the XUGU service Port.                            |
 | Username                   | Set the username for XUGU connection.                   |
 | Password                   | Set the password for XUGU connection.                   |
 | Database name              | Enter the schema name of the XUGU connection.           |
