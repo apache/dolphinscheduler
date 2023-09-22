@@ -25,6 +25,7 @@ import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import styles from '../index.module.scss'
 
+
 export default defineComponent({
   name: 'ResourceEdit',
   setup() {
