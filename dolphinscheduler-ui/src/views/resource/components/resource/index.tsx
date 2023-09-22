@@ -106,8 +106,9 @@ export default defineComponent({
     const handleRenameFile = () => {
       variables.renameShowRef = true
     }
-  	const detailPageStore = useDetailPageStore()   
-	  const isDetailPageStore = useIsDetailPageStore()
+    const detailPageStore = useDetailPageStore()   
+    const isDetailPageStore = useIsDetailPageStore()
+    
     const handleDetailBackList = () => {
       if(isDetailPageStore.getIsDetailPage){
         variables.resourceType = detailPageStore.getResourceType  
@@ -116,20 +117,19 @@ export default defineComponent({
         variables.searchRef = detailPageStore.getSearchValue 
         variables.pagination.page = detailPageStore.getPage 
         variables.pagination.pageSize = detailPageStore.getPageSize 
-        if(isEmpty(variables.searchRef)){
+        if(!isEmpty(variables.searchRef)){
           handleConditions()
         }
-		    detailPageStore.$reset()
-		    isDetailPageStore.$reset()
+	detailPageStore.$reset()
+	isDetailPageStore.$reset()
       } else {
-		  detailPageStore.$reset()
-		  isDetailPageStore.$reset()
+	  detailPageStore.$reset()
+	  isDetailPageStore.$reset()
       }
     }
 
     onUnmounted(() => {
       isDetailPageStore.$reset()
-      detailPageStore.$reset()
     })
     onMounted(() => {
       handleDetailBackList()
