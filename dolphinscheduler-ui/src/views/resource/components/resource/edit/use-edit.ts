@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 import { useI18n } from 'vue-i18n'
 import type { Router } from 'vue-router'
 import { useRouter } from 'vue-router'
