@@ -224,11 +224,11 @@ export function useTable() {
       variables.pagination.pageSize
     )
     detailPageStore.setResourceType(variables.resourceType!)
-	  detailPageStore.setFullName(variables.fullName)
-	  detailPageStore.setTenantCode(variables.tenantCode)
-	  detailPageStore.setSearchValue(variables.searchRef)
-	  detailPageStore.setPage(variables.pagination.page)
-	  detailPageStore.setPageSize(variables.pagination.pageSize)
+    detailPageStore.setFullName(variables.fullName)
+    detailPageStore.setTenantCode(variables.tenantCode)
+    detailPageStore.setSearchValue(variables.searchRef)
+    detailPageStore.setPage(variables.pagination.page)
+    detailPageStore.setPageSize(variables.pagination.pageSize)
   }
 
   const updateList = () => {
