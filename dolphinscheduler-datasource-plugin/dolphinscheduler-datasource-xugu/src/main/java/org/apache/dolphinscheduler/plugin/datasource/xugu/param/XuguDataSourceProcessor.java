@@ -48,21 +48,21 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
+    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException{
         XuguConnectionParam connectionParams = (XuguConnectionParam) createConnectionParams(connectionJson);
-        XuguDataSourceParamDTO xuguDatasourceParamDTO = new XuguDataSourceParamDTO();
+        XuguDataSourceParamDTO xuguDataSourceParamDTO = new XuguDataSourceParamDTO();
 
-        xuguDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        xuguDatasourceParamDTO.setUserName(connectionParams.getUser());
-        xuguDatasourceParamDTO.setOther(connectionParams.getOther());
+        xuguDataSourceParamDTO.setUserName(connectionParams.getUser());
+        xuguDataSourceParamDTO.setDatabase(connectionParams.getDatabase());
+        xuguDataSourceParamDTO.setOther(connectionParams.getOther());
 
         String address = connectionParams.getAddress();
-        String[] hostSeperator = address.split(Constants.DOUBLE_SLASH);
-        String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
-        xuguDatasourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
-        xuguDatasourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
+        String[] hostSeparator = address.split(Constants.DOUBLE_SLASH);
+        String[] hostPortArray = hostSeparator[hostSeparator.length - 1].split(Constants.COMMA);
+        xuguDataSourceParamDTO.setPort(Integer.parseInt(hostPortArray[0].split(Constants.COLON)[1]));
+        xuguDataSourceParamDTO.setHost(hostPortArray[0].split(Constants.COLON)[0]);
 
-        return xuguDatasourceParamDTO;
+        return xuguDataSourceParamDTO;
     }
 
     @Override
@@ -114,6 +114,7 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
         XuguConnectionParam xuguConnectionParam = (XuguConnectionParam) connectionParam;
         Class.forName(getDatasourceDriver());
+
         return DriverManager.getConnection(getJdbcUrl(connectionParam), xuguConnectionParam.getUser(),
                 PasswordUtils.decodePassword(xuguConnectionParam.getPassword()));
     }

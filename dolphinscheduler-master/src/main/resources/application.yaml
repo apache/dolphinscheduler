@@ -156,14 +156,3 @@ spring:
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
-
----
-spring:
-  config:
-    activate:
-      on-profile: xugu
-  datasource:
-    driver-class-name: com.xugu.cloudjdbc.Driver
-    url: jdbc:xugu://192.168.2.215:5145/dolphinscheduler
-    username: SYSDBA
-    password: SYSDBA
