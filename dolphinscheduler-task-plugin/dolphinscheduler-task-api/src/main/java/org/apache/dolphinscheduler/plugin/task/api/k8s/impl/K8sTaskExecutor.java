@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s.impl;
 
+import static java.util.Collections.singletonList;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
@@ -67,6 +68,7 @@ import org.slf4j.Logger;
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.AffinityBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.NodeSelectorTerm;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
@@ -91,7 +93,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         super(logger, taskRequest);
     }
 
-    public Job buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
+    public void buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
         String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String image = k8STaskMainParameters.getImage();
@@ -188,8 +190,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .endTemplate()
                 .withBackoffLimit(retryNum)
                 .endSpec();
-
-        return jobBuilder.build();
+        job = jobBuilder.build();
+        if (!StringUtils.isEmpty(pullSecret)) {
+            job.getSpec().getTemplate().getSpec()
+                    .setImagePullSecrets(singletonList(new LocalObjectReference(pullSecret)));
+        }
     }
 
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
@@ -326,7 +331,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);
         try {
             log.info("[K8sJobExecutor-{}-{}] start to submit job", taskName, taskInstanceId);
-            job = buildK8sJob(k8STaskMainParameters);
+            buildK8sJob(k8STaskMainParameters);
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
             k8sUtils.createJob(namespaceName, job);
