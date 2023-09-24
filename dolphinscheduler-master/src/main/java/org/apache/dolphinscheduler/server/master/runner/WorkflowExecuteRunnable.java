@@ -26,9 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.*;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
@@ -811,7 +809,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         commandService.createCommand(command);
     }
-
     private void initTaskQueue() throws StateEventHandleException, CronParseException {
 
         taskFailedSubmit = false;
@@ -834,11 +831,22 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             // the task instance needs fault tolerance
             if(workflowInstance.getRecovery() == Flag.YES){
                 //determine whether the task is running
-                int taskSize = validTaskInstanceList.size();
-                for (int i = 0; i < taskSize; i++) {
-                    TaskInstance taskInstance  = cloneTolerantTaskInstance(validTaskInstanceList.get(i));
-                    taskInstance.setName("NEED_FAULT_TOLERANCE");
-                    validTaskInstanceList.add(taskInstance);
+                for (int i = 0; i < validTaskInstanceList.size(); i++) {
+                    TaskInstance task = validTaskInstanceList.get(i);
+                    boolean isRunningTaskFaultTolerance = false;
+                    try {
+                        isRunningTaskFaultTolerance = determineWhetherTaskIsRunning(task);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    if(Boolean.TRUE.equals(isRunningTaskFaultTolerance)){
+                        log.warn(
+                            "Cannot recover tolerance fault task instance: {} , the task may be running and does not need to be repeated",
+                            task.getId());
+                        validTaskInstanceList.remove(task);
+                        continue;
+                    }
                 }
             }
             for (TaskInstance task : validTaskInstanceList) {
@@ -2263,5 +2271,119 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         processVarPool.addAll(taskVarPool);
 
         workflowInstance.setVarPool(JSONUtils.toJsonString(processVarPool));
+    }
+
+    /**
+     * determines whether the process is running
+     *
+     * @param pid process_id
+     * @return boolean
+     */
+    public boolean isProcessRunning(String pid) throws Exception {
+
+        String processPath = pid;
+
+        // build shell commands, use ps-ef to list all processes, and use GREP filters to match the process id
+        String command = "/bin/sh -c \"ps -ef | grep " + processPath + " | grep -v grep\"";
+
+        // use the ProcessBuilder class to create a new process and set its command
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", command);
+
+        // start the process
+        Process process = processBuilder.start();
+
+        // reads the output of the command and gets the standard input stream for the process
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        // reads each line in the process input stream
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.contains(processPath)) {
+                return true;
+            }
+        }
+        try {
+            // gets the exit code for the command.
+            int exitCode = process.waitFor();
+            // if the exit code is 0, and the output contains process id, the process exists.
+            return exitCode == 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * determine if the yarn task is running
+     *
+     * @param applicationId applicationId
+     * @return boolean
+     */
+    public boolean isApplicationRunning(String applicationId ) throws Exception {
+
+        // build shell commands, use yarn application -status applicationId
+        String[] command = {"/bin/bash", "-c", "yarn application -status " + applicationId};
+
+        // use the ProcessBuilder class to create a new process and set its command
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        // start the process
+        Process process = processBuilder.start();
+
+        // reads the output of the command and gets the standard input stream for the process
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line;
+        String state = null;
+        // reads each line in the process input stream
+        while ((line = reader.readLine()) != null) {
+            // get the yarn task running status
+            if (line.contains("State")) {
+                state = line.split(":")[1].trim();
+                break;
+            }
+        }
+        try {
+            // gets the exit code for the command.
+            int exitCode = process.waitFor();
+            // if the exit code is 0, and the yarn task is running
+            if (exitCode == 0 && state.equals("RUNNING")) {
+                // process is running
+                return true;
+            } else {
+                return false;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean determineWhetherTaskIsRunning(TaskInstance task) throws Exception {
+        String pidPath = null;
+        if(task.getExecutePath() != null){
+            pidPath = task.getExecutePath();
+
+        }
+        String pid = getDesiredPath(pidPath);
+
+        // Yarn task is determined by parsing whether the task log contains the content of the application
+        String applicationId  = task.getAppLink();
+        if(applicationId == null || applicationId.isEmpty() ){
+            // not a Yarn task
+            return isProcessRunning(pid);
+        }else {
+            // is a Yarn task
+            return isApplicationRunning(applicationId);
+        }
+    }
+
+    public String getDesiredPath(String filePath) {
+        String desiredPath = filePath;
+        for (int i = 0; i < 2; i++) {
+            int endIndex = desiredPath.lastIndexOf("/");
+            desiredPath = filePath.substring(0, endIndex);
+
+        }
+        return desiredPath;
     }
 }
