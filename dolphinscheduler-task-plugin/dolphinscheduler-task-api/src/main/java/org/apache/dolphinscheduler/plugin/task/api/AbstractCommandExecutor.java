@@ -19,14 +19,11 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
@@ -40,11 +37,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
