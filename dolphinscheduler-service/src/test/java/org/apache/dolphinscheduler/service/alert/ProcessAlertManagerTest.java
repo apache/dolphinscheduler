@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,6 +52,12 @@ public class ProcessAlertManagerTest {
 
     @Mock
     private AlertDao alertDao;
+
+    @Mock
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Mock
+    private UserMapper userMapper;
 
     /**
      * send worker alert fault tolerance
@@ -81,6 +89,8 @@ public class ProcessAlertManagerTest {
         processInstance.setState(WorkflowExecutionStatus.SUCCESS);
         processInstance.setCommandType(CommandType.COMPLEMENT_DATA);
         processInstance.setWarningGroupId(1);
+        processInstance.setProcessDefinitionCode(1L);
+        processInstance.setProcessDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
         TaskInstance taskInstance = new TaskInstance();
@@ -106,6 +116,8 @@ public class ProcessAlertManagerTest {
         processInstance.setEndTime(new Date());
         processInstance.setHost("127.0.0.1");
         processInstance.setWarningGroupId(1);
+        processInstance.setProcessDefinitionCode(1L);
+        processInstance.setProcessDefinitionVersion(1);
 
         ProjectUser projectUser = new ProjectUser();
 
