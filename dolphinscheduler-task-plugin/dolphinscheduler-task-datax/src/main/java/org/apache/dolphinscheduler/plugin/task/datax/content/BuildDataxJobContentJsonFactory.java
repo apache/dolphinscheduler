@@ -11,16 +11,15 @@ public class BuildDataxJobContentJsonFactory {
     public AbstractBuildDataxJobContentJsonReader getReader(DbType dbType) {
         switch (dbType) {
             default:
-                new BuildDataxJobContentJsonDefaultReader();
+                return new BuildDataxJobContentJsonDefaultReader();
         }
-        return null;
     }
 
     public AbstractBuildDataxJobContentJsonWriter getWriter(DbType dbType) {
         switch (dbType) {
             default:
-                new BuildDataxJobContentJsonDefaultWriter();
+                return new BuildDataxJobContentJsonDefaultWriter();
         }
-        return null;
     }
+
 }

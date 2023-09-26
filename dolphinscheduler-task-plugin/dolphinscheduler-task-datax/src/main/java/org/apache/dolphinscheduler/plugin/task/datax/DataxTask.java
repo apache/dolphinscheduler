@@ -62,8 +62,6 @@ public class DataxTask extends AbstractTask {
      */
     private static final String PYTHON_LAUNCHER = "${PYTHON_LAUNCHER}";
 
-    BuildDataxJobContentJsonFactory buildDataxJobContentJsonFactory;
-
     /**
      * post jdbc info regex
      */
@@ -81,6 +79,11 @@ public class DataxTask extends AbstractTask {
      * datax parameters
      */
     private DataxParameters dataXParameters;
+
+    /**
+     * datax JobContentJson
+     */
+    private BuildDataxJobContentJsonFactory buildDataxJobContentJsonFactory;
 
     /**
      * shell command executor
