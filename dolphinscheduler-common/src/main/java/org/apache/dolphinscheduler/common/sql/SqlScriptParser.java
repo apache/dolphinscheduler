@@ -15,31 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.common.sql;
 
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import java.io.IOException;
+import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface SqlScriptParser {
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class MasterHeartBeat implements HeartBeat {
+    List<String> getAllSql() throws IOException;
 
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double memoryUsage;
-    private double availablePhysicalMemorySize;
-    private double reservedMemory;
-    private double diskAvailable;
-    private int processId;
-    private ServerStatus serverStatus;
-
-    private String host;
-    private int port;
 }
