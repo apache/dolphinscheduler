@@ -15,6 +15,7 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
 * [SubProcess](../task/sub-process.md)
+* [Kubernetes](../task/kubernetes.md)
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a SubProcess node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the subprocess.
 
