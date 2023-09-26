@@ -259,8 +259,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
 
-                        if (line.contains(VarPoolUtils.VAR_PREFIX_DOLLAR)
-                                || line.contains(VarPoolUtils.VAR_PREFIX_HASH)) {
+                        if (line.endsWith(VarPoolUtils.VAR_SUFFIX)) {
                             varPool.append(VarPoolUtils.findVarPool(line));
                             varPool.append(VarPoolUtils.VAR_DELIMITER);
                         }

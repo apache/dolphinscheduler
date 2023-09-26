@@ -27,9 +27,8 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class VarPoolUtils {
 
-    static final Pattern SETVALUE_REGEX = Pattern.compile(TaskConstants.SETVALUE_REGEX);
-    public static final String VAR_PREFIX_DOLLAR = "${setValue(";
-    public static final String VAR_PREFIX_HASH = "#{setValue(";
+    static final Pattern DSVALUE_REGEX = Pattern.compile(TaskConstants.DSVALUE_REGEX);
+    public static final String VAR_SUFFIX = ")dsVal}";
 
     public static final String VAR_DELIMITER = "$VarPool$";
     /**
@@ -39,7 +38,7 @@ public class VarPoolUtils {
      * @return
      */
     public static String findVarPool(String line) {
-        Matcher matcher = SETVALUE_REGEX.matcher(line);
+        Matcher matcher = DSVALUE_REGEX.matcher(line);
         if (matcher.find()) {
             return matcher.group(1);
         }

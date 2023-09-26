@@ -116,3 +116,11 @@ Save the workflow and run it. The result of the downstream task is as follows:
 ![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
 
 Although the two parameters var1 and var2 are output in the A task, only the `OUT` parameter var1 is defined in the workflow definition, and the downstream task successfully outputs var1. It proves that the var1 parameter is passed in the workflow with reference to the expected value.
+
+#### Pass parameter from Kubernetes task to downstream
+
+Different programming languages may use different logging frameworks in Kubernetes tasks.  To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)dsVal}`.  Users can output log data in the format `${(key=value)dsVal}` in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter.  DolphinScheduler will capture the `${(key=value)dsVal}` in the output logs to capture the parameters and pass them downstream.
+
+For example
+
+![kubernetes_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)

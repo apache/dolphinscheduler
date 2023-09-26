@@ -27,22 +27,21 @@ public class VarPoolUtilsTest {
     @Test
     public void findVar() {
         HashMap<String, String> tcs = new HashMap<>();
-        tcs.put("${setValue(set_val=123)}", "set_val=123");
-        tcs.put("1970-01-01 ${setValue(set_val=123)}", "set_val=123");
-        tcs.put("1970-01-01 ${setValue(set_val=123)}123", "set_val=123");
-        tcs.put("${setValue(set_val=123)}123", "set_val=123");
-        tcs.put("${setValue(set_val=123}", null);
-        tcs.put("#{setValue(set_val=123)}", "set_val=123");
-        tcs.put("1970-01-01 #{setValue(set_val=123)}", "set_val=123");
-        tcs.put("1970-01-01 #{setValue(set_val=123)}123", "set_val=123");
-        tcs.put("#{setValue(set_val=123)}123", "set_val=123");
-        tcs.put("#{setValue(set_val=123}", null);
+        tcs.put("${(set_val=123)dsVal}", "set_val=123");
+        tcs.put("1970-01-01 ${(set_val=123)dsVal}", "set_val=123");
+        tcs.put("1970-01-01 ${(set_val=123)dsVal}123", null);
+        tcs.put("${(set_val=123}dsVal", null);
+        tcs.put("#{(set_val=123)dsVal}", "set_val=123");
+        tcs.put("1970-01-01 #{(set_val=123)dsVal}", "set_val=123");
+        tcs.put("1970-01-01 #{(set_val=123)dsVal}123", null);
+        tcs.put("#{(set_val=123)dsVal}123", null);
+        tcs.put("#{(set_val=123dsVal}", null);
 
-        tcs.put("${setValue(set_val=123)}${setValue(set_val=456)}", "set_val=123");
-        tcs.put("1970-01-01$#{setValue(set_val=123)}123", "set_val=123");
-        tcs.put("1970-01-01{setValue(set_val=123)}123", null);
-        tcs.put("1970-01-01$#{setValue(${setValue(set_val=123)})}123", "${setValue(set_val=123");
-        tcs.put("1970-01-01$#{setValue(${setValue(set_val=123\\)})}123", "${setValue(set_val=123\\");
+        tcs.put("${(set_val=123)dsVal}${(set_val=456)dsVal}", "set_val=123)dsVal}${(set_val=456");
+        tcs.put("1970-01-01$#{(set_val=123)dsVal}", "set_val=123");
+        tcs.put("1970-01-01{(set_val=123)dsVal}123", null);
+        tcs.put("1970-01-01$#{(${(set_val=123)})dsVal}", "${(set_val=123)}");
+        tcs.put("1970-01-01$#{(${(set_val=123\\)})dsVal}", "${(set_val=123\\)}");
 
         for (String tc : tcs.keySet()) {
             Assertions.assertEquals(tcs.get(tc), VarPoolUtils.findVarPool(tc));
