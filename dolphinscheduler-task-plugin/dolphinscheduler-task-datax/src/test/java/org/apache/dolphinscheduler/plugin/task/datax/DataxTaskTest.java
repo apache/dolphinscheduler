@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.datax.content.writer.BuildDataxJobContentJsonDefaultWriter;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 import java.io.File;
@@ -53,6 +54,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -216,9 +218,17 @@ public class DataxTaskTest {
 
             ResultSet resultSet = mock(ResultSet.class);
             when(resultSet.getMetaData()).thenReturn(md);
+
             when(stmt.executeQuery()).thenReturn(resultSet);
 
+            String[] rows = new BuildDataxJobContentJsonDefaultWriter().tryExecuteSqlResolveColumnNames(DbType.MYSQL, baseConnectionParam, "");
+            Assertions.assertEquals(rows.length, 1);
+            Assertions.assertEquals(rows[0], "something");
+
             when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Connection failed"));
+
+            String[] nullRows = new BuildDataxJobContentJsonDefaultWriter().tryExecuteSqlResolveColumnNames(DbType.MYSQL, baseConnectionParam, "");
+            Assertions.assertNull(nullRows);
         }
     }
 
