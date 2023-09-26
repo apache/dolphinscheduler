@@ -489,3 +489,4 @@ azure-storage-blob-12.21.0.jar
 azure-storage-internal-avro-12.6.0.jar
 vertica-jdbc-12.0.4-0.jar
 esdk-obs-java-bundle-3.23.3.jar
+xugu-jdbc-12.1.12.jar

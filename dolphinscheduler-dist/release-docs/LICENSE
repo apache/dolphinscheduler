@@ -563,6 +563,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     org.apache.oltu.oauth2.client 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client/1.0.2  Apache 2.0
     org.apache.oltu.oauth2.common 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.common/1.0.2  Apache 2.0
     esdk-obs-java-bundle 3.23.3 https://mvnrepository.com/artifact/com.huaweicloud/esdk-obs-java-bundle/3.23.3  Apache 2.0
+    xugu-jdbc 12.1.12 https://mvnrepository.com/artifact/com.xugudb/xugu-jdbc/12.1.12, Apache 2.0
 
 
 
