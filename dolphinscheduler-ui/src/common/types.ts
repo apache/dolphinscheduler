@@ -19,6 +19,7 @@ import { Component } from 'vue'
 export type ITaskState =
   | 'SUBMITTED_SUCCESS'
   | 'RUNNING_EXECUTION'
+  | 'STOP'
   | 'PAUSE'
   | 'FAILURE'
   | 'SUCCESS'
