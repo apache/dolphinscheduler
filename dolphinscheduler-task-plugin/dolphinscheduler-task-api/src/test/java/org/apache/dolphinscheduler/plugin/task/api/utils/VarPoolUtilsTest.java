@@ -22,10 +22,10 @@ import java.util.HashMap;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class VarPoolUtilsTest {
+class VarPoolUtilsTest {
 
     @Test
-    public void findVar() {
+    void findVar() {
         HashMap<String, String> tcs = new HashMap<>();
         tcs.put("${(set_val=123)dsVal}", "set_val=123");
         tcs.put("1970-01-01 ${(set_val=123)dsVal}", "set_val=123");

@@ -123,4 +123,6 @@ Different programming languages may use different logging frameworks in Kubernet
 
 For example
 
-![kubernetes_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
+![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
+
+Another special consideration, not always can DolphinScheduler collect pod logs, if user redirect log output stream, DolphinScheduler can not collect logs use and can not use output parameter, either.
