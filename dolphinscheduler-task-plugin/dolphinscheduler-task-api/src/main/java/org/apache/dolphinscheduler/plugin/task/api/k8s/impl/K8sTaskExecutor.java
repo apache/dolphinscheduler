@@ -158,7 +158,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                         .endRequiredDuringSchedulingIgnoredDuringExecution()
                         .endNodeAffinity().build();
 
-        JobBuilder jobBuilder = new JobBuilder()
+        job = new JobBuilder()
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
                 .withName(k8sJobName)
@@ -181,17 +181,15 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withResources(new ResourceRequirements(limitRes, reqRes))
                 .withEnv(envVars)
                 .endContainer()
+                .withImagePullSecrets(StringUtils.isEmpty(pullSecret) ? null : singletonList(new LocalObjectReference(pullSecret)))
                 .withRestartPolicy(RESTART_POLICY)
                 .withAffinity(affinity)
                 .endSpec()
                 .endTemplate()
                 .withBackoffLimit(retryNum)
-                .endSpec();
-        job = jobBuilder.build();
-        if (!StringUtils.isEmpty(pullSecret)) {
-            job.getSpec().getTemplate().getSpec()
-                    .setImagePullSecrets(singletonList(new LocalObjectReference(pullSecret)));
-        }
+                .endSpec()
+                .build();
+
     }
 
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
