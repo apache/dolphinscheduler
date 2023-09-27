@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api.k8s;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.VAR_DELIMITER;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -105,5 +106,12 @@ public class K8sTaskExecutorTest {
         } catch (TaskException e) {
             Assertions.assertEquals(e.getMessage(), "K8sTask is timeout");
         }
+    }
+
+    @Test
+    public void testValpool() {
+        String result = "key=value" + VAR_DELIMITER;
+        k8sTaskExecutor.varPool.append(result);
+        Assertions.assertEquals(result, k8sTaskExecutor.getVarPool());
     }
 }

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
+import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.VAR_DELIMITER;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -74,6 +76,7 @@ public class K8sTaskTest {
         k8sTaskParameters.setArgs(args);
         k8sTaskParameters.setCustomizedLabels(labels);
         k8sTaskParameters.setNodeSelectors(nodeSelectorExpressions);
+        k8sTaskParameters.setLocalParams(new ArrayList<>());
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
@@ -127,4 +130,14 @@ public class K8sTaskTest {
         Assertions.assertEquals(expectedList, nodeSelectorRequirements.get(0).getValues());
     }
 
+    @Test
+    public void testDealOutParam() {
+        String result = "key=123" + VAR_DELIMITER;
+        k8sTask.getParameters().localParams.add(new Property("key", Direct.OUT, DataType.VARCHAR, "value"));
+        k8sTask.dealOutParam(result);
+        k8sTask.getParameters().getVarPool().forEach(property -> {
+            Assertions.assertNotEquals("value", property.getValue());
+            Assertions.assertEquals("123", property.getValue());
+        });
+    }
 }
