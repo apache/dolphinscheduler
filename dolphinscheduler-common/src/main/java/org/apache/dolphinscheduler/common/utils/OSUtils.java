@@ -97,14 +97,14 @@ public class OSUtils {
     }
 
     /**
-     * get available physical memory size
+     * get available physical or pod memory size
      * <p>
      * Keep 2 decimal
      *
-     * @return available Physical Memory Size, unit: G
+     * @return Available physical or pod memory size, unit: G
      */
     public static double availablePhysicalMemorySize() {
-        double  availablePhysicalMemorySize;
+        double availablePhysicalMemorySize;
 
         if (KubernetesUtils.isKubernetesMode()) {
             long freeMemory = Runtime.getRuntime().freeMemory();
