@@ -24,9 +24,11 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class KubernetesUtils {
 
+    public static final Boolean KUBERNETES_MODE = !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
+            && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+
     public boolean isKubernetesMode() {
-        return !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_HOST"))
-                && !StringUtils.isEmpty(System.getenv("KUBERNETES_SERVICE_PORT"));
+        return KUBERNETES_MODE;
     }
 
 }
