@@ -46,6 +46,8 @@ public class K8sTaskTest {
     private final String image = "ds-dev";
     private final String imagePullPolicy = "IfNotPresent";
 
+    private final String pullSecret = "ds-secret";
+
     private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
 
     private final double minCpuCores = 2;
@@ -74,6 +76,7 @@ public class K8sTaskTest {
         k8sTaskParameters.setArgs(args);
         k8sTaskParameters.setCustomizedLabels(labels);
         k8sTaskParameters.setNodeSelectors(nodeSelectorExpressions);
+        k8sTaskParameters.setPullSecret(pullSecret);
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
@@ -99,7 +102,7 @@ public class K8sTaskTest {
     @Test
     public void testBuildCommandNormal() {
         String expectedStr =
-                "{\"image\":\"ds-dev\",\"command\":\"[\\\"/bin/bash\\\", \\\"-c\\\"]\",\"args\":\"[\\\"echo hello world\\\"]\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"imagePullPolicy\":\"IfNotPresent\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"},\"labelMap\":{\"test\":\"1234\"},\"nodeSelectorRequirements\":[{\"key\":\"node-label\",\"operator\":\"In\",\"values\":[\"1234\",\"12345\"]}]}";
+                "{\"image\":\"ds-dev\",\"command\":\"[\\\"/bin/bash\\\", \\\"-c\\\"]\",\"args\":\"[\\\"echo hello world\\\"]\",\"pullSecret\":\"ds-secret\",\"namespaceName\":\"default\",\"clusterName\":\"lab\",\"imagePullPolicy\":\"IfNotPresent\",\"minCpuCores\":2.0,\"minMemorySpace\":10.0,\"paramsMap\":{\"day\":\"20220507\"},\"labelMap\":{\"test\":\"1234\"},\"nodeSelectorRequirements\":[{\"key\":\"node-label\",\"operator\":\"In\",\"values\":[\"1234\",\"12345\"]}]}";
         String commandStr = k8sTask.buildCommand();
         Assertions.assertEquals(expectedStr, commandStr);
     }
@@ -107,7 +110,7 @@ public class K8sTaskTest {
     @Test
     public void testGetParametersNormal() {
         String expectedStr =
-                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], args=[\"echo hello world\"], imagePullPolicy=IfNotPresent, minCpuCores=2.0, minMemorySpace=10.0, customizedLabels=[Label(label=test, value=1234)], nodeSelectors=[NodeSelectorExpression(key=node-label, operator=In, values=1234,12345)])";
+                "K8sTaskParameters(image=ds-dev, namespace={\"name\":\"default\",\"cluster\":\"lab\"}, command=[\"/bin/bash\", \"-c\"], args=[\"echo hello world\"], pullSecret=ds-secret, imagePullPolicy=IfNotPresent, minCpuCores=2.0, minMemorySpace=10.0, customizedLabels=[Label(label=test, value=1234)], nodeSelectors=[NodeSelectorExpression(key=node-label, operator=In, values=1234,12345)])";
         String result = k8sTask.getParameters().toString();
         Assertions.assertEquals(expectedStr, result);
     }
