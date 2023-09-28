@@ -126,4 +126,4 @@ For example
 
 ![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
 
-Another special consideration, not always can DolphinScheduler collect pod logs, if user redirect log output stream, DolphinScheduler can not collect logs use and can not use output parameter, either.
+Another special consideration, not always can DolphinScheduler collect pod logs, if the user redirects the log output stream, DolphinScheduler can not collect logs for use and can not use the output parameter, either.
