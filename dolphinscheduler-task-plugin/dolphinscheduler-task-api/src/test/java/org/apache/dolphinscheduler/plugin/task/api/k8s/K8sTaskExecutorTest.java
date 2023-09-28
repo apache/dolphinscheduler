@@ -82,7 +82,8 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setCommand("[\"perl\" ,\"-Mbignum=bpi\", \"-wle\", \"print bpi(2000)\"]");
         k8sTaskMainParameters.setLabelMap(labelMap);
         k8sTaskMainParameters.setNodeSelectorRequirements(Arrays.asList(requirement));
-        job = k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
+        k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
+        job = k8sTaskExecutor.getJob();
     }
     @Test
     public void testGetK8sJobStatusNormal() {
