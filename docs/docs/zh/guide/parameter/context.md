@@ -119,7 +119,7 @@ Node_mysql 运行结果如下：
 
 #### Kubernetes 任务传递参数
 
-在Kubernetes 任务中不同的程序开发语言可能会采用不同的日志框架，DolphinScheduler 为了兼容不同的日志框架，提供了一种通用的日志数据格式，即 `${(key=value)dsVal}`，用户可以在应用程序的终端日志中输出以格式为 `${(key=value)dsVal}` 结束的日志数据，key 为对应参数的 prop，value 为该参数的值。DolphinScheduler会捕捉输出日志中的 `${(key=value)dsVal}`来进行参数捕捉，从而传递到下游
+在Kubernetes任务中不同的程序开发语言可能会采用不同的日志框架，DolphinScheduler为了兼容不同的日志框架，提供了一种通用的日志数据格式，即 `${(key=value)dsVal}`，用户可以在应用程序的终端日志中输出以格式为 `${(key=value)dsVal}` 结束的日志数据，key 为对应参数的 prop，value 为该参数的值。DolphinScheduler会捕捉输出日志中的 `${(key=value)dsVal}`来进行参数捕捉，从而传递到下游。
 
 如下图所示：
 
