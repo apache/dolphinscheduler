@@ -181,7 +181,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withResources(new ResourceRequirements(limitRes, reqRes))
                 .withEnv(envVars)
                 .endContainer()
-                .withImagePullSecrets(StringUtils.isEmpty(pullSecret) ? null : singletonList(new LocalObjectReference(pullSecret)))
+                .withImagePullSecrets(
+                        StringUtils.isEmpty(pullSecret) ? null : singletonList(new LocalObjectReference(pullSecret)))
                 .withRestartPolicy(RESTART_POLICY)
                 .withAffinity(affinity)
                 .endSpec()
