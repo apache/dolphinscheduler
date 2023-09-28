@@ -39,6 +39,7 @@ type IDataBase =
   | 'HANA'
   | 'ZEPPELIN'
   | 'DORIS'
+  | 'SAGEMAKER'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -59,6 +60,7 @@ type IDataBaseLabel =
   | 'OCEANBASE'
   | 'SSH'
   | 'ZEPPELIN'
+  | 'SAGEMAKER'
 
 interface IDataSource {
   id?: number

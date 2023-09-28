@@ -239,7 +239,7 @@ export function useForm(id?: number) {
 
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
-    state.showAwsRegion = type === 'ATHENA'
+    state.showAwsRegion = type === 'ATHENA' || type === 'SAGEMAKER'
     state.showMode = ['AZURESQL', 'REDSHIFT'].includes(type)
 
     if (type === 'ORACLE' && !id) {
@@ -254,7 +254,7 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
-    if (type === 'SSH' || type === 'ZEPPELIN') {
+    if (type === 'SSH' || type === 'ZEPPELIN' || type == 'SAGEMAKER') {
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
@@ -266,6 +266,10 @@ export function useForm(id?: number) {
         state.showHost = false
         state.showPort = false
         state.showRestEndpoint = true
+      }
+      if (type == 'SAGEMAKER') {
+        state.showHost = false
+        state.showPort = false
       }
     } else {
       state.showDataBaseName = true
@@ -420,6 +424,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'DORIS',
     label: 'DORIS',
     defaultPort: 9030
+  },
+  SAGEMAKER: {
+    value: 'SAGEMAKER',
+    label: 'SAGEMAKER',
+    defaultPort: 0
   }
 }
 
