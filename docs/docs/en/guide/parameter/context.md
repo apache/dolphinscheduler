@@ -120,7 +120,7 @@ Although the two parameters var1 and var2 are output in the A task, only the `OU
 
 #### Pass parameter from Kubernetes task to downstream
 
-Different programming languages may use different logging frameworks in Kubernetes tasks.  To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)dsVal}`.  Users can output log data in the format `${(key=value)dsVal}` in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter.  DolphinScheduler will capture the `${(key=value)dsVal}` in the output logs to capture the parameters and pass them downstream.
+Different programming languages may use different logging frameworks in Kubernetes tasks. To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)dsVal}`. Users can output log data in the format `${(key=value)dsVal}` in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter. DolphinScheduler will capture the `${(key=value)dsVal}` in the output logs to capture the parameters and pass them downstream.
 
 For example
 
