@@ -81,6 +81,14 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
+      field: 'pullSecret',
+      name: t('project.node.pull_secret'),
+      props: {
+        placeholder: t('project.node.pull_secret_tips')
+      }
+    },
+    {
+      type: 'input',
       field: 'command',
       name: t('project.node.command'),
       props: {

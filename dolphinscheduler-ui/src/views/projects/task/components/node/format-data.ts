@@ -359,6 +359,7 @@ export function formatParams(data: INodeData): {
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels
     taskParams.nodeSelectors = data.nodeSelectors
+    taskParams.pullSecret = data.pullSecret
   }
 
   if (data.taskType === 'JUPYTER') {
