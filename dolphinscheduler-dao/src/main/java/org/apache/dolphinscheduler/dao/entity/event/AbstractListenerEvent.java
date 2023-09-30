@@ -15,57 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.vo;
+package org.apache.dolphinscheduler.dao.entity.event;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.common.enums.ListenerEventType;
 
-import lombok.Data;
+public interface AbstractListenerEvent {
 
-@Data
-public class AlertPluginInstanceVO {
+    ListenerEventType getEventType();
 
-    /**
-     * id
-     */
-    private int id;
-
-    /**
-     * plugin_define_id
-     */
-    private int pluginDefineId;
-
-    /**
-     * alert plugin instance name
-     */
-    private String instanceName;
-
-    /**
-     * alert plugin instance type
-     */
-    private String instanceType;
-
-    /**
-     * alert plugin instance warning type
-     */
-    private String warningType;
-
-    /**
-     * plugin_instance_params
-     */
-    private String pluginInstanceParams;
-
-    /**
-     * create_time
-     */
-    private Date createTime;
-
-    /**
-     * update_time
-     */
-    private Date updateTime;
-
-    /**
-     * alert plugin name
-     */
-    private String alertPluginName;
+    String getTitle();
 }

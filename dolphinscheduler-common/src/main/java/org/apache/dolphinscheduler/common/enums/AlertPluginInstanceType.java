@@ -15,57 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.vo;
+package org.apache.dolphinscheduler.common.enums;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.EnumValue;
 
-import lombok.Data;
+public enum AlertPluginInstanceType {
 
-@Data
-public class AlertPluginInstanceVO {
+    NORMAL(0, "NORMAL"),
+    GLOBAL(1, "GLOBAL");
+    AlertPluginInstanceType(int code, String descp) {
+        this.code = code;
+        this.descp = descp;
+    }
 
-    /**
-     * id
-     */
-    private int id;
+    @EnumValue
+    private final int code;
+    private final String descp;
 
-    /**
-     * plugin_define_id
-     */
-    private int pluginDefineId;
+    public int getCode() {
+        return code;
+    }
 
-    /**
-     * alert plugin instance name
-     */
-    private String instanceName;
+    public String getDescp() {
+        return descp;
+    }
 
-    /**
-     * alert plugin instance type
-     */
-    private String instanceType;
-
-    /**
-     * alert plugin instance warning type
-     */
-    private String warningType;
-
-    /**
-     * plugin_instance_params
-     */
-    private String pluginInstanceParams;
-
-    /**
-     * create_time
-     */
-    private Date createTime;
-
-    /**
-     * update_time
-     */
-    private Date updateTime;
-
-    /**
-     * alert plugin name
-     */
-    private String alertPluginName;
 }

@@ -1035,6 +1035,8 @@ VALUES (-1, 'default', 'default tenant', '1', '2018-03-27 15:48:50', '2018-10-24
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
@@ -1071,6 +1073,8 @@ CREATE TABLE t_ds_alert_plugin_instance (
 	create_time timestamp NULL,
 	update_time timestamp NULL,
 	instance_name varchar(255) NULL,
+	instance_type int4 NOT NULL default '0',
+	warning_type int4,
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
@@ -2103,3 +2107,24 @@ CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (pare
 CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
+--
+-- Table structure for table t_ds_alert
+--
+
+DROP TABLE IF EXISTS t_ds_listener_event;
+CREATE TABLE t_ds_listener_event(
+    id          int         NOT NULL,
+    content     text,
+    sign        varchar(40) NOT NULL DEFAULT '',
+    post_status int                  DEFAULT '0',
+    event_type  int,
+    log         text,
+    create_time timestamp            DEFAULT NULL,
+    update_time timestamp            DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+comment
+on column t_ds_listener_event.sign is 'sign=sha1(content)';
+
+create index idx_status on t_ds_listener_event (alert_status);
+create index idx_sign on t_ds_listener_event (sign);

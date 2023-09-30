@@ -15,57 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.vo;
+package org.apache.dolphinscheduler.dao.entity.event;
+
+import org.apache.dolphinscheduler.common.enums.ListenerEventType;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class AlertPluginInstanceVO {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProcessDefinitionDeletedListenerEvent implements AbstractListenerEvent {
 
-    /**
-     * id
-     */
-    private int id;
+    private Integer projectId;
+    private Long projectCode;
+    private String projectName;
+    private String owner;
+    private Integer id;
+    private Long code;
+    private String name;
+    private Integer userId;
+    private String modifiedBy;
+    private Date eventTime;
+    @Override
+    public ListenerEventType getEventType() {
+        return ListenerEventType.PROCESS_DEFINITION_DELETED;
+    }
 
-    /**
-     * plugin_define_id
-     */
-    private int pluginDefineId;
-
-    /**
-     * alert plugin instance name
-     */
-    private String instanceName;
-
-    /**
-     * alert plugin instance type
-     */
-    private String instanceType;
-
-    /**
-     * alert plugin instance warning type
-     */
-    private String warningType;
-
-    /**
-     * plugin_instance_params
-     */
-    private String pluginInstanceParams;
-
-    /**
-     * create_time
-     */
-    private Date createTime;
-
-    /**
-     * update_time
-     */
-    private Date updateTime;
-
-    /**
-     * alert plugin name
-     */
-    private String alertPluginName;
+    @Override
+    public String getTitle() {
+        return String.format("process definition deleted:%s", this.name);
+    }
 }
