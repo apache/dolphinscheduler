@@ -267,7 +267,11 @@ export default {
     AtUserIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}所有人"
+    IsAtAll: "{'@'}所有人",
+    appId: '应用ID',
+    appSecret: '应用密钥',
+    receiveIdType: '消息接收者id类型',
+    receiveId: '消息接收者的ID'
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
