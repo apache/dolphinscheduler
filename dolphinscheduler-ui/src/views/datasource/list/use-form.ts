@@ -218,7 +218,7 @@ export function useForm(id?: number) {
         value: 'accessToken'
       }
     ],
-    redShitModeOptions: [
+    redShiftModeOptions: [
       {
         label: 'password',
         value: 'password'
