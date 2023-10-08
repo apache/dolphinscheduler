@@ -102,7 +102,7 @@ public class DataSourceConstants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX =
-            "(?<=((?i)password((\":\")|(=')))).*?(?=((\")|(')))";
+            "(?<=((?i)password((\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
 
     /**
      * datasource encryption salt

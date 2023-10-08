@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.common.log;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
 
+import java.util.HashMap;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -28,30 +30,61 @@ public class SensitiveDataConverterTest {
 
     private final Logger logger = LoggerFactory.getLogger(SensitiveDataConverterTest.class);
 
-    private final String logMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
-            + "\"database\":\"carbond\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
-            + "\"user\":\"view\","
-            + "\"password\":\"view1\"}";
-
-    private final String maskLogMsg = "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
-            + "\"database\":\"carbond\","
-            + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
-            + "\"user\":\"view\","
-            + "\"password\":\"*****\"}";
-
     /**
      * mask sensitive logMsg - sql task datasource password
      */
     @Test
     public void testPwdLogMsgConverter() {
-        final String maskedLog = SensitiveDataConverter.maskSensitiveData(logMsg);
+        HashMap<String, String> tcs = new HashMap<>();
+        tcs.put("{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
+                + "\"database\":\"carbond\","
+                + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
+                + "\"user\":\"view\","
+                + "\"password\":\"view1\"}",
 
-        logger.info("original parameter : {}", logMsg);
-        logger.info("masked parameter : {}", maskedLog);
+                "{\"address\":\"jdbc:mysql://192.168.xx.xx:3306\","
+                        + "\"database\":\"carbond\","
+                        + "\"jdbcUrl\":\"jdbc:mysql://192.168.xx.xx:3306/ods\","
+                        + "\"user\":\"view\","
+                        + "\"password\":\"*****\"}");
 
-        Assertions.assertEquals(maskLogMsg, maskedLog);
+        tcs.put("End initialize task {\n" +
+                "  \"resourceParametersHelper\" : {\n" +
+                "    \"resourceMap\" : {\n" +
+                "      \"DATASOURCE\" : {\n" +
+                "        \"1\" : {\n" +
+                "          \"resourceType\" : \"DATASOURCE\",\n" +
+                "          \"type\" : \"ORACLE\",\n" +
+                "          \"connectionParams\" : \"{\\\"user\\\":\\\"user\\\",\\\"password\\\":\\\"view1\\\"}\",\n" +
+                "          \"DATASOURCE\" : null\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}",
 
+                "End initialize task {\n" +
+                        "  \"resourceParametersHelper\" : {\n" +
+                        "    \"resourceMap\" : {\n" +
+                        "      \"DATASOURCE\" : {\n" +
+                        "        \"1\" : {\n" +
+                        "          \"resourceType\" : \"DATASOURCE\",\n" +
+                        "          \"type\" : \"ORACLE\",\n" +
+                        "          \"connectionParams\" : \"{\\\"user\\\":\\\"user\\\",\\\"password\\\":\\\"*****\\\"}\",\n"
+                        +
+                        "          \"DATASOURCE\" : null\n" +
+                        "        }\n" +
+                        "      }\n" +
+                        "    }\n" +
+                        "  }\n" +
+                        "}");
+
+        for (String logMsg : tcs.keySet()) {
+            String maskedLog = SensitiveDataConverter.maskSensitiveData(logMsg);
+            logger.info("original parameter : {}", logMsg);
+            logger.info("masked parameter : {}", maskedLog);
+            Assertions.assertEquals(tcs.get(logMsg), maskedLog);
+        }
     }
 
     @Test
