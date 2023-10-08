@@ -24,7 +24,7 @@ BEGIN
                   AND column_name = 'value')
       THEN
          ALTER TABLE t_ds_dq_rule_input_entry
-                 RENAME COLUMN value TO data;
+                 RENAME COLUMN "value" TO "data";
        END IF;
 END;
 $$ LANGUAGE plpgsql;
@@ -44,7 +44,7 @@ BEGIN
                   AND column_name = 'value_type')
       THEN
          ALTER TABLE t_ds_dq_rule_input_entry
-                 RENAME COLUMN value_type TO data_type;
+                 RENAME COLUMN "value_type" TO "data_type";
        END IF;
 END;
 $$ LANGUAGE plpgsql;
