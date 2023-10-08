@@ -14,3 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+delimiter ;
+DROP FUNCTION IF EXISTS modify_data_t_ds_dq_rule_input_entry();
+delimiter d//
+CREATE FUNCTION modify_data_t_ds_dq_rule_input_entry() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_dq_rule_input_entry'
+                  AND column_name = 'value')
+      THEN
+         ALTER TABLE t_ds_dq_rule_input_entry
+                 RENAME COLUMN value TO data;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select modify_data_t_ds_dq_rule_input_entry();
+DROP FUNCTION modify_data_t_ds_dq_rule_input_entry();
+
+
+delimiter ;
+DROP FUNCTION IF EXISTS modify_data_type_t_ds_dq_rule_input_entry();
+delimiter d//
+CREATE FUNCTION modify_data_type_t_ds_dq_rule_input_entry() RETURNS void AS $$
+BEGIN
+       IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_dq_rule_input_entry'
+                  AND column_name = 'value_type')
+      THEN
+         ALTER TABLE t_ds_dq_rule_input_entry
+                 RENAME COLUMN value_type TO data_type;
+       END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+delimiter ;
+select modify_data_type_t_ds_dq_rule_input_entry();
+DROP FUNCTION modify_data_type_t_ds_dq_rule_input_entry();

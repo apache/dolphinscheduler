@@ -14,3 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- t_ds_dq_rule_input_entry behavior change
+--DROP PROCEDURE if EXISTS modify_t_ds_dq_rule_input_entry;
+DROP PROCEDURE if EXISTS modify_t_ds_dq_rule_input_entry;
+delimiter d//
+CREATE PROCEDURE modify_t_ds_dq_rule_input_entry()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_dq_rule_input_entry'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='value')
+   THEN
+       ALTER TABLE `t_ds_dq_rule_input_entry`
+       CHANGE COLUMN `value` `data` varchar(255) DEFAULT NULL,
+       CHANGE COLUMN `value_type` `data_type` int(11) DEFAULT NULL;
+   END IF;
+END;
+d//
+delimiter ;
+CALL modify_t_ds_dq_rule_input_entry;
+DROP PROCEDURE modify_t_ds_dq_rule_input_entry;
