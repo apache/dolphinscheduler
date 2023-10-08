@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-
+-- modify_data_t_ds_dq_rule_input_entry
 delimiter d//
-CREATE FUNCTION modify_data_t_ds_dq_rule_input_entry() RETURNS void AS $$
+CREATE OR REPLACE FUNCTION modify_data_t_ds_dq_rule_input_entry() RETURNS void AS $$
 BEGIN
        IF EXISTS (SELECT 1
                   FROM information_schema.columns
@@ -32,10 +32,11 @@ d//
 
 delimiter ;
 select modify_data_t_ds_dq_rule_input_entry();
-DROP FUNCTION modify_data_t_ds_dq_rule_input_entry();
+DROP FUNCTION IF EXISTS modify_data_t_ds_dq_rule_input_entry();
 
+-- modify_data_type_t_ds_dq_rule_input_entry
 delimiter d//
-CREATE FUNCTION modify_data_type_t_ds_dq_rule_input_entry() RETURNS void AS $$
+CREATE OR REPLACE FUNCTION modify_data_type_t_ds_dq_rule_input_entry() RETURNS void AS $$
 BEGIN
        IF EXISTS (SELECT 1
                   FROM information_schema.columns
@@ -51,4 +52,4 @@ d//
 
 delimiter ;
 select modify_data_type_t_ds_dq_rule_input_entry();
-DROP FUNCTION modify_data_type_t_ds_dq_rule_input_entry();
+DROP FUNCTION IF EXISTS modify_data_type_t_ds_dq_rule_input_entry();
