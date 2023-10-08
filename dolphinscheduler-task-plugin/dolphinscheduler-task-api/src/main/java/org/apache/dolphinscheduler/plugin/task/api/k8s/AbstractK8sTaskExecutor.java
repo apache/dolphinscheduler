@@ -31,12 +31,16 @@ public abstract class AbstractK8sTaskExecutor {
     protected TaskExecutionContext taskRequest;
     protected K8sUtils k8sUtils;
     protected Yaml yaml;
-
+    protected StringBuilder varPool;
     protected AbstractK8sTaskExecutor(Logger log, TaskExecutionContext taskRequest) {
         this.log = log;
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
         this.yaml = new Yaml();
+        this.varPool = new StringBuilder();
+    }
+    public String getVarPool() {
+        return varPool.toString();
     }
 
     public abstract TaskResponse run(String k8sParameterStr) throws Exception;

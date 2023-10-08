@@ -37,6 +37,8 @@ public class TaskConstants {
 
     public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\((.*?)\\)}";
 
+    public static final String DSVALUE_REGEX = "[\\$#]\\{\\((.*?)\\)dsVal}$";
+
     /**
      * string false
      */
