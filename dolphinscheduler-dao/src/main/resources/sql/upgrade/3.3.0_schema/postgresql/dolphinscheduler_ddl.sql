@@ -15,8 +15,6 @@
  * limitations under the License.
 */
 
-delimiter ;
-DROP FUNCTION IF EXISTS modify_data_t_ds_dq_rule_input_entry();
 delimiter d//
 CREATE FUNCTION modify_data_t_ds_dq_rule_input_entry() RETURNS void AS $$
 BEGIN
@@ -31,13 +29,11 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 d//
+
 delimiter ;
 select modify_data_t_ds_dq_rule_input_entry();
 DROP FUNCTION modify_data_t_ds_dq_rule_input_entry();
 
-
-delimiter ;
-DROP FUNCTION IF EXISTS modify_data_type_t_ds_dq_rule_input_entry();
 delimiter d//
 CREATE FUNCTION modify_data_type_t_ds_dq_rule_input_entry() RETURNS void AS $$
 BEGIN
@@ -52,6 +48,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 d//
+
 delimiter ;
 select modify_data_type_t_ds_dq_rule_input_entry();
 DROP FUNCTION modify_data_type_t_ds_dq_rule_input_entry();
