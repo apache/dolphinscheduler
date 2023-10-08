@@ -14,3 +14,90 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- t_ds_k8s_namespace
+-- ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS limits_cpu;
+drop PROCEDURE if EXISTS drop_t_ds_k8s_namespace_col_code;
+delimiter d//
+CREATE PROCEDURE drop_t_ds_k8s_namespace_col_code()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_k8s_namespace'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='limits_cpu')
+    THEN
+ALTER TABLE t_ds_k8s_namespace DROP COLUMN limits_cpu;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_t_ds_k8s_namespace_col_code;
+DROP PROCEDURE drop_t_ds_k8s_namespace_col_code;
+-- ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS limits_memory;
+drop PROCEDURE if EXISTS drop_t_ds_k8s_namespace_col_code;
+delimiter d//
+CREATE PROCEDURE drop_t_ds_k8s_namespace_col_code()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_k8s_namespace'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='limits_memory')
+    THEN
+ALTER TABLE t_ds_k8s_namespace DROP COLUMN limits_memory;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_t_ds_k8s_namespace_col_code;
+DROP PROCEDURE drop_t_ds_k8s_namespace_col_code;
+-- ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS pod_replicas;
+drop PROCEDURE if EXISTS drop_t_ds_k8s_namespace_col_code;
+delimiter d//
+CREATE PROCEDURE drop_t_ds_k8s_namespace_col_code()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_k8s_namespace'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='pod_replicas')
+    THEN
+ALTER TABLE t_ds_k8s_namespace DROP COLUMN pod_replicas;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_t_ds_k8s_namespace_col_code;
+DROP PROCEDURE drop_t_ds_k8s_namespace_col_code;
+-- ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS pod_request_cpu;
+drop PROCEDURE if EXISTS drop_t_ds_k8s_namespace_col_code;
+delimiter d//
+CREATE PROCEDURE drop_t_ds_k8s_namespace_col_code()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_k8s_namespace'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='pod_request_cpu')
+    THEN
+ALTER TABLE t_ds_k8s_namespace DROP COLUMN pod_request_cpu;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_t_ds_k8s_namespace_col_code;
+DROP PROCEDURE drop_t_ds_k8s_namespace_col_code;
+-- ALTER TABLE t_ds_k8s_namespace DROP COLUMN IF EXISTS pod_request_memory;
+drop PROCEDURE if EXISTS drop_t_ds_k8s_namespace_col_code;
+delimiter d//
+CREATE PROCEDURE drop_t_ds_k8s_namespace_col_code()
+BEGIN
+    IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_k8s_namespace'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='pod_request_memory')
+    THEN
+ALTER TABLE t_ds_k8s_namespace DROP COLUMN pod_request_memory;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_t_ds_k8s_namespace_col_code;
+DROP PROCEDURE drop_t_ds_k8s_namespace_col_code;

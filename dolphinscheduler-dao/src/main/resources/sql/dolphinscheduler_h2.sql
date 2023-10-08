@@ -2018,13 +2018,8 @@ DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
     id                 int(11) NOT NULL AUTO_INCREMENT ,
     code               bigint(20) NOT NULL,
-    limits_memory      int(11) DEFAULT NULL,
     namespace          varchar(255) DEFAULT NULL,
     user_id            int(11) DEFAULT NULL,
-    pod_replicas       int(11) DEFAULT NULL,
-    pod_request_cpu    decimal(14,3) DEFAULT NULL,
-    pod_request_memory int(11) DEFAULT NULL,
-    limits_cpu         decimal(14,3) DEFAULT NULL,
     cluster_code       bigint(20) NOT NULL,
     create_time        datetime DEFAULT NULL ,
     update_time        datetime DEFAULT NULL ,
@@ -2035,16 +2030,16 @@ CREATE TABLE t_ds_k8s_namespace (
 -- Records of t_ds_k8s_namespace
 -- ----------------------------
 INSERT INTO `t_ds_k8s_namespace`
-(`id`,`code`,`limits_memory`,`namespace`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`cluster_code`,`create_time`,`update_time`)
-VALUES (1, 990001, 1000, 'flink_test', 1, 1, 0.1, 1, 100, 0, '2022-03-03 11:31:24.0', '2022-03-03 11:31:24.0');
+(`id`,`code`,`namespace`,`user_id`,`cluster_code`,`create_time`,`update_time`)
+VALUES (1, 990001, 'flink_test', 1, 0, '2022-03-03 11:31:24.0', '2022-03-03 11:31:24.0');
 
 INSERT INTO `t_ds_k8s_namespace`
-(`id`,`code`,`limits_memory`,`namespace`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`cluster_code`,`create_time`,`update_time`)
-VALUES (2, 990002, 500, 'spark_test', 2, 1, 10000, 1, 100, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(`id`,`code`,`namespace`,`user_id`,`cluster_code`,`create_time`,`update_time`)
+VALUES (2, 990002, 'spark_test', 2, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 
 INSERT INTO `t_ds_k8s_namespace`
-(`id`,`code`,`limits_memory`,`namespace`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`cluster_code`,`create_time`,`update_time`)
-VALUES (3, 990003, 200, 'auth_test', 3, 1, 100, 1, 10000, 0, '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
+(`id`,`code`,`namespace`,`user_id`,`cluster_code`,`create_time`,`update_time`)
+VALUES (3, 990003, 'auth_test', 3, 0, '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
 
 -- ----------------------------
 -- Table structure for t_ds_relation_namespace_user

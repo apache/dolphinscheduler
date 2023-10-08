@@ -1997,13 +1997,8 @@ DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
    id serial NOT NULL,
    code               bigint  NOT NULL,
-   limits_memory      int DEFAULT NULL ,
    namespace          varchar(255) DEFAULT NULL ,
    user_id            int DEFAULT NULL,
-   pod_replicas       int DEFAULT NULL,
-   pod_request_cpu    NUMERIC(13,4) NULL,
-   pod_request_memory int DEFAULT NULL,
-   limits_cpu         NUMERIC(13,4) NULL,
    cluster_code       bigint  NOT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
