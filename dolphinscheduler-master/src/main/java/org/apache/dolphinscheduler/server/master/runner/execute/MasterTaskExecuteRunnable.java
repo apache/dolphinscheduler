@@ -55,9 +55,10 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
     protected abstract void afterExecute() throws MasterTaskExecuteException;
 
     protected void afterThrowing(Throwable throwable) {
+        TaskInstanceLogHeader.printFinalizeTaskHeader();
         try {
+            log.error("Get a exception when execute the task, will try to cancel the task", throwable);
             cancelTask();
-            log.error("Get a exception when execute the task, canceled the task", throwable);
         } catch (Exception e) {
             log.error("Cancel task failed,", e);
         }
@@ -69,6 +70,7 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
         MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
         log.info("Get a exception when execute the task, removed the TaskExecutionContext");
+        closeLogAppender();
     }
 
     public void cancelTask() throws MasterTaskExecuteException {
@@ -111,7 +113,6 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         } catch (Throwable ex) {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
-            closeLogAppender();
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             LogUtils.removeTaskInstanceLogFullPathMDC();
