@@ -519,6 +519,7 @@ common:
 Modify the `api.enabled`, `alert.enabled`, `master.enabled`, or `worker.enabled` configuration items in the `values.yaml` file.
 
 For example, if you need to deploy worker to both CPU and GPU servers in a cluster, and the worker uses different images, you can do the following:
+
 ```bash
 # Install master, api-server, alert-server, and other default components, but do not install worker
 helm install dolphinscheduler . --set worker.enabled=false
@@ -535,11 +536,12 @@ helm install dolphinscheduler-gpu-worker . \
      --set worker.enabled=true --set image.tag=lastes-cpu --set worker.nodeSelector.gpu="a100" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 ```
+
 Please note that the above steps are for reference only, and specific operations need to be adjusted according to the actual situation.
 
 ## Appendix-Configuration
 
-| Parameter                                                            | Description                                                                                                                   | Default                               |
+|                              Parameter                               |                                                          Description                                                          |                Default                |
 |----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
 | `timezone`                                                           | World time and date for cities in all time zones                                                                              | `Asia/Shanghai`                       |
 |                                                                      |                                                                                                                               |                                       |

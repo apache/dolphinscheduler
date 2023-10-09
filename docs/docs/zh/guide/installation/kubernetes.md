@@ -506,9 +506,10 @@ common:
 
 ### 如何单独部署特定组件?
 
-修改 `values.yaml` 文件中的 `api.enabled`, `alert.enabled` `master.enabled` 或 `worker.enabled` 配置项 
+修改 `values.yaml` 文件中的 `api.enabled`, `alert.enabled` `master.enabled` 或 `worker.enabled` 配置项
 
 例如，在一个集群中需要同时将 worker 部署到 CPU 服务器和 GPU 服务器，并且 worker 使用不同的镜像，可以这样做:
+
 ```bash
 # 安装 master、api-server、alert-server以及其他默认组件，但是不安装 worker
 helm install dolphinscheduler . --set worker.enabled=false
@@ -525,11 +526,12 @@ helm install dolphinscheduler-gpu-worker . \
      --set worker.enabled=true --set image.tag=lastes-cpu --set worker.nodeSelector.gpu="a100" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 ```
+
 请注意，以上步骤仅供参考，具体操作需要根据实际情况进行调整。
 
 ## 附录-配置
 
-| Parameter                                                            | Description                                                                                                                   | Default                               |
+|                              Parameter                               |                                                          Description                                                          |                Default                |
 |----------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------|---------------------------------------|
 | `timezone`                                                           | World time and date for cities in all time zones                                                                              | `Asia/Shanghai`                       |
 |                                                                      |                                                                                                                               |                                       |
