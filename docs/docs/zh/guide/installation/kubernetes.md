@@ -504,6 +504,15 @@ common:
 
 修改 `values.yaml` 文件中的 SKYWALKING 配置项
 
+```yaml
+common:
+  configmap:
+    SKYWALKING_ENABLE: "true"
+    SW_AGENT_COLLECTOR_BACKEND_SERVICES: "127.0.0.1:11800"
+    SW_GRPC_LOG_SERVER_HOST: "127.0.0.1"
+    SW_GRPC_LOG_SERVER_PORT: "11800"
+```
+
 ### 如何单独部署特定组件?
 
 修改 `values.yaml` 文件中的 `api.enabled`, `alert.enabled` `master.enabled` 或 `worker.enabled` 配置项
