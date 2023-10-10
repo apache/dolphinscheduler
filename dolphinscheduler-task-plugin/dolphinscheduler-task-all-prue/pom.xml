@@ -24,7 +24,7 @@
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dolphinscheduler-task-all-prue</artifactId>
+    <artifactId>dolphinscheduler-task-all-prune</artifactId>
 
     <dependencies>
 
