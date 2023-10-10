@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -257,6 +258,21 @@ public class TaskDefinition {
             }
         }
         return taskParamMap;
+    }
+
+    /**
+     * get task param resource names
+     *
+     * @return {@link List}<{@link String}>
+     */
+    public List<String> getTaskParamResourceNames() {
+        if (StringUtils.isNotEmpty(taskParams)) {
+            JsonNode resourceList = JSONUtils.parseObject(taskParams).findValue("resourceList");
+            if (resourceList != null && !resourceList.isNull()) {
+                return resourceList.findValuesAsText("resourceName");
+            }
+        }
+        return null;
     }
 
     public String getDependence() {

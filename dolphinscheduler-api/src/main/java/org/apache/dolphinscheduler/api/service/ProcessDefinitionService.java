@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterExtendRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -128,6 +129,13 @@ public interface ProcessDefinitionService {
     PageInfo<ProcessDefinition> filterProcessDefinition(User loginUser,
                                                         WorkflowFilterRequest workflowFilterRequest);
 
+    /**
+     * Filter resource process definitions
+     *
+     * @param workflowFilterExtendRequest workflow filter requests
+     * @return {@link List}<{@link ProcessDefinition}>
+     */
+    List<ProcessDefinition> filterProcessDefinition(WorkflowFilterExtendRequest workflowFilterExtendRequest);
     /**
      * query detail of process definition
      *
