@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,7 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -106,7 +108,7 @@ public final class HttpSender {
     }
 
     public String getResponseString(HttpRequestBase httpRequest) throws IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
         CloseableHttpResponse response = httpClient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, DEFAULT_CHARSET);

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
@@ -69,7 +70,7 @@ public final class PagerDutySender {
 
     private AlertResult send(AlertResult alertResult, String url, String requestBody) throws IOException {
         HttpPost httpPost = constructHttpPost(url, requestBody);
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
 
         try {
             CloseableHttpResponse response = httpClient.execute(httpPost);
