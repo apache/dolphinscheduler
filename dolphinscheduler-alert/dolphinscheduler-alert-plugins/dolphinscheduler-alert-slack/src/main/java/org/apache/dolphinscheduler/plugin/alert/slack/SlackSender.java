@@ -66,7 +66,9 @@ public final class SlackSender {
      * @return slack response
      */
     public String sendMessage(String title, String content) {
-        try (CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {
+        try (
+                CloseableHttpClient httpClient =
+                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put(SlackParamsConstants.SLACK_BOT_NAME, botName);
             paramMap.put(SlackParamsConstants.TEXT, title);

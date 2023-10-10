@@ -81,7 +81,9 @@ public final class WeChatSender {
     }
 
     private static String post(String url, String data) throws IOException {
-        try (CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {
+        try (
+                CloseableHttpClient httpClient =
+                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(data, WeChatAlertConstants.CHARSET));
             CloseableHttpResponse response = httpClient.execute(httpPost);
@@ -134,7 +136,9 @@ public final class WeChatSender {
     private static String get(String url) throws IOException {
         String resp;
 
-        try (CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();) {
+        try (
+                CloseableHttpClient httpClient =
+                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();) {
             HttpGet httpGet = new HttpGet(url);
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 HttpEntity entity = response.getEntity();

@@ -70,7 +70,8 @@ public final class PagerDutySender {
 
     private AlertResult send(AlertResult alertResult, String url, String requestBody) throws IOException {
         HttpPost httpPost = constructHttpPost(url, requestBody);
-        CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
+        CloseableHttpClient httpClient =
+                HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
 
         try {
             CloseableHttpResponse response = httpClient.execute(httpPost);

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
 import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -41,7 +42,8 @@ public final class HttpRequestUtil {
             HttpHost httpProxy = new HttpHost(proxy, port);
             CredentialsProvider provider = new BasicCredentialsProvider();
             provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-            return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).setDefaultCredentialsProvider(provider).build();
+            return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy)
+                    .setDefaultCredentialsProvider(provider).build();
         } else {
             return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
         }

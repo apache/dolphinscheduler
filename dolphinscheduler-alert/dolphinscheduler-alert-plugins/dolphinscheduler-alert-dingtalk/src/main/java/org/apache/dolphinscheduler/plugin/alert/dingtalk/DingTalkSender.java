@@ -109,7 +109,8 @@ public final class DingTalkSender {
         HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).setDefaultCredentialsProvider(provider).build();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy)
+                .setDefaultCredentialsProvider(provider).build();
     }
 
     private static CloseableHttpClient getDefaultClient() {

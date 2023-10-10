@@ -23,12 +23,10 @@ import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ServiceUnavailableRetryStrategy;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultServiceUnavailableRetryStrategy;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
@@ -80,7 +78,8 @@ public final class WebexTeamsSender {
     }
 
     private void send(AlertResult alertResult, AlertData alertData) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
+        CloseableHttpClient httpClient =
+                HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
 
         try {
             HttpPost httpPost = constructHttpPost(getMessage(alertData), botAccessToken);

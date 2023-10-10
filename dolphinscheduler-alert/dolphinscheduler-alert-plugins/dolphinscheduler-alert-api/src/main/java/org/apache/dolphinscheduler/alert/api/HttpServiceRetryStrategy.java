@@ -19,17 +19,16 @@
 
 package org.apache.dolphinscheduler.alert.api;
 
-import org.apache.http.*;
 import org.apache.http.client.HttpRequestRetryHandler;
-import org.apache.http.client.ServiceUnavailableRetryStrategy;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.protocol.HttpContext;
 
-import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+
+import javax.net.ssl.SSLException;
 
 public class HttpServiceRetryStrategy implements HttpRequestRetryHandler {
 
