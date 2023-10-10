@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+{{- if and .Values.api.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -85,4 +86,5 @@ spec:
     targetPort: api-port
     path: {{ .Values.api.service.serviceMonitor.path }}
     interval: {{ .Values.api.service.serviceMonitor.interval }}
+{{- end }}
 {{- end }}

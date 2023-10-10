@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+{{- if and .Values.worker.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -179,3 +180,4 @@ spec:
             storage: {{ .Values.worker.persistentVolumeClaim.logsPersistentVolume.storage | quote }}
     {{- end }}
   {{- end }}
+{{- end }}
