@@ -112,9 +112,9 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
             int deleted = projectWorkerGroupMapper.delete(new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode
             ).in(ProjectWorkerGroup::getWorkerGroup, difference));
             if (deleted > 0) {
-                log.info("Success to delete worker groups [{}] for the project [{}] .", difference.toString() project.getName());
+                log.info("Success to delete worker groups [{}] for the project [{}] .", difference, project.getName());
             } else {
-                log.error("Failed to delete worker groups [{}] for the project [{}].", difference.toString() project.getName());
+                log.error("Failed to delete worker groups [{}] for the project [{}].", difference, project.getName());
                 throw new ServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR, project.getName());
             }
         }

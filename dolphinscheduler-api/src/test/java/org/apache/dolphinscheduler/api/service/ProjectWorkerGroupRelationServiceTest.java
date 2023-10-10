@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -49,6 +50,12 @@ public class ProjectWorkerGroupRelationServiceTest {
     private WorkerGroupMapper workerGroupMapper;
 
     protected final static long projectCode = 1L;
+
+
+    @Test
+    public void testAssignWorkerGroupsToProject() {
+
+    }
 
 
     private User getGeneralUser() {
