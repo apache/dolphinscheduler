@@ -62,7 +62,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-all</artifactId>
+            <artifactId>dolphinscheduler-task-all-prue</artifactId>
         </dependency>
 
         <dependency>

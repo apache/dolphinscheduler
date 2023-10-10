@@ -24,11 +24,11 @@ import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 
-import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
-
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
+
+import com.google.common.collect.ImmutableSet;
 
 @UtilityClass
 public class TaskMetrics {

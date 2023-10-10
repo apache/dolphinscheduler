@@ -65,12 +65,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-all</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-storage-all</artifactId>
+            <artifactId>dolphinscheduler-task-all-prue</artifactId>
         </dependency>
 
         <dependency>
