@@ -30,7 +30,6 @@ END;
 $$ LANGUAGE plpgsql;
 d//
 
-delimiter ;
 select modify_data_t_ds_dq_rule_input_entry();
 DROP FUNCTION IF EXISTS modify_data_t_ds_dq_rule_input_entry();
 
@@ -50,6 +49,5 @@ END;
 $$ LANGUAGE plpgsql;
 d//
 
-delimiter ;
 select modify_data_type_t_ds_dq_rule_input_entry();
 DROP FUNCTION IF EXISTS modify_data_type_t_ds_dq_rule_input_entry();
