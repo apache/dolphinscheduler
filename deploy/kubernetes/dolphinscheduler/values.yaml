@@ -300,6 +300,8 @@ common:
     storage: "20Gi"
 
 master:
+  ## Enable or disable the Master component
+  enabled: true
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
   ## Replicas is the desired number of replicas of the given Template.
@@ -387,6 +389,8 @@ master:
       annotations: {}
 
 worker:
+  ## Enable or disable the Worker component
+  enabled: true
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
   ## Replicas is the desired number of replicas of the given Template.
@@ -504,6 +508,8 @@ worker:
 
 
 alert:
+  ## Enable or disable the Alert-Server component
+  enabled: true
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
   replicas: 1
   ## The deployment strategy to use to replace existing pods with new ones.
@@ -581,6 +587,8 @@ alert:
 
 
 api:
+  ## Enable or disable the API-Server component
+  enabled: true
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
   replicas: "1"
   ## The deployment strategy to use to replace existing pods with new ones.
