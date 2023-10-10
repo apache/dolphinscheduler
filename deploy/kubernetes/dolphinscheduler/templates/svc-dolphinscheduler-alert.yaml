@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+{{- if and .Values.alert.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -66,4 +67,5 @@ spec:
     targetPort: actuator-port
     path: {{ .Values.alert.service.serviceMonitor.path }}
     interval: {{ .Values.alert.service.serviceMonitor.interval }}
+{{- end }}
 {{- end }}
