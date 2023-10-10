@@ -15,11 +15,11 @@
  * limitations under the License.
 */
 
--- t_ds_dq_rule_input_entry behavior change
---DROP PROCEDURE if EXISTS modify_t_ds_dq_rule_input_entry;
-DROP PROCEDURE if EXISTS modify_t_ds_dq_rule_input_entry;
+-- modify_data_t_ds_dq_rule_input_entry behavior change
+--DROP PROCEDURE if EXISTS modify_data_t_ds_dq_rule_input_entry;
+DROP PROCEDURE if EXISTS modify_data_t_ds_dq_rule_input_entry;
 delimiter d//
-CREATE PROCEDURE modify_t_ds_dq_rule_input_entry()
+CREATE PROCEDURE modify_data_t_ds_dq_rule_input_entry()
 BEGIN
    IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
            WHERE TABLE_NAME='t_ds_dq_rule_input_entry'
@@ -27,11 +27,30 @@ BEGIN
            AND COLUMN_NAME ='value')
    THEN
        ALTER TABLE `t_ds_dq_rule_input_entry`
-       CHANGE COLUMN `value` `data` varchar(255) DEFAULT NULL,
+       CHANGE COLUMN `value` `data` varchar(255) DEFAULT NULL;
+   END IF;
+END;
+d//
+delimiter ;
+CALL modify_data_t_ds_dq_rule_input_entry;
+DROP PROCEDURE modify_data_t_ds_dq_rule_input_entry;
+
+-- modify_data_value_t_ds_dq_rule_input_entry behavior change
+--DROP PROCEDURE if EXISTS modify_data_value_t_ds_dq_rule_input_entry;
+DROP PROCEDURE if EXISTS modify_data_value_t_ds_dq_rule_input_entry;
+delimiter d//
+CREATE PROCEDURE modify_data_value_t_ds_dq_rule_input_entry()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_dq_rule_input_entry'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='value_type')
+   THEN
+       ALTER TABLE `t_ds_dq_rule_input_entry`
        CHANGE COLUMN `value_type` `data_type` int(11) DEFAULT NULL;
    END IF;
 END;
 d//
 delimiter ;
-CALL modify_t_ds_dq_rule_input_entry;
-DROP PROCEDURE modify_t_ds_dq_rule_input_entry;
+CALL modify_data_value_t_ds_dq_rule_input_entry;
+DROP PROCEDURE modify_data_value_t_ds_dq_rule_input_entry;
