@@ -376,6 +376,7 @@ interface ITaskParams {
   minMemorySpace?: string
   image?: string
   imagePullPolicy?: string
+  pullSecret?: string
   command?: string
   args?: string
   customizedLabels?: ILabel[]

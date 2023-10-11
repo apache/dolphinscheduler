@@ -33,12 +33,22 @@ CREATE TABLE IF NOT EXISTS t_ds_relation_sub_workflow (
     sub_workflow_instance_id BIGINT NOT NULL,
     PRIMARY KEY (id)
 );
+
+ALTER TABLE IF EXISTS t_ds_fav RENAME TO t_ds_fav_task;
+
 CREATE TABLE if not exists "t_ds_fav_task" (
     "id" serial NOT NULL,
     "task_type" VARCHAR(64) NOT NULL,
     "user_id" integer NOT NULL,
     PRIMARY KEY ("id")
 );
+
+ALTER TABLE t_ds_process_definition ADD COLUMN IF NOT EXISTS execution_type int NULL DEFAULT '0';
+
+ALTER TABLE t_ds_process_definition_log ADD COLUMN IF NOT EXISTS execution_type int NULL DEFAULT '0';
+
+ALTER TABLE t_ds_process_instance ADD COLUMN IF NOT EXISTS next_process_instance_id int NULL DEFAULT '0';
+
 CREATE TABLE if not exists "t_ds_project_preference" (
     "id" int NOT NULL,
     "code" bigint NOT NULL,
