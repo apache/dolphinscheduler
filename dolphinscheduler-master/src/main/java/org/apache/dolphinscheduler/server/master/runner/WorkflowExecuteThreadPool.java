@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import com.google.common.base.Strings;
-import lombok.NonNull;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -34,6 +32,14 @@ import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.LoggerUtils;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.annotation.PostConstruct;
+
+import lombok.NonNull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +48,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import javax.annotation.PostConstruct;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.base.Strings;
 
 /**
  * Used to execute {@link WorkflowExecuteRunnable}.
@@ -80,6 +84,17 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         this.setThreadNamePrefix("WorkflowExecuteThread-");
         this.setMaxPoolSize(masterConfig.getExecThreads());
         this.setCorePoolSize(masterConfig.getExecThreads());
+    }
+
+    public boolean existStateEvent(StateEvent stateEvent) {
+        WorkflowExecuteRunnable workflowExecuteThread =
+                processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+        if (workflowExecuteThread == null) {
+            logger.warn("Submit state event error, cannot from workflowExecuteThread from cache manager, stateEvent:{}",
+                    stateEvent);
+            return false;
+        }
+        return workflowExecuteThread.existStateEvent(stateEvent);
     }
 
     /**
