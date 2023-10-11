@@ -18,7 +18,7 @@
 INSERT INTO t_ds_tenant(id, tenant_code, description, queue_id, create_time, update_time) VALUES (-1, 'default', 'default tenant', '0', '2018-03-27 15:48:50', '2018-10-24 17:40:22') ON CONFLICT (id) DO NOTHING;
 
 -- tenant improvement
-UPDATE t_ds_schedules t1 SET t1.tenant_code = COALESCE(t3.tenant_code, 'default') FROM t_ds_process_definition t2 LEFT JOIN t_ds_tenant t3 ON t2.tenant_id = t3.id WHERE t1.process_definition_code = t2.code;
+UPDATE t_ds_schedules as t1 SET tenant_code = COALESCE(t3.tenant_code, 'default') FROM t_ds_process_definition as t2 LEFT JOIN t_ds_tenant t3 ON t2.tenant_id = t3.id WHERE t1.process_definition_code = t2.code;
 UPDATE t_ds_process_instance SET tenant_code = 'default' WHERE tenant_code IS NULL;
 
 -- data quality support choose database

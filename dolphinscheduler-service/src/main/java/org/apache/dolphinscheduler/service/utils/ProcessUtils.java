@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClient;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -162,16 +160,10 @@ public class ProcessUtils {
      * @param taskExecutionContext taskExecutionContext
      * @return yarn application ids
      */
-    public static @Nullable List<String> killApplication(@NonNull LogClient logClient,
+    public static @Nullable List<String> killApplication(@NonNull List<String> appIds,
                                                          @NonNull TaskExecutionContext taskExecutionContext) {
-        if (taskExecutionContext.getLogPath() == null) {
-            return Collections.emptyList();
-        }
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            Host host = Host.of(taskExecutionContext.getHost());
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
-                    taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
                 taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {

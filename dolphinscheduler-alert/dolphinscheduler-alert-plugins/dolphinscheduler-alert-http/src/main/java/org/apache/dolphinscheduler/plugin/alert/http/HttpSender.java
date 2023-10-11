@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,14 +29,16 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -104,19 +107,20 @@ public final class HttpSender {
     }
 
     public String getResponseString(HttpRequestBase httpRequest) throws IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        CloseableHttpClient httpClient =
+                HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
         CloseableHttpResponse response = httpClient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, DEFAULT_CHARSET);
     }
 
     private void createHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
-        if (REQUEST_TYPE_POST.equals(requestType)) {
+        if (REQUEST_TYPE_POST.equalsIgnoreCase(requestType)) {
             httpRequest = new HttpPost(url);
             setHeader();
             // POST request add param in request body
             setMsgInRequestBody(msg);
-        } else if (REQUEST_TYPE_GET.equals(requestType)) {
+        } else if (REQUEST_TYPE_GET.equalsIgnoreCase(requestType)) {
             // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
@@ -139,7 +143,11 @@ public final class HttpSender {
             if (!url.contains(URL_SPLICE_CHAR)) {
                 type = URL_SPLICE_CHAR;
             }
-            url = String.format("%s%s%s=%s", url, type, contentField, msg);
+            try {
+                url = String.format("%s%s%s=%s", url, type, contentField, URLEncoder.encode(msg, DEFAULT_CHARSET));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 

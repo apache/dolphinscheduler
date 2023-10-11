@@ -129,7 +129,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
             bootstrapCommand.add("-u");
             bootstrapCommand.add(runUser);
         }
-        bootstrapCommand.add("-E");
+        bootstrapCommand.add("-i");
         bootstrapCommand.add(shellAbsolutePath().toString());
         return bootstrapCommand;
     }
