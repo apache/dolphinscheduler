@@ -320,7 +320,7 @@ public class DagHelper {
                 log.error("taskNode {} is null, please check dag", subsequent);
                 continue;
             }
-            if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList,completeTaskList)) {
+            if (isTaskNodeNeedSkip(taskNode, skipTaskNodeList, completeTaskList)) {
                 setTaskNodeSkip(subsequent, dag, completeTaskList, skipTaskNodeList);
                 continue;
             }
@@ -340,7 +340,8 @@ public class DagHelper {
      * if all of the task dependence are skipped, skip it too.
      */
     private static boolean isTaskNodeNeedSkip(TaskNode taskNode,
-                                              Map<Long, TaskNode> skipTaskNodeList, Map<Long, TaskInstance> completeTaskList) {
+                                              Map<Long, TaskNode> skipTaskNodeList,
+                                              Map<Long, TaskInstance> completeTaskList) {
         if (CollectionUtils.isEmpty(taskNode.getDepList())) {
             return false;
         }
@@ -348,7 +349,7 @@ public class DagHelper {
             if (!skipTaskNodeList.containsKey(depNode)) {
                 return false;
             }
-            if(completeTaskList.containsKey(depNode)){
+            if (completeTaskList.containsKey(depNode)) {
                 return false;
             }
         }
