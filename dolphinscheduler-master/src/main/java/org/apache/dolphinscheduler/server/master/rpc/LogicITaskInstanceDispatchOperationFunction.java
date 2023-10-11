@@ -64,13 +64,14 @@ public class LogicITaskInstanceDispatchOperationFunction
             MasterTaskExecutionContextHolder.putTaskExecutionContext(taskExecutionContext);
 
             int delayTime = taskExecutionContext.getDelayTime();
-            if(delayTime >0) {
+            if (delayTime > 0) {
                 // todo: calculate the delay in master dispatcher then we don't need to use a queue to store the task
                 final long remainTime =
                         DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                                 TimeUnit.SECONDS.toMillis(delayTime));
                 if (remainTime > 0) {
-                    log.info("Current taskInstance: {} is choosing delay execution, delay time: {}/ms, remainTime: {}/ms",
+                    log.info(
+                            "Current taskInstance: {} is choosing delay execution, delay time: {}/ms, remainTime: {}/ms",
                             taskExecutionContext.getTaskName(),
                             TimeUnit.SECONDS.toMillis(taskExecutionContext.getDelayTime()), remainTime);
                     taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
