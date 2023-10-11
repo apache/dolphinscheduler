@@ -496,7 +496,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             if (!subProcessDefineCodes.isEmpty()) {
                 log.info(
                         "Need to check sub process definition state before change schedule state, subProcessDefineCodes:{}.",
-                        org.apache.commons.lang.StringUtils.join(subProcessDefineCodes, ","));
+                        StringUtils.join(subProcessDefineCodes, ","));
                 List<ProcessDefinition> subProcessDefinitionList =
                         processDefinitionMapper.queryByCodes(subProcessDefineCodes);
                 if (subProcessDefinitionList != null && !subProcessDefinitionList.isEmpty()) {
