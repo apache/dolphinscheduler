@@ -31,26 +31,23 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterExtendRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
-import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
+import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -59,7 +56,6 @@ import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -119,16 +115,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private ResourceUserMapper resourceUserMapper;
 
     @Autowired
-    private ProcessDefinitionService processDefinitionService;
-
-    @Autowired
-    private ProcessService processService;
-
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
-
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private TaskDefinitionService taskDefinitionService;
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
@@ -932,31 +919,15 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private Result verifyResourceExistsOnlineUsage(String fullName) {
         Result<Object> result = new Result<>();
         putMsg(result, Status.SUCCESS);
-
-        WorkflowFilterExtendRequest workflowFilterExtendRequest = new WorkflowFilterExtendRequest();
-        workflowFilterExtendRequest.setReleaseState(ReleaseState.ONLINE);
-        // query all processDefinition from process state
-        List<ProcessDefinition> processDefinitions =
-                processDefinitionService.filterProcessDefinition(workflowFilterExtendRequest);
-        if (CollectionUtils.isEmpty(processDefinitions)) {
-            return result;
-        }
-        boolean resourceUse = false;
-        for (ProcessDefinition processDefinition : processDefinitions) {
-            DagData dagData = processService.genDagData(processDefinition);
-            if (CollectionUtils.isNotEmpty(dagData.getTaskDefinitionList())) {
-                for (TaskDefinition taskDefinition : dagData.getTaskDefinitionList()) {
-                    // if usage resource, then return true
-                    if (CollectionUtils.isNotEmpty(taskDefinition.getTaskParamResourceNames())
-                            && taskDefinition.getTaskParamResourceNames().contains(fullName)) {
-                        resourceUse = true;
-                        putMsg(result, Status.RESOURCE_IS_USED);
-                        break;
-                    }
+        // query all online work flow task
+        List<TaskDefinition> taskDefinitions = taskDefinitionService
+                .queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState.ONLINE, Flag.YES);
+        if (CollectionUtils.isNotEmpty(taskDefinitions)) {
+            for (TaskDefinition taskDefinition : taskDefinitions) {
+                if (taskDefinition.getTaskParamResourceNames().contains(fullName)) {
+                    putMsg(result, Status.RESOURCE_IS_USED);
+                    break;
                 }
-            }
-            if (resourceUse) {
-                break;
             }
         }
         return result;

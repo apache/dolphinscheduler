@@ -1326,4 +1326,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // delete task workflow relation
         processTaskRelationService.deleteByWorkflowDefinitionCode(workflowDefinitionCode, workflowDefinitionVersion);
     }
+
+    @Override
+    public List<TaskDefinition> queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState releaseState,
+                                                                                        Flag flag) {
+        return taskDefinitionMapper.queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(releaseState, flag);
+    }
 }

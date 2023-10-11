@@ -48,7 +48,6 @@ import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterExtendRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -165,8 +164,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -640,16 +637,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         pageInfo.setTotalList(processDefinitionIPage.getRecords());
 
         return pageInfo;
-    }
-
-    @Override
-    public List<ProcessDefinition> filterProcessDefinition(WorkflowFilterExtendRequest workflowFilterExtendRequest) {
-        LambdaQueryWrapper<ProcessDefinition> queryWrapper = new QueryWrapper<ProcessDefinition>().lambda();
-
-        if (workflowFilterExtendRequest.getReleaseState() != null) {
-            queryWrapper.eq(ProcessDefinition::getReleaseState, workflowFilterExtendRequest.getReleaseState());
-        }
-        return processDefinitionMapper.selectList(queryWrapper);
     }
 
     /**
