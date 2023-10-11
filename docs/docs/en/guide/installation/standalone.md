@@ -12,7 +12,7 @@ If you want to deploy DolphinScheduler in production, we recommend you follow [c
 ## Preparation
 
 - JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
-- Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/<version>).  <!-- markdown-link-check-disable-line -->
+- Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/3.2.0).  <!-- markdown-link-check-disable-line -->
 
 ## Start DolphinScheduler Standalone Server
 

@@ -12,16 +12,16 @@ Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务
 
 ## 安装 dolphinscheduler
 
-请下载源码包 apache-dolphinscheduler-<version>-src.tar.gz，下载地址: [下载](https://dolphinscheduler.apache.org/zh-cn/download)
+请下载源码包 apache-dolphinscheduler-3.2.0-src.tar.gz，下载地址: [下载](https://dolphinscheduler.apache.org/zh-cn/download)
 
 发布一个名为 `dolphinscheduler` 的版本(release)，请执行以下命令：
 
 ```
-$ tar -zxvf apache-dolphinscheduler-<version>-src.tar.gz
-$ cd apache-dolphinscheduler-<version>-src/deploy/kubernetes/dolphinscheduler
+$ tar -zxvf apache-dolphinscheduler-3.2.0-src.tar.gz
+$ cd apache-dolphinscheduler-3.2.0-src/deploy/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
-$ helm install dolphinscheduler . --set image.tag=<version>
+$ helm install dolphinscheduler . --set image.tag=3.2.0
 ```
 
 将名为 `dolphinscheduler` 的版本(release) 发布到 `test` 的命名空间中：
@@ -231,9 +231,9 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 2. 创建一个新的 `Dockerfile`，用于添加 MySQL 的驱动包:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.2.0
 # 例如
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:3.2.0
 
 # 注意，如果构建的是dolphinscheduler-tools镜像
 # 需要将下面一行修改为COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
@@ -282,9 +282,9 @@ externalDatabase:
 2. 创建一个新的 `Dockerfile`，用于添加 MySQL 或者 Oracle 驱动包:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.2.0
 # 例如
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.0
 
 # 如果你想支持 MySQL 数据源
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
@@ -314,7 +314,7 @@ docker build -t apache/dolphinscheduler-<service>:new-driver .
 1. 创建一个新的 `Dockerfile`，用于安装 pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.0
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -349,7 +349,7 @@ docker build -t apache/dolphinscheduler-worker:pip .
 1. 创建一个新的 `Dockerfile`，用于安装 Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.0
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*

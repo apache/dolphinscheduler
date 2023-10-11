@@ -12,16 +12,16 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Install DolphinScheduler
 
-Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](https://dolphinscheduler.apache.org/en-us/download)
+Please download the source code package `apache-dolphinscheduler-3.2.0-src.tar.gz`, download address: [download address](https://dolphinscheduler.apache.org/en-us/download)
 
 To publish the release name `dolphinscheduler` version, please execute the following commands:
 
 ```
-$ tar -zxvf apache-dolphinscheduler-<version>-src.tar.gz
-$ cd apache-dolphinscheduler-<version>-src/deploy/kubernetes/dolphinscheduler
+$ tar -zxvf apache-dolphinscheduler-3.2.0-src.tar.gz
+$ cd apache-dolphinscheduler-3.2.0-src/deploy/kubernetes/dolphinscheduler
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
 $ helm dependency update .
-$ helm install dolphinscheduler . --set image.tag=<version>
+$ helm install dolphinscheduler . --set image.tag=3.2.0
 ```
 
 To publish the release name `dolphinscheduler` version to `test` namespace:
@@ -232,9 +232,9 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.2.0
 # For example
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:3.2.0
 
 # Attention Please, If the build is dolphinscheduler-tools image
 # You need to change the following line to: COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
@@ -283,9 +283,9 @@ externalDatabase:
 2. Create a new `Dockerfile` to add MySQL or Oracle driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.2.0
 # For example
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.0
 
 # If you want to support MySQL Datasource
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
@@ -315,7 +315,7 @@ docker build -t apache/dolphinscheduler-<service>:new-driver .
 1. Create a new `Dockerfile` to install pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.0
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -350,7 +350,7 @@ docker build -t apache/dolphinscheduler-worker:pip .
 1. Create a new `Dockerfile` to install Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.0
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*

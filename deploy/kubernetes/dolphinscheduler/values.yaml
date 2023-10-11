@@ -28,7 +28,7 @@ initImage:
 
 image:
   registry: "dolphinscheduler.docker.scarf.sh/apache"
-  tag: "dev-SNAPSHOT"
+  tag: "3.2.0"
   pullPolicy: "IfNotPresent"
   pullSecret: ""
   master: dolphinscheduler-master
