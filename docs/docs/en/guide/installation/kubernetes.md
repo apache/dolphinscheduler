@@ -527,13 +527,13 @@ helm install dolphinscheduler . --set worker.enabled=false
 helm install dolphinscheduler-cpu-worker . \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
-     --set worker.enabled=true --set image.tag=lastes-cpu --set worker.nodeSelector.cpu="x86" \
+     --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 # Disable the installation of other components, only install worker, use the self-built GPU image, deploy to GPU servers with the `a100` label through nodeselector, and use zookeeper as the external registry center
 helm install dolphinscheduler-gpu-worker . \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
-     --set worker.enabled=true --set image.tag=lastes-cpu --set worker.nodeSelector.gpu="a100" \
+     --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 ```
 
