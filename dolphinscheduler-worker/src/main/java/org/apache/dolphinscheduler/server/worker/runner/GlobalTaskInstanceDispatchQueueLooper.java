@@ -75,16 +75,21 @@ public class GlobalTaskInstanceDispatchQueueLooper extends BaseDaemonThread {
                 TaskExecutionContext taskExecutionContext = globalTaskInstanceDispatchQueue.take();
                 LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
                 LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
-                // delay task process
-                long remainTime =
-                        DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                                taskExecutionContext.getDelayTime() * 60L);
-                if (remainTime > 0) {
-                    log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
-                    taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                    // todo: use delay running event
-                    workerMessageSender.sendMessage(taskExecutionContext,
-                            ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+
+                int delayTime = taskExecutionContext.getDelayTime();
+                if (delayTime > 0) {
+                    // delay task process
+                    long remainTime =
+                            DateUtils.getRemainTime(
+                                    DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                                    delayTime * 60L);
+                    if (remainTime > 0) {
+                        log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
+                        taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
+                        // todo: use delay running event
+                        workerMessageSender.sendMessage(taskExecutionContext,
+                                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+                    }
                 }
                 WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder
                         .createWorkerDelayTaskExecuteRunnableFactory(
