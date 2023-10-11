@@ -514,6 +514,31 @@ common:
     SW_GRPC_LOG_SERVER_PORT: "11800"
 ```
 
+### How to deploy specific components separately?
+
+Modify the `api.enabled`, `alert.enabled`, `master.enabled`, or `worker.enabled` configuration items in the `values.yaml` file.
+
+For example, if you need to deploy worker to both CPU and GPU servers in a cluster, and the worker uses different images, you can do the following:
+
+```bash
+# Install master, api-server, alert-server, and other default components, but do not install worker
+helm install dolphinscheduler . --set worker.enabled=false
+# Disable the installation of other components, only install worker, use the self-built CPU image, deploy to CPU servers with the `x86` label through nodeselector, and use zookeeper as the external registry center
+helm install dolphinscheduler-cpu-worker . \
+     --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
+     --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
+     --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
+     --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
+# Disable the installation of other components, only install worker, use the self-built GPU image, deploy to GPU servers with the `a100` label through nodeselector, and use zookeeper as the external registry center
+helm install dolphinscheduler-gpu-worker . \
+     --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
+     --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
+     --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \
+     --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
+```
+
+Please note that the above steps are for reference only, and specific operations need to be adjusted according to the actual situation.
+
 ## Appendix-Configuration
 
 |                              Parameter                               |                                                          Description                                                          |                Default                |
@@ -590,6 +615,7 @@ common:
 | `common.fsFileResourcePersistence.storageClassName`                  | Resource persistent volume storage class, must support the access mode: ReadWriteMany                                         | `-`                                   |
 | `common.fsFileResourcePersistence.storage`                           | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
 |                                                                      |                                                                                                                               |                                       |
+| `master.enabled`                                                     | Enable or disable the Master component                                                                                        | true                                  |
 | `master.podManagementPolicy`                                         | PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down | `Parallel`                            |
 | `master.replicas`                                                    | Replicas is the desired number of replicas of the given Template                                                              | `3`                                   |
 | `master.annotations`                                                 | The `annotations` for master server                                                                                           | `{}`                                  |
@@ -624,6 +650,7 @@ common:
 | `master.persistentVolumeClaim.storageClassName`                      | `Master` logs data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning  | `-`                                   |
 | `master.persistentVolumeClaim.storage`                               | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
 |                                                                      |                                                                                                                               |                                       |
+| `worker.enabled`                                                     | Enable or disable the Worker component                                                                                        | true                                  |
 | `worker.podManagementPolicy`                                         | PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down | `Parallel`                            |
 | `worker.replicas`                                                    | Replicas is the desired number of replicas of the given Template                                                              | `3`                                   |
 | `worker.annotations`                                                 | The `annotations` for worker server                                                                                           | `{}`                                  |
@@ -658,6 +685,7 @@ common:
 | `worker.persistentVolumeClaim.logsPersistentVolume.storageClassName` | `Worker` logs data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning  | `-`                                   |
 | `worker.persistentVolumeClaim.logsPersistentVolume.storage`          | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
 |                                                                      |                                                                                                                               |                                       |
+| `alert.enabled`                                                      | Enable or disable the Alert-Server component                                                                                  | true                                  |
 | `alert.replicas`                                                     | Replicas is the desired number of replicas of the given Template                                                              | `1`                                   |
 | `alert.strategy.type`                                                | Type of deployment. Can be "Recreate" or "RollingUpdate"                                                                      | `RollingUpdate`                       |
 | `alert.strategy.rollingUpdate.maxSurge`                              | The maximum number of pods that can be scheduled above the desired number of pods                                             | `25%`                                 |
@@ -699,6 +727,7 @@ common:
 | `alert.persistentVolumeClaim.storageClassName`                       | `Alert` logs data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning   | `-`                                   |
 | `alert.persistentVolumeClaim.storage`                                | `PersistentVolumeClaim` size                                                                                                  | `20Gi`                                |
 |                                                                      |                                                                                                                               |                                       |
+| `api.enabled`                                                        | Enable or disable the API-Server component                                                                                    | true                                  |
 | `api.replicas`                                                       | Replicas is the desired number of replicas of the given Template                                                              | `1`                                   |
 | `api.strategy.type`                                                  | Type of deployment. Can be "Recreate" or "RollingUpdate"                                                                      | `RollingUpdate`                       |
 | `api.strategy.rollingUpdate.maxSurge`                                | The maximum number of pods that can be scheduled above the desired number of pods                                             | `25%`                                 |
