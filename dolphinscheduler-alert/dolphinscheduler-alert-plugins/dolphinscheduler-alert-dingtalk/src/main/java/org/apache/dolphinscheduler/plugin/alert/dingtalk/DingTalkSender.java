@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.codec.binary.Base64;
@@ -108,11 +109,12 @@ public final class DingTalkSender {
         HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-        return HttpClients.custom().setDefaultCredentialsProvider(provider).build();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy)
+                .setDefaultCredentialsProvider(provider).build();
     }
 
     private static CloseableHttpClient getDefaultClient() {
-        return HttpClients.createDefault();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
     }
 
     private static RequestConfig getProxyConfig(String proxy, int port) {

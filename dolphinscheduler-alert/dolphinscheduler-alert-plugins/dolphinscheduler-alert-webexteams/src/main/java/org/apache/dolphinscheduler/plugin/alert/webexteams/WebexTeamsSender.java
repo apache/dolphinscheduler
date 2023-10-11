@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.webexteams;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.http.HttpStatus;
@@ -77,7 +78,8 @@ public final class WebexTeamsSender {
     }
 
     private void send(AlertResult alertResult, AlertData alertData) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpClient httpClient =
+                HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
 
         try {
             HttpPost httpPost = constructHttpPost(getMessage(alertData), botAccessToken);

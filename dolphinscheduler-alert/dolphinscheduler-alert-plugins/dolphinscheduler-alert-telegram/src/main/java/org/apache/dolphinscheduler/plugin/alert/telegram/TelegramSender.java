@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -239,14 +240,15 @@ public final class TelegramSender {
     }
 
     private static CloseableHttpClient getDefaultClient() {
-        return HttpClients.createDefault();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
     }
 
     private static CloseableHttpClient getProxyClient(String proxy, int port, String user, String password) {
         HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-        return HttpClients.custom().setDefaultCredentialsProvider(provider).build();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy)
+                .setDefaultCredentialsProvider(provider).build();
     }
 
     private static RequestConfig getProxyConfig(String proxy, int port) {

@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.alert.wechat.WeChatAlertConstan
 
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -80,7 +81,9 @@ public final class WeChatSender {
     }
 
     private static String post(String url, String data) throws IOException {
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (
+                CloseableHttpClient httpClient =
+                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(data, WeChatAlertConstants.CHARSET));
             CloseableHttpResponse response = httpClient.execute(httpPost);
@@ -133,7 +136,9 @@ public final class WeChatSender {
     private static String get(String url) throws IOException {
         String resp;
 
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (
+                CloseableHttpClient httpClient =
+                        HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();) {
             HttpGet httpGet = new HttpGet(url);
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 HttpEntity entity = response.getEntity();
