@@ -1068,13 +1068,13 @@ CREATE TABLE t_ds_plugin_define (
 DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
 CREATE TABLE t_ds_alert_plugin_instance (
 	id serial NOT NULL,
-	plugin_define_id int4 NOT NULL,
+	plugin_define_id int NOT NULL,
 	plugin_instance_params text NULL,
 	create_time timestamp NULL,
 	update_time timestamp NULL,
 	instance_name varchar(255) NULL,
-	instance_type int4 NOT NULL default '0',
-	warning_type int4,
+	instance_type int NOT NULL default '0',
+	warning_type int,
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
@@ -2123,8 +2123,7 @@ CREATE TABLE t_ds_listener_event(
     update_time timestamp            DEFAULT NULL,
     PRIMARY KEY (id)
 );
-comment
-on column t_ds_listener_event.sign is 'sign=sha1(content)';
+comment on column t_ds_listener_event.sign is 'sign=sha1(content)';
 
 create index idx_status on t_ds_listener_event (alert_status);
 create index idx_sign on t_ds_listener_event (sign);

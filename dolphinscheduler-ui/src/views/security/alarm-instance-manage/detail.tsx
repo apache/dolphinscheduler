@@ -98,13 +98,7 @@ const DetailModal = defineComponent({
     )
     watch(
       () => state.detailForm.instanceType,
-      () => {
-        if(state.detailForm.instanceType === 'GLOBAL'){
-          warningTypeSpan.value = 0
-        }else{
-          warningTypeSpan.value = 24
-        }
-      }
+      () => warningTypeSpan.value = state.detailForm.instanceType === 'GLOBAL' ? 0 : 24
     )
     watch(
       () => state.json,
