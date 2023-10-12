@@ -38,6 +38,7 @@ public class K8sTaskParameters extends AbstractParameters {
     private String namespace;
     private String command;
     private String args;
+    private String pullSecret;
     private String imagePullPolicy;
     private double minCpuCores;
     private double minMemorySpace;
