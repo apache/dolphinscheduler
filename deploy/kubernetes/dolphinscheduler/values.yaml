@@ -97,7 +97,7 @@ zookeeper:
     size: "20Gi"
     storageClass: "-"
 
-etcd:
+registryEtcd:
   enabled: false
   endpoints: ""
   namespace: "dolphinscheduler"
@@ -111,6 +111,18 @@ etcd:
     keyCertChainFile: "etcd-certs/client.crt"
     keyFile: "etcd-certs/client.pem"
 
+registryJdbc:
+  enabled: false
+  termRefreshInterval: 2s
+  termExpireTimes: 3
+  hikariConfig:
+    # Default use same Dolphinscheduler's database, if you want to use other database please change `enabled` to `true` and change other configs
+    enabled: false
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcurl: jdbc:mysql://
+    username: ""
+    password: ""
+
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
   registryPluginName: "zookeeper"
@@ -118,7 +130,9 @@ externalRegistry:
 
 security:
   authentication:
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
+    # IF you set type `LDAP`, below config will be effective
     ldap:
       urls: ldap://ldap.forumsys.com:389/
       basedn: dc=example,dc=com
