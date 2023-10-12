@@ -762,4 +762,15 @@ public class TaskDefinitionServiceImplTest {
 
         return processTaskRelationList;
     }
+
+    @Test
+    public void testQueryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag() {
+        List<TaskDefinition> tasks = Arrays.asList(new TaskDefinition(), new TaskDefinition());
+        Mockito.when(taskDefinitionMapper.queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState.OFFLINE,
+                null)).thenReturn(tasks);
+
+        List<TaskDefinition> taskDefinitions = taskDefinitionService
+                .queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState.OFFLINE, null);
+        Assertions.assertEquals(tasks, taskDefinitions);
+    }
 }
