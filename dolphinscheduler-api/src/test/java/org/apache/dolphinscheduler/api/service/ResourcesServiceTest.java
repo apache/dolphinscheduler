@@ -28,16 +28,14 @@ import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -111,7 +109,7 @@ public class ResourcesServiceTest {
     private UdfFuncMapper udfFunctionMapper;
 
     @Mock
-    private TaskDefinitionService taskDefinitionService;
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     @Mock
     private ResourceUserMapper resourceUserMapper;
@@ -409,9 +407,6 @@ public class ResourcesServiceTest {
         Mockito.when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest",
                 null, "123", null))
                 .thenReturn(getStorageEntityResource());
-        Mockito.when(taskDefinitionService.queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState.OFFLINE,
-                Flag.YES)).thenReturn(Arrays.asList(new TaskDefinition()));
-
         Result result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResNotExist", "123");
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());

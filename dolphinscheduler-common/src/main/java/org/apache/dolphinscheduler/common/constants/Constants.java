@@ -697,7 +697,7 @@ public final class Constants {
      * schedule timezone
      */
     public static final String SCHEDULE_TIMEZONE = "schedule_timezone";
-    public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 255;
+    public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 128;
 
     /**
      * tenant

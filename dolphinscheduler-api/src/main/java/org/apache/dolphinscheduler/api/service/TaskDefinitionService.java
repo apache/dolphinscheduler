@@ -22,13 +22,11 @@ import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -257,13 +255,4 @@ public interface TaskDefinitionService {
                                               ReleaseState releaseState);
 
     void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
-
-    /**
-     * queryAll TaskDefinition
-     *
-     * @param releaseState workFlow releaseState
-     * @param flag         task flag
-     * @return TaskDefinition list
-     */
-    List<TaskDefinition> queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState releaseState, Flag flag);
 }
