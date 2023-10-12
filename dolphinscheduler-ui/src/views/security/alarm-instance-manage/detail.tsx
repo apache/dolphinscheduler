@@ -199,7 +199,6 @@ const DetailModal = defineComponent({
                       uncheckedValue={'NORMAL'}
                       disabled={!!currentRecord?.id}
                       v-model:value={detailForm.instanceType}
-                      onUpdateValue={() => console.log(this.detailForm)}
                     />
                     )
                   },
