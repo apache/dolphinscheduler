@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -158,4 +160,14 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
 
     void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
+
+    /**
+     * queryAll TaskDefinition
+     *
+     * @param releaseState release state
+     * @param flag         task flag
+     * @return task list
+     */
+    List<TaskDefinition> queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(@Param("releaseState") ReleaseState releaseState,
+                                                                                 @Param("taskFlag") Flag flag);
 }
