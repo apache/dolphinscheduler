@@ -35,22 +35,24 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
+import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -118,10 +120,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private ResourceUserMapper resourceUserMapper;
 
     @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
-
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
+    private TaskDefinitionService taskDefinitionService;
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
@@ -129,11 +128,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * create directory
      *
-     * @param loginUser   login user
-     * @param name        alias
-     * @param type        type
-     * @param pid         parent id
-     * @param currentDir  current directory
+     * @param loginUser  login user
+     * @param name       alias
+     * @param type       type
+     * @param pid        parent id
+     * @param currentDir current directory
      * @return create directory result
      */
     @Override
@@ -271,7 +270,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
      * update the folder's size of the resource
      *
      * @param resource the current resource
-     * @param size size
+     * @param size     size
      */
     private void updateParentResourceSize(Resource resource, long size) {
         if (resource.getSize() > 0) {
@@ -316,13 +315,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * update resource
      *
-     * @param loginUser  login user
+     * @param loginUser        login user
      * @param resourceFullName resource full name
-     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
-     *                      can be different from the login user in the case of logging in as admin users.
-     * @param name       name
-     * @param type       resource type
-     * @param file       resource file
+     * @param resTenantCode    tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                         can be different from the login user in the case of logging in as admin users.
+     * @param name             name
+     * @param type             resource type
+     * @param file             resource file
      * @return update result code
      */
     @Override
@@ -410,6 +409,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // if name unchanged, return directly without moving on HDFS
         if (originResourceName.equals(name) && file == null) {
             return result;
+        } else {
+            result = verifyResourceExistsOnlineUsage(resourceFullName);
+            if (result.isFailed()) {
+                return result;
+            }
         }
 
         if (file != null) {
@@ -509,14 +513,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * query resources list paging
      *
-     * @param loginUser login user
-     * @param fullName resource full name
+     * @param loginUser     login user
+     * @param fullName      resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
-     * @param type      resource type
-     * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
+     * @param type          resource type
+     * @param searchVal     search value
+     * @param pageNo        page number
+     * @param pageSize      page size
      * @return resource list page
      */
     @Override
@@ -818,7 +822,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * transform resource object into StorageEntity object
      *
-     * @param resource  a resource object
+     * @param resource a resource object
      * @return a storageEntity object
      */
     private StorageEntity createStorageEntityBasedOnResource(Resource resource) {
@@ -837,8 +841,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * delete resource
      *
-     * @param loginUser  login user
-     * @param fullName resource full name
+     * @param loginUser     login user
+     * @param fullName      resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
      * @return delete result code
@@ -899,11 +903,38 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
         }
 
+        result = verifyResourceExistsOnlineUsage(fullName);
+        if (result.isFailed()) {
+            return result;
+        }
+
         // delete file on hdfs,S3
         storageOperate.delete(fullName, allChildren, true);
-
         putMsg(result, Status.SUCCESS);
 
+        return result;
+    }
+
+    /**
+     * validate whether usage resource
+     *
+     * @param fullName fullName
+     * @return {@link Result}
+     */
+    private Result verifyResourceExistsOnlineUsage(String fullName) {
+        Result<Object> result = new Result<>();
+        putMsg(result, Status.SUCCESS);
+        // query all online work flow task
+        List<TaskDefinition> taskDefinitions = taskDefinitionService
+                .queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag(ReleaseState.ONLINE, Flag.YES);
+        if (CollectionUtils.isNotEmpty(taskDefinitions)) {
+            for (TaskDefinition taskDefinition : taskDefinitions) {
+                if (taskDefinition.getTaskParamResourceNames().contains(fullName)) {
+                    putMsg(result, Status.RESOURCE_IS_USED);
+                    break;
+                }
+            }
+        }
         return result;
     }
 
@@ -959,8 +990,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * verify resource by full name or pid and type
      *
-     * @param fileName resource file name
-     * @param type     resource type
+     * @param fileName      resource file name
+     * @param type          resource type
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
      * @return true if the resource full name or pid not exists, otherwise return false
@@ -1010,7 +1041,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     /**
      * get resource by id
-     * @param fullName resource full name
+     *
+     * @param fullName      resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
      * @return resource
@@ -1057,10 +1089,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * view resource file online
      *
-     * @param fullName  resource fullName
-     * @param resTenantCode  owner's tenant code of the resource
-     * @param skipLineNum skip line number
-     * @param limit       limit
+     * @param fullName      resource fullName
+     * @param resTenantCode owner's tenant code of the resource
+     * @param skipLineNum   skip line number
+     * @param limit         limit
      * @return resource content
      */
     @Override
@@ -1253,10 +1285,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * updateProcessInstance resource
      *
-     * @param fullName resource full name
+     * @param fullName      resource full name
      * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
      *                      can be different from the login user in the case of logging in as admin users.
-     * @param content    content
+     * @param content       content
      * @return update result cod
      */
     @Override
@@ -1317,9 +1349,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     /**
-     * @param fullName resource full name
-     * @param tenantCode   tenant code
-     * @param content      content
+     * @param fullName   resource full name
+     * @param tenantCode tenant code
+     * @param content    content
      * @return result
      */
     private Result<Object> uploadContentToStorage(User loginUser, String fullName, String tenantCode, String content) {
@@ -1365,6 +1397,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     /**
      * download file
+     *
      * @return resource content
      */
     @Override
@@ -1751,10 +1784,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * check permission by comparing login user's tenantCode with tenantCode in the request
      *
-     * @param isAdmin is the login user admin
+     * @param isAdmin        is the login user admin
      * @param userTenantCode loginUser's tenantCode
-     * @param resTenantCode tenantCode in the request field "resTenantCode" for tenant code owning the resource,
-     *                      can be different from the login user in the case of logging in as admin users.
+     * @param resTenantCode  tenantCode in the request field "resTenantCode" for tenant code owning the resource,
+     *                       can be different from the login user in the case of logging in as admin users.
      * @return isValid
      */
     private boolean isUserTenantValid(boolean isAdmin, String userTenantCode,

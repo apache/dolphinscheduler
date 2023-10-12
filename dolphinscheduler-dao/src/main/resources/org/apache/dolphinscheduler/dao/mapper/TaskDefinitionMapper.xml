@@ -170,4 +170,24 @@
         </where>
         order by update_time desc, id asc
     </select>
+
+    <select id="queryAllTaskDefinitionByWorkFlowReleaseStateAndTaskFlag" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        SELECT
+        <include refid="baseSqlV2">
+            <property name="alias" value="td"/>
+        </include>
+        FROM t_ds_process_definition as pd
+        JOIN t_ds_process_task_relation as ptr on pd.code = ptr.process_definition_code and pd.version = ptr.process_definition_version
+        JOIN t_ds_task_definition as td on ptr.post_task_code = td.code and ptr.post_task_version = td.version
+        <where>
+            <if test="releaseState != null">
+                and pd.release_state = #{releaseState}
+            </if>
+            <if test="taskFlag != null">
+                and td.flag = #{taskFlag}
+            </if>
+        </where>
+
+    </select>
+
 </mapper>
