@@ -29,6 +29,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +40,6 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
-import org.apache.http.util.EntityUtils;
 
 @Slf4j
 public final class WebexTeamsSender {
@@ -96,7 +96,9 @@ public final class WebexTeamsSender {
                     alertResult.setStatus("true");
                     alertResult.setMessage("send webex teams alert success");
                 } else {
-                    alertResult.setMessage(String.format("send webex teams alert error, message: %s, statusCode: %s, responseContent: %s", message, statusCode, responseContent));
+                    alertResult.setMessage(String.format(
+                            "send webex teams alert error, message: %s, statusCode: %s, responseContent: %s", message,
+                            statusCode, responseContent));
                     log.info("send webex teams alert fail, statusCode : {}", statusCode);
                 }
             } finally {

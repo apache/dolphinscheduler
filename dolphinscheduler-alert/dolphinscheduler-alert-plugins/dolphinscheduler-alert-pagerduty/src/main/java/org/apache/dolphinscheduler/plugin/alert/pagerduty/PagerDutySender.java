@@ -28,6 +28,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -39,7 +40,6 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
-import org.apache.http.util.EntityUtils;
 
 @Slf4j
 public final class PagerDutySender {
@@ -86,7 +86,9 @@ public final class PagerDutySender {
                     alertResult.setStatus("true");
                     alertResult.setMessage("send pager duty alert success");
                 } else {
-                    alertResult.setMessage(String.format("send pager duty alert error, statusCode: %s, responseContent: %s", statusCode, responseContent));
+                    alertResult.setMessage(
+                            String.format("send pager duty alert error, statusCode: %s, responseContent: %s",
+                                    statusCode, responseContent));
                     log.info("send pager duty alert fail, statusCode : {}", statusCode);
                 }
             } finally {

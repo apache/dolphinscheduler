@@ -21,6 +21,7 @@ import lombok.Data;
 
 @Data
 public class WebexMessage {
+
     private String roomId;
     private String toPersonId;
     private String toPersonEmail;
