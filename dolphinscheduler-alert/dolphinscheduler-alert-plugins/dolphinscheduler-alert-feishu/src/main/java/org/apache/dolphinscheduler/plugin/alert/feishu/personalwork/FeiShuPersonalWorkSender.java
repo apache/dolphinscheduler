@@ -163,12 +163,9 @@ public class FeiShuPersonalWorkSender {
         String msg = generateContentJson(alertData);
 
         final String accessTokenUrl = "https://open.feishu.cn/open-apis/im/v1/messages";
-        HttpPost httpPost = constructHttpPost(accessTokenUrl, msg, new HashMap<String, String>() {
-
-            {
-                put("receive_id_type", receiveIdType);
-            }
-        });
+        HashMap<String, String> pathParams = new HashMap<>();
+        pathParams.put("receive_id_type", receiveIdType);
+        HttpPost httpPost = constructHttpPost(accessTokenUrl, msg, pathParams);
         httpPost.setHeader("Authorization", String.format("Bearer %s", accessToken.getTenantAccessToken()));
 
         CloseableHttpClient httpClient = getDefaultClient();;
