@@ -500,19 +500,6 @@ common:
 
 > **注意**: `MINIO_IP` 只能使用 IP 而非域名, 因为 DolphinScheduler 尚不支持 S3 路径风格访问 (S3 path style access)
 
-### 如何配置 SkyWalking？
-
-修改 `values.yaml` 文件中的 SKYWALKING 配置项
-
-```yaml
-common:
-  configmap:
-    SKYWALKING_ENABLE: "true"
-    SW_AGENT_COLLECTOR_BACKEND_SERVICES: "127.0.0.1:11800"
-    SW_GRPC_LOG_SERVER_HOST: "127.0.0.1"
-    SW_GRPC_LOG_SERVER_PORT: "11800"
-```
-
 ### 如何单独部署特定组件?
 
 修改 `values.yaml` 文件中的 `api.enabled`, `alert.enabled` `master.enabled` 或 `worker.enabled` 配置项
@@ -536,7 +523,7 @@ helm install dolphinscheduler-gpu-worker . \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 ```
 
-请注意，以上步骤仅供参考，具体操作需要根据实际情况进行调整。
+> **注意**:以上步骤仅供参考，具体操作需要根据实际情况进行调整。
 
 ## 附录-配置
 
@@ -623,10 +610,6 @@ helm install dolphinscheduler-gpu-worker . \
 | `common.configmap.RESOURCE_MANAGER_HTTPADDRESS_PORT`                 | Set resource manager httpaddress port for yarn                                                                                                                                                         | `8088`                                 |
 | `common.configmap.YARN_RESOURCEMANAGER_HA_RM_IDS`                    | If resourcemanager HA is enabled, please set the HA IPs                                                                                                                                                | `nil`                                  |
 | `common.configmap.YARN_APPLICATION_STATUS_ADDRESS`                   | If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname, otherwise keep default                                                                                  | `http://ds1:%s/ws/v1/cluster/apps/%s`  |
-| `common.configmap.SKYWALKING_ENABLE`                                 | Set whether to enable skywalking                                                                                                                                                                       | `false`                                |
-| `common.configmap.SW_AGENT_COLLECTOR_BACKEND_SERVICES`               | Set agent collector backend services for skywalking                                                                                                                                                    | `127.0.0.1:11800`                      |
-| `common.configmap.SW_GRPC_LOG_SERVER_HOST`                           | Set grpc log server host for skywalking                                                                                                                                                                | `127.0.0.1`                            |
-| `common.configmap.SW_GRPC_LOG_SERVER_PORT`                           | Set grpc log server port for skywalking                                                                                                                                                                | `11800`                                |
 | `common.configmap.HADOOP_HOME`                                       | Set `HADOOP_HOME` for DolphinScheduler's task environment                                                                                                                                              | `/opt/soft/hadoop`                     |
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                                                                                          | `/opt/soft/hadoop/etc/hadoop`          |
 | `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                                                                                               | `/opt/soft/spark`                      |
