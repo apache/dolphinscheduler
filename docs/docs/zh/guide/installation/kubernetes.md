@@ -513,6 +513,31 @@ common:
     SW_GRPC_LOG_SERVER_PORT: "11800"
 ```
 
+### 如何单独部署特定组件?
+
+修改 `values.yaml` 文件中的 `api.enabled`, `alert.enabled` `master.enabled` 或 `worker.enabled` 配置项
+
+例如，在一个集群中需要同时将 worker 部署到 CPU 服务器和 GPU 服务器，并且 worker 使用不同的镜像，可以这样做:
+
+```bash
+# 安装 master、api-server、alert-server以及其他默认组件，但是不安装 worker
+helm install dolphinscheduler . --set worker.enabled=false
+# 禁用其他组件的安装，只安装 worker，使用自行建构建的 CPU镜像，通过 nodeselector部署到附带 x86标签的 CPU服务器，使用 zookeeper作为外部注册中心
+helm install dolphinscheduler-cpu-worker . \
+     --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
+     --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
+     --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
+     --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
+# 禁用其他组件的安装，只安装 worker，使用自行建构建的 GPU 镜像，通过 nodeselector部署到附带 a100标签的 gpu服务器，使用zookeeper作为外部注册中心
+helm install dolphinscheduler-gpu-worker . \
+     --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
+     --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
+     --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \
+     --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
+```
+
+请注意，以上步骤仅供参考，具体操作需要根据实际情况进行调整。
+
 ## 附录-配置
 
 |                              Parameter                               |                                                                                              Description                                                                                               |                Default                 |
