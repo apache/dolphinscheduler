@@ -258,9 +258,17 @@ Location: `api-server/conf/application.yaml`
 |security.authentication.ldap.user.identity-attribute|uid|LDAP user identity attribute|
 |security.authentication.ldap.user.email-attribute|mail|LDAP user email attribute|
 |security.authentication.ldap.user.not-exist-action|CREATE|action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY)|
-|security.authentication.ldap.ssl.enable|false|LDAP switch|
+|security.authentication.ldap.ssl.enable|false|LDAP ssl switch|
 |security.authentication.ldap.ssl.trust-store|ldapkeystore.jks|LDAP jks file absolute path|
 |security.authentication.ldap.ssl.trust-store-password|password|LDAP jks password|
+|security.authentication.casdoor.user.admin||admin user account when you log-in with Casdoor|
+|casdoor.endpoint||Casdoor server url|
+|casdoor.client-id||id in Casdoor|
+|casdoor.client-secret||secret in Casdoor|
+|casdoor.certificate||certificate in Casdoor|
+|casdoor.organization-name||organization name in Casdoor|
+|casdoor.application-name||application name in Casdoor|
+|casdoor.redirect-url||doplhinscheduler login url|
 |api.traffic.control.global.switch|false|traffic control global switch|
 |api.traffic.control.max-global-qps-rate|300|global max request number per second|
 |api.traffic.control.tenant-switch|false|traffic control tenant switch|

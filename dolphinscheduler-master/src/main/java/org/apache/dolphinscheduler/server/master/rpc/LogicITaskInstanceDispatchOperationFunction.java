@@ -56,23 +56,29 @@ public class LogicITaskInstanceDispatchOperationFunction
             final int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
             final String taskInstanceName = taskExecutionContext.getTaskName();
 
+            taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
+
             LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstanceId, taskInstanceId);
             LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
             MasterTaskExecutionContextHolder.putTaskExecutionContext(taskExecutionContext);
-            // todo: calculate the delay in master dispatcher then we don't need to use a queue to store the task
-            final long remainTime =
-                    DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                            TimeUnit.SECONDS.toMillis(taskExecutionContext.getDelayTime()));
-            if (remainTime > 0) {
-                log.info("Current taskInstance: {} is choosing delay execution, delay time: {}/ms, remainTime: {}/ms",
-                        taskExecutionContext.getTaskName(),
-                        TimeUnit.SECONDS.toMillis(taskExecutionContext.getDelayTime()), remainTime);
-                taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                // todo: send delay execution message
-                return LogicTaskDispatchResponse.success(taskExecutionContext.getTaskInstanceId());
-            }
 
+            int delayTime = taskExecutionContext.getDelayTime();
+            if (delayTime > 0) {
+                // todo: calculate the delay in master dispatcher then we don't need to use a queue to store the task
+                final long remainTime =
+                        DateUtils.getRemainTime(DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
+                                TimeUnit.SECONDS.toMillis(delayTime));
+                if (remainTime > 0) {
+                    log.info(
+                            "Current taskInstance: {} is choosing delay execution, delay time: {}/ms, remainTime: {}/ms",
+                            taskExecutionContext.getTaskName(),
+                            TimeUnit.SECONDS.toMillis(taskExecutionContext.getDelayTime()), remainTime);
+                    taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
+                    // todo: send delay execution message
+                    return LogicTaskDispatchResponse.success(taskExecutionContext.getTaskInstanceId());
+                }
+            }
             final MasterDelayTaskExecuteRunnable masterDelayTaskExecuteRunnable =
                     masterTaskExecuteRunnableFactoryBuilder
                             .createWorkerDelayTaskExecuteRunnableFactory(taskExecutionContext.getTaskType())

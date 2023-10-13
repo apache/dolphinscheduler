@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_PREFERE
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectPreferenceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -64,7 +63,6 @@ public class ProjectPreferenceController extends BaseController {
     @PutMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_PROJECT_PREFERENCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProjectPreference(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "projectPreferences", required = true) String projectPreferences) {
@@ -75,7 +73,6 @@ public class ProjectPreferenceController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_PREFERENCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectPreferenceByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         return projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
@@ -88,7 +85,6 @@ public class ProjectPreferenceController extends BaseController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_PREFERENCE_STATE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result enableProjectPreference(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "state", required = true) int state) {

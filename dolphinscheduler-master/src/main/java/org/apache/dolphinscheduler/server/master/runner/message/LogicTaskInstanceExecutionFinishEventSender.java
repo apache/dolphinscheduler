@@ -32,9 +32,9 @@ public class LogicTaskInstanceExecutionFinishEventSender
     @Override
     public void sendMessage(TaskInstanceExecutionFinishEvent message) {
         ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
-                        .getProxyClient(message.getHost(), ITaskInstanceExecutionEventListener.class);
-        iTaskInstanceExecutionEventListener.onTaskInstanceExecutionFinish(new TaskInstanceExecutionFinishEvent());
+                SingletonJdkDynamicRpcClientProxyFactory
+                        .getProxyClient(message.getWorkflowInstanceHost(), ITaskInstanceExecutionEventListener.class);
+        iTaskInstanceExecutionEventListener.onTaskInstanceExecutionFinish(message);
     }
 
     @Override
@@ -47,7 +47,8 @@ public class LogicTaskInstanceExecutionFinishEventSender
         taskExecuteResultMessage.setExecutePath(taskExecutionContext.getExecutePath());
         taskExecuteResultMessage.setAppIds(taskExecutionContext.getAppIds());
         taskExecuteResultMessage.setProcessId(taskExecutionContext.getProcessId());
-        taskExecuteResultMessage.setHost(taskExecutionContext.getHost());
+        taskExecuteResultMessage.setWorkflowInstanceHost(taskExecutionContext.getWorkflowInstanceHost());
+        taskExecuteResultMessage.setTaskInstanceHost(taskExecutionContext.getHost());
         taskExecuteResultMessage.setStartTime(taskExecutionContext.getStartTime());
         taskExecuteResultMessage.setEndTime(taskExecutionContext.getEndTime());
         taskExecuteResultMessage.setVarPool(taskExecutionContext.getVarPool());

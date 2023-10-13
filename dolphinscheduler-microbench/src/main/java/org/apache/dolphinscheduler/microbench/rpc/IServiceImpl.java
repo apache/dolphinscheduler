@@ -14,25 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.utils;
 
-import java.io.StringReader;
+package org.apache.dolphinscheduler.microbench.rpc;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+public class IServiceImpl implements IService {
 
-public class ScriptRunnerTest {
-
-    @Test
-    public void testRunScript() {
-        // connection is null
-        Exception exception = null;
-        ScriptRunner s = new ScriptRunner(null, true, true);
-        try {
-            s.runScript(new StringReader("select 1"));
-        } catch (Exception e) {
-            exception = e;
-        }
-        Assertions.assertNotNull(exception);
+    @Override
+    public String ping(String pingRequest) {
+        return "I get " + pingRequest + ", I am Pong!";
     }
+
 }

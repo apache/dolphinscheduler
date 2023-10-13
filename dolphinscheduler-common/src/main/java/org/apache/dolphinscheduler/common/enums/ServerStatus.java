@@ -15,21 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.aspect;
+package org.apache.dolphinscheduler.common.enums;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public enum ServerStatus {
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface AccessLogAnnotation {
+    NORMAL, ABNORMAL, BUSY
 
-    // ignore request args
-    String[] ignoreRequestArgs() default {"loginUser"};
-
-    boolean ignoreRequest() default false;
 }

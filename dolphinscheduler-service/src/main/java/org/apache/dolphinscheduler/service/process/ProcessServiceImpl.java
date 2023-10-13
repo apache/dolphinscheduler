@@ -389,8 +389,8 @@ public class ProcessServiceImpl implements ProcessService {
                 if (update) {
                     try {
                         final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
-                                SingletonJdkDynamicRpcClientProxyFactory.getInstance()
-                                        .getProxyClient(info.getHost(), ITaskInstanceExecutionEventListener.class);
+                                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(info.getHost(),
+                                        ITaskInstanceExecutionEventListener.class);
                         final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent =
                                 new WorkflowInstanceStateChangeEvent(info.getId(), 0, info.getState(), info.getId(), 0);
                         iTaskInstanceExecutionEventListener
@@ -516,11 +516,11 @@ public class ProcessServiceImpl implements ProcessService {
                 continue;
             }
             if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-                IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
                 masterLogService.removeLogicTaskInstanceLog(taskLogPath);
             } else {
-                IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory.getInstance()
+                IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
                 iWorkerLogService.removeTaskInstanceLog(taskLogPath);
             }
