@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMD
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -126,6 +127,11 @@ public class FileUtilsTest {
 
         Assertions.assertDoesNotThrow(
                 () -> FileUtils.getFileChecksum(dirPath));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        FileUtils.deleteFile("test");
     }
 
 }
