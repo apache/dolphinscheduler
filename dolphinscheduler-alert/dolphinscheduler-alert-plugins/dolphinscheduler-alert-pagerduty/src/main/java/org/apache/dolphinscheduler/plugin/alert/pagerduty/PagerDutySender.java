@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -38,6 +39,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Preconditions;
+import org.apache.http.util.EntityUtils;
 
 @Slf4j
 public final class PagerDutySender {
@@ -77,11 +79,14 @@ public final class PagerDutySender {
             CloseableHttpResponse response = httpClient.execute(httpPost);
 
             int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity entity = response.getEntity();
+            String responseContent = EntityUtils.toString(entity, StandardCharsets.UTF_8);
             try {
                 if (statusCode == HttpStatus.SC_OK || statusCode == HttpStatus.SC_ACCEPTED) {
                     alertResult.setStatus("true");
                     alertResult.setMessage("send pager duty alert success");
                 } else {
+                    alertResult.setMessage(String.format("send pager duty alert error, statusCode: %s, responseContent: %s", statusCode, responseContent));
                     log.info("send pager duty alert fail, statusCode : {}", statusCode);
                 }
             } finally {
