@@ -27,11 +27,15 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+@Slf4j
 public class ClasspathSqlScriptParser implements SqlScriptParser {
 
     private final String sqlScriptPath;
@@ -46,6 +50,10 @@ public class ClasspathSqlScriptParser implements SqlScriptParser {
     @Override
     public List<String> getAllSql() throws IOException {
         Resource sqlScriptResource = new ClassPathResource(sqlScriptPath);
+        if (!sqlScriptResource.exists()) {
+            log.warn("The sql script file {} doesn't exist", sqlScriptPath);
+            return Collections.emptyList();
+        }
         List<String> result = new ArrayList<>();
         try (
                 InputStream inputStream = sqlScriptResource.getInputStream();

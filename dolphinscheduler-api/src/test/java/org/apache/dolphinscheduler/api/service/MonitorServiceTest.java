@@ -26,12 +26,12 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.dao.MonitorDBDao;
 import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -53,6 +53,8 @@ import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.baomidou.mybatisplus.annotation.DbType;
+
 /**
  * monitor service test
  */
@@ -66,7 +68,7 @@ public class MonitorServiceTest {
     private MonitorServiceImpl monitorService;
 
     @Mock
-    private MonitorDBDao monitorDBDao;
+    private DatabaseMonitor databaseMonitor;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -88,7 +90,7 @@ public class MonitorServiceTest {
     @Test
     public void testQueryDatabaseState() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, true);
-        Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
+        Mockito.when(databaseMonitor.getDatabaseMetrics()).thenReturn(getDatabaseMetrics());
         Map<String, Object> result = monitorService.queryDatabaseState(user);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -138,14 +140,8 @@ public class MonitorServiceTest {
                 serviceLogger)).thenReturn(true);
     }
 
-    private List<MonitorRecord> getList() {
-        List<MonitorRecord> monitorRecordList = new ArrayList<>();
-        monitorRecordList.add(getEntity());
-        return monitorRecordList;
-    }
-
-    private MonitorRecord getEntity() {
-        MonitorRecord monitorRecord = new MonitorRecord();
+    private DatabaseMetrics getDatabaseMetrics() {
+        DatabaseMetrics monitorRecord = new DatabaseMetrics();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
     }

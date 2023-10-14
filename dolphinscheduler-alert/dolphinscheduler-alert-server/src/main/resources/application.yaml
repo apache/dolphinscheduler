@@ -16,6 +16,8 @@
 #
 
 spring:
+  profiles:
+    active: postgresql
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"

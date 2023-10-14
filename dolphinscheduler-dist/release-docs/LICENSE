@@ -511,7 +511,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     zt-zip 1.15: https://github.com/zeroturnaround/zt-zip/blob/master/LICENSE, Apache 2.0
     content-type 2.2: https://mvnrepository.com/artifact/com.nimbusds/content-type/2.2, Apache 2.0
     jackson-dataformat-xml 2.13.3: https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml/2.13.3, Apache 2.0
-    jna-platform 5.6.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.6.0, Apache 2.0
     lang-tag 1.6: https://mvnrepository.com/artifact/com.nimbusds/lang-tag/1.6, Apache 2.0
     netty-codec-dns 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-dns/4.1.53.Final, Apache 2.0
     netty-codec-socks 4.1.53.Final: https://mvnrepository.com/artifact/io.netty/netty-codec-socks/4.1.53.Final, Apache 2.0
@@ -651,6 +650,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     slf4j-api 1.7.36: https://mvnrepository.com/artifact/org.slf4j/slf4j-api/1.7.36, MIT
     animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT
     checker-qual 3.12.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.12.0, MIT + GPLv2
+    checker-qual 3.19.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.19.0, MIT + GPLv2
     Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket,  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
