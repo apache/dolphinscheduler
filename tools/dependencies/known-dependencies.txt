@@ -32,7 +32,6 @@ bucket4j-core-6.2.0.jar
 caffeine-2.9.3.jar
 checker-qual-3.12.0.jar
 checker-qual-3.19.0.jar
-checker-qual-3.5.0.jar
 classgraph-4.8.147.jar
 classmate-1.5.1.jar
 clickhouse-jdbc-0.4.6.jar
@@ -381,7 +380,6 @@ azure-core-http-netty-1.13.0.jar
 azure-identity-1.7.1.jar
 content-type-2.2.jar
 jackson-dataformat-xml-2.13.3.jar
-jna-platform-5.6.0.jar
 lang-tag-1.6.jar
 msal4j-1.13.3.jar
 msal4j-persistence-extension-1.1.0.jar
