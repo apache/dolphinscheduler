@@ -501,19 +501,6 @@ Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` to a
 
 > **Note**: `MINIO_IP` can only use IP instead of the domain name, because DolphinScheduler currently doesn't support S3 path style access.
 
-### How to Configure SkyWalking?
-
-Modify SkyWalking configurations in `values.yaml`:
-
-```yaml
-common:
-  configmap:
-    SKYWALKING_ENABLE: "true"
-    SW_AGENT_COLLECTOR_BACKEND_SERVICES: "127.0.0.1:11800"
-    SW_GRPC_LOG_SERVER_HOST: "127.0.0.1"
-    SW_GRPC_LOG_SERVER_PORT: "11800"
-```
-
 ### How to deploy specific components separately?
 
 Modify the `api.enabled`, `alert.enabled`, `master.enabled`, or `worker.enabled` configuration items in the `values.yaml` file.
@@ -537,7 +524,7 @@ helm install dolphinscheduler-gpu-worker . \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 ```
 
-Please note that the above steps are for reference only, and specific operations need to be adjusted according to the actual situation.
+> **Note**: the above steps are for reference only, and specific operations need to be adjusted according to the actual situation.
 
 ## Appendix-Configuration
 
@@ -624,10 +611,6 @@ Please note that the above steps are for reference only, and specific operations
 | `common.configmap.RESOURCE_MANAGER_HTTPADDRESS_PORT`                 | Set resource manager httpaddress port for yarn                                                                                                                                                         | `8088`                                 |
 | `common.configmap.YARN_RESOURCEMANAGER_HA_RM_IDS`                    | If resourcemanager HA is enabled, please set the HA IPs                                                                                                                                                | `nil`                                  |
 | `common.configmap.YARN_APPLICATION_STATUS_ADDRESS`                   | If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname, otherwise keep default                                                                                  | `http://ds1:%s/ws/v1/cluster/apps/%s`  |
-| `common.configmap.SKYWALKING_ENABLE`                                 | Set whether to enable skywalking                                                                                                                                                                       | `false`                                |
-| `common.configmap.SW_AGENT_COLLECTOR_BACKEND_SERVICES`               | Set agent collector backend services for skywalking                                                                                                                                                    | `127.0.0.1:11800`                      |
-| `common.configmap.SW_GRPC_LOG_SERVER_HOST`                           | Set grpc log server host for skywalking                                                                                                                                                                | `127.0.0.1`                            |
-| `common.configmap.SW_GRPC_LOG_SERVER_PORT`                           | Set grpc log server port for skywalking                                                                                                                                                                | `11800`                                |
 | `common.configmap.HADOOP_HOME`                                       | Set `HADOOP_HOME` for DolphinScheduler's task environment                                                                                                                                              | `/opt/soft/hadoop`                     |
 | `common.configmap.HADOOP_CONF_DIR`                                   | Set `HADOOP_CONF_DIR` for DolphinScheduler's task environment                                                                                                                                          | `/opt/soft/hadoop/etc/hadoop`          |
 | `common.configmap.SPARK_HOME`                                        | Set `SPARK_HOME` for DolphinScheduler's task environment                                                                                                                                               | `/opt/soft/spark`                      |

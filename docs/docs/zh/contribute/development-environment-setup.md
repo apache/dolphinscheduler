@@ -202,7 +202,6 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
   <root level="INFO">
   +  <appender-ref ref="STDOUT"/>
     <appender-ref ref="APILOGFILE"/>
-    <appender-ref ref="SKYWALKING-LOG"/>
   </root>
   ```
 

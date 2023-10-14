@@ -209,7 +209,6 @@ spring:
   <root level="INFO">
   +  <appender-ref ref="STDOUT"/>
     <appender-ref ref="APILOGFILE"/>
-    <appender-ref ref="SKYWALKING-LOG"/>
   </root>
   ```
 
