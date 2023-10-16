@@ -100,7 +100,7 @@ public final class HttpSender {
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());
             alertResult.setStatus("false");
-            alertResult.setMessage("send http request  alert fail." + e.getMessage());
+            alertResult.setMessage("send http request alert fail:" + e.getMessage());
         }
 
         return alertResult;
