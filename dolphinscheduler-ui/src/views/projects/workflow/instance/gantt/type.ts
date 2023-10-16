@@ -14,27 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ITaskState } from '@/common/types'
+import {ITaskState} from '@/common/types'
+import {TotalList} from "@/service/modules/task-instances/types";
 
 interface ITask {
-  taskName: string
-  startDate: Array<number>
-  endDate: Array<number>
-  isoStart: string
-  isoEnd: string
-  status: string
-  duration: string
+    taskName: string
+    startDate: Array<number>
+    endDate: Array<number>
+    isoStart: string
+    isoEnd: string
+    status: string
+    duration: string
 }
 
 interface IGanttRes {
-  height: number
-  taskNames: Array<number>
-  taskStatus: Object
-  tasks: Array<ITask>
+    height: number
+    taskNames: Array<number>
+    taskStatus: Object
+    tasks: Array<ITask>
 }
+
+interface ITaskGantt extends TotalList, ITask {
+    startDateTime: number
+    endDateTime: number
+    submitDateTime: number
+}
+
 
 interface ISeriesData {
-  [taskState: string]: Array<any>
+    [taskState: string]: Array<any>
 }
 
-export { ITask, IGanttRes, ISeriesData, ITaskState }
+export {ITask, IGanttRes, ISeriesData, ITaskState, ITaskGantt}
