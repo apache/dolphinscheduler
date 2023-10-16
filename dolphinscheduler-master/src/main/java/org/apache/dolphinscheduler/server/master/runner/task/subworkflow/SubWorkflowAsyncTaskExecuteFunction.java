@@ -55,6 +55,8 @@ public class SubWorkflowAsyncTaskExecuteFunction implements AsyncTaskExecuteFunc
         }
         subWorkflowInstance = processInstanceDao.queryById(subWorkflowInstance.getId());
         if (subWorkflowInstance != null && subWorkflowInstance.getState().isFinished()) {
+            //update the varPool of sub workflow
+            taskExecutionContext.setVarPool(subWorkflowInstance.getVarPool());
             return subWorkflowInstance.getState().isSuccess() ? AsyncTaskExecutionStatus.SUCCESS
                     : AsyncTaskExecutionStatus.FAILED;
         }

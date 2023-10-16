@@ -1094,8 +1094,6 @@ public class ProcessServiceImpl implements ProcessService {
      */
     private String joinVarPool(String parentValPool, String subValPool) {
         List<Property> parentValPools = Lists.newArrayList(JSONUtils.toList(parentValPool, Property.class));
-        parentValPools = parentValPools.stream().filter(valPool -> valPool.getDirect() == Direct.OUT)
-                .collect(Collectors.toList());
 
         List<Property> subValPools = Lists.newArrayList(JSONUtils.toList(subValPool, Property.class));
 
