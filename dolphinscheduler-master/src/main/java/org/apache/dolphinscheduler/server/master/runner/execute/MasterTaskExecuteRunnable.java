@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteExce
 import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTask;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
+import org.apache.dolphinscheduler.server.master.runner.task.subworkflow.SubWorkflowLogicTask;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -166,7 +167,9 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
     protected void sendTaskResult() {
         try {
             taskExecutionContext.setEndTime(System.currentTimeMillis());
-            taskExecutionContext.setVarPool(JSONUtils.toJsonString(logicTask.getTaskParameters().getVarPool()));
+            if (!SubWorkflowLogicTask.TASK_TYPE.equals(taskExecutionContext.getTaskType())) {
+                taskExecutionContext.setVarPool(JSONUtils.toJsonString(logicTask.getTaskParameters().getVarPool()));
+            }
             logicTaskInstanceExecutionEventSenderManager.getLogicTaskInstanceExecutionFinishEventSender()
                     .sendMessage(taskExecutionContext);
             log.info("Send task status: {} to master: {} successfully",
