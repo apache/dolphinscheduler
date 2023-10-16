@@ -36,8 +36,8 @@ public class SeatunnelFlinkParameters extends SeatunnelParameters {
     public enum RunModeEnum {
 
         NONE("none"),
-        RUN("--run-mode run"),
-        RUN_APPLICATION("--run-mode run-application");
+        RUN("--deploy-mode run"),
+        RUN_APPLICATION("--deploy-mode run-application");
 
         private final String command;
 

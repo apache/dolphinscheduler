@@ -19,14 +19,17 @@ package org.apache.dolphinscheduler.plugin.alert.webexteams;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -77,18 +80,25 @@ public final class WebexTeamsSender {
     }
 
     private void send(AlertResult alertResult, AlertData alertData) throws IOException {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+        CloseableHttpClient httpClient =
+                HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
 
         try {
-            HttpPost httpPost = constructHttpPost(getMessage(alertData), botAccessToken);
+            WebexMessage message = getMessage(alertData);
+            HttpPost httpPost = constructHttpPost(message, botAccessToken);
             CloseableHttpResponse response = httpClient.execute(httpPost);
 
             int statusCode = response.getStatusLine().getStatusCode();
+            HttpEntity entity = response.getEntity();
+            String responseContent = EntityUtils.toString(entity, StandardCharsets.UTF_8);
             try {
                 if (statusCode == HttpStatus.SC_OK) {
                     alertResult.setStatus("true");
                     alertResult.setMessage("send webex teams alert success");
                 } else {
+                    alertResult.setMessage(String.format(
+                            "send webex teams alert error, message: %s, statusCode: %s, responseContent: %s", message,
+                            statusCode, responseContent));
                     log.info("send webex teams alert fail, statusCode : {}", statusCode);
                 }
             } finally {

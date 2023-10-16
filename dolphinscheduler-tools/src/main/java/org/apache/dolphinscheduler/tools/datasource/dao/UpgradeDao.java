@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import org.apache.dolphinscheduler.common.utils.ScriptRunner;
+import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
 import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,9 +30,6 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 @Slf4j
 public abstract class UpgradeDao {
@@ -63,17 +58,13 @@ public abstract class UpgradeDao {
      * @param dbType db type
      */
     private void runInitSql(DbType dbType) {
-        String sqlFile = String.format("dolphinscheduler_%s.sql", dbType.getDescp());
-        Resource mysqlSQLFilePath = new ClassPathResource("sql/" + sqlFile);
-        try (Connection conn = dataSource.getConnection()) {
-            // Execute the dolphinscheduler_ddl.sql script to create the table structure of dolphinscheduler
-            ScriptRunner initScriptRunner = new ScriptRunner(conn, true, true);
-            try (Reader initSqlReader = new InputStreamReader(mysqlSQLFilePath.getInputStream())) {
-                initScriptRunner.runScript(initSqlReader);
-            }
-        } catch (Exception e) {
-            log.error("Execute init sql file: {} error", sqlFile, e);
-            throw new RuntimeException(String.format("Execute init sql file: %s error", sqlFile), e);
+        String sqlFilePath = String.format("sql/dolphinscheduler_%s.sql", dbType.getDescp());
+        SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, sqlFilePath);
+        try {
+            sqlScriptRunner.execute();
+            log.info("Success execute the sql initialize file: {}", sqlFilePath);
+        } catch (Exception ex) {
+            throw new RuntimeException("Execute initialize sql file: " + sqlFilePath + " error", ex);
         }
     }
 
@@ -120,14 +111,13 @@ public abstract class UpgradeDao {
 
     private void upgradeDolphinSchedulerDML(String schemaDir, String scriptFile) {
         String schemaVersion = schemaDir.split("_")[0];
-        Resource sqlFilePath = new ClassPathResource(
-                String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile));
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(false);
+        String sqlFilePath =
+                String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile);
+        try {
             // Execute the upgraded dolphinscheduler dml
-            ScriptRunner scriptRunner = new ScriptRunner(conn, false, true);
-            try (Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream())) {
-                scriptRunner.runScript(sqlReader);
+            SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, sqlFilePath);
+            sqlScriptRunner.execute();
+            try (Connection connection = dataSource.getConnection()) {
                 String upgradeSQL;
                 if (isExistsTable(T_VERSION_NAME)) {
                     // Change version in the version table to the new version
@@ -138,11 +128,10 @@ public abstract class UpgradeDao {
                 } else {
                     throw new RuntimeException("The version table does not exist");
                 }
-                try (PreparedStatement pstmt = conn.prepareStatement(upgradeSQL)) {
+                try (PreparedStatement pstmt = connection.prepareStatement(upgradeSQL)) {
                     pstmt.setString(1, schemaVersion);
                     pstmt.executeUpdate();
                 }
-                conn.commit();
             }
             log.info("Success execute the dml file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile);
         } catch (FileNotFoundException e) {
@@ -161,15 +150,12 @@ public abstract class UpgradeDao {
      * @param schemaDir schemaDir
      */
     public void upgradeDolphinSchedulerDDL(String schemaDir, String scriptFile) {
-        Resource sqlFilePath = new ClassPathResource(
-                String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile));
-        try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(true);
+        String sqlFilePath =
+                String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile);
+        SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, sqlFilePath);
+        try {
             // Execute the dolphinscheduler ddl.sql for the upgrade
-            ScriptRunner scriptRunner = new ScriptRunner(conn, true, true);
-            try (Reader sqlReader = new InputStreamReader(sqlFilePath.getInputStream())) {
-                scriptRunner.runScript(sqlReader);
-            }
+            sqlScriptRunner.execute();
             log.info("Success execute the ddl file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile);
         } catch (FileNotFoundException e) {
             log.error("Cannot find the DDL file, schemaDir:  {}, ddlScript: {}", schemaDir, scriptFile, e);

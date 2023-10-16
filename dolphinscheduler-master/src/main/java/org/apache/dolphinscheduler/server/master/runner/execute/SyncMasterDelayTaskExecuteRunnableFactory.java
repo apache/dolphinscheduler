@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.runner.message.MasterMessageSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,11 +35,11 @@ public class SyncMasterDelayTaskExecuteRunnableFactory
     @Autowired
     private LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
     @Autowired
-    private MasterMessageSenderManager masterMessageSenderManager;
+    private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
 
     @Override
     public SyncMasterDelayTaskExecuteRunnable createWorkerTaskExecuteRunnable(TaskExecutionContext taskExecutionContext) {
         return new SyncMasterDelayTaskExecuteRunnable(taskExecutionContext, logicTaskPluginFactoryBuilder,
-                masterMessageSenderManager);
+                logicTaskInstanceExecutionEventSenderManager);
     }
 }

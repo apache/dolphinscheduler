@@ -25,7 +25,7 @@ backend:
   - 'dolphinscheduler-dist/**/*'
   - 'dolphinscheduler-master/**/*'
   - 'dolphinscheduler-registry/**/*'
-  - 'dolphinscheduler-remote/**/*'
+  - 'dolphinscheduler-extract/**/*'
   - 'dolphinscheduler-scheduler-plugin/**/*'
   - 'dolphinscheduler-service/**/*'
   - 'dolphinscheduler-spi/**/*'

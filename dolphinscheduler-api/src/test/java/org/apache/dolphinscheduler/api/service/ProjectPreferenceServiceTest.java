@@ -90,6 +90,20 @@ public class ProjectPreferenceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
+    @Test
+    public void testEnableProjectPreference() {
+        User loginUser = getGeneralUser();
+
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
+                .thenReturn(true);
+
+        Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(getProjectPreference());
+        Result result = projectPreferenceService.enableProjectPreference(loginUser, projectCode, 1);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+
+    }
+
     private User getGeneralUser() {
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
@@ -113,6 +127,7 @@ public class ProjectPreferenceServiceTest {
         projectPreference.setCode(1);
         projectPreference.setProjectCode(projectCode);
         projectPreference.setPreferences("value");
+        projectPreference.setState(1);
         return projectPreference;
     }
 }
