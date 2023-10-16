@@ -1,0 +1,83 @@
+
+#gantt {
+  margin: auto;
+
+  .gantt-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px dashed #ccc;
+    padding: 2px 0;
+
+    &:hover {
+      background-color: rgba(200, 248, 198, 0.56);
+    }
+
+    .task-name {
+      width: 200px !important;
+      height: 15px;
+      text-align: right;
+      margin-right: 10px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      font-size: 12px;
+    }
+
+    .bar {
+      height: 15px;
+      display: flex;
+      flex-grow: 1;
+    }
+  }
+}
+
+.exp {
+  display: flex;
+  flex-grow: 5;
+  margin-bottom: 5px;
+  height: 15px;
+  line-height: 15px;
+  font-size: 12px;
+
+  span {
+    width: 50px;
+    text-align: right;
+    padding-right: 5px;
+  }
+
+  div {
+    width: 50px;
+  }
+}
+
+.submitted {
+  background: #e3e3e3;
+}
+
+.running {
+  background: #33b5e5;
+}
+
+.success {
+  background: #54b445;
+}
+
+.failure {
+  background: #410416;
+}
+
+.kill {
+  background: #fd0000;
+}
+
+.tips-show {
+  position: absolute;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  overflow: hidden;
+  min-width: 300px;
+  width: 300px;
+  background: rgba(2, 2, 2, 0.8);
+  color: #cccccc;
+  padding: 10px;
+  border-radius: 5px;
+}
