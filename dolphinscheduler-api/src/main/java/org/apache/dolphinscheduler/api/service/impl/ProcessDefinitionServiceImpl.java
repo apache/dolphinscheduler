@@ -42,6 +42,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAM
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
@@ -250,6 +251,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
+
+    private Map<Long, Long> processDefinitionCodeMap = new HashMap<>();
 
     /**
      * create process definition
@@ -1507,7 +1510,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
-            processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+            long code = CodeGenerateUtils.getInstance().genCode();
+            processDefinitionCodeMap.put(processDefinition.getCode(), code);
+            processDefinition.setCode(code);
         } catch (CodeGenerateException e) {
             log.error(
                     "Save process definition error because generate process definition code error, projectCode:{}.",
@@ -1520,6 +1525,16 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         Date now = new Date();
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         for (TaskDefinition taskDefinition : taskDefinitionList) {
+            if (TASK_TYPE_SUB_PROCESS.equals(taskDefinition.getTaskType())) {
+                String originTaskParams = taskDefinition.getTaskParams();
+                long originProcessDefinitionCode =
+                        Long.parseLong(JSONUtils.getNodeString(originTaskParams, Constants.PROCESS_DEFINITION_CODE));
+                Long importProcessDefinitionCode = processDefinitionCodeMap.get(originProcessDefinitionCode);
+                ObjectNode taskParamsNode = JSONUtils.parseObject(taskDefinition.getTaskParams());
+                taskParamsNode.put(Constants.PROCESS_DEFINITION_CODE, importProcessDefinitionCode);
+                taskDefinition.setTaskParams(taskParamsNode.toString());
+            }
+
             TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
             taskDefinitionLog.setName(taskDefinitionLog.getName());
             taskDefinitionLog.setProjectCode(projectCode);
