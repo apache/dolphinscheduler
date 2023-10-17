@@ -220,6 +220,14 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     isSpin: false,
     classNames: 'pause'
   },
+  STOP: {
+    id: 5,
+    desc: `${t('project.workflow.stop')}`,
+    color: '#e90101',
+    icon: StopOutlined,
+    isSpin: false,
+    classNames: 'stop'
+  },
   FAILURE: {
     id: 6,
     desc: `${t('project.workflow.failed')}`,

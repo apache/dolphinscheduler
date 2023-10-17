@@ -20,6 +20,7 @@ export type ITaskState =
   | 'SUBMITTED_SUCCESS'
   | 'RUNNING_EXECUTION'
   | 'PAUSE'
+  | 'STOP'
   | 'FAILURE'
   | 'SUCCESS'
   | 'NEED_FAULT_TOLERANCE'
