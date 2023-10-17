@@ -800,8 +800,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     processTaskRelation.setPostTaskVersion(version);
                 }
                 processTaskRelation.setProcessDefinitionVersion(processDefinitionVersion);
-                int update_2 = processTaskRelationMapper.updateProcessTaskRelationTaskVersion(processTaskRelation);
-                if (update_2 != 1) {
+                int updateProcessDefinitionVersionCount =
+                        processTaskRelationMapper.updateProcessTaskRelationTaskVersion(processTaskRelation);
+                if (updateProcessDefinitionVersionCount != 1) {
                     log.error("batch update process task relation error, projectCode:{}, taskDefinitionCode:{}.",
                             projectCode, taskCode);
                     putMsg(result, Status.PROCESS_TASK_RELATION_BATCH_UPDATE_ERROR);
@@ -811,8 +812,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 processTaskRelationLog.setOperator(loginUser.getId());
                 processTaskRelationLog.setId(null);
                 processTaskRelationLog.setOperateTime(now);
-                int insert_2 = processTaskRelationLogDao.insert(processTaskRelationLog);
-                if (insert_2 != 1) {
+                int insertProcessTaskRelationLogCount = processTaskRelationLogDao.insert(processTaskRelationLog);
+                if (insertProcessTaskRelationLogCount != 1) {
                     log.error("batch update process task relation error, projectCode:{}, taskDefinitionCode:{}.",
                             projectCode, taskCode);
                     putMsg(result, Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR);
@@ -824,13 +825,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             processDefinition.setUpdateTime(now);
             processDefinition.setUserId(loginUser.getId());
             // update process definition
-            int update_3 = processDefinitionMapper.updateById(processDefinition);
+            int updateProcessDefinitionCount = processDefinitionMapper.updateById(processDefinition);
             ProcessDefinitionLog processDefinitionLog = new ProcessDefinitionLog(processDefinition);
             processDefinitionLog.setOperateTime(now);
             processDefinitionLog.setId(null);
             processDefinitionLog.setOperator(loginUser.getId());
-            int insert_3 = processDefinitionLogMapper.insert(processDefinitionLog);
-            if ((update_3 & insert_3) != 1) {
+            int insertProcessDefinitionLogCount = processDefinitionLogMapper.insert(processDefinitionLog);
+            if ((updateProcessDefinitionCount & insertProcessDefinitionLogCount) != 1) {
                 putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
