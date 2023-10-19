@@ -70,6 +70,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
         paramsMap.add("instanceName", instanceName);
+        paramsMap.add("instanceType", pluginInstanceType.getDescp());
+        paramsMap.add("warningType", warningType.name());
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.create(any(User.class), eq(pluginDefineId), eq(instanceName),
@@ -96,6 +98,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
         paramsMap.add("instanceName", instanceName);
+        paramsMap.add("warningType", warningType.name());
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.update(any(User.class), eq(pluginDefineId), eq(instanceName),
