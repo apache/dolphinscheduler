@@ -38,6 +38,8 @@ type IDataBase =
   | 'SNOWFLAKE'
   | 'HANA'
   | 'DORIS'
+  | 'KYUUBI'
+
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -57,6 +59,7 @@ type IDataBaseLabel =
   | 'DAMENG'
   | 'OCEANBASE'
   | 'SSH'
+  | 'KYUUBI'
 
 interface IDataSource {
   id?: number
