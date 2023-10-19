@@ -31,6 +31,8 @@ server:
       custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 spring:
+  profiles:
+    active: postgresql
   banner:
     charset: UTF-8
   jackson:

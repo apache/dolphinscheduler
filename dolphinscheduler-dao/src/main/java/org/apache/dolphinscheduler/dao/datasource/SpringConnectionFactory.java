@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.datasource;
 
-import org.apache.ibatis.mapping.DatabaseIdProvider;
-import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
+import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
+
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
-
-import java.util.Properties;
 
 import javax.sql.DataSource;
 
@@ -30,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -53,6 +50,12 @@ public class SpringConnectionFactory {
     @Autowired(required = false)
     public DataSourceScriptDatabaseInitializer dataSourceScriptDatabaseInitializer;
 
+    /**
+     * Inject this field to make sure the DaoPluginConfiguration is initialized before SpringConnectionFactory.
+     */
+    @Autowired
+    public DaoPluginConfiguration daoPluginConfiguration;
+
     @Bean
     public MybatisPlusInterceptor paginationInterceptor(DbType dbType) {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
@@ -66,7 +69,8 @@ public class SpringConnectionFactory {
     }
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource, GlobalConfig globalConfig,
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource,
+                                               GlobalConfig globalConfig,
                                                DbType dbType) throws Exception {
         MybatisConfiguration configuration = new MybatisConfiguration();
         configuration.setMapUnderscoreToCamelCase(true);
@@ -82,9 +86,9 @@ public class SpringConnectionFactory {
         sqlSessionFactoryBean.setGlobalConfig(globalConfig);
         sqlSessionFactoryBean.setTypeAliasesPackage("org.apache.dolphinscheduler.dao.entity");
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+        // todo: if the different database has different sql, we need to add the different mapper.
         sqlSessionFactoryBean
                 .setMapperLocations(resolver.getResources("org/apache/dolphinscheduler/dao/mapper/*Mapper.xml"));
-        sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider());
         return sqlSessionFactoryBean.getObject();
     }
 
@@ -95,32 +99,13 @@ public class SpringConnectionFactory {
     }
 
     @Bean
-    public DatabaseIdProvider databaseIdProvider() {
-        DatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
-        Properties properties = new Properties();
-        properties.setProperty("MySQL", "mysql");
-        properties.setProperty("PostgreSQL", "pg");
-        properties.setProperty("h2", "h2");
-        databaseIdProvider.setProperties(properties);
-        return databaseIdProvider;
+    public DbType dbType() {
+        return daoPluginConfiguration.dbType();
     }
 
     @Bean
-    @Primary
-    @Profile("mysql")
-    public DbType mysql() {
-        return DbType.MYSQL;
+    public DatabaseMonitor databaseMonitor() {
+        return daoPluginConfiguration.databaseMonitor();
     }
 
-    @Bean
-    public DbType h2() {
-        return DbType.H2;
-    }
-
-    @Bean
-    @Primary
-    @Profile("postgresql")
-    public DbType postgresql() {
-        return DbType.POSTGRE_SQL;
-    }
 }
