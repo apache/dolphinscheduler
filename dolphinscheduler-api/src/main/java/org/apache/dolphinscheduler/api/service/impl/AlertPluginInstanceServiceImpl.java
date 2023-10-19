@@ -128,8 +128,6 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                     globalAlertGroup.setAlertInstanceIds(StringUtils.join(ids, ","));
                 }
                 alertGroupMapper.updateById(globalAlertGroup);
-                log.info("Add global alert plugin instance into global alert group automatically, name:{}",
-                        alertPluginInstance.getInstanceName());
             }
             result.put(Constants.DATA_LIST, alertPluginInstance);
             putMsg(result, Status.SUCCESS);
