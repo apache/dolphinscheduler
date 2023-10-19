@@ -227,10 +227,12 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
                                         @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
 
     /**
-     * process task relation by taskCode
+     * process task relation by taskCode and postTaskVersion
      *
      * @param taskCode taskCode
+     * @param postTaskVersion postTaskVersion
      * @return ProcessTaskRelation
      */
-    List<ProcessTaskRelation> queryProcessTaskRelationByTaskCode(@Param("taskCode") long taskCode);
+    List<ProcessTaskRelation> queryProcessTaskRelationByTaskCodeAndTaskVersion(@Param("taskCode") long taskCode,
+                                                                               @Param("postTaskVersion") long postTaskVersion);
 }

@@ -242,7 +242,7 @@
         where process_definition_code = #{workflowDefinitionCode} and process_definition_version = #{workflowDefinitionVersion}
     </delete>
 
-    <select id="queryProcessTaskRelationByTaskCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+    <select id="queryProcessTaskRelationByTaskCodeAndTaskVersion" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
         select
         <include refid="baseSql"/>
         from t_ds_process_task_relation
@@ -253,6 +253,7 @@
                                             t_ds_process_task_relation
                                             WHERE
                                             post_task_code = #{taskCode}
+                                            and post_task_version = #{postTaskVersion}
                                           )
     </select>
 </mapper>
