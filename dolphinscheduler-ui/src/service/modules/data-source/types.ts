@@ -40,7 +40,6 @@ type IDataBase =
   | 'DORIS'
   | 'KYUUBI'
 
-
 type IDataBaseLabel =
   | 'MYSQL'
   | 'POSTGRESQL'
