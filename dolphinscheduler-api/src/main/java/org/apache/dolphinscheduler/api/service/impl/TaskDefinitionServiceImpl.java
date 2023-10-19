@@ -760,9 +760,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskCode);
             return null;
         }
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
-                .queryProcessTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
-                        taskDefinition.getVersion());
         Date now = new Date();
         taskDefinitionToUpdate.setCode(taskCode);
         taskDefinitionToUpdate.setId(taskDefinition.getId());
@@ -788,6 +785,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
                     projectCode, taskCode, taskDefinitionToUpdate.getVersion());
         // update process task relation
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper
+                .queryProcessTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
+                        taskDefinition.getVersion());
         if (CollectionUtils.isNotEmpty(processTaskRelations)) {
             Map<Long, List<ProcessTaskRelation>> processTaskRelationGroupList = processTaskRelations.stream()
                     .collect(Collectors.groupingBy(ProcessTaskRelation::getProcessDefinitionCode));
