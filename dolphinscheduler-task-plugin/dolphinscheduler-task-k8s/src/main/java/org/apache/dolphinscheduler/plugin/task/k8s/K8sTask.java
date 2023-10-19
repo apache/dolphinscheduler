@@ -102,6 +102,11 @@ public class K8sTask extends AbstractK8sTask {
         return JSONUtils.toJsonString(k8sTaskMainParameters);
     }
 
+    @Override
+    protected void dealOutParam(String result) {
+        this.k8sTaskParameters.dealOutParam(result);
+    }
+
     public List<NodeSelectorRequirement> convertToNodeSelectorRequirements(List<NodeSelectorExpression> expressions) {
         if (CollectionUtils.isEmpty(expressions)) {
             return Collections.emptyList();
