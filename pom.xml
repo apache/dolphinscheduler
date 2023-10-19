@@ -656,11 +656,11 @@
                     <skip>${spotless.skip}</skip>
                     <java>
                         <eclipse>
-                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
+                            <file>${maven.multiModuleProjectDirectory}/style/spotless_dolphinscheduler_formatter.xml</file>
                         </eclipse>
                         <removeUnusedImports />
                         <importOrder>
-                            <file>style/eclipse.importorder</file>
+                            <file>${maven.multiModuleProjectDirectory}/style/eclipse.importorder</file>
                         </importOrder>
                         <replaceRegex>
                             <name>Remove wildcard imports</name>
