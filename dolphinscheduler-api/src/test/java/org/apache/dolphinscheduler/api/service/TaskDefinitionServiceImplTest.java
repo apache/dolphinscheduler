@@ -197,7 +197,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(processDefinitionLogMapper.insert(Mockito.any(ProcessDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
-        Mockito.when(processTaskRelationMapper.queryProcessTaskRelationByTaskCode(3))
+        Mockito.when(processTaskRelationMapper.queryProcessTaskRelationByTaskCodeAndTaskVersion(TASK_CODE, 0))
                 .thenReturn(getProcessTaskRelationList2());
         Mockito.when(processTaskRelationMapper
                 .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(1);
