@@ -85,6 +85,9 @@ public class ClasspathSqlScriptParser implements SqlScriptParser {
             if (trimLine.startsWith("delimiter")) {
                 // begin to parse processor, until delimiter ;
                 String[] split = trimLine.split(" ");
+                if (split[1].equals(";")) {
+                    continue;
+                }
                 return parseProcedure(lineNumberReader, split[1]);
             }
             // begin to parse sql until;
@@ -131,7 +134,7 @@ public class ClasspathSqlScriptParser implements SqlScriptParser {
             if (StringUtils.isBlank(line)) {
                 continue;
             }
-            if (line.startsWith(delimiter)) {
+            if (line.trim().startsWith(delimiter)) {
                 break;
             }
             sqlLines.add(line);
