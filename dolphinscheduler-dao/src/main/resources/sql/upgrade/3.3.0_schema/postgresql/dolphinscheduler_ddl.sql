@@ -14,3 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- t_ds_k8s_namespace
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "limits_cpu";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "limits_memory";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_replicas";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_request_cpu";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_request_memory";
