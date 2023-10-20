@@ -19,6 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOG_LINES;
 
+import io.fabric8.kubernetes.client.dsl.internal.OperationContext;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
+import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 
 import java.util.List;
@@ -87,6 +91,23 @@ public class K8sUtils {
                     .watch(watcher);
         } catch (Exception e) {
             throw new TaskException("fail to register batch job watcher", e);
+        }
+    }
+
+    public SharedIndexInformer createBatchJobInformer(Job job, ResourceEventHandler<Job> resourceEventHandler) {
+        try {
+
+            SharedInformerFactory sharedInformerFactory =  client
+                    .informers()
+                    .inNamespace(job.getMetadata().getNamespace())
+                    .withName(job.getMetadata().getName());
+            SharedIndexInformer<Job> jobSharedIndexInformer =  sharedInformerFactory
+                    .sharedIndexInformerFor(Job.class , 30 * 1000L);
+            jobSharedIndexInformer.addEventHandler(resourceEventHandler);
+            sharedInformerFactory.startAllRegisteredInformers();
+            return jobSharedIndexInformer;
+        } catch (Exception e) {
+            throw new TaskException("fail to register batch job informer", e);
         }
     }
 
