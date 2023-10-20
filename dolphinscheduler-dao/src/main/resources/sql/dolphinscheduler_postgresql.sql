@@ -2125,5 +2125,5 @@ CREATE TABLE t_ds_listener_event(
 );
 comment on column t_ds_listener_event.sign is 'sign=sha1(content)';
 
-create index idx_status on t_ds_listener_event (alert_status);
-create index idx_sign on t_ds_listener_event (sign);
+create index idx_listener_event_post_status on t_ds_listener_event (post_status);
+create index idx_listener_event_sign on t_ds_listener_event (sign);
