@@ -23,6 +23,7 @@ import {
   updateResourceContent,
   viewResource
 } from '@/service/modules/resources'
+import { defineStore } from 'pinia'
 
 export function useEdit(state: any) {
   const { t } = useI18n()
@@ -60,4 +61,30 @@ export function useEdit(state: any) {
     getResourceView,
     handleUpdateContent
   }
+}
+
+export const useIsDetailPageStore = defineStore("isDetailPage", {
+  state:() => {
+    return {
+      isDetailPage:false
+    }
+  },
+  getters: {
+    getIsDetailPage(): boolean {
+      return this.isDetailPage
+    }
+  },
+  actions: {
+    setIsDetailPage(isDetailPage: boolean) {
+      this.isDetailPage = isDetailPage
+    }
+  }
+})
+
+export const isEmpty = (string: any): boolean => {
+    if(string === '' || string === undefined || string === null){
+        return true
+    }else{
+        return false
+    }
 }

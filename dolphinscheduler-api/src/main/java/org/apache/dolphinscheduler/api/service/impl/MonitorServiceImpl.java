@@ -22,9 +22,8 @@ import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
-import org.apache.dolphinscheduler.dao.MonitorDBDao;
-import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -39,6 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
@@ -49,7 +49,7 @@ import com.google.common.collect.Sets;
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
 
     @Autowired
-    private MonitorDBDao monitorDBDao;
+    private DatabaseMonitor databaseMonitor;
 
     @Autowired
     private RegistryClient registryClient;
@@ -63,8 +63,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     @Override
     public Map<String, Object> queryDatabaseState(User loginUser) {
         Map<String, Object> result = new HashMap<>();
-        List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
-        result.put(Constants.DATA_LIST, monitorRecordList);
+        result.put(Constants.DATA_LIST, Lists.newArrayList(databaseMonitor.getDatabaseMetrics()));
         putMsg(result, Status.SUCCESS);
         return result;
     }
