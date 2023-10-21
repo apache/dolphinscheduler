@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,6 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -72,19 +75,19 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
             return result;
         }
 
-        if (Objects.nonNull(projectCode)) {
-            putMsg(result, Status.PROJECT_NOT_EXIST);
-            return result;
-        }
-
-        Project project = projectMapper.queryByCode(projectCode);
-        if (Objects.isNull(project)) {
+        if (Objects.isNull(projectCode)) {
             putMsg(result, Status.PROJECT_NOT_EXIST);
             return result;
         }
 
         if (CollectionUtils.isEmpty(workerGroups)) {
             putMsg(result, Status.WORKER_GROUP_NOT_EXIST);
+            return result;
+        }
+
+        Project project = projectMapper.queryByCode(projectCode);
+        if (Objects.isNull(project)) {
+            putMsg(result, Status.PROJECT_NOT_EXIST);
             return result;
         }
 
@@ -138,6 +141,21 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
             });
         }
 
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * query worker groups that assigned to the project
+     *
+     * @param projectCode project code
+     */
+    @Override
+    public Map<String, Object> queryWorkerGroupsByProject(Long projectCode) {
+        Map<String, Object> result = new HashMap<>();
+
+        List<ProjectWorkerGroup> projectWorkerGroups = projectWorkerGroupMapper.selectList(new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode));
+        result.put(Constants.DATA_LIST, projectWorkerGroups);
         putMsg(result, Status.SUCCESS);
         return result;
     }

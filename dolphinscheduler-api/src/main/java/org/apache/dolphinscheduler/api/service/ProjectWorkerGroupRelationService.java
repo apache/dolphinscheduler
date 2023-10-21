@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import java.util.List;
+import java.util.Map;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -34,5 +35,13 @@ public interface ProjectWorkerGroupRelationService {
      * @param workerGroups assigned worker group names
      */
     Result assignWorkerGroupsToProject(User loginUser, Long projectCode, List<String> workerGroups);
+
+
+    /**
+     * query worker groups that assigned to the project
+     *
+     * @param projectCode project code
+     */
+    Map<String, Object> queryWorkerGroupsByProject(Long projectCode);
 
 }

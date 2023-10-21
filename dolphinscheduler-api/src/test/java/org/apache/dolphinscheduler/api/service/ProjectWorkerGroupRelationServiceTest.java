@@ -20,11 +20,15 @@ package org.apache.dolphinscheduler.api.service;
 import com.google.common.collect.Lists;
 import com.sun.org.apache.regexp.internal.RE;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import kotlin.jvm.internal.unsafe.MonitorKt;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
@@ -66,10 +70,29 @@ public class ProjectWorkerGroupRelationServiceTest {
     public void testAssignWorkerGroupsToProject() {
         User loginUser = getAdminUser();
 
-        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(null);
+        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(null);
         Result result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, getWorkerGroups());
         Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
 
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setName("test");
+        Mockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject());
+        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(Lists.newArrayList(workerGroup));
+
+        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, getWorkerGroups());
+        Assertions.assertEquals(Status.WORKER_GROUP_NOT_EXIST.getCode(), result.getCode());
+    }
+
+    @Test
+    public void testQueryWorkerGroupsByProject() {
+
+        Mockito.when(projectWorkerGroupMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList(getProjectWorkerGroup()));
+
+        Map<String, Object> result = projectWorkerGroupRelationService.queryWorkerGroupsByProject(projectCode);
+
+        ProjectWorkerGroup[] actualValue = ((List<ProjectWorkerGroup>)result.get(Constants.DATA_LIST)).toArray(new ProjectWorkerGroup[0]);
+
+        Assertions.assertEquals(actualValue[0].getWorkerGroup(), getProjectWorkerGroup().getWorkerGroup());
     }
 
     private List<String> getWorkerGroups() {
