@@ -312,6 +312,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'HIVE/IMPALA',
     defaultPort: 10000
   },
+  KYUUBI: {
+    value: 'KYUUBI',
+    label: 'KYUUBI',
+    defaultPort: 10000
+  },
   SPARK: {
     value: 'SPARK',
     label: 'SPARK',
