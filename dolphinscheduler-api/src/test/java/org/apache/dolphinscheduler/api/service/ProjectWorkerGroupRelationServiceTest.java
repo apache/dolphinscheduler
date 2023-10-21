@@ -17,18 +17,28 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import com.google.common.collect.Lists;
+import com.sun.org.apache.regexp.internal.RE;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -54,7 +64,16 @@ public class ProjectWorkerGroupRelationServiceTest {
 
     @Test
     public void testAssignWorkerGroupsToProject() {
+        User loginUser = getAdminUser();
 
+        Mockito.when(projectMapper.queryByCode(Mockito.any())).thenReturn(null);
+        Result result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, getWorkerGroups());
+        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
+
+    }
+
+    private List<String> getWorkerGroups() {
+        return Lists.newArrayList("default");
     }
 
 
@@ -74,7 +93,7 @@ public class ProjectWorkerGroupRelationServiceTest {
         return loginUser;
     }
 
-    private Project getProject(long projectCode) {
+    private Project getProject() {
         Project project = new Project();
         project.setCode(projectCode);
         project.setId(1);
