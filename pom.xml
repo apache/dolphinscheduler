@@ -56,6 +56,7 @@
         <module>dolphinscheduler-scheduler-plugin</module>
         <module>dolphinscheduler-storage-plugin</module>
         <module>dolphinscheduler-extract</module>
+        <module>dolphinscheduler-dao-plugin</module>
     </modules>
 
     <properties>
@@ -72,6 +73,7 @@
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
@@ -94,6 +96,9 @@
         <skipDepCheck>true</skipDepCheck>
         <build.ui.skip>false</build.ui.skip>
         <spotless.skip>false</spotless.skip>
+
+        <skipUT>false</skipUT>
+        <skipIT>true</skipIT>
     </properties>
 
     <dependencyManagement>
@@ -256,6 +261,36 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-extract-alert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-plugin-all</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-h2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-mysql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-postgresql</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -559,10 +594,32 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <skip>${skipUT}</skip>
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <skip>${skipIT}</skip>
+                    <additionalClasspathElements>dolphinscheduler-dao/src/main/resources</additionalClasspathElements>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- jenkins plugin jacoco report-->
@@ -625,11 +682,11 @@
                     <skip>${spotless.skip}</skip>
                     <java>
                         <eclipse>
-                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
+                            <file>${maven.multiModuleProjectDirectory}/style/spotless_dolphinscheduler_formatter.xml</file>
                         </eclipse>
                         <removeUnusedImports />
                         <importOrder>
-                            <file>style/eclipse.importorder</file>
+                            <file>${maven.multiModuleProjectDirectory}/style/eclipse.importorder</file>
                         </importOrder>
                         <replaceRegex>
                             <name>Remove wildcard imports</name>
