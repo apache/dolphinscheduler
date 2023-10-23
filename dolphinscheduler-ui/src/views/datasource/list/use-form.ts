@@ -218,7 +218,7 @@ export function useForm(id?: number) {
         value: 'accessToken'
       }
     ],
-    redShitModeOptions: [
+    redShiftModeOptions: [
       {
         label: 'password',
         value: 'password'
@@ -310,6 +310,11 @@ export const datasourceType: IDataBaseOptionKeys = {
   HIVE: {
     value: 'HIVE',
     label: 'HIVE/IMPALA',
+    defaultPort: 10000
+  },
+  KYUUBI: {
+    value: 'KYUUBI',
+    label: 'KYUUBI',
     defaultPort: 10000
   },
   SPARK: {

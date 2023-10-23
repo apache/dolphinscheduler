@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
+import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_SS;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
-import static org.apache.dolphinscheduler.common.enums.ResUploadType.HDFS;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
@@ -144,11 +144,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                           int pid,
                                           String currentDir) {
         Result<Object> result = new Result<>();
-
-        result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
         if (FileUtils.directoryTraversal(name)) {
             log.warn("Parameter name is invalid, name:{}.", RegexUtils.escapeNRT(name));
             putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
@@ -214,11 +209,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          String currentDir) {
         Result<Object> result = new Result<>();
 
-        result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
@@ -242,7 +232,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // check resource name exists
         String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
                 : storageOperate.getResDir(tenantCode);
-        String currDirNFileName = getOnlineCreatePath(currentDir, userResRootPath) + name;
+        String currDirNFileName = !currentDir.contains(userResRootPath) ? userResRootPath + name : currentDir + name;
 
         try {
             if (checkResourceExists(currDirNFileName)) {
@@ -273,6 +263,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             ApiServerMetrics.recordApiResourceUploadSize(file.getSize());
         log.info("Upload resource file complete, resourceName:{}, fileName:{}.",
                 RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -344,11 +335,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                          MultipartFile file) {
         Result<Object> result = new Result<>();
 
-        result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
@@ -373,13 +359,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             log.error("Get file status fail, resource path: {}", resourceFullName, e);
             putMsg(result, Status.RESOURCE_NOT_EXIST);
             throw new ServiceException((String.format("Get file status fail, resource path: %s", resourceFullName)));
-        }
-
-        if (!PropertyUtils.isResourceStorageStartup()) {
-            log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.isResourceStorageStartup());
-            putMsg(result, Status.STORAGE_NOT_STARTUP);
-            return result;
         }
 
         // TODO: deal with OSS
@@ -460,6 +439,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             log.info("start  copy {} -> {}", originFullName, destHdfsFileName);
             storageOperate.copy(originFullName, destHdfsFileName, true, true);
+            putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
             log.error(MessageFormat.format(" copy {0} -> {1} fail", originFullName, destHdfsFileName), e);
             putMsg(result, Status.HDFS_COPY_FAIL);
@@ -562,7 +542,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
                 : storageOperate.getDir(type, tenantCode);
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)
-                || isMatchBaseDir(fullName, baseDir)) {
+                || (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir))) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
@@ -597,7 +577,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String defaultPath = "";
         List<StorageEntity> resourcesList = new ArrayList<>();
         String resourceStorageType =
-                PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE, ResUploadType.NONE.name());
+                PropertyUtils.getString(Constants.RESOURCE_STORAGE_TYPE, ResUploadType.LOCAL.name());
         if (isAdmin(loginUser) && StringUtils.isBlank(fullName)) {
             // list all tenants' resources to admin users in the root directory
             List<User> userList = userMapper.selectList(null);
@@ -669,6 +649,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
                 // throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
             }
+            putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
             log.error("create resource directory {} failed", fullName);
             putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
@@ -868,11 +849,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> delete(User loginUser, String fullName,
                                  String resTenantCode) throws IOException {
         Result<Object> result = new Result<>();
-
-        result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
@@ -1090,10 +1066,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> readResource(User loginUser, String fullName, String resTenantCode,
                                        int skipLineNum, int limit) {
-        Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
+        Result<Object> result = new Result<>();
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
@@ -1167,11 +1140,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                                String content, String currentDir) {
         Result<Object> result = new Result<>();
 
-        result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
@@ -1207,8 +1175,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String name = fileName.trim() + "." + nameSuffix;
 
+        String fullName = "";
         String userResRootPath = storageOperate.getResDir(tenantCode);
-        String fullName = getOnlineCreatePath(currentDir, userResRootPath) + name;
+        if (!currentDir.contains(userResRootPath)) {
+            fullName = userResRootPath + name;
+        } else {
+            fullName = currentDir + name;
+        }
 
         result = verifyResourceName(fullName, type, loginUser);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -1248,19 +1221,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID
                         : AuthorizationType.UDF_FILE;
         permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), log);
-    }
-
-    private Result<Object> checkResourceUploadStartupState() {
-        Result<Object> result = new Result<>();
-        putMsg(result, Status.SUCCESS);
-        // if resource upload startup
-        if (!PropertyUtils.isResourceStorageStartup()) {
-            log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.isResourceStorageStartup());
-            putMsg(result, Status.STORAGE_NOT_STARTUP);
-            return result;
-        }
-        return result;
     }
 
     private Result<Object> verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
@@ -1303,11 +1263,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Transactional
     public Result<Object> updateResourceContent(User loginUser, String fullName, String resTenantCode,
                                                 String content) {
-        Result<Object> result = checkResourceUploadStartupState();
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-
+        Result<Object> result = new Result<>();
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
@@ -1410,18 +1366,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     /**
      * download file
      * @return resource content
-     * @throws IOException exception
      */
     @Override
     public org.springframework.core.io.Resource downloadResource(User loginUser,
-                                                                 String fullName) throws IOException {
-        // if resource upload startup
-        if (!PropertyUtils.isResourceStorageStartup()) {
-            log.warn("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.isResourceStorageStartup());
-            throw new ServiceException("hdfs not startup");
-        }
-
+                                                                 String fullName) {
         if (fullName.endsWith("/")) {
             log.error("resource id {} is directory,can't download it", fullName);
             throw new ServiceException("can't download directory");
@@ -1690,6 +1638,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> queryResourceBaseDir(User loginUser, ResourceType type) {
         Result<Object> result = new Result<>();
+        if (storageOperate == null) {
+            putMsg(result, Status.SUCCESS);
+            result.setData(EMPTY_STRING);
+            return result;
+        }
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
@@ -1816,35 +1769,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         return true;
-    }
-
-    private boolean isLocal(String baseDir) {
-        return storageOperate.returnStorageType() == HDFS && baseDir.startsWith("file:///");
-    }
-
-    /**
-     * Check whether the full name is in the correct base directory. Local storage full path with value `file:/path/to/file`
-     * instead of of `file:///path/to/file`
-     */
-    private boolean isMatchBaseDir(String fullName,
-                                   String baseDir) {
-        if (isLocal(baseDir)) {
-            String midBaseDir = baseDir.replace("file:///", "file:/");
-            return (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, midBaseDir));
-        }
-        return (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir));
-    }
-
-    /**
-     * Get online create path. Local storage full path with value `file:/path/to/file` instead of `file:///path/to/file`
-     */
-    private String getOnlineCreatePath(String currentDir,
-                                       String userResRootPath) {
-        if (isLocal(userResRootPath)) {
-            String midUserResRootPath = userResRootPath.replace("file:///", "file:/");
-            return currentDir.contains(midUserResRootPath) ? currentDir : userResRootPath;
-        }
-        return currentDir.contains(userResRootPath) ? currentDir : userResRootPath;
     }
 
     private String getTenantCode(User user) {

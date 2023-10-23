@@ -14,25 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.utils;
 
-import java.io.StringReader;
+package org.apache.dolphinscheduler.tools.datasource.postgresql;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class ScriptRunnerTest {
+@Slf4j
+class DolphinSchedulerInitializeWithPostgresqlIT extends BaseDolphinSchedulerManagerWithPostgresqlIT {
 
     @Test
-    public void testRunScript() {
-        // connection is null
-        Exception exception = null;
-        ScriptRunner s = new ScriptRunner(null, true, true);
-        try {
-            s.runScript(new StringReader("select 1"));
-        } catch (Exception e) {
-            exception = e;
-        }
-        Assertions.assertNotNull(exception);
+    @DisplayName("Test initDolphinScheduler database in PostgreSQL")
+    void testInitializeWithPostgreSQLProfile() {
+        Assertions.assertDoesNotThrow(() -> {
+            dolphinSchedulerManager.initDolphinScheduler();
+        });
+        // todo: Assert table count
     }
 }

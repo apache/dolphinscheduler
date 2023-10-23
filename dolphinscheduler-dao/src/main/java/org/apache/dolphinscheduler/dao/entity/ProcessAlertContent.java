@@ -61,6 +61,8 @@ public class ProcessAlertContent implements Serializable {
     private CommandType processType;
     @JsonProperty("processState")
     private WorkflowExecutionStatus processState;
+    @JsonProperty("modifyBy")
+    private String modifyBy;
     @JsonProperty("recovery")
     private Flag recovery;
     @JsonProperty("runTimes")
@@ -91,6 +93,8 @@ public class ProcessAlertContent implements Serializable {
     private Date taskEndTime;
     @JsonProperty("taskHost")
     private String taskHost;
+    @JsonProperty("taskPriority")
+    private String taskPriority;
     @JsonProperty("logPath")
     private String logPath;
 
