@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
 import org.apache.dolphinscheduler.spi.params.input.number.InputNumberParam;
 import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,12 +49,62 @@ public final class FeiShuAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public List<PluginParams> params() {
-        InputParam webHookParam =
-                InputParam.newBuilder(FeiShuParamsConstants.NAME_WEB_HOOK, FeiShuParamsConstants.WEB_HOOK)
+        InputParam webHookOrAppIdParam =
+                InputParam
+                        .newBuilder(FeiShuParamsConstants.NAME_WEB_HOOK_OR_APP_ID,
+                                FeiShuParamsConstants.WEB_HOOK_OR_APP_ID)
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
+                        .setPlaceholder(AlertInputTips.WEBHOOK_OR_APP_ID.getMsg())
                         .build();
+
+        RadioParam sendType = RadioParam
+                .newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_SEND_TYPE,
+                        FeiShuParamsConstants.FEI_SHU_SEND_TYPE)
+                .addParamsOptions(new ParamsOptions(FeiShuType.CUSTOM_ROBOT.getDescp(),
+                        FeiShuType.CUSTOM_ROBOT.getDescp(), false))
+                .addParamsOptions(
+                        new ParamsOptions(FeiShuType.APPLIANCE_ROBOT.getDescp(), FeiShuType.APPLIANCE_ROBOT.getDescp(),
+                                false))
+                .setValue(FeiShuType.CUSTOM_ROBOT.getDescp())
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
+        InputParam appSecretParam =
+                InputParam.newBuilder(FeiShuParamsConstants.NAME_PERSONAL_WORK_APP_SECRET,
+                        FeiShuParamsConstants.PERSONAL_WORK_APP_SECRET)
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(false)
+                                .build())
+                        .setPlaceholder(AlertInputTips.APP_SECRET.getMsg())
+                        .build();
+        SelectParam receiveIdTypeParam = SelectParam
+                .newBuilder(FeiShuParamsConstants.NAME_RECEIVE_ID_TYPE,
+                        FeiShuParamsConstants.RECEIVE_ID_TYPE)
+                .addOptions(new ParamsOptions(FeiShuParamsConstants.OPEN_ID,
+                        FeiShuParamsConstants.OPEN_ID, false))
+                .addOptions(new ParamsOptions(FeiShuParamsConstants.USER_ID,
+                        FeiShuParamsConstants.USER_ID, false))
+                .addOptions(new ParamsOptions(FeiShuParamsConstants.UNION_ID,
+                        FeiShuParamsConstants.UNION_ID, false))
+                .addOptions(new ParamsOptions(FeiShuParamsConstants.EMAIL,
+                        FeiShuParamsConstants.EMAIL, false))
+                .addOptions(new ParamsOptions(FeiShuParamsConstants.CHAT_ID,
+                        FeiShuParamsConstants.CHAT_ID, false))
+                .setValue(FeiShuParamsConstants.OPEN_ID)
+                .addValidate(Validate.newBuilder()
+                        .setRequired(false)
+                        .build())
+                .build();
+        InputParam receiveIdParam =
+                InputParam.newBuilder(FeiShuParamsConstants.NAME_RECEIVE_ID,
+                        FeiShuParamsConstants.RECEIVE_ID)
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(false)
+                                .build())
+                        .setPlaceholder(AlertInputTips.RECEIVE_ID.getMsg())
+                        .build();
+
         RadioParam isEnableProxy =
                 RadioParam
                         .newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE,
@@ -90,7 +141,8 @@ public final class FeiShuAlertChannelFactory implements AlertChannelFactory {
                 .setType("password")
                 .build();
 
-        return Arrays.asList(webHookParam, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
+        return Arrays.asList(sendType, webHookOrAppIdParam, appSecretParam, receiveIdTypeParam, receiveIdParam,
+                isEnableProxy, proxyParam, portParam, userParam, passwordParam);
 
     }
 

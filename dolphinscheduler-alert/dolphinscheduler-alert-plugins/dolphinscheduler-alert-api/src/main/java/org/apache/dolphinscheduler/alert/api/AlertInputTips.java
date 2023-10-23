@@ -50,8 +50,8 @@ public enum AlertInputTips {
     SECRET("please input secret", "请输入secret"),
     WECHAT_MENTION_USERS("use `|` to separate userIds and `@all` to everyone", "使用`|`来分割userId或使用`@all`来提到所有人"),
     WECHAT_AGENT_ID("please input agent id or chat id", "请输入agent id或chat id"),
-    APP_ID("please input app id", "请输入app id"),
-    APP_SECRET("please input app secret", "请输入app secret"),
+    WEBHOOK_OR_APP_ID("please input webhook or app id", "请输入webhook或者app id"),
+    APP_SECRET("please input robot app secret", "请输入app secret"),
     RECEIVE_ID("please input receive id", "请输入receive id"),
     ;
 

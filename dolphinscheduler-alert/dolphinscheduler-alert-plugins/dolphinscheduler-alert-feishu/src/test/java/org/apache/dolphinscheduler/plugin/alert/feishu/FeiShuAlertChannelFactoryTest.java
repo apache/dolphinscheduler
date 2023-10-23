@@ -33,7 +33,7 @@ public class FeiShuAlertChannelFactoryTest {
         FeiShuAlertChannelFactory feiShuAlertChannelFactory = new FeiShuAlertChannelFactory();
         List<PluginParams> params = feiShuAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
-        Assertions.assertEquals(6, params.size());
+        Assertions.assertEquals(10, params.size());
     }
 
     @Test

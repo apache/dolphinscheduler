@@ -268,10 +268,10 @@ export default {
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
     IsAtAll: "{'@'}所有人",
-    appId: '应用ID',
-    appSecret: '应用密钥',
-    receiveIdType: '消息接收者id类型',
-    receiveId: '消息接收者的ID'
+    WebhookOrAppId: '自定义机器人Webhook地址/应用机器人AppId',
+    appSecret: '应用机器人-应用密钥',
+    receiveIdType: '应用机器人-消息接收者id类型',
+    receiveId: '应用机器人-消息接收者的ID'
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
