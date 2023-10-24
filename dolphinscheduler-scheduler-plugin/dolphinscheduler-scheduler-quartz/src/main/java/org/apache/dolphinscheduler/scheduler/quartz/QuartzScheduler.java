@@ -29,8 +29,7 @@ import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
 
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,7 +48,7 @@ public class QuartzScheduler implements SchedulerApi {
     @Autowired
     private Scheduler scheduler;
 
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantLock lock = new ReentrantLock();
 
     @Override
     public void start() throws SchedulerException {
@@ -85,7 +84,7 @@ public class QuartzScheduler implements SchedulerApi {
             startDate = now;
         }
 
-        lock.writeLock().lock();
+        lock.lock();
         try {
 
             JobDetail jobDetail;
@@ -143,7 +142,7 @@ public class QuartzScheduler implements SchedulerApi {
             log.error("Failed to add scheduler task, projectId: {}, scheduler: {}", projectId, schedule, e);
             throw new SchedulerException("Add schedule job failed", e);
         } finally {
-            lock.writeLock().unlock();
+            lock.unlock();
         }
     }
 
