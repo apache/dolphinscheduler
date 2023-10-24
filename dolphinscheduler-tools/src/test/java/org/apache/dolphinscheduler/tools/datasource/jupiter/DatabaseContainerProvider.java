@@ -15,23 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.tools.datasource.postgresql;
+package org.apache.dolphinscheduler.tools.datasource.jupiter;
 
-import lombok.extern.slf4j.Slf4j;
+import org.testcontainers.containers.GenericContainer;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+public interface DatabaseContainerProvider {
 
-@Slf4j
-class DolphinSchedulerInitializeWithPostgresqlIT extends BaseDolphinSchedulerManagerWithPostgresqlIT {
+    GenericContainer<?> getContainer(DolphinSchedulerDatabaseContainer dataSourceContainer);
 
-    @Test
-    @DisplayName("Test initDolphinScheduler database in PostgreSQL")
-    void testInitializeWithPostgreSQLProfile() {
-        Assertions.assertDoesNotThrow(() -> {
-            dolphinSchedulerManager.initDolphinScheduler();
-        });
-        // todo: Assert table count
-    }
+    String getType();
+
 }
