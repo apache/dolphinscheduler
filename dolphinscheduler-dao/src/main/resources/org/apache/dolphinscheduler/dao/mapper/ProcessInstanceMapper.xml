@@ -164,6 +164,12 @@
         where tenant_code = #{originTenantCode}
     </update>
 
+    <update id="updateProcessInstanceByHost">
+        update t_ds_process_instance
+        set host = #{destHost}
+        where id = #{processId}
+    </update>
+
     <update id="updateProcessInstanceByWorkerGroupName">
         update t_ds_process_instance
         set worker_group = #{destWorkerGroupName}

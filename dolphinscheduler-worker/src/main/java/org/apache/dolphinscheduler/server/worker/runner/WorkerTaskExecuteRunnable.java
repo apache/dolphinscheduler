@@ -53,8 +53,10 @@ import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.NoSuchFileException;
 import java.util.Optional;
 
@@ -164,6 +166,24 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
             }
             TaskInstanceLogHeader.printLoadTaskInstancePluginHeader();
             beforeExecute();
+
+            if (taskExecutionContext.getWorkflowInstanceHost().equals("newHost")) {
+                // determine whether the task is running
+                int runningTask = 0;
+                boolean isRunningTaskFaultTolerance = false;
+                try {
+                    isRunningTaskFaultTolerance = determineWhetherTaskIsRunning();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                if (Boolean.TRUE.equals(isRunningTaskFaultTolerance)) {
+                    runningTask++;
+                }
+                if (runningTask > 0) {
+                    workerMessageSender.sendMessage(taskExecutionContext,
+                        ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+                }
+            }
 
             TaskCallBack taskCallBack = TaskCallbackImpl.builder()
                     .workerMessageSender(workerMessageSender)
@@ -338,6 +358,105 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     public @Nullable AbstractTask getTask() {
         return task;
+    }
+
+    /**
+     * determines whether the process is running
+     *
+     * @param pid process_id
+     * @return boolean
+     */
+    public boolean isProcessRunning(String pid) throws Exception {
+
+        String processPath = pid;
+
+        // build shell commands, use ps-ef to list all processes, and use GREP filters to match the process id
+        String command = "/bin/sh -c \"ps -ef | grep " + processPath + " | grep -v grep\"";
+
+        // use the ProcessBuilder class to create a new process and set its command
+        ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", command);
+
+        // start the process
+        Process process = processBuilder.start();
+
+        // reads the output of the command and gets the standard input stream for the process
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        // reads each line in the process input stream
+        String line;
+        while ((line = reader.readLine()) != null) {
+            if (line.contains(processPath)) {
+                return true;
+            }
+        }
+        try {
+            // gets the exit code for the command.
+            int exitCode = process.waitFor();
+            // if the exit code is 0, and the output contains process id, the process exists.
+            return exitCode == 0;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * determine if the yarn task is running
+     *
+     * @param applicationId applicationId
+     * @return boolean
+     */
+    public boolean isApplicationRunning(String applicationId) throws Exception {
+
+        // build shell commands, use yarn application -status applicationId
+        String[] command = {"/bin/bash", "-c", "yarn application -status " + applicationId};
+
+        // use the ProcessBuilder class to create a new process and set its command
+        ProcessBuilder processBuilder = new ProcessBuilder(command);
+
+        // start the process
+        Process process = processBuilder.start();
+
+        // reads the output of the command and gets the standard input stream for the process
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+        String line;
+        String state = null;
+        // reads each line in the process input stream
+        while ((line = reader.readLine()) != null) {
+            // get the yarn task running status
+            if (line.contains("State")) {
+                state = line.split(":")[1].trim();
+                break;
+            }
+        }
+        try {
+            // gets the exit code for the command.
+            int exitCode = process.waitFor();
+            // if the exit code is 0, and the yarn task is running
+            if (exitCode == 0 && state.equals("RUNNING")) {
+                // process is running
+                return true;
+            } else {
+                return false;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    public boolean determineWhetherTaskIsRunning() throws Exception {
+        String pid = String.valueOf(taskExecutionContext.getProcessId());
+
+        // Yarn task is determined by parsing whether the task log contains the content of the application
+        String applicationId = taskExecutionContext.getAppIds();
+        if (applicationId == null || applicationId.isEmpty()) {
+            // not a Yarn task
+            return isProcessRunning(pid);
+        } else {
+            // is a Yarn task
+            return isApplicationRunning(applicationId);
+        }
     }
 
 }

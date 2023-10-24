@@ -58,7 +58,9 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
+import org.apache.dolphinscheduler.extract.master.IWorkerNodeService;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.UpdateMasterHostResponse;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
@@ -720,6 +722,21 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 log.warn("The workflow has already been started, current state: {}", workflowRunnableStatus);
                 return WorkflowStartStatus.DUPLICATED_SUBMITTED;
             }
+            // the task instance needs fault tolerance
+            String newMasterHost = "newHost";
+            try {
+                IWorkerNodeService IWorkerNodeService =
+                    SingletonJdkDynamicRpcClientProxyFactory
+                        .getProxyClient(workflowInstance.getHost(), IWorkerNodeService.class);
+                UpdateMasterHostResponse updateMasterHostResponse = IWorkerNodeService.changeWorkflowInstanceHost(workflowInstance.getId(), newMasterHost);
+                if (updateMasterHostResponse.isSuccess()) {
+                    workflowInstance = processService.findProcessInstanceById(workflowInstance.getId());
+                }
+            } catch (Exception e) {
+                log.error(
+                    "Failure to update master on {} and send message {}",
+                    workflowInstance.getHost(), e.getMessage());
+            }
             if (workflowRunnableStatus == WorkflowRunnableStatus.CREATED) {
                 initTaskQueue();
                 workflowRunnableStatus = WorkflowRunnableStatus.INITIALIZE_QUEUE;
@@ -825,27 +842,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             List<TaskInstance> validTaskInstanceList =
                     taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId(),
                             workflowInstance.getTestFlag());
-            // the task instance needs fault tolerance
-            if(workflowInstance.getRecovery() == Flag.YES){
-                //determine whether the task is running
-                for (int i = 0; i < validTaskInstanceList.size(); i++) {
-                    TaskInstance task = validTaskInstanceList.get(i);
-                    boolean isRunningTaskFaultTolerance = false;
-                    try {
-                        isRunningTaskFaultTolerance = determineWhetherTaskIsRunning(task);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    if(Boolean.TRUE.equals(isRunningTaskFaultTolerance)){
-                        log.warn(
-                            "Cannot recover tolerance fault task instance: {} , the task may be running and does not need to be repeated",
-                            task.getId());
-                        validTaskInstanceList.remove(task);
-                        continue;
-                    }
-                }
-            }
             for (TaskInstance task : validTaskInstanceList) {
                 try {
                     LogUtils.setWorkflowAndTaskInstanceIDMDC(task.getProcessInstanceId(), task.getId());
@@ -2270,117 +2266,5 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         workflowInstance.setVarPool(JSONUtils.toJsonString(processVarPool));
     }
 
-    /**
-     * determines whether the process is running
-     *
-     * @param pid process_id
-     * @return boolean
-     */
-    public boolean isProcessRunning(String pid) throws Exception {
 
-        String processPath = pid;
-
-        // build shell commands, use ps-ef to list all processes, and use GREP filters to match the process id
-        String command = "/bin/sh -c \"ps -ef | grep " + processPath + " | grep -v grep\"";
-
-        // use the ProcessBuilder class to create a new process and set its command
-        ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", command);
-
-        // start the process
-        Process process = processBuilder.start();
-
-        // reads the output of the command and gets the standard input stream for the process
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        // reads each line in the process input stream
-        String line;
-        while ((line = reader.readLine()) != null) {
-            if (line.contains(processPath)) {
-                return true;
-            }
-        }
-        try {
-            // gets the exit code for the command.
-            int exitCode = process.waitFor();
-            // if the exit code is 0, and the output contains process id, the process exists.
-            return exitCode == 0;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
-     * determine if the yarn task is running
-     *
-     * @param applicationId applicationId
-     * @return boolean
-     */
-    public boolean isApplicationRunning(String applicationId ) throws Exception {
-
-        // build shell commands, use yarn application -status applicationId
-        String[] command = {"/bin/bash", "-c", "yarn application -status " + applicationId};
-
-        // use the ProcessBuilder class to create a new process and set its command
-        ProcessBuilder processBuilder = new ProcessBuilder(command);
-
-        // start the process
-        Process process = processBuilder.start();
-
-        // reads the output of the command and gets the standard input stream for the process
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-        String line;
-        String state = null;
-        // reads each line in the process input stream
-        while ((line = reader.readLine()) != null) {
-            // get the yarn task running status
-            if (line.contains("State")) {
-                state = line.split(":")[1].trim();
-                break;
-            }
-        }
-        try {
-            // gets the exit code for the command.
-            int exitCode = process.waitFor();
-            // if the exit code is 0, and the yarn task is running
-            if (exitCode == 0 && state.equals("RUNNING")) {
-                // process is running
-                return true;
-            } else {
-                return false;
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-    public boolean determineWhetherTaskIsRunning(TaskInstance task) throws Exception {
-        String pidPath = null;
-        if(task.getExecutePath() != null){
-            pidPath = task.getExecutePath();
-
-        }
-        String pid = getDesiredPath(pidPath);
-
-        // Yarn task is determined by parsing whether the task log contains the content of the application
-        String applicationId  = task.getAppLink();
-        if(applicationId == null || applicationId.isEmpty() ){
-            // not a Yarn task
-            return isProcessRunning(pid);
-        }else {
-            // is a Yarn task
-            return isApplicationRunning(applicationId);
-        }
-    }
-
-    public String getDesiredPath(String filePath) {
-        String desiredPath = filePath;
-        for (int i = 0; i < 2; i++) {
-            int endIndex = desiredPath.lastIndexOf("/");
-            desiredPath = filePath.substring(0, endIndex);
-
-        }
-        return desiredPath;
-    }
 }

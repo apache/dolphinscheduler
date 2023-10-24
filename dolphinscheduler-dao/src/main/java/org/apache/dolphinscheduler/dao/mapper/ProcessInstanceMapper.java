@@ -149,6 +149,16 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                           @Param("destTenantCode") String destTenantCode);
 
     /**
+     * update process instance host
+     *
+     * @param processId processId
+     * @param destHost   destHost
+     * @return update result
+     */
+    int updateProcessInstanceByHost(@Param("processId") Integer processId,
+                                    @Param("destHost") String destHost);
+
+    /**
      * update process instance by worker groupId
      *
      * @param originWorkerGroupName originWorkerGroupName
