@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.upgrade;
+package org.apache.dolphinscheduler.tools.datasource.dao;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
@@ -28,6 +28,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Slf4j
 public class JsonSplitDao {
 
