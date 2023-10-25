@@ -15,34 +15,43 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.tools.datasource.mysql;
+package org.apache.dolphinscheduler.tools.datasource.postgresql.v11;
 
 import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
+import org.apache.dolphinscheduler.tools.datasource.DolphinSchedulerManager;
+import org.apache.dolphinscheduler.tools.datasource.jupiter.DolphinSchedulerDatabaseContainer;
+import org.apache.dolphinscheduler.tools.datasource.postgresql.DolphinSchedulerPostgresqlProfile;
 
-import java.io.IOException;
-import java.sql.SQLException;
+import javax.sql.DataSource;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
-class DolphinSchedulerDatabaseUpgradeWithMysqlIT extends BaseDolphinSchedulerDatabaseWithMysqlIT {
+@DolphinSchedulerPostgresqlProfile
+@DolphinSchedulerDatabaseContainer(imageName = "postgres:11.1")
+class UpgradeWithPostgresqlIT {
+
+    @Autowired
+    private DolphinSchedulerManager dolphinSchedulerManager;
+    @Autowired
+    private DataSource dataSource;
 
     @Test
-    @DisplayName("Test Upgrade DolphinScheduler database in MySQL")
-    void testUpgradeWithMysqlProfile() throws SQLException, IOException {
-
+    @SneakyThrows
+    @DisplayName("Test Upgrade DolphinScheduler database in PostgreSQL")
+    void testUpgradeWithPostgreSQLProfile() {
         // initialize the 3.0.0 schema
-        SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, "3.0.0_schema/mysql_3.0.0.sql");
+        SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, "3.0.0_schema/postgresql_3.0.0.sql");
         sqlScriptRunner.execute();
         log.info("Initialize the 3.0.0 schema successfully.");
 
         Assertions.assertDoesNotThrow(() -> dolphinSchedulerManager.upgradeDolphinScheduler());
         // todo: Assert table count
-
     }
-
 }

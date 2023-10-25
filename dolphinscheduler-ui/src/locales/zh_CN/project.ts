@@ -633,6 +633,7 @@ export default {
     hour: '时',
     add_dependency: '添加依赖',
     waiting_dependent_start: '等待依赖启动',
+    dependent_task_parameter_passing: '参数传递',
     check_interval: '检查间隔',
     check_interval_tips: '检查间隔必须为正整数',
     waiting_dependent_complete: '等待依赖完成',
