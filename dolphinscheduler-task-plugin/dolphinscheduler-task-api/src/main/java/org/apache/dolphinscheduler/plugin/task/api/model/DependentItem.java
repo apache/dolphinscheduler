@@ -35,6 +35,7 @@ public class DependentItem {
     private String dateValue;
     private DependResult dependResult;
     private TaskExecutionStatus status;
+    private Boolean parameterPassing;
 
     public String getKey() {
         return String.format("%d-%d-%s-%s",
