@@ -357,6 +357,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 selectOptions.value[i] = options
                 item.depTaskCode = null
                 item.definitionCode = null
+                item.parameterPassing = false
               }
             },
             options: projectList,
@@ -474,6 +475,13 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 }
               }
             }
+          }),
+          (j = 0) => ({
+            type: 'switch',
+            field: 'parameterPassing',
+            span: 20,
+            name: t('project.node.dependent_task_parameter_passing'),
+            path: `dependTaskList.${i}.dependItemList.${j}.parameterPassing`
           }),
           (j = 0) => ({
             type: 'custom',

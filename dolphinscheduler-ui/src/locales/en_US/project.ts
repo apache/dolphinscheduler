@@ -644,6 +644,7 @@ export default {
     hour: 'hour',
     add_dependency: 'Add dependency',
     waiting_dependent_start: 'Waiting Dependent start',
+    dependent_task_parameter_passing: 'Parameter Passing',
     check_interval: 'Check interval',
     check_interval_tips: 'Check interval must be a positive integer',
     waiting_dependent_complete: 'Waiting Dependent complete',

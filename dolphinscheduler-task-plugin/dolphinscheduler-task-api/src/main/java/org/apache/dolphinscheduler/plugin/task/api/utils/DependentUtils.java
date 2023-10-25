@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class DependentUtils {
 
@@ -149,6 +151,32 @@ public class DependentUtils {
                 break;
         }
         return result;
+    }
+
+    /**
+     * add varPool from dependItemVarPoolMap to dependTaskVarPoolMap
+     *
+     * @param dependItemVarPoolPropertyMap dependItemVarPoolPropertyMap
+     * @param dependItemVarPoolEndTimeMap dependItemVarPoolEndTimeMap
+     * @param dependTaskVarPoolPropertyMap dependTaskVarPoolPropertyMap
+     * @param dependTaskVarPoolEndTimeMap dependTaskVarPoolEndTimeMap
+     */
+    public static void addTaskVarPool(Map<String, Property> dependItemVarPoolPropertyMap,
+                                      Map<String, Long> dependItemVarPoolEndTimeMap,
+                                      Map<String, Property> dependTaskVarPoolPropertyMap,
+                                      Map<String, Long> dependTaskVarPoolEndTimeMap) {
+        dependItemVarPoolPropertyMap.forEach((prop, property) -> {
+            Long itemEndTime = dependItemVarPoolEndTimeMap.get(prop);
+            if (dependTaskVarPoolPropertyMap.containsKey(prop)) {
+                if (itemEndTime < dependTaskVarPoolEndTimeMap.get(prop)) {
+                    dependTaskVarPoolPropertyMap.put(prop, property);
+                    dependTaskVarPoolEndTimeMap.put(prop, itemEndTime);
+                }
+            } else {
+                dependTaskVarPoolPropertyMap.put(prop, property);
+                dependTaskVarPoolEndTimeMap.put(prop, itemEndTime);
+            }
+        });
     }
 
 }
