@@ -15,9 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.tools.datasource.postgresql;
+package org.apache.dolphinscheduler.tools.datasource.postgresql.v16;
 
 import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
+import org.apache.dolphinscheduler.tools.datasource.DolphinSchedulerManager;
+import org.apache.dolphinscheduler.tools.datasource.jupiter.DolphinSchedulerDatabaseContainer;
+import org.apache.dolphinscheduler.tools.datasource.postgresql.DolphinSchedulerPostgresqlProfile;
+
+import javax.sql.DataSource;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +30,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
-class DolphinSchedulerDatabaseUpgradeWithPostgresqlIT extends BaseDolphinSchedulerManagerWithPostgresqlIT {
+@DolphinSchedulerPostgresqlProfile
+@DolphinSchedulerDatabaseContainer(imageName = "postgres:16.0")
+class UpgradeWithPostgresql16IT {
+
+    @Autowired
+    private DolphinSchedulerManager dolphinSchedulerManager;
+    @Autowired
+    private DataSource dataSource;
 
     @Test
     @SneakyThrows

@@ -15,16 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.tools.datasource;
+package org.apache.dolphinscheduler.tools.datasource.postgresql;
 
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.tools.datasource.UpgradeDolphinScheduler;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 import org.springframework.boot.test.context.SpringBootTest;
-import org.testcontainers.containers.Network;
-
+import org.springframework.test.context.ActiveProfiles;
+@Inherited
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@ActiveProfiles("postgresql")
 @SpringBootTest(classes = {UpgradeDolphinScheduler.class, DaoConfiguration.class})
-public abstract class BaseDolphinSchedulerManagerIT {
-
-    protected static final Network NETWORK = Network.newNetwork();
+public @interface DolphinSchedulerPostgresqlProfile {
 
 }
