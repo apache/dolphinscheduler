@@ -231,7 +231,8 @@
     <update id="updateProcessTaskRelationTaskVersion">
         update t_ds_process_task_relation
         set pre_task_version=#{processTaskRelation.preTaskVersion},
-            post_task_version=#{processTaskRelation.postTaskVersion}
+            post_task_version=#{processTaskRelation.postTaskVersion},
+            process_definition_version=#{processTaskRelation.processDefinitionVersion}
         where id = #{processTaskRelation.id}
     </update>
 
@@ -240,4 +241,19 @@
         from t_ds_process_task_relation
         where process_definition_code = #{workflowDefinitionCode} and process_definition_version = #{workflowDefinitionVersion}
     </delete>
+
+    <select id="queryProcessTaskRelationByTaskCodeAndTaskVersion" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation
+        WHERE process_definition_code in (
+                                            SELECT
+                                            process_definition_code
+                                            FROM
+                                            t_ds_process_task_relation
+                                            WHERE
+                                            post_task_code = #{taskCode}
+                                            and post_task_version = #{postTaskVersion}
+                                          )
+    </select>
 </mapper>
