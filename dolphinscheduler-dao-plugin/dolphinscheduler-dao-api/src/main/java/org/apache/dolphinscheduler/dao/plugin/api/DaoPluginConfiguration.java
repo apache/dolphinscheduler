@@ -20,6 +20,7 @@
 
 package org.apache.dolphinscheduler.dao.plugin.api;
 
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 
 import com.baomidou.mybatisplus.annotation.DbType;
@@ -32,5 +33,7 @@ public interface DaoPluginConfiguration {
     DbType dbType();
 
     DatabaseMonitor databaseMonitor();
+
+    DatabaseDialect databaseDialect();
 
 }

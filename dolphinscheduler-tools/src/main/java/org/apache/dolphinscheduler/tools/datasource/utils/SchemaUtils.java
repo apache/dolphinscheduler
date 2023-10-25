@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.upgrade;
+package org.apache.dolphinscheduler.tools.datasource.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 

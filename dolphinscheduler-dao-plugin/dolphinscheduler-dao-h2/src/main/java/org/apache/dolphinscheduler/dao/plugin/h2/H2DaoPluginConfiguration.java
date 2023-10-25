@@ -21,7 +21,9 @@
 package org.apache.dolphinscheduler.dao.plugin.h2;
 
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
+import org.apache.dolphinscheduler.dao.plugin.h2.dialect.H2Dialect;
 import org.apache.dolphinscheduler.dao.plugin.h2.monitor.H2Monitor;
 
 import javax.sql.DataSource;
@@ -47,6 +49,11 @@ public class H2DaoPluginConfiguration implements DaoPluginConfiguration {
     @Override
     public DatabaseMonitor databaseMonitor() {
         return new H2Monitor(dataSource);
+    }
+
+    @Override
+    public DatabaseDialect databaseDialect() {
+        return new H2Dialect();
     }
 
 }

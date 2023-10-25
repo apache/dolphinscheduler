@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.upgrade;
+package org.apache.dolphinscheduler.tools.datasource.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,6 +26,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Deprecated
 @Slf4j
 public class ScheduleDao {
 

@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.tools.datasource.dao;
+package org.apache.dolphinscheduler.tools.datasource.upgrader;
 
 import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
-import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
+import org.apache.dolphinscheduler.tools.datasource.dao.ResourceDao;
+import org.apache.dolphinscheduler.tools.datasource.utils.SchemaUtils;
 
 import java.io.FileNotFoundException;
 import java.sql.Connection;
@@ -31,34 +32,33 @@ import javax.sql.DataSource;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.annotation.DbType;
+
 @Slf4j
-public abstract class UpgradeDao {
+@Service
+public class UpgradeDao {
 
     private static final String T_VERSION_NAME = "t_escheduler_version";
     private static final String T_NEW_VERSION_NAME = "t_ds_version";
 
-    protected final DataSource dataSource;
+    @Autowired
+    private DataSource dataSource;
 
-    protected UpgradeDao(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    @Autowired
+    private DbType dbType;
 
-    protected abstract String initSqlPath();
-
-    public abstract DbType getDbType();
-
-    public void initSchema() {
-        // Execute the dolphinscheduler full sql
-        runInitSql(getDbType());
-    }
+    @Autowired
+    private DatabaseDialect databaseDialect;
 
     /**
      * run init sql to init db schema
-     *
-     * @param dbType db type
      */
-    private void runInitSql(DbType dbType) {
-        String sqlFilePath = String.format("sql/dolphinscheduler_%s.sql", dbType.getDescp());
+    public void initSchema() {
+        // Execute the dolphinscheduler full sql
+        String sqlFilePath = String.format("sql/dolphinscheduler_%s.sql", dbType.getDb());
         SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, sqlFilePath);
         try {
             sqlScriptRunner.execute();
@@ -67,10 +67,6 @@ public abstract class UpgradeDao {
             throw new RuntimeException("Execute initialize sql file: " + sqlFilePath + " error", ex);
         }
     }
-
-    public abstract boolean isExistsTable(String tableName);
-
-    public abstract boolean isExistsColumn(String tableName, String columnName);
 
     public String getCurrentVersion(String versionName) {
         String sql = String.format("select version from %s", versionName);
@@ -112,17 +108,17 @@ public abstract class UpgradeDao {
     private void upgradeDolphinSchedulerDML(String schemaDir, String scriptFile) {
         String schemaVersion = schemaDir.split("_")[0];
         String sqlFilePath =
-                String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile);
+                String.format("sql/upgrade/%s/%s/%s", schemaDir, dbType.getDb(), scriptFile);
         try {
             // Execute the upgraded dolphinscheduler dml
             SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, sqlFilePath);
             sqlScriptRunner.execute();
             try (Connection connection = dataSource.getConnection()) {
                 String upgradeSQL;
-                if (isExistsTable(T_VERSION_NAME)) {
+                if (databaseDialect.tableExists(T_VERSION_NAME)) {
                     // Change version in the version table to the new version
                     upgradeSQL = String.format("update %s set version = ?", T_VERSION_NAME);
-                } else if (isExistsTable(T_NEW_VERSION_NAME)) {
+                } else if (databaseDialect.tableExists(T_NEW_VERSION_NAME)) {
                     // Change version in the version table to the new version
                     upgradeSQL = String.format("update %s set version = ?", T_NEW_VERSION_NAME);
                 } else {
@@ -151,7 +147,7 @@ public abstract class UpgradeDao {
      */
     public void upgradeDolphinSchedulerDDL(String schemaDir, String scriptFile) {
         String sqlFilePath =
-                String.format("sql/upgrade/%s/%s/%s", schemaDir, getDbType().name().toLowerCase(), scriptFile);
+                String.format("sql/upgrade/%s/%s/%s", schemaDir, dbType.getDb(), scriptFile);
         SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, sqlFilePath);
         try {
             // Execute the dolphinscheduler ddl.sql for the upgrade
