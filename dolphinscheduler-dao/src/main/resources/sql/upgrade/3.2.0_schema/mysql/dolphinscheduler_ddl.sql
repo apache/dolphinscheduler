@@ -91,8 +91,8 @@ BEGIN
 ALTER TABLE t_ds_process_instance ADD COLUMN `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId';
 END IF;
 END;
- d//
- delimiter ;
+d//
+delimiter ;
 CALL t_ds_process_instance_add_column;
 DROP PROCEDURE t_ds_process_instance_add_column;
 
@@ -445,9 +445,7 @@ BEGIN
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='task_name')
    THEN
-       ALTER TABLE `t_ds_fav_task` MODIFY COLUMN `id` bigint NOT NULL AUTO_INCREMENT;
        ALTER TABLE `t_ds_fav_task` DROP COLUMN `task_name`;
-       ALTER TABLE `t_ds_fav_task` ADD COLUMN `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name';
    END IF;
 END;
 d//
