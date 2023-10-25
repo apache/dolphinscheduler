@@ -47,8 +47,6 @@ public class QuartzScheduler implements SchedulerApi {
     @Autowired
     private Scheduler scheduler;
 
-    private final ReentrantLock lock = new ReentrantLock();
-
     @Override
     public void start() throws SchedulerException {
         try {
