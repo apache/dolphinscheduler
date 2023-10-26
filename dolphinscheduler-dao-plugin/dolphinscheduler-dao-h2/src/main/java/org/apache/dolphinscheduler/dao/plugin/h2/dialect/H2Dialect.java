@@ -15,34 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.dao.plugin.h2.dialect;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 
-import lombok.Data;
+public class H2Dialect implements DatabaseDialect {
 
-/**
- * dependent item
- */
-@Data
-public class DependentItem {
-
-    private long projectCode;
-    private long definitionCode;
-    private long depTaskCode;
-    private String cycle;
-    private String dateValue;
-    private DependResult dependResult;
-    private TaskExecutionStatus status;
-    private Boolean parameterPassing;
-
-    public String getKey() {
-        return String.format("%d-%d-%s-%s",
-                getDefinitionCode(),
-                getDepTaskCode(),
-                getCycle(),
-                getDateValue());
+    @Override
+    public boolean tableExists(String tableName) {
+        throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean columnExists(String tableName, String columnName) {
+        throw new UnsupportedOperationException();
+    }
 }

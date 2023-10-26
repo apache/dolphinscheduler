@@ -15,34 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.dao.plugin.api.dialect;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+public interface DatabaseDialect {
 
-import lombok.Data;
+    boolean tableExists(String tableName);
 
-/**
- * dependent item
- */
-@Data
-public class DependentItem {
-
-    private long projectCode;
-    private long definitionCode;
-    private long depTaskCode;
-    private String cycle;
-    private String dateValue;
-    private DependResult dependResult;
-    private TaskExecutionStatus status;
-    private Boolean parameterPassing;
-
-    public String getKey() {
-        return String.format("%d-%d-%s-%s",
-                getDefinitionCode(),
-                getDepTaskCode(),
-                getCycle(),
-                getDateValue());
-    }
+    boolean columnExists(String tableName, String columnName);
 
 }

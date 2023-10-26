@@ -13,36 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.plugin.task.api.model;
-
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
-import lombok.Data;
-
-/**
- * dependent item
- */
-@Data
-public class DependentItem {
-
-    private long projectCode;
-    private long definitionCode;
-    private long depTaskCode;
-    private String cycle;
-    private String dateValue;
-    private DependResult dependResult;
-    private TaskExecutionStatus status;
-    private Boolean parameterPassing;
-
-    public String getKey() {
-        return String.format("%d-%d-%s-%s",
-                getDefinitionCode(),
-                getDepTaskCode(),
-                getCycle(),
-                getDateValue());
-    }
-
-}
+*/

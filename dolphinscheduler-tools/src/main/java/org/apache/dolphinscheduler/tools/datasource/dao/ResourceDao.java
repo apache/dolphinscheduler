@@ -34,6 +34,7 @@ import com.google.common.base.Strings;
 /**
  * resource dao
  */
+@Deprecated
 @Slf4j
 public class ResourceDao {
 
