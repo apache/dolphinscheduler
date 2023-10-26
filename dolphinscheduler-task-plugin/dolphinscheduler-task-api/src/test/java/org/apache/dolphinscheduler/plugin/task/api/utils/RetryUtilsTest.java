@@ -37,7 +37,6 @@ public class RetryUtilsTest {
             Assertions.fail();
         });
 
-
         long startTime = System.currentTimeMillis();
         Assertions.assertThrows(RuntimeException.class, () -> RetryUtils.retryFunction((Supplier<Boolean>) () -> {
             throw new RuntimeException("Test failed function");
