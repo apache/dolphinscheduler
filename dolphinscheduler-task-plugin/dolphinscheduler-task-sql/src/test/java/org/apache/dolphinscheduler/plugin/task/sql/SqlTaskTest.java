@@ -138,4 +138,8 @@ class SqlTaskTest {
         sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
         Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
     }
+
+    @Test
+    void splitSql() {
+    }
 }
