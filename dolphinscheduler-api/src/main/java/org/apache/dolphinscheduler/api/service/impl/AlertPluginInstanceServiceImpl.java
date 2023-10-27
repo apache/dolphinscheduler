@@ -80,6 +80,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Autowired
     private AlertGroupMapper alertGroupMapper;
 
+    private final Integer GLOBAL_ALERT_GROUP_ID = 2;
+
     /**
      * creat alert plugin instance
      *
@@ -117,7 +119,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             log.info("Create alert plugin instance complete, name:{}", alertPluginInstance.getInstanceName());
             // global instance will be added into global alert group automatically
             if (instanceType == AlertPluginInstanceType.GLOBAL) {
-                AlertGroup globalAlertGroup = alertGroupMapper.selectById(2);
+                AlertGroup globalAlertGroup = alertGroupMapper.selectById(GLOBAL_ALERT_GROUP_ID);
                 if (StringUtils.isEmpty(globalAlertGroup.getAlertInstanceIds())) {
                     globalAlertGroup.setAlertInstanceIds(String.valueOf(alertPluginInstance.getId()));
                 } else {
@@ -187,7 +189,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(id);
         if (alertPluginInstance.getInstanceType() == AlertPluginInstanceType.GLOBAL) {
             // global instance will be removed from global alert group automatically
-            AlertGroup globalAlertGroup = alertGroupMapper.selectById(2);
+            AlertGroup globalAlertGroup = alertGroupMapper.selectById(GLOBAL_ALERT_GROUP_ID);
             List<Integer> ids = Arrays.stream(globalAlertGroup.getAlertInstanceIds().split(","))
                     .map(s -> Integer.parseInt(s.trim()))
                     .collect(Collectors.toList());
