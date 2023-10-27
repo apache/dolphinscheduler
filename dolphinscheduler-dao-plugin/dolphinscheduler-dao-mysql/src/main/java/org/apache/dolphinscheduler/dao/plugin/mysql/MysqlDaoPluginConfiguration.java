@@ -20,7 +20,9 @@
 package org.apache.dolphinscheduler.dao.plugin.mysql;
 
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
+import org.apache.dolphinscheduler.dao.plugin.mysql.dialect.MysqlDialect;
 import org.apache.dolphinscheduler.dao.plugin.mysql.monitor.MysqlMonitor;
 
 import javax.sql.DataSource;
@@ -46,5 +48,10 @@ public class MysqlDaoPluginConfiguration implements DaoPluginConfiguration {
     @Override
     public DatabaseMonitor databaseMonitor() {
         return new MysqlMonitor(dataSource);
+    }
+
+    @Override
+    public DatabaseDialect databaseDialect() {
+        return new MysqlDialect(dataSource);
     }
 }
