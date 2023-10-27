@@ -1089,7 +1089,7 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `instance_name` varchar(255) DEFAULT NULL COMMENT 'alert instance name',
   `instance_type` int NOT NULL default '0',
-  `warning_type` int,
+  `warning_type` int NOT NULL default  '3',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
@@ -2126,9 +2126,9 @@ DROP TABLE IF EXISTS `t_ds_listener_event`;
 CREATE TABLE `t_ds_listener_event` (
    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
    `content` text COMMENT 'listener event json content',
-   `sign` char(40) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
-   `post_status` tinyint(4) DEFAULT '0' COMMENT '0:wait running,1:success,2:failed,3:partial success',
-   `event_type` int(11)  COMMENT 'listener event type',
+   `sign` char(64 NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
+   `post_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:wait running,1:success,2:failed,3:partial success',
+   `event_type` int(11)  NOT NULL COMMENT 'listener event type',
    `log` text COMMENT 'log',
    `create_time` datetime DEFAULT NULL COMMENT 'create time',
    `update_time` datetime DEFAULT NULL COMMENT 'update time',

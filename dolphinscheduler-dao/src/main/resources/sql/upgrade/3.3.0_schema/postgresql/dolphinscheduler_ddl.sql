@@ -15,9 +15,9 @@
  * limitations under the License.
 */
 -- Modify "t_ds_alert_plugin_instance" table
-ALTER TABLE "t_ds_alert_plugin_instance" ADD COLUMN "instance_type" integer NOT NULL DEFAULT 0, ADD COLUMN "warning_type" integer NULL;
+ALTER TABLE "t_ds_alert_plugin_instance" ADD COLUMN "instance_type" integer NOT NULL DEFAULT 0, ADD COLUMN "warning_type" integer NOT NULL DEFAULT 3;
 -- Create "t_ds_listener_event" table
-CREATE TABLE "t_ds_listener_event" ("id" integer NOT NULL, "content" text NULL, "sign" character varying(40) NOT NULL DEFAULT '', "post_status" integer NULL DEFAULT 0, "event_type" integer NULL, "log" text NULL, "create_time" timestamp NULL, "update_time" timestamp NULL, PRIMARY KEY ("id"));
+CREATE TABLE "t_ds_listener_event" ("id" integer NOT NULL, "content" text NULL, "sign" character varying(64) NOT NULL DEFAULT '', "post_status" integer NOT NULL DEFAULT 0, "event_type" integer NOT NULL, "log" text NULL, "create_time" timestamp NULL, "update_time" timestamp NULL, PRIMARY KEY ("id"));
 -- Create index "idx_listener_event_post_status" to table: "t_ds_listener_event"
 CREATE INDEX "idx_listener_event_post_status" ON "t_ds_listener_event" ("post_status");
 -- Create index "idx_listener_event_sign" to table: "t_ds_listener_event"

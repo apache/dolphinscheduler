@@ -58,7 +58,7 @@ public enum ListenerEventType {
     public static ListenerEventType of(int code) {
         ListenerEventType listenerEventType = CODE_MAP.get(code);
         if (listenerEventType == null) {
-            throw new IllegalArgumentException(String.format("The task execution status code: %s is invalidated",
+            throw new IllegalArgumentException(String.format("The task execution status code: %s is invalid",
                     code));
         }
         return listenerEventType;

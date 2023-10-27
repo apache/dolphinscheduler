@@ -1102,7 +1102,7 @@ CREATE TABLE t_ds_alert_plugin_instance
     update_time            timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     instance_name          varchar(200) DEFAULT NULL,
     instance_type          int NOT NULL default '0',
-    warning_type           int,
+    warning_type           int NOT NULL default '3',
     PRIMARY KEY (id)
 );
 
@@ -2156,8 +2156,8 @@ CREATE TABLE t_ds_listener_event
 (
     id          int      NOT NULL AUTO_INCREMENT,
     content     text,
-    sign        char(40) NOT NULL DEFAULT '',
-    post_status tinyint(4) DEFAULT '0',
+    sign        char(64) NOT NULL DEFAULT '',
+    post_status tinyint(4) NOT NULL DEFAULT '0',
     event_type  int(11),
     log         text,
     create_time datetime          DEFAULT NULL,

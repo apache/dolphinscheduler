@@ -64,14 +64,15 @@ import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public final class ListenerEventPostService extends BaseDaemonThread implements AutoCloseable {
 
-    private static final int QUERY_ALERT_THRESHOLD = 100;
-
+    @Value("${alert.query_alert_threshold:100}")
+    private Integer QUERY_ALERT_THRESHOLD;
     @Autowired
     private ListenerEventMapper listenerEventMapper;
     @Autowired
@@ -88,12 +89,13 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
     @Override
     public void run() {
         log.info("listener event post thread started");
+        log.error("______________________________________{}________________", QUERY_ALERT_THRESHOLD);
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 List<ListenerEvent> listenerEvents = listenerEventMapper
                         .listingListenerEventByStatus(AlertStatus.WAIT_EXECUTION, QUERY_ALERT_THRESHOLD);
                 if (CollectionUtils.isEmpty(listenerEvents)) {
-                    log.debug("There is not waiting listener events");
+                    log.debug("There is no waiting listener events");
                     continue;
                 }
                 this.send(listenerEvents);
@@ -119,9 +121,9 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
             }
             AbstractListenerEvent event = generateEventFromContent(listenerEvent);
             if (event == null) {
-                log.error("parse listener event to abstract listener event fail. {}", listenerEvent.getContent());
+                log.error("parse listener event to abstract listener event fail.ed {}", listenerEvent.getContent());
                 listenerEventMapper.updateListenerEvent(eventId, AlertStatus.EXECUTION_FAILURE,
-                        "parse listener event to abstract listener event fail", new Date());
+                        "parse listener event to abstract listener event failed", new Date());
                 continue;
             }
             List<AbstractListenerEvent> events = Lists.newArrayList(event);

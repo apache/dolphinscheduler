@@ -267,7 +267,7 @@ public class ListenerEventAlertManager {
     }
 
     private String generateSign(String content) {
-        return DigestUtils.sha1Hex(content).toLowerCase();
+        return DigestUtils.sha256Hex(content).toLowerCase();
     }
 
     private boolean needSendGlobalListenerEvent() {

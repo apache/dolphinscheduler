@@ -1074,7 +1074,7 @@ CREATE TABLE t_ds_alert_plugin_instance (
 	update_time timestamp NULL,
 	instance_name varchar(255) NULL,
 	instance_type int NOT NULL default '0',
-	warning_type int,
+	warning_type int NOT NULL default '3',
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
@@ -2115,9 +2115,9 @@ DROP TABLE IF EXISTS t_ds_listener_event;
 CREATE TABLE t_ds_listener_event(
     id          int         NOT NULL,
     content     text,
-    sign        varchar(40) NOT NULL DEFAULT '',
-    post_status int                  DEFAULT '0',
-    event_type  int,
+    sign        varchar(64) NOT NULL DEFAULT '',
+    post_status int         NOT NULL DEFAULT '0',
+    event_type  int         NOT NULL,
     log         text,
     create_time timestamp            DEFAULT NULL,
     update_time timestamp            DEFAULT NULL,

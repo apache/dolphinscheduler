@@ -18,15 +18,15 @@
 ALTER TABLE `t_ds_alertgroup` AUTO_INCREMENT 3;
 -- Modify "t_ds_alert_plugin_instance" table
 ALTER TABLE `t_ds_alert_plugin_instance`
-    ADD COLUMN `instance_type` int NOT NULL DEFAULT 0, ADD COLUMN `warning_type` int NULL;
+    ADD COLUMN `instance_type` int NOT NULL DEFAULT 0, ADD COLUMN `warning_type` int NOT NULL DEFAULT 3;
 -- Create "t_ds_listener_event" table
 CREATE TABLE `t_ds_listener_event`
 (
     `id`          int      NOT NULL AUTO_INCREMENT COMMENT "key",
     `content`     text NULL COMMENT "listener event json content",
-    `sign`        char(40) NOT NULL DEFAULT "" COMMENT "sign=sha1(content)",
-    `post_status` tinyint NULL DEFAULT 0 COMMENT "0:wait running,1:success,2:failed,3:partial success",
-    `event_type`  int NULL COMMENT "listener event type",
+    `sign`        char(64) NOT NULL DEFAULT "" COMMENT "sign=sha1(content)",
+    `post_status` tinyint NOT NULL DEFAULT 0 COMMENT "0:wait running,1:success,2:failed,3:partial success",
+    `event_type`  int NOT NULL COMMENT "listener event type",
     `log`         text NULL COMMENT "log",
     `create_time` datetime NULL COMMENT "create time",
     `update_time` datetime NULL COMMENT "update time",
