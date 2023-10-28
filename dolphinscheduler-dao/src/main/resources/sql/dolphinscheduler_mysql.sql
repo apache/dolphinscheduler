@@ -2126,7 +2126,7 @@ DROP TABLE IF EXISTS `t_ds_listener_event`;
 CREATE TABLE `t_ds_listener_event` (
    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
    `content` text COMMENT 'listener event json content',
-   `sign` char(64 NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
+   `sign` char(64) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
    `post_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:wait running,1:success,2:failed,3:partial success',
    `event_type` int(11)  NOT NULL COMMENT 'listener event type',
    `log` text COMMENT 'log',
