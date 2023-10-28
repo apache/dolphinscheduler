@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.tools.datasource.upgrader.v130;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.upgrade.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.upgrade.WorkerGroupDao;
+import org.apache.dolphinscheduler.tools.datasource.dao.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.tools.datasource.dao.WorkerGroupDao;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerVersion;
 
