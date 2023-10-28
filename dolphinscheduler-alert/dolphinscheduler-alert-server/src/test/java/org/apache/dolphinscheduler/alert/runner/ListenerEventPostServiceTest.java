@@ -74,7 +74,47 @@ public class ListenerEventPostServiceTest {
     }
 
     @Test
-    public void testRun() {
+    public void testSendServerDownEventSuccess() {
+        List<ListenerEvent> events = new ArrayList<>();
+        ServerDownListenerEvent serverDownListenerEvent = new ServerDownListenerEvent();
+        serverDownListenerEvent.setEventTime(new Date());
+        serverDownListenerEvent.setType("WORKER");
+        serverDownListenerEvent.setHost("192.168.*.*");
+        ListenerEvent successEvent = new ListenerEvent();
+        successEvent.setId(1);
+        successEvent.setPostStatus(AlertStatus.WAIT_EXECUTION);
+        successEvent.setContent(JSONUtils.toJsonString(serverDownListenerEvent));
+        successEvent.setSign(DigestUtils.sha256Hex(successEvent.getContent()));
+        successEvent.setEventType(ListenerEventType.SERVER_DOWN);
+        successEvent.setCreateTime(new Date());
+        successEvent.setUpdateTime(new Date());
+        events.add(successEvent);
+
+        int pluginDefineId = 1;
+        String pluginInstanceParams =
+                "{\"User\":\"xx\",\"receivers\":\"xx\",\"sender\":\"xx\",\"smtpSslTrust\":\"*\",\"enableSmtpAuth\":\"true\",\"receiverCcs\":null,\"showType\":\"table\",\"starttlsEnable\":\"false\",\"serverPort\":\"25\",\"serverHost\":\"xx\",\"Password\":\"xx\",\"sslEnable\":\"false\"}";
+        String pluginInstanceName = "alert-instance-mail";
+        List<AlertPluginInstance> alertInstanceList = new ArrayList<>();
+        AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
+                pluginDefineId, pluginInstanceParams, pluginInstanceName);
+        alertPluginInstance.setInstanceType(AlertPluginInstanceType.GLOBAL);
+        alertPluginInstance.setId(1);
+        alertInstanceList.add(alertPluginInstance);
+        when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList()).thenReturn(alertInstanceList);
+
+        AlertResult sendResult = new AlertResult();
+        sendResult.setStatus(String.valueOf(true));
+        sendResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
+        AlertChannel alertChannelMock = mock(AlertChannel.class);
+        when(alertChannelMock.process(Mockito.any())).thenReturn(sendResult);
+        when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
+        Assertions.assertTrue(Boolean.parseBoolean(sendResult.getStatus()));
+        when(listenerEventMapper.deleteById(1)).thenReturn(1);
+        listenerEventPostService.send(events);
+    }
+
+    @Test
+    public void testSendServerDownEventFailed() {
         List<ListenerEvent> events = new ArrayList<>();
         ServerDownListenerEvent serverDownListenerEvent = new ServerDownListenerEvent();
         serverDownListenerEvent.setEventTime(new Date());
@@ -103,13 +143,12 @@ public class ListenerEventPostServiceTest {
         when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList()).thenReturn(alertInstanceList);
 
         AlertResult sendResult = new AlertResult();
-        sendResult.setStatus(String.valueOf(true));
-        sendResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
+        sendResult.setStatus(String.valueOf(false));
+        sendResult.setMessage(String.format("Alert Plugin %s send failed", pluginInstanceName));
         AlertChannel alertChannelMock = mock(AlertChannel.class);
         when(alertChannelMock.process(Mockito.any())).thenReturn(sendResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
-        Assertions.assertTrue(Boolean.parseBoolean(sendResult.getStatus()));
-        when(listenerEventMapper.deleteById(1)).thenReturn(1);
+        Assertions.assertFalse(Boolean.parseBoolean(sendResult.getStatus()));
         listenerEventPostService.send(events);
     }
 }

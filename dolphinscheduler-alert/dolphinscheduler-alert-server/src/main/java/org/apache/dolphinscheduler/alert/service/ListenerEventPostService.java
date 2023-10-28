@@ -89,7 +89,6 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
     @Override
     public void run() {
         log.info("listener event post thread started");
-        log.error("______________________________________{}________________", QUERY_ALERT_THRESHOLD);
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 List<ListenerEvent> listenerEvents = listenerEventMapper

@@ -63,7 +63,7 @@ import org.springframework.stereotype.Component;
 public class ListenerEventAlertManager {
 
     @Value("${alert.alarm-suppression.crash:60}")
-    private Integer crashAlarmSuppression;
+    private int crashAlarmSuppression;
 
     @Autowired
     private ListenerEventMapper listenerEventMapper;
