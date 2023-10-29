@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -88,9 +90,12 @@ public class AlertPluginInstanceController extends BaseController {
     public Result createAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                             @RequestParam(value = "instanceName") String instanceName,
+                                            @RequestParam(value = "instanceType") AlertPluginInstanceType instanceType,
+                                            @RequestParam(value = "warningType") WarningType warningType,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
         Map<String, Object> result =
-                alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, pluginInstanceParams);
+                alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, instanceType, warningType,
+                        pluginInstanceParams);
         return returnDataList(result);
     }
 
@@ -115,9 +120,10 @@ public class AlertPluginInstanceController extends BaseController {
     public Result updateAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable(value = "id") int id,
                                             @RequestParam(value = "instanceName") String instanceName,
+                                            @RequestParam(value = "warningType") WarningType warningType,
                                             @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
         Map<String, Object> result =
-                alertPluginInstanceService.update(loginUser, id, instanceName, pluginInstanceParams);
+                alertPluginInstanceService.update(loginUser, id, instanceName, warningType, pluginInstanceParams);
         return returnDataList(result);
     }
 

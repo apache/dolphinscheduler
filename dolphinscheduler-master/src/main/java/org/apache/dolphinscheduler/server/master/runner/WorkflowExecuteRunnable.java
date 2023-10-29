@@ -85,6 +85,7 @@ import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecu
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -225,6 +226,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     private final MasterConfig masterConfig;
 
+    private final ListenerEventAlertManager listenerEventAlertManager;
+
     public WorkflowExecuteRunnable(
                                    @NonNull IWorkflowExecuteContext workflowExecuteContext,
                                    @NonNull CommandService commandService,
@@ -235,7 +238,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                                    @NonNull StateWheelExecuteThread stateWheelExecuteThread,
                                    @NonNull CuringParamsService curingParamsService,
                                    @NonNull TaskInstanceDao taskInstanceDao,
-                                   @NonNull DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory) {
+                                   @NonNull DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory,
+                                   @NonNull ListenerEventAlertManager listenerEventAlertManager) {
         this.processService = processService;
         this.commandService = commandService;
         this.processInstanceDao = processInstanceDao;
@@ -246,6 +250,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         this.curingParamsService = curingParamsService;
         this.taskInstanceDao = taskInstanceDao;
         this.defaultTaskExecuteRunnableFactory = defaultTaskExecuteRunnableFactory;
+        this.listenerEventAlertManager = listenerEventAlertManager;
         TaskMetrics.registerTaskPrepared(readyToSubmitTaskQueue::size);
     }
 
@@ -372,6 +377,17 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             return true;
         }
     }
+    public void processStart() {
+        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+        this.listenerEventAlertManager.publishProcessStartListenerEvent(workflowInstance, projectUser);
+    }
+
+    public void taskStart(TaskInstance taskInstance) {
+        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+        this.listenerEventAlertManager.publishTaskStartListenerEvent(workflowInstance, taskInstance, projectUser);
+    }
 
     public void processTimeout() {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
@@ -398,6 +414,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 completeTaskSet.add(taskInstance.getTaskCode());
                 mergeTaskInstanceVarPool(taskInstance);
                 processInstanceDao.upsertProcessInstance(workflowInstance);
+                ProjectUser projectUser =
+                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+                listenerEventAlertManager.publishTaskEndListenerEvent(workflowInstance, taskInstance, projectUser);
                 // save the cacheKey only if the task is defined as cache task and the task is success
                 if (taskInstance.getIsCache().equals(Flag.YES)) {
                     saveCacheTaskInstance(taskInstance);
@@ -411,6 +430,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 retryTaskInstance(taskInstance);
             } else if (taskInstance.getState().isFailure()) {
                 completeTaskSet.add(taskInstance.getTaskCode());
+                ProjectUser projectUser =
+                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
+                listenerEventAlertManager.publishTaskFailListenerEvent(workflowInstance, taskInstance, projectUser);
                 // There are child nodes and the failure policy is: CONTINUE
                 if (workflowInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
                         taskInstance.getTaskCode(),
@@ -725,6 +747,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
             }
             if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_QUEUE) {
+                processStart();
                 submitPostNode(null);
                 workflowRunnableStatus = WorkflowRunnableStatus.STARTED;
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
@@ -753,6 +776,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         processAlertManager.sendAlertProcessInstance(workflowInstance, getValidTaskList(), projectUser);
         if (workflowInstance.getState().isSuccess()) {
             processAlertManager.closeAlert(workflowInstance);
+            listenerEventAlertManager.publishProcessEndListenerEvent(workflowInstance, projectUser);
+        } else {
+            listenerEventAlertManager.publishProcessFailListenerEvent(workflowInstance, projectUser);
         }
         if (checkTaskQueue()) {
             // release task group

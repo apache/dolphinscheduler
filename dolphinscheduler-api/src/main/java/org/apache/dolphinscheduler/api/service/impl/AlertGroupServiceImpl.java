@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -85,6 +86,28 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             }
             alertGroups = alertGroupMapper.selectBatchIds(ids);
         }
+        result.put(Constants.DATA_LIST, alertGroups);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> queryNormalAlertgroup(User loginUser) {
+        HashMap<String, Object> result = new HashMap<>();
+        List<AlertGroup> alertGroups;
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            alertGroups = alertGroupMapper.queryAllGroupList();
+        } else {
+            Set<Integer> ids = resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), log);
+            if (ids.isEmpty()) {
+                result.put(Constants.DATA_LIST, Collections.emptyList());
+                putMsg(result, Status.SUCCESS);
+                return result;
+            }
+            alertGroups = alertGroupMapper.selectBatchIds(ids);
+        }
+        alertGroups = alertGroups.stream().filter(alertGroup -> alertGroup.getId() != 2).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, alertGroups);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -223,6 +246,11 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc,
                                                 String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
+        // don't allow to update global alert group
+        if (id == 2) {
+            putMsg(result, Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP);
+            return result;
+        }
 
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
             putMsg(result, Status.USER_NO_OPERATION_PERM);
@@ -282,7 +310,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         }
 
         // Not allow to delete the default alarm group ,because the module of service need to use it.
-        if (id == 1) {
+        if (id == 1 || id == 2) {
             log.warn("Not allow to delete the default alarm group.");
             putMsg(result, Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
             return result;

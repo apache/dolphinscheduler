@@ -35,11 +35,13 @@ public enum WarningType {
      * 1 send if process success;
      * 2 send if process failed;
      * 3 send if process ends, whatever the result;
+     * 4 send global events;
      */
     NONE(0, "none"),
     SUCCESS(1, "success"),
     FAILURE(2, "failure"),
-    ALL(3, "all");
+    ALL(3, "all"),
+    GLOBAL(4, "global");
 
     WarningType(int code, String descp) {
         this.code = code;

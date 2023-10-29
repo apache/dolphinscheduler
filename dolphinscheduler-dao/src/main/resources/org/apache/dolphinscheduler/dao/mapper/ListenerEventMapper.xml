@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  ~ Licensed to the Apache Software Foundation (ASF) under one or more
+  ~ contributor license agreements.  See the NOTICE file distributed with
+  ~ this work for additional information regarding copyright ownership.
+  ~ The ASF licenses this file to You under the Apache License, Version 2.0
+  ~ (the "License"); you may not use this file except in compliance with
+  ~ the License.  You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper">
+
+    <sql id="baseSql">
+        id
+        , content, sign, event_type, post_status, log, create_time, update_time
+    </sql>
+
+    <insert id="batchInsert">
+        insert into t_ds_listener_event ( content, sign, post_status, event_type, create_time, update_time)
+        values
+        <foreach collection='events' item='event' separator=','>
+            (#{event.content},#{event.sign},#{event.postStatus.code},
+            #{event.eventType.code},#{event.createTime},#{event.updateTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertServerDownEvent">
+        insert into t_ds_listener_event (content, sign, post_status, event_type, create_time, update_time)
+        SELECT #{event.sign},
+               #{event.content},
+               #{event.postStatus.code},
+               #{event.eventType.code},
+               #{event.createTime},
+               #{event.updateTime}
+        from t_ds_listener_event
+        where create_time >= #{crashAlarmSuppressionStartTime}
+          and sign = #{event.sign}
+          and post_status = #{event.postStatus.code}
+        having count(*) = 0
+    </insert>
+
+    <update id="updateListenerEvent">
+        update t_ds_listener_event
+        set log         = #{log},
+            post_status = #{postStatus.code},
+            update_time = #{updateTime}
+        where id = #{eventId}
+    </update>
+
+    <select id="listingListenerEventByStatus" resultType="org.apache.dolphinscheduler.dao.entity.ListenerEvent">
+        select
+        <include refid="baseSql"/>
+        from t_ds_listener_event
+        where post_status = #{postStatus.code}
+        limit #{limit}
+    </select>
+</mapper>

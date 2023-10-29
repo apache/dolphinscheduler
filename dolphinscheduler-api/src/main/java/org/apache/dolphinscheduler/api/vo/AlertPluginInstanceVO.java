@@ -40,6 +40,16 @@ public class AlertPluginInstanceVO {
     private String instanceName;
 
     /**
+     * alert plugin instance type
+     */
+    private String instanceType;
+
+    /**
+     * alert plugin instance warning type
+     */
+    private String warningType;
+
+    /**
      * plugin_instance_params
      */
     private String pluginInstanceParams;

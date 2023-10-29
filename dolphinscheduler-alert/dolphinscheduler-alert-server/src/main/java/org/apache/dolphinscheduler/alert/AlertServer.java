@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
+import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -44,6 +45,8 @@ public class AlertServer {
     @Autowired
     private AlertBootstrapService alertBootstrapService;
     @Autowired
+    private ListenerEventPostService listenerEventPostService;
+    @Autowired
     private AlertRpcServer alertRpcServer;
     @Autowired
     private AlertPluginManager alertPluginManager;
@@ -61,6 +64,7 @@ public class AlertServer {
         alertPluginManager.start();
         alertRegistryClient.start();
         alertBootstrapService.start();
+        listenerEventPostService.start();
         alertRpcServer.start();
         log.info("Alert server is started ...");
     }
@@ -88,6 +92,7 @@ public class AlertServer {
             try (
                     AlertRpcServer closedAlertRpcServer = alertRpcServer;
                     AlertBootstrapService closedAlertBootstrapService = alertBootstrapService;
+                    ListenerEventPostService closedListenerEventPostService = listenerEventPostService;
                     AlertRegistryClient closedAlertRegistryClient = alertRegistryClient) {
                 // close resource
             }

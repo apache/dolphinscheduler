@@ -36,6 +36,14 @@ public interface AlertGroupService {
     Map<String, Object> queryAlertgroup(User loginUser);
 
     /**
+     * query normal alert group list
+     *
+     * @param loginUser
+     * @return alert group list
+     */
+    Map<String, Object> queryNormalAlertgroup(User loginUser);
+
+    /**
      * query alert group by id
      *
      * @param loginUser login user
