@@ -361,6 +361,7 @@ export function formatParams(data: INodeData): {
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels
     taskParams.nodeSelectors = data.nodeSelectors
+    taskParams.pullSecret = data.pullSecret
     taskParams.datasource = data.datasource
     taskParams.type = data.type
     taskParams.kubeConfig = data.kubeConfig
@@ -414,8 +415,6 @@ export function formatParams(data: INodeData): {
     taskParams.datasource = data.datasource
     taskParams.type = data.type
     taskParams.awsRegion = data.awsRegion
-    // eslint-disable-next-line no-console
-    console.log(taskParams.awsRegion)
   }
   if (data.taskType === 'PYTORCH') {
     taskParams.script = data.script

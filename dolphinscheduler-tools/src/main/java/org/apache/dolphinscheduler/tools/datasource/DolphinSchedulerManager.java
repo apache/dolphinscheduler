@@ -17,54 +17,42 @@
 
 package org.apache.dolphinscheduler.tools.datasource;
 
-import org.apache.dolphinscheduler.dao.upgrade.SchemaUtils;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerVersion;
+import org.apache.dolphinscheduler.tools.datasource.upgrader.UpgradeDao;
+import org.apache.dolphinscheduler.tools.datasource.utils.SchemaUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
-
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
 public class DolphinSchedulerManager {
 
-    private final UpgradeDao upgradeDao;
+    @Autowired
+    private UpgradeDao upgradeDao;
+
+    @Autowired
+    private DatabaseDialect databaseDialect;
 
     private Map<DolphinSchedulerVersion, DolphinSchedulerUpgrader> upgraderMap = new HashMap<>();
 
-    public DolphinSchedulerManager(DataSource dataSource, List<UpgradeDao> daos,
-                                   List<DolphinSchedulerUpgrader> dolphinSchedulerUpgraders) throws Exception {
-        final DbType type = getCurrentDbType(dataSource);
-        upgradeDao = daos.stream()
-                .filter(it -> it.getDbType() == type)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(
-                        "Cannot find UpgradeDao implementation for db type: " + type));
+    public DolphinSchedulerManager(List<DolphinSchedulerUpgrader> dolphinSchedulerUpgraders) throws Exception {
         if (CollectionUtils.isNotEmpty(dolphinSchedulerUpgraders)) {
             upgraderMap = dolphinSchedulerUpgraders.stream()
                     .collect(Collectors.toMap(DolphinSchedulerUpgrader::getCurrentVersion, Function.identity()));
-        }
-    }
-
-    private DbType getCurrentDbType(DataSource dataSource) throws Exception {
-        try (Connection conn = dataSource.getConnection()) {
-            String name = conn.getMetaData().getDatabaseProductName().toUpperCase();
-            return DbType.valueOf(name);
         }
     }
 
@@ -78,9 +66,9 @@ public class DolphinSchedulerManager {
      */
     public boolean schemaIsInitialized() {
         // Determines whether the dolphinscheduler table structure has been init
-        if (upgradeDao.isExistsTable("t_escheduler_version")
-                || upgradeDao.isExistsTable("t_ds_version")
-                || upgradeDao.isExistsTable("t_escheduler_queue")) {
+        if (databaseDialect.tableExists("t_escheduler_version")
+                || databaseDialect.tableExists("t_ds_version")
+                || databaseDialect.tableExists("t_escheduler_queue")) {
             log.info("The database has been initialized. Skip the initialization step");
             return true;
         }
@@ -100,13 +88,13 @@ public class DolphinSchedulerManager {
         } else {
             String version;
             // Gets the version of the current system
-            if (upgradeDao.isExistsTable("t_escheduler_version")) {
+            if (databaseDialect.tableExists("t_escheduler_version")) {
                 version = upgradeDao.getCurrentVersion("t_escheduler_version");
-            } else if (upgradeDao.isExistsTable("t_ds_version")) {
+            } else if (databaseDialect.tableExists("t_ds_version")) {
                 version = upgradeDao.getCurrentVersion("t_ds_version");
-            } else if (upgradeDao.isExistsColumn("t_escheduler_queue", "create_time")) {
+            } else if (databaseDialect.columnExists("t_escheduler_queue", "create_time")) {
                 version = "1.0.1";
-            } else if (upgradeDao.isExistsTable("t_escheduler_queue")) {
+            } else if (databaseDialect.tableExists("t_escheduler_queue")) {
                 version = "1.0.0";
             } else {
                 log.error("Unable to determine current software version, so cannot upgrade");

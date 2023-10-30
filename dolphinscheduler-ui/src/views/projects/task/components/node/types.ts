@@ -101,6 +101,7 @@ interface IDependentItem {
   cycle?: 'month' | 'week' | 'day' | 'hour'
   dateValue?: string
   dependentType?: 'DEPENDENT_ON_WORKFLOW' | 'DEPENDENT_ON_TASK'
+  parameterPassing?: boolean
 }
 
 interface IDependTask {
@@ -378,6 +379,7 @@ interface ITaskParams {
   minMemorySpace?: string
   image?: string
   imagePullPolicy?: string
+  pullSecret?: string
   command?: string
   args?: string
   customizedLabels?: ILabel[]

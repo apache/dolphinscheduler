@@ -166,7 +166,7 @@ const DetailModal = defineComponent({
       showNamespace,
       showKubeConfig,
       modeOptions,
-      redShitModeOptions,
+      redShiftModeOptions,
       sagemakerModeOption,
       loading,
       saving,
@@ -323,7 +323,7 @@ const DetailModal = defineComponent({
                     v-model={[detailForm.mode, 'value']}
                     options={
                       detailForm.type === 'REDSHIFT'
-                        ? redShitModeOptions
+                        ? redShiftModeOptions
                         : detailForm.type === 'SAGEMAKER'
                         ? sagemakerModeOption
                         : modeOptions

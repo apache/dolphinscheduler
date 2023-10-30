@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api.k8s;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.VAR_DELIMITER;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -81,7 +82,8 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters.setCommand("[\"perl\" ,\"-Mbignum=bpi\", \"-wle\", \"print bpi(2000)\"]");
         k8sTaskMainParameters.setLabelMap(labelMap);
         k8sTaskMainParameters.setNodeSelectorRequirements(Arrays.asList(requirement));
-        job = k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
+        k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
+        job = k8sTaskExecutor.getJob();
     }
     @Test
     public void testGetK8sJobStatusNormal() {
@@ -105,5 +107,12 @@ public class K8sTaskExecutorTest {
         } catch (TaskException e) {
             Assertions.assertEquals(e.getMessage(), "K8sTask is timeout");
         }
+    }
+
+    @Test
+    public void testValpool() {
+        String result = "key=value" + VAR_DELIMITER;
+        k8sTaskExecutor.varPool.append(result);
+        Assertions.assertEquals(result, k8sTaskExecutor.getVarPool());
     }
 }
