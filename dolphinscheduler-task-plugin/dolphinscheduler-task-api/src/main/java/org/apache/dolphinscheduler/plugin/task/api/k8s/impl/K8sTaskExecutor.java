@@ -295,9 +295,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String connectionParams = k8sTaskExecutionContext.getConnectionParams();
-            String kubeConfig = JSONUtils.getNodeString(connectionParams, "kubeConfig");
-            String configYaml = kubeConfig;
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
@@ -338,7 +336,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             buildK8sJob(k8STaskMainParameters);
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
-            log.info("namespaceName info {}", namespaceName);
             k8sUtils.createJob(namespaceName, job);
             log.info("[K8sJobExecutor-{}-{}] submitted job successfully", taskName, taskInstanceId);
         } catch (Exception e) {
@@ -353,9 +350,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);
         String namespaceName = k8STaskMainParameters.getNamespaceName();
         String jobName = job.getMetadata().getName();
-
-        log.info("stop job namespace {}", namespaceName);
-        log.info("stop job jobName {}", jobName);
         try {
             if (Boolean.TRUE.equals(k8sUtils.jobExist(jobName, namespaceName))) {
                 k8sUtils.deleteJob(jobName, namespaceName);

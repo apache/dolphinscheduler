@@ -113,7 +113,6 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     @Override
     public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
         SagemakerConnectionParam baseConnectionParam = (SagemakerConnectionParam) connectionParam;
-        log.info("### baseConnectionParam {}", baseConnectionParam.toString());
         try (
                 SagemakerClientWrapper sagemakerClientWrapper =
                         new SagemakerClientWrapper(baseConnectionParam.userName,

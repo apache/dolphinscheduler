@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
+
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.datasource.k8s.param.K8sConnectionParam;
-import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,10 +56,6 @@ public class K8sTask extends AbstractK8sTask {
      */
     private final K8sTaskParameters k8sTaskParameters;
 
-    private final K8sTaskExecutionContext k8sTaskExecutionContext;
-
-    private K8sConnectionParam k8sConnectionParam;
-
     /**
      * @param taskRequest taskRequest
      */
@@ -72,16 +67,6 @@ public class K8sTask extends AbstractK8sTask {
         if (k8sTaskParameters == null || !k8sTaskParameters.checkParameters()) {
             throw new TaskException("K8S task params is not valid");
         }
-
-        k8sTaskExecutionContext =
-                k8sTaskParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
-        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
-        k8sConnectionParam =
-                (K8sConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(k8sTaskParameters.getType()),
-                        k8sTaskExecutionContext.getConnectionParams());
-        final String kubeConfig = k8sConnectionParam.getKubeConfig();
-        this.k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());
-        this.k8sTaskParameters.setKubeConfig(kubeConfig);
     }
 
     @Override
@@ -98,8 +83,9 @@ public class K8sTask extends AbstractK8sTask {
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        String namespaceName = k8sTaskParameters.getNamespace();
-        String clusterName = "cluster";
+        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
+        String namespaceName = namespace.get(NAMESPACE_NAME);
+        String clusterName = namespace.get(CLUSTER);
         k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());
         k8sTaskMainParameters.setPullSecret(k8sTaskParameters.getPullSecret());
         k8sTaskMainParameters.setNamespaceName(namespaceName);
