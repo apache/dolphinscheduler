@@ -198,6 +198,5 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                 @FindBy(tagName = "textarea"),
         })
         private WebElement inputKubeConfig;
-
     }
 }
