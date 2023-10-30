@@ -201,6 +201,8 @@ export default {
     alarm_instance_name: '告警实例名称',
     alarm_instance_name_tips: '请输入告警实例名称',
     alarm_plugin_name: '告警插件名称',
+    alarm_instance_type: '告警实例类型',
+    is_global_instance: '是否全局告警实例',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
