@@ -56,9 +56,10 @@ public class JDBCDataSourceProvider {
 
         Boolean isOneSession = PropertyUtils.getBoolean(Constants.SUPPORT_HIVE_ONE_SESSION, false);
         dataSource.setMinimumIdle(
-                isOneSession ? 1 : PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 5));
+                isOneSession ? 1 : PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MIN_IDLE, 0));
         dataSource.setMaximumPoolSize(
                 isOneSession ? 1 : PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_MAX_ACTIVE, 50));
+        dataSource.setIdleTimeout(PropertyUtils.getInt(DataSourceConstants.SPRING_DATASOURCE_IDLE_TIMEOUT, 30000));
         dataSource.setConnectionTestQuery(properties.getValidationQuery());
 
         if (MapUtils.isNotEmpty(properties.getOther())) {

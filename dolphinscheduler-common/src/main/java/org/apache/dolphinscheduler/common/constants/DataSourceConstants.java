@@ -120,6 +120,8 @@ public class DataSourceConstants {
 
     public static final String SPRING_DATASOURCE_TEST_ON_BORROW = "spring.datasource.testOnBorrow";
 
+    public static final String SPRING_DATASOURCE_IDLE_TIMEOUT = "spring.datasource.idleTimeoutMs";
+
     /**
      * azure static websites
      */
