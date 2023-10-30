@@ -44,7 +44,6 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
 import com.amazonaws.services.sagemaker.AmazonSageMakerClientBuilder;
-import com.amazonaws.services.sagemaker.model.ListNotebookInstancesRequest;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -78,14 +77,6 @@ public class SagemakerTask extends AbstractRemoteTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
         client = createClient();
-        try {
-            // If listing notebook instances fails, an exception will be thrown directly
-            ListNotebookInstancesRequest request = new ListNotebookInstancesRequest();
-            client.listNotebookInstances(request);
-            log.info("sagemaker client connects to server successfully");
-        } catch (Exception e) {
-            log.info("sagemaker client failed to connect to the server");
-        }
         utils = new PipelineUtils();
     }
 
@@ -98,15 +89,21 @@ public class SagemakerTask extends AbstractRemoteTask {
     public void init() {
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
-
-        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }
         if (!parameters.checkParameters()) {
             throw new SagemakerTaskException("Sagemaker task params is not valid");
         }
-
+        sagemakerTaskExecutionContext =
+                parameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        sagemakerConnectionParam =
+                (SagemakerConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(parameters.getType()),
+                        sagemakerTaskExecutionContext.getConnectionParams());
+        parameters.setUsername(sagemakerConnectionParam.getUserName());
+        parameters.setPassword(sagemakerConnectionParam.getPassword());
+        parameters.setAwsRegion(sagemakerConnectionParam.getAwsRegion());
+        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
     }
 
     @Override
@@ -185,21 +182,9 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     protected AmazonSageMaker createClient() {
-        final String taskParams = taskExecutionContext.getTaskParams();
-        this.parameters = JSONUtils.parseObject(taskParams, SagemakerParameters.class);
-        if (this.parameters == null || !this.parameters.checkParameters()) {
-            throw new SagemakerTaskException("sagemaker task params is not valid");
-        }
-
-        sagemakerTaskExecutionContext =
-                parameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
-        sagemakerConnectionParam =
-                (SagemakerConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(parameters.getType()),
-                        sagemakerTaskExecutionContext.getConnectionParams());
-
-        final String awsAccessKeyId = sagemakerConnectionParam.getUserName();
-        final String awsSecretAccessKey = sagemakerConnectionParam.getPassword();
-        final String awsRegion = sagemakerConnectionParam.getAwsRegion();
+        final String awsAccessKeyId = parameters.getUsername();
+        final String awsSecretAccessKey = parameters.getPassword();
+        final String awsRegion = parameters.getAwsRegion();
         final BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
         final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
         // create a SageMaker client

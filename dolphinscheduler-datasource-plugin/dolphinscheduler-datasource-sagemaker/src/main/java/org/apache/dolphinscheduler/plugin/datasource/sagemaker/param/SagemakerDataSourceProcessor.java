@@ -66,12 +66,12 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         SagemakerConnectionParam connectionParams = (SagemakerConnectionParam) createConnectionParams(connectionJson);
-        SagemakerDataSourceParamDTO SageMakerDataSourceParamDTO = new SagemakerDataSourceParamDTO();
+        SagemakerDataSourceParamDTO sagemakerDataSourceParamDTO = new SagemakerDataSourceParamDTO();
 
-        SageMakerDataSourceParamDTO.setUserName(connectionParams.getUserName());
-        SageMakerDataSourceParamDTO.setPassword(connectionParams.getPassword());
-        SageMakerDataSourceParamDTO.setAwsRegion(connectionParams.getAwsRegion());
-        return SageMakerDataSourceParamDTO;
+        sagemakerDataSourceParamDTO.setUserName(connectionParams.getUserName());
+        sagemakerDataSourceParamDTO.setPassword(connectionParams.getPassword());
+        sagemakerDataSourceParamDTO.setAwsRegion(connectionParams.getAwsRegion());
+        return sagemakerDataSourceParamDTO;
     }
 
     @Override

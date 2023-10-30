@@ -53,8 +53,6 @@ public class SagemakerParameters extends AbstractParameters {
     }
 
     public SagemakerTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
-        log.info("sagemakerRequestJson {}", sagemakerRequestJson);
-        log.info("{} {} {} {} {}", username, password, awsRegion, datasource, type);
         DataSourceParameters dataSourceParameters =
                 (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
         SagemakerTaskExecutionContext sagemakerTaskExecutionContext = new SagemakerTaskExecutionContext();
