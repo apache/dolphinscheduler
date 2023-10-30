@@ -163,8 +163,11 @@ const DetailModal = defineComponent({
       showDataBaseName,
       showJDBCConnectParameters,
       showPublicKey,
+      showNamespace,
+      showKubeConfig,
       modeOptions,
       redShitModeOptions,
+      sagemakerModeOption,
       loading,
       saving,
       testing,
@@ -321,6 +324,8 @@ const DetailModal = defineComponent({
                     options={
                       detailForm.type === 'REDSHIFT'
                         ? redShitModeOptions
+                        : detailForm.type === 'SAGEMAKER'
+                        ? sagemakerModeOption
                         : modeOptions
                     }
                   ></NSelect>
@@ -497,7 +502,11 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  v-show={
+                    showMode &&
+                    detailForm.mode === 'IAM-accessKey' &&
+                    detailForm.type != 'SAGEMAKER'
+                  }
                   label={t('datasource.dbUser')}
                   path='dbUser'
                   show-require-mark
@@ -535,7 +544,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={!showMode || detailForm.mode === 'password'}
+                  v-show={
+                    (!showMode || detailForm.mode === 'password') &&
+                    detailForm.type != 'K8S'
+                  }
                   label={t('datasource.user_name')}
                   path='userName'
                   show-require-mark
@@ -550,7 +562,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={!showMode || detailForm.mode === 'password'}
+                  v-show={
+                    (!showMode || detailForm.mode === 'password') &&
+                    detailForm.type != 'K8S'
+                  }
                   label={t('datasource.user_password')}
                   path='password'
                 >
@@ -669,6 +684,35 @@ const DetailModal = defineComponent({
                     autosize={{
                       minRows: 4
                     }}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showKubeConfig}
+                  label={t('datasource.kubeConfig')}
+                  path='kubeConfig'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-kubeConfig'
+                    v-model={[detailForm.kubeConfig, 'value']}
+                    type='textarea'
+                    autosize={{
+                      minRows: 14
+                    }}
+                    placeholder={t('datasource.kubeConfig_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showNamespace}
+                  label={t('datasource.namespace')}
+                  path='namespace'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.namespace, 'value']}
+                    placeholder={t('datasource.namespace_tips')}
                   />
                 </NFormItem>
               </NForm>

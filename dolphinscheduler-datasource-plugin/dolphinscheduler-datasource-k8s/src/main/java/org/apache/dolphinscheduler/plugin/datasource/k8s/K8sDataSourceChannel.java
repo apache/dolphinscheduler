@@ -15,24 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.sagemaker.param;
+package org.apache.dolphinscheduler.plugin.datasource.k8s;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import lombok.Data;
-
-@Data
-public class SagemakerDataSourceParamDTO extends BaseDataSourceParamDTO {
-
-    protected String userName;
-
-    protected String password;
-
-    protected String awsRegion;
+public class K8sDataSourceChannel implements DataSourceChannel {
 
     @Override
-    public DbType getType() {
-        return DbType.SAGEMAKER;
+    public AdHocDataSourceClient createAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        throw new UnsupportedOperationException("K8S AdHocDataSourceClient is not supported");
+    }
+
+    @Override
+    public PooledDataSourceClient createPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        throw new UnsupportedOperationException("K8S AdHocDataSourceClient is not supported");
     }
 }

@@ -143,5 +143,15 @@
             <artifactId>dolphinscheduler-datasource-doris</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-sagemaker</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-k8s</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

@@ -15,21 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.sagemaker.param;
+package org.apache.dolphinscheduler.plugin.datasource.k8s.param;
 
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import lombok.Data;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class SagemakerConnectionParam implements ConnectionParam {
+public class K8sDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    protected String userName;
+    protected String kubeConfig;
+    protected String namespace;
 
-    protected String password;
-
-    protected String awsRegion;
+    @Override
+    public DbType getType() {
+        return DbType.K8S;
+    }
 }

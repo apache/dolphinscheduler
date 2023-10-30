@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.sagemaker.param;
+package org.apache.dolphinscheduler.plugin.datasource.k8s.param;
 
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 
@@ -25,11 +25,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SagemakerConnectionParam implements ConnectionParam {
+public class K8sConnectionParam implements ConnectionParam {
 
-    protected String userName;
-
-    protected String password;
-
-    protected String awsRegion;
+    protected String kubeConfig;
+    protected String namespace;
 }

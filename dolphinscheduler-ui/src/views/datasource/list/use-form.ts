@@ -69,6 +69,8 @@ export function useForm(id?: number) {
     showDataBaseName: true,
     showJDBCConnectParameters: true,
     showPublicKey: false,
+    showNamespace: false,
+    showKubeConfig: false,
     rules: {
       name: {
         trigger: ['input'],
@@ -118,7 +120,8 @@ export function useForm(id?: number) {
         validator() {
           if (
             !state.detailForm.userName &&
-            state.detailForm.type !== 'AZURESQL'
+            state.detailForm.type !== 'AZURESQL' &&
+            state.detailForm.type !== 'K8S'
           ) {
             return new Error(t('datasource.user_name_tips'))
           }
@@ -182,7 +185,8 @@ export function useForm(id?: number) {
           if (
             !state.detailForm.dbUser &&
             state.showMode &&
-            state.detailForm.mode === 'IAM-accessKey'
+            state.detailForm.mode === 'IAM-accessKey' &&
+            state.detailForm.type != 'SAGEMAKER'
           ) {
             return new Error(t('datasource.IAM-accessKey'))
           }
@@ -228,6 +232,12 @@ export function useForm(id?: number) {
         label: 'IAM-accessKey',
         value: 'IAM-accessKey'
       }
+    ],
+    sagemakerModeOption: [
+      {
+        label: 'IAM-accessKey',
+        value: 'IAM-accessKey'
+      }
     ]
   })
 
@@ -240,7 +250,7 @@ export function useForm(id?: number) {
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
     state.showAwsRegion = type === 'ATHENA' || type === 'SAGEMAKER'
-    state.showMode = ['AZURESQL', 'REDSHIFT'].includes(type)
+    state.showMode = ['AZURESQL', 'REDSHIFT', 'SAGEMAKER'].includes(type)
 
     if (type === 'ORACLE' && !id) {
       state.detailForm.connectType = 'ORACLE_SERVICE_NAME'
@@ -254,7 +264,12 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
-    if (type === 'SSH' || type === 'ZEPPELIN' || type == 'SAGEMAKER') {
+    if (
+      type === 'SSH' ||
+      type === 'ZEPPELIN' ||
+      type === 'SAGEMAKER' ||
+      type === 'K8S'
+    ) {
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
@@ -267,9 +282,13 @@ export function useForm(id?: number) {
         state.showPort = false
         state.showRestEndpoint = true
       }
-      if (type == 'SAGEMAKER') {
+      if (type === 'SAGEMAKER' || type === 'K8S') {
         state.showHost = false
         state.showPort = false
+      }
+      if (type === 'K8S') {
+        state.showNamespace = true
+        state.showKubeConfig = true
       }
     } else {
       state.showDataBaseName = true
@@ -429,7 +448,12 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'SAGEMAKER',
     label: 'SAGEMAKER',
     defaultPort: 0
-  }
+  },
+  K8S: {
+    value: 'K8S',
+    label: 'K8S',
+    defaultPort: 6443
+  },
 }
 
 export const datasourceTypeList: IDataBaseOption[] = Object.values(

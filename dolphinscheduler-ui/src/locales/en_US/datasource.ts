@@ -91,5 +91,11 @@ export default {
   SecretAccessKey: 'SecretAccessKey',
   SecretAccessKey_tips: 'Please input SecretAccessKey',
   dbUser: 'DbUser',
-  dbUser_tips: 'Please input DbUser'
+  dbUser_tips: 'Please input DbUser',
+  zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+  zeppelin_rest_endpoint_tips: 'Please input zeppelin restEndpoint',
+  kubeConfig: 'kubeConfig',
+  kubeConfig_tips: 'Please input KubeConfig',
+  namespace: 'namespace',
+  namespace_tips: 'Please input namespace'
 }

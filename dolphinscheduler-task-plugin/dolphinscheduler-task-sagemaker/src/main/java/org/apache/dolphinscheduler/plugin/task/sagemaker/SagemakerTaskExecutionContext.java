@@ -15,21 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.sagemaker.param;
+package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import java.io.Serializable;
 
-import lombok.Data;
+/**
+ * master/worker task transport
+ */
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+public class SagemakerTaskExecutionContext implements Serializable {
 
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class SagemakerConnectionParam implements ConnectionParam {
+    /**
+     * connectionParams
+     */
+    private String connectionParams;
 
-    protected String userName;
+    public String getConnectionParams() {
+        return connectionParams;
+    }
 
-    protected String password;
+    public void setConnectionParams(String connectionParams) {
+        this.connectionParams = connectionParams;
+    }
 
-    protected String awsRegion;
+    @Override
+    public String toString() {
+        return "SagemakerTaskExecutionContext{" + "connectionParams='" + connectionParams + '\'' + '}';
+    }
 }

@@ -15,21 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.sagemaker.param;
+package org.apache.dolphinscheduler.plugin.datasource.k8s;
 
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
-import lombok.Data;
+import com.google.auto.service.AutoService;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+@AutoService(DataSourceChannelFactory.class)
+public class K8sDataSourceChannelFactory implements DataSourceChannelFactory {
 
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class SagemakerConnectionParam implements ConnectionParam {
+    @Override
+    public DataSourceChannel create() {
+        return new K8sDataSourceChannel();
+    }
 
-    protected String userName;
+    @Override
+    public String getName() {
+        return "k8s";
+    }
 
-    protected String password;
-
-    protected String awsRegion;
 }

@@ -46,9 +46,9 @@ export function userSagemaker({
     type: 'SAGEMAKER',
     displayRows: 10,
     timeoutNotifyStrategy: ['WARN'],
-    accessKey: '',
-    secretAccessKey: '',
-    region: ''
+    username: '',
+    password: '',
+    awsRegion: ''
   } as INodeData)
 
   return {

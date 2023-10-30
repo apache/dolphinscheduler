@@ -90,5 +90,9 @@ export default {
   dbUser: 'DbUser',
   dbUser_tips: '请输入DbUser',
   zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
-  zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint'
+  zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint',
+  kubeConfig: 'kubeConfig',
+  kubeConfig_tips: '请输入KubeConfig',
+  namespace: 'namespace',
+  namespace_tips: '请输入namespace'
 }

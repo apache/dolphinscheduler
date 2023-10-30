@@ -46,9 +46,9 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO datasourceParamDTO) {
         SagemakerDataSourceParamDTO sageMakerDataSourceParamDTO = (SagemakerDataSourceParamDTO) datasourceParamDTO;
-        if (StringUtils.isEmpty(sageMakerDataSourceParamDTO.getAccessKey())
-                || StringUtils.isEmpty(sageMakerDataSourceParamDTO.getSecretAccessKey())
-                || StringUtils.isEmpty(sageMakerDataSourceParamDTO.getRegion())) {
+        if (StringUtils.isEmpty(sageMakerDataSourceParamDTO.getUserName())
+                || StringUtils.isEmpty(sageMakerDataSourceParamDTO.getPassword())
+                || StringUtils.isEmpty(sageMakerDataSourceParamDTO.getAwsRegion())) {
             throw new IllegalArgumentException("sagemaker datasource param is not valid");
         }
     }
@@ -57,9 +57,9 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         SagemakerConnectionParam baseConnectionParam = (SagemakerConnectionParam) connectionParam;
         return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(),
-                PasswordUtils.encodePassword(baseConnectionParam.getAccessKey()),
-                PasswordUtils.encodePassword(baseConnectionParam.getSecretAccessKey()),
-                PasswordUtils.encodePassword(baseConnectionParam.getRegion()));
+                PasswordUtils.encodePassword(baseConnectionParam.getUserName()),
+                PasswordUtils.encodePassword(baseConnectionParam.getPassword()),
+                PasswordUtils.encodePassword(baseConnectionParam.getAwsRegion()));
     }
 
     // SageMaker
@@ -68,9 +68,9 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
         SagemakerConnectionParam connectionParams = (SagemakerConnectionParam) createConnectionParams(connectionJson);
         SagemakerDataSourceParamDTO SageMakerDataSourceParamDTO = new SagemakerDataSourceParamDTO();
 
-        SageMakerDataSourceParamDTO.setUserName(connectionParams.getAccessKey());
-        SageMakerDataSourceParamDTO.setPassword(connectionParams.getSecretAccessKey());
-        SageMakerDataSourceParamDTO.setRegion(connectionParams.getRegion());
+        SageMakerDataSourceParamDTO.setUserName(connectionParams.getUserName());
+        SageMakerDataSourceParamDTO.setPassword(connectionParams.getPassword());
+        SageMakerDataSourceParamDTO.setAwsRegion(connectionParams.getAwsRegion());
         return SageMakerDataSourceParamDTO;
     }
 
@@ -78,9 +78,9 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     public SagemakerConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         SagemakerDataSourceParamDTO sageMakerDataSourceParam = (SagemakerDataSourceParamDTO) datasourceParam;
         SagemakerConnectionParam sageMakerConnectionParam = new SagemakerConnectionParam();
-        sageMakerConnectionParam.setAccessKey(sageMakerDataSourceParam.getAccessKey());
-        sageMakerConnectionParam.setSecretAccessKey(sageMakerDataSourceParam.getSecretAccessKey());
-        sageMakerConnectionParam.setRegion(sageMakerConnectionParam.getRegion());
+        sageMakerConnectionParam.setUserName(sageMakerDataSourceParam.getUserName());
+        sageMakerConnectionParam.setPassword(sageMakerDataSourceParam.getPassword());
+        sageMakerConnectionParam.setAwsRegion(sageMakerDataSourceParam.getAwsRegion());
 
         return sageMakerConnectionParam;
     }
@@ -113,10 +113,11 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     @Override
     public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
         SagemakerConnectionParam baseConnectionParam = (SagemakerConnectionParam) connectionParam;
+        log.info("### baseConnectionParam {}", baseConnectionParam.toString());
         try (
                 SagemakerClientWrapper sagemakerClientWrapper =
-                        new SagemakerClientWrapper(baseConnectionParam.getAccessKey(),
-                                baseConnectionParam.getSecretAccessKey(), baseConnectionParam.getRegion())) {
+                        new SagemakerClientWrapper(baseConnectionParam.userName,
+                                baseConnectionParam.password, baseConnectionParam.awsRegion)) {
             return sagemakerClientWrapper.checkConnect();
         } catch (Exception e) {
             log.error("sagemaker client failed to connect to the server", e);
