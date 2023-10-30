@@ -164,7 +164,7 @@ const DetailModal = defineComponent({
       showJDBCConnectParameters,
       showPublicKey,
       modeOptions,
-      redShitModeOptions,
+      redShiftModeOptions,
       loading,
       saving,
       testing,
@@ -320,7 +320,7 @@ const DetailModal = defineComponent({
                     v-model={[detailForm.mode, 'value']}
                     options={
                       detailForm.type === 'REDSHIFT'
-                        ? redShitModeOptions
+                        ? redShiftModeOptions
                         : modeOptions
                     }
                   ></NSelect>

@@ -31,6 +31,8 @@ server:
       custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 spring:
+  profiles:
+    active: postgresql
   banner:
     charset: UTF-8
   jackson:
@@ -85,6 +87,20 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
   packages-to-scan: org.apache.dolphinscheduler.api
+
+# Mybatis-plus configuration, you don't need to change it
+mybatis-plus:
+  mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
+  type-aliases-package: org.apache.dolphinscheduler.dao.entity
+  configuration:
+    cache-enabled: false
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
 
 management:
   endpoints:

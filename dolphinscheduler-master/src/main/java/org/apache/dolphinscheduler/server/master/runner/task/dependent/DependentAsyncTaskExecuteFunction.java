@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task.dependent;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
@@ -69,6 +71,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
     private final Date dependentDate;
     private final List<DependentExecute> dependentTaskList;
     private final Map<String, DependResult> dependResultMap;
+    private final Map<String, Property> dependVarPoolPropertyMap;
 
     public DependentAsyncTaskExecuteFunction(TaskExecutionContext taskExecutionContext,
                                              DependentParameters dependentParameters,
@@ -89,6 +92,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         this.dependentTaskList = initializeDependentTaskList();
         log.info("Initialized dependent task list successfully");
         this.dependResultMap = new HashMap<>();
+        this.dependVarPoolPropertyMap = new HashMap<>();
     }
 
     @Override
@@ -97,8 +101,13 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
             log.info("All dependent task finished, will calculate the dependent result");
             DependResult dependResult = calculateDependResult();
             log.info("The Dependent result is: {}", dependResult);
-            return dependResult == DependResult.SUCCESS ? AsyncTaskExecutionStatus.SUCCESS
-                    : AsyncTaskExecutionStatus.FAILED;
+            if (dependResult == DependResult.SUCCESS) {
+                dependentParameters.setVarPool(JSONUtils.toJsonString(dependVarPoolPropertyMap.values()));
+                log.info("Set dependentParameters varPool: {}", dependentParameters.getVarPool());
+                return AsyncTaskExecutionStatus.SUCCESS;
+            } else {
+                return AsyncTaskExecutionStatus.FAILED;
+            }
         }
         return AsyncTaskExecutionStatus.RUNNING;
     }
@@ -189,9 +198,16 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
 
     private DependResult calculateDependResult() {
         List<DependResult> dependResultList = new ArrayList<>();
+        Map<String, Long> dependVarPoolEndTimeMap = new HashMap<>();
         for (DependentExecute dependentExecute : dependentTaskList) {
             DependResult dependResult =
                     dependentExecute.getModelDependResult(dependentDate, processInstance.getTestFlag());
+            if (dependResult == DependResult.SUCCESS) {
+                Map<String, Property> varPoolPropertyMap = dependentExecute.getDependTaskVarPoolPropertyMap();
+                Map<String, Long> varPoolEndTimeMap = dependentExecute.getDependTaskVarPoolEndTimeMap();
+                DependentUtils.addTaskVarPool(varPoolPropertyMap, varPoolEndTimeMap, dependVarPoolPropertyMap,
+                        dependVarPoolEndTimeMap);
+            }
             dependResultList.add(dependResult);
         }
         return DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(),

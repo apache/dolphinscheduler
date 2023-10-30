@@ -87,6 +87,7 @@ public class K8sTask extends AbstractK8sTask {
         String namespaceName = namespace.get(NAMESPACE_NAME);
         String clusterName = namespace.get(CLUSTER);
         k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());
+        k8sTaskMainParameters.setPullSecret(k8sTaskParameters.getPullSecret());
         k8sTaskMainParameters.setNamespaceName(namespaceName);
         k8sTaskMainParameters.setClusterName(clusterName);
         k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());
@@ -99,6 +100,11 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());
         k8sTaskMainParameters.setImagePullPolicy(k8sTaskParameters.getImagePullPolicy());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
+    }
+
+    @Override
+    protected void dealOutParam(String result) {
+        this.k8sTaskParameters.dealOutParam(result);
     }
 
     public List<NodeSelectorRequirement> convertToNodeSelectorRequirements(List<NodeSelectorExpression> expressions) {
