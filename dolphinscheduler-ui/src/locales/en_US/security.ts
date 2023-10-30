@@ -204,6 +204,8 @@ export default {
     alarm_instance_name: 'Alarm instance name',
     alarm_instance_name_tips: 'Please enter alarm plugin instance name',
     alarm_plugin_name: 'Alarm plugin name',
+    alarm_instance_type: 'Alarm instance type',
+    is_global_instance: 'Is Global Instance',
     create_time: 'Create Time',
     update_time: 'Update Time',
     operation: 'Operation',

@@ -186,5 +186,12 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         @FindBy(className = "btn-test-connection")
         private WebElement btnTestConnection;
+
+        @FindBys({
+                @FindBy(className = "input-zeppelin_rest_endpoint"),
+                @FindBy(tagName = "input"),
+        })
+        private WebElement inputZeppelinRestEndpoint;
+
     }
 }

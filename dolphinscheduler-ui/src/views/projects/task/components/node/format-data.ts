@@ -347,6 +347,8 @@ export function formatParams(data: INodeData): {
     taskParams.password = data.password
     taskParams.productionNoteDirectory = data.productionNoteDirectory
     taskParams.parameters = data.parameters
+    taskParams.datasource = data.datasource
+    taskParams.type = data.type
   }
 
   if (data.taskType === 'K8S') {
