@@ -89,21 +89,15 @@ public class SagemakerTask extends AbstractRemoteTask {
     public void init() {
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
+
+        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }
         if (!parameters.checkParameters()) {
             throw new SagemakerTaskException("Sagemaker task params is not valid");
         }
-        sagemakerTaskExecutionContext =
-                parameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
-        sagemakerConnectionParam =
-                (SagemakerConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(parameters.getType()),
-                        sagemakerTaskExecutionContext.getConnectionParams());
-        parameters.setUsername(sagemakerConnectionParam.getUserName());
-        parameters.setPassword(sagemakerConnectionParam.getPassword());
-        parameters.setAwsRegion(sagemakerConnectionParam.getAwsRegion());
-        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
+
     }
 
     @Override
@@ -182,6 +176,21 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     protected AmazonSageMaker createClient() {
+        final String taskParams = taskExecutionContext.getTaskParams();
+        this.parameters = JSONUtils.parseObject(taskParams, SagemakerParameters.class);
+        if (this.parameters == null || !this.parameters.checkParameters()) {
+            throw new SagemakerTaskException("sagemaker task params is not valid");
+        }
+
+        sagemakerTaskExecutionContext =
+                parameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        sagemakerConnectionParam =
+                (SagemakerConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(parameters.getType()),
+                        sagemakerTaskExecutionContext.getConnectionParams());
+        parameters.setUsername(sagemakerConnectionParam.getUserName());
+        parameters.setPassword(sagemakerConnectionParam.getPassword());
+        parameters.setAwsRegion(sagemakerConnectionParam.getAwsRegion());
+
         final String awsAccessKeyId = parameters.getUsername();
         final String awsSecretAccessKey = parameters.getPassword();
         final String awsRegion = parameters.getAwsRegion();

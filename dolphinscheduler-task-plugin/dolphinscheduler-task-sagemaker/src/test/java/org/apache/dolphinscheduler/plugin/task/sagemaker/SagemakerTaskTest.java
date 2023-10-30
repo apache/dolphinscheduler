@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -41,7 +40,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
+import com.amazonaws.services.sagemaker.AmazonSageMakerClientBuilder;
 import com.amazonaws.services.sagemaker.model.DescribePipelineExecutionResult;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionResult;
@@ -61,9 +64,8 @@ public class SagemakerTaskTest {
     private static final String MOCK_TYPE = "SAGEMAKER";
     private static final String MOCK_AWS_REGION = "REGION";
 
-
     private static MockedStatic<DataSourceUtils> dataSourceUtilsStaticMock = null;
-    private static MockedStatic<JSONUtils> jsonUtilsStaticMock = null;
+    private static MockedStatic<AmazonSageMakerClientBuilder> sageMakerMockedStatic = null;
 
     @BeforeEach
     public void before() {
@@ -80,6 +82,17 @@ public class SagemakerTaskTest {
                 .thenReturn(sagemakerConnectionParam);
 
         client = Mockito.mock(AmazonSageMaker.class);
+        BasicAWSCredentials basicAWSCredentials = Mockito.mock(BasicAWSCredentials.class);
+        AWSCredentialsProvider awsCredentialsProvider = Mockito.mock(AWSCredentialsProvider.class);
+        Mockito.when(awsCredentialsProvider.getCredentials()).thenReturn(basicAWSCredentials);
+
+        sageMakerMockedStatic = Mockito.mockStatic(AmazonSageMakerClientBuilder.class);
+
+        sageMakerMockedStatic
+                .when(() -> AmazonSageMakerClientBuilder.standard().withCredentials(awsCredentialsProvider)
+                        .withRegion((Regions) any()).build())
+                .thenReturn(client);
+
         sagemakerTask = spy(new SagemakerTask(taskExecutionContext));
         sagemakerTask.init();
 
@@ -102,6 +115,7 @@ public class SagemakerTaskTest {
     @AfterEach
     public void afterEach() {
         dataSourceUtilsStaticMock.close();
+        sageMakerMockedStatic.close();
     }
 
     @Test
