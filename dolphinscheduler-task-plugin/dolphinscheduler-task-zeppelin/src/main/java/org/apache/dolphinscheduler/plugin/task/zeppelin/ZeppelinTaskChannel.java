@@ -44,6 +44,6 @@ public class ZeppelinTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return null;
+        return JSONUtils.parseObject(parameters, ZeppelinParameters.class).getResources();
     }
 }

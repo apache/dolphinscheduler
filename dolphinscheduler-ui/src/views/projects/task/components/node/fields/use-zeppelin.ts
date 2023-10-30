@@ -49,43 +49,10 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
-      field: 'restEndpoint',
-      name: t('project.node.zeppelin_rest_endpoint'),
-      props: {
-        placeholder: t('project.node.zeppelin_rest_endpoint_tips')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        required: true,
-        validator(validate: any, value: string) {
-          if (!value) {
-            return new Error(t('project.node.zeppelin_rest_endpoint_tips'))
-          }
-        }
-      }
-    },
-    {
-      type: 'input',
       field: 'productionNoteDirectory',
       name: t('project.node.zeppelin_production_note_directory'),
       props: {
         placeholder: t('project.node.zeppelin_production_note_directory_tips')
-      }
-    },
-    {
-      type: 'input',
-      field: 'username',
-      name: t('project.node.zeppelin_username'),
-      props: {
-        placeholder: t('project.node.zeppelin_username_tips')
-      }
-    },
-    {
-      type: 'input',
-      field: 'password',
-      name: t('project.node.zeppelin_password'),
-      props: {
-        placeholder: t('project.node.zeppelin_password_tips')
       }
     },
     {

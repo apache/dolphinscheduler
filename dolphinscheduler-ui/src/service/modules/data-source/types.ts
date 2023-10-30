@@ -39,6 +39,7 @@ type IDataBase =
   | 'HANA'
   | 'DORIS'
   | 'KYUUBI'
+  | 'ZEPPELIN'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -59,6 +60,7 @@ type IDataBaseLabel =
   | 'OCEANBASE'
   | 'SSH'
   | 'KYUUBI'
+  | 'ZEPPELIN'
 
 interface IDataSource {
   id?: number
@@ -80,6 +82,7 @@ interface IDataSource {
   connectType?: string
   other?: object
   endpoint?: string
+  restEndpoint?: string
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string

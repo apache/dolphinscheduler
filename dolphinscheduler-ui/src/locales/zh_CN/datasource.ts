@@ -84,5 +84,7 @@ export default {
   SecretAccessKey: 'SecretAccessKey',
   SecretAccessKey_tips: '请输入SecretAccessKey',
   dbUser: 'DbUser',
-  dbUser_tips: '请输入DbUser'
+  dbUser_tips: '请输入DbUser',
+  zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+  zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint'
 }

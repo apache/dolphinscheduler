@@ -61,6 +61,7 @@ export function useForm(id?: number) {
     showHost: true,
     showPort: true,
     showAwsRegion: false,
+    showRestEndpoint: false,
     showCompatibleMode: false,
     showConnectType: false,
     showPrincipal: false,
@@ -253,11 +254,19 @@ export function useForm(id?: number) {
     } else {
       state.showPrincipal = false
     }
-    if (type === 'SSH') {
+    if (type === 'SSH' || type === 'ZEPPELIN') {
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
-      state.showPublicKey = true
+      state.showPublicKey = false
+      if (type === 'SSH') {
+        state.showPublicKey = true
+      }
+      if (type === 'ZEPPELIN') {
+        state.showHost = false
+        state.showPort = false
+        state.showRestEndpoint = true
+      }
     } else {
       state.showDataBaseName = true
       state.requiredDataBase = true
@@ -406,6 +415,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'HANA',
     label: 'HANA',
     defaultPort: 30015
+  },
+  ZEPPELIN: {
+    value: 'ZEPPELIN',
+    label: 'ZEPPELIN',
+    defaultPort: 8080
   },
   DORIS: {
     value: 'DORIS',
