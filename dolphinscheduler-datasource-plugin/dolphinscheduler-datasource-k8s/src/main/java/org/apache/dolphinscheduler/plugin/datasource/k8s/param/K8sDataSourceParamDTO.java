@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.k8s;
+package org.apache.dolphinscheduler.plugin.datasource.k8s.param;
 
-import java.util.List;
-import java.util.Map;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import lombok.Data;
-import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
-/**
- * k8s task parameters
- */
 @Data
-public class K8sTaskMainParameters {
+public class K8sDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    private String image;
-    private String command;
-    private String args;
-    private String pullSecret;
-    private String namespaceName;
-    private String imagePullPolicy;
-    private double minCpuCores;
-    private double minMemorySpace;
-    private Map<String, String> paramsMap;
-    private Map<String, String> labelMap;
-    private List<NodeSelectorRequirement> nodeSelectorRequirements;
+    protected String kubeConfig;
+    protected String namespace;
+
+    @Override
+    public DbType getType() {
+        return DbType.K8S;
+    }
 }

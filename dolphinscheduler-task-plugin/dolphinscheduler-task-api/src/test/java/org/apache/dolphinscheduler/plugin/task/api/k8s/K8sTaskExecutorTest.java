@@ -17,12 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.VAR_DELIMITER;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
@@ -50,7 +47,7 @@ public class K8sTaskExecutorTest {
     private K8sTaskMainParameters k8sTaskMainParameters = null;
     private final String image = "ds-dev";
     private final String imagePullPolicy = "IfNotPresent";
-    private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
+    private final String namespace = "namespace";
     private final double minCpuCores = 2;
     private final double minMemorySpace = 10;
     private final int taskInstanceId = 1000;
@@ -61,9 +58,6 @@ public class K8sTaskExecutorTest {
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
-        Map<String, String> namespace = JSONUtils.toMap(this.namespace);
-        String namespaceName = namespace.get(NAMESPACE_NAME);
-        String clusterName = namespace.get(CLUSTER);
         Map<String, String> labelMap = new HashMap<>();
         labelMap.put("test", "1234");
 
@@ -75,8 +69,7 @@ public class K8sTaskExecutorTest {
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
         k8sTaskMainParameters.setImagePullPolicy(imagePullPolicy);
-        k8sTaskMainParameters.setNamespaceName(namespaceName);
-        k8sTaskMainParameters.setClusterName(clusterName);
+        k8sTaskMainParameters.setNamespaceName(namespace);
         k8sTaskMainParameters.setMinCpuCores(minCpuCores);
         k8sTaskMainParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskMainParameters.setCommand("[\"perl\" ,\"-Mbignum=bpi\", \"-wle\", \"print bpi(2000)\"]");

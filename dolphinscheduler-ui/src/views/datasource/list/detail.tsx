@@ -163,6 +163,8 @@ const DetailModal = defineComponent({
       showDataBaseName,
       showJDBCConnectParameters,
       showPublicKey,
+      showNamespace,
+      showKubeConfig,
       modeOptions,
       redShiftModeOptions,
       sagemakerModeOption,
@@ -542,7 +544,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={!showMode || detailForm.mode === 'password'}
+                  v-show={
+                    (!showMode || detailForm.mode === 'password') &&
+                    detailForm.type != 'K8S'
+                  }
                   label={t('datasource.user_name')}
                   path='userName'
                   show-require-mark
@@ -557,7 +562,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={!showMode || detailForm.mode === 'password'}
+                  v-show={
+                    (!showMode || detailForm.mode === 'password') &&
+                    detailForm.type != 'K8S'
+                  }
                   label={t('datasource.user_password')}
                   path='password'
                 >
@@ -676,6 +684,35 @@ const DetailModal = defineComponent({
                     autosize={{
                       minRows: 4
                     }}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showKubeConfig}
+                  label={t('datasource.kubeConfig')}
+                  path='kubeConfig'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-kubeConfig'
+                    v-model={[detailForm.kubeConfig, 'value']}
+                    type='textarea'
+                    autosize={{
+                      minRows: 14
+                    }}
+                    placeholder={t('datasource.kubeConfig_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showNamespace}
+                  label={t('datasource.namespace')}
+                  path='namespace'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.namespace, 'value']}
+                    placeholder={t('datasource.namespace_tips')}
                   />
                 </NFormItem>
               </NForm>

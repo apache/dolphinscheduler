@@ -15,29 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.k8s;
+package org.apache.dolphinscheduler.plugin.datasource.k8s;
 
-import java.util.List;
-import java.util.Map;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
 
-import lombok.Data;
-import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
+import com.google.auto.service.AutoService;
 
-/**
- * k8s task parameters
- */
-@Data
-public class K8sTaskMainParameters {
+@AutoService(DataSourceChannelFactory.class)
+public class K8sDataSourceChannelFactory implements DataSourceChannelFactory {
 
-    private String image;
-    private String command;
-    private String args;
-    private String pullSecret;
-    private String namespaceName;
-    private String imagePullPolicy;
-    private double minCpuCores;
-    private double minMemorySpace;
-    private Map<String, String> paramsMap;
-    private Map<String, String> labelMap;
-    private List<NodeSelectorRequirement> nodeSelectorRequirements;
+    @Override
+    public DataSourceChannel create() {
+        return new K8sDataSourceChannel();
+    }
+
+    @Override
+    public String getName() {
+        return "k8s";
+    }
+
 }
