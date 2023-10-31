@@ -165,6 +165,7 @@ const DetailModal = defineComponent({
       showPublicKey,
       modeOptions,
       redShiftModeOptions,
+      sagemakerModeOption,
       loading,
       saving,
       testing,
@@ -321,6 +322,8 @@ const DetailModal = defineComponent({
                     options={
                       detailForm.type === 'REDSHIFT'
                         ? redShiftModeOptions
+                        : detailForm.type === 'SAGEMAKER'
+                        ? sagemakerModeOption
                         : modeOptions
                     }
                   ></NSelect>
@@ -497,7 +500,11 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  v-show={
+                    showMode &&
+                    detailForm.mode === 'IAM-accessKey' &&
+                    detailForm.type != 'SAGEMAKER'
+                  }
                   label={t('datasource.dbUser')}
                   path='dbUser'
                   show-require-mark

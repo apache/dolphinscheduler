@@ -451,6 +451,8 @@ interface ITaskParams {
   filterCondition?: string
   listParameters?: Array<any>
   yarnQueue?: string
+  awsRegion?: string
+  kubeConfig?: string
 }
 
 interface INodeData

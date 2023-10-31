@@ -43,7 +43,12 @@ export function userSagemaker({
     workerGroup: 'default',
     delayTime: 0,
     timeout: 30,
-    timeoutNotifyStrategy: ['WARN']
+    type: 'SAGEMAKER',
+    displayRows: 10,
+    timeoutNotifyStrategy: ['WARN'],
+    username: '',
+    password: '',
+    awsRegion: ''
   } as INodeData)
 
   return {
@@ -60,6 +65,7 @@ export function userSagemaker({
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
+      ...Fields.useDatasource(model),
       ...Fields.useSagemaker(model),
       Fields.usePreTasks()
     ] as IJsonItem[],
