@@ -146,6 +146,14 @@ Create a database environment variables.
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
+- name: SPRING_PROFILES_ACTIVE
+  {{- if .Values.postgresql.enabled }}
+  value: "postgresql"
+  {{- else if .Values.mysql.enabled }}
+  value: "mysql"
+  {{- else }}
+  value: {{ .Values.externalDatabase.type | quote }}
+  {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
   value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
