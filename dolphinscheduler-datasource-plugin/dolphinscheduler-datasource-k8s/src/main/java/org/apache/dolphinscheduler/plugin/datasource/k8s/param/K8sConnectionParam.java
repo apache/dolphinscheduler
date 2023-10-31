@@ -15,29 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.k8s;
+package org.apache.dolphinscheduler.plugin.datasource.k8s.param;
 
-import java.util.List;
-import java.util.Map;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 
 import lombok.Data;
-import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
-/**
- * k8s task parameters
- */
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Data
-public class K8sTaskMainParameters {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class K8sConnectionParam implements ConnectionParam {
 
-    private String image;
-    private String command;
-    private String args;
-    private String pullSecret;
-    private String namespaceName;
-    private String imagePullPolicy;
-    private double minCpuCores;
-    private double minMemorySpace;
-    private Map<String, String> paramsMap;
-    private Map<String, String> labelMap;
-    private List<NodeSelectorRequirement> nodeSelectorRequirements;
+    protected String kubeConfig;
+    protected String namespace;
 }

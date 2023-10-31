@@ -193,5 +193,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         })
         private WebElement inputZeppelinRestEndpoint;
 
+        @FindBys({
+                @FindBy(className = "input-kubeConfig"),
+                @FindBy(tagName = "textarea"),
+        })
+        private WebElement inputKubeConfig;
+
     }
 }
