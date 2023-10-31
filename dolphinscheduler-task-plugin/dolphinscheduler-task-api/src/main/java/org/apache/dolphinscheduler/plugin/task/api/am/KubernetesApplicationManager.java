@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_L
 
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -131,6 +132,8 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
+        k8sTaskExecutionContext
+                .setConfigYaml(JSONUtils.getNodeString(k8sTaskExecutionContext.getConnectionParams(), "kubeConfig"));
         return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),
                 key -> new KubernetesClientBuilder()
                         .withConfig(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())).build());
