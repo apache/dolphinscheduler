@@ -35,6 +35,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -423,15 +424,23 @@ public class TaskExecutionContextFactory {
         dataSource.setUserName(hikariDataSource.getUsername());
         JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
         if (jdbcInfo != null) {
-            Properties properties = new Properties();
-            properties.setProperty(USER, hikariDataSource.getUsername());
-            properties.setProperty(PASSWORD, hikariDataSource.getPassword());
-            properties.setProperty(DATABASE, jdbcInfo.getDatabase());
-            properties.setProperty(ADDRESS, jdbcInfo.getAddress());
-            properties.setProperty(OTHER, jdbcInfo.getParams());
-            properties.setProperty(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            ObjectNode objectNode = JSONUtils.createObjectNode();
+            objectNode.put(USER, hikariDataSource.getUsername());
+            objectNode.put(PASSWORD,hikariDataSource.getPassword());
+            objectNode.put(DATABASE,jdbcInfo.getDatabase());
+            objectNode.put(ADDRESS, jdbcInfo.getAddress());
+            objectNode.put(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            Map<String, String> map = new HashMap<>();
+            String[] params = jdbcInfo.getParams().split("&");
+            for (String param : params) {
+                String[] keyValue = param.split("=");
+                String key = keyValue[0];
+                String value = keyValue.length > 1 ? keyValue[1] : "";
+                map.put(key, value);
+            }
+            objectNode.putPOJO(OTHER,map);
             dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
-            dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
+            dataSource.setConnectionParams(objectNode.toString());
         }
 
         return dataSource;
