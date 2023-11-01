@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.enums.Flag;
 
 /**
  * k8s task parameters
@@ -35,7 +38,7 @@ import lombok.Data;
 public class K8sTaskParameters extends AbstractParameters {
 
     private String image;
-    private String namespace;
+    private int namespaceId;
     private String command;
     private String args;
     private String pullSecret;
@@ -47,11 +50,22 @@ public class K8sTaskParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(image) && StringUtils.isNotEmpty(namespace);
+        return StringUtils.isNotEmpty(image) && 0!= namespaceId;
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+
+        if (0 == namespaceId) {
+            return resources;
+        }
+        resources.put(ResourceType.K8S_NAMESPACE, namespaceId);
+        return resources;
     }
 }

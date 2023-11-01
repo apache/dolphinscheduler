@@ -24,7 +24,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, visible = true, property = "resourceType")
 @JsonSubTypes({
         @Type(value = DataSourceParameters.class, name = "DATASOURCE"),
-        @Type(value = UdfFuncParameters.class, name = "UDF")
+        @Type(value = UdfFuncParameters.class, name = "UDF"),
+        @Type(value = K8sNamespaceParameters.class, name = "K8S_NAMESPACE")
 })
 public abstract class AbstractResourceParameters {
 

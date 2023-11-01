@@ -30,8 +30,10 @@ public class KubeflowParameters extends AbstractParameters {
 
     private String clusterYAML;
 
+    private int namespaceId;
+
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(yamlContent);
+        return StringUtils.isNotEmpty(yamlContent) && 0 != namespaceId;
     }
 
 }

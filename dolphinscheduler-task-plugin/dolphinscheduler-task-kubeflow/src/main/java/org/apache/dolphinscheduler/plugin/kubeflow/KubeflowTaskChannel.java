@@ -43,6 +43,6 @@ public class KubeflowTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return null;
+        return JSONUtils.parseObject(parameters, KubeflowParameters.class).getResources();
     }
 }

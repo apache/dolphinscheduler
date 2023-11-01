@@ -33,7 +33,7 @@ public class K8sParametersTest {
     private K8sTaskParameters k8sTaskParameters = null;
     private final String image = "ds-dev";
     private final String imagePullPolicy = "IfNotPresent";
-    private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
+    private final int namespaceId = 1;
     private final double minCpuCores = 2;
     private final double minMemorySpace = 10;
     private final String command = "[\"/bin/bash\", \"-c\"]";
@@ -47,7 +47,7 @@ public class K8sParametersTest {
         k8sTaskParameters = new K8sTaskParameters();
         k8sTaskParameters.setImage(image);
         k8sTaskParameters.setImagePullPolicy(imagePullPolicy);
-        k8sTaskParameters.setNamespace(namespace);
+        k8sTaskParameters.setNamespaceId(namespaceId);
         k8sTaskParameters.setMinCpuCores(minCpuCores);
         k8sTaskParameters.setMinMemorySpace(minMemorySpace);
         k8sTaskParameters.setCommand(command);
@@ -71,7 +71,7 @@ public class K8sParametersTest {
     public void testK8sParameters() {
         Assertions.assertEquals(image, k8sTaskParameters.getImage());
         Assertions.assertEquals(imagePullPolicy, k8sTaskParameters.getImagePullPolicy());
-        Assertions.assertEquals(namespace, k8sTaskParameters.getNamespace());
+        Assertions.assertEquals(namespaceId, k8sTaskParameters.getNamespaceId());
         Assertions.assertEquals(0, Double.compare(minCpuCores, k8sTaskParameters.getMinCpuCores()));
         Assertions.assertEquals(0, Double.compare(minMemorySpace, k8sTaskParameters.getMinMemorySpace()));
         Assertions.assertEquals(command, k8sTaskParameters.getCommand());

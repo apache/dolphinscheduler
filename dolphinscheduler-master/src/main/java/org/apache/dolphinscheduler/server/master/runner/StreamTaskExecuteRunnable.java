@@ -325,7 +325,6 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
         TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
         ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
-
         AbstractParameters baseParam = taskPluginManager.getParameters(
                 ParametersNode.builder()
                         .taskType(taskInstance.getTaskType())
@@ -348,7 +347,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         // process instance id default 0
         taskExecutionContext.setProcessInstanceId(0);
         taskExecutionContextFactory.setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, tenantCode);
-        taskExecutionContextFactory.setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
+        taskExecutionContextFactory.setK8sTaskRelation(taskExecutionContext, taskInstance);
         return taskExecutionContext;
     }
 

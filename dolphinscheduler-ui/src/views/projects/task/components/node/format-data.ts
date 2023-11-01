@@ -60,8 +60,8 @@ export function formatParams(data: INodeData): {
     taskParams.appName = data.appName
     taskParams.mainArgs = data.mainArgs
     taskParams.others = data.others
-    if (data.namespace) {
-      taskParams.namespace = data.namespace
+    if (data.namespaceId) {
+      taskParams.namespaceId = data.namespaceId
     }
     taskParams.yarnQueue = data.yarnQueue
   }
@@ -350,7 +350,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'K8S') {
-    taskParams.namespace = data.namespace
+    taskParams.namespaceId = data.namespaceId
     taskParams.minCpuCores = data.minCpuCores
     taskParams.minMemorySpace = data.minMemorySpace
     taskParams.image = data.image
@@ -470,7 +470,7 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'KUBEFLOW') {
     taskParams.yamlContent = data.yamlContent
-    taskParams.namespace = data.namespace
+    taskParams.namespaceId = data.namespaceId
   }
 
   if (data.taskType === 'LINKIS') {

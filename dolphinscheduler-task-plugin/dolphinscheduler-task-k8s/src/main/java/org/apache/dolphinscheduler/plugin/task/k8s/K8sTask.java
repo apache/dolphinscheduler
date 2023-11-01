@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPAC
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.K8sNamespaceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -83,9 +85,9 @@ public class K8sTask extends AbstractK8sTask {
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
-        String namespaceName = namespace.get(NAMESPACE_NAME);
-        String clusterName = namespace.get(CLUSTER);
+        K8sNamespaceParameters k8sNamespaceParameters = (K8sNamespaceParameters) k8sTaskParameters.getResources().getResourceMap(ResourceType.K8S_NAMESPACE).get(k8sTaskParameters.getNamespaceId());
+        String namespaceName = k8sNamespaceParameters.getNamespace();
+        String clusterName = k8sNamespaceParameters.getClusterName();
         k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());
         k8sTaskMainParameters.setPullSecret(k8sTaskParameters.getPullSecret());
         k8sTaskMainParameters.setNamespaceName(namespaceName);

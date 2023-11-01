@@ -33,10 +33,7 @@ export function useNamespace(): IJsonItem {
     options.value = (totalList || []).map(
       (item: { id: string; namespace: string; clusterName: string }) => ({
         label: `${item.namespace}(${item.clusterName})`,
-        value: JSON.stringify({
-          name: item.namespace,
-          cluster: item.clusterName
-        })
+        value: item.id
       })
     )
     loading.value = false
@@ -53,7 +50,7 @@ export function useNamespace(): IJsonItem {
 
   return {
     type: 'select',
-    field: 'namespace',
+    field: 'namespaceId',
     name: t('project.node.namespace_cluster'),
     props: {
       loading,

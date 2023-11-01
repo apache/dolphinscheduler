@@ -44,6 +44,6 @@ public class SparkTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return null;
+        return JSONUtils.parseObject(parameters, SparkParameters.class).getResources();
     }
 }

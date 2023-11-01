@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.spark;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 @Data
 public class SparkParameters extends AbstractParameters {
@@ -103,15 +105,20 @@ public class SparkParameters extends AbstractParameters {
     /**
      * kubernetes cluster namespace
      */
-    private String namespace;
+    private int namespaceId;
 
-    public String getNamespace() {
-        return namespace;
-    }
 
     private List<ResourceInfo> resourceList = new ArrayList<>();
 
     private String sqlExecutionType;
+
+    public int getNamespaceId() {
+        return namespaceId;
+    }
+
+    public void setNamespaceId(int namespaceId) {
+        this.namespaceId = namespaceId;
+    }
 
     @Override
     public boolean checkParameters() {
@@ -129,6 +136,16 @@ public class SparkParameters extends AbstractParameters {
             resourceList.add(mainJar);
         }
         return resourceList;
+    }
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+
+        if (0 == namespaceId) {
+            return resources;
+        }
+        resources.put(ResourceType.K8S_NAMESPACE, namespaceId);
+        return resources;
     }
 
 }

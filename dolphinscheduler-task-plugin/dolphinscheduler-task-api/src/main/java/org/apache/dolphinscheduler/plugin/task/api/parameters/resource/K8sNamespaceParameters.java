@@ -15,11 +15,39 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
-public enum ResourceType {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.UdfType;
 
-    DATASOURCE,
-    UDF,
-    K8S_NAMESPACE;
+import java.util.Date;
+
+@Data
+public class K8sNamespaceParameters extends AbstractResourceParameters {
+
+    /**
+     * id
+     */
+    private int id;
+
+    @JsonProperty(value = "K8S_NAMESPACE")
+    private String resourceType;
+
+    /**
+     * namespace
+     */
+    private String namespace;
+
+    /**
+     * cluster name
+     */
+    private String clusterName;
+
+    /**
+     * cluster config yaml
+     */
+    private String configYaml;
+
 }

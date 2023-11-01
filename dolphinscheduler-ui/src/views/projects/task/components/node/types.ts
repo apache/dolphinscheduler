@@ -373,7 +373,7 @@ interface ITaskParams {
   connParams?: string
   targetJobName?: string
   cluster?: string
-  namespace?: string
+  namespaceId?: string
   clusterNamespace?: string
   minCpuCores?: string
   minMemorySpace?: string

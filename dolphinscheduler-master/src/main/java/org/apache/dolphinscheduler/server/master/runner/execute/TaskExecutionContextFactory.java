@@ -35,17 +35,22 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
+import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
+import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -59,10 +64,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractResourceParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.*;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
@@ -84,6 +86,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -110,6 +113,12 @@ public class TaskExecutionContextFactory {
 
     @Autowired
     private HikariDataSource hikariDataSource;
+
+    @Autowired
+    private K8sNamespaceMapper k8sNamespaceMapper;
+
+    @Autowired
+    private ClusterMapper clusterMapper;
 
     public TaskExecutionContext createTaskExecutionContext(TaskInstance taskInstance) throws TaskExecutionContextCreateException {
         ProcessInstance workflowInstance = taskInstance.getProcessInstance();
@@ -139,7 +148,7 @@ public class TaskExecutionContextFactory {
                 .create();
 
         setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, workflowInstance.getTenantCode());
-        setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
+        setK8sTaskRelation(taskExecutionContext, taskInstance);
         return taskExecutionContext;
     }
 
@@ -152,11 +161,6 @@ public class TaskExecutionContextFactory {
             setDataQualityTaskRelation(dataQualityTaskExecutionContext, taskInstance, tenantCode);
         }
         taskExecutionContext.setDataQualityTaskExecutionContext(dataQualityTaskExecutionContext);
-    }
-
-    public void setK8sTaskRelatedInfo(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance) {
-        K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
-        taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
     }
 
     private Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
@@ -186,6 +190,9 @@ public class TaskExecutionContextFactory {
                     break;
                 case UDF:
                     setTaskUdfFuncResourceInfo(map);
+                    break;
+                case K8S_NAMESPACE:
+                    setTaskK8SNamespaceResourceInfo(map);
                     break;
                 default:
                     break;
@@ -224,6 +231,26 @@ public class TaskExecutionContextFactory {
             udfFuncParameters.setTenantCode(tenantCode);
             map.put(udfFunc.getId(), udfFuncParameters);
         });
+    }
+
+    private void setTaskK8SNamespaceResourceInfo(Map<Integer, AbstractResourceParameters> map) {
+        if (MapUtils.isEmpty(map)) {
+            return;
+        }
+        List<K8sNamespace> k8sNamespaceUsers = k8sNamespaceMapper.selectBatchIds(map.keySet().stream().collect(Collectors.toList()));
+        k8sNamespaceUsers.forEach(k8sNamespace -> {
+            Cluster cluster = clusterMapper.selectById(k8sNamespace.getClusterCode());
+            if(ObjectUtils.isEmpty(cluster)){
+                return;
+            }
+            K8sNamespaceParameters k8sNamespaceParameters = new K8sNamespaceParameters();
+            k8sNamespaceParameters.setId(k8sNamespace.getId());
+            k8sNamespaceParameters.setNamespace(k8sNamespace.getNamespace());
+            k8sNamespaceParameters.setClusterName(cluster.getName());
+            k8sNamespaceParameters.setConfigYaml(cluster.getConfig());
+            map.put(k8sNamespace.getId(), k8sNamespaceParameters);
+        });
+
     }
 
     private void setDataQualityTaskRelation(DataQualityTaskExecutionContext dataQualityTaskExecutionContext,
@@ -270,36 +297,28 @@ public class TaskExecutionContextFactory {
         setStatisticsValueWriterConfig(dataQualityTaskExecutionContext);
     }
 
-    private K8sTaskExecutionContext setK8sTaskRelation(TaskInstance taskInstance) {
+    public void setK8sTaskRelation(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance) {
         K8sTaskExecutionContext k8sTaskExecutionContext = null;
-        String namespace = "";
+        String namespaceId = "";
         switch (taskInstance.getTaskType()) {
             case "K8S":
             case "KUBEFLOW":
-                K8sTaskParameters k8sTaskParameters =
-                        JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
-                namespace = k8sTaskParameters.getNamespace();
-                break;
             case "SPARK":
-                SparkParameters sparkParameters =
-                        JSONUtils.parseObject(taskInstance.getTaskParams(), SparkParameters.class);
-                if (StringUtils.isNotEmpty(sparkParameters.getNamespace())) {
-                    namespace = sparkParameters.getNamespace();
-                }
+                Map <String,Object> map = JSONUtils.parseObject(taskInstance.getTaskParams(), Map.class);
+                namespaceId = null == map.get("namespaceId")? null:map.get("namespaceId").toString();
                 break;
             default:
                 break;
         }
 
-        if (StringUtils.isNotEmpty(namespace)) {
-            String clusterName = JSONUtils.toMap(namespace).get(CLUSTER);
-            String configYaml = processService.findConfigYamlByName(clusterName);
-            if (configYaml != null) {
+        if (StringUtils.isNotEmpty(namespaceId)) {
+            K8sNamespaceParameters k8sNamespaceParameters = (K8sNamespaceParameters) taskExecutionContext.getResourceParametersHelper().getResourceMap(org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType.K8S_NAMESPACE).get(namespaceId);
+            if (StringUtils.isNotEmpty(k8sNamespaceParameters.getConfigYaml())) {
                 k8sTaskExecutionContext =
-                        new K8sTaskExecutionContext(configYaml, JSONUtils.toMap(namespace).get(NAMESPACE_NAME));
+                        new K8sTaskExecutionContext(k8sNamespaceParameters.getConfigYaml(), k8sNamespaceParameters.getNamespace());
             }
         }
-        return k8sTaskExecutionContext;
+        taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
     }
 
     /**

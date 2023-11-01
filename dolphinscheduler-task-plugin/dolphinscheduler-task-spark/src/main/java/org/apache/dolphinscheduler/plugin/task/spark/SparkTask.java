@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.plugin.task.spark.SparkConstants.SPARK
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -131,11 +132,11 @@ public class SparkTask extends AbstractYarnTask {
 
         String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
                 : SparkConstants.DEPLOY_MODE_LOCAL;
-
-        boolean onNativeKubernetes = StringUtils.isNotEmpty(sparkParameters.getNamespace());
+        K8sTaskExecutionContext k8sTaskExecutionContext = taskExecutionContext.getK8sTaskExecutionContext();
+        boolean onNativeKubernetes = null != k8sTaskExecutionContext;
 
         String masterUrl = onNativeKubernetes ? SPARK_ON_K8S_MASTER_PREFIX +
-                Config.fromKubeconfig(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml()).getMasterUrl()
+                Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml()).getMasterUrl()
                 : SparkConstants.SPARK_ON_YARN;
 
         if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
@@ -178,7 +179,7 @@ public class SparkTask extends AbstractYarnTask {
         if (onNativeKubernetes) {
             args.add(String.format(DRIVER_LABEL_CONF, UNIQUE_LABEL_NAME, taskExecutionContext.getTaskAppId()));
             args.add(String.format(SPARK_KUBERNETES_NAMESPACE,
-                    JSONUtils.toMap(sparkParameters.getNamespace()).get(NAMESPACE_NAME)));
+                    k8sTaskExecutionContext.getNamespace()));
         }
 
         ResourceInfo mainJar = sparkParameters.getMainJar();
