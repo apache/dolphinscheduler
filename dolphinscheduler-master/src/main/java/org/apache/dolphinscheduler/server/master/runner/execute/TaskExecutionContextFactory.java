@@ -35,7 +35,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_CONNECTOR_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.TARGET_DATASOURCE_ID;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -84,13 +83,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
@@ -426,8 +425,8 @@ public class TaskExecutionContextFactory {
         if (jdbcInfo != null) {
             ObjectNode objectNode = JSONUtils.createObjectNode();
             objectNode.put(USER, hikariDataSource.getUsername());
-            objectNode.put(PASSWORD,hikariDataSource.getPassword());
-            objectNode.put(DATABASE,jdbcInfo.getDatabase());
+            objectNode.put(PASSWORD, hikariDataSource.getPassword());
+            objectNode.put(DATABASE, jdbcInfo.getDatabase());
             objectNode.put(ADDRESS, jdbcInfo.getAddress());
             objectNode.put(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
             Map<String, String> map = new HashMap<>();
@@ -438,7 +437,7 @@ public class TaskExecutionContextFactory {
                 String value = keyValue.length > 1 ? keyValue[1] : "";
                 map.put(key, value);
             }
-            objectNode.putPOJO(OTHER,map);
+            objectNode.putPOJO(OTHER, map);
             dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
             dataSource.setConnectionParams(objectNode.toString());
         }
