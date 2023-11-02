@@ -612,10 +612,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             try {
                 if (StringUtils.isBlank(fullName)) {
-                    resourcesList = storageOperate.listFilesStatus(defaultPath, defaultPath, tenantCode, type);
-                } else {
-                    resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
+                    fullName = defaultPath;
                 }
+                resourcesList = recursive ? storageOperate.listFilesStatusRecursively(fullName, defaultPath,
+                        tenantCode, type)
+                        : storageOperate.listFilesStatus(fullName, defaultPath,
+                                tenantCode, type);
             } catch (Exception e) {
                 log.error(e.getMessage() + " Resource path: {}", fullName, e);
                 throw new ServiceException(String.format(e.getMessage() +
