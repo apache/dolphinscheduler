@@ -20,7 +20,7 @@ import { reactive, h, ref } from 'vue'
 import { NButton, NIcon, NPopconfirm, NSpace, NTooltip } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
-import { DeleteOutlined, EditOutlined } from '@vicons/antd'
+import { DeleteOutlined } from '@vicons/antd'
 import {
   queryNamespaceListPaging,
   delNamespaceById
@@ -38,12 +38,6 @@ import {
 
 export function useTable() {
   const { t } = useI18n()
-
-  const handleEdit = (row: NamespaceItem) => {
-    variables.showModalRef = true
-    variables.statusRef = 1
-    variables.row = row
-  }
 
   const handleDelete = (row: NamespaceItem) => {
     delNamespaceById(row.id).then(() => {
@@ -77,16 +71,6 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
-        title: t('security.k8s_namespace.limit_cpu'),
-        key: 'limitsCpu',
-        width: 140
-      },
-      {
-        title: t('security.k8s_namespace.limit_memory'),
-        key: 'limitsMemory',
-        width: 140
-      },
-      {
         title: t('security.k8s_namespace.create_time'),
         key: 'createTime',
         ...COLUMN_WIDTH_CONFIG['time']
@@ -103,29 +87,6 @@ export function useTable() {
         render(row: NamespaceItem) {
           return h(NSpace, null, {
             default: () => [
-              h(
-                NTooltip,
-                {},
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        onClick: () => {
-                          handleEdit(row)
-                        }
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, { default: () => h(EditOutlined) })
-                      }
-                    ),
-                  default: () => t('security.k8s_namespace.edit')
-                }
-              ),
               h(
                 NPopconfirm,
                 {

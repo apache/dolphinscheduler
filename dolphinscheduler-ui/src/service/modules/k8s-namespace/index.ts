@@ -50,17 +50,6 @@ export function createK8sNamespace(params: K8SReq): any {
   })
 }
 
-export function updateK8sNamespace(params: K8SReq, id: number): any {
-  return axios({
-    url: `/k8s-namespace/${id}`,
-    method: 'put',
-    params: {
-      ...params,
-      id
-    }
-  })
-}
-
 export function delNamespaceById(id: number): any {
   return axios({
     url: '/k8s-namespace/delete',

@@ -28,7 +28,6 @@ import org.yaml.snakeyaml.Yaml;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceList;
 import io.fabric8.kubernetes.api.model.ObjectMeta;
-import io.fabric8.kubernetes.api.model.ResourceQuota;
 import io.fabric8.kubernetes.client.KubernetesClient;
 
 /**
@@ -41,14 +40,12 @@ public class K8sClientService {
     @Autowired
     private K8sManager k8sManager;
 
-    public ResourceQuota upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace,
-                                                         String yamlStr) {
+    public void upsertNamespaceAndResourceToK8s(K8sNamespace k8sNamespace) {
         if (!checkNamespaceToK8s(k8sNamespace.getNamespace(), k8sNamespace.getClusterCode())) {
             throw new RuntimeException(String.format(
                     "namespace %s does not exist in k8s cluster, please create namespace in k8s cluster first",
                     k8sNamespace.getNamespace()));
         }
-        return upsertNamespacedResourceToK8s(k8sNamespace, yamlStr);
     }
 
     public Optional<Namespace> deleteNamespaceToK8s(String name, Long clusterCode) {
@@ -63,33 +60,6 @@ public class K8sClientService {
             client.namespaces().delete(body);
         }
         return getNamespaceFromK8s(name, clusterCode);
-    }
-
-    private ResourceQuota upsertNamespacedResourceToK8s(K8sNamespace k8sNamespace,
-                                                        String yamlStr) {
-
-        KubernetesClient client = k8sManager.getK8sClient(k8sNamespace.getClusterCode());
-
-        // 创建资源
-        ResourceQuota queryExist = client.resourceQuotas()
-                .inNamespace(k8sNamespace.getNamespace())
-                .withName(k8sNamespace.getNamespace())
-                .get();
-
-        ResourceQuota body = yaml.loadAs(yamlStr, ResourceQuota.class);
-
-        if (queryExist != null) {
-            if (k8sNamespace.getLimitsCpu() == null && k8sNamespace.getLimitsMemory() == null) {
-                client.resourceQuotas().inNamespace(k8sNamespace.getNamespace())
-                        .withName(k8sNamespace.getNamespace())
-                        .delete();
-                return null;
-            }
-        }
-
-        return client.resourceQuotas().inNamespace(k8sNamespace.getNamespace())
-                .withName(k8sNamespace.getNamespace())
-                .createOrReplace(body);
     }
 
     private Optional<Namespace> getNamespaceFromK8s(String name, Long clusterCode) {

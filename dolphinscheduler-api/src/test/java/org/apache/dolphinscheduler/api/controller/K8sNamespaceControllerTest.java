@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -81,24 +80,6 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());// because we not have a k8s
                                                                                        // cluster in test env
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void updateNamespace() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "1");
-        paramsMap.add("owner", "owmer1");
-        paramsMap.add("tag", "flink");
-
-        MvcResult mvcResult = mockMvc.perform(put("/k8s-namespace/{id}", 1)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
     @Test

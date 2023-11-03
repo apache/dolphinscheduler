@@ -19,8 +19,7 @@ import { reactive, ref, SetupContext } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   verifyNamespaceK8s,
-  createK8sNamespace,
-  updateK8sNamespace
+  createK8sNamespace
 } from '@/service/modules/k8s-namespace'
 import { queryAllClusterList } from '@/service/modules/cluster'
 import { useAsyncState } from '@vueuse/core'
@@ -38,8 +37,6 @@ export function useModal(
       namespace: ref(''),
       clusterCode: ref(''),
       userId: ref(''),
-      limitsCpu: ref(''),
-      limitsMemory: ref(''),
       clusterOptions: []
     },
     saving: false,
@@ -72,9 +69,10 @@ export function useModal(
     variables.saving = true
 
     try {
-      statusRef === 0
-        ? await submitK8SNamespaceModal()
-        : await updateK8SNamespaceModal()
+      if (statusRef === 0) {
+        submitK8SNamespaceModal()
+      }
+
       variables.saving = false
     } catch (err) {
       variables.saving = false
@@ -110,20 +108,10 @@ export function useModal(
       createK8sNamespace(variables.model).then(() => {
         variables.model.namespace = ''
         variables.model.clusterCode = ''
-        variables.model.limitsCpu = ''
-        variables.model.limitsMemory = ''
         variables.model.userId = ''
         ctx.emit('confirmModal', props.showModalRef)
       })
     })
-  }
-
-  const updateK8SNamespaceModal = () => {
-    updateK8sNamespace(variables.model, variables.model.id).then(
-      (ignored: any) => {
-        ctx.emit('confirmModal', props.showModalRef)
-      }
-    )
   }
 
   return {

@@ -23,14 +23,7 @@ import {
   watch
 } from 'vue'
 import Modal from '@/components/modal'
-import {
-  NForm,
-  NFormItem,
-  NInput,
-  NInputGroup,
-  NInputGroupLabel,
-  NSelect
-} from 'naive-ui'
+import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
 import { useI18n } from 'vue-i18n'
 
@@ -59,8 +52,6 @@ const K8sNamespaceModal = defineComponent({
       if (props.statusRef === 0) {
         variables.model.namespace = ''
         variables.model.clusterCode = ''
-        variables.model.limitsCpu = ''
-        variables.model.limitsMemory = ''
         variables.model.userId = ''
       }
       ctx.emit('cancelModal', props.showModalRef)
@@ -85,15 +76,11 @@ const K8sNamespaceModal = defineComponent({
         if (props.statusRef === 0) {
           variables.model.namespace = ''
           variables.model.clusterCode = ''
-          variables.model.limitsCpu = ''
-          variables.model.limitsMemory = ''
           variables.model.userId = ''
         } else {
           variables.model.id = props.row.id
           variables.model.namespace = props.row.namespace
           variables.model.clusterCode = props.row.clusterCode
-          variables.model.limitsCpu = props.row.limitsCpu + ''
-          variables.model.limitsMemory = props.row.limitsMemory + ''
           variables.model.userId = props.row.userId
         }
       }
@@ -105,8 +92,6 @@ const K8sNamespaceModal = defineComponent({
         variables.model.id = props.row.id
         variables.model.namespace = props.row.namespace
         variables.model.clusterCode = props.row.clusterCode
-        variables.model.limitsCpu = props.row.limitsCpu + ''
-        variables.model.limitsMemory = props.row.limitsMemory + ''
         variables.model.userId = props.row.userId
       }
     )
@@ -118,11 +103,7 @@ const K8sNamespaceModal = defineComponent({
     return (
       <div>
         <Modal
-          title={
-            this.statusRef === 0
-              ? t('security.k8s_namespace.create_namespace')
-              : t('security.k8s_namespace.edit_namespace')
-          }
+          title={t('security.k8s_namespace.create_namespace')}
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
@@ -161,34 +142,6 @@ const K8sNamespaceModal = defineComponent({
                     v-model={[this.model.clusterCode, 'value']}
                     disabled={this.statusRef !== 0}
                   />
-                </NFormItem>
-                <NFormItem
-                  label={t('security.k8s_namespace.limit_cpu')}
-                  path='limitsCpu'
-                >
-                  <NInputGroup>
-                    <NInput
-                      allowInput={this.trim}
-                      placeholder={t('security.k8s_namespace.limit_cpu_tips')}
-                      v-model={[this.model.limitsCpu, 'value']}
-                    />
-                    <NInputGroupLabel>CORE</NInputGroupLabel>
-                  </NInputGroup>
-                </NFormItem>
-                <NFormItem
-                  label={t('security.k8s_namespace.limit_memory')}
-                  path='limitsMemory'
-                >
-                  <NInputGroup>
-                    <NInput
-                      allowInput={this.trim}
-                      placeholder={t(
-                        'security.k8s_namespace.limit_memory_tips'
-                      )}
-                      v-model={[this.model.limitsMemory, 'value']}
-                    />
-                    <NInputGroupLabel>GB</NInputGroupLabel>
-                  </NInputGroup>
                 </NFormItem>
               </NForm>
             )
