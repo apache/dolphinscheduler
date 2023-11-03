@@ -689,8 +689,6 @@ public final class Constants {
      */
     public static final String NAMESPACE = "namespace";
     public static final String CLUSTER = "cluster";
-    public static final String LIMITS_CPU = "limitsCpu";
-    public static final String LIMITS_MEMORY = "limitsMemory";
     public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**

@@ -13,34 +13,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-interface ListReq {
-  pageNo: number
-  pageSize: number
-  searchVal?: string
-}
-
-interface K8SReq {
-  namespace: string
-  clusterCode: string
-  owner?: string
-  tag?: string
-}
-
-interface NamespaceItem extends K8SReq {
-  id: number
-  createTime: string
-  updateTime: string
-}
-
-interface NamespaceListRes {
-  totalList: NamespaceItem[]
-  total: number
-  totalPage: number
-  pageSize: number
-  currentPage: number
-  start: number
-}
-
-export { ListReq, K8SReq, NamespaceItem, NamespaceListRes }
+-- t_ds_k8s_namespace
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "limits_cpu";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "limits_memory";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_replicas";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_request_cpu";
+ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_request_memory";
