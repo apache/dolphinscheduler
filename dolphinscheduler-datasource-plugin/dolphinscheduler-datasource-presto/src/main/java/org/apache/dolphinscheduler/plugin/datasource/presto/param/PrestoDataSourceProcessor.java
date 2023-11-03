@@ -102,10 +102,11 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
-        if (MapUtils.isNotEmpty(prestoConnectionParam.getOther())) {
-            return String.format("%s?%s", prestoConnectionParam.getJdbcUrl(),
-                    transformOther(prestoConnectionParam.getOther()));
-        }
+        /**
+         * return jdbc url without other parameters, avoid to assign same parameters both in URL and properties.
+         * or else got error msg: Connection property '...' is both in the URL and an argument
+         * ref to <a href="https://prestodb.io/docs/current/installation/jdbc.html">Presto JDBC Driver</>
+         */
         return prestoConnectionParam.getJdbcUrl();
     }
 
