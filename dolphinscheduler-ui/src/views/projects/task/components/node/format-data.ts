@@ -361,6 +361,9 @@ export function formatParams(data: INodeData): {
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels
     taskParams.nodeSelectors = data.nodeSelectors
+    taskParams.datasource = data.datasource
+    taskParams.type = data.type
+    taskParams.kubeConfig = data.kubeConfig
     taskParams.pullSecret = data.pullSecret
   }
 
@@ -407,6 +410,11 @@ export function formatParams(data: INodeData): {
 
   if (data.taskType === 'SAGEMAKER') {
     taskParams.sagemakerRequestJson = data.sagemakerRequestJson
+    taskParams.username = data.username
+    taskParams.password = data.password
+    taskParams.datasource = data.datasource
+    taskParams.type = data.type
+    taskParams.awsRegion = data.awsRegion
   }
   if (data.taskType === 'PYTORCH') {
     taskParams.script = data.script
