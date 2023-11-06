@@ -121,6 +121,7 @@
         <testcontainer.version>1.17.6</testcontainer.version>
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
+        <hana.version>2.18.13</hana.version>
     </properties>
 
     <dependencyManagement>
@@ -391,6 +392,13 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sap.cloud.db.jdbc</groupId>
+                <artifactId>ngdbc</artifactId>
+                <version>${hana.version}</version>
                 <scope>test</scope>
             </dependency>
 
