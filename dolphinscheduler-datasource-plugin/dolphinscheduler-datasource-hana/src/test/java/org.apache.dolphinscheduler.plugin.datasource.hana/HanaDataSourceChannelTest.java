@@ -17,22 +17,22 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hana;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-
-import com.google.auto.service.AutoService;
+import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@AutoService(DataSourceChannelFactory.class)
-public class HanaDataSourceChannelFactory implements DataSourceChannelFactory {
+@ExtendWith(MockitoExtension.class)
+public class HanaDataSourceChannelTest {
 
-    @Override
-    public String getName() {
-        return DbType.HANA.getDescp();
-    }
-
-    @Override
-    public DataSourceChannel create() {
-        return new HanaDataSourceChannel();
+    @Test
+    public void testCreateDataSourceClient() {
+        HanaDataSourceChannel sourceChannel = Mockito.mock(HanaDataSourceChannel.class);
+        HanaPooledDataSourceClient dataSourceClient = Mockito.mock(HanaPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new HanaConnectionParam(), DbType.HANA));
     }
 }

@@ -17,22 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hana;
 
-import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BasePooledDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
-public class HanaDataSourceChannelTest {
+public class HanaPooledDataSourceClient extends BasePooledDataSourceClient {
 
-    @Test
-    public void testCreateDataSourceClient() {
-        HanaDataSourceChannel sourceChannel = Mockito.mock(HanaDataSourceChannel.class);
-        HanaDataSourceClient dataSourceClient = Mockito.mock(HanaDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new HanaConnectionParam(), DbType.HANA));
+    public HanaPooledDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
     }
+
 }

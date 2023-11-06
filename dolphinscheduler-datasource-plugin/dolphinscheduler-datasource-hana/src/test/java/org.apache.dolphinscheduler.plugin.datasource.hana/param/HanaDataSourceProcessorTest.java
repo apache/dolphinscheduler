@@ -38,17 +38,17 @@ public class HanaDataSourceProcessorTest {
     @Test
     public void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
-        HanaDataSourceParamDTO mysqlDatasourceParamDTO = new HanaDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setUserName("root");
-        mysqlDatasourceParamDTO.setPassword("123456");
-        mysqlDatasourceParamDTO.setHost("localhost");
-        mysqlDatasourceParamDTO.setPort(30015);
-        mysqlDatasourceParamDTO.setDatabase("default");
-        mysqlDatasourceParamDTO.setOther(props);
+        HanaDataSourceParamDTO hanaDatasourceParamDTO = new HanaDataSourceParamDTO();
+        hanaDatasourceParamDTO.setUserName("root");
+        hanaDatasourceParamDTO.setPassword("123456");
+        hanaDatasourceParamDTO.setHost("localhost");
+        hanaDatasourceParamDTO.setPort(30015);
+        hanaDatasourceParamDTO.setDatabase("default");
+        hanaDatasourceParamDTO.setOther(props);
         try (MockedStatic<PasswordUtils> mockedPasswordUtils = Mockito.mockStatic(PasswordUtils.class)) {
             Mockito.when(PasswordUtils.encodePassword(Mockito.anyString())).thenReturn("test");
             HanaConnectionParam connectionParams = (HanaConnectionParam) hanaDataSourceProcessor
-                    .createConnectionParams(mysqlDatasourceParamDTO);
+                    .createConnectionParams(hanaDatasourceParamDTO);
             Assertions.assertEquals("jdbc:sap://localhost:30015", connectionParams.getAddress());
             Assertions.assertEquals("jdbc:sap://localhost:30015?currentschema=default", connectionParams.getJdbcUrl());
         }

@@ -38,10 +38,10 @@ public class JDBCDataSourceProviderTest {
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
             HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
             mockedJDBCDataSourceProvider
-                    .when(() -> JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
+                    .when(() -> JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any()))
                     .thenReturn(dataSource);
             Assertions.assertNotNull(
-                    JDBCDataSourceProvider.createJdbcDataSource(new HanaConnectionParam(), DbType.HANA));
+                    JDBCDataSourceProvider.createOneSessionJdbcDataSource(new HanaConnectionParam(), DbType.HANA));
         }
     }
 
