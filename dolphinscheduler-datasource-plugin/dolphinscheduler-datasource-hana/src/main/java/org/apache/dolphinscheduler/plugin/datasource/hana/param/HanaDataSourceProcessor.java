@@ -96,7 +96,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.COM_HANA_DB_JDBC_DRIVER;
+        return DataSourceConstants.HANA_VALIDATION_QUERY;
     }
 
     @Override
@@ -106,7 +106,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
         if (MapUtils.isNotEmpty(hanaConnectionParam.getOther())) {
             return String.format("%s?%s&%s", jdbcUrl, hanaConnectionParam.getOther(), APPEND_PARAMS);
         }
-        return String.format("%s&%s", jdbcUrl, APPEND_PARAMS);
+        return String.format("%s?%s", jdbcUrl, APPEND_PARAMS);
     }
 
     @Override
