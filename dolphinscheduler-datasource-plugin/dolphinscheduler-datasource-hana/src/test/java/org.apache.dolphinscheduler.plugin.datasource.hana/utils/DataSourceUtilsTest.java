@@ -102,7 +102,7 @@ public class DataSourceUtilsTest {
             HanaConnectionParam connectionParam = new HanaConnectionParam();
             connectionParam.setUser("root");
             connectionParam.setPassword("123456");
-            connection = DataSourceClientProvider.getAdHocConnection(DbType.DORIS, connectionParam);
+            connection = DataSourceClientProvider.getAdHocConnection(DbType.HANA, connectionParam);
 
             Assertions.assertNotNull(connection);
         }
