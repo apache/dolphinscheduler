@@ -33,6 +33,9 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,9 +107,18 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
         HanaConnectionParam hanaConnectionParam = (HanaConnectionParam) connectionParam;
         String jdbcUrl = hanaConnectionParam.getJdbcUrl();
         if (MapUtils.isNotEmpty(hanaConnectionParam.getOther())) {
-            return String.format("%s?%s&%s", jdbcUrl, hanaConnectionParam.getOther(), APPEND_PARAMS);
+             return String.format("%s?%s&%s", jdbcUrl,APPEND_PARAMS, transformOther(hanaConnectionParam.getOther()));
         }
         return String.format("%s?%s", jdbcUrl, APPEND_PARAMS);
+    }
+
+    private String transformOther(Map<String, String> otherMap) {
+        if (MapUtils.isEmpty(otherMap)) {
+            return null;
+        }
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
     @Override

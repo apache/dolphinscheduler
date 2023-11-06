@@ -73,9 +73,14 @@ public class HanaDataSourceProcessorTest {
     @Test
     public void testGetJdbcUrl() {
         HanaConnectionParam hanaConnectionParam = new HanaConnectionParam();
-        hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015?currentschema=default");
+        hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015");
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("currentschema","default");
+        hanaConnectionParam.setOther(map);
+
         Assertions.assertEquals(
-                "jdbc:sap://localhost:30015?currentschema=default&reconnect=true",
+                "jdbc:sap://localhost:30015?reconnect=true&currentschema=default",
                 hanaDataSourceProcessor.getJdbcUrl(hanaConnectionParam));
     }
 
