@@ -20,15 +20,16 @@ package org.apache.dolphinscheduler.plugin.datasource.hana.param;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class HanaDataSourceProcessorTest {
@@ -76,7 +77,7 @@ public class HanaDataSourceProcessorTest {
         hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015");
 
         HashMap<String, String> map = new HashMap<>();
-        map.put("currentschema","default");
+        map.put("currentschema", "default");
         hanaConnectionParam.setOther(map);
 
         Assertions.assertEquals(

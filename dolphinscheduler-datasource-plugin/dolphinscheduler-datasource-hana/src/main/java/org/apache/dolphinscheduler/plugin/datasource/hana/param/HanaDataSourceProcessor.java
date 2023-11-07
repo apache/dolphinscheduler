@@ -107,7 +107,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
         HanaConnectionParam hanaConnectionParam = (HanaConnectionParam) connectionParam;
         String jdbcUrl = hanaConnectionParam.getJdbcUrl();
         if (MapUtils.isNotEmpty(hanaConnectionParam.getOther())) {
-             return String.format("%s?%s&%s", jdbcUrl,APPEND_PARAMS, transformOther(hanaConnectionParam.getOther()));
+            return String.format("%s?%s&%s", jdbcUrl, APPEND_PARAMS, transformOther(hanaConnectionParam.getOther()));
         }
         return String.format("%s?%s", jdbcUrl, APPEND_PARAMS);
     }

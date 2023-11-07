@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hana;
 
-import org.apache.dolphinscheduler.spi.datasource.*;
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 public class HanaDataSourceChannel implements DataSourceChannel {

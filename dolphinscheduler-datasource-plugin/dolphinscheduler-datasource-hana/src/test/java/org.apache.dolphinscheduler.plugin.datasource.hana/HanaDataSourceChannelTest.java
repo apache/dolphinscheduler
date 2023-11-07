@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.hana;
 
 import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +33,8 @@ public class HanaDataSourceChannelTest {
     public void testCreateDataSourceClient() {
         HanaDataSourceChannel sourceChannel = Mockito.mock(HanaDataSourceChannel.class);
         HanaPooledDataSourceClient dataSourceClient = Mockito.mock(HanaPooledDataSourceClient.class);
-        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new HanaConnectionParam(), DbType.HANA));
     }
 }
