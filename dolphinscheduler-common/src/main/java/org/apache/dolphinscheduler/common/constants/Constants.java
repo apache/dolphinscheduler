@@ -306,9 +306,9 @@ public final class Constants {
     public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
-     * time unit second to minutes
+     * unit convertor for minute to second
      */
-    public static final int SEC_2_MINUTES_TIME_UNIT = 60;
+    public static final int MINUTE_2_SECOND_TIME_UNIT = 60;
 
     /***
      *
