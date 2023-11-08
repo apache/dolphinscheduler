@@ -258,6 +258,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         // change the state of the task instance
         task.setState(TaskExecutionStatus.FORCED_SUCCESS);
+        task.setEndTime(new Date());
         int changedNum = taskInstanceMapper.updateById(task);
         if (changedNum > 0) {
             processService.forceProcessInstanceSuccessByTaskInstanceId(taskInstanceId);
