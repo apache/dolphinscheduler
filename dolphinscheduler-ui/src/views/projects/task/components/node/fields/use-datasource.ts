@@ -147,6 +147,11 @@ export function useDatasource(
       id: 24,
       code: 'SAGEMAKER',
       disabled: false
+    },
+    {
+      id: 25,
+      code: 'KYUUBI',
+      disabled: false
     }
   ]
 
