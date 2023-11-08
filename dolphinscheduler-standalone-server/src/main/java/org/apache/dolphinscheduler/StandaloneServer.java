@@ -17,27 +17,49 @@
 
 package org.apache.dolphinscheduler;
 
-import org.apache.curator.test.TestingServer;
+import org.apache.dolphinscheduler.registry.StandaloneRegistry;
+
+import java.util.List;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 @Slf4j
 public class StandaloneServer {
 
+    @Value("${registry.type}")
+    private String registryType;
+
+    @Autowired
+    private List<StandaloneRegistry> registries;
+
     public static void main(String[] args) throws Exception {
         try {
-            // We cannot use try-with-resources to close "TestingServer", since SpringApplication.run() will not block
-            // the main thread.
-            TestingServer zookeeperServer = new TestingServer(true);
-            System.setProperty("registry.zookeeper.connect-string", zookeeperServer.getConnectString());
-            SpringApplication.run(StandaloneServer.class, args);
+            ConfigurableApplicationContext context = SpringApplication.run(StandaloneServer.class, args);
+            StandaloneServer standaloneServer = context.getBean(StandaloneServer.class);
+            standaloneServer.registry();
         } catch (Exception ex) {
             log.error("StandaloneServer start failed", ex);
             System.exit(1);
+        }
+    }
+
+    private void registry() {
+        Optional<StandaloneRegistry> registry = registries.stream()
+                .filter(r -> r.supports(registryType))
+                .findFirst();
+
+        if (registry.isPresent()) {
+            registry.get().init();
+        } else {
+            log.error("Unsupported registry type: {}", registryType);
         }
     }
 
