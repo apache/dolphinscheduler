@@ -18,7 +18,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { IJsonItem } from '../../task/components/node/types'
-import { listAlertGroupById } from '@/service/modules/alert-group'
+import { listNormalAlertGroupById } from '@/service/modules/alert-group'
 
 export function useAlertGroup(): IJsonItem {
   const { t } = useI18n()
@@ -26,7 +26,7 @@ export function useAlertGroup(): IJsonItem {
   const options = ref([] as { label: string; value: string }[])
 
   const getAlertGroups = async () => {
-    const res = await listAlertGroupById()
+    const res = await listNormalAlertGroupById()
     options.value = res.map((item: any) => ({
       label: item.groupName,
       value: item.id

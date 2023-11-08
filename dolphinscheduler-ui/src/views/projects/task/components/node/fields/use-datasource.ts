@@ -135,7 +135,17 @@ export function useDatasource(
     },
     {
       id: 23,
+      code: 'ZEPPELIN',
+      disabled: false
+    },
+    {
+      id: 23,
       code: 'DORIS',
+      disabled: false
+    },
+    {
+      id: 24,
+      code: 'SAGEMAKER',
       disabled: false
     }
   ]
