@@ -24,7 +24,7 @@ public class JdbcStandaloneRegistry implements StandaloneRegistry {
 
     @Override
     public void init() {
-
+        // The JDBC plugin will take effect via @ConditionalOnProperty.
     }
 
     @Override

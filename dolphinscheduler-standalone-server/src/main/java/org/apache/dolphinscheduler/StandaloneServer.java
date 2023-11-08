@@ -37,8 +37,12 @@ public class StandaloneServer {
     @Value("${registry.type}")
     private String registryType;
 
+    private final List<StandaloneRegistry> registries;
+
     @Autowired
-    private List<StandaloneRegistry> registries;
+    public StandaloneServer(List<StandaloneRegistry> registries) {
+        this.registries = registries;
+    }
 
     public static void main(String[] args) throws Exception {
         try {
