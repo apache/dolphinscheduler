@@ -41,9 +41,6 @@ public class WorkflowSubmitFailStateEventHandler implements StateEventHandler {
                 "Handle workflow instance submit fail state event, the current workflow instance state {} will be changed to {}",
                 processInstance.getState(), workflowStateEvent.getStatus());
 
-        if (workflowExecuteRunnable.processComplementData()) {
-            return true;
-        }
         workflowExecuteRunnable.updateProcessInstanceState(workflowStateEvent);
         workflowExecuteRunnable.endProcess();
         return true;
