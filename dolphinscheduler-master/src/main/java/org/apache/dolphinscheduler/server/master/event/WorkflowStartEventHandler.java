@@ -55,10 +55,10 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
     public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
         logger.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
         WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
-            workflowEvent.getWorkflowInstanceId());
+                workflowEvent.getWorkflowInstanceId());
         if (workflowExecuteRunnable == null) {
             throw new WorkflowEventHandleError(
-                "The workflow start event is invalid, cannot find the workflow instance from cache");
+                    "The workflow start event is invalid, cannot find the workflow instance from cache");
         }
         ProcessInstanceMetrics.incProcessInstanceByState("submit");
         ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
@@ -71,7 +71,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                         }
                     } else if (WorkflowSubmitStatue.FAILED == workflowSubmitStatue) {
                         logger.error(
-                             "Failed to submit the workflow instance, will resend the workflow start event: {}",
+                                "Failed to submit the workflow instance, will send fail state event: {}",
                                 workflowEvent);
                         WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
                                 .processInstanceId(processInstance.getId())
@@ -80,7 +80,7 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
                                 .build();
                         workflowExecuteRunnable.addStateEvent(stateEvent);
                     }
-            });
+                });
     }
 
     @Override
