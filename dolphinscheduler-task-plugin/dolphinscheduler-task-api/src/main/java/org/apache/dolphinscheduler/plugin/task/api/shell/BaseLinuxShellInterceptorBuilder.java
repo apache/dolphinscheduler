@@ -120,7 +120,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
     }
 
     private List<String> bootstrapCommandInSudoMode() {
-        if (PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE)) {
+        if (PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE, false)) {
             return bootstrapCommandInResourceLimitMode();
         }
         List<String> bootstrapCommand = new ArrayList<>();
@@ -129,7 +129,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
             bootstrapCommand.add("-u");
             bootstrapCommand.add(runUser);
         }
-        bootstrapCommand.add("-E");
+        bootstrapCommand.add("-i");
         bootstrapCommand.add(shellAbsolutePath().toString());
         return bootstrapCommand;
     }

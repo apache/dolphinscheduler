@@ -33,13 +33,14 @@ import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,7 +73,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private WorkflowEventLooper workflowEventLooper;
 
     @Autowired
-    private ServerNodeManager serverNodeManager;
+    private MasterSlotManager masterSlotManager;
 
     @Autowired
     private MasterTaskExecutorBootstrap masterTaskExecutorBootstrap;
@@ -132,8 +133,14 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 commands.parallelStream()
                         .forEach(command -> {
                             try {
-                                WorkflowExecuteRunnable workflowExecuteRunnable =
+                                Optional<WorkflowExecuteRunnable> workflowExecuteRunnableOptional =
                                         workflowExecuteRunnableFactory.createWorkflowExecuteRunnable(command);
+                                if (!workflowExecuteRunnableOptional.isPresent()) {
+                                    log.warn(
+                                            "The command execute success, will not trigger a WorkflowExecuteRunnable, this workflowInstance might be in serial mode");
+                                    return;
+                                }
+                                WorkflowExecuteRunnable workflowExecuteRunnable = workflowExecuteRunnableOptional.get();
                                 ProcessInstance processInstance = workflowExecuteRunnable
                                         .getWorkflowExecuteContext().getWorkflowInstance();
                                 if (processInstanceExecCacheManager.contains(processInstance.getId())) {
@@ -164,8 +171,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private List<Command> findCommands() throws MasterException {
         try {
             long scheduleStartTime = System.currentTimeMillis();
-            int thisMasterSlot = serverNodeManager.getSlot();
-            int masterCount = serverNodeManager.getMasterSize();
+            int thisMasterSlot = masterSlotManager.getSlot();
+            int masterCount = masterSlotManager.getMasterSize();
             if (masterCount <= 0) {
                 log.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();

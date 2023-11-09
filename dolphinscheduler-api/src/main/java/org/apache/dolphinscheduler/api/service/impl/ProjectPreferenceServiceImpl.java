@@ -77,6 +77,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
             projectPreference.setPreferences(preferences);
             projectPreference.setUserId(loginUser.getId());
             projectPreference.setCode(CodeGenerateUtils.getInstance().genCode());
+            projectPreference.setState(1);
             projectPreference.setCreateTime(now);
             projectPreference.setUpdateTime(now);
             if (projectPreferenceMapper.insert(projectPreference) > 0) {
@@ -121,6 +122,37 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
         result.setData(projectPreference);
 
         putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public Result enableProjectPreference(User loginUser, long projectCode, int state) {
+        Result result = new Result();
+
+        // check if the user has the writing permission for project
+        Project project = projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
+            return result;
+        }
+
+        ProjectPreference projectPreference = projectPreferenceMapper
+                .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
+                        projectCode));
+
+        putMsg(result, Status.SUCCESS);
+        if (Objects.nonNull(projectPreference) && projectPreference.getState() != state) {
+            projectPreference.setState(state);
+            projectPreference.setUpdateTime(new Date());
+
+            if (projectPreferenceMapper.updateById(projectPreference) > 0) {
+                log.info("The state of the project preference is updated and id is :{}", projectPreference.getId());
+            } else {
+                log.error("Failed to update the state of the project preference, projectCode:{}.",
+                        projectPreference.getProjectCode());
+                putMsg(result, Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR);
+            }
+        }
         return result;
     }
 }

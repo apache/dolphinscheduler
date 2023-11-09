@@ -241,6 +241,7 @@ export default {
     online: '已上线',
     offline: '已下线',
     task_name: '任务名称',
+    task_code: '任务编码',
     task_type: '任务类型',
     task_instance: '任务实例',
     create_task: '创建任务',
@@ -393,6 +394,8 @@ export default {
     image_tips: '请输入镜像',
     image_pull_policy: '镜像拉取策略',
     image_pull_policy_tips: '请选择镜像拉取策略（必选）',
+    pull_secret: '仓库密钥',
+    pull_secret_tips: '请输入仓库密钥',
     command: '容器执行命令',
     command_tips: '请输入容器执行命令，例如：["printenv"]',
     args: '执行命令参数',
@@ -630,6 +633,7 @@ export default {
     hour: '时',
     add_dependency: '添加依赖',
     waiting_dependent_start: '等待依赖启动',
+    dependent_task_parameter_passing: '参数传递',
     check_interval: '检查间隔',
     check_interval_tips: '检查间隔必须为正整数',
     waiting_dependent_complete: '等待依赖完成',
@@ -850,6 +854,9 @@ export default {
     child_node_instance: '子节点实例',
     yarn_queue: 'Yarn队列',
     yarn_queue_tips: '请输入Yarn队列(选填)',
+    dependent_type: '依赖类型',
+    dependent_on_workflow: '依赖于工作流',
+    dependent_on_task: '依赖于任务',
   },
   menu: {
     fav: '收藏组件',
@@ -883,6 +890,8 @@ export default {
     preference_manage: '项目偏好管理',
     instruction_tips: '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
     success: '成功',
-    submit: '提交'
+    submit: '提交',
+    enabled: '启用',
+    disabled: '未启用'
   },
 }

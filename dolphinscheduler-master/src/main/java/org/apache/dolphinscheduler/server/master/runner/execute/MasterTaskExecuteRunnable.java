@@ -25,11 +25,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskFactoryNotFoundException;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.message.MasterMessageSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTask;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
@@ -40,15 +39,15 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
-    protected final MasterMessageSenderManager masterMessageSenderManager;
+    protected final LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
     protected ILogicTask logicTask;
 
     public MasterTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
                                      LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                     MasterMessageSenderManager masterMessageSenderManager) {
+                                     LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
         this.taskExecutionContext = taskExecutionContext;
         this.logicTaskPluginFactoryBuilder = logicTaskPluginFactoryBuilder;
-        this.masterMessageSenderManager = masterMessageSenderManager;
+        this.logicTaskInstanceExecutionEventSenderManager = logicTaskInstanceExecutionEventSenderManager;
     }
 
     protected abstract void executeTask() throws MasterTaskExecuteException;
@@ -56,9 +55,10 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
     protected abstract void afterExecute() throws MasterTaskExecuteException;
 
     protected void afterThrowing(Throwable throwable) {
+        TaskInstanceLogHeader.printFinalizeTaskHeader();
         try {
+            log.error("Get a exception when execute the task, will try to cancel the task", throwable);
             cancelTask();
-            log.error("Get a exception when execute the task, canceled the task", throwable);
         } catch (Exception e) {
             log.error("Cancel task failed,", e);
         }
@@ -70,6 +70,7 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
         MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
         log.info("Get a exception when execute the task, removed the TaskExecutionContext");
+        closeLogAppender();
     }
 
     public void cancelTask() throws MasterTaskExecuteException {
@@ -112,7 +113,6 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         } catch (Throwable ex) {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
-            closeLogAppender();
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             LogUtils.removeTaskInstanceLogFullPathMDC();
@@ -134,9 +134,10 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         log.info("End initialize task {}", JSONUtils.toPrettyJsonString(taskExecutionContext));
     }
 
-    protected void beforeExecute() throws LogicTaskFactoryNotFoundException, LogicTaskInitializeException, RemotingException {
+    protected void beforeExecute() throws LogicTaskFactoryNotFoundException, LogicTaskInitializeException {
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.RUNNING_EXECUTION);
-        masterMessageSenderManager.getMasterTaskExecuteRunningMessageSender().sendMessage(taskExecutionContext);
+        logicTaskInstanceExecutionEventSenderManager.getMasterTaskExecuteRunningMessageSender()
+                .sendMessage(taskExecutionContext);
         log.info("Send task status {} to master {}", taskExecutionContext.getCurrentExecutionStatus().name(),
                 taskExecutionContext.getWorkflowInstanceHost());
 
@@ -166,7 +167,8 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
         try {
             taskExecutionContext.setEndTime(System.currentTimeMillis());
             taskExecutionContext.setVarPool(JSONUtils.toJsonString(logicTask.getTaskParameters().getVarPool()));
-            masterMessageSenderManager.getMasterTaskExecuteResultMessageSender().sendMessage(taskExecutionContext);
+            logicTaskInstanceExecutionEventSenderManager.getLogicTaskInstanceExecutionFinishEventSender()
+                    .sendMessage(taskExecutionContext);
             log.info("Send task status: {} to master: {} successfully",
                     taskExecutionContext.getCurrentExecutionStatus().name(),
                     taskExecutionContext.getWorkflowInstanceHost());

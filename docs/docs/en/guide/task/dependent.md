@@ -27,11 +27,16 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 
 The Dependent node provides a logical judgment function, which can detect the execution of the dependent node according to the logic.
 
-For example, process A is a weekly task, processes B and C are daily tasks, and task A requires tasks B and C to be successfully executed every day of the last week.
+Two dependency modes are supported, including workflow-dependent and task-dependent. The task-dependent mode is divided into two cases: depend on all tasks in the workflow and depend on a single task.
+The workflow-dependent mode checks the status of the dependent workflow; the all-task-dependent mode checks the status of all tasks in the workflow; and the single-task-dependent mode checks the status of the dependent task.
+
+When the dependent result is success and the parameter passing option is true, the Dependent node will output the output parameters of the dependency to the downstream task. When the parameter names of multiple dependencies are the same, it involves the priority of the parameters. See also [Parameter Priority](../parameter/priority.md)
+
+For example, process A is a weekly task, processes B and C are daily tasks, and task A requires tasks B and C to be successfully executed last week.
 
 ![dependent_task01](../../../../img/tasks/demo/dependent_task01.png)
 
-And another example is that process A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B or C to be successfully executed every day of the last week:
+And another example is that process A is a weekly report task, processes B and C are daily tasks, and task A requires tasks B or C to be successfully executed last week:
 
 ![dependent_task02](../../../../img/tasks/demo/dependent_task02.png)
 

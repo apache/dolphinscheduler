@@ -81,7 +81,7 @@ public class ShellTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(ParameterUtils.convert(shellParameters.getLocalParametersMap()))
+                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
                     .appendScript(shellParameters.getRawScript());
 
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
