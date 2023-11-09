@@ -22,13 +22,14 @@ import org.apache.dolphinscheduler.registry.StandaloneRegistry;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 @Slf4j
@@ -46,25 +47,20 @@ public class StandaloneServer {
 
     public static void main(String[] args) throws Exception {
         try {
-            ConfigurableApplicationContext context = SpringApplication.run(StandaloneServer.class, args);
-            StandaloneServer standaloneServer = context.getBean(StandaloneServer.class);
-            standaloneServer.registry();
+            SpringApplication.run(StandaloneServer.class, args);
         } catch (Exception ex) {
             log.error("StandaloneServer start failed", ex);
             System.exit(1);
         }
     }
 
-    private void registry() {
+    @PostConstruct
+    private void initRegistry() {
         Optional<StandaloneRegistry> registry = registries.stream()
                 .filter(r -> r.supports(registryType))
                 .findFirst();
 
-        if (registry.isPresent()) {
-            registry.get().init();
-        } else {
-            log.error("Unsupported registry type: {}", registryType);
-        }
+        registry.ifPresent(StandaloneRegistry::init);
     }
 
 }

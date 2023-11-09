@@ -17,18 +17,29 @@
 
 package org.apache.dolphinscheduler.registry;
 
+import org.apache.curator.test.TestingServer;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
-public class JdbcStandaloneRegistry implements StandaloneRegistry {
+public class StandaloneZookeeperRegistry implements StandaloneRegistry {
 
     @Override
     public void init() {
-        // The JDBC plugin will take effect via @ConditionalOnProperty.
+        try {
+            // We cannot use try-with-resources to close "TestingServer", since SpringApplication.run() will not block
+            TestingServer zookeeperServer = new TestingServer(true);
+            System.setProperty("registry.zookeeper.connect-string", zookeeperServer.getConnectString());
+        } catch (Exception ex) {
+            log.error("Zookeeper TestingServer create failed", ex);
+        }
     }
 
     @Override
     public boolean supports(String registryType) {
-        return "jdbc".equalsIgnoreCase(registryType);
+        return "zookeeper".equalsIgnoreCase(registryType);
     }
 }
