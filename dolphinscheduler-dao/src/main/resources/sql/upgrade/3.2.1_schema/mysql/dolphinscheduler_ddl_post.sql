@@ -13,25 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package org.apache.dolphinscheduler.plugin.doris;
-
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import com.google.auto.service.AutoService;
-
-@AutoService(DataSourceChannelFactory.class)
-public class DorisDataSourceChannelFactory implements DataSourceChannelFactory {
-
-    @Override
-    public DataSourceChannel create() {
-        return new DorisDataSourceChannel();
-    }
-
-    @Override
-    public String getName() {
-        return DbType.DORIS.getDescp();
-    }
-}
+*/
