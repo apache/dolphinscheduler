@@ -63,7 +63,7 @@ public class PrometheusAlertSender {
             String resp = sendMsg(alertData);
             return checkSendAlertManageMsgResult(resp);
         } catch (Exception e) {
-            String errorMsg = String.format("send prometheus alert manager alert msg  exception: %s", e.getMessage());
+            String errorMsg = String.format("send prometheus alert manager alert error, exception: %s", e.getMessage());
             log.error(errorMsg);
             alertResult = new AlertResult();
             alertResult.setStatus("false");
