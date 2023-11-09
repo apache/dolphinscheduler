@@ -26,18 +26,12 @@ interface K8SReq {
   clusterCode: string
   owner?: string
   tag?: string
-  limitsCpu?: number | string
-  limitsMemory?: number | string
 }
 
 interface NamespaceItem extends K8SReq {
   id: number
   createTime: string
   updateTime: string
-  podRequestCpu?: any
-  podRequestMemory?: any
-  podReplicas?: any
-  onlineJobNum?: any
 }
 
 interface NamespaceListRes {

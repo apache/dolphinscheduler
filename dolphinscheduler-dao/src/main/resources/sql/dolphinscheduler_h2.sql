@@ -1062,6 +1062,10 @@ INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, desc
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39',
+        '2018-11-29 10:20:39');
+
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
@@ -1097,6 +1101,8 @@ CREATE TABLE t_ds_alert_plugin_instance
     create_time            timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     update_time            timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     instance_name          varchar(200) DEFAULT NULL,
+    instance_type          int NOT NULL default '0',
+    warning_type           int NOT NULL default '3',
     PRIMARY KEY (id)
 );
 
@@ -2018,13 +2024,8 @@ DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
     id                 int(11) NOT NULL AUTO_INCREMENT ,
     code               bigint(20) NOT NULL,
-    limits_memory      int(11) DEFAULT NULL,
     namespace          varchar(255) DEFAULT NULL,
     user_id            int(11) DEFAULT NULL,
-    pod_replicas       int(11) DEFAULT NULL,
-    pod_request_cpu    decimal(14,3) DEFAULT NULL,
-    pod_request_memory int(11) DEFAULT NULL,
-    limits_cpu         decimal(14,3) DEFAULT NULL,
     cluster_code       bigint(20) NOT NULL,
     create_time        datetime DEFAULT NULL ,
     update_time        datetime DEFAULT NULL ,
@@ -2035,16 +2036,16 @@ CREATE TABLE t_ds_k8s_namespace (
 -- Records of t_ds_k8s_namespace
 -- ----------------------------
 INSERT INTO `t_ds_k8s_namespace`
-(`id`,`code`,`limits_memory`,`namespace`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`cluster_code`,`create_time`,`update_time`)
-VALUES (1, 990001, 1000, 'flink_test', 1, 1, 0.1, 1, 100, 0, '2022-03-03 11:31:24.0', '2022-03-03 11:31:24.0');
+(`id`,`code`,`namespace`,`user_id`,`cluster_code`,`create_time`,`update_time`)
+VALUES (1, 990001, 'flink_test', 1, 0, '2022-03-03 11:31:24.0', '2022-03-03 11:31:24.0');
 
 INSERT INTO `t_ds_k8s_namespace`
-(`id`,`code`,`limits_memory`,`namespace`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`cluster_code`,`create_time`,`update_time`)
-VALUES (2, 990002, 500, 'spark_test', 2, 1, 10000, 1, 100, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
+(`id`,`code`,`namespace`,`user_id`,`cluster_code`,`create_time`,`update_time`)
+VALUES (2, 990002, 'spark_test', 2, 0, '2021-03-03 11:31:24.0', '2021-03-03 11:31:24.0');
 
 INSERT INTO `t_ds_k8s_namespace`
-(`id`,`code`,`limits_memory`,`namespace`,`user_id`,`pod_replicas`,`pod_request_cpu`,`pod_request_memory`,`limits_cpu`,`cluster_code`,`create_time`,`update_time`)
-VALUES (3, 990003, 200, 'auth_test', 3, 1, 100, 1, 10000, 0, '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
+(`id`,`code`,`namespace`,`user_id`,`cluster_code`,`create_time`,`update_time`)
+VALUES (3, 990003, 'auth_test', 3, 0, '2020-03-03 11:31:24.0', '2020-03-03 11:31:24.0');
 
 -- ----------------------------
 -- Table structure for t_ds_relation_namespace_user
@@ -2141,3 +2142,22 @@ CREATE TABLE t_ds_relation_sub_workflow (
     INDEX idx_parent_task_code (parent_task_code),
     INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Table structure for t_ds_listener_event
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_listener_event;
+CREATE TABLE t_ds_listener_event
+(
+    id          int      NOT NULL AUTO_INCREMENT,
+    content     text,
+    sign        char(64) NOT NULL DEFAULT '',
+    post_status tinyint(4) NOT NULL DEFAULT '0',
+    event_type  int(11),
+    log         text,
+    create_time datetime          DEFAULT NULL,
+    update_time datetime          DEFAULT NULL,
+    PRIMARY KEY (id),
+    KEY         idx_status (post_status),
+    KEY         idx_event_sign (sign)
+);

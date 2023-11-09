@@ -21,7 +21,9 @@
 package org.apache.dolphinscheduler.dao.plugin.postgresql;
 
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
+import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
+import org.apache.dolphinscheduler.dao.plugin.postgresql.dialect.PostgresqlDialect;
 import org.apache.dolphinscheduler.dao.plugin.postgresql.monitor.PostgresqlMonitor;
 
 import javax.sql.DataSource;
@@ -47,5 +49,10 @@ public class PostgresqlDaoPluginConfiguration implements DaoPluginConfiguration 
     @Override
     public DatabaseMonitor databaseMonitor() {
         return new PostgresqlMonitor(dataSource);
+    }
+
+    @Override
+    public DatabaseDialect databaseDialect() {
+        return new PostgresqlDialect(dataSource);
     }
 }

@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -36,7 +38,9 @@ public interface AlertPluginInstanceService {
      * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName, String pluginInstanceParams);
+    Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName,
+                               AlertPluginInstanceType instanceType, WarningType warningType,
+                               String pluginInstanceParams);
 
     /**
      * update
@@ -47,7 +51,7 @@ public interface AlertPluginInstanceService {
      * @return result
      */
     Map<String, Object> update(User loginUser, int alertPluginInstanceId, String instanceName,
-                               String pluginInstanceParams);
+                               WarningType warningType, String pluginInstanceParams);
 
     /**
      * delete alert plugin instance

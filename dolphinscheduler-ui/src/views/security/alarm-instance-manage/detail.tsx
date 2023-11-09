@@ -23,7 +23,7 @@ import {
   ref,
   getCurrentInstance
 } from 'vue'
-import { NSelect, NInput } from 'naive-ui'
+import { NSelect, NInput, NSwitch, NRadioGroup, NSpace, NRadio } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { useForm } from './use-form'
@@ -57,6 +57,7 @@ const DetailModal = defineComponent({
 
     const rules = ref<IFormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
+    const warningTypeSpan = ref(24)
 
     const {
       meta,
@@ -96,6 +97,10 @@ const DetailModal = defineComponent({
       }
     )
     watch(
+      () => state.detailForm.instanceType,
+      () => warningTypeSpan.value = state.detailForm.instanceType === 'GLOBAL' ? 0 : 24
+    )
+    watch(
       () => state.json,
       () => {
         if (!state.json?.length) return
@@ -121,6 +126,7 @@ const DetailModal = defineComponent({
       ...toRefs(state),
       ...toRefs(status),
       meta,
+      warningTypeSpan,
       rules,
       elements,
       onChangePlugin,
@@ -134,6 +140,7 @@ const DetailModal = defineComponent({
       show,
       t,
       meta,
+      warningTypeSpan,
       rules,
       elements,
       detailForm,
@@ -181,6 +188,38 @@ const DetailModal = defineComponent({
                           'security.alarm_instance.alarm_instance_name_tips'
                         )}
                       />
+                    )
+                  },
+                  {
+                    path: 'instanceType',
+                    label: t('security.alarm_instance.is_global_instance'),
+                    widget: (
+                      <NSwitch
+                      checkedValue={'GLOBAL'}
+                      uncheckedValue={'NORMAL'}
+                      disabled={!!currentRecord?.id}
+                      v-model:value={detailForm.instanceType}
+                    />
+                    )
+                  },
+                  {
+                    path: 'warningType',
+                    label: t('security.alarm_instance.WarningType'),
+                    span: warningTypeSpan,
+                    widget: (
+                      <NRadioGroup v-model:value={detailForm.warningType}>
+                      <NSpace>
+                        <NRadio value={'SUCCESS'}>
+                          {"success"}
+                        </NRadio>
+                        <NRadio value={'FAILURE'} >
+                          {"failure"}
+                        </NRadio>
+                        <NRadio value={'ALL'} >
+                          {"all"}
+                        </NRadio>
+                      </NSpace>
+                    </NRadioGroup>
                     )
                   },
                   {

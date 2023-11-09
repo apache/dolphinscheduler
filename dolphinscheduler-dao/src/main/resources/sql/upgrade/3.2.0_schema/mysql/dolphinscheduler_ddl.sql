@@ -450,6 +450,13 @@ BEGIN
    THEN
        ALTER TABLE `t_ds_fav_task` DROP COLUMN `task_name`;
    END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_fav_task'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='task_type')
+   THEN
+        ALTER TABLE `t_ds_fav_task` ADD `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name';
+    END IF;
 END;
 d//
 delimiter ;
