@@ -20,24 +20,43 @@ package org.apache.dolphinscheduler.plugin.alert.feishu;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class FeiShuSenderTest {
 
     private static Map<String, String> feiShuConfig = new HashMap<>();
 
-    @BeforeEach
-    public void initFeiShuConfig() {
-        feiShuConfig.put(FeiShuParamsConstants.WEB_HOOK, "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxx");
+    @AfterEach
+    public void resetFeiShuPersonalWorkConfig() {
+        feiShuConfig = new HashMap<>();
     }
 
     @Test
-    public void testSend() {
+    public void testSendCustomRobotMassage() {
+        feiShuConfig.put(FeiShuParamsConstants.NAME_WEB_HOOK_OR_APP_ID,
+                "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxx");
+        feiShuConfig.put(FeiShuParamsConstants.NAME_FEI_SHU_SEND_TYPE, FeiShuType.CUSTOM_ROBOT.getDescp());
+        AlertData alertData = new AlertData();
+        alertData.setTitle("feishu test title");
+        alertData.setContent("feishu test content");
+        FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
+        AlertResult alertResult = feiShuSender.sendFeiShuMsg(alertData);
+        Assertions.assertEquals("false", alertResult.getStatus());
+    }
+
+    @Test
+    public void testSendApplicationMassage() {
+        feiShuConfig.put(FeiShuParamsConstants.NAME_FEI_SHU_SEND_TYPE, FeiShuType.APPLIANCE_ROBOT.getDescp());
+        feiShuConfig.put(FeiShuParamsConstants.NAME_WEB_HOOK_OR_APP_ID, "appid");
+        feiShuConfig.put(FeiShuParamsConstants.NAME_PERSONAL_WORK_APP_SECRET, "app_secret");
+        feiShuConfig.put(FeiShuParamsConstants.NAME_RECEIVE_ID_TYPE, "email");
+        feiShuConfig.put(FeiShuParamsConstants.NAME_RECEIVE_ID, "xxxx@xxx.com");
         AlertData alertData = new AlertData();
         alertData.setTitle("feishu test title");
         alertData.setContent("feishu test content");
@@ -73,26 +92,49 @@ public class FeiShuSenderTest {
     }
 
     @Test
+    public void testQueryAndSetAccessToken() throws IOException {
+        feiShuConfig.put(FeiShuParamsConstants.NAME_WEB_HOOK_OR_APP_ID, "appid");
+        feiShuConfig.put(FeiShuParamsConstants.NAME_PERSONAL_WORK_APP_SECRET, "app_secret");
+        FeiShuSender sender = new FeiShuSender(feiShuConfig);
+        sender.queryAndSetAccessToken();
+        Assertions.assertNull(sender.getAccessToken());
+    }
+
+    @Test
     public void testSendWithFormatException() {
         AlertData alertData = new AlertData();
         alertData.setTitle("feishu test title");
         alertData.setContent("feishu test content");
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         String alertResult = feiShuSender.formatContent(alertData);
-        Assertions.assertEquals(alertResult, alertData.getTitle() + alertData.getContent());
+        Assertions.assertEquals(alertResult, alertData.getTitle() + "\n" + alertData.getContent());
     }
 
     @Test
-    public void testCheckSendFeiShuSendMsgResult() {
+    public void testCheckSendCustomRobotMsgResult() {
 
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
-        AlertResult alertResult = feiShuSender.checkSendFeiShuSendMsgResult("");
+        AlertResult alertResult = feiShuSender.checkSendCustomRobotMsgResult("");
         Assertions.assertFalse(Boolean.valueOf(alertResult.getStatus()));
-        AlertResult alertResult2 = feiShuSender.checkSendFeiShuSendMsgResult("123");
+        AlertResult alertResult2 = feiShuSender.checkSendCustomRobotMsgResult("123");
         Assertions.assertEquals("send fei shu msg fail", alertResult2.getMessage());
 
         String response = "{\"StatusCode\":\"0\",\"extra\":\"extra\",\"StatusMessage\":\"StatusMessage\"}";
-        AlertResult alertResult3 = feiShuSender.checkSendFeiShuSendMsgResult(response);
+        AlertResult alertResult3 = feiShuSender.checkSendCustomRobotMsgResult(response);
+        Assertions.assertTrue(Boolean.valueOf(alertResult3.getStatus()));
+    }
+
+    @Test
+    public void testCheckSendApplicationRobotMsgResult() {
+
+        FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
+        AlertResult alertResult = feiShuSender.checkSendApplicationRobotMsgResult("");
+        Assertions.assertFalse(Boolean.valueOf(alertResult.getStatus()));
+        AlertResult alertResult2 = feiShuSender.checkSendApplicationRobotMsgResult("123");
+        Assertions.assertEquals("send FeiShu personal work msg fail", alertResult2.getMessage());
+
+        String response = "{\"code\":\"0\",\"msg\":\"msg\",\"data\":\"data\"}";
+        AlertResult alertResult3 = feiShuSender.checkSendApplicationRobotMsgResult(response);
         Assertions.assertTrue(Boolean.valueOf(alertResult3.getStatus()));
     }
 }

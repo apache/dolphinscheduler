@@ -31,6 +31,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,12 +39,21 @@ import java.util.Map.Entry;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 @Slf4j
 public final class FeiShuSender {
 
-    private final String url;
+    private FeiShuPersonalWorkAccessToken accessToken;
+
+    private String sendType;
+
+    private final String urlOrAppId;
+
+    private String appSecret;
+
+    private String receiveIdType;
+
+    private String receiveId;
+
     private final Boolean enableProxy;
 
     private String proxy;
@@ -55,7 +65,11 @@ public final class FeiShuSender {
     private String password;
 
     FeiShuSender(Map<String, String> config) {
-        url = config.get(FeiShuParamsConstants.NAME_WEB_HOOK);
+        sendType = config.get(FeiShuParamsConstants.NAME_FEI_SHU_SEND_TYPE);
+        urlOrAppId = config.get(FeiShuParamsConstants.NAME_WEB_HOOK_OR_APP_ID);
+        appSecret = config.get(FeiShuParamsConstants.NAME_PERSONAL_WORK_APP_SECRET);
+        receiveIdType = config.get(FeiShuParamsConstants.NAME_RECEIVE_ID_TYPE);
+        receiveId = config.get(FeiShuParamsConstants.NAME_RECEIVE_ID);
         enableProxy = Boolean.valueOf(config.get(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE));
         if (Boolean.TRUE.equals(enableProxy)) {
             port = Integer.parseInt(config.get(FeiShuParamsConstants.NAME_FEI_SHU_PORT));
@@ -66,7 +80,7 @@ public final class FeiShuSender {
 
     }
 
-    private static String textToJsonString(AlertData alertData) {
+    private static String generateCustomRobotContentJson(AlertData alertData) {
         Map<String, Object> items = new HashMap<>(2);
         items.put("msg_type", "text");
         Map<String, String> textContent = new HashMap<>();
@@ -77,7 +91,17 @@ public final class FeiShuSender {
         return JSONUtils.toJsonString(items);
     }
 
-    public static AlertResult checkSendFeiShuSendMsgResult(String result) {
+    private String generateApplicationRobotContentJson(AlertData alertData) {
+        Map<String, String> text = new HashMap<>();
+        text.put("text", formatContent(alertData));
+        Map<String, String> body = new HashMap<>();
+        body.put("content", JSONUtils.toJsonString(text));
+        body.put("msg_type", "text");
+        body.put("receive_id", receiveId);
+        return JSONUtils.toJsonString(body);
+    }
+
+    public AlertResult checkSendCustomRobotMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
         alertResult.setStatus("false");
 
@@ -93,7 +117,7 @@ public final class FeiShuSender {
             log.info("send fei shu msg error,resp error");
             return alertResult;
         }
-        if (sendMsgResponse.statusCode == 0) {
+        if (sendMsgResponse.getStatusCode() == 0) {
             alertResult.setStatus("true");
             alertResult.setMessage("send fei shu msg success");
             return alertResult;
@@ -104,12 +128,40 @@ public final class FeiShuSender {
         return alertResult;
     }
 
+    public AlertResult checkSendApplicationRobotMsgResult(String result) {
+        AlertResult alertResult = new AlertResult();
+        alertResult.setStatus("false");
+
+        if (null == result) {
+            alertResult.setMessage("send fei shu personal work msg error, fei shu server resp is null");
+            log.info("send fei shu personal work msg error, fei shu server resp is null");
+            return alertResult;
+        }
+        FeiShuPersonalWorkResponse sendMsgResponse =
+                JSONUtils.parseObject(result, FeiShuPersonalWorkResponse.class);
+        if (null == sendMsgResponse) {
+            alertResult.setMessage("send fei shu personal work msg fail");
+            log.info(String.format("send fei shu personal work resp error, resp : %s", result));
+            return alertResult;
+        }
+        if (sendMsgResponse.getCode() != 0) {
+            alertResult.setMessage(
+                    String.format("send fei shu personal work msg fail, code is %d", sendMsgResponse.getCode()));
+            log.info(String.format("send fei shu personal work resp error, resp : %s", result));
+            return alertResult;
+        }
+        alertResult.setStatus("true");
+        alertResult.setMessage("send fei shu personal work msg success");
+        log.info("send fei shu personal work msg success");
+        return alertResult;
+    }
+
     public static String formatContent(AlertData alertData) {
         if (alertData.getContent() != null) {
 
             List<Map> list = JSONUtils.toList(alertData.getContent(), Map.class);
             if (CollectionUtils.isEmpty(list)) {
-                return alertData.getTitle() + alertData.getContent();
+                return alertData.getTitle() + "\n" + alertData.getContent();
             }
 
             StringBuilder contents = new StringBuilder(100);
@@ -130,8 +182,19 @@ public final class FeiShuSender {
     public AlertResult sendFeiShuMsg(AlertData alertData) {
         AlertResult alertResult;
         try {
-            String resp = sendMsg(alertData);
-            return checkSendFeiShuSendMsgResult(resp);
+            String resp = "";
+            if (sendType.equals(FeiShuType.CUSTOM_ROBOT.getDescp())) {
+                resp = sendCustomRobotMsg(alertData);
+                return checkSendCustomRobotMsgResult(resp);
+            } else if (sendType.equals(FeiShuType.APPLIANCE_ROBOT.getDescp())) {
+                queryAndSetAccessToken();
+                resp = sendApplicationRobotMsg(alertData);
+                return checkSendApplicationRobotMsgResult(resp);
+            }
+            alertResult = new AlertResult();
+            log.info("send fei shu alert fail, no support send type");
+            alertResult.setStatus("false");
+            alertResult.setMessage("send fei shu alert fail");
         } catch (Exception e) {
             log.info("send fei shu alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
@@ -141,11 +204,38 @@ public final class FeiShuSender {
         return alertResult;
     }
 
-    private String sendMsg(AlertData alertData) throws IOException {
+    private String sendApplicationRobotMsg(AlertData alertData) throws IOException, URISyntaxException {
+        String msg = generateApplicationRobotContentJson(alertData);
 
-        String msgToJson = textToJsonString(alertData);
+        HashMap<String, String> pathParams = new HashMap<>();
+        pathParams.put("receive_id_type", receiveIdType);
+        HttpPost httpPost = HttpRequestUtil.constructHttpPost(FeiShuParamsConstants.accessMessageUrl, msg, pathParams);
+        httpPost.setHeader("Authorization", String.format("Bearer %s", accessToken.getTenantAccessToken()));
 
-        HttpPost httpPost = HttpRequestUtil.constructHttpPost(url, msgToJson);
+        CloseableHttpClient httpClient = HttpRequestUtil.getHttpClient(enableProxy, proxy, port, user, password);
+
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, "UTF-8");
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
+            }
+            log.info("fei shu personal work send msg :{}, resp: {}", msg, resp);
+            return resp;
+        } finally {
+            httpClient.close();
+        }
+    }
+
+    private String sendCustomRobotMsg(AlertData alertData) throws IOException {
+
+        String msgToJson = generateCustomRobotContentJson(alertData);
+
+        HttpPost httpPost = HttpRequestUtil.constructHttpPost(urlOrAppId, msgToJson);
 
         CloseableHttpClient httpClient;
 
@@ -156,7 +246,7 @@ public final class FeiShuSender {
 
             int statusCode = response.getStatusLine().getStatusCode();
             if (statusCode != HttpStatus.SC_OK) {
-                log.error("send feishu message error, return http status code: {} ", statusCode);
+                log.error("send fei shu message error, return http status code: {} ", statusCode);
             }
             String resp;
             try {
@@ -166,7 +256,7 @@ public final class FeiShuSender {
             } finally {
                 response.close();
             }
-            log.info("Fei Shu send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(),
+            log.info("fei shu send title :{} ,content :{}, resp: {}", alertData.getTitle(), alertData.getContent(),
                     resp);
             return resp;
         } finally {
@@ -174,87 +264,58 @@ public final class FeiShuSender {
         }
     }
 
-    static final class FeiShuSendMsgResponse {
+    public void queryAndSetAccessToken() throws IOException {
+        CloseableHttpClient httpClient = HttpRequestUtil.getHttpClient(enableProxy, proxy, port, user, password);
+        Map<String, String> params = generateAccessParams();
+        HttpPost httpPost =
+                HttpRequestUtil.constructHttpPost(FeiShuParamsConstants.accessTokenUrl, JSONUtils.toJsonString(params));
 
-        @JsonProperty("Extra")
-        private String extra;
-        @JsonProperty("StatusCode")
-        private Integer statusCode;
-        @JsonProperty("StatusMessage")
-        private String statusMessage;
-
-        public FeiShuSendMsgResponse() {
-        }
-
-        public String getExtra() {
-            return this.extra;
-        }
-
-        @JsonProperty("Extra")
-        public void setExtra(String extra) {
-            this.extra = extra;
-        }
-
-        public Integer getStatusCode() {
-            return this.statusCode;
-        }
-
-        @JsonProperty("StatusCode")
-        public void setStatusCode(Integer statusCode) {
-            this.statusCode = statusCode;
-        }
-
-        public String getStatusMessage() {
-            return this.statusMessage;
-        }
-
-        @JsonProperty("StatusMessage")
-        public void setStatusMessage(String statusMessage) {
-            this.statusMessage = statusMessage;
-        }
-
-        public boolean equals(final Object o) {
-            if (o == this) {
-                return true;
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String resp;
+            try {
+                HttpEntity entity = response.getEntity();
+                resp = EntityUtils.toString(entity, "UTF-8");
+                EntityUtils.consume(entity);
+            } finally {
+                response.close();
             }
-            if (!(o instanceof FeiShuSendMsgResponse)) {
-                return false;
-            }
-            final FeiShuSendMsgResponse other = (FeiShuSendMsgResponse) o;
-            final Object this$extra = this.getExtra();
-            final Object other$extra = other.getExtra();
-            if (this$extra == null ? other$extra != null : !this$extra.equals(other$extra)) {
-                return false;
-            }
-            final Object this$statusCode = this.getStatusCode();
-            final Object other$statusCode = other.getStatusCode();
-            if (this$statusCode == null ? other$statusCode != null : !this$statusCode.equals(other$statusCode)) {
-                return false;
-            }
-            final Object this$statusMessage = this.getStatusMessage();
-            final Object other$statusMessage = other.getStatusMessage();
-            if (this$statusMessage == null ? other$statusMessage != null
-                    : !this$statusMessage.equals(other$statusMessage)) {
-                return false;
-            }
-            return true;
-        }
 
-        public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            final Object $extra = this.getExtra();
-            result = result * PRIME + ($extra == null ? 43 : $extra.hashCode());
-            final Object $statusCode = this.getStatusCode();
-            result = result * PRIME + ($statusCode == null ? 43 : $statusCode.hashCode());
-            final Object $statusMessage = this.getStatusMessage();
-            result = result * PRIME + ($statusMessage == null ? 43 : $statusMessage.hashCode());
-            return result;
-        }
+            FeiShuAccessTokenResponse tokenResponse =
+                    JSONUtils.parseObject(resp, FeiShuAccessTokenResponse.class);
+            if (tokenResponse == null) {
+                log.info(String.format("fei shu sender get access token failed, resp: %s", resp));
+                return;
+            }
 
-        public String toString() {
-            return "FeiShuSender.FeiShuSendMsgResponse(extra=" + this.getExtra() + ", statusCode="
-                    + this.getStatusCode() + ", statusMessage=" + this.getStatusMessage() + ")";
+            if (tokenResponse.getTenantAccessToken() == null || tokenResponse.getTenantAccessToken().isEmpty()) {
+                log.info(String.format("fei shu sender get access token failed, resp: %s", resp));
+                return;
+            }
+
+            log.info("fei shu sender get access token succeed");
+            FeiShuPersonalWorkAccessToken token = new FeiShuPersonalWorkAccessToken();
+            token.setTenantAccessToken(tokenResponse.getTenantAccessToken());
+            token.setStart(System.currentTimeMillis());
+            token.setExpire(System.currentTimeMillis() + tokenResponse.getExpire());
+            this.accessToken = token;
+        } finally {
+            httpClient.close();
         }
+    }
+
+    private Map<String, String> generateAccessParams() {
+        Map<String, String> params = new HashMap<>();
+        params.put("app_id", urlOrAppId);
+        params.put("app_secret", appSecret);
+        return params;
+    }
+
+    public FeiShuPersonalWorkAccessToken getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(FeiShuPersonalWorkAccessToken accessToken) {
+        this.accessToken = accessToken;
     }
 }

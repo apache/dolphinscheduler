@@ -20,15 +20,23 @@ package org.apache.dolphinscheduler.plugin.alert.feishu;
 import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 
 import org.apache.http.HttpHost;
+import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public final class HttpRequestUtil {
 
@@ -53,6 +61,21 @@ public final class HttpRequestUtil {
         HttpPost post = new HttpPost(url);
         StringEntity entity = new StringEntity(msg, ContentType.APPLICATION_JSON);
         post.setEntity(entity);
+        return post;
+    }
+
+    public static HttpPost constructHttpPost(String url, String msg,
+                                             HashMap<String, String> pathParams) throws URISyntaxException {
+        URIBuilder uriBuilder = new URIBuilder(url);
+        if (pathParams != null) {
+            List<NameValuePair> pairs = new ArrayList<>();
+            pathParams.forEach((key, value) -> pairs.add(new BasicNameValuePair(key, value)));
+            uriBuilder.addParameters(pairs);
+        }
+        HttpPost post = new HttpPost(uriBuilder.build());
+        StringEntity entity = new StringEntity(msg, ContentType.APPLICATION_JSON);
+        post.setEntity(entity);
+        post.addHeader("Content-Type", "application/json; charset=utf-8");
         return post;
     }
 }

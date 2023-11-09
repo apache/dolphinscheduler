@@ -269,7 +269,11 @@ export default {
     AtUserIds: 'At User Ids',
     MsgType: 'Msg Type',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}All"
+    IsAtAll: "{'@'}All",
+    WebhookOrAppId: 'Custom robot Webhook/Application robot AppId',
+    appSecret: 'Application robot AppSecret',
+    receiveIdType: 'Application robot ReceiveIdType',
+    receiveId: 'Application robot receiveId'
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
