@@ -272,8 +272,8 @@ export default {
     IsAtAll: "{'@'}All",
     calledNumber:"Called phone number",
     calledShowNumber:"Call display number",
-    ttsCode:"tts Code",
-    address:'address',
+    ttsCode:"TTS Code",
+    address:'Address',
     accessKeyId:"AccessKeyId",
     accessKeySecret:"AccessKeySecret"
   },

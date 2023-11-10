@@ -42,7 +42,7 @@ public final class VoiceAlertChannel implements AlertChannel {
         AlertData alert = info.getAlertData();
         Map<String, String> paramsMap = info.getAlertParams();
         if (null == paramsMap) {
-            return new AlertResult("false", "mail params is null");
+            return new AlertResult("false", "aliyun-voice params is null");
         }
         VoiceParam voiceParam = buildVoiceParam(paramsMap);
         VoiceSender voiceSender = new VoiceSender(voiceParam);
