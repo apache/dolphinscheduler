@@ -113,6 +113,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     // the current server is not at running status, cannot consume command.
                     log.warn("The current server is not at running status, cannot consumes commands.");
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    continue;
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
                 boolean isOverload =

@@ -119,7 +119,9 @@ public class WorkerManagerThread implements Runnable {
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
+                    log.warn("The current server is not at running status, cannot consumes task queue.");
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
+                    continue;
                 }
                 if (this.getThreadPoolQueueSize() <= workerExecThreads) {
                     final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
