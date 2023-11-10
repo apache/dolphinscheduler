@@ -148,7 +148,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 }
                 long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(),
                         (long) processInstance.getTimeout()
-                                * Constants.SEC_2_MINUTES_TIME_UNIT);
+                                * Constants.MINUTE_2_SECOND_TIME_UNIT);
                 if (timeRemain < 0) {
                     log.info("Workflow instance {} timeout, adding timeout event", processInstance.getId());
                     addProcessTimeoutEvent(processInstance);
@@ -248,7 +248,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                     long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(),
                             (long) taskInstance.getTaskDefine().getTimeout()
-                                    * Constants.SEC_2_MINUTES_TIME_UNIT);
+                                    * Constants.MINUTE_2_SECOND_TIME_UNIT);
                     if (timeRemain < 0) {
                         log.info("Task instance is timeout, adding task timeout event and remove the check");
                         addTaskTimeoutEvent(taskInstance);
