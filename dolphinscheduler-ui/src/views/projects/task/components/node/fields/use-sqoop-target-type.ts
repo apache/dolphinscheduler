@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {ref, h, watch, Ref, onMounted} from 'vue'
+import {h, onMounted, Ref, ref, watch} from 'vue'
 import {useI18n} from 'vue-i18n'
 import {useDatasource} from './use-sqoop-datasource'
 import styles from '../index.module.scss'
@@ -26,8 +26,8 @@ export function useTargetType(
     unCustomSpan: Ref<number>
 ): IJsonItem[] {
     const {t} = useI18n()
-    const hiveSpan = ref(0)
-    const hdfsSpan = ref(24)
+    const hiveSpan = ref(24)
+    const hdfsSpan = ref(0)
     const rdbmsSpan = ref(0)
     const dataSourceSpan = ref(0)
     const updateSpan = ref(0)
@@ -89,6 +89,25 @@ export function useTargetType(
         }
     }
 
+    const resetValue = () => {
+        switch (model.modelType) {
+            case 'import':
+                model.targetHiveDatabase = '';
+                model.targetHiveTable = '';
+                model.targetHdfsTargetPath = '';
+            case 'export':
+                model.targetMysqlDatasource = '';
+                model.targetMysqlTable = '';
+                model.targetMysqlColumns = '';
+                model.targetMysqlFieldsTerminated = '';
+                model.targetMysqlLinesTerminated = '';
+                model.targetMysqlTable = '';
+            default:
+                model.sourceMysqlDatasource = '';
+        }
+
+    }
+
     onMounted(() => {
         targetTypes.value = [...hadoopSourceTypes.value];
     })
@@ -97,15 +116,14 @@ export function useTargetType(
         () => [model.sourceType, model.srcQueryType],
         ([sourceType, srcQueryType]) => {
             targetTypes.value = getTargetTypesBySourceType(sourceType, srcQueryType)
-            if (!model.targetType) {
-                model.targetType = targetTypes.value[0].value
-            }
+            model.targetType = targetTypes.value[0].value
         }
     )
 
     watch(
         () => [unCustomSpan.value, model.targetType, model.targetMysqlIsUpdate],
         () => {
+            resetValue();
             resetSpan()
         }
     )

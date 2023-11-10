@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import {ref, h, watch, Ref, onMounted} from 'vue'
+import {h, onMounted, Ref, ref, watch} from 'vue'
 import {useI18n} from 'vue-i18n'
 import {useDatasource} from './use-sqoop-datasource'
 import {useCustomParams} from '.'
@@ -73,6 +73,22 @@ export function useSourceType(
         datasourceSpan.value =
             unCustomSpan.value && rdbmsSourceTypes.value.some(source => source.value === model.sourceType) ? 24 : 0
     }
+    const resetValue = () => {
+        switch (model.modelType) {
+            case 'import':
+                model.sourceMysqlDatasource = ''
+
+            case 'export':
+                model.sourceHiveDatabase = ''
+                model.sourceHiveTable = ''
+                model.sourceHivePartitionKey = ''
+                model.sourceHivePartitionValue = ''
+                model.sourceHdfsExportDir = ''
+            default:
+                model.sourceMysqlDatasource = ''
+        }
+
+    }
     const getSourceTypesByModelType = (modelType: ModelType): IOption[] => {
         switch (modelType) {
             case 'import':
@@ -92,9 +108,7 @@ export function useSourceType(
         () => model.modelType,
         (modelType: ModelType) => {
             sourceTypes.value = getSourceTypesByModelType(modelType)
-            if (!model.sourceType) {
-                model.sourceType = sourceTypes.value[0].value
-            }
+            model.sourceType = sourceTypes.value[0].value
         }
     )
     watch(
@@ -105,7 +119,8 @@ export function useSourceType(
             model.srcColumnType
         ],
         () => {
-            resetSpan()
+            resetValue();
+            resetSpan();
         }
     )
 
