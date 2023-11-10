@@ -174,16 +174,15 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     }
 
     @Override
-    public List<TaskInstance> queryLastTaskInstanceListIntervalByTaskCodes(Set<Long> taskCodes,
-                                                                           DateInterval dateInterval, int testFlag) {
-        return mybatisMapper.findLastTaskInstances(taskCodes, dateInterval.getStartTime(), dateInterval.getEndTime(),
-                testFlag);
+    public List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
+                                                                                 Set<Long> taskCodes,
+                                                                                 int testFlag) {
+        return mybatisMapper.findLastTaskInstances(processInstanceId, taskCodes, testFlag);
     }
 
     @Override
-    public TaskInstance queryLastTaskInstanceIntervalByTaskCode(long depTaskCode, DateInterval dateInterval,
-                                                                int testFlag) {
-        return mybatisMapper.findLastTaskInstance(depTaskCode, dateInterval.getStartTime(), dateInterval.getEndTime(),
-                testFlag);
+    public TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId, long depTaskCode,
+                                                                       int testFlag) {
+        return mybatisMapper.findLastTaskInstance(processInstanceId, depTaskCode, testFlag);
     }
 }

@@ -101,3 +101,7 @@ d//
 delimiter ;
 CALL drop_t_ds_k8s_namespace_col_pod_request_memory;
 DROP PROCEDURE drop_t_ds_k8s_namespace_col_pod_request_memory;
+
+
+CREATE INDEX IF NOT EXISTS idx_pid_code_end_time ON t_ds_task_instance (process_instance_id, task_code, end_time);
+ANALYZE TABLE t_ds_task_instance;

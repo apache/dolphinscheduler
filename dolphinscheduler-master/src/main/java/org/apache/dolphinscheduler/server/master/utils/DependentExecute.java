@@ -158,10 +158,9 @@ public class DependentExecute {
             if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
                 result = dependResultByProcessInstance(processInstance);
             } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                result = dependResultByAllTaskOfProcessInstance(processInstance, dateInterval, testFlag);
+                result = dependResultByAllTaskOfProcessInstance(processInstance, testFlag);
             } else {
-                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), dateInterval,
-                        testFlag);
+                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), testFlag);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -194,8 +193,7 @@ public class DependentExecute {
      *
      * @return
      */
-    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance,
-                                                                DateInterval dateInterval, int testFlag) {
+    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance, int testFlag) {
         if (!processInstance.getState().isFinished()) {
             log.info("Wait for the dependent workflow to complete, processCode: {}, processInstanceId: {}.",
                     processInstance.getProcessDefinitionCode(), processInstance.getId());
@@ -212,8 +210,8 @@ public class DependentExecute {
                             .collect(Collectors.toMap(TaskDefinitionLog::getCode, TaskDefinitionLog::getName));
 
             List<TaskInstance> taskInstanceList =
-                    taskInstanceDao.queryLastTaskInstanceListIntervalByTaskCodes(taskDefinitionCodeMap.keySet(),
-                            dateInterval, testFlag);
+                    taskInstanceDao.queryLastTaskInstanceListIntervalInProcessInstance(processInstance.getId(),
+                            taskDefinitionCodeMap.keySet(), testFlag);
             Map<Long, TaskExecutionStatus> taskExecutionStatusMap =
                     taskInstanceList.stream()
                             .filter(taskInstance -> taskInstance.getTaskExecuteType() != TaskExecuteType.STREAM)
@@ -245,14 +243,14 @@ public class DependentExecute {
      *
      * @param processInstance last process instance in the date interval
      * @param depTaskCode the dependent task code
-     * @param dateInterval date interval
      * @param testFlag test flag
      * @return depend result
      */
     private DependResult dependResultBySingleTaskInstance(ProcessInstance processInstance, long depTaskCode,
-                                                          DateInterval dateInterval, int testFlag) {
+                                                          int testFlag) {
         TaskInstance taskInstance =
-                taskInstanceDao.queryLastTaskInstanceIntervalByTaskCode(depTaskCode, dateInterval, testFlag);
+                taskInstanceDao.queryLastTaskInstanceIntervalInProcessInstance(processInstance.getId(),
+                        depTaskCode, testFlag);
 
         if (taskInstance == null) {
             TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(depTaskCode);
@@ -318,21 +316,12 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
-        ProcessInstance lastSchedulerProcess =
-                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+        // Task instance cannot run without process instance,
+        // we should only use `scheduleTime` to search for process instances,
+        // as `dateInterval` is calculated based on the `scheduleTime` of the
+        // process instance where the `dependent` node is located.
 
-        ProcessInstance lastManualProcess =
-                processInstanceDao.queryLastManualProcessInterval(definitionCode, dateInterval, testFlag);
-
-        if (lastManualProcess == null) {
-            return lastSchedulerProcess;
-        }
-        if (lastSchedulerProcess == null) {
-            return lastManualProcess;
-        }
-
-        // In the time range, there are both manual and scheduled workflow instances, return the last workflow instance
-        return lastManualProcess.getId() > lastSchedulerProcess.getId() ? lastManualProcess : lastSchedulerProcess;
+        return processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
     }
 
     /**

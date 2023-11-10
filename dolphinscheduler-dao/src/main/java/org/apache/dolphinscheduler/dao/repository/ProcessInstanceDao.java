@@ -41,15 +41,6 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
     ProcessInstance queryLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
 
     /**
-     * find last manual process instance interval
-     *
-     * @param definitionCode process definition code
-     * @param dateInterval   dateInterval
-     * @return process instance
-     */
-    ProcessInstance queryLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
-
-    /**
      * query first schedule process instance
      *
      * @param definitionCode definitionCode
