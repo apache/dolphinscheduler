@@ -154,6 +154,7 @@ const DetailModal = defineComponent({
       requiredDataBase,
       showHost,
       showPort,
+      showRestEndpoint,
       showAwsRegion,
       showCompatibleMode,
       showConnectType,
@@ -162,8 +163,11 @@ const DetailModal = defineComponent({
       showDataBaseName,
       showJDBCConnectParameters,
       showPublicKey,
+      showNamespace,
+      showKubeConfig,
       modeOptions,
-      redShitModeOptions,
+      redShiftModeOptions,
+      sagemakerModeOption,
       loading,
       saving,
       testing,
@@ -252,6 +256,21 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
+                  v-show={showRestEndpoint}
+                  label={t('datasource.zeppelin_rest_endpoint')}
+                  path='restEndPoint'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-zeppelin_rest_endpoint'
+                    v-model={[detailForm.restEndpoint, 'value']}
+                    type='text'
+                    maxlength={255}
+                    placeholder={t('datasource.zeppelin_rest_endpoint_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
                   v-show={showPort}
                   label={t('datasource.port')}
                   path='port'
@@ -304,7 +323,9 @@ const DetailModal = defineComponent({
                     v-model={[detailForm.mode, 'value']}
                     options={
                       detailForm.type === 'REDSHIFT'
-                        ? redShitModeOptions
+                        ? redShiftModeOptions
+                        : detailForm.type === 'SAGEMAKER'
+                        ? sagemakerModeOption
                         : modeOptions
                     }
                   ></NSelect>
@@ -481,7 +502,11 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showMode && detailForm.mode === 'IAM-accessKey'}
+                  v-show={
+                    showMode &&
+                    detailForm.mode === 'IAM-accessKey' &&
+                    detailForm.type != 'SAGEMAKER'
+                  }
                   label={t('datasource.dbUser')}
                   path='dbUser'
                   show-require-mark
@@ -519,7 +544,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={!showMode || detailForm.mode === 'password'}
+                  v-show={
+                    (!showMode || detailForm.mode === 'password') &&
+                    detailForm.type != 'K8S'
+                  }
                   label={t('datasource.user_name')}
                   path='userName'
                   show-require-mark
@@ -534,7 +562,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={!showMode || detailForm.mode === 'password'}
+                  v-show={
+                    (!showMode || detailForm.mode === 'password') &&
+                    detailForm.type != 'K8S'
+                  }
                   label={t('datasource.user_password')}
                   path='password'
                 >
@@ -653,6 +684,35 @@ const DetailModal = defineComponent({
                     autosize={{
                       minRows: 4
                     }}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showKubeConfig}
+                  label={t('datasource.kubeConfig')}
+                  path='kubeConfig'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    class='input-kubeConfig'
+                    v-model={[detailForm.kubeConfig, 'value']}
+                    type='textarea'
+                    autosize={{
+                      minRows: 14
+                    }}
+                    placeholder={t('datasource.kubeConfig_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                  v-show={showNamespace}
+                  label={t('datasource.namespace')}
+                  path='namespace'
+                  show-require-mark
+                >
+                  <NInput
+                    allowInput={this.trim}
+                    v-model={[detailForm.namespace, 'value']}
+                    placeholder={t('datasource.namespace_tips')}
                   />
                 </NFormItem>
               </NForm>

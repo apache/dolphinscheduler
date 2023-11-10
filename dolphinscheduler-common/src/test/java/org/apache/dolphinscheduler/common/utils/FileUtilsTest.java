@@ -19,11 +19,10 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,18 +59,6 @@ public class FileUtilsTest {
         try {
             FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
             Assertions.assertTrue(true);
-        } catch (Exception e) {
-            Assertions.fail();
-        }
-    }
-
-    @Test
-    public void testSetValue() {
-        try {
-            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "true");
-            Assertions.assertTrue(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
-            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "false");
-            Assertions.assertFalse(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
         } catch (Exception e) {
             Assertions.fail();
         }
@@ -140,6 +127,11 @@ public class FileUtilsTest {
 
         Assertions.assertDoesNotThrow(
                 () -> FileUtils.getFileChecksum(dirPath));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        FileUtils.deleteFile("test");
     }
 
 }

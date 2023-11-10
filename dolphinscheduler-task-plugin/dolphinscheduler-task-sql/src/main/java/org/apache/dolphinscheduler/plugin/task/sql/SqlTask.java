@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.sql.utils.SqlSplitUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -59,8 +60,6 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -98,13 +97,8 @@ public class SqlTask extends AbstractTask {
 
     public static final int TEST_FLAG_YES = 1;
 
-    private static final String SQL_SEPARATOR = ";\n";
+    private final DbType dbType;
 
-    /**
-     * Abstract Yarn Task
-     *
-     * @param taskRequest taskRequest
-     */
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
@@ -119,6 +113,7 @@ public class SqlTask extends AbstractTask {
 
         sqlTaskExecutionContext =
                 sqlParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        dbType = DbType.valueOf(sqlParameters.getType());
     }
 
     @Override
@@ -140,18 +135,17 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getConnParams(),
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
-        String separator = SQL_SEPARATOR;
         try {
 
             // get datasource
-            baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                    DbType.valueOf(sqlParameters.getType()),
+            baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dbType,
                     sqlTaskExecutionContext.getConnectionParams());
-            if (DbType.valueOf(sqlParameters.getType()).isSupportMultipleStatement()) {
-                separator = "";
-            }
+            List<String> subSqls =
+                    dbType.isSupportMultipleStatement() ? Collections.singletonList(sqlParameters.getSql())
+                            : SqlSplitUtils.splitSql(sqlParameters.getSql());
+
             // ready to execute SQL and parameter entity Map
-            List<SqlBinds> mainStatementSqlBinds = split(sqlParameters.getSql(), separator)
+            List<SqlBinds> mainStatementSqlBinds = subSqls
                     .stream()
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
@@ -167,7 +161,7 @@ public class SqlTask extends AbstractTask {
                     .map(this::getSqlAndSqlParamsMap)
                     .collect(Collectors.toList());
 
-            List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncParametersList(), log);
+            List<String> createFuncs = createFuncs(sqlTaskExecutionContext.getUdfFuncParametersList());
 
             // execute sql task
             executeFuncAndSql(mainStatementSqlBinds, preStatementSqlBinds, postStatementSqlBinds, createFuncs);
@@ -187,31 +181,6 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * split sql by segment separator
-     * <p>The segment separator is used
-     * when the data source does not support multi-segment SQL execution,
-     * and the client needs to split the SQL and execute it multiple times.</p>
-     * @param sql
-     * @param segmentSeparator
-     * @return
-     */
-    public static List<String> split(String sql, String segmentSeparator) {
-        if (StringUtils.isEmpty(segmentSeparator)) {
-            return Collections.singletonList(sql);
-        }
-
-        String[] lines = sql.split(segmentSeparator);
-        List<String> segments = new ArrayList<>();
-        for (String line : lines) {
-            if (line.trim().isEmpty() || line.startsWith("--")) {
-                continue;
-            }
-            segments.add(line);
-        }
-        return segments;
-    }
-
-    /**
      * execute function and sql
      *
      * @param mainStatementsBinds main statements binds
@@ -223,12 +192,11 @@ public class SqlTask extends AbstractTask {
                                   List<SqlBinds> preStatementsBinds,
                                   List<SqlBinds> postStatementsBinds,
                                   List<String> createFuncs) throws Exception {
-        Connection connection = null;
-        try {
+        try (
+                Connection connection =
+                        DataSourceClientProvider.getAdHocConnection(DbType.valueOf(sqlParameters.getType()),
+                                baseConnectionParam)) {
 
-            // create connection
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.valueOf(sqlParameters.getType()),
-                    baseConnectionParam);
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
                 createTempFunction(connection, createFuncs);
@@ -256,8 +224,6 @@ public class SqlTask extends AbstractTask {
         } catch (Exception e) {
             log.error("execute sql error: {}", e.getMessage());
             throw e;
-        } finally {
-            close(connection);
         }
     }
 
@@ -529,10 +495,9 @@ public class SqlTask extends AbstractTask {
      * create function list
      *
      * @param udfFuncParameters udfFuncParameters
-     * @param log log
      * @return
      */
-    private List<String> createFuncs(List<UdfFuncParameters> udfFuncParameters, Logger log) {
+    private List<String> createFuncs(List<UdfFuncParameters> udfFuncParameters) {
 
         if (CollectionUtils.isEmpty(udfFuncParameters)) {
             log.info("can't find udf function resource");

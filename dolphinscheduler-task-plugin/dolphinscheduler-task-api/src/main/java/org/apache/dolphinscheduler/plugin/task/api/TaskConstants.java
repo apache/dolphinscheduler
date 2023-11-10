@@ -37,6 +37,8 @@ public class TaskConstants {
 
     public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\((.*?)\\)}";
 
+    public static final String DSVALUE_REGEX = "[\\$#]\\{\\((.*?)\\)dsVal}$";
+
     /**
      * string false
      */
@@ -474,6 +476,12 @@ public class TaskConstants {
     public static final String ALIBABA_CLOUD_ACCESS_KEY_ID = "resource.alibaba.cloud.access.key.id";
     public static final String ALIBABA_CLOUD_ACCESS_KEY_SECRET = "resource.alibaba.cloud.access.key.secret";
     public static final String ALIBABA_CLOUD_REGION = "resource.alibaba.cloud.region";
+
+    /**
+     * huawei cloud config
+     */
+    public static final String HUAWEI_CLOUD_ACCESS_KEY_ID = "resource.huawei.cloud.access.key.id";
+    public static final String HUAWEI_CLOUD_ACCESS_KEY_SECRET = "resource.huawei.cloud.access.key.secret";
 
     /**
      * use for k8s task

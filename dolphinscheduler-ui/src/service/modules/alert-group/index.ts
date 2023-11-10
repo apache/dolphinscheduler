@@ -41,6 +41,13 @@ export function listAlertGroupById(): any {
   })
 }
 
+export function listNormalAlertGroupById(): any {
+  return axios({
+    url: '/alert-groups/normal-list',
+    method: 'get'
+  })
+}
+
 export function queryAlertGroupById(data: IdReq): any {
   return axios({
     url: '/alert-groups/query',

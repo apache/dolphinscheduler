@@ -618,6 +618,7 @@ CREATE TABLE t_ds_project_preference
     project_code bigint NOT NULL,
     preferences varchar(512) NOT NULL,
     user_id int DEFAULT NULL ,
+    state int default 1,
     create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
     update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
     PRIMARY KEY (id)
@@ -1034,13 +1035,15 @@ VALUES (-1, 'default', 'default tenant', '1', '2018-03-27 15:48:50', '2018-10-24
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('dev');
+INSERT INTO t_ds_version(version) VALUES ('3.3.0');
 
 --
 -- Table structure for table t_ds_plugin_define
@@ -1065,11 +1068,13 @@ CREATE TABLE t_ds_plugin_define (
 DROP TABLE IF EXISTS t_ds_alert_plugin_instance;
 CREATE TABLE t_ds_alert_plugin_instance (
 	id serial NOT NULL,
-	plugin_define_id int4 NOT NULL,
+	plugin_define_id int NOT NULL,
 	plugin_instance_params text NULL,
 	create_time timestamp NULL,
 	update_time timestamp NULL,
 	instance_name varchar(255) NULL,
+	instance_type int NOT NULL default '0',
+	warning_type int NOT NULL default '3',
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
@@ -1996,13 +2001,8 @@ DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
    id serial NOT NULL,
    code               bigint  NOT NULL,
-   limits_memory      int DEFAULT NULL ,
    namespace          varchar(255) DEFAULT NULL ,
    user_id            int DEFAULT NULL,
-   pod_replicas       int DEFAULT NULL,
-   pod_request_cpu    NUMERIC(13,4) NULL,
-   pod_request_memory int DEFAULT NULL,
-   limits_cpu         NUMERIC(13,4) NULL,
    cluster_code       bigint  NOT NULL,
    create_time        timestamp DEFAULT NULL ,
    update_time        timestamp DEFAULT NULL ,
@@ -2102,3 +2102,23 @@ CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (pare
 CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
+--
+-- Table structure for table t_ds_alert
+--
+
+DROP TABLE IF EXISTS t_ds_listener_event;
+CREATE TABLE t_ds_listener_event(
+    id          int         NOT NULL,
+    content     text,
+    sign        varchar(64) NOT NULL DEFAULT '',
+    post_status int         NOT NULL DEFAULT '0',
+    event_type  int         NOT NULL,
+    log         text,
+    create_time timestamp            DEFAULT NULL,
+    update_time timestamp            DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+comment on column t_ds_listener_event.sign is 'sign=sha1(content)';
+
+create index idx_listener_event_post_status on t_ds_listener_event (post_status);
+create index idx_listener_event_sign on t_ds_listener_event (sign);

@@ -694,6 +694,7 @@ CREATE TABLE `t_ds_project_preference` (
    `project_code` bigint(20) NOT NULL COMMENT 'project code',
    `preferences` varchar(512) NOT NULL COMMENT 'project preferences',
    `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+   `state` int(11) DEFAULT '1' comment '1 means enabled, 0 means disabled',
    `create_time` datetime NOT NULL COMMENT 'create time',
    `update_time` datetime DEFAULT NULL COMMENT 'update time',
    PRIMARY KEY (`id`),
@@ -1042,7 +1043,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT IGNORE INTO `t_ds_version` VALUES ('1', 'dev');
+INSERT IGNORE INTO `t_ds_version` VALUES ('1', '3.3.0');
 
 
 -- ----------------------------
@@ -1050,6 +1051,8 @@ INSERT IGNORE INTO `t_ds_version` VALUES ('1', 'dev');
 -- ----------------------------
 INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', current_timestamp, current_timestamp);
+INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
+VALUES (NULL, 1, 'global alert group', 'global alert group', current_timestamp, current_timestamp);
 
 -- ----------------------------
 -- Records of t_ds_user
@@ -1085,6 +1088,8 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `instance_name` varchar(255) DEFAULT NULL COMMENT 'alert instance name',
+  `instance_type` int NOT NULL default '0',
+  `warning_type` int NOT NULL default  '3',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
@@ -2012,13 +2017,8 @@ DROP TABLE IF EXISTS `t_ds_k8s_namespace`;
 CREATE TABLE `t_ds_k8s_namespace` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` bigint(20) NOT NULL DEFAULT '0',
-  `limits_memory` int(11) DEFAULT NULL,
   `namespace` varchar(255) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
-  `pod_replicas` int(11) DEFAULT NULL,
-  `pod_request_cpu` decimal(14,3) DEFAULT NULL,
-  `pod_request_memory` int(11) DEFAULT NULL,
-  `limits_cpu` decimal(14,3) DEFAULT NULL,
   `cluster_code` bigint(20) NOT NULL DEFAULT '0',
   `create_time` datetime DEFAULT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
@@ -2113,3 +2113,21 @@ CREATE TABLE `t_ds_relation_sub_workflow` (
     KEY `idx_parent_task_code` (`parent_task_code`),
     KEY `idx_sub_workflow_instance_id` (`sub_workflow_instance_id`)
 );
+
+-- ----------------------------
+-- Table structure for t_ds_listener_event
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_listener_event`;
+CREATE TABLE `t_ds_listener_event` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+   `content` text COMMENT 'listener event json content',
+   `sign` char(64) NOT NULL DEFAULT '' COMMENT 'sign=sha1(content)',
+   `post_status` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:wait running,1:success,2:failed,3:partial success',
+   `event_type` int(11)  NOT NULL COMMENT 'listener event type',
+   `log` text COMMENT 'log',
+   `create_time` datetime DEFAULT NULL COMMENT 'create time',
+   `update_time` datetime DEFAULT NULL COMMENT 'update time',
+    PRIMARY KEY (`id`),
+    KEY `idx_status` (`post_status`) USING BTREE,
+    KEY `idx_sign` (`sign`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
