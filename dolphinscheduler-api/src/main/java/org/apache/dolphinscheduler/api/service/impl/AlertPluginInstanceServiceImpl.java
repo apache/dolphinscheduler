@@ -21,6 +21,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
@@ -79,6 +81,9 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
+
+    @Autowired
+    private ListenerEventPostService listenerEventPostService;
 
     private final Integer GLOBAL_ALERT_GROUP_ID = 2;
 
@@ -352,4 +357,23 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         return first.isPresent();
     }
 
+    @Override
+    public Result<Object> testSend(int pluginDefineId, String pluginInstanceParams) {
+        Result<Object> result = new Result<>();
+        AlertResult alertResult = listenerEventPostService.testSend(pluginDefineId, pluginInstanceParams);
+        if (alertResult == null) {
+            putMsg(result, Status.ALERT_CHANNEL_NOT_EXIST);
+            return result;
+        }
+
+        boolean sendStatus = Boolean.parseBoolean(alertResult.getStatus());
+
+        if (sendStatus) {
+            putMsg(result, Status.SUCCESS);
+        } else {
+            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertResult.getMessage());
+        }
+
+        return result;
+    }
 }

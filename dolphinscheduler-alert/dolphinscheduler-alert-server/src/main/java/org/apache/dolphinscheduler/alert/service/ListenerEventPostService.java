@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.alert.service;
 
-import org.apache.dolphinscheduler.alert.api.AlertChannel;
-import org.apache.dolphinscheduler.alert.api.AlertData;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
-import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -47,6 +43,7 @@ import org.apache.dolphinscheduler.dao.entity.event.TaskFailListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.event.TaskStartListenerEvent;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.curator.shaded.com.google.common.collect.Lists;
@@ -178,8 +175,8 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
     private @Nullable AlertResult alertResultHandler(AlertPluginInstance instance, AlertData alertData) {
         String pluginInstanceName = instance.getInstanceName();
         int pluginDefineId = instance.getPluginDefineId();
-        Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(instance.getPluginDefineId());
-        if (!alertChannelOptional.isPresent()) {
+        AlertChannel alertChannel = getPluginDefine(pluginDefineId);
+        if (alertChannel == null) {
             String message =
                     String.format("Global Alert Plugin %s send error: the channel doesn't exist, pluginDefineId: %s",
                             pluginInstanceName,
@@ -187,7 +184,6 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
             log.error("Global Alert Plugin {} send error : not found plugin {}", pluginInstanceName, pluginDefineId);
             return new AlertResult("false", message);
         }
-        AlertChannel alertChannel = alertChannelOptional.get();
 
         Map<String, String> paramsMap = JSONUtils.toMap(instance.getPluginInstanceParams());
 
@@ -260,4 +256,30 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
         log.info("Closed ListenerEventPostService...");
     }
 
+    public AlertChannel getPluginDefine(int pluginDefineId) {
+        Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(pluginDefineId);
+        return alertChannelOptional.orElse(null);
+    }
+
+    public AlertResult testSend(int pluginDefineId, String pluginInstanceParams) {
+        AlertChannel alertChannel = getPluginDefine(pluginDefineId);
+        if (alertChannel == null) {
+            return null;
+        }
+
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginInstanceParams);
+
+        AlertData alertData = AlertData.builder()
+                .title(AlertConstants.TEST_TITLE)
+                .content(AlertConstants.TEST_CONTENT)
+                .warnType(WarningType.ALL.getCode())
+                .build();
+
+        AlertInfo alertInfo = AlertInfo.builder()
+                .alertData(alertData)
+                .alertParams(paramsMap)
+                .build();
+
+        return alertChannel.process(alertInfo);
+    }
 }

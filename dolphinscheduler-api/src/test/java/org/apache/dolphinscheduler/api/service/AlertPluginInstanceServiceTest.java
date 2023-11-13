@@ -21,10 +21,13 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -77,6 +80,9 @@ public class AlertPluginInstanceServiceTest {
 
     @Mock
     private AlertGroupMapper alertGroupMapper;
+
+    @Mock
+    private ListenerEventPostService listenerEventPostService;
 
     private List<AlertPluginInstance> alertPluginInstances;
 
@@ -188,6 +194,18 @@ public class AlertPluginInstanceServiceTest {
         result = alertPluginInstanceService.create(user, 1, "test1", normalInstanceType, warningType, uiParams);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         Assertions.assertNotNull(result.get(Constants.DATA_LIST));
+    }
+
+    @Test
+    public void testSendAlert() {
+        Result<Object> result;
+        result = alertPluginInstanceService.testSend(1, uiParams);
+        Assertions.assertEquals(Status.ALERT_CHANNEL_NOT_EXIST.getCode(), result.getCode());
+        AlertResult alertResult = new AlertResult();
+        alertResult.setStatus("true");
+        Mockito.when(listenerEventPostService.testSend(1, uiParams)).thenReturn(alertResult);
+        result = alertPluginInstanceService.testSend(1, uiParams);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
     @Test

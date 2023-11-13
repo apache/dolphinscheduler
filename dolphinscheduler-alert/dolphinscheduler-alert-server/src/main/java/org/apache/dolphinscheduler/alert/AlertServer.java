@@ -31,6 +31,7 @@ import javax.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -60,13 +61,17 @@ public class AlertServer {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        log.info("Alert server is staring ...");
         alertPluginManager.start();
-        alertRegistryClient.start();
-        alertBootstrapService.start();
-        listenerEventPostService.start();
-        alertRpcServer.start();
-        log.info("Alert server is started ...");
+
+        if (this.getClass().getName()
+                .contains(((SpringApplication) readyEvent.getSource()).getMainApplicationClass().getName())) {
+            log.info("Alert server is staring ...");
+            alertRegistryClient.start();
+            alertBootstrapService.start();
+            listenerEventPostService.start();
+            alertRpcServer.start();
+            log.info("Alert server is started ...");
+        }
     }
 
     @PreDestroy
