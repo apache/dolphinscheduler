@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /**
  * rule input entry value type
  */
-public enum ValueType {
+public enum DataType {
 
     /**
      * 0-string
@@ -38,7 +38,7 @@ public enum ValueType {
     NUMBER(2, "number"),
     LIKE_SQL(3, "sql");
 
-    ValueType(int code, String description) {
+    DataType(int code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -55,17 +55,17 @@ public enum ValueType {
         return description;
     }
 
-    private static final Map<Integer, ValueType> VALUES_MAP = new HashMap<>();
+    private static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<>();
 
     static {
-        for (ValueType type : ValueType.values()) {
-            VALUES_MAP.put(type.code, type);
+        for (DataType type : DataType.values()) {
+            DATA_TYPE_MAP.put(type.code, type);
         }
     }
 
-    public static ValueType of(Integer status) {
-        if (VALUES_MAP.containsKey(status)) {
-            return VALUES_MAP.get(status);
+    public static DataType of(Integer status) {
+        if (DATA_TYPE_MAP.containsKey(status)) {
+            return DATA_TYPE_MAP.get(status);
         }
         throw new IllegalArgumentException("invalid code : " + status);
     }
