@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -262,6 +263,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
+
+                        if (line.endsWith(VarPoolUtils.VAR_SUFFIX)) {
+                            varPool.append(VarPoolUtils.findVarPool(line));
+                            varPool.append(VarPoolUtils.VAR_DELIMITER);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -289,7 +295,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String configYaml = k8sTaskExecutionContext.getConfigYaml();
+            String connectionParams = k8sTaskExecutionContext.getConnectionParams();
+            String kubeConfig = JSONUtils.getNodeString(connectionParams, "kubeConfig");
+            String configYaml = kubeConfig;
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();

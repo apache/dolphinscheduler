@@ -54,7 +54,9 @@ public enum AlertInputTips {
     APP_SECRET("please input app secret", "请输入app secret"),
     ROBOT_CODE("please input robot code", "请输入robot code"),
     USER_IDS("please input user ids, use ',' to split ids, like '111,222'", "请输入user ids, 使用','去分割id, 类似'111,222'"),
-    ;
+    ANNOTATION("please input annotation in json form", "请输入json格式的annotation"),
+    GENERATOR_URL("please input Generator URL", "请输入生成地址");
+
 
     private final String enMsg;
     private final String zhMsg;

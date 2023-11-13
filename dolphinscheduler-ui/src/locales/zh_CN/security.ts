@@ -201,6 +201,8 @@ export default {
     alarm_instance_name: '告警实例名称',
     alarm_instance_name_tips: '请输入告警实例名称',
     alarm_plugin_name: '告警插件名称',
+    alarm_instance_type: '告警实例类型',
+    is_global_instance: '是否全局告警实例',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
@@ -273,6 +275,8 @@ export default {
     robotCode: '企业机器人代码',
     userIds: '发送消息用户id',
     msgKey: '消息类型'
+    annotations: '注释',
+    generatorURL: '生成地址',
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',

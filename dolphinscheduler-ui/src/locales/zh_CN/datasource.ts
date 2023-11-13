@@ -67,6 +67,10 @@ export default {
   user_password_tips: '请输入密码',
   aws_region: 'AwsRegion',
   aws_region_tips: '请输入AwsRegion',
+  aws_access_key: 'AwsAccessKey',
+  aws_access_key_tips: '请输入AwsAccessKey',
+  aws_secret_access_key: 'AwsSecretAccessKey',
+  aws_secret_access_key_tips: '请输入AwsSecretAccessKey',
   validation: '验证',
   mode_tips: '请选择验证模式',
   jdbc_format_tips: 'jdbc连接参数不是一个正确的JSON格式',
@@ -84,5 +88,11 @@ export default {
   SecretAccessKey: 'SecretAccessKey',
   SecretAccessKey_tips: '请输入SecretAccessKey',
   dbUser: 'DbUser',
-  dbUser_tips: '请输入DbUser'
+  dbUser_tips: '请输入DbUser',
+  zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+  zeppelin_rest_endpoint_tips: '请输入zeppelin server的rest endpoint',
+  kubeConfig: 'kubeConfig',
+  kubeConfig_tips: '请输入KubeConfig',
+  namespace: 'namespace',
+  namespace_tips: '请输入namespace'
 }
