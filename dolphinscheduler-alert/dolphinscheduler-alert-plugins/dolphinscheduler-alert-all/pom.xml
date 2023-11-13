@@ -29,6 +29,11 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-prometheus</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-alert-dingtalk</artifactId>
             <version>${project.version}</version>
         </dependency>

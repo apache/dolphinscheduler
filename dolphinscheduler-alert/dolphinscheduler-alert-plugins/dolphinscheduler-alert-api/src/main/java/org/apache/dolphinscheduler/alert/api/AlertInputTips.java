@@ -50,7 +50,8 @@ public enum AlertInputTips {
     SECRET("please input secret", "请输入secret"),
     WECHAT_MENTION_USERS("use `|` to separate userIds and `@all` to everyone", "使用`|`来分割userId或使用`@all`来提到所有人"),
     WECHAT_AGENT_ID("please input agent id or chat id", "请输入agent id或chat id"),
-    ;
+    ANNOTATION("please input annotation in json form", "请输入json格式的annotation"),
+    GENERATOR_URL("please input Generator URL", "请输入生成地址");
 
     private final String enMsg;
     private final String zhMsg;

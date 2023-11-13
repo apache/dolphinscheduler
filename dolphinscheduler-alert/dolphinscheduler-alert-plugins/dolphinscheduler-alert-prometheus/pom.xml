@@ -16,30 +16,24 @@
   ~ limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-alert</artifactId>
+        <artifactId>dolphinscheduler-alert-plugins</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <artifactId>dolphinscheduler-alert-plugins</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>dolphinscheduler-alert-prometheus</artifactId>
+    <packaging>jar</packaging>
 
-    <modules>
-        <module>dolphinscheduler-alert-all</module>
-        <module>dolphinscheduler-alert-api</module>
-        <module>dolphinscheduler-alert-email</module>
-        <module>dolphinscheduler-alert-wechat</module>
-        <module>dolphinscheduler-alert-dingtalk</module>
-        <module>dolphinscheduler-alert-script</module>
-        <module>dolphinscheduler-alert-http</module>
-        <module>dolphinscheduler-alert-feishu</module>
-        <module>dolphinscheduler-alert-slack</module>
-        <module>dolphinscheduler-alert-pagerduty</module>
-        <module>dolphinscheduler-alert-webexteams</module>
-        <module>dolphinscheduler-alert-telegram</module>
-        <module>dolphinscheduler-alert-prometheus</module>
-    </modules>
-
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+    </dependencies>
 </project>
