@@ -345,12 +345,12 @@ public class TaskExecutionContextFactory {
                 if (type != null) {
                     DqRuleInputEntry comparisonName = new DqRuleInputEntry();
                     comparisonName.setField(COMPARISON_NAME);
-                    comparisonName.setValue(type.getName());
+                    comparisonName.setData(type.getName());
                     ruleInputEntryList.add(comparisonName);
 
                     DqRuleInputEntry comparisonTable = new DqRuleInputEntry();
                     comparisonTable.setField(COMPARISON_TABLE);
-                    comparisonTable.setValue(type.getOutputTable());
+                    comparisonTable.setData(type.getOutputTable());
                     ruleInputEntryList.add(comparisonTable);
 
                     if (executeSqlList == null) {
