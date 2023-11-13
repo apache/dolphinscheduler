@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 
+import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,8 @@ import org.springframework.context.annotation.Configuration;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+
+import java.util.Properties;
 
 @Configuration
 @EnableAutoConfiguration
@@ -63,8 +66,15 @@ public class DaoConfiguration {
     }
 
     @Bean
-    public VendorDatabaseIdProvider databaseIdProvider() {
-        return new VendorDatabaseIdProvider();
+    public DatabaseIdProvider databaseIdProvider() {
+        VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
+        Properties properties = new Properties();
+        properties.put("H2", "h2");
+        properties.put("Oracle", "oracle");
+        properties.put("MySQL", "mysql");
+        properties.put("PostgreSQL", "pg");
+        databaseIdProvider.setProperties(properties);
+        return databaseIdProvider;
     }
 
     @Bean
