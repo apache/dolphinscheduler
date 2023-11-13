@@ -56,7 +56,8 @@ public enum AlertInputTips {
     ALIYUN_VIICE_ADDRESS("please input aliyun viice address", "请输入阿里云访问域名"),
     ALIYUN_VIICE_ACCESSKEYID("please input accessKeyId", "请输入accessKeyId"),
     ALIYUN_VIICE_ACCESSKEY_SECRET("please input accessKeySecret", "请输入accessKeySecret"),
-    ;
+    ANNOTATION("please input annotation in json form", "请输入json格式的annotation"),
+    GENERATOR_URL("please input Generator URL", "请输入生成地址");
 
     private final String enMsg;
     private final String zhMsg;

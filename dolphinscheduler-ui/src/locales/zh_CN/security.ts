@@ -275,8 +275,9 @@ export default {
     ttsCode:"语音模板",
     address:'访问域名',
     accessKeyId:"AccessKeyId",
-    accessKeySecret:"AccessKeySecret"
-
+    accessKeySecret:"AccessKeySecret",
+    annotations: '注释',
+    generatorURL: '生成地址',
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',

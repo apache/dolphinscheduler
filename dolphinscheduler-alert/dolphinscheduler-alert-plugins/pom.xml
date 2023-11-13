@@ -40,6 +40,7 @@
         <module>dolphinscheduler-alert-webexteams</module>
         <module>dolphinscheduler-alert-telegram</module>
         <module>dolphinscheduler-alert-voice</module>
+        <module>dolphinscheduler-alert-prometheus</module>
     </modules>
 
 </project>

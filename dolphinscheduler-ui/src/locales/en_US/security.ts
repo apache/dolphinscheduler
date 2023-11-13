@@ -275,7 +275,9 @@ export default {
     ttsCode:"TTS Code",
     address:'Address',
     accessKeyId:"AccessKeyId",
-    accessKeySecret:"AccessKeySecret"
+    accessKeySecret:"AccessKeySecret",
+    annotations: 'Annotations',
+    generatorURL: 'GeneratorURL',
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',
