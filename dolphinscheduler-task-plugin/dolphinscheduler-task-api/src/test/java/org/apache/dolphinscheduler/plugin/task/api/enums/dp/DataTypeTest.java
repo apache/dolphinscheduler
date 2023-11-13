@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.api.enums.dp;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class ValueTypeTest {
+public class DataTypeTest {
 
     /**
      * 0-string
@@ -30,25 +30,25 @@ public class ValueTypeTest {
      */
     @Test
     public void testGetCode() {
-        Assertions.assertEquals(0, ValueType.STRING.getCode());
-        Assertions.assertEquals(1, ValueType.LIST.getCode());
-        Assertions.assertEquals(2, ValueType.NUMBER.getCode());
-        Assertions.assertEquals(3, ValueType.LIKE_SQL.getCode());
+        Assertions.assertEquals(0, DataType.STRING.getCode());
+        Assertions.assertEquals(1, DataType.LIST.getCode());
+        Assertions.assertEquals(2, DataType.NUMBER.getCode());
+        Assertions.assertEquals(3, DataType.LIKE_SQL.getCode());
     }
 
     @Test
     public void testGetDescription() {
-        Assertions.assertEquals("string", ValueType.STRING.getDescription());
-        Assertions.assertEquals("list", ValueType.LIST.getDescription());
-        Assertions.assertEquals("number", ValueType.NUMBER.getDescription());
-        Assertions.assertEquals("sql", ValueType.LIKE_SQL.getDescription());
+        Assertions.assertEquals("string", DataType.STRING.getDescription());
+        Assertions.assertEquals("list", DataType.LIST.getDescription());
+        Assertions.assertEquals("number", DataType.NUMBER.getDescription());
+        Assertions.assertEquals("sql", DataType.LIKE_SQL.getDescription());
     }
 
     @Test
     public void testOf() {
-        Assertions.assertEquals(ValueType.STRING, ValueType.of(0));
-        Assertions.assertEquals(ValueType.LIST, ValueType.of(1));
-        Assertions.assertEquals(ValueType.NUMBER, ValueType.of(2));
-        Assertions.assertEquals(ValueType.LIKE_SQL, ValueType.of(3));
+        Assertions.assertEquals(DataType.STRING, DataType.of(0));
+        Assertions.assertEquals(DataType.LIST, DataType.of(1));
+        Assertions.assertEquals(DataType.NUMBER, DataType.of(2));
+        Assertions.assertEquals(DataType.LIKE_SQL, DataType.of(3));
     }
 }

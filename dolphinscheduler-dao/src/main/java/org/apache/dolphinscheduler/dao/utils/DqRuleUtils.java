@@ -40,7 +40,7 @@ public class DqRuleUtils {
 
                 if (valuesMap.get(dqRuleInputEntry.getField()) != null) {
                     String value = String.valueOf(valuesMap.get(dqRuleInputEntry.getField()));
-                    dqRuleInputEntry.setValue(value);
+                    dqRuleInputEntry.setData(value);
                 }
 
                 if (valuesMap.get("is_show") != null) {

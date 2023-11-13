@@ -71,11 +71,11 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -546,13 +546,13 @@ public class ProcessServiceTest {
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
         srcConnectorType.setIsShow(true);
-        srcConnectorType.setValue("JDBC");
+        srcConnectorType.setData("JDBC");
         srcConnectorType.setPlaceholder("Please select the source connector type");
         srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcConnectorType
                 .setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
         srcConnectorType.setInputType(InputType.DEFAULT.getCode());
-        srcConnectorType.setValueType(ValueType.NUMBER.getCode());
+        srcConnectorType.setDataType(DataType.NUMBER.getCode());
         srcConnectorType.setIsEmit(true);
 
         DqRuleInputEntry statisticsName = new DqRuleInputEntry();
@@ -564,7 +564,7 @@ public class ProcessServiceTest {
         statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsName.setInputType(InputType.DEFAULT.getCode());
-        statisticsName.setValueType(ValueType.STRING.getCode());
+        statisticsName.setDataType(DataType.STRING.getCode());
         statisticsName.setIsEmit(false);
 
         DqRuleInputEntry statisticsExecuteSql = new DqRuleInputEntry();
@@ -575,7 +575,7 @@ public class ProcessServiceTest {
         statisticsExecuteSql.setIsShow(true);
         statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
+        statisticsExecuteSql.setDataType(DataType.LIKE_SQL.getCode());
         statisticsExecuteSql.setIsEmit(false);
 
         list.add(srcConnectorType);

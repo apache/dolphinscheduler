@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -56,10 +56,10 @@ public class DqRuleInputEntry implements Serializable {
     @TableField(value = "title")
     private String title;
     /**
-     * default value，can be null
+     * default data，can be null
      */
-    @TableField(value = "value")
-    private String value;
+    @TableField(value = "data")
+    private String data;
     /**
      * default options，can be null
      *  [{label:"",value:""}]
@@ -79,8 +79,8 @@ public class DqRuleInputEntry implements Serializable {
     /**
      * input entry type: string，array，number .etc
      */
-    @TableField(value = "value_type")
-    private int valueType = ValueType.NUMBER.getCode();
+    @TableField(value = "data_type")
+    private int dataType = DataType.NUMBER.getCode();
     /**
      * input entry type: default,statistics,comparison
      */

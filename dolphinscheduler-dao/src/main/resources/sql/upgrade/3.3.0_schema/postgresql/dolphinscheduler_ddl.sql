@@ -24,3 +24,41 @@ CREATE INDEX "idx_listener_event_post_status" ON "t_ds_listener_event" ("post_st
 CREATE INDEX "idx_listener_event_sign" ON "t_ds_listener_event" ("sign");
 -- Set comment to column: "sign" on table: "t_ds_listener_event"
 COMMENT ON COLUMN "t_ds_listener_event" ."sign" IS 'sign=sha1(content)';
+-- modify_data_t_ds_dq_rule_input_entry
+
+delimiter d//
+CREATE OR REPLACE FUNCTION modify_data_t_ds_dq_rule_input_entry() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_dq_rule_input_entry'
+                  AND column_name = 'value')
+      THEN
+         ALTER TABLE t_ds_dq_rule_input_entry
+                 RENAME COLUMN "value" TO "data";
+      END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select modify_data_t_ds_dq_rule_input_entry();
+DROP FUNCTION IF EXISTS modify_data_t_ds_dq_rule_input_entry();
+
+-- modify_data_type_t_ds_dq_rule_input_entry
+delimiter d//
+CREATE OR REPLACE FUNCTION modify_data_type_t_ds_dq_rule_input_entry() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_dq_rule_input_entry'
+                  AND column_name = 'value_type')
+      THEN
+         ALTER TABLE t_ds_dq_rule_input_entry
+                 RENAME COLUMN "value_type" TO "data_type";
+      END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select modify_data_type_t_ds_dq_rule_input_entry();
+DROP FUNCTION IF EXISTS modify_data_type_t_ds_dq_rule_input_entry();
