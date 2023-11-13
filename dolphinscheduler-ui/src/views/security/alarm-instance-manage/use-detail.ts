@@ -19,14 +19,19 @@ import { reactive } from 'vue'
 import { isFunction } from 'lodash'
 import {
   createAlertPluginInstance,
+  testAlertPluginInstance,
   updateAlertPluginInstance,
   verifyAlertInstanceName
 } from '@/service/modules/alert-plugin'
 import type { IJsonItem, IRecord } from './types'
+import { useI18n } from 'vue-i18n'
 
 export function useDetail(getFormValues: Function) {
+  const { t } = useI18n()
+
   const status = reactive({
     saving: false,
+    testing: false,
     loading: false
   })
 
@@ -39,6 +44,27 @@ export function useDetail(getFormValues: Function) {
       mergedItem.value = values[mergedItem.field]
     })
     return JSON.stringify(json)
+  }
+
+  const testSend = async (json?: IJsonItem[]) => {
+    const values = getFormValues()
+
+    if (status.testing) return
+    status.testing = true
+    try {
+      const res = await testAlertPluginInstance({
+        pluginDefineId: values.pluginDefineId,
+        pluginInstanceParams: formatParams(json, values)
+      })
+      window.$message.success(
+        res
+          ? res.msg
+          : `${t('security.alarm_instance.test_send')} ${t('home.success')}`
+      )
+      status.testing = false
+    } catch (err) {
+      status.testing = false
+    }
   }
 
   const createOrUpdate = async (currentRecord: IRecord, json?: IJsonItem[]) => {
@@ -79,5 +105,5 @@ export function useDetail(getFormValues: Function) {
     }
   }
 
-  return { status, createOrUpdate }
+  return { status, createOrUpdate, testSend }
 }
