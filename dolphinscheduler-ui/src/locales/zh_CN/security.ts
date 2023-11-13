@@ -270,6 +270,8 @@ export default {
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
     IsAtAll: "{'@'}所有人",
+    annotations: '注释',
+    generatorURL: '生成地址',
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',
