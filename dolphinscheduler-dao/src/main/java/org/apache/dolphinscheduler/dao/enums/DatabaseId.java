@@ -28,7 +28,6 @@ import lombok.Getter;
 public enum DatabaseId {
 
     H2("H2", "h2"),
-    ORACLE("Oracle", "oracle"),
     MYSQL("MySQL", "mysql"),
     POSTGRESQL("PostgreSQL", "pg");
 
