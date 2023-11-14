@@ -139,7 +139,7 @@ export default defineComponent({
                         style='position: absolute; bottom: 10px; left: 10px;'
                         class='btn-delete-all'
                       >
-                        t('project.workflow.delete')
+                        {t('project.workflow.delete')}
                       </NButton>
                     )
                   }}
