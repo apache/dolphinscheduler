@@ -285,6 +285,15 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
                 .alertParams(paramsMap)
                 .build();
 
-        return alertChannel.process(alertInfo);
+        AlertResult result;
+
+        try {
+            result = alertChannel.process(alertInfo);
+        }catch (Exception e) {
+            log.error("Test send alert error", e);
+            result = new AlertResult("false", e.getMessage());
+        }
+
+        return result;
     }
 }
