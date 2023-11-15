@@ -91,7 +91,9 @@ Node_mysql 运行结果如下：
 如
 ![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
 
+
 注意： 当变量 value 中含有 `\n` 标识，如 `value = "hello \n world"`， 则需要将 value 进行特殊进行，需要使用 `print('${setValue(key=%s)}' % repr(value))`, 否则参数无法传递到后面的流程。
+
 
 #### SubProcess 任务传递参数
 
