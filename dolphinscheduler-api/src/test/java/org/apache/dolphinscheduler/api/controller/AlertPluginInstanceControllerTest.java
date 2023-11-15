@@ -95,12 +95,16 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testSendAlertPluginInstance() throws Exception {
         // Given
+        Result result = JSONUtils.parseObject(
+                "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}",
+                Result.class);
+
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.testSend(eq(pluginDefineId), eq(pluginInstanceParams)))
-                .thenReturn(Result.success("Test Data"));
+                .thenReturn(result);
 
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances/test-send")
