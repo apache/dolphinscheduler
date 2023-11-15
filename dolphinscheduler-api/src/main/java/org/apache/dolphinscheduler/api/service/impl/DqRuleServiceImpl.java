@@ -260,7 +260,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                         .setRequired(inputEntry.getIsValidate())
                         .build())
                 .setProps(paramProps)
-                .setValue(inputEntry.getValue())
+                .setValue(inputEntry.getData())
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
@@ -302,7 +302,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         return SelectParam
                 .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .setOptions(options)
-                .setValue(inputEntry.getValue())
+                .setValue(inputEntry.getData())
                 .setSize(SMALL)
                 .setPlaceHolder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
@@ -322,7 +322,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                         .setRequired(inputEntry.getIsValidate())
                         .build())
                 .setProps(paramProps)
-                .setValue(inputEntry.getValue())
+                .setValue(inputEntry.getData())
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
