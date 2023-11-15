@@ -110,7 +110,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances/test-send")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
