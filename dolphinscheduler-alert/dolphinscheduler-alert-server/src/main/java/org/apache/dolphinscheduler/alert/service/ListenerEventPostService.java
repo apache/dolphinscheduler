@@ -289,7 +289,7 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
 
         try {
             result = alertChannel.process(alertInfo);
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error("Test send alert error", e);
             result = new AlertResult("false", e.getMessage());
         }
