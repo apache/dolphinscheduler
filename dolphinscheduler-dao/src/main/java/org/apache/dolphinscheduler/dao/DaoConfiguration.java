@@ -20,13 +20,16 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import org.apache.dolphinscheduler.dao.enums.DatabaseId;
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 
-import org.apache.dolphinscheduler.dao.enums.DatabaseId;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
+
+import java.util.Properties;
+
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -38,8 +41,6 @@ import org.springframework.context.annotation.Configuration;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-
-import java.util.Properties;
 
 @Configuration
 @EnableAutoConfiguration
