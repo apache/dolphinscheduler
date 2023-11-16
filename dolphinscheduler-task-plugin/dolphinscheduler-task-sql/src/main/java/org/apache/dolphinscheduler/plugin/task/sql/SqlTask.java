@@ -480,13 +480,17 @@ public class SqlTask extends AbstractTask {
     private String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
         Pattern pattern = Pattern.compile(rgex);
         while (true) {
+            StringBuffer sb = new StringBuffer(content.length());
             Matcher m = pattern.matcher(content);
             if (!m.find()) {
                 break;
             }
             String paramName = m.group(1);
             String paramValue = sqlParamsMap.get(paramName).getValue();
-            content = m.replaceFirst(paramValue);
+            m.appendReplacement(sb,"");
+            sb.append(paramValue);
+            m.appendTail(sb);
+            content = sb.toString();
         }
         return content;
     }
