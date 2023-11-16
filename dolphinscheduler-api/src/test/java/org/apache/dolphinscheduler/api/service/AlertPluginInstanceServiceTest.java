@@ -21,8 +21,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
-import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
@@ -40,12 +38,10 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,7 +78,7 @@ public class AlertPluginInstanceServiceTest {
     private AlertGroupMapper alertGroupMapper;
 
     @Mock
-    private ListenerEventPostService listenerEventPostService;
+    private RegistryClient registryClient;
 
     private List<AlertPluginInstance> alertPluginInstances;
 
@@ -199,13 +195,17 @@ public class AlertPluginInstanceServiceTest {
     @Test
     public void testSendAlert() {
         Result<Object> result;
+        Mockito.when(registryClient.getAlertServerAddress()).thenReturn(Optional.empty());
         result = alertPluginInstanceService.testSend(1, uiParams);
         Assertions.assertEquals(Status.ALERT_CHANNEL_NOT_EXIST.getCode(), result.getCode());
-        AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("true");
-        Mockito.when(listenerEventPostService.testSend(1, uiParams)).thenReturn(alertResult);
+        AlertSendResponse.AlertSendResponseResult alertResult = new AlertSendResponse.AlertSendResponseResult();
+        alertResult.setSuccess(true);
+        AlertTestSendRequest alertTestSendRequest = new AlertTestSendRequest(
+                1,
+                uiParams);
+        Mockito.when(registryClient.getAlertServerAddress()).thenReturn(Optional.of(new Host("127.0.0.1", 50052)));
         result = alertPluginInstanceService.testSend(1, uiParams);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(Status.ALERT_TEST_SENDING_FAILED.getCode(), result.getCode());
     }
 
     @Test

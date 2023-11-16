@@ -385,11 +385,11 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
         } catch (Exception e) {
             log.error("Send alert: {} to: {} failed", alertTestSendRequest, alertServerAddress, e);
-            putMsg(result, Status.ALERT_CHANNEL_NOT_EXIST);
+            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, e.getMessage());
             return result;
         }
 
-        if (alertSendResponse != null && alertSendResponse.isSuccess()) {
+        if (alertSendResponse.isSuccess()) {
             putMsg(result, Status.SUCCESS);
         } else {
             putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertSendResponse.getMessage());
