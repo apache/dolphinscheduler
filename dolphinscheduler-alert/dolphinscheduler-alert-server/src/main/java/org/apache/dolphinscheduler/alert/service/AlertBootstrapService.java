@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -300,6 +301,43 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
             log.error("send alert error alert data id :{},", alertData.getId(), e);
             return new AlertResult("false", e.getMessage());
         }
+    }
+
+    public AlertSendResponse.AlertSendResponseResult syncTestSend(int pluginDefineId, String pluginInstanceParams) {
+        Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(pluginDefineId);
+        if (!alertChannelOptional.isPresent()) {
+            String message = String.format("Test send alert error: the channel doesn't exist, pluginDefineId: %s",
+                    pluginDefineId);
+            log.error("Test send alert error : not found plugin {}", pluginDefineId);
+            return new AlertSendResponse.AlertSendResponseResult(false, message);
+        }
+        AlertChannel alertChannel = alertChannelOptional.get();
+
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginInstanceParams);
+
+        AlertData alertData = AlertData.builder()
+                .title(AlertConstants.TEST_TITLE)
+                .content(AlertConstants.TEST_CONTENT)
+                .warnType(WarningType.ALL.getCode())
+                .build();
+
+        AlertInfo alertInfo = AlertInfo.builder()
+                .alertData(alertData)
+                .alertParams(paramsMap)
+                .build();
+
+        AlertSendResponse.AlertSendResponseResult result;
+
+        try {
+            AlertResult alertResult = alertChannel.process(alertInfo);
+            result = new AlertSendResponse.AlertSendResponseResult(Boolean.parseBoolean(alertResult.getStatus()),
+                    alertResult.getMessage());
+        } catch (Exception e) {
+            log.error("Test send alert error", e);
+            result = new AlertSendResponse.AlertSendResponseResult(false, e.getMessage());
+        }
+
+        return result;
     }
 
     @Override

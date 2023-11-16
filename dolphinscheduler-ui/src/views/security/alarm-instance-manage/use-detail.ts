@@ -61,8 +61,7 @@ export function useDetail(getFormValues: Function) {
           ? res.msg
           : `${t('security.alarm_instance.test_send')} ${t('home.success')}`
       )
-      status.testing = false
-    } catch (err) {
+    } finally {
       status.testing = false
     }
   }

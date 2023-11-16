@@ -21,8 +21,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
-import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
@@ -41,6 +39,12 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -82,10 +86,10 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Autowired
     private AlertGroupMapper alertGroupMapper;
 
-    @Autowired
-    private ListenerEventPostService listenerEventPostService;
-
     private final Integer GLOBAL_ALERT_GROUP_ID = 2;
+
+    @Autowired
+    private RegistryClient registryClient;
 
     /**
      * creat alert plugin instance
@@ -360,18 +364,35 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Override
     public Result<Object> testSend(int pluginDefineId, String pluginInstanceParams) {
         Result<Object> result = new Result<>();
-        AlertResult alertResult = listenerEventPostService.testSend(pluginDefineId, pluginInstanceParams);
-        if (alertResult == null) {
+        Optional<Host> alertServerAddressOptional = registryClient.getAlertServerAddress();
+        if (!alertServerAddressOptional.isPresent()) {
+            log.error("Cannot get alert server address, please check the alert server is running");
             putMsg(result, Status.ALERT_CHANNEL_NOT_EXIST);
             return result;
         }
 
-        boolean sendStatus = Boolean.parseBoolean(alertResult.getStatus());
+        Host alertServerAddress = alertServerAddressOptional.get();
+        AlertTestSendRequest alertTestSendRequest = new AlertTestSendRequest(
+                pluginDefineId,
+                pluginInstanceParams);
 
-        if (sendStatus) {
+        AlertSendResponse.AlertSendResponseResult alertSendResponse;
+
+        try {
+            IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory
+                    .getProxyClient(alertServerAddress.getAddress(), IAlertOperator.class);
+            alertSendResponse = alertOperator.sendTestAlert(alertTestSendRequest);
+            log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
+        } catch (Exception e) {
+            log.error("Send alert: {} to: {} failed", alertTestSendRequest, alertServerAddress, e);
+            putMsg(result, Status.ALERT_CHANNEL_NOT_EXIST);
+            return result;
+        }
+
+        if (alertSendResponse != null && alertSendResponse.isSuccess()) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertResult.getMessage());
+            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertSendResponse.getMessage());
         }
 
         return result;

@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -33,10 +32,7 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
@@ -107,12 +103,7 @@ public class WorkerRegistryClient implements AutoCloseable {
     }
 
     public Optional<Host> getAlertServerAddress() {
-        List<Server> serverList = registryClient.getServerList(RegistryNodeType.ALERT_SERVER);
-        if (CollectionUtils.isEmpty(serverList)) {
-            return Optional.empty();
-        }
-        Server server = serverList.get(0);
-        return Optional.of(new Host(server.getHost(), server.getPort()));
+        return registryClient.getAlertServerAddress();
     }
 
     public void setRegistryStoppable(IStoppable stoppable) {
