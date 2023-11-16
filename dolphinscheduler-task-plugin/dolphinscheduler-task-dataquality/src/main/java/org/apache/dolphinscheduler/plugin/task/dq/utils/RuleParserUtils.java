@@ -258,7 +258,7 @@ public class RuleParserUtils {
 
         Map<String, String> defaultInputParameterValue = new HashMap<>();
         for (DqRuleInputEntry inputEntry : defaultInputEntryList) {
-            defaultInputParameterValue.put(inputEntry.getField(), inputEntry.getValue());
+            defaultInputParameterValue.put(inputEntry.getField(), inputEntry.getData());
         }
 
         return defaultInputParameterValue;
