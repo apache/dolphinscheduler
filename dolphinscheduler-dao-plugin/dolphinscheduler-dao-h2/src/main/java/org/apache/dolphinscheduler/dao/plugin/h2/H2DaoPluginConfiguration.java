@@ -47,6 +47,11 @@ public class H2DaoPluginConfiguration implements DaoPluginConfiguration {
     }
 
     @Override
+    public String databaseId() {
+        return "h2";
+    }
+
+    @Override
     public DatabaseMonitor databaseMonitor() {
         return new H2Monitor(dataSource);
     }

@@ -32,6 +32,8 @@ public interface DaoPluginConfiguration {
 
     DbType dbType();
 
+    String databaseId();
+
     DatabaseMonitor databaseMonitor();
 
     DatabaseDialect databaseDialect();

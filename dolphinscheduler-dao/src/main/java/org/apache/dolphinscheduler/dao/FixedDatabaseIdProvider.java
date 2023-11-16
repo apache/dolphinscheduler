@@ -15,22 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.enums;
+package org.apache.dolphinscheduler.dao;
+
+import org.apache.ibatis.mapping.DatabaseIdProvider;
+
+import javax.sql.DataSource;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 
-/**
- * mybatis productName and databaseId mapping
- */
 @AllArgsConstructor
-@Getter
-public enum DatabaseId {
+public class FixedDatabaseIdProvider implements DatabaseIdProvider {
 
-    H2("H2", "h2"),
-    MYSQL("MySQL", "mysql"),
-    POSTGRESQL("PostgreSQL", "pg");
-
-    private final String productName;
     private final String databaseId;
+
+    @Override
+    public String getDatabaseId(DataSource dataSource) {
+        return databaseId;
+    }
+
 }

@@ -46,6 +46,11 @@ public class MysqlDaoPluginConfiguration implements DaoPluginConfiguration {
     }
 
     @Override
+    public String databaseId() {
+        return "mysql";
+    }
+
+    @Override
     public DatabaseMonitor databaseMonitor() {
         return new MysqlMonitor(dataSource);
     }

@@ -20,15 +20,11 @@
 
 package org.apache.dolphinscheduler.dao;
 
-import org.apache.dolphinscheduler.dao.enums.DatabaseId;
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
-import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
-
-import java.util.Properties;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,13 +65,7 @@ public class DaoConfiguration {
 
     @Bean
     public DatabaseIdProvider databaseIdProvider() {
-        VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
-        Properties properties = new Properties();
-        for (DatabaseId databaseId : DatabaseId.values()) {
-            properties.put(databaseId.getProductName(), databaseId.getDatabaseId());
-        }
-        databaseIdProvider.setProperties(properties);
-        return databaseIdProvider;
+        return new FixedDatabaseIdProvider(daoPluginConfiguration.databaseId());
     }
 
     @Bean
