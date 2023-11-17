@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -63,6 +64,7 @@ public final class HttpSender {
     private final String bodyParams;
     private final String contentField;
     private final String requestType;
+    private final int timeout;
     private String url;
     private HttpRequestBase httpRequest;
 
@@ -73,6 +75,9 @@ public final class HttpSender {
         bodyParams = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
         contentField = paramsMap.get(HttpAlertConstants.NAME_CONTENT_FIELD);
         requestType = paramsMap.get(HttpAlertConstants.NAME_REQUEST_TYPE);
+        timeout = StringUtils.isNotBlank(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+                ? Integer.parseInt(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+                : HttpAlertConstants.DEFAULT_TIMEOUT;
     }
 
     public AlertResult send(String msg) {
@@ -108,8 +113,15 @@ public final class HttpSender {
     }
 
     public String getResponseString(HttpRequestBase httpRequest) throws IOException {
-        CloseableHttpClient httpClient =
-                HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(timeout * HttpAlertConstants.NUMBER_1000)
+                .setConnectionRequestTimeout(timeout * HttpAlertConstants.NUMBER_1000)
+                .setSocketTimeout(timeout * HttpAlertConstants.NUMBER_1000)
+                .build();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
+
         CloseableHttpResponse response = httpClient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, DEFAULT_CHARSET);

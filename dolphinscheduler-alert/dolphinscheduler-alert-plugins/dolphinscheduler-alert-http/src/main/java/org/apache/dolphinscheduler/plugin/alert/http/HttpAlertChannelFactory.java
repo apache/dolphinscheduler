@@ -79,7 +79,15 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
                                 .build())
                         .build();
 
-        return Arrays.asList(url, requestType, headerParams, bodyParams, contentField);
+        InputParam timeout =
+                InputParam.newBuilder(HttpAlertConstants.NAME_TIMEOUT, HttpAlertConstants.TIMEOUT)
+                        .setPlaceholder(AlertInputTips.HTTP_TIMEOUT.getMsg())
+                        .addValidate(Validate.newBuilder()
+                                .setRequired(false)
+                                .build())
+                        .build();
+
+        return Arrays.asList(url, requestType, headerParams, bodyParams, contentField, timeout);
     }
 
     @Override

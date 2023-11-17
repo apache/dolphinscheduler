@@ -42,6 +42,7 @@ public class HttpSenderTest {
         paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, "{\"Content-Type\":\"application/json\"}");
         paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, "{\"number\":\"123456\"}");
         paramsMap.put(HttpAlertConstants.NAME_CONTENT_FIELD, contentField);
+        paramsMap.put(HttpAlertConstants.NAME_TIMEOUT, String.valueOf(HttpAlertConstants.DEFAULT_TIMEOUT));
 
         HttpSender httpSender = spy(new HttpSender(paramsMap));
         doReturn("success").when(httpSender).getResponseString(any());

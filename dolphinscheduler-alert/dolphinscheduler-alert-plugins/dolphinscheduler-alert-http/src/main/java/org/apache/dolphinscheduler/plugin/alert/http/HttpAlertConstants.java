@@ -39,6 +39,14 @@ public final class HttpAlertConstants {
 
     public static final String NAME_REQUEST_TYPE = "requestType";
 
+    public static final String TIMEOUT = "$t('timeout')";
+
+    public static final String NAME_TIMEOUT = "timeout";
+
+    public static final int DEFAULT_TIMEOUT = 120;
+
+    public static final int NUMBER_1000 = 1000;
+
     private HttpAlertConstants() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
