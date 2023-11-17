@@ -63,7 +63,7 @@ public final class HttpSender {
     private final String bodyParams;
     private final String contentField;
     private final String requestType;
-    private final String timeoutStr;
+    private final int timeout;
     private String url;
     private HttpRequestBase httpRequest;
 
@@ -74,7 +74,9 @@ public final class HttpSender {
         bodyParams = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
         contentField = paramsMap.get(HttpAlertConstants.NAME_CONTENT_FIELD);
         requestType = paramsMap.get(HttpAlertConstants.NAME_REQUEST_TYPE);
-        timeoutStr = paramsMap.get(HttpAlertConstants.NAME_TIMEOUT);
+        timeout = StringUtils.isNotBlank(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+                ? Integer.parseInt(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+                : HttpAlertConstants.DEFAULT_TIMEOUT;
     }
 
     public AlertResult send(String msg) {
@@ -111,14 +113,10 @@ public final class HttpSender {
 
     public String getResponseString(HttpRequestBase httpRequest) throws Exception {
 
-        int timeout = StringUtils.isNotBlank(timeoutStr)
-                ? Integer.parseInt(timeoutStr)
-                : HttpAlertConstants.DEFAULT_TIMEOUT;
-
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(timeout * HttpAlertConstants.NUMBER_1000)
-                .setConnectionRequestTimeout(timeout * HttpAlertConstants.NUMBER_1000)
-                .setSocketTimeout(timeout * HttpAlertConstants.NUMBER_1000)
+                .setConnectTimeout(timeout * 1000)
+                .setConnectionRequestTimeout(timeout * 1000)
+                .setSocketTimeout(timeout * 1000)
                 .build();
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(requestConfig)

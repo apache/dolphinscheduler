@@ -249,7 +249,7 @@ export default {
     headerParams: 'Headers',
     bodyParams: 'Body',
     contentField: 'Content Field',
-    timeout: 'Timeout',
+    timeout: 'Timeout(s)',
     Keyword: 'Keyword',
     userParams: 'User Params',
     path: 'Script Path',

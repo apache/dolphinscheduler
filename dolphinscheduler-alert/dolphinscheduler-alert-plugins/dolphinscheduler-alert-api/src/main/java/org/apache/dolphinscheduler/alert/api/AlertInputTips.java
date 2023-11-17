@@ -33,7 +33,6 @@ public enum AlertInputTips {
     JSON_BODY("input request body as JSON format", "请输入JSON格式的请求体"),
     FIELD_NAME("input alert msg field name", "请输入告警信息的内容字段名称"),
     HTTP_METHOD("input request type POST or GET", "请输入HTTP请求类型POST或GET"),
-    HTTP_TIMEOUT("input http request timeout, default 120 (Unit: seconds)", "请输入HTTP请求超时时间，默认120（单位：秒）"),
     CUSTOMIZED_PARAMS("the custom parameters passed when calling scripts", "请输入调用脚本时传入的自定义参数"),
     SCRIPT_PATH("the absolute script path under alert-server, and make sure access rights",
             "请输入alert-server机器的脚本的绝对路径，并确保文件有权接入"),
