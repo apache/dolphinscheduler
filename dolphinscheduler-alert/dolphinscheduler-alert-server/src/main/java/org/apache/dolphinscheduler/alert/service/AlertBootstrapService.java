@@ -352,6 +352,7 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
             alertSendResponseResult.setSuccess(false);
             alertSendResponseResult.setMessage(e.getMessage());
             sendResponseResults.add(alertSendResponseResult);
+            return new AlertSendResponse(false, sendResponseResults);
         }
 
         return new AlertSendResponse(sendResponseStatus, sendResponseResults);
