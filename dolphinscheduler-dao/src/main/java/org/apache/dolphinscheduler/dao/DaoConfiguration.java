@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
+import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public class DaoConfiguration {
 
     @Bean
     public DatabaseIdProvider databaseIdProvider() {
-        return new FixedDatabaseIdProvider(daoPluginConfiguration.databaseId());
+        return new VendorDatabaseIdProvider();
     }
 
     @Bean

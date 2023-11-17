@@ -47,11 +47,6 @@ public class PostgresqlDaoPluginConfiguration implements DaoPluginConfiguration 
     }
 
     @Override
-    public String databaseId() {
-        return "pg";
-    }
-
-    @Override
     public DatabaseMonitor databaseMonitor() {
         return new PostgresqlMonitor(dataSource);
     }
