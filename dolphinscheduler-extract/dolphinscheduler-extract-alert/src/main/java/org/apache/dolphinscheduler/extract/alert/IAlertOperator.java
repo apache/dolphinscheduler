@@ -30,6 +30,6 @@ public interface IAlertOperator {
     AlertSendResponse sendAlert(AlertSendRequest alertSendRequest);
 
     @RpcMethod
-    AlertSendResponse.AlertSendResponseResult sendTestAlert(AlertTestSendRequest alertSendRequest);
+    AlertSendResponse sendTestAlert(AlertTestSendRequest alertSendRequest);
 
 }

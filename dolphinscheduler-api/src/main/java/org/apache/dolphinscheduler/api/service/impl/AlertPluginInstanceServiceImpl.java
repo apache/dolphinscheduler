@@ -367,7 +367,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         Optional<Host> alertServerAddressOptional = registryClient.getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");
-            putMsg(result, Status.ALERT_CHANNEL_NOT_EXIST);
+            putMsg(result, Status.ALERT_SERVER_NOT_EXIST);
             return result;
         }
 
@@ -376,7 +376,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                 pluginDefineId,
                 pluginInstanceParams);
 
-        AlertSendResponse.AlertSendResponseResult alertSendResponse;
+        AlertSendResponse alertSendResponse;
 
         try {
             IAlertOperator alertOperator = SingletonJdkDynamicRpcClientProxyFactory
@@ -392,7 +392,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         if (alertSendResponse.isSuccess()) {
             putMsg(result, Status.SUCCESS);
         } else {
-            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertSendResponse.getMessage());
+            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertSendResponse.getResResults().get(0).getMessage());
         }
 
         return result;

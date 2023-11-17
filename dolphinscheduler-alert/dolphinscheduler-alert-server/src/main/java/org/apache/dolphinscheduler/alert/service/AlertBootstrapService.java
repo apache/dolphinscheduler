@@ -193,7 +193,7 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
             if (alertResult != null) {
                 AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
                         new AlertSendResponse.AlertSendResponseResult(
-                                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())),
+                                Boolean.parseBoolean(alertResult.getStatus()),
                                 alertResult.getMessage());
                 sendResponseStatus = sendResponseStatus && alertSendResponseResult.isSuccess();
                 sendResponseResults.add(alertSendResponseResult);
@@ -303,13 +303,22 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
         }
     }
 
-    public AlertSendResponse.AlertSendResponseResult syncTestSend(int pluginDefineId, String pluginInstanceParams) {
+    public AlertSendResponse syncTestSend(int pluginDefineId, String pluginInstanceParams) {
+
+        boolean sendResponseStatus = true;
+        List<AlertSendResponse.AlertSendResponseResult> sendResponseResults = new ArrayList<>();
+
         Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(pluginDefineId);
         if (!alertChannelOptional.isPresent()) {
             String message = String.format("Test send alert error: the channel doesn't exist, pluginDefineId: %s",
                     pluginDefineId);
+            AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                    new AlertSendResponse.AlertSendResponseResult();
+            alertSendResponseResult.setSuccess(false);
+            alertSendResponseResult.setMessage(message);
+            sendResponseResults.add(alertSendResponseResult);
             log.error("Test send alert error : not found plugin {}", pluginDefineId);
-            return new AlertSendResponse.AlertSendResponseResult(false, message);
+            return new AlertSendResponse(false, sendResponseResults);
         }
         AlertChannel alertChannel = alertChannelOptional.get();
 
@@ -326,18 +335,26 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
                 .alertParams(paramsMap)
                 .build();
 
-        AlertSendResponse.AlertSendResponseResult result;
-
         try {
             AlertResult alertResult = alertChannel.process(alertInfo);
-            result = new AlertSendResponse.AlertSendResponseResult(Boolean.parseBoolean(alertResult.getStatus()),
-                    alertResult.getMessage());
+            if (alertResult != null) {
+                AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                        new AlertSendResponse.AlertSendResponseResult(
+                                Boolean.parseBoolean(alertResult.getStatus()),
+                                alertResult.getMessage());
+                sendResponseStatus = alertSendResponseResult.isSuccess();
+                sendResponseResults.add(alertSendResponseResult);
+            }
         } catch (Exception e) {
             log.error("Test send alert error", e);
-            result = new AlertSendResponse.AlertSendResponseResult(false, e.getMessage());
+            AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                    new AlertSendResponse.AlertSendResponseResult();
+            alertSendResponseResult.setSuccess(false);
+            alertSendResponseResult.setMessage(e.getMessage());
+            sendResponseResults.add(alertSendResponseResult);
         }
 
-        return result;
+        return new AlertSendResponse(sendResponseStatus, sendResponseResults);
     }
 
     @Override

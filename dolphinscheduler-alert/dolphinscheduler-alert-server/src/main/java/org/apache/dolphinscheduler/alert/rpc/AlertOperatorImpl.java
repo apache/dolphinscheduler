@@ -47,9 +47,9 @@ public class AlertOperatorImpl implements IAlertOperator {
     }
 
     @Override
-    public AlertSendResponse.AlertSendResponseResult sendTestAlert(AlertTestSendRequest alertSendRequest) {
+    public AlertSendResponse sendTestAlert(AlertTestSendRequest alertSendRequest) {
         log.info("Received AlertTestSendRequest : {}", alertSendRequest);
-        AlertSendResponse.AlertSendResponseResult alertSendResponse = alertBootstrapService.syncTestSend(
+        AlertSendResponse alertSendResponse = alertBootstrapService.syncTestSend(
                 alertSendRequest.getPluginDefineId(),
                 alertSendRequest.getPluginInstanceParams());
         log.info("Handle AlertTestSendRequest finish: {}", alertSendResponse);
