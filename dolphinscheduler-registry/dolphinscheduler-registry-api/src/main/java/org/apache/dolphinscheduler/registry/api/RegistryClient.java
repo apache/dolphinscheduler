@@ -26,10 +26,8 @@ import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -41,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -241,14 +238,4 @@ public class RegistryClient {
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {
         return getChildrenKeys(nodeType.getRegistryPath());
     }
-
-    public Optional<Host> getAlertServerAddress() {
-        List<Server> serverList = getServerList(RegistryNodeType.ALERT_SERVER);
-        if (CollectionUtils.isEmpty(serverList)) {
-            return Optional.empty();
-        }
-        Server server = serverList.get(0);
-        return Optional.of(new Host(server.getHost(), server.getPort()));
-    }
-
 }
