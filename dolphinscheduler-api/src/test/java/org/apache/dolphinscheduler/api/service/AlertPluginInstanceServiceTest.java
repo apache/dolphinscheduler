@@ -201,7 +201,7 @@ public class AlertPluginInstanceServiceTest {
 
     @Test
     public void testSendAlert() {
-        Result<Object> result;
+        Result<Void> result;
         Mockito.when(registryClient.getAlertServerAddress()).thenReturn(Optional.empty());
         result = alertPluginInstanceService.testSend(1, uiParams);
         Assertions.assertEquals(Status.ALERT_CHANNEL_NOT_EXIST.getCode(), result.getCode());

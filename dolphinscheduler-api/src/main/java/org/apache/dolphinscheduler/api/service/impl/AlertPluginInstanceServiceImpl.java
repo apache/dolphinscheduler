@@ -362,8 +362,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public Result<Object> testSend(int pluginDefineId, String pluginInstanceParams) {
-        Result<Object> result = new Result<>();
+    public Result<Void> testSend(int pluginDefineId, String pluginInstanceParams) {
+        Result<Void> result = new Result<>();
         Optional<Host> alertServerAddressOptional = registryClient.getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             log.error("Cannot get alert server address, please check the alert server is running");

@@ -95,5 +95,5 @@ public interface AlertPluginInstanceService {
      */
     Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize);
 
-    Result<Object> testSend(int pluginDefineId, String pluginInstanceParams);
+    Result<Void> testSend(int pluginDefineId, String pluginInstanceParams);
 }
