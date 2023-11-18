@@ -246,6 +246,7 @@ export default {
     headerParams: '请求头',
     bodyParams: '请求体',
     contentField: '内容字段',
+    timeout: '超时时间（秒）',
     Keyword: '关键词',
     userParams: '自定义参数',
     path: '脚本路径',
