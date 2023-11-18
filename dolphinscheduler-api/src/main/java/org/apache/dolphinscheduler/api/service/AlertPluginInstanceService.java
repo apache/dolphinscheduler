@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * alert plugin instance service
@@ -38,8 +40,11 @@ public interface AlertPluginInstanceService {
      * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName,
-                               AlertPluginInstanceType instanceType, WarningType warningType,
+    AlertPluginInstance create(User loginUser,
+                               int pluginDefineId,
+                               String instanceName,
+                               AlertPluginInstanceType instanceType,
+                               WarningType warningType,
                                String pluginInstanceParams);
 
     /**
@@ -50,17 +55,20 @@ public interface AlertPluginInstanceService {
      * @param pluginInstanceParams plugin instance params
      * @return result
      */
-    Map<String, Object> update(User loginUser, int alertPluginInstanceId, String instanceName,
-                               WarningType warningType, String pluginInstanceParams);
+    AlertPluginInstance updateById(User loginUser,
+                                   int alertPluginInstanceId,
+                                   String instanceName,
+                                   WarningType warningType,
+                                   String pluginInstanceParams);
 
     /**
      * delete alert plugin instance
      *
      * @param loginUser login user
-     * @param id id
+     * @param alertPluginInstanceId id
      * @return result
      */
-    Map<String, Object> delete(User loginUser, int id);
+    void deleteById(User loginUser, int alertPluginInstanceId);
 
     /**
      * get alert plugin instance
@@ -69,14 +77,14 @@ public interface AlertPluginInstanceService {
      * @param id get id
      * @return alert plugin
      */
-    Map<String, Object> get(User loginUser, int id);
+    AlertPluginInstance getById(User loginUser, int id);
 
     /**
      * queryAll
      *
      * @return alert plugins
      */
-    Map<String, Object> queryAll();
+    List<AlertPluginInstanceVO> queryAll();
 
     /**
      * checkExistPluginInstanceName
@@ -93,7 +101,7 @@ public interface AlertPluginInstanceService {
      * @param pageSize  page size
      * @return plugins
      */
-    Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize);
+    PageInfo<AlertPluginInstanceVO> listPaging(User loginUser, String searchVal, int pageNo, int pageSize);
 
-    Result<Void> testSend(int pluginDefineId, String pluginInstanceParams);
+    void testSend(int pluginDefineId, String pluginInstanceParams);
 }

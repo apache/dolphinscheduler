@@ -65,6 +65,7 @@ public interface ProjectService {
      * @param perm String
      * @return true if the login user have permission to see the project
      */
+    @Deprecated
     Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
 
     void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
@@ -82,11 +83,18 @@ public interface ProjectService {
      * @param permission String
      * @return true if the login user have permission to the project
      */
+    @Deprecated
     boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
 
+    @Deprecated
     boolean hasProjectAndWritePerm(User loginUser, Project project, Result result);
 
+    @Deprecated
     boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
+
+    void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode);
+
+    void checkHasProjectWritePermissionThrowException(User loginUser, Project project);
 
     /**
      * admin can view all projects
