@@ -13,7 +13,7 @@ Steps to be used are as follows:
 - Select the corresponding alarm plug-in and fill in the relevant alarm parameters.
 - Select `Alarm Group Management`, create an alarm group, and choose the corresponding alarm instance.
 
-> You can click `Test send` button to test whether the alarm instance is configured correctly.
+> You can click `Test Send` button to test whether the alarm instance is configured correctly.
 
 ![alert-instance01](../../../../img/new_ui/dev/alert/alert_instance01.png)
 
