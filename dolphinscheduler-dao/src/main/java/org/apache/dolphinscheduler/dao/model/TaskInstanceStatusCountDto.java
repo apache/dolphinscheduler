@@ -15,28 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.dao.model;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * count definition number group by user
- */
 @Data
-public class DefinitionGroupByUser {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskInstanceStatusCountDto {
 
-    /**
-     * user name
-     */
-    private String userName;
+    private TaskExecutionStatus state;
 
-    /**
-     * user id
-     */
-    private Integer userId;
-
-    /**
-     * count number
-     */
     private int count;
 }
