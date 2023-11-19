@@ -692,6 +692,24 @@ api:
       annotations: {}
   env:
     JAVA_OPTS: "-Xms512m -Xmx512m -Xmn256m"
+  taskTypeFilter:
+    # -- Enable or disable the task type filter
+    # -- If set to true, the API-Server will return tasks of a specific type set in api.taskTypeFilter.task
+    # -- Note: This feature only filters tasks to return a specific type on the WebUI. However, you can still create any task that DolphinScheduler supports via the API.
+    enabled: false
+    # -- @param taskTypeFilter.taskType task type
+    # -- ref: https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-api/src/main/resources/task-type-config.yaml
+    task: {}
+    #  example task sets
+    #  universal:
+    #    - 'SQL'
+    #  cloud: []
+    #  logic: []
+    #  dataIntegration: []
+    #  dataQuality: []
+    #  machineLearning: []
+    #  other: []
+
 
 ingress:
   enabled: false

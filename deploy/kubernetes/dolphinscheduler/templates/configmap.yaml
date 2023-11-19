@@ -22,6 +22,16 @@ metadata:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-common
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
+  {{- if and .Values.api.taskTypeFilter.enabled }}
+  task-type-config.yaml: |-
+    {{- if .Values.api.taskTypeFilter.task }}
+    task:
+      {{- range $key, $value := .Values.api.taskTypeFilter.task }}
+      {{ $key }}:
+        {{- toYaml $value | nindent 8 }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   common_properties: |-
   {{- if index .Values.conf "common" }}
   {{- range $key, $value := index .Values.conf "common" }}
