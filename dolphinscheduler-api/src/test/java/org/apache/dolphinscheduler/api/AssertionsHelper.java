@@ -15,25 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.queue;
+package org.apache.dolphinscheduler.api;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 
-import lombok.Data;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 
-/**
- * queue update response
- */
-@Data
-public class QueueUpdateResponse extends Result {
+public class AssertionsHelper extends Assertions {
 
-    private Queue data;
-
-    public QueueUpdateResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((Queue) result.getData());
+    public static void assertThrowsServiceException(Status status, Executable executable) {
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, executable);
+        Assertions.assertEquals(status.getCode(), exception.getCode());
     }
+
+    public static void assertDoesNotThrow(Executable executable) {
+        Assertions.assertDoesNotThrow(executable);
+    }
+
 }

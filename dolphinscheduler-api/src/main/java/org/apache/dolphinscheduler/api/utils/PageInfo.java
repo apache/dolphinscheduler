@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.api.utils;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * page info
- *
- * @param <T> model
- */
+import lombok.Data;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
+@Data
 public class PageInfo<T> {
 
     /**
@@ -65,67 +65,14 @@ public class PageInfo<T> {
         this.currentPage = currentPage;
     }
 
-    public Integer getStart() {
-        return pageNo;
+    public static <T> PageInfo<T> of(IPage<T> iPage) {
+        PageInfo<T> pageInfo = new PageInfo<>((int) iPage.getCurrent(), (int) iPage.getSize());
+        pageInfo.setTotalList(iPage.getRecords());
+        pageInfo.setTotal((int) iPage.getTotal());
+        return pageInfo;
     }
 
-    public void setStart(Integer start) {
-        this.pageNo = start;
-    }
-
-    public List<T> getTotalList() {
-        return totalList;
-    }
-
-    public void setTotalList(List<T> totalList) {
-        this.totalList = totalList;
-    }
-
-    public Integer getTotal() {
-        if (total == null) {
-            total = 0;
-        }
-        return total;
-    }
-
-    public void setTotal(Integer total) {
-        this.total = total;
-    }
-
-    public Integer getTotalPage() {
-        if (pageSize == null || pageSize == 0) {
-            pageSize = 7;
-        }
-        this.totalPage =
-                (this.total % this.pageSize) == 0
-                        ? ((this.total / this.pageSize) == 0 ? 1 : (this.total / this.pageSize))
-                        : (this.total / this.pageSize + 1);
-        return this.totalPage;
-    }
-
-    public void setTotalPage(Integer totalPage) {
-        this.totalPage = totalPage;
-    }
-
-    public Integer getPageSize() {
-        if (pageSize == null || pageSize == 0) {
-            pageSize = 7;
-        }
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public Integer getCurrentPage() {
-        if (currentPage == null || currentPage <= 0) {
-            this.currentPage = 1;
-        }
-        return currentPage;
-    }
-
-    public void setCurrentPage(Integer currentPage) {
-        this.currentPage = currentPage;
+    public static <T> PageInfo<T> of(Integer currentPage, Integer pageSize) {
+        return new PageInfo<>(currentPage, pageSize);
     }
 }

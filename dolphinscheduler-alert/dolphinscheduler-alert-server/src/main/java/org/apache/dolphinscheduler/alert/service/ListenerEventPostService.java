@@ -259,5 +259,4 @@ public final class ListenerEventPostService extends BaseDaemonThread implements 
     public void close() {
         log.info("Closed ListenerEventPostService...");
     }
-
 }

@@ -23,6 +23,7 @@ export interface ResourceFileTableData {
   user_name: string
   directory: string
   file_name: string
+  alias: string
   description: string
   size: number
   type: ResourceType
