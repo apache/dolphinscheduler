@@ -63,10 +63,13 @@ public class WorkflowStateEventHandler implements StateEventHandler {
             }
             workflowExecuteRunnable.endProcess();
         }
-        if (processInstance.getState().isReadyStop()) {
-            workflowExecuteRunnable.killAllTasks();
-        }
 
+        if (workflowStateEvent.getStatus().isReadyStop()) {
+            workflowExecuteRunnable.refreshProcessInstance(processInstance.getId());
+            if (processInstance.getState().isReadyStop()) {
+                workflowExecuteRunnable.killAllTasks();
+            }
+        }
         return true;
     }
 
