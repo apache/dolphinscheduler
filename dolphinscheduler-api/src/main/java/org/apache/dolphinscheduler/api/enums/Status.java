@@ -440,7 +440,7 @@ public enum Status {
     QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70012, "query access token list paging error", "分页查询访问token列表错误"),
     UPDATE_ACCESS_TOKEN_ERROR(70013, "update access token error", "更新访问token错误"),
     DELETE_ACCESS_TOKEN_ERROR(70014, "delete access token error", "删除访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist", "访问token不存在"),
+    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
     QUERY_ACCESSTOKEN_BY_USER_ERROR(70016, "query access token by user error", "查询访问指定用户的token错误"),
 
     COMMAND_STATE_COUNT_ERROR(80001, "task instance state count error", "查询各状态任务实例数错误"),
