@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -40,17 +39,16 @@ public interface DataSourceService {
      * @param datasourceParam datasource parameter
      * @return create result code
      */
-    Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
+    DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
     /**
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param id data source id
      * @param dataSourceParam data source params
      * @return update result code
      */
-    Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam);
+    DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
      * updateProcessInstance datasource
@@ -86,7 +84,7 @@ public interface DataSourceService {
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
-    Result<Object> verifyDataSourceName(String name);
+    void verifyDataSourceName(String name);
 
     /**
      * check connection
@@ -95,7 +93,7 @@ public interface DataSourceService {
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
-    Result<Object> checkConnection(DbType type, ConnectionParam parameter);
+    void checkConnection(DbType type, ConnectionParam parameter);
 
     /**
      * test connection
@@ -103,7 +101,7 @@ public interface DataSourceService {
      * @param id datasource id
      * @return connect result code
      */
-    Result<Object> connectionTest(int id);
+    void connectionTest(int id);
 
     /**
      * delete datasource
@@ -112,7 +110,7 @@ public interface DataSourceService {
      * @param datasourceId data source id
      * @return delete result code
      */
-    Result<Object> delete(User loginUser, int datasourceId);
+    void delete(User loginUser, int datasourceId);
 
     /**
      * unauthorized datasource

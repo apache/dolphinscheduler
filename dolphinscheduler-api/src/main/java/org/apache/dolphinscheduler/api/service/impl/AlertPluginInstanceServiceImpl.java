@@ -23,11 +23,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -55,7 +54,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,6 +65,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -96,15 +95,23 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     /**
      * creat alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginDefineId plugin define id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginDefineId       plugin define id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      */
     @Override
-    public Map<String, Object> create(User loginUser, int pluginDefineId, String instanceName,
-                                      AlertPluginInstanceType instanceType, WarningType warningType,
+    public AlertPluginInstance create(User loginUser,
+                                      int pluginDefineId,
+                                      String instanceName,
+                                      AlertPluginInstanceType instanceType,
+                                      WarningType warningType,
                                       String pluginInstanceParams) {
+
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALART_INSTANCE_CREATE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
         alertPluginInstance.setPluginInstanceParams(paramsMapJson);
@@ -113,16 +120,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         alertPluginInstance.setInstanceType(instanceType);
         alertPluginInstance.setWarningType(warningType);
 
-        Map<String, Object> result = new HashMap<>();
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALART_INSTANCE_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
-            log.error("Plugin instance with the same name already exists, name:{}.",
-                    alertPluginInstance.getInstanceName());
-            putMsg(result, Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
-            return result;
+            throw new ServiceException(Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
         }
 
         int i = alertPluginInstanceMapper.insert(alertPluginInstance);
@@ -142,94 +141,77 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                 }
                 alertGroupMapper.updateById(globalAlertGroup);
             }
-            result.put(Constants.DATA_LIST, alertPluginInstance);
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return alertPluginInstance;
         }
-        log.error("Create alert plugin instance error, name:{}", alertPluginInstance.getInstanceName());
-        putMsg(result, Status.SAVE_ERROR);
-        return result;
+        throw new ServiceException(Status.SAVE_ERROR);
     }
 
     /**
      * update alert plugin instance
      *
-     * @param loginUser login user
-     * @param pluginInstanceId plugin instance id
-     * @param instanceName instance name
+     * @param loginUser            login user
+     * @param pluginInstanceId     plugin instance id
+     * @param instanceName         instance name
      * @param pluginInstanceParams plugin instance params
      */
     @Override
-    public Map<String, Object> update(User loginUser, int pluginInstanceId, String instanceName,
-                                      WarningType warningType, String pluginInstanceParams) {
+    public AlertPluginInstance updateById(User loginUser, int pluginInstanceId, String instanceName,
+                                          WarningType warningType, String pluginInstanceParams) {
+
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_UPDATE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
 
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
         AlertPluginInstance alertPluginInstance =
                 new AlertPluginInstance(pluginInstanceId, paramsMapJson, instanceName, warningType, new Date());
 
-        Map<String, Object> result = new HashMap<>();
-
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_UPDATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
         int i = alertPluginInstanceMapper.updateById(alertPluginInstance);
 
         if (i > 0) {
             log.info("Update alert plugin instance complete, instanceId:{}, name:{}", alertPluginInstance.getId(),
                     alertPluginInstance.getInstanceName());
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return alertPluginInstance;
         }
-        log.error("Update alert plugin instance error, instanceId:{}, name:{}", alertPluginInstance.getId(),
-                alertPluginInstance.getInstanceName());
-        putMsg(result, Status.SAVE_ERROR);
-        return result;
+        throw new ServiceException(Status.SAVE_ERROR);
     }
 
     /**
      * delete alert plugin instance
      *
-     * @param loginUser login user
-     * @param id id
+     * @param loginUser             login user
+     * @param alertPluginInstanceId id
      * @return result
      */
     @Override
-    public Map<String, Object> delete(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
-        AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(id);
+    @Transactional
+    public void deleteById(User loginUser, int alertPluginInstanceId) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_DELETE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(alertPluginInstanceId);
+
         if (alertPluginInstance.getInstanceType() == AlertPluginInstanceType.GLOBAL) {
             // global instance will be removed from global alert group automatically
             AlertGroup globalAlertGroup = alertGroupMapper.selectById(GLOBAL_ALERT_GROUP_ID);
             List<Integer> ids = Arrays.stream(globalAlertGroup.getAlertInstanceIds().split(","))
                     .map(s -> Integer.parseInt(s.trim()))
                     .collect(Collectors.toList());
-            ids = ids.stream().filter(x -> x != id).collect(Collectors.toList());
+            ids = ids.stream().filter(x -> x != alertPluginInstanceId).collect(Collectors.toList());
             globalAlertGroup.setAlertInstanceIds(StringUtils.join(ids, ","));
             alertGroupMapper.updateById(globalAlertGroup);
             log.info("Remove global alert plugin instance from global alert group automatically, name:{}",
                     alertPluginInstance.getInstanceName());
         } else {
             // check if there is an associated alert group
-            boolean hasAssociatedAlertGroup = checkHasAssociatedAlertGroup(String.valueOf(id));
+            boolean hasAssociatedAlertGroup = checkHasAssociatedAlertGroup(String.valueOf(alertPluginInstanceId));
             if (hasAssociatedAlertGroup) {
-                log.warn("Delete alert plugin failed because alert group is using it, pluginId:{}.", id);
-                putMsg(result, Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
-                return result;
+                throw new ServiceException(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
             }
         }
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
-        }
 
-        int i = alertPluginInstanceMapper.deleteById(id);
-        if (i > 0) {
-            log.info("Delete alert plugin instance complete, instanceId:{}", id);
-            putMsg(result, Status.SUCCESS);
-        }
-        log.error("Delete alert plugin instance error, instanceId:{}", id);
-        return result;
+        alertPluginInstanceMapper.deleteById(alertPluginInstanceId);
     }
 
     /**
@@ -240,33 +222,18 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      * @return alert plugin
      */
     @Override
-    public Map<String, Object> get(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
-        AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(id);
+    public AlertPluginInstance getById(User loginUser, int id) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-
-        if (null != alertPluginInstance) {
-            putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, alertPluginInstance);
-        }
-
-        return result;
+        return alertPluginInstanceMapper.selectById(id);
     }
 
     @Override
-    public Map<String, Object> queryAll() {
-        Map<String, Object> result = new HashMap<>();
+    public List<AlertPluginInstanceVO> queryAll() {
         List<AlertPluginInstance> alertPluginInstances = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
-        List<AlertPluginInstanceVO> alertPluginInstanceVOS = buildPluginInstanceVOList(alertPluginInstances);
-        if (null != alertPluginInstances) {
-            putMsg(result, Status.SUCCESS);
-            result.put(Constants.DATA_LIST, alertPluginInstanceVOS);
-        }
-        return result;
+        return buildPluginInstanceVOList(alertPluginInstances);
     }
 
     @Override
@@ -275,19 +242,15 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public Result listPaging(User loginUser, String searchVal, int pageNo, int pageSize) {
+    public PageInfo<AlertPluginInstanceVO> listPaging(User loginUser, String searchVal, int pageNo, int pageSize) {
 
-        Result result = new Result();
-        Page<AlertPluginInstance> page = new Page<>(pageNo, pageSize);
         IPage<AlertPluginInstance> alertPluginInstanceIPage =
-                alertPluginInstanceMapper.queryByInstanceNamePage(page, searchVal);
+                alertPluginInstanceMapper.queryByInstanceNamePage(new Page<>(pageNo, pageSize), searchVal);
 
         PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) alertPluginInstanceIPage.getTotal());
         pageInfo.setTotalList(buildPluginInstanceVOList(alertPluginInstanceIPage.getRecords()));
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return pageInfo;
     }
 
     private List<AlertPluginInstanceVO> buildPluginInstanceVOList(List<AlertPluginInstance> alertPluginInstances) {
@@ -373,13 +336,10 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public Result<Void> testSend(int pluginDefineId, String pluginInstanceParams) {
-        Result<Void> result = new Result<>();
+    public void testSend(int pluginDefineId, String pluginInstanceParams) {
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
-            log.error("Cannot get alert server address, please check the alert server is running");
-            putMsg(result, Status.ALERT_SERVER_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.ALERT_SERVER_NOT_EXIST);
         }
 
         Host alertServerAddress = alertServerAddressOptional.get();
@@ -396,16 +356,12 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
         } catch (Exception e) {
             log.error("Send alert: {} to: {} failed", alertTestSendRequest, alertServerAddress, e);
-            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, e.getMessage());
-            return result;
+            throw new ServiceException(Status.ALERT_TEST_SENDING_FAILED, e.getMessage());
         }
 
         if (alertSendResponse.isSuccess()) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.ALERT_TEST_SENDING_FAILED, alertSendResponse.getResResults().get(0).getMessage());
+            throw new ServiceException(Status.ALERT_TEST_SENDING_FAILED,
+                    alertSendResponse.getResResults().get(0).getMessage());
         }
-
-        return result;
     }
 }

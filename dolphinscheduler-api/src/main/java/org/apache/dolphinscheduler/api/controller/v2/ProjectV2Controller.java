@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectDeleteResponse;
-import org.apache.dolphinscheduler.api.dto.project.ProjectListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectListResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectQueryResponse;
@@ -40,8 +39,10 @@ import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateResponse;
 import org.apache.dolphinscheduler.api.dto.user.UserListResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -150,16 +151,12 @@ public class ProjectV2Controller extends BaseController {
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
-    public ProjectListPagingResponse queryProjectListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<Project>> queryProjectListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                             ProjectQueryRequest projectQueryReq) {
-        Result result = checkPageParams(projectQueryReq.getPageNo(), projectQueryReq.getPageSize());
-        if (!result.checkResult()) {
-            return new ProjectListPagingResponse(result);
-        }
+        checkPageParams(projectQueryReq.getPageNo(), projectQueryReq.getPageSize());
         String searchVal = ParameterUtils.handleEscapes(projectQueryReq.getSearchVal());
-        result = projectService.queryProjectListPaging(loginUser, projectQueryReq.getPageSize(),
+        return projectService.queryProjectListPaging(loginUser, projectQueryReq.getPageSize(),
                 projectQueryReq.getPageNo(), searchVal);
-        return new ProjectListPagingResponse(result);
     }
 
     /**

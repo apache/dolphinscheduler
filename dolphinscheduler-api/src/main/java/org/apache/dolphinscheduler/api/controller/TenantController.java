@@ -26,12 +26,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -81,13 +83,13 @@ public class TenantController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TENANT_ERROR)
-    public Result createTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @RequestParam(value = "tenantCode") String tenantCode,
-                               @RequestParam(value = "queueId") int queueId,
-                               @RequestParam(value = "description", required = false) String description) throws Exception {
+    public Result<Tenant> createTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "tenantCode") String tenantCode,
+                                       @RequestParam(value = "queueId") int queueId,
+                                       @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.createTenant(loginUser, tenantCode, queueId, description);
-        return returnDataList(result);
+        Tenant tenant = tenantService.createTenant(loginUser, tenantCode, queueId, description);
+        return Result.success(tenant);
     }
 
     /**
@@ -108,18 +110,14 @@ public class TenantController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
-    public Result queryTenantlistPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam(value = "searchVal", required = false) String searchVal,
-                                        @RequestParam("pageNo") Integer pageNo,
-                                        @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-
-        }
+    public Result<PageInfo<Tenant>> queryTenantlistPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                          @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                          @RequestParam("pageNo") Integer pageNo,
+                                                          @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = tenantService.queryTenantList(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        PageInfo<Tenant> tenantPageInfo = tenantService.queryTenantList(loginUser, searchVal, pageNo, pageSize);
+        return Result.success(tenantPageInfo);
     }
 
     /**
@@ -132,9 +130,9 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
-    public Result queryTenantlist(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = tenantService.queryTenantList(loginUser);
-        return returnDataList(result);
+    public Result<List<Tenant>> queryTenantlist(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<Tenant> tenants = tenantService.queryTenantList(loginUser);
+        return Result.success(tenants);
     }
 
     /**
@@ -157,14 +155,14 @@ public class TenantController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TENANT_ERROR)
-    public Result updateTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @PathVariable(value = "id") int id,
-                               @RequestParam(value = "tenantCode") String tenantCode,
-                               @RequestParam(value = "queueId") int queueId,
-                               @RequestParam(value = "description", required = false) String description) throws Exception {
+    public Result<Boolean> updateTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @PathVariable(value = "id") int id,
+                                        @RequestParam(value = "tenantCode") String tenantCode,
+                                        @RequestParam(value = "queueId") int queueId,
+                                        @RequestParam(value = "description", required = false) String description) throws Exception {
 
-        Map<String, Object> result = tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
-        return returnDataList(result);
+        tenantService.updateTenant(loginUser, id, tenantCode, queueId, description);
+        return Result.success(true);
     }
 
     /**
@@ -181,10 +179,10 @@ public class TenantController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
-    public Result deleteTenantById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @PathVariable(value = "id") int id) throws Exception {
-        Map<String, Object> result = tenantService.deleteTenantById(loginUser, id);
-        return returnDataList(result);
+    public Result<Boolean> deleteTenantById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @PathVariable(value = "id") int id) throws Exception {
+        tenantService.deleteTenantById(loginUser, id);
+        return Result.success(true);
     }
 
     /**
@@ -201,9 +199,10 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/verify-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
-    public Result verifyTenantCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "tenantCode") String tenantCode) {
-        return tenantService.verifyTenantCode(tenantCode);
+    public Result<Boolean> verifyTenantCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                            @RequestParam(value = "tenantCode") String tenantCode) {
+        tenantService.verifyTenantCode(tenantCode);
+        return Result.success(true);
     }
 
 }

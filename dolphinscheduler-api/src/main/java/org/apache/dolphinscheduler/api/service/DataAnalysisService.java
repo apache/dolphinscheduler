@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.CommandStateCount;
+import org.apache.dolphinscheduler.api.dto.DefineUserDto;
+import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -41,7 +44,7 @@ public interface DataAnalysisService {
      * @param endDate     end date
      * @return task state count data
      */
-    Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate);
+    TaskCountDto countTaskStateByProject(User loginUser, long projectCode, String startDate, String endDate);
 
     /**
      * statistical process instance status data
@@ -52,8 +55,8 @@ public interface DataAnalysisService {
      * @param endDate     end date
      * @return process instance state count data
      */
-    Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
-                                                           String endDate);
+    TaskCountDto countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
+                                                    String endDate);
 
     /**
      * statistics the process definition quantities of a certain person
@@ -64,7 +67,7 @@ public interface DataAnalysisService {
      * @param projectCode project code
      * @return workflow count data
      */
-    Map<String, Object> countDefinitionByUser(User loginUser, long projectCode);
+    DefineUserDto countDefinitionByUser(User loginUser, long projectCode);
     /**
      * statistics the workflow quantities of certain user
      * <p>
@@ -76,7 +79,7 @@ public interface DataAnalysisService {
      * @param releaseState releaseState
      * @return workflow count data
      */
-    Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId, Integer releaseState);
+    DefineUserDto countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId, Integer releaseState);
 
     /**
      * statistical command status data
@@ -84,7 +87,7 @@ public interface DataAnalysisService {
      * @param loginUser login user
      * @return command state count data
      */
-    Map<String, Object> countCommandState(User loginUser);
+    List<CommandStateCount> countCommandState(User loginUser);
 
     /**
      * count queue state
@@ -92,7 +95,7 @@ public interface DataAnalysisService {
      * @param loginUser login user
      * @return queue state count data
      */
-    Map<String, Object> countQueueState(User loginUser);
+    Map<String, Integer> countQueueState(User loginUser);
 
     /**
      * Statistics task instance group by given project codes list
@@ -121,8 +124,8 @@ public interface DataAnalysisService {
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow states count
      */
-    Map<String, Object> countWorkflowStates(User loginUser,
-                                            StatisticsStateRequest statisticsStateRequest);
+    TaskCountDto countWorkflowStates(User loginUser,
+                                     StatisticsStateRequest statisticsStateRequest);
 
     /**
      * query one workflow states count
@@ -130,7 +133,7 @@ public interface DataAnalysisService {
      * @param workflowCode workflowCode
      * @return workflow states count
      */
-    Map<String, Object> countOneWorkflowStates(User loginUser, Long workflowCode);
+    TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode);
 
     /**
      * query all task states count
@@ -138,7 +141,7 @@ public interface DataAnalysisService {
      * @param statisticsStateRequest statisticsStateRequest
      * @return tasks states count
      */
-    Map<String, Object> countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest);
+    TaskCountDto countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest);
 
     /**
      * query one task states count
@@ -146,7 +149,7 @@ public interface DataAnalysisService {
      * @param taskCode taskCode
      * @return tasks states count
      */
-    Map<String, Object> countOneTaskStates(User loginUser, Long taskCode);
+    TaskCountDto countOneTaskStates(User loginUser, Long taskCode);
 
     Long getProjectCodeByName(String projectName);
 }

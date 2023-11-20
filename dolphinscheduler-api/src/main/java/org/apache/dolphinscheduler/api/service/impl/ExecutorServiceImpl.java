@@ -227,11 +227,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    boolean allLevelDependent, ExecutionOrder executionOrder) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
+
+        Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             log.warn("Parameter timeout is invalid, timeout:{}.", timeout);
@@ -464,10 +462,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         WorkflowExecuteResponse response = new WorkflowExecuteResponse();
 
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
 
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
@@ -1158,18 +1154,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode,
-                                                      int taskDefinitionVersion,
-                                                      int warningGroupId, String workerGroup, String tenantCode,
-                                                      Long environmentCode,
-                                                      Map<String, String> startParams, int dryRun) {
+    public void execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode,
+                                       int taskDefinitionVersion,
+                                       int warningGroupId, String workerGroup, String tenantCode,
+                                       Long environmentCode,
+                                       Map<String, String> startParams, int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
+
         checkValidTenant(tenantCode);
         checkMasterExists();
         // todo dispatch improvement
@@ -1195,13 +1188,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 streamingTaskOperator.triggerStreamingTask(taskExecuteStartMessage);
         if (streamingTaskTriggerResponse.isSuccess()) {
             log.info("Send task execute start command complete, response is {}.", streamingTaskOperator);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            log.error(
-                    "Start to execute stream task instance error, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}, response: {}.",
-                    projectCode, taskDefinitionCode, taskDefinitionVersion, streamingTaskTriggerResponse);
-            putMsg(result, Status.START_TASK_INSTANCE_ERROR);
+            return;
         }
-        return result;
+        log.error(
+                "Start to execute stream task instance error, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}, response: {}.",
+                projectCode, taskDefinitionCode, taskDefinitionVersion, streamingTaskTriggerResponse);
+        throw new ServiceException(Status.START_TASK_INSTANCE_ERROR);
     }
 }

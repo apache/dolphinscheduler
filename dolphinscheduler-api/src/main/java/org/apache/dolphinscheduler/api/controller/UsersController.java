@@ -140,14 +140,9 @@ public class UsersController extends BaseController {
                                 @RequestParam("pageNo") Integer pageNo,
                                 @RequestParam("pageSize") Integer pageSize,
                                 @RequestParam(value = "searchVal", required = false) String searchVal) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        return usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**

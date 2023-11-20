@@ -1218,40 +1218,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return storageOperate.getFileStatus(fullName, defaultPath, user.getTenantCode(), ResourceType.FILE);
     }
 
-    private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
-        AuthorizationType authorizationType =
-                resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID
-                        : AuthorizationType.UDF_FILE;
-        permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), log);
-    }
-
-    private Result<Object> verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
-        Result<Object> result = verifyResourceName(fullName, type, loginUser);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-        return verifyPid(loginUser, pid);
-    }
-
-    private Result<Object> verifyPid(User loginUser, int pid) {
-        Result<Object> result = new Result<>();
-        putMsg(result, Status.SUCCESS);
-        if (pid != -1) {
-            Resource parentResource = resourcesMapper.selectById(pid);
-            if (parentResource == null) {
-                log.error("Parent resource does not exist, parentResourceId:{}.", pid);
-                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
-                return result;
-            }
-            if (!canOperator(loginUser, parentResource.getUserId())) {
-                log.warn("User does not have operation privilege, loginUserName:{}.", loginUser.getUserName());
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
-        }
-        return result;
-    }
-
     /**
      * updateProcessInstance resource
      *

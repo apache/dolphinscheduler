@@ -20,9 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.AuditServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -67,13 +65,19 @@ public class AuditServiceTest {
         IPage<AuditLog> page = new Page<>(1, 10);
         page.setRecords(getLists());
         page.setTotal(1L);
-        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(),
-                Mockito.eq(""), eq(start), eq(end)))
-                        .thenReturn(page);
-        Result result = auditService.queryLogListPaging(new User(), null, null, "2020-11-01 00:00:00",
-                "2020-11-02 00:00:00", "", 1, 10);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(""),
+                eq(start), eq(end))).thenReturn(page);
+        Assertions.assertDoesNotThrow(() -> {
+            auditService.queryLogListPaging(
+                    new User(),
+                    null,
+                    null,
+                    "2020-11-01 00:00:00",
+                    "2020-11-02 00:00:00",
+                    "",
+                    1,
+                    10);
+        });
     }
 
     private List<AuditLog> getLists() {

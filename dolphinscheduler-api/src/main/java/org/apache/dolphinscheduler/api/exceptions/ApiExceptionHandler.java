@@ -36,20 +36,19 @@ import org.springframework.web.method.HandlerMethod;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
-    public Result exceptionHandler(ServiceException e, HandlerMethod hm) {
-        log.error("ServiceException: ", e);
-        return new Result(e.getCode(), e.getMessage());
+    public Result<Object> exceptionHandler(ServiceException e, HandlerMethod hm) {
+        log.error("{} Meet a ServiceException: {}", hm.getShortLogMessage(), e.getMessage());
+        return new Result<>(e.getCode(), e.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public Result exceptionHandler(Exception e, HandlerMethod hm) {
+    @ExceptionHandler(Throwable.class)
+    public Result<Object> exceptionHandler(Throwable e, HandlerMethod hm) {
         ApiException ce = hm.getMethodAnnotation(ApiException.class);
+        log.error("Meet en unknown exception: ", e);
         if (ce == null) {
-            log.error(e.getMessage(), e);
             return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, e.getMessage());
         }
         Status st = ce.value();
-        log.error(st.getMsg(), e);
         return Result.error(st);
     }
 

@@ -142,11 +142,6 @@ public class ResourcePermissionCheckServiceImpl
     }
 
     @Override
-    public void postHandle(Object authorizationType, Integer userId, List<Integer> ids, Logger logger) {
-        logger.debug("no post handle");
-    }
-
-    @Override
     public Set<Object> userOwnedResourceIdsAcquisition(Object authorizationType, Integer userId, Logger logger) {
         User user = processService.getUserById(userId);
         if (user == null) {

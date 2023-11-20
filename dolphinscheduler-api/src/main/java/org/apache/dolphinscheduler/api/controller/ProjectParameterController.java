@@ -136,11 +136,7 @@ public class ProjectParameterController extends BaseController {
                                                   @RequestParam("pageNo") Integer pageNo,
                                                   @RequestParam("pageSize") Integer pageSize) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            log.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         return projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo,
                 searchVal);

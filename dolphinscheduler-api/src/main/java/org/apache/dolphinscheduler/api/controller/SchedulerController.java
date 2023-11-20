@@ -248,14 +248,10 @@ public class SchedulerController extends BaseController {
                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                           @RequestParam("pageNo") Integer pageNo,
                                           @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo,
+        return schedulerService.querySchedule(loginUser, projectCode, processDefinitionCode, searchVal, pageNo,
                 pageSize);
-        return result;
 
     }
 

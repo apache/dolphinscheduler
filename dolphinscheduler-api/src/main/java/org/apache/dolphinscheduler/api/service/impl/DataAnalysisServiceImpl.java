@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -35,6 +36,7 @@ import org.apache.dolphinscheduler.common.utils.TriFunction;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -101,6 +103,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     @Autowired
     private ProcessTaskRelationMapper relationMapper;
+
     /**
      * statistical task instance status data
      *
@@ -111,8 +114,8 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return task state count data
      */
     @Override
-    public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate,
-                                                       String endDate) {
+    public TaskCountDto countTaskStateByProject(User loginUser, long projectCode, String startDate,
+                                                String endDate) {
 
         return countStateByProject(
                 loginUser,
@@ -132,22 +135,21 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return process instance state count data
      */
     @Override
-    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
-                                                                  String endDate) {
-        Map<String, Object> result = this.countStateByProject(
+    public TaskCountDto countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
+                                                           String endDate) {
+        TaskCountDto taskCountDto = countStateByProject(
                 loginUser,
                 projectCode,
                 startDate,
                 endDate,
-                (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end,
+                (start, end, projectCodes) -> processInstanceMapper.countInstanceStateByProjectCodes(start, end,
                         projectCodes));
 
         // process state count needs to remove state of forced success
-        if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
-            ((TaskCountDto) result.get(Constants.DATA_LIST))
-                    .removeStateFromCountList(TaskExecutionStatus.FORCED_SUCCESS);
+        if (taskCountDto != null) {
+            taskCountDto.removeStateFromCountList(TaskExecutionStatus.FORCED_SUCCESS);
         }
-        return result;
+        return taskCountDto;
     }
 
     /**
@@ -158,15 +160,13 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @param startDate   start date
      * @param endDate     end date
      */
-    private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate,
-                                                    TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>();
+    private TaskCountDto countStateByProject(User loginUser,
+                                             long projectCode,
+                                             String startDate,
+                                             String endDate,
+                                             TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
         if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         }
 
         Date start = null;
@@ -175,12 +175,10 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             start = DateUtils.stringToDate(startDate);
             end = DateUtils.stringToDate(endDate);
             if (Objects.isNull(start) || Objects.isNull(end)) {
-                log.warn("Parameter startDate or endDate is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             }
         }
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, TaskCountDto> projectIds = getProjectIds(loginUser);
         if (projectIds.getRight() != null) {
             return projectIds.getRight();
         }
@@ -193,11 +191,9 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         }
 
         if (processInstanceStateCounts != null) {
-            TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
+            return new TaskCountDto(processInstanceStateCounts);
         }
-        return result;
+        return null;
     }
 
     /**
@@ -210,35 +206,26 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
-        Map<String, Object> result = new HashMap<>();
+    public DefineUserDto countDefinitionByUser(User loginUser, long projectCode) {
         if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        }
+
+        // todo: refactor this method, don't use Pair
+        Pair<Set<Integer>, TaskCountDto> projectIds = getProjectIds(loginUser);
+        if (projectIds.getRight() != null) {
+            List<DefinitionGroupByUser> emptyList = new ArrayList<>();
+            return new DefineUserDto(emptyList);
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
-        if (projectIds.getRight() != null) {
-            List<DefinitionGroupByUser> emptyList = new ArrayList<>();
-            DefineUserDto dto = new DefineUserDto(emptyList);
-            result.put(Constants.DATA_LIST, dto);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
         Long[] projectCodeArray =
                 projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
         if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
             defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
         }
 
-        DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
-        result.put(Constants.DATA_LIST, dto);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new DefineUserDto(defineGroupByUsers);
     }
 
     /**
@@ -248,8 +235,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return command state count data
      */
     @Override
-    public Map<String, Object> countCommandState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public List<CommandStateCount> countCommandState(User loginUser) {
 
         /**
          * find all the task lists in the project under the user
@@ -257,13 +243,12 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
          */
         Date start = null;
         Date end = null;
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, TaskCountDto> projectIds = getProjectIds(loginUser);
         if (projectIds.getRight() != null) {
             List<CommandStateCount> noData = Arrays.stream(CommandType.values())
-                    .map(commandType -> new CommandStateCount(0, 0, commandType)).collect(Collectors.toList());
-            result.put(Constants.DATA_LIST, noData);
-            putMsg(result, Status.SUCCESS);
-            return result;
+                    .map(commandType -> new CommandStateCount(0, 0, commandType))
+                    .collect(Collectors.toList());
+            return noData;
         }
         Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
         // count normal command state
@@ -284,20 +269,15 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                         normalCountCommandCounts.getOrDefault(commandType, 0),
                         commandType))
                 .collect(Collectors.toList());
-
-        result.put(Constants.DATA_LIST, list);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return list;
     }
 
-    private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
+    private Pair<Set<Integer>, TaskCountDto> getProjectIds(User loginUser) {
         Set<Integer> projectIds = resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>();
-            result.put(Constants.DATA_LIST, new TaskCountDto(taskInstanceStateCounts));
-            putMsg(result, Status.SUCCESS);
-            return Pair.of(null, result);
+            return Pair.of(null, new TaskCountDto(taskInstanceStateCounts));
         }
         return Pair.of(projectIds, null);
     }
@@ -316,16 +296,14 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return queue state count data
      */
     @Override
-    public Map<String, Object> countQueueState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Integer> countQueueState(User loginUser) {
 
         // TODO need to add detail data info
+        // todo: refactor this method, don't use Map
         Map<String, Integer> dataMap = new HashMap<>();
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
-        result.put(Constants.DATA_LIST, dataMap);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return dataMap;
     }
 
     @Override
@@ -375,6 +353,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             List<Long> projectCodes = projects.stream().map(project -> project.getCode()).collect(Collectors.toList());
             count = projectMapper.queryAllWorkflowCounts(projectCodes);
         }
+        // todo: refactor this method, don't use Map
         result.put("data", "AllWorkflowCounts = " + count);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -382,19 +361,18 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     /**
      * query all workflow states count
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return workflow states count
      */
     @Override
-    public Map<String, Object> countWorkflowStates(User loginUser,
-                                                   StatisticsStateRequest statisticsStateRequest) {
-        Map<String, Object> result = new HashMap<>();
+    public TaskCountDto countWorkflowStates(User loginUser,
+                                            StatisticsStateRequest statisticsStateRequest) {
         Set<Integer> projectIds = resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return new TaskCountDto(Collections.emptyList());
         }
 
         String projectName = statisticsStateRequest.getProjectName();
@@ -425,50 +403,42 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
         List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(
                 startTime, endTime, projectCode, workflowCode, model, projectIds);
-        TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
-        result.put(Constants.DATA_LIST, taskCountResult);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new TaskCountDto(executeStatusCounts);
     }
 
     /**
      * query one workflow states count
-     * @param loginUser login user
+     *
+     * @param loginUser    login user
      * @param workflowCode workflowCode
      * @return workflow states count
      */
     @Override
-    public Map<String, Object> countOneWorkflowStates(User loginUser, Long workflowCode) {
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByCode(workflowCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
+    public TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
         }
-        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(
-                null, null, null, workflowCode, Constants.QUERY_ALL_ON_WORKFLOW, null);
-        if (executeStatusCounts != null) {
-            TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, processDefinition.getProjectCode());
+
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(null, null, null,
+                workflowCode, Constants.QUERY_ALL_ON_WORKFLOW, null);
+        return new TaskCountDto(executeStatusCounts);
     }
 
     /**
      * query all task states count
-     * @param loginUser login user
+     *
+     * @param loginUser              login user
      * @param statisticsStateRequest statisticsStateRequest
      * @return tasks states count
      */
     @Override
-    public Map<String, Object> countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest) {
-        Map<String, Object> result = new HashMap<>();
+    public TaskCountDto countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest) {
         Set<Integer> projectIds = resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return new TaskCountDto(Collections.emptyList());
         }
         String projectName = statisticsStateRequest.getProjectName();
         String workflowName = statisticsStateRequest.getWorkflowName();
@@ -508,10 +478,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                 taskInstanceMapper.countTaskInstanceStateByProjectIdsV2(startTime, endTime, projectIds));
         List<TaskExecutionStatus> needRecountState = setOptional(startTimeStates);
         if (needRecountState.size() == 0) {
-            TaskCountDto taskCountResult = new TaskCountDto(startTimeStates.get());
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return new TaskCountDto(startTimeStates.get());
         }
         List<ExecuteStatusCount> recounts = this.taskInstanceMapper
                 .countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2(startTime, endTime, projectCode,
@@ -519,37 +486,29 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                         needRecountState);
         startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
         List<ExecuteStatusCount> executeStatusCounts = startTimeStates.orElse(null);
-        TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
-        result.put(Constants.DATA_LIST, taskCountResult);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new TaskCountDto(executeStatusCounts);
     }
 
     /**
      * query one task states count
+     *
      * @param loginUser login user
-     * @param taskCode taskCode
+     * @param taskCode  taskCode
      * @return tasks states count
      */
     @Override
-    public Map<String, Object> countOneTaskStates(User loginUser, Long taskCode) {
-        Map<String, Object> result = new HashMap<>();
+    public TaskCountDto countOneTaskStates(User loginUser, Long taskCode) {
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         long projectCode = taskDefinition.getProjectCode();
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+
         Set<Integer> projectId = Collections.singleton(project.getId());
         Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(
                 taskInstanceMapper.countTaskInstanceStateByProjectIdsV2(null, null, projectId));
         List<TaskExecutionStatus> needRecountState = setOptional(startTimeStates);
         if (needRecountState.size() == 0) {
-            TaskCountDto taskCountResult = new TaskCountDto(startTimeStates.get());
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return new TaskCountDto(startTimeStates.get());
         }
         List<ExecuteStatusCount> recounts = this.taskInstanceMapper
                 .countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2(null, null, projectCode, null, taskCode,
@@ -557,10 +516,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                         needRecountState);
         startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
         List<ExecuteStatusCount> executeStatusCounts = startTimeStates.orElse(null);
-        TaskCountDto taskCountResult = new TaskCountDto(executeStatusCounts);
-        result.put(Constants.DATA_LIST, taskCountResult);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new TaskCountDto(executeStatusCounts);
     }
 
     /**
@@ -573,25 +529,18 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return definition count data
      */
     @Override
-    public Map<String, Object> countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId,
-                                                       Integer releaseState) {
-        Map<String, Object> result = new HashMap<>();
+    public DefineUserDto countDefinitionByUserV2(User loginUser, Long projectCode, Integer userId,
+                                                 Integer releaseState) {
         if (null != projectCode) {
             Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+            projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
         }
 
         List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
+        Pair<Set<Integer>, TaskCountDto> projectIds = getProjectIds(loginUser);
         if (projectIds.getRight() != null) {
             List<DefinitionGroupByUser> emptyList = new ArrayList<>();
-            DefineUserDto dto = new DefineUserDto(emptyList);
-            result.put(Constants.DATA_LIST, dto);
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return new DefineUserDto(emptyList);
         }
         Long[] projectCodeArray =
                 projectCode == null ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
@@ -600,10 +549,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                     processDefinitionMapper.countDefinitionByProjectCodesV2(projectCodeArray, userId, releaseState);
         }
 
-        DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
-        result.put(Constants.DATA_LIST, dto);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new DefineUserDto(defineGroupByUsers);
     }
 
     @Override

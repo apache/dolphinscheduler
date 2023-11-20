@@ -74,14 +74,8 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     public Result queryWorkflowInstanceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestBody WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
-        Result result =
-                checkPageParams(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-        if (!result.checkResult()) {
-            return result;
-        }
-
-        result = processInstanceService.queryProcessInstanceList(loginUser, workflowInstanceQueryRequest);
-        return result;
+        checkPageParams(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
+        return processInstanceService.queryProcessInstanceList(loginUser, workflowInstanceQueryRequest);
     }
 
     /**

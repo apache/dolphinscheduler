@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_FORW
 import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_REAL_IP;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 
@@ -42,25 +43,17 @@ public class BaseController {
     /**
      * check params
      *
-     * @param pageNo page number
+     * @param pageNo   page number
      * @param pageSize page size
-     * @return check result code
+     * @throws ServiceException exception
      */
-    // todo: directly throw exception
-    public <T> Result<T> checkPageParams(int pageNo, int pageSize) {
-        Result<T> result = new Result<>();
-        Status resultEnum = Status.SUCCESS;
-        String msg = Status.SUCCESS.getMsg();
+    public void checkPageParams(int pageNo, int pageSize) throws ServiceException {
         if (pageNo <= 0) {
-            resultEnum = Status.REQUEST_PARAMS_NOT_VALID_ERROR;
-            msg = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.PAGE_NUMBER);
-        } else if (pageSize <= 0) {
-            resultEnum = Status.REQUEST_PARAMS_NOT_VALID_ERROR;
-            msg = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.PAGE_SIZE);
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.PAGE_NUMBER);
         }
-        result.setCode(resultEnum.getCode());
-        result.setMsg(msg);
-        return result;
+        if (pageSize <= 0) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.PAGE_SIZE);
+        }
     }
 
     /**

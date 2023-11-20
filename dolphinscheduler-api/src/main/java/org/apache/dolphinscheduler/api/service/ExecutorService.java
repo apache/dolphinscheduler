@@ -164,12 +164,12 @@ public interface ExecutorService {
      * @param startParams the global param values which pass to new process instance
      * @return execute process instance code
      */
-    Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode,
-                                               long taskDefinitionCode, int taskDefinitionVersion,
-                                               int warningGroupId,
-                                               String workerGroup,
-                                               String tenantCode,
-                                               Long environmentCode,
-                                               Map<String, String> startParams,
-                                               int dryRun);
+    void execStreamTaskInstance(User loginUser, long projectCode,
+                                long taskDefinitionCode, int taskDefinitionVersion,
+                                int warningGroupId,
+                                String workerGroup,
+                                String tenantCode,
+                                Long environmentCode,
+                                Map<String, String> startParams,
+                                int dryRun);
 }

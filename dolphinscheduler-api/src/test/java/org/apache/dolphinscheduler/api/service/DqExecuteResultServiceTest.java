@@ -17,16 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -39,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -90,12 +88,11 @@ public class DqExecuteResultServiceTest {
         Page<DqExecuteResult> page = new Page<>(1, 10);
         page.setTotal(1);
         page.setRecords(getExecuteResultList());
-        when(dqExecuteResultMapper.queryResultListPaging(
-                any(IPage.class), eq(""), eq(loginUser), any(), eq(ruleType), eq(start), eq(end))).thenReturn(page);
+        when(dqExecuteResultMapper.queryResultListPaging(any(IPage.class), eq(""), eq(loginUser), any(), eq(ruleType),
+                eq(start), eq(end))).thenReturn(page);
 
-        Result result = dqExecuteResultService.queryResultListPaging(
-                loginUser, searchVal, 1, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
+        assertDoesNotThrow(() -> dqExecuteResultService.queryResultListPaging(loginUser, searchVal, 1, 0,
+                "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10));
     }
 
     public List<DqExecuteResult> getExecuteResultList() {

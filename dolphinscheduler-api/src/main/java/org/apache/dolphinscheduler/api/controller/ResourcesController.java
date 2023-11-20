@@ -227,15 +227,11 @@ public class ResourcesController extends BaseController {
                                                                    @RequestParam("pageNo") Integer pageNo,
                                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                                    @RequestParam("pageSize") Integer pageSize) {
-        Result<PageInfo<StorageEntity>> result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
+        return resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
                 pageSize);
-        return result;
     }
 
     /**
@@ -567,10 +563,7 @@ public class ResourcesController extends BaseController {
                                                  @RequestParam("pageNo") Integer pageNo,
                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
                                                  @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         return udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 

@@ -90,7 +90,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

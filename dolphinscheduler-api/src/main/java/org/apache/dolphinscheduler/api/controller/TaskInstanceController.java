@@ -114,12 +114,9 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(
+        return taskInstanceService.queryTaskListPaging(
                 loginUser,
                 projectCode,
                 processInstanceId,
@@ -136,7 +133,6 @@ public class TaskInstanceController extends BaseController {
                 taskExecuteType,
                 pageNo,
                 pageSize);
-        return result;
     }
 
     /**

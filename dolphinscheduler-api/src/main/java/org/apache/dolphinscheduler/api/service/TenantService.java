@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,52 +32,54 @@ public interface TenantService {
     /**
      * create tenant
      *
-     * @param loginUser login user
+     * @param loginUser  login user
      * @param tenantCode tenant code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return create result code
      * @throws Exception exception
      */
-    Map<String, Object> createTenant(User loginUser,
-                                     String tenantCode,
-                                     int queueId,
-                                     String desc) throws Exception;
+    Tenant createTenant(User loginUser,
+                        String tenantCode,
+                        int queueId,
+                        String desc) throws Exception;
 
     /**
      * query tenant list paging
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return tenant list page
      */
-    Result queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    PageInfo<Tenant> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * updateProcessInstance tenant
      *
-     * @param loginUser login user
-     * @param id tennat id
+     * @param loginUser  login user
+     * @param id         tennat id
      * @param tenantCode tennat code
-     * @param queueId queue id
-     * @param desc description
+     * @param queueId    queue id
+     * @param desc       description
      * @return update result code
      * @throws Exception exception
      */
-    Map<String, Object> updateTenant(User loginUser, int id, String tenantCode, int queueId,
-                                     String desc) throws Exception;
+    void updateTenant(User loginUser,
+                      int id, String tenantCode,
+                      int queueId,
+                      String desc) throws Exception;
 
     /**
      * delete tenant
      *
      * @param loginUser login user
-     * @param id tenant id
+     * @param id        tenant id
      * @return delete result code
      * @throws Exception exception
      */
-    Map<String, Object> deleteTenantById(User loginUser, int id) throws Exception;
+    void deleteTenantById(User loginUser, int id) throws Exception;
 
     /**
      * query tenant list
@@ -84,7 +87,7 @@ public interface TenantService {
      * @param loginUser login user
      * @return tenant list
      */
-    Map<String, Object> queryTenantList(User loginUser);
+    List<Tenant> queryTenantList(User loginUser);
 
     /**
      * verify tenant code
@@ -92,7 +95,7 @@ public interface TenantService {
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
-    Result verifyTenantCode(String tenantCode);
+    void verifyTenantCode(String tenantCode);
 
     /**
      * query tenant by tenant code

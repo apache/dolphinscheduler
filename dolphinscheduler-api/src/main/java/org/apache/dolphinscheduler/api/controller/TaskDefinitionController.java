@@ -208,10 +208,7 @@ public class TaskDefinitionController extends BaseController {
                                               @PathVariable(value = "code") long code,
                                               @RequestParam(value = "pageNo") int pageNo,
                                               @RequestParam(value = "pageSize") int pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         return taskDefinitionService.queryTaskDefinitionVersions(loginUser, projectCode, code, pageNo, pageSize);
     }
 
@@ -343,10 +340,7 @@ public class TaskDefinitionController extends BaseController {
                                                 @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
                                                 @RequestParam("pageNo") Integer pageNo,
                                                 @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchTaskName = ParameterUtils.handleEscapes(searchTaskName);
         return taskDefinitionService.queryTaskDefinitionListPaging(loginUser, projectCode,
                 searchTaskName, taskType, taskExecuteType, pageNo, pageSize);

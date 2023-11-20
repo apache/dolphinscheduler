@@ -86,13 +86,9 @@ public class K8sNamespaceController extends BaseController {
                                            @RequestParam("pageSize") Integer pageSize,
                                            @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        return k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**

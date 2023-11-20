@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.dto.ClusterDto;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * cluster service
@@ -34,22 +36,23 @@ public interface ClusterService {
      * @param name      cluster name
      * @param config    cluster config
      * @param desc      cluster desc
+     * @return cluster code
      */
-    Map<String, Object> createCluster(User loginUser, String name, String config, String desc);
+    Long createCluster(User loginUser, String name, String config, String desc);
 
     /**
      * query cluster
      *
      * @param name cluster name
      */
-    Map<String, Object> queryClusterByName(String name);
+    ClusterDto queryClusterByName(String name);
 
     /**
      * query cluster
      *
      * @param code cluster code
      */
-    Map<String, Object> queryClusterByCode(Long code);
+    ClusterDto queryClusterByCode(Long code);
 
     /**
      * delete cluster
@@ -57,7 +60,7 @@ public interface ClusterService {
      * @param loginUser login user
      * @param code      cluster code
      */
-    Map<String, Object> deleteClusterByCode(User loginUser, Long code);
+    void deleteClusterByCode(User loginUser, Long code);
 
     /**
      * update cluster
@@ -68,7 +71,7 @@ public interface ClusterService {
      * @param config    cluster config
      * @param desc      cluster desc
      */
-    Map<String, Object> updateClusterByCode(User loginUser, Long code, String name, String config, String desc);
+    Cluster updateClusterByCode(User loginUser, Long code, String name, String config, String desc);
 
     /**
      * query cluster paging
@@ -78,14 +81,14 @@ public interface ClusterService {
      * @param pageSize  page size
      * @return cluster list page
      */
-    Result queryClusterListPaging(Integer pageNo, Integer pageSize, String searchVal);
+    PageInfo<ClusterDto> queryClusterListPaging(Integer pageNo, Integer pageSize, String searchVal);
 
     /**
      * query all cluster
      *
      * @return all cluster list
      */
-    Map<String, Object> queryAllClusterList();
+    List<ClusterDto> queryAllClusterList();
 
     /**
      * verify cluster name
@@ -93,6 +96,6 @@ public interface ClusterService {
      * @param clusterName cluster name
      * @return true if the cluster name not exists, otherwise return false
      */
-    Map<String, Object> verifyCluster(String clusterName);
+    void verifyCluster(String clusterName);
 
 }

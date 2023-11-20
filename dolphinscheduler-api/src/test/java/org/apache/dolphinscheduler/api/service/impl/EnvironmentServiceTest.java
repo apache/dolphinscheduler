@@ -15,16 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_UPDATE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
-import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
-import org.apache.dolphinscheduler.api.service.impl.EnvironmentServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -98,94 +100,74 @@ public class EnvironmentServiceTest {
     @Test
     public void testCreateEnvironment() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
                 loginUser.getId(), ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result =
-                environmentService.createEnvironment(loginUser, environmentName, getConfig(), getDesc(), workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> environmentService
+                .createEnvironment(loginUser, environmentName, getConfig(), getDesc(), workerGroups));
 
-        loginUser = getAdminUser();
-        result = environmentService.createEnvironment(loginUser, environmentName, "", getDesc(), workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        User adminUser = getAdminUser();
+        assertThrowsServiceException(Status.ENVIRONMENT_CONFIG_IS_NULL,
+                () -> environmentService.createEnvironment(adminUser, environmentName, "", getDesc(), workerGroups));
+        assertThrowsServiceException(Status.ENVIRONMENT_NAME_IS_NULL,
+                () -> environmentService.createEnvironment(adminUser, "", getConfig(), getDesc(), workerGroups));
+        assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
+                () -> environmentService.createEnvironment(adminUser, environmentName, getConfig(), getDesc(), "test"));
 
-        result = environmentService.createEnvironment(loginUser, "", getConfig(), getDesc(), workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
+        assertThrowsServiceException(Status.ENVIRONMENT_NAME_EXISTS, () -> environmentService
+                .createEnvironment(adminUser, environmentName, getConfig(), getDesc(), workerGroups));
 
-        result = environmentService.createEnvironment(loginUser, environmentName, getConfig(), getDesc(), "test");
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
-
-        Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.createEnvironment(loginUser, environmentName, getConfig(), getDesc(), workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
-
-        Mockito.when(environmentMapper.insert(Mockito.any(Environment.class))).thenReturn(1);
-        Mockito.when(relationMapper.insert(Mockito.any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
-        result = environmentService.createEnvironment(loginUser, "testName", "test", "test", workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        when(environmentMapper.insert(any(Environment.class))).thenReturn(1);
+        when(relationMapper.insert(any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
+        assertDoesNotThrow(
+                () -> environmentService.createEnvironment(adminUser, "testName", "test", "test", workerGroups));
 
     }
 
     @Test
     public void testCheckParams() {
-        Map<String, Object> result = environmentService.checkParams(environmentName, getConfig(), "test");
-        Assertions.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
+                () -> environmentService.checkParams(environmentName, getConfig(), "test"));
     }
 
     @Test
     public void testUpdateEnvironmentByCode() {
-        User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
-                loginUser.getId(), ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
-                0, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result = environmentService.updateEnvironmentByCode(loginUser, 1L, environmentName,
-                getConfig(), getDesc(), workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        final User loginUser = getGeneralUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT, loginUser.getId(),
+                ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null, 0,
+                baseServiceLogger)).thenReturn(true);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> environmentService
+                .updateEnvironmentByCode(loginUser, 1L, environmentName, getConfig(), getDesc(), workerGroups));
 
-        loginUser = getAdminUser();
-        result = environmentService.updateEnvironmentByCode(loginUser, 1L, environmentName, "", getDesc(),
-                workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_CONFIG_IS_NULL, result.get(Constants.STATUS));
+        final User adminUser = getAdminUser();
+        assertThrowsServiceException(Status.ENVIRONMENT_CONFIG_IS_NULL, () -> environmentService
+                .updateEnvironmentByCode(adminUser, 1L, environmentName, "", getDesc(), workerGroups));
 
-        result = environmentService.updateEnvironmentByCode(loginUser, 1L, "", getConfig(), getDesc(), workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.ENVIRONMENT_NAME_IS_NULL, () -> environmentService
+                .updateEnvironmentByCode(adminUser, 1L, "", getConfig(), getDesc(), workerGroups));
 
-        result = environmentService.updateEnvironmentByCode(loginUser, 1L, environmentName, getConfig(), getDesc(),
-                "test");
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, () -> environmentService
+                .updateEnvironmentByCode(adminUser, 1L, environmentName, getConfig(), getDesc(), "test"));
 
-        Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.updateEnvironmentByCode(loginUser, 2L, environmentName, getConfig(), getDesc(),
-                workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
+        when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
+        assertThrowsServiceException(Status.ENVIRONMENT_NAME_EXISTS, () -> environmentService
+                .updateEnvironmentByCode(adminUser, 2L, environmentName, getConfig(), getDesc(), workerGroups));
 
-        Mockito.when(environmentMapper.update(Mockito.any(Environment.class), Mockito.any(Wrapper.class)))
-                .thenReturn(1);
-        result = environmentService.updateEnvironmentByCode(loginUser, 1L, "testName", "test", "test", workerGroups);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(1);
+        assertDoesNotThrow(() -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
+                workerGroups));
     }
 
     @Test
     public void testQueryAllEnvironmentList() {
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
                 1, environmentServiceLogger)).thenReturn(ids);
-        Mockito.when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
+        when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
 
         Map<String, Object> result = environmentService.queryAllEnvironmentList(getAdminUser());
         logger.info(result.toString());
@@ -200,7 +182,7 @@ public class EnvironmentServiceTest {
         IPage<Environment> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
-        Mockito.when(environmentMapper.queryEnvironmentListPaging(Mockito.any(Page.class), Mockito.eq(environmentName)))
+        when(environmentMapper.queryEnvironmentListPaging(any(Page.class), Mockito.eq(environmentName)))
                 .thenReturn(page);
 
         Result result = environmentService.queryEnvironmentListPaging(getAdminUser(), 1, 10, environmentName);
@@ -211,12 +193,12 @@ public class EnvironmentServiceTest {
 
     @Test
     public void testQueryEnvironmentByName() {
-        Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
+        when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
         logger.info(result.toString());
         Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, result.get(Constants.STATUS));
 
-        Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
+        when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         result = environmentService.queryEnvironmentByName(environmentName);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -224,12 +206,12 @@ public class EnvironmentServiceTest {
 
     @Test
     public void testQueryEnvironmentByCode() {
-        Mockito.when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(null);
+        when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByCode(1L);
         logger.info(result.toString());
         Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, result.get(Constants.STATUS));
 
-        Mockito.when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
+        when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
         result = environmentService.queryEnvironmentByCode(1L);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -238,22 +220,22 @@ public class EnvironmentServiceTest {
     @Test
     public void testDeleteEnvironmentByCode() {
         User loginUser = getGeneralUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
                 loginUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
-        Mockito.when(taskDefinitionMapper.selectCount(Mockito.any(LambdaQueryWrapper.class))).thenReturn(1L);
+        when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
         result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
         Assertions.assertEquals(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS, result.get(Constants.STATUS));
 
-        Mockito.when(taskDefinitionMapper.selectCount(Mockito.any(LambdaQueryWrapper.class))).thenReturn(0L);
-        Mockito.when(environmentMapper.deleteByCode(1L)).thenReturn(1);
+        when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
+        when(environmentMapper.deleteByCode(1L)).thenReturn(1);
         result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
@@ -265,7 +247,7 @@ public class EnvironmentServiceTest {
         logger.info(result.toString());
         Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
-        Mockito.when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
+        when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         result = environmentService.verifyEnvironment(environmentName);
         logger.info(result.toString());
         Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));

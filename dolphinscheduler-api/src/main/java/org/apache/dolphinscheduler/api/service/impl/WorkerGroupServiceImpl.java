@@ -166,8 +166,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
-            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(),
-                    Collections.singletonList(workerGroup.getId()), log);
         }
     }
 
