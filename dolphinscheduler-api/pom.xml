@@ -228,6 +228,10 @@
             <groupId>com.azure.resourcemanager</groupId>
             <artifactId>azure-resourcemanager-datafactory</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-alert</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <testResources>

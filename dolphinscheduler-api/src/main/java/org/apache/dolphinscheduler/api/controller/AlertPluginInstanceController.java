@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_PLUGIN_I
 import static org.apache.dolphinscheduler.api.enums.Status.GET_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -97,6 +98,19 @@ public class AlertPluginInstanceController extends BaseController {
                 alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, instanceType, warningType,
                         pluginInstanceParams);
         return returnDataList(result);
+    }
+
+    @Operation(summary = "testSendAlertPluginInstance", description = "TEST_SEND_ALERT_PLUGIN_INSTANCE")
+    @Parameters({
+            @Parameter(name = "pluginDefineId", description = "ALERT_PLUGIN_DEFINE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema = @Schema(implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
+    })
+    @PostMapping(value = "/test-send")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR)
+    public Result testSendAlertPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
+                                              @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
+        return alertPluginInstanceService.testSend(pluginDefineId, pluginInstanceParams);
     }
 
     /**

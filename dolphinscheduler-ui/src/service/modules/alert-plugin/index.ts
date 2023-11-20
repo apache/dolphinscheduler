@@ -21,7 +21,8 @@ import {
   PluginInstanceReq,
   InstanceNameReq,
   IdReq,
-  UpdatePluginInstanceReq
+  UpdatePluginInstanceReq,
+  TestPluginInstanceReq
 } from './types'
 
 export function queryAlertPluginInstanceListPaging(params: ListReq): any {
@@ -35,6 +36,14 @@ export function queryAlertPluginInstanceListPaging(params: ListReq): any {
 export function createAlertPluginInstance(data: PluginInstanceReq): any {
   return axios({
     url: '/alert-plugin-instances',
+    method: 'post',
+    data
+  })
+}
+
+export function testAlertPluginInstance(data: TestPluginInstanceReq): any {
+  return axios({
+    url: '/alert-plugin-instances/test-send',
     method: 'post',
     data
   })

@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.alert;
+package org.apache.dolphinscheduler.extract.alert.request;
 
-import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
-import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
-import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
-import org.apache.dolphinscheduler.extract.base.RpcMethod;
-import org.apache.dolphinscheduler.extract.base.RpcService;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@RpcService
-public interface IAlertOperator {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class AlertTestSendRequest {
 
-    @RpcMethod
-    AlertSendResponse sendAlert(AlertSendRequest alertSendRequest);
+    private int pluginDefineId;
 
-    @RpcMethod
-    AlertSendResponse sendTestAlert(AlertTestSendRequest alertSendRequest);
-
+    private String pluginInstanceParams;
 }

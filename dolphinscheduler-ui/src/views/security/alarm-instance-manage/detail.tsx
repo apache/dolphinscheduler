@@ -23,7 +23,15 @@ import {
   ref,
   getCurrentInstance
 } from 'vue'
-import { NSelect, NInput, NSwitch, NRadioGroup, NSpace, NRadio } from 'naive-ui'
+import {
+  NSelect,
+  NInput,
+  NSwitch,
+  NRadioGroup,
+  NSpace,
+  NRadio,
+  NButton
+} from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { useForm } from './use-form'
@@ -69,7 +77,7 @@ const DetailModal = defineComponent({
       changePlugin
     } = useForm()
 
-    const { status, createOrUpdate } = useDetail(getFormValues)
+    const { status, createOrUpdate, testSend } = useDetail(getFormValues)
 
     const onCancel = () => {
       resetForm()
@@ -86,6 +94,11 @@ const DetailModal = defineComponent({
         ctx.emit('update')
       }
     }
+    const onTest = async () => {
+      await state.detailFormRef.validate()
+      testSend(state.json)
+    }
+
     const onChangePlugin = changePlugin
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -98,7 +111,9 @@ const DetailModal = defineComponent({
     )
     watch(
       () => state.detailForm.instanceType,
-      () => warningTypeSpan.value = state.detailForm.instanceType === 'GLOBAL' ? 0 : 24
+      () =>
+        (warningTypeSpan.value =
+          state.detailForm.instanceType === 'GLOBAL' ? 0 : 24)
     )
     watch(
       () => state.json,
@@ -131,6 +146,7 @@ const DetailModal = defineComponent({
       elements,
       onChangePlugin,
       onSubmit,
+      onTest,
       onCancel,
       trim
     }
@@ -150,7 +166,9 @@ const DetailModal = defineComponent({
       saving,
       onChangePlugin,
       onCancel,
-      onSubmit
+      onSubmit,
+      onTest,
+      testing
     } = this
     const { currentRecord } = props
     return (
@@ -195,11 +213,11 @@ const DetailModal = defineComponent({
                     label: t('security.alarm_instance.is_global_instance'),
                     widget: (
                       <NSwitch
-                      checkedValue={'GLOBAL'}
-                      uncheckedValue={'NORMAL'}
-                      disabled={!!currentRecord?.id}
-                      v-model:value={detailForm.instanceType}
-                    />
+                        checkedValue={'GLOBAL'}
+                        uncheckedValue={'NORMAL'}
+                        disabled={!!currentRecord?.id}
+                        v-model:value={detailForm.instanceType}
+                      />
                     )
                   },
                   {
@@ -208,18 +226,12 @@ const DetailModal = defineComponent({
                     span: warningTypeSpan,
                     widget: (
                       <NRadioGroup v-model:value={detailForm.warningType}>
-                      <NSpace>
-                        <NRadio value={'SUCCESS'}>
-                          {"success"}
-                        </NRadio>
-                        <NRadio value={'FAILURE'} >
-                          {"failure"}
-                        </NRadio>
-                        <NRadio value={'ALL'} >
-                          {"all"}
-                        </NRadio>
-                      </NSpace>
-                    </NRadioGroup>
+                        <NSpace>
+                          <NRadio value={'SUCCESS'}>{'success'}</NRadio>
+                          <NRadio value={'FAILURE'}>{'failure'}</NRadio>
+                          <NRadio value={'ALL'}>{'all'}</NRadio>
+                        </NSpace>
+                      </NRadioGroup>
                     )
                   },
                   {
@@ -244,6 +256,18 @@ const DetailModal = defineComponent({
                 cols: 24
               }}
             />
+          ),
+
+          'btn-middle': () => (
+            <NButton
+              class='btn-test-send'
+              type='primary'
+              size='small'
+              onClick={onTest}
+              loading={testing || loading}
+            >
+              {t('security.alarm_instance.test_send')}
+            </NButton>
           )
         }}
       </Modal>

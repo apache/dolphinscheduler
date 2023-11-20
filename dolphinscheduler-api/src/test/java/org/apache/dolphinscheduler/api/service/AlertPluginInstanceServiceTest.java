@@ -25,11 +25,13 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -37,6 +39,10 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,6 +83,9 @@ public class AlertPluginInstanceServiceTest {
 
     @Mock
     private AlertGroupMapper alertGroupMapper;
+
+    @Mock
+    private RegistryClient registryClient;
 
     private List<AlertPluginInstance> alertPluginInstances;
 
@@ -188,6 +197,26 @@ public class AlertPluginInstanceServiceTest {
         result = alertPluginInstanceService.create(user, 1, "test1", normalInstanceType, warningType, uiParams);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         Assertions.assertNotNull(result.get(Constants.DATA_LIST));
+    }
+
+    @Test
+    public void testSendAlert() {
+        Result<Void> result;
+        Mockito.when(registryClient.getServerList(RegistryNodeType.ALERT_SERVER)).thenReturn(new ArrayList<>());
+        result = alertPluginInstanceService.testSend(1, uiParams);
+        Assertions.assertEquals(Status.ALERT_SERVER_NOT_EXIST.getCode(), result.getCode());
+        AlertSendResponse.AlertSendResponseResult alertResult = new AlertSendResponse.AlertSendResponseResult();
+        alertResult.setSuccess(true);
+        AlertTestSendRequest alertTestSendRequest = new AlertTestSendRequest(
+                1,
+                uiParams);
+        Server server = new Server();
+        server.setPort(50052);
+        server.setHost("127.0.0.1");
+        Mockito.when(registryClient.getServerList(RegistryNodeType.ALERT_SERVER))
+                .thenReturn(Collections.singletonList(server));
+        result = alertPluginInstanceService.testSend(1, uiParams);
+        Assertions.assertEquals(Status.ALERT_TEST_SENDING_FAILED.getCode(), result.getCode());
     }
 
     @Test

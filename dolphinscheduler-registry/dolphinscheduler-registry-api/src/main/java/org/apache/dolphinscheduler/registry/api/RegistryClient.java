@@ -238,5 +238,4 @@ public class RegistryClient {
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {
         return getChildrenKeys(nodeType.getRegistryPath());
     }
-
 }
