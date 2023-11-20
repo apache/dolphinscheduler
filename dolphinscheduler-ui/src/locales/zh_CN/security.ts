@@ -213,6 +213,7 @@ export default {
     confirm: '确定',
     cancel: '取消',
     submit: '提交',
+    test_send: '测试发送',
     create_alarm_instance: '创建告警实例',
     select_plugin: '选择插件',
     select_plugin_tips: '请选择告警插件',
