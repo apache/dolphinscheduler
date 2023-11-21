@@ -116,15 +116,11 @@ public class ProcessInstanceController extends BaseController {
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime,
+        return processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime,
                 endTime,
                 searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
-        return result;
     }
 
     /**

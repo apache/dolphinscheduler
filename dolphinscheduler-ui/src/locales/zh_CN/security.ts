@@ -201,6 +201,8 @@ export default {
     alarm_instance_name: '告警实例名称',
     alarm_instance_name_tips: '请输入告警实例名称',
     alarm_plugin_name: '告警插件名称',
+    alarm_instance_type: '告警实例类型',
+    is_global_instance: '是否全局告警实例',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
@@ -211,6 +213,7 @@ export default {
     confirm: '确定',
     cancel: '取消',
     submit: '提交',
+    test_send: '测试发送',
     create_alarm_instance: '创建告警实例',
     select_plugin: '选择插件',
     select_plugin_tips: '请选择告警插件',
@@ -244,6 +247,7 @@ export default {
     headerParams: '请求头',
     bodyParams: '请求体',
     contentField: '内容字段',
+    timeout: '超时时间（秒）',
     Keyword: '关键词',
     userParams: '自定义参数',
     path: '脚本路径',
@@ -267,7 +271,9 @@ export default {
     AtUserIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}所有人"
+    IsAtAll: "{'@'}所有人",
+    annotations: '注释',
+    generatorURL: '生成地址',
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
@@ -81,9 +83,6 @@ public class K8SNamespaceServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        Mockito.when(
-                k8sClientService.upsertNamespaceAndResourceToK8s(Mockito.any(K8sNamespace.class), Mockito.anyString()))
-                .thenReturn(null);
         Mockito.when(k8sClientService.deleteNamespaceToK8s(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);
     }
 
@@ -108,37 +107,16 @@ public class K8SNamespaceServiceTest {
     public void createK8sNamespace() {
         // namespace is null
         Map<String, Object> result =
-                k8sNamespaceService.createK8sNamespace(getLoginUser(), null, clusterCode, 10.0, 100);
+                k8sNamespaceService.createK8sNamespace(getLoginUser(), null, clusterCode);
         logger.info(result.toString());
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
         // k8s is null
-        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, null, 10.0, 100);
+        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, null);
         logger.info(result.toString());
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
         // correct
         Mockito.when(clusterMapper.queryByClusterCode(Mockito.anyLong())).thenReturn(getCluster());
-        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, clusterCode, 10.0, 100);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        // null limit cpu and mem
-        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, clusterCode, null, null);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
-    @Test
-    public void updateK8sNamespace() {
-        Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
-
-        Map<String, Object> result = k8sNamespaceService.updateK8sNamespace(getLoginUser(), 1, null, null, null);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-        result = k8sNamespaceService.updateK8sNamespace(getLoginUser(), 1, null, -1.0, 100);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
-
-        result = k8sNamespaceService.updateK8sNamespace(getLoginUser(), 1, null, 1.0, 100);
+        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, clusterCode);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
@@ -195,10 +173,8 @@ public class K8SNamespaceServiceTest {
         // test non-admin user
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setId(3);
-        result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-        namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(CollectionUtils.isEmpty(namespaces));
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2));
     }
 
     @Test
@@ -217,11 +193,8 @@ public class K8SNamespaceServiceTest {
         // test non-admin user
         loginUser.setId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
-        result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 3);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
-        namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(CollectionUtils.isEmpty(namespaces));
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 3));
     }
 
     @Test

@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+{{- if and .Values.api.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -115,6 +116,11 @@ spec:
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common_properties
+            {{- if .Values.api.taskTypeFilter.enabled }}
+            - name: config-volume
+              mountPath: /opt/dolphinscheduler/conf/task-type-config.yaml
+              subPath: task-type-config.yaml
+            {{- end }}
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.ldap.ssl.volumeMount" . | nindent 12 }}
@@ -134,3 +140,4 @@ spec:
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.ldap.ssl.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
+{{- end }}

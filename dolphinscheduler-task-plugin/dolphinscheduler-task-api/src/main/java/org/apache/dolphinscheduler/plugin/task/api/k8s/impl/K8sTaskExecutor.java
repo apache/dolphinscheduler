@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s.impl;
 
+import static java.util.Collections.singletonList;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
@@ -46,6 +47,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -67,6 +69,7 @@ import org.slf4j.Logger;
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.AffinityBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.NodeSelectorTerm;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
@@ -91,10 +94,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         super(logger, taskRequest);
     }
 
-    public Job buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
+    public void buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
         String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String image = k8STaskMainParameters.getImage();
+        String pullSecret = k8STaskMainParameters.getPullSecret();
         String namespaceName = k8STaskMainParameters.getNamespaceName();
         String imagePullPolicy = k8STaskMainParameters.getImagePullPolicy();
         Map<String, String> otherParams = k8STaskMainParameters.getParamsMap();
@@ -155,7 +159,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                         .endRequiredDuringSchedulingIgnoredDuringExecution()
                         .endNodeAffinity().build();
 
-        JobBuilder jobBuilder = new JobBuilder()
+        job = new JobBuilder()
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
                 .withName(k8sJobName)
@@ -178,14 +182,16 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withResources(new ResourceRequirements(limitRes, reqRes))
                 .withEnv(envVars)
                 .endContainer()
+                .withImagePullSecrets(
+                        StringUtils.isEmpty(pullSecret) ? null : singletonList(new LocalObjectReference(pullSecret)))
                 .withRestartPolicy(RESTART_POLICY)
                 .withAffinity(affinity)
                 .endSpec()
                 .endTemplate()
                 .withBackoffLimit(retryNum)
-                .endSpec();
+                .endSpec()
+                .build();
 
-        return jobBuilder.build();
     }
 
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
@@ -257,6 +263,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
+
+                        if (line.endsWith(VarPoolUtils.VAR_SUFFIX)) {
+                            varPool.append(VarPoolUtils.findVarPool(line));
+                            varPool.append(VarPoolUtils.VAR_DELIMITER);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -284,7 +295,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String configYaml = k8sTaskExecutionContext.getConfigYaml();
+            String connectionParams = k8sTaskExecutionContext.getConnectionParams();
+            String kubeConfig = JSONUtils.getNodeString(connectionParams, "kubeConfig");
+            String configYaml = kubeConfig;
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
@@ -322,7 +335,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);
         try {
             log.info("[K8sJobExecutor-{}-{}] start to submit job", taskName, taskInstanceId);
-            job = buildK8sJob(k8STaskMainParameters);
+            buildK8sJob(k8STaskMainParameters);
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
             k8sUtils.createJob(namespaceName, job);

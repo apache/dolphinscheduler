@@ -51,7 +51,7 @@
         <httpcore.version>4.4.15</httpcore.version>
         <jackson.version>2.13.4</jackson.version>
         <protostuff.version>1.7.2</protostuff.version>
-        <byte-buddy.version>1.9.16</byte-buddy.version>
+        <byte-buddy.version>1.12.11</byte-buddy.version>
         <logback.version>1.2.11</logback.version>
         <hadoop.version>3.2.4</hadoop.version>
         <cron-utils.version>9.1.6</cron-utils.version>
@@ -117,6 +117,10 @@
         <protobuf.version>3.17.2</protobuf.version>
         <esdk-obs.version>3.23.3</esdk-obs.version>
         <system-lambda.version>1.2.1</system-lambda.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
+        <testcontainer.version>1.17.6</testcontainer.version>
+        <checker-qual.version>3.19.0</checker-qual.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
     </properties>
 
     <dependencyManagement>
@@ -893,6 +897,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.zeppelin</groupId>
+                <artifactId>zeppelin-client</artifactId>
+                <version>${zeppelin-client.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
@@ -920,8 +930,31 @@
                 <version>${system-lambda.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- test dependencies on TestContainers -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mysql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>${checker-qual.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
+
     <profiles>
         <profile>
             <id>zk-3.8</id>

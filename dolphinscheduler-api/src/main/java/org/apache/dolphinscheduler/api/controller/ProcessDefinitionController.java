@@ -286,14 +286,9 @@ public class ProcessDefinitionController extends BaseController {
                                                  @RequestParam(value = "pageSize") int pageSize,
                                                  @PathVariable(value = "code") long code) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
-        result = processDefinitionService.queryProcessDefinitionVersions(loginUser, projectCode, pageNo, pageSize,
+        checkPageParams(pageNo, pageSize);
+        return processDefinitionService.queryProcessDefinitionVersions(loginUser, projectCode, pageNo, pageSize,
                 code);
-
-        return result;
     }
 
     /**
@@ -487,10 +482,7 @@ public class ProcessDefinitionController extends BaseController {
                                                                                 @RequestParam("pageNo") Integer pageNo,
                                                                                 @RequestParam("pageSize") Integer pageSize) {
 
-        Result<PageInfo<ProcessDefinition>> result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
 
         PageInfo<ProcessDefinition> pageInfo = processDefinitionService.queryProcessDefinitionListPaging(
