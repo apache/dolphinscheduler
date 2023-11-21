@@ -95,7 +95,7 @@ public abstract class AbstractAuthenticator implements Authenticator {
             return result;
         }
 
-        log.info("Session is created and sessionId is :{}.", sessionId);
+        log.info("Session is created, userName:{}.", user.getUserName());
 
         Map<String, String> data = new HashMap<>();
         data.put(Constants.SESSION_ID, sessionId);
