@@ -55,6 +55,10 @@ public class Host implements Serializable {
     }
 
     public static Host of(@NonNull String address) {
+        int i = address.indexOf("_");
+        if (i > 0) {
+            address = address.substring(0, i);
+        }
         return new Host(address);
     }
 

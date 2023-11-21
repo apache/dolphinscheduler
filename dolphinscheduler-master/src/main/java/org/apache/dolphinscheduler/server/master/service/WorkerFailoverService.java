@@ -87,7 +87,7 @@ public class WorkerFailoverService {
         this.processService = processService;
         this.workflowExecuteThreadPool = workflowExecuteThreadPool;
         this.cacheManager = cacheManager;
-        this.localAddress = masterConfig.getMasterAddress();
+        this.localAddress = masterConfig.getId();
         this.taskInstanceDao = taskInstanceDao;
     }
 

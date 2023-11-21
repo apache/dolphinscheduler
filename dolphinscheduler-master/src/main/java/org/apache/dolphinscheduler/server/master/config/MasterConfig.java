@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -102,6 +103,8 @@ public class MasterConfig implements Validator {
     // ip:listenPort
     private String masterAddress;
 
+    private String id;
+
     // /nodes/master/ip:listenPort
     private String masterRegistryPath;
 
@@ -157,8 +160,10 @@ public class MasterConfig implements Validator {
             masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         }
 
+        masterConfig.setId(masterAddress + "_" + UUID.randomUUID().toString().replaceAll("-", ""));
+
         masterConfig.setMasterRegistryPath(
-                RegistryNodeType.MASTER.getRegistryPath() + "/" + masterConfig.getMasterAddress());
+                RegistryNodeType.MASTER.getRegistryPath() + "/" + masterConfig.getId());
         printConfig();
     }
 
@@ -181,5 +186,6 @@ public class MasterConfig implements Validator {
         log.info("Master config: masterAddress -> {} ", masterAddress);
         log.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
         log.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
+        log.info("Master config: id -> {} ", id);
     }
 }
