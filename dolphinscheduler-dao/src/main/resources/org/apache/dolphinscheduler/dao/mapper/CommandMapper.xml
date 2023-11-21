@@ -43,7 +43,7 @@
     <select id="queryCommandPageBySlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select *
         from t_ds_command
-        where id % #{masterCount} = #{thisMasterSlot}
+        where conv(left(md5(id), 4), 16, 10) % #{masterCount} = #{thisMasterSlot}
         order by process_instance_priority, id asc
             limit #{limit}
     </select>

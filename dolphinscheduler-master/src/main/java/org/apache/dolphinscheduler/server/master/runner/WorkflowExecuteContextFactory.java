@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -90,12 +91,17 @@ public class WorkflowExecuteContextFactory {
         SlotCheckState state;
         if (masterSize <= 0) {
             state = SlotCheckState.CHANGE;
-        } else if (command.getId() % masterSize == slot) {
+        } else if (hashCommandId(command.getId()) % masterSize == slot) {
             state = SlotCheckState.PASS;
         } else {
             state = SlotCheckState.INJECT;
         }
         return state;
+    }
+
+    private int hashCommandId(Integer commandId) {
+        String md5 = DigestUtils.md5Hex(String.valueOf(commandId));
+        return Integer.valueOf(md5.substring(0, 4), 16);
     }
 
 }
