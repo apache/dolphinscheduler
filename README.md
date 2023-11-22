@@ -31,6 +31,8 @@ The key features for DolphinScheduler are as follows:
   - Want to [start with Docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/start/docker)
 - For Kubernetes
   - [Start with Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/kubernetes)
+- For Terraform
+  - [Start with Terraform](deploy/terraform/README.md) 
 
 ## User Interface Screenshots
 

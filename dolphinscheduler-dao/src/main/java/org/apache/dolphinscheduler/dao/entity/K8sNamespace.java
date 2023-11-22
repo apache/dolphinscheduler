@@ -45,17 +45,6 @@ public class K8sNamespace {
     private String namespace;
 
     /**
-     * total cpu limit
-     */
-    @TableField(value = "limits_cpu")
-    private Double limitsCpu;
-
-    /**
-     * total memory limit,mi
-     */
-    private Integer limitsMemory;
-
-    /**
      * owner
      */
     @TableField(value = "user_id")
@@ -78,24 +67,6 @@ public class K8sNamespace {
      */
     @TableField("update_time")
     private Date updateTime;
-
-    /**
-     * 1.00 = 1 cpu
-     */
-    @TableField("pod_request_cpu")
-    private Double podRequestCpu = 0.0;
-
-    /**
-     * Mi
-     */
-    @TableField("pod_request_memory")
-    private Integer podRequestMemory = 0;
-
-    /**
-     * replicas
-     */
-    @TableField("pod_replicas")
-    private Integer podReplicas = 0;
 
     /**
      * cluster code

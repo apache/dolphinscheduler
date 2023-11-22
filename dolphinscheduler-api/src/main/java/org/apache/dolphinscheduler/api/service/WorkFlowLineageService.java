@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -28,7 +30,7 @@ import java.util.Set;
  */
 public interface WorkFlowLineageService {
 
-    Map<String, Object> queryWorkFlowLineageByName(long projectCode, String workFlowName);
+    List<WorkFlowLineage> queryWorkFlowLineageByName(long projectCode, String workFlowName);
 
     Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long workFlowCode);
 

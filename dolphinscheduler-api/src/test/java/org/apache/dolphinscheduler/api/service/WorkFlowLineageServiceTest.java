@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -83,9 +85,8 @@ public class WorkFlowLineageServiceTest {
         when(projectMapper.queryByCode(1L)).thenReturn(project);
         when(workFlowLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(getWorkFlowLineages());
-        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(1L, name);
-        List<WorkFlowLineage> workFlowLineageList = (List<WorkFlowLineage>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(workFlowLineageList.size() > 0);
+        List<WorkFlowLineage> workFlowLineages = workFlowLineageService.queryWorkFlowLineageByName(1L, name);
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(workFlowLineages));
     }
 
     @Test

@@ -118,6 +118,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -251,6 +252,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
 
+    @Autowired
+    private ListenerEventAlertManager listenerEventAlertManager;
+
     /**
      * create process definition
      *
@@ -306,7 +310,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         globalParams, locations, timeout, loginUser.getId());
         processDefinition.setExecutionType(executionType);
 
-        return createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
+        result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs, otherParamsJson);
+        if (result.get(Constants.STATUS) == Status.SUCCESS) {
+            listenerEventAlertManager.publishProcessDefinitionCreatedListenerEvent(loginUser, processDefinition,
+                    taskDefinitionLogs,
+                    taskRelationList);
+        }
+        return result;
     }
 
     private void createWorkflowValid(User user, ProcessDefinition processDefinition) {
@@ -563,10 +573,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                         Integer userId,
                                                                         Integer pageNo,
                                                                         Integer pageSize) {
-        Project project = projectMapper.queryByCode(projectCode);
 
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_DEFINITION);
 
         PageListingResult<ProcessDefinition> processDefinitionsPageListingResult =
                 processDefinitionDao.listingProcessDefinition(
@@ -805,8 +814,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 JSONUtils.parseObject(JSONUtils.toJsonString(processDefinition), ProcessDefinition.class);
         processDefinition.set(projectCode, name, description, globalParams, locations, timeout);
         processDefinition.setExecutionType(executionType);
-        return updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
+        result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs, otherParamsJson);
+        if (result.get(Constants.STATUS) == Status.SUCCESS) {
+            listenerEventAlertManager.publishProcessDefinitionUpdatedListenerEvent(loginUser, processDefinition,
+                    taskDefinitionLogs,
+                    taskRelationList);
+        }
+        return result;
     }
 
     /**
@@ -1071,6 +1086,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinitionDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
+        listenerEventAlertManager.publishProcessDefinitionDeletedListenerEvent(loginUser, project, processDefinition);
     }
 
     /**
