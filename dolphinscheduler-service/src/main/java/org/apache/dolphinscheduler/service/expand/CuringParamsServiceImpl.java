@@ -190,10 +190,6 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             prepareParamsMap.putAll(globalParams);
         }
 
-        if (MapUtils.isNotEmpty(varParams)) {
-            prepareParamsMap.putAll(varParams);
-        }
-
         if (MapUtils.isNotEmpty(localParams)) {
             prepareParamsMap.putAll(localParams);
         }
@@ -202,6 +198,10 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             prepareParamsMap.putAll(ParameterUtils.getUserDefParamsMap(cmdParam));
         }
 
+        if (MapUtils.isNotEmpty(varParams)) {
+            prepareParamsMap.putAll(varParams);
+        }
+        
         Iterator<Map.Entry<String, Property>> iter = prepareParamsMap.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, Property> en = iter.next();
