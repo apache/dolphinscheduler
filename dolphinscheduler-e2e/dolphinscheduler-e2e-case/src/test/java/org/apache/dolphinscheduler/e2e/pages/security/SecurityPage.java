@@ -53,12 +53,6 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(7) > .n-menu-item-content")
     private WebElement menuEnvironmentManage;
 
-    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(8) > .n-menu-item-content")
-    private WebElement menuClusterManage;
-
-    @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(9) > .n-menu-item-content")
-    private WebElement menuNamespaceManage;
-
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(10) > .n-menu-item-content")
     private WebElement menuTokenManage;
 
@@ -102,25 +96,11 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
             return tab.cast(new EnvironmentPage(driver));
         }
 
-        if (tab == ClusterPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuClusterManage));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuClusterManage());
-            return tab.cast(new ClusterPage(driver));
-        }
-
         if (tab == TokenPage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuTokenManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuTokenManage());
             return tab.cast(new TokenPage(driver));
-        }
-
-        if (tab == NamespacePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuNamespaceManage));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuNamespaceManage());
-            return tab.cast(new NamespacePage(driver));
         }
 
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());
