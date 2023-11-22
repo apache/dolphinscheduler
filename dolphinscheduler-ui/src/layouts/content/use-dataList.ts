@@ -321,16 +321,6 @@ export function useDataList() {
                   icon: renderIcon(EnvironmentOutlined)
                 },
                 {
-                  label: t('menu.cluster_manage'),
-                  key: '/security/cluster-manage',
-                  icon: renderIcon(ClusterOutlined)
-                },
-                {
-                  label: t('menu.k8s_namespace_manage'),
-                  key: '/security/k8s-namespace-manage',
-                  icon: renderIcon(CloudServerOutlined)
-                },
-                {
                   label: t('menu.token_manage'),
                   key: '/security/token-manage',
                   icon: renderIcon(SafetyOutlined)
