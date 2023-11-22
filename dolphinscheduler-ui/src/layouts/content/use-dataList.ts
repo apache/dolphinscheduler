@@ -45,9 +45,7 @@ import {
   GroupOutlined,
   ContainerOutlined,
   ApartmentOutlined,
-  BarsOutlined,
-  CloudServerOutlined,
-  ClusterOutlined
+  BarsOutlined
 } from '@vicons/antd'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/store/user/user'
