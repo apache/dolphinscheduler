@@ -40,6 +40,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.google.common.collect.Lists;
+
 /**
  * command mapper test
  */
@@ -147,13 +149,12 @@ public class CommandMapperTest extends BaseDaoTest {
 
         createCommandMap(count, CommandType.START_PROCESS, processDefinition.getCode());
 
-        Long[] projectCodeArray = {processDefinition.getProjectCode()};
-
         Date startTime = DateUtils.stringToDate("2019-12-29 00:10:00");
 
         Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
 
-        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime, projectCodeArray);
+        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime,
+                Lists.newArrayList(processDefinition.getProjectCode()));
 
         Assertions.assertTrue(actualCommandCounts.size() >= 1);
     }

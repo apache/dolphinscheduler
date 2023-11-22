@@ -24,6 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -38,6 +40,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * data analysis controller test
@@ -60,7 +64,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testCountTaskState() throws Exception {
+    public void testGetTaskInstanceStateCount() throws Exception {
         int projectId = createProject();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -73,15 +77,17 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
-        logger.info(mvcResult.getResponse().getContentAsString());
-
+        Result<TaskInstanceCountVo> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<TaskInstanceCountVo>>() {
+                });
+        assertThat(result.getCode())
+                .isNotNull()
+                .isEqualTo(Status.SUCCESS.getCode());
         projectMapper.deleteById(projectId);
     }
 
     @Test
-    public void testCountProcessInstanceState() throws Exception {
+    public void testGetWorkflowInstanceStateCount() throws Exception {
         int projectId = createProject();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -95,9 +101,11 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        Result<WorkflowInstanceCountVo> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<WorkflowInstanceCountVo>>() {
+                });
+        assertThat(result.getCode())
+                .isEqualTo(Status.SUCCESS.getCode());
 
         projectMapper.deleteById(projectId);
     }

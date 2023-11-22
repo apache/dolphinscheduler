@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
 import java.util.List;
@@ -123,7 +123,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         User un = userMapper.queryByUserNameAccurately("un");
         TaskDefinition taskDefinition = insertOne(un.getId());
 
-        List<DefinitionGroupByUser> users =
+        List<WorkflowDefinitionCountDto> users =
                 taskDefinitionMapper.countDefinitionGroupByUser(new Long[]{taskDefinition.getProjectCode()});
         Assertions.assertNotEquals(0, users.size());
 

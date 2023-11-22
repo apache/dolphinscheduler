@@ -337,10 +337,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                                       Integer pageSize) {
 
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
-                ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
 
         int[] statusArray = null;
         // filter by state
@@ -356,7 +354,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         IPage<ProcessInstance> processInstanceList = processInstanceMapper.queryProcessInstanceListPaging(
                 page,
-                project.getCode(),
+                projectCode,
                 processDefineCode,
                 searchVal,
                 executorName,
@@ -685,14 +683,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine,
                                                      String globalParams,
                                                      String locations, int timeout) {
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.INSTANCE_UPDATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
+                ApiFuncIdentificationConstant.INSTANCE_UPDATE);
+        Map<String, Object> result = new HashMap<>();
         // check process instance exists
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
                 .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId));

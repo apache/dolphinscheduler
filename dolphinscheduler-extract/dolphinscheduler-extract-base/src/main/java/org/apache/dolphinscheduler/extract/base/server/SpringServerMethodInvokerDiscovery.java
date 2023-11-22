@@ -60,7 +60,7 @@ public class SpringServerMethodInvokerDiscovery implements BeanPostProcessor {
             }
             ServerMethodInvoker methodInvoker = new ServerMethodInvokerImpl(bean, method);
             nettyRemotingServer.registerMethodInvoker(methodInvoker);
-            log.info("Register ServerMethodInvoker: {} to bean: {}", methodInvoker.getMethodIdentify(), beanName);
+            log.debug("Register ServerMethodInvoker: {} to bean: {}", methodInvoker.getMethodIdentify(), beanName);
         }
     }
 }

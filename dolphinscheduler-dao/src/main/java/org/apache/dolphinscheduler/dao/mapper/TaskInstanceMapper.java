@@ -21,10 +21,12 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -77,9 +79,9 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
      * @param projectCodes Project codes list to filter
      * @return List of ExecuteStatusCount
      */
-    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
-                                                                  @Param("endTime") Date endTime,
-                                                                  @Param("projectCodes") Long[] projectCodes);
+    List<TaskInstanceStatusCountDto> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
+                                                                          @Param("endTime") Date endTime,
+                                                                          @Param("projectCodes") Collection<Long> projectCodes);
 
     /**
      * Statistics task instance group by given project ids list by start time

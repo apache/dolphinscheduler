@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -239,7 +241,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
-    public void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) {
+    public void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) {
+        if (projectCode == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
         Project project = projectMapper.queryByCode(projectCode);
         checkProjectAndAuthThrowException(loginUser, project, permission);
     }
@@ -833,5 +838,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public List<Long> getAuthorizedProjectCodes(User loginUser) {
+        if (loginUser == null) {
+            throw new IllegalArgumentException("loginUser can not be null");
+        }
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return Collections.emptyList();
+        }
+        return projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
     }
 }

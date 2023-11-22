@@ -131,24 +131,27 @@
             #{i}
         </foreach>
     </select>
-    <select id="countDefinitionByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
-        SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
+
+    <select id="countDefinitionByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
+        SELECT user_id as user_id, tu.user_name as user_name, count(0) as count
         FROM t_ds_process_definition td
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
-        <if test="projectCodes != null and projectCodes.length != 0">
+        <if test="projectCodes != null and projectCodes.size() != 0">
             and td.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         group by td.user_id,tu.user_name
-    </select><select id="countDefinitionByProjectCodesV2" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+    </select>
+
+    <select id="countDefinitionByProjectCodesV2" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
         SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
         FROM t_ds_process_definition td
         JOIN t_ds_user tu on tu.id=td.user_id
         where 1 = 1
-        <if test="projectCodes != null and projectCodes.length != 0">
+        <if test="projectCodes != null and projectCodes.size() != 0">
             and td.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}

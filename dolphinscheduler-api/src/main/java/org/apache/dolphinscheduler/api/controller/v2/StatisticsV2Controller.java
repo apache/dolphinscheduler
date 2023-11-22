@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_WORKFLOW_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ONE_TASK_STATES_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ONE_WORKFLOW_STATE_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_STATES_COUNT_ERROR;
@@ -33,10 +32,6 @@ import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,20 +56,6 @@ public class StatisticsV2Controller extends BaseController {
 
     @Autowired
     private DataAnalysisService dataAnalysisService;
-
-    /**
-     * query all workflow count
-     * @param loginUser login user
-     * @return workflow count
-     */
-    @Operation(summary = "queryAllWorkflowCount", description = "QUERY_ALL_WORKFLOW_COUNT")
-    @GetMapping(value = "/workflows/count")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_WORKFLOW_COUNT_ERROR)
-    public Result queryWorkflowInstanceCounts(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = dataAnalysisService.queryAllWorkflowCounts(loginUser);
-        return returnDataList(result);
-    }
 
     /**
      * query all workflow states count
@@ -157,13 +138,8 @@ public class StatisticsV2Controller extends BaseController {
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     public Result<DefineUserDto> countDefinitionByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestBody(required = false) StatisticsStateRequest statisticsStateRequest) {
-        String projectName = statisticsStateRequest.getProjectName();
-        Long projectCode = statisticsStateRequest.getProjectCode();
-        if (null == projectCode && !StringUtils.isBlank(projectName)) {
-            projectCode = dataAnalysisService.getProjectCodeByName(projectName);
-        }
-        DefineUserDto defineUserDto = dataAnalysisService.countDefinitionByUserV2(loginUser, projectCode, null, null);
-        return Result.success(defineUserDto);
+        // todo: directly use StatisticsStateRequest
+        throw new UnsupportedOperationException("not supported");
     }
 
     /**
@@ -179,7 +155,7 @@ public class StatisticsV2Controller extends BaseController {
     @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     public Result<DefineUserDto> countDefinitionByUserId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                          @PathVariable("userId") Integer userId) {
-        DefineUserDto defineUserDto = dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, null);
+        DefineUserDto defineUserDto = dataAnalysisService.countDefinitionByUserV2(loginUser, userId, null);
         return Result.success(defineUserDto);
     }
 
@@ -199,7 +175,7 @@ public class StatisticsV2Controller extends BaseController {
                                                             @PathVariable("userId") Integer userId,
                                                             @PathVariable("releaseState") Integer releaseState) {
         DefineUserDto defineUserDto =
-                dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, releaseState);
+                dataAnalysisService.countDefinitionByUserV2(loginUser, userId, releaseState);
         return Result.success(defineUserDto);
     }
 }

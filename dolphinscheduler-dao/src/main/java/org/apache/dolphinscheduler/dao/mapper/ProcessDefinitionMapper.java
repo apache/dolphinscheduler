@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -158,7 +158,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param projectCodes projectCodes
      * @return definition group by user
      */
-    List<DefinitionGroupByUser> countDefinitionByProjectCodes(@Param("projectCodes") Long[] projectCodes);
+    List<WorkflowDefinitionCountDto> countDefinitionByProjectCodes(@Param("projectCodes") Collection<Long> projectCodes);
 
     /**
      * Statistics process definition group by project codes list
@@ -170,9 +170,9 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param releaseState releaseState
      * @return definition group by user
      */
-    List<DefinitionGroupByUser> countDefinitionByProjectCodesV2(@Param("projectCodes") Long[] projectCodes,
-                                                                @Param("userId") Integer userId,
-                                                                @Param("releaseState") Integer releaseState);
+    List<WorkflowDefinitionCountDto> countDefinitionByProjectCodesV2(@Param("projectCodes") List<Long> projectCodes,
+                                                                     @Param("userId") Integer userId,
+                                                                     @Param("releaseState") Integer releaseState);
 
     /**
      * list all resource ids

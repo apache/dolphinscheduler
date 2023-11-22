@@ -144,9 +144,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                       Integer pageNo,
                                       Integer pageSize) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_INSTANCE);
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.getCode()};
@@ -160,7 +159,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             // stream task without process instance
             taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
                     page,
-                    project.getCode(),
+                    projectCode,
                     processDefinitionName,
                     searchVal,
                     taskName,
@@ -174,7 +173,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         } else {
             taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                     page,
-                    project.getCode(),
+                    projectCode,
                     processInstanceId,
                     processInstanceName,
                     searchVal,

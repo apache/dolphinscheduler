@@ -51,7 +51,7 @@
         order by create_time desc
     </select>
 
-    <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser">
+    <select id="countDefinitionGroupByUser" resultType="org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto">
         SELECT td.user_id as user_id, tu.user_name as user_name, count(0) as count
         FROM t_ds_task_definition td
         JOIN t_ds_user tu on tu.id=td.user_id

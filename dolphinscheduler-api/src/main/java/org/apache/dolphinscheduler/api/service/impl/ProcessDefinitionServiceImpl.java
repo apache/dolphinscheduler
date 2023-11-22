@@ -573,10 +573,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                                                                         Integer userId,
                                                                         Integer pageNo,
                                                                         Integer pageSize) {
-        Project project = projectMapper.queryByCode(projectCode);
 
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_DEFINITION);
 
         PageListingResult<ProcessDefinition> processDefinitionsPageListingResult =
                 processDefinitionDao.listingProcessDefinition(
