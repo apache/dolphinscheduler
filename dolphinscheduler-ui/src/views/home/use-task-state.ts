@@ -20,7 +20,7 @@ import { format } from 'date-fns'
 import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { countTaskState } from '@/service/modules/projects-analysis'
-import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
+import type {TaskInstanceCountVo} from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 import { reactive, ref } from 'vue'
 
@@ -37,23 +37,21 @@ export function useTaskState() {
       countTaskState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
         endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
-        projectCode: 0
-      }).then((res: TaskStateRes): StateData => {
-        const table = res.taskCountDtos.map((item, unused) => {
+      }).then((res: TaskInstanceCountVo): StateData => {
+        const table = res.taskInstanceStatusCounts.map((item, unused) => {
           return {
-            state: t('home.' + toLower(item.taskStateType)),
+            state: t('home.' + toLower(item.state)),
             number: item.count
           }
         })
 
-        const chart = res.taskCountDtos.map((item) => {
+        const chart = res.taskInstanceStatusCounts.map((item) => {
           return {
             value: item.count,
-            name: t('home.' + toLower(item.taskStateType))
+            name: t('home.' + toLower(item.state))
           }
         })
         taskVariables.taskLoadingRef = false
-
         return { table, chart }
       }),
       { table: [], chart: [] }

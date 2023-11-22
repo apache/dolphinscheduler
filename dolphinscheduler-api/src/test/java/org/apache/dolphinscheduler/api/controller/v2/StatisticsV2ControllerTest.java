@@ -25,18 +25,14 @@ import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -50,21 +46,6 @@ public class StatisticsV2ControllerTest extends AbstractControllerTest {
     @Mock
     private DataAnalysisServiceImpl dataAnalysisService;
 
-    @Test
-    public void testQueryWorkflowInstanceCounts() {
-        User loginUser = getLoginUser();
-        int count = 0;
-        Map<String, Object> result = new HashMap<>();
-        result.put("data", "AllWorkflowCounts = " + count);
-        putMsg(result, Status.SUCCESS);
-
-        when(dataAnalysisService.queryAllWorkflowCounts(loginUser)).thenReturn(result);
-
-        Result result1 = statisticsV2Controller.queryWorkflowInstanceCounts(loginUser);
-
-        assertTrue(result1.isSuccess());
-
-    }
     @Test
     public void testQueryWorkflowStatesCounts() {
         User loginUser = getLoginUser();
@@ -121,27 +102,14 @@ public class StatisticsV2ControllerTest extends AbstractControllerTest {
         assertTrue(result1.isSuccess());
 
     }
-    @Test
-    public void testCountDefinitionByUser() {
-        User loginUser = getLoginUser();
 
-        StatisticsStateRequest statisticsStateRequest = new StatisticsStateRequest();
-
-        List<DefinitionGroupByUser> definitionGroupByUsers = new ArrayList<>();
-        DefineUserDto taskCountResult = new DefineUserDto(definitionGroupByUsers);
-        when(dataAnalysisService.countDefinitionByUserV2(loginUser, statisticsStateRequest.getProjectCode(), null,
-                null)).thenReturn(taskCountResult);
-
-        assertDoesNotThrow(() -> statisticsV2Controller.countDefinitionByUser(loginUser, statisticsStateRequest));
-
-    }
     @Test
     public void testCountDefinitionByUserId() {
         User loginUser = getLoginUser();
         Integer userId = 1;
 
         DefineUserDto defineUserDto = new DefineUserDto(Collections.emptyList());
-        when(dataAnalysisService.countDefinitionByUserV2(loginUser, null, userId, null)).thenReturn(defineUserDto);
+        when(dataAnalysisService.countDefinitionByUserV2(loginUser, userId, null)).thenReturn(defineUserDto);
 
         assertDoesNotThrow(() -> statisticsV2Controller.countDefinitionByUserId(loginUser, userId));
     }
