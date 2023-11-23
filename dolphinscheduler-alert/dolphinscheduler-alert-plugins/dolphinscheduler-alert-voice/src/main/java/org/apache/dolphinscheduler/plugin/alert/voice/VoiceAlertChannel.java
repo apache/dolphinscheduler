@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.alert.voice;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertInfo;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+
+import java.util.Map;
+
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_ACCESS_KEY_ID;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_ACCESS_KEY_SECRET;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_ADDRESS;
@@ -24,22 +31,12 @@ import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_CALLED_SHOW_NUMBER;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_TTS_CODE;
 
-import org.apache.dolphinscheduler.alert.api.AlertChannel;
-import org.apache.dolphinscheduler.alert.api.AlertData;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
-import org.apache.dolphinscheduler.alert.api.AlertResult;
-
-import java.util.Map;
-
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public final class VoiceAlertChannel implements AlertChannel {
 
     @Override
     public AlertResult process(AlertInfo info) {
 
-        AlertData alert = info.getAlertData();
         Map<String, String> paramsMap = info.getAlertParams();
         if (null == paramsMap) {
             return new AlertResult("false", "aliyun-voice params is null");
@@ -48,7 +45,7 @@ public final class VoiceAlertChannel implements AlertChannel {
         VoiceSender voiceSender = new VoiceSender(voiceParam);
 
         AlertResult alertResult = voiceSender.send();
-        Boolean flag = Boolean.parseBoolean(String.valueOf(alertResult.getStatus()));
+        boolean flag = Boolean.parseBoolean(String.valueOf(alertResult.getStatus()));
         if (flag) {
             log.info("alert send success");
             alertResult.setStatus("true");
