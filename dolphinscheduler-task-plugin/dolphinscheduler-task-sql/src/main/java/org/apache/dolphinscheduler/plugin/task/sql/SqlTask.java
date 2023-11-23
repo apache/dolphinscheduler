@@ -487,7 +487,7 @@ public class SqlTask extends AbstractTask {
             }
             String paramName = m.group(1);
             String paramValue = sqlParamsMap.get(paramName).getValue();
-            m.appendReplacement(sb,"");
+            m.appendReplacement(sb, "");
             sb.append(paramValue);
             m.appendTail(sb);
             content = sb.toString();
