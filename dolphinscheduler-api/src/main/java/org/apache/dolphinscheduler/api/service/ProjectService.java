@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,7 +71,7 @@ public interface ProjectService {
 
     void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
 
-    void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) throws ServiceException;
+    void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) throws ServiceException;
 
     boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String perm);
 
@@ -213,4 +214,6 @@ public interface ProjectService {
      * @return project list
      */
     Result queryAllProjectListForDependent();
+
+    List<Long> getAuthorizedProjectCodes(User loginUser);
 }

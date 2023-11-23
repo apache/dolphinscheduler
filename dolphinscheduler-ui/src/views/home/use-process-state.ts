@@ -20,7 +20,7 @@ import { countProcessInstanceState } from '@/service/modules/projects-analysis'
 import { format } from 'date-fns'
 import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
-import type { TaskStateRes } from '@/service/modules/projects-analysis/types'
+import type { WorkflowInstanceCountVo } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 import { reactive, ref } from 'vue'
 
@@ -37,19 +37,18 @@ export function useProcessState() {
       countProcessInstanceState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
         endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
-        projectCode: 0
-      }).then((res: TaskStateRes): StateData => {
-        const table = res.taskCountDtos.map((item) => {
+      }).then((res: WorkflowInstanceCountVo): StateData => {
+        const table = res.workflowInstanceStatusCounts.map((item) => {
           return {
-            state: t('home.' + toLower(item.taskStateType)),
+            state: t('home.' + toLower(item.state)),
             number: item.count
           }
         })
 
-        const chart = res.taskCountDtos.map((item) => {
+        const chart = res.workflowInstanceStatusCounts.map((item) => {
           return {
             value: item.count,
-            name: t('home.' + toLower(item.taskStateType))
+            name: t('home.' + toLower(item.state))
           }
         })
 

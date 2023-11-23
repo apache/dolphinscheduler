@@ -101,17 +101,17 @@ public class LoggerServiceTest {
         // PROJECT_NOT_EXIST
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
+        Project project = getProject(1);
+        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         try {
             Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
-                    .checkProjectAndAuthThrowException(loginUser, null, VIEW_LOG);
+                    .checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
             loggerService.queryLog(loginUser, 1, 1, 1);
         } catch (ServiceException serviceException) {
             Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
         }
 
         // USER_NO_OPERATION_PERM
-        Project project = getProject(1);
-        when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         try {
             Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
                     .checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
@@ -160,7 +160,7 @@ public class LoggerServiceTest {
         taskInstance.setLogPath("/temp/log");
         try {
             Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
-                    .checkProjectAndAuthThrowException(loginUser, null, DOWNLOAD_LOG);
+                    .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), DOWNLOAD_LOG);
             loggerService.queryLog(loginUser, 1, 1, 1);
         } catch (ServiceException serviceException) {
             Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
