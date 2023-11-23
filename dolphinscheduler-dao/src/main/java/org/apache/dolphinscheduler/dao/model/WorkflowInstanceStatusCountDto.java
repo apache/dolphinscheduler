@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.queue;
+package org.apache.dolphinscheduler.dao.model;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
-import java.util.List;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * queue List response
- */
 @Data
-public class QueueListResponse extends Result {
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowInstanceStatusCountDto {
 
-    private List<Queue> data;
+    private WorkflowExecutionStatus state;
 
-    public QueueListResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData(JSONUtils.toList(JSONUtils.toJsonString(result.getData()), Project.class));
-    }
+    private int count;
+
 }

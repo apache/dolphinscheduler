@@ -15,28 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 
-public class CreateTokenResponse extends Result {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.function.Executable;
 
-    private AccessToken data;
+public class AssertionsHelper extends Assertions {
 
-    public CreateTokenResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((AccessToken) result.getData());
+    public static void assertThrowsServiceException(Status status, Executable executable) {
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, executable);
+        Assertions.assertEquals(status.getCode(), exception.getCode());
     }
 
-    @Override
-    public AccessToken getData() {
-        return data;
+    public static void assertDoesNotThrow(Executable executable) {
+        Assertions.assertDoesNotThrow(executable);
     }
 
-    public void setData(AccessToken data) {
-        this.data = data;
-    }
 }

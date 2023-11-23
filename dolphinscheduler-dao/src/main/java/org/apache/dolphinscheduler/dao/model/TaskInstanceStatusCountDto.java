@@ -15,25 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.queue;
+package org.apache.dolphinscheduler.dao.model;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * queue create response
- */
 @Data
-public class QueueCreateResponse extends Result {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskInstanceStatusCountDto {
 
-    private Queue data;
+    private TaskExecutionStatus state;
 
-    public QueueCreateResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((Queue) result.getData());
-    }
+    private int count;
 }
