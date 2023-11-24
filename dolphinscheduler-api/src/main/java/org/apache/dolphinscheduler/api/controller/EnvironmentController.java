@@ -24,11 +24,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ENVIRONMENT_ERR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ENVIRONMENT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_ENVIRONMENT_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -80,16 +80,14 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ENVIRONMENT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam("name") String name,
-                                    @RequestParam("config") String config,
-                                    @RequestParam(value = "description", required = false) String description,
-                                    @RequestParam(value = "workerGroups", required = false) String workerGroups) {
+    public Result<Long> createEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam("name") String name,
+                                          @RequestParam("config") String config,
+                                          @RequestParam(value = "description", required = false) String description,
+                                          @RequestParam(value = "workerGroups", required = false) String workerGroups) {
 
-        Map<String, Object> result =
-                environmentService.createEnvironment(loginUser, name, config, description, workerGroups);
-        return returnDataList(result);
+        Long environmentCode = environmentService.createEnvironment(loginUser, name, config, description, workerGroups);
+        return Result.success(environmentCode);
     }
 
     /**
@@ -113,16 +111,15 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ENVIRONMENT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam("code") Long code,
-                                    @RequestParam("name") String name,
-                                    @RequestParam("config") String config,
-                                    @RequestParam(value = "description", required = false) String description,
-                                    @RequestParam(value = "workerGroups", required = false) String workerGroups) {
-        Map<String, Object> result =
+    public Result<Environment> updateEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                 @RequestParam("code") Long code,
+                                                 @RequestParam("name") String name,
+                                                 @RequestParam("config") String config,
+                                                 @RequestParam(value = "description", required = false) String description,
+                                                 @RequestParam(value = "workerGroups", required = false) String workerGroups) {
+        Environment environment =
                 environmentService.updateEnvironmentByCode(loginUser, code, name, config, description, workerGroups);
-        return returnDataList(result);
+        return Result.success(environment);
     }
 
     /**
@@ -138,7 +135,6 @@ public class EnvironmentController extends BaseController {
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_BY_CODE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryEnvironmentByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("environmentCode") Long environmentCode) {
 
@@ -163,19 +159,14 @@ public class EnvironmentController extends BaseController {
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryEnvironmentListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam(value = "searchVal", required = false) String searchVal,
                                              @RequestParam("pageSize") Integer pageSize,
                                              @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = environmentService.queryEnvironmentListPaging(loginUser, pageNo, pageSize, searchVal);
-        return result;
+        return environmentService.queryEnvironmentListPaging(loginUser, pageNo, pageSize, searchVal);
     }
 
     /**
@@ -192,7 +183,6 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ENVIRONMENT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("environmentCode") Long environmentCode) {
 
@@ -210,7 +200,6 @@ public class EnvironmentController extends BaseController {
     @GetMapping(value = "/query-environment-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllEnvironmentList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = environmentService.queryAllEnvironmentList(loginUser);
         return returnDataList(result);
@@ -230,7 +219,6 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/verify-environment")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_ENVIRONMENT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "environmentName") String environmentName) {
         Map<String, Object> result = environmentService.verifyEnvironment(environmentName);

@@ -26,15 +26,19 @@ import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -42,6 +46,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
@@ -63,6 +68,18 @@ public class AlertBootstrapServiceTest {
     @InjectMocks
     private AlertBootstrapService alertBootstrapService;
 
+    private static final String PLUGIN_INSTANCE_PARAMS =
+            "{\"User\":\"xx\",\"receivers\":\"xx\",\"sender\":\"xx\",\"smtpSslTrust\":\"*\",\"enableSmtpAuth\":\"true\",\"receiverCcs\":null,\"showType\":\"table\",\"starttlsEnable\":\"false\",\"serverPort\":\"25\",\"serverHost\":\"xx\",\"Password\":\"xx\",\"sslEnable\":\"false\"}";
+
+    private static final String PLUGIN_INSTANCE_NAME = "alert-instance-mail";
+    private static final String TITLE = "alert mail test TITLE";
+    private static final String CONTENT = "alert mail test CONTENT";
+    private static final List<ListenerEvent> EVENTS = new ArrayList<>();
+
+    private static final int PLUGIN_DEFINE_ID = 1;
+
+    private static final int ALERT_GROUP_ID = 1;
+
     @BeforeEach
     public void before() {
         MockitoAnnotations.initMocks(this);
@@ -70,17 +87,12 @@ public class AlertBootstrapServiceTest {
 
     @Test
     public void testSyncHandler() {
-
-        int alertGroupId = 1;
-        String title = "alert mail test title";
-        String content = "alert mail test content";
-
         // 1.alert instance does not exist
-        when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(null);
+        when(alertDao.listInstanceByAlertGroupId(ALERT_GROUP_ID)).thenReturn(null);
         when(alertConfig.getWaitTimeout()).thenReturn(0);
 
         AlertSendResponse alertSendResponse =
-                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -101,7 +113,7 @@ public class AlertBootstrapServiceTest {
         when(pluginDao.getPluginDefineById(pluginDefineId)).thenReturn(pluginDefine);
 
         alertSendResponse =
-                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -113,7 +125,7 @@ public class AlertBootstrapServiceTest {
         when(alertConfig.getWaitTimeout()).thenReturn(0);
 
         alertSendResponse =
-                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -126,7 +138,7 @@ public class AlertBootstrapServiceTest {
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
         alertSendResponse =
-                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, WarningType.ALL.getCode());
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -140,7 +152,7 @@ public class AlertBootstrapServiceTest {
         when(alertConfig.getWaitTimeout()).thenReturn(5000);
 
         alertSendResponse =
-                alertBootstrapService.syncHandler(alertGroupId, title, content, WarningType.ALL.getCode());
+                alertBootstrapService.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, WarningType.ALL.getCode());
         Assertions.assertTrue(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -149,15 +161,12 @@ public class AlertBootstrapServiceTest {
 
     @Test
     public void testRun() {
-        int alertGroupId = 1;
-        String title = "alert mail test title";
-        String content = "alert mail test content";
         List<Alert> alertList = new ArrayList<>();
         Alert alert = new Alert();
         alert.setId(1);
-        alert.setAlertGroupId(alertGroupId);
-        alert.setTitle(title);
-        alert.setContent(content);
+        alert.setAlertGroupId(ALERT_GROUP_ID);
+        alert.setTitle(TITLE);
+        alert.setContent(CONTENT);
         alert.setWarningType(WarningType.FAILURE);
         alertList.add(alert);
 
@@ -170,7 +179,7 @@ public class AlertBootstrapServiceTest {
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance(
                 pluginDefineId, pluginInstanceParams, pluginInstanceName);
         alertInstanceList.add(alertPluginInstance);
-        when(alertDao.listInstanceByAlertGroupId(alertGroupId)).thenReturn(alertInstanceList);
+        when(alertDao.listInstanceByAlertGroupId(ALERT_GROUP_ID)).thenReturn(alertInstanceList);
 
         String pluginName = "alert-plugin-mail";
         PluginDefine pluginDefine = new PluginDefine(pluginName, "1", null);
@@ -185,5 +194,21 @@ public class AlertBootstrapServiceTest {
         Assertions.assertTrue(Boolean.parseBoolean(alertResult.getStatus()));
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(new ArrayList<>());
         alertBootstrapService.send(alertList);
+    }
+
+    @Test
+    public void testSendAlert() {
+        AlertResult sendResult = new AlertResult();
+        sendResult.setStatus(String.valueOf(true));
+        sendResult.setMessage(String.format("Alert Plugin %s send success", PLUGIN_INSTANCE_NAME));
+        AlertChannel alertChannelMock = mock(AlertChannel.class);
+        when(alertChannelMock.process(Mockito.any())).thenReturn(sendResult);
+        when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
+        Map<String, String> paramsMap = JSONUtils.toMap(PLUGIN_INSTANCE_PARAMS);
+        MockedStatic<PluginParamsTransfer> pluginParamsTransferMockedStatic =
+                Mockito.mockStatic(PluginParamsTransfer.class);
+        pluginParamsTransferMockedStatic.when(() -> PluginParamsTransfer.getPluginParamsMap(PLUGIN_INSTANCE_PARAMS))
+                .thenReturn(paramsMap);
+        alertBootstrapService.syncTestSend(PLUGIN_DEFINE_ID, PLUGIN_INSTANCE_PARAMS);
     }
 }

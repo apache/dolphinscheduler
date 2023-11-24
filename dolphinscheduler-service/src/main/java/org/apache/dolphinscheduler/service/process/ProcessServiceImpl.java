@@ -115,6 +115,11 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.master.IMasterLogService;
+import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
+import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -125,15 +130,12 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.remote.command.workflow.WorkflowStateEventChangeRequest;
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
-import org.apache.dolphinscheduler.remote.utils.Host;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
-import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
@@ -145,6 +147,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -271,9 +274,6 @@ public class ProcessServiceImpl implements ProcessService {
     private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     @Autowired
-    StateEventCallbackService stateEventCallbackService;
-
-    @Autowired
     private EnvironmentMapper environmentMapper;
 
     @Autowired
@@ -293,9 +293,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private CuringParamsService curingGlobalParamsService;
-
-    @Autowired
-    private LogClient logClient;
 
     @Autowired
     private CommandService commandService;
@@ -391,12 +388,14 @@ public class ProcessServiceImpl implements ProcessService {
                 boolean update = processInstanceDao.updateById(info);
                 // determine whether the process is normal
                 if (update) {
-                    WorkflowStateEventChangeRequest workflowStateEventChangeRequest =
-                            new WorkflowStateEventChangeRequest(
-                                    info.getId(), 0, info.getState(), info.getId(), 0);
                     try {
-                        Host host = new Host(info.getHost());
-                        stateEventCallbackService.sendResult(host, workflowStateEventChangeRequest.convert2Command());
+                        final ITaskInstanceExecutionEventListener iTaskInstanceExecutionEventListener =
+                                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(info.getHost(),
+                                        ITaskInstanceExecutionEventListener.class);
+                        final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent =
+                                new WorkflowInstanceStateChangeEvent(info.getId(), 0, info.getState(), info.getId(), 0);
+                        iTaskInstanceExecutionEventListener
+                                .onWorkflowInstanceInstanceStateChange(workflowInstanceStateChangeEvent);
                     } catch (Exception e) {
                         log.error("sendResultError", e);
                     }
@@ -517,7 +516,15 @@ public class ProcessServiceImpl implements ProcessService {
             if (StringUtils.isEmpty(taskInstance.getHost()) || StringUtils.isEmpty(taskLogPath)) {
                 continue;
             }
-            logClient.removeTaskLog(Host.of(taskInstance.getHost()), taskLogPath);
+            if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
+                IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
+                        .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
+                masterLogService.removeLogicTaskInstanceLog(taskLogPath);
+            } else {
+                IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
+                        .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
+                iWorkerLogService.removeTaskInstanceLog(taskLogPath);
+            }
         }
     }
 
@@ -525,51 +532,26 @@ public class ProcessServiceImpl implements ProcessService {
      * recursive query sub process definition id by parent id.
      *
      * @param parentCode parentCode
-     * @param ids        ids
      */
     @Override
-    public void recurseFindSubProcess(long parentCode, List<Long> ids) {
+    public List<Long> findAllSubWorkflowDefinitionCode(long parentCode) {
         List<TaskDefinition> taskNodeList = taskDefinitionDao.getTaskDefinitionListByDefinition(parentCode);
+        if (CollectionUtils.isEmpty(taskNodeList)) {
+            return Collections.emptyList();
+        }
+        List<Long> subWorkflowDefinitionCodes = new ArrayList<>();
 
-        if (taskNodeList != null && !taskNodeList.isEmpty()) {
-
-            for (TaskDefinition taskNode : taskNodeList) {
-                String parameter = taskNode.getTaskParams();
-                ObjectNode parameterJson = JSONUtils.parseObject(parameter);
-                if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE) != null) {
-                    SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
-                    ids.add(subProcessParam.getProcessDefinitionCode());
-                    recurseFindSubProcess(subProcessParam.getProcessDefinitionCode(), ids);
-                }
+        for (TaskDefinition taskNode : taskNodeList) {
+            String parameter = taskNode.getTaskParams();
+            ObjectNode parameterJson = JSONUtils.parseObject(parameter);
+            if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE) != null) {
+                SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
+                long subWorkflowDefinitionCode = subProcessParam.getProcessDefinitionCode();
+                subWorkflowDefinitionCodes.add(subWorkflowDefinitionCode);
+                subWorkflowDefinitionCodes.addAll(findAllSubWorkflowDefinitionCode(subWorkflowDefinitionCode));
             }
         }
-    }
-
-    /**
-     * get schedule time from command
-     *
-     * @param command  command
-     * @param cmdParam cmdParam map
-     * @return date
-     */
-    private Date getScheduleTime(Command command, Map<String, String> cmdParam) throws CronParseException {
-        Date scheduleTime = command.getScheduleTime();
-        if (scheduleTime == null && cmdParam != null && cmdParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
-
-            Date start = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE));
-            Date end = DateUtils.stringToDate(cmdParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE));
-            List<Schedule> schedules =
-                    queryReleaseSchedulerListByProcessDefinitionCode(command.getProcessDefinitionCode());
-            List<Date> complementDateList = CronUtils.getSelfFireDateList(start, end, schedules);
-
-            if (CollectionUtils.isNotEmpty(complementDateList)) {
-                scheduleTime = complementDateList.get(0);
-            } else {
-                log.error("set scheduler time error: complement date list is empty, command: {}",
-                        command.toString());
-            }
-        }
-        return scheduleTime;
+        return subWorkflowDefinitionCodes;
     }
 
     /**
@@ -1857,8 +1839,8 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Override
     public int switchProcessTaskRelationVersion(ProcessDefinition processDefinition) {
-        List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper
-                .queryByProcessCode(processDefinition.getProjectCode(), processDefinition.getCode());
+        List<ProcessTaskRelation> processTaskRelationList =
+                processTaskRelationMapper.queryByProcessCode(processDefinition.getCode());
         if (!processTaskRelationList.isEmpty()) {
             processTaskRelationMapper.deleteByCode(processDefinition.getProjectCode(), processDefinition.getCode());
         }
@@ -2082,7 +2064,7 @@ public class ProcessServiceImpl implements ProcessService {
         int insert = taskRelationList.size();
         if (Boolean.TRUE.equals(syncDefine)) {
             List<ProcessTaskRelation> processTaskRelationList =
-                    processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+                    processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
             if (!processTaskRelationList.isEmpty()) {
                 Set<Integer> processTaskRelationSet =
                         processTaskRelationList.stream().map(ProcessTaskRelation::hashCode).collect(toSet());

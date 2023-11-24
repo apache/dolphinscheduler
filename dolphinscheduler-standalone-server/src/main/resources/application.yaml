@@ -16,6 +16,8 @@
 #
 
 spring:
+  profiles:
+    active: h2
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -74,6 +76,19 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
 
+mybatis-plus:
+  mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
+  type-aliases-package: org.apache.dolphinscheduler.dao.entity
+  configuration:
+    cache-enabled: false
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
+
 registry:
   type: zookeeper
   zookeeper:
@@ -111,6 +126,47 @@ security:
         # jks file absolute path && password
         trust-store: "/ldapkeystore.jks"
         trust-store-password: ""
+    casdoor:
+      user:
+        admin: admin
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: "https://github.com/login/oauth/authorize"
+          redirectUri: "http://localhost:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://github.com/login/oauth/access_token"
+          userInfoUri: "https://api.github.com/user"
+          callbackUrl: "http://localhost:5173/login"
+          iconUri: ""
+          provider: github
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
+          iconUri: ""
+          provider: gitee
+
+casdoor:
+  # Your Casdoor server url
+  endpoint: http://localhost:8000
+  client-id: ""
+  client-secret: ""
+  # The certificate may be multi-line, you can use `|-` for ease
+  certificate: ""
+  # Your organization name added in Casdoor
+  organization-name: built-in
+  # Your application name added in Casdoor
+  application-name: dolphinscheduler
+  # Doplhinscheduler login url
+  redirect-url: http://localhost:5173/login
+
 
 
 master:
@@ -167,6 +223,7 @@ alert:
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
   heartbeat-interval: 60s
+  query_alert_threshold: 100
 
 api:
   audit-enable: false
@@ -216,6 +273,9 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
   jetty:
     max-http-form-post-size: 5000000
+    accesslog:
+      enabled: true
+      custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 management:
   endpoints:
@@ -265,4 +325,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
-    password: root
+    password: root@123

@@ -23,7 +23,6 @@ import {
   DownloadOutlined,
   FormOutlined,
   EditOutlined,
-  InfoCircleFilled,
   UploadOutlined
 } from '@vicons/antd'
 import _ from 'lodash'
@@ -68,10 +67,18 @@ export default defineComponent({
       return !(flag && size < 1000000)
     }
 
-    const handleEditFile = (item: { fullName: string; user_name: string }) => {
+    const handleEditFile = (item: {
+      fullName: string
+      user_name: string
+      alias: string
+    }) => {
       router.push({
         name: 'resource-file-edit',
-        query: { prefix: item.fullName, tenantCode: item.user_name }
+        query: {
+          prefix: item.fullName,
+          tenantCode: item.user_name,
+          alias: item.alias
+        }
       })
     }
 
@@ -127,7 +134,8 @@ export default defineComponent({
                   onClick={() => {
                     this.handleEditFile({
                       fullName: this.row.fullName,
-                      user_name: this.row.user_name
+                      user_name: this.row.user_name,
+                      alias: this.row.alias
                     })
                   }}
                   style={{ marginRight: '-5px' }}
@@ -222,32 +230,27 @@ export default defineComponent({
           {{
             default: () => t('resource.file.delete'),
             trigger: () => (
-              <NButton size='tiny' type='error' circle class='btn-delete'>
-                <NPopconfirm
-                  positive-text={t('resource.file.confirm')}
-                  negative-text={t('resource.file.cancel')}
-                  onPositiveClick={() => {
-                    this.handleDeleteFile({
-                      fullName: this.row.fullName,
-                      tenantCode: this.row.user_name
-                    })
-                  }}
-                >
-                  {{
-                    default: () => t('resource.file.delete_confirm'),
-                    icon: () => (
-                      <NIcon>
-                        <InfoCircleFilled />
-                      </NIcon>
-                    ),
-                    trigger: () => (
+              <NPopconfirm
+                positive-text={t('resource.file.confirm')}
+                negative-text={t('resource.file.cancel')}
+                onPositiveClick={() => {
+                  this.handleDeleteFile({
+                    fullName: this.row.fullName,
+                    tenantCode: this.row.user_name
+                  })
+                }}
+              >
+                {{
+                  default: () => t('resource.file.delete_confirm'),
+                  trigger: () => (
+                    <NButton size='tiny' type='error' circle class='btn-delete'>
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
-                    )
-                  }}
-                </NPopconfirm>
-              </NButton>
+                    </NButton>
+                  )
+                }}
+              </NPopconfirm>
             )
           }}
         </NTooltip>

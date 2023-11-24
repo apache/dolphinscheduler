@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.graph.WorkflowGraphFactory;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 public class WorkflowExecuteContextFactory {
 
     @Autowired
-    private ServerNodeManager serverNodeManager;
+    private MasterSlotManager masterSlotManager;
 
     @Autowired
     private ProcessService processService;
@@ -85,8 +85,8 @@ public class WorkflowExecuteContextFactory {
     }
 
     private SlotCheckState slotCheck(Command command) {
-        int slot = serverNodeManager.getSlot();
-        int masterSize = serverNodeManager.getMasterSize();
+        int slot = masterSlotManager.getSlot();
+        int masterSize = masterSlotManager.getMasterSize();
         SlotCheckState state;
         if (masterSize <= 0) {
             state = SlotCheckState.CHANGE;

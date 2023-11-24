@@ -78,26 +78,26 @@
             </foreach>
         </if>
     </select>
-    <select id="countTaskInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
+
+    <select id="countTaskInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto">
         select state, count(0) as count
-        from t_ds_task_instance t
-        left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
-        left join t_ds_project p on p.code=d.project_code
+        from t_ds_task_instance
         where 1=1
-        <if test="projectCodes != null and projectCodes.length != 0">
-            and d.project_code in
+        <if test="projectCodes != null and projectCodes.size() != 0">
+            and project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         <if test="startTime != null">
-            and t.start_time <![CDATA[ > ]]> #{startTime}
+            and start_time <![CDATA[ > ]]> #{startTime}
         </if>
         <if test="endTime != null">
-            and t.start_time <![CDATA[ <= ]]> #{endTime}
+            and start_time <![CDATA[ <= ]]> #{endTime}
         </if>
-        group by t.state
+        group by state
     </select>
+
     <select id="countTaskInstanceStateByProjectIdsV2" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select state, count(0) as count
         from t_ds_task_instance t
@@ -267,6 +267,9 @@
         <if test="taskName != null and taskName != ''">
             and name = #{taskName}
         </if>
+        <if test="taskCode != null">
+            and task_code = #{taskCode}
+        </if>
         <if test="states != null and states.length != 0">
             and state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
@@ -304,6 +307,9 @@
         <if test="taskName != null and taskName != ''">
             and name=#{taskName}
         </if>
+        <if test="taskCode != null">
+            and task_code = #{taskCode}
+        </if>
         <if test="states != null and states.length != 0">
             and state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
@@ -334,7 +340,40 @@
         where instance.process_instance_id = #{processInstanceId}
         and que.status = #{status}
     </select>
-    
+    <select id="findLastTaskInstances" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="instance"/>
+        </include>
+        from t_ds_task_instance instance
+        join (
+        select task_code, max(end_time) as max_end_time
+        from t_ds_task_instance
+        where 1=1 and test_flag = #{testFlag}
+        <if test="taskCodes != null and taskCodes.size() != 0">
+            and task_code in
+            <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        <if test="startTime!=null and endTime != null">
+            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        group by task_code
+        ) t_max
+        on instance.task_code = t_max.task_code and instance.end_time = t_max.max_end_time
+    </select>
+    <select id="findLastTaskInstance" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where task_code = #{taskCode}
+        <if test="startTime!=null and endTime != null">
+            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        order by end_time desc limit 1
+    </select>
+
     <delete id="deleteByWorkflowInstanceId">
         delete
         from t_ds_task_instance

@@ -41,7 +41,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_N
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -118,7 +117,6 @@ public class ResourcesController extends BaseController {
     })
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> createDirectory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "type") ResourceType type,
                                           @RequestParam(value = "name") String alias,
@@ -142,7 +140,6 @@ public class ResourcesController extends BaseController {
     })
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> createResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
@@ -171,7 +168,6 @@ public class ResourcesController extends BaseController {
     })
     @PutMapping()
     @ApiException(UPDATE_RESOURCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> updateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "fullName") String fullName,
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode,
@@ -196,7 +192,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryResourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "type") ResourceType type,
                                             @RequestParam(value = "fullName") String fullName) {
@@ -225,7 +220,6 @@ public class ResourcesController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_PAGING)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<PageInfo<StorageEntity>> queryResourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                    @RequestParam(value = "fullName") String fullName,
                                                                    @RequestParam(value = "tenantCode") String tenantCode,
@@ -233,15 +227,11 @@ public class ResourcesController extends BaseController {
                                                                    @RequestParam("pageNo") Integer pageNo,
                                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                                    @RequestParam("pageSize") Integer pageSize) {
-        Result<PageInfo<StorageEntity>> result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
+        return resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
                 pageSize);
-        return result;
     }
 
     /**
@@ -257,7 +247,6 @@ public class ResourcesController extends BaseController {
     @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "fullName") String fullName,
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode) throws Exception {
@@ -277,7 +266,6 @@ public class ResourcesController extends BaseController {
     @DeleteMapping(value = "/data-transfer")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public DeleteDataTransferResponse deleteDataTransferData(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                              @RequestParam(value = "days") Integer days) {
         return resourceService.deleteDataTransferData(loginUser, days);
@@ -299,7 +287,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> verifyResourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam(value = "fullName") String fullName,
                                              @RequestParam(value = "type") ResourceType type) {
@@ -320,7 +307,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryResourceJarList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "type") ResourceType type,
                                                @RequestParam(value = "programType", required = false) ProgramType programType) {
@@ -345,7 +331,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/query-file-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryResourceByFileName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestParam(value = "fileName", required = false) String fileName,
                                                   @RequestParam(value = "tenantCode", required = false) String tenantCode,
@@ -371,7 +356,6 @@ public class ResourcesController extends BaseController {
     })
     @GetMapping(value = "/view")
     @ApiException(VIEW_RESOURCE_FILE_ON_LINE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam(value = "skipLineNum") int skipLineNum,
                                @RequestParam(value = "limit") int limit,
@@ -396,7 +380,6 @@ public class ResourcesController extends BaseController {
     })
     @PostMapping(value = "/online-create")
     @ApiException(CREATE_RESOURCE_FILE_ON_LINE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result onlineCreateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "type") ResourceType type,
                                        @RequestParam(value = "fileName") String fileName,
@@ -425,7 +408,6 @@ public class ResourcesController extends BaseController {
     })
     @PutMapping(value = "/update-content")
     @ApiException(EDIT_RESOURCE_FILE_ON_LINE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateResourceContent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "fullName") String fullName,
                                         @RequestParam(value = "tenantCode") String tenantCode,
@@ -450,7 +432,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/download")
     @ResponseBody
     @ApiException(DOWNLOAD_RESOURCE_FILE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public ResponseEntity downloadResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "fullName") String fullName) throws Exception {
         Resource file = resourceService.downloadResource(loginUser, fullName);
@@ -489,7 +470,6 @@ public class ResourcesController extends BaseController {
     @PostMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_UDF_FUNCTION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "type") UdfType type,
                                 @RequestParam(value = "funcName") String funcName,
@@ -518,7 +498,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/{id}/udf-func")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VIEW_UDF_FUNCTION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result viewUIUdfFunction(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @PathVariable("id") int id) {
         return udfFuncService.queryUdfFuncDetail(loginUser, id);
@@ -549,7 +528,6 @@ public class ResourcesController extends BaseController {
     })
     @PutMapping(value = "/udf-func/{id}")
     @ApiException(UPDATE_UDF_FUNCTION_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId,
                                 @RequestParam(value = "type") UdfType type,
@@ -581,15 +559,11 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UDF_FUNCTION_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryUdfFuncListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @RequestParam("pageNo") Integer pageNo,
                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
                                                  @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         return udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
@@ -607,7 +581,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/udf-func/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> queryUdfFuncList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("type") UdfType type) {
         return udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
@@ -628,7 +601,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/udf-func/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_UDF_FUNCTION_NAME_ERROR)
-    @AccessLogAnnotation
     public Result verifyUdfFuncName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam(value = "name") String name) {
         return udfFuncService.verifyUdfFuncByName(loginUser, name);
@@ -648,7 +620,6 @@ public class ResourcesController extends BaseController {
     @DeleteMapping(value = "/udf-func/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_UDF_FUNCTION_ERROR)
-    @AccessLogAnnotation
     public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId) {
         return udfFuncService.delete(loginUser, udfFuncId);
@@ -668,7 +639,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/authed-file")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
-    @AccessLogAnnotation
     public Result authorizedFile(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizedFile(loginUser, userId);
@@ -689,7 +659,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/authed-resource-tree")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZE_RESOURCE_TREE)
-    @AccessLogAnnotation
     public Result authorizeResourceTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizeResourceTree(loginUser, userId);
@@ -710,7 +679,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/unauth-udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UNAUTHORIZED_UDF_FUNCTION_ERROR)
-    @AccessLogAnnotation
     public Result unauthUDFFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("userId") Integer userId) {
 
@@ -732,7 +700,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/authed-udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(AUTHORIZED_UDF_FUNCTION_ERROR)
-    @AccessLogAnnotation
     public Result authorizedUDFFunction(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam("userId") Integer userId) {
         Map<String, Object> result = resourceService.authorizedUDFFunction(loginUser, userId);
@@ -754,7 +721,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/query-full-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryResourceByFullName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "type") ResourceType type,
                                           @RequestParam(value = "fullName") String fullName,
@@ -770,7 +736,6 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/base-dir")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
-    @AccessLogAnnotation
     public Result<Object> queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "type") ResourceType type) {
         return resourceService.queryResourceBaseDir(loginUser, type);

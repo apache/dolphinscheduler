@@ -21,10 +21,12 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -77,9 +79,9 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
      * @param projectCodes Project codes list to filter
      * @return List of ExecuteStatusCount
      */
-    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
-                                                                  @Param("endTime") Date endTime,
-                                                                  @Param("projectCodes") Long[] projectCodes);
+    List<TaskInstanceStatusCountDto> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
+                                                                          @Param("endTime") Date endTime,
+                                                                          @Param("projectCodes") Collection<Long> projectCodes);
 
     /**
      * Statistics task instance group by given project ids list by start time
@@ -136,6 +138,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                     @Param("processInstanceName") String processInstanceName,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("taskName") String taskName,
+                                                    @Param("taskCode") Long taskCode,
                                                     @Param("executorName") String executorName,
                                                     @Param("states") int[] statusArray,
                                                     @Param("host") String host,
@@ -148,6 +151,7 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                           @Param("processDefinitionName") String processDefinitionName,
                                                           @Param("searchVal") String searchVal,
                                                           @Param("taskName") String taskName,
+                                                          @Param("taskCode") Long taskCode,
                                                           @Param("executorName") String executorName,
                                                           @Param("states") int[] statusArray,
                                                           @Param("host") String host,
@@ -161,4 +165,23 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 
     List<TaskInstance> findByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
+
+    /**
+     * find last task instance list in the date interval
+     *
+     * @param taskCodes taskCodes
+     * @param startTime startTime
+     * @param endTime endTime
+     * @param testFlag testFlag
+     * @return task instance list
+     */
+    List<TaskInstance> findLastTaskInstances(@Param("taskCodes") Set<Long> taskCodes,
+                                             @Param("startTime") Date startTime,
+                                             @Param("endTime") Date endTime,
+                                             @Param("testFlag") int testFlag);
+
+    TaskInstance findLastTaskInstance(@Param("taskCode") long depTaskCode,
+                                      @Param("startTime") Date startTime,
+                                      @Param("endTime") Date endTime,
+                                      @Param("testFlag") int testFlag);
 }

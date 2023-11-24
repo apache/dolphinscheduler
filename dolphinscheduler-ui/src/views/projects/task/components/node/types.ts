@@ -83,6 +83,7 @@ interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
 }
 
 interface IDependentItemOptions {
+  dependentTypeOptions?: IOption[]
   definitionCodeOptions?: IOption[]
   depTaskCodeOptions?: IOption[]
   dateOptions?: IOption[]
@@ -99,6 +100,8 @@ interface IDependentItem {
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
   dateValue?: string
+  dependentType?: 'DEPENDENT_ON_WORKFLOW' | 'DEPENDENT_ON_TASK'
+  parameterPassing?: boolean
 }
 
 interface IDependTask {
@@ -376,6 +379,7 @@ interface ITaskParams {
   minMemorySpace?: string
   image?: string
   imagePullPolicy?: string
+  pullSecret?: string
   command?: string
   args?: string
   customizedLabels?: ILabel[]
@@ -447,6 +451,8 @@ interface ITaskParams {
   filterCondition?: string
   listParameters?: Array<any>
   yarnQueue?: string
+  awsRegion?: string
+  kubeConfig?: string
 }
 
 interface INodeData

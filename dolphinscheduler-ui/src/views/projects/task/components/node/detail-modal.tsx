@@ -122,7 +122,7 @@ const NodeDetailModal = defineComponent({
 
     const initProjectPreferences = (projectCode: number) => {
       queryProjectPreferenceByProjectCode(projectCode).then((result: any) => {
-        if (result?.preferences) {
+        if (result?.preferences && result.state === 1) {
           projectPreferences.value = JSON.parse(result.preferences)
         }
       })
@@ -158,9 +158,8 @@ const NodeDetailModal = defineComponent({
           action: () => {
             router.push({
               name: 'task-instance',
-              params: {
-                processInstanceId: processInstance.id,
-                taskName: props.data.name
+              query: {
+                taskCode: props.data.code
               }
             })
           },

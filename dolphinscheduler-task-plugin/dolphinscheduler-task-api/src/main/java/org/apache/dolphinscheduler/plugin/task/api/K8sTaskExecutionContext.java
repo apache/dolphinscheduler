@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.io.Serializable;
 
-import lombok.Value;
+import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -27,12 +27,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  *  k8s Task ExecutionContext
  */
-@Value
+@Data
 public class K8sTaskExecutionContext implements Serializable {
 
     private String configYaml;
 
     private String namespace;
+
+    private String connectionParams;
+
+    public K8sTaskExecutionContext() {
+    }
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public K8sTaskExecutionContext(
@@ -47,6 +52,7 @@ public class K8sTaskExecutionContext implements Serializable {
         return "K8sTaskExecutionContext{"
                 + "namespace=" + namespace
                 + ", configYaml='" + configYaml + '\''
+                + ", connectionParams='" + connectionParams + '\''
                 + '}';
     }
 }

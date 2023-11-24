@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -36,7 +35,6 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -55,7 +53,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -92,30 +89,23 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     /**
      * create data source
      *
-     * @param loginUser login user
+     * @param loginUser       login user
      * @param datasourceParam datasource parameters
      * @return create result code
      */
     @Override
-    @Transactional
-    public Result<Object> createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
+    public DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
         DataSourceUtils.checkDatasourceParam(datasourceParam);
-        Result<Object> result = new Result<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.DATASOURCE,
                 ApiFuncIdentificationConstant.DATASOURCE_CREATE_DATASOURCE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         // check name can use or not
         if (checkName(datasourceParam.getName())) {
-            log.warn("Datasource with the same name already exists, name:{}.", datasourceParam.getName());
-            putMsg(result, Status.DATASOURCE_EXIST);
-            return result;
+            throw new ServiceException(Status.DATASOURCE_EXIST);
         }
         if (checkDescriptionLength(datasourceParam.getNote())) {
-            log.warn("Parameter description is too long, description:{}.", datasourceParam.getNote());
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
 
@@ -133,54 +123,38 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setUpdateTime(now);
         try {
             dataSourceMapper.insert(dataSource);
-            putMsg(result, Status.SUCCESS);
-            permissionPostHandle(AuthorizationType.DATASOURCE, loginUser.getId(),
-                    Collections.singletonList(dataSource.getId()), log);
-            log.info("Datasource create complete, dbType:{}, datasourceName:{}.", dataSource.getType().getDescp(),
-                    dataSource.getName());
+            return dataSource;
         } catch (DuplicateKeyException ex) {
-            log.error("Datasource create error.", ex);
-            putMsg(result, Status.DATASOURCE_EXIST);
+            throw new ServiceException(Status.DATASOURCE_EXIST);
         }
-
-        return result;
     }
 
     /**
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param id data source id
      * @return update result code
      */
     @Override
-    public Result<Object> updateDataSource(int id, User loginUser, BaseDataSourceParamDTO dataSourceParam) {
+    public DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam) {
         DataSourceUtils.checkDatasourceParam(dataSourceParam);
-        Result<Object> result = new Result<>();
         // determine whether the data source exists
-        DataSource dataSource = dataSourceMapper.selectById(id);
+        DataSource dataSource = dataSourceMapper.selectById(dataSourceParam.getId());
         if (dataSource == null) {
-            log.error("Datasource does not exist, id:{}.", id);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
 
         if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
                 DATASOURCE_UPDATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         // check name can use or not
         if (!dataSourceParam.getName().trim().equals(dataSource.getName()) && checkName(dataSourceParam.getName())) {
-            log.warn("Datasource with the same name already exists, name:{}.", dataSource.getName());
-            putMsg(result, Status.DATASOURCE_EXIST);
-            return result;
+            throw new ServiceException(Status.DATASOURCE_EXIST);
         }
         if (checkDescriptionLength(dataSourceParam.getNote())) {
-            log.warn("Parameter description is too long, description:{}.", dataSourceParam.getNote());
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         // check password，if the password is not updated, set to the old password.
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(dataSourceParam);
@@ -203,15 +177,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setUpdateTime(now);
         try {
             dataSourceMapper.updateById(dataSource);
-            log.info("Update datasource complete, datasourceId:{}, datasourceName:{}.", dataSource.getId(),
-                    dataSource.getName());
-            putMsg(result, Status.SUCCESS);
+            return dataSource;
         } catch (DuplicateKeyException ex) {
-            log.error("Update datasource error, datasourceId:{}, datasourceName:{}.", dataSource.getId(),
-                    dataSource.getName());
-            putMsg(result, Status.DATASOURCE_EXIST);
+            throw new ServiceException(Status.DATASOURCE_EXIST);
         }
-        return result;
     }
 
     private boolean checkName(String name) {
@@ -335,59 +304,29 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return true if data datasource not exists, otherwise return false
      */
     @Override
-    public Result<Object> verifyDataSourceName(String name) {
-        Result<Object> result = new Result<>();
+    public void verifyDataSourceName(String name) {
         List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
-            log.warn("Datasource with the same name already exists, dataSourceName:{}.",
-                    dataSourceList.get(0).getName());
-            putMsg(result, Status.DATASOURCE_EXIST);
-        } else {
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.DATASOURCE_EXIST);
         }
-
-        return result;
     }
 
     /**
      * check connection
      *
-     * @param type data source type
+     * @param type            data source type
      * @param connectionParam connectionParam
      * @return true if connect successfully, otherwise false
      * @return true if connect successfully, otherwise false
      */
     @Override
-    public Result<Object> checkConnection(DbType type, ConnectionParam connectionParam) {
-        Result<Object> result = new Result<>();
-        if (type == DbType.SSH) {
-            DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
-            if (sshDataSourceProcessor.testConnection(connectionParam)) {
-                putMsg(result, Status.SUCCESS);
-            } else {
-                putMsg(result, Status.CONNECT_DATASOURCE_FAILURE);
-            }
-            return result;
+    public void checkConnection(DbType type, ConnectionParam connectionParam) {
+        DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
+        boolean connectivity = sshDataSourceProcessor.checkDataSourceConnectivity(connectionParam);
+        if (connectivity) {
+            return;
         }
-        try (Connection connection = DataSourceClientProvider.getAdHocConnection(type, connectionParam)) {
-            if (connection == null) {
-                log.error("Connection test to {} datasource failed, connectionParam:{}.", type.getDescp(),
-                        connectionParam);
-                putMsg(result, Status.CONNECTION_TEST_FAILURE);
-                return result;
-            }
-            log.info("Connection test to {} datasource success, connectionParam:{}", type.getDescp(),
-                    connectionParam);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        } catch (Exception e) {
-            String message = Optional.of(e).map(Throwable::getCause)
-                    .map(Throwable::getMessage)
-                    .orElse(e.getMessage());
-            log.error("Datasource test connection error, dbType:{}, connectionParam:{}, message:{}.", type,
-                    connectionParam, message);
-            return new Result<>(Status.CONNECTION_TEST_FAILURE);
-        }
+        throw new ServiceException(Status.CONNECTION_TEST_FAILURE);
     }
 
     /**
@@ -397,51 +336,36 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
      * @return connect result code
      */
     @Override
-    public Result<Object> connectionTest(int id) {
+    public void connectionTest(int id) {
         DataSource dataSource = dataSourceMapper.selectById(id);
         if (dataSource == null) {
-            Result<Object> result = new Result<>();
-            log.error("Datasource does not exist, datasourceId:{}.", id);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
-        return checkConnection(dataSource.getType(),
+        checkConnection(dataSource.getType(),
                 DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
     }
 
     /**
      * delete datasource
      *
-     * @param loginUser login user
+     * @param loginUser    login user
      * @param datasourceId data source id
      * @return delete result code
      */
     @Override
     @Transactional
-    public Result<Object> delete(User loginUser, int datasourceId) {
-        Result<Object> result = new Result<>();
-        try {
-            // query datasource by id
-            DataSource dataSource = dataSourceMapper.selectById(datasourceId);
-            if (dataSource == null) {
-                log.warn("Datasource does not exist, datasourceId:{}.", datasourceId);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
-                return result;
-            }
-            if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
-                    DATASOURCE_DELETE)) {
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
-            dataSourceMapper.deleteById(datasourceId);
-            datasourceUserMapper.deleteByDatasourceId(datasourceId);
-            log.info("Delete datasource complete, datasourceId:{}.", datasourceId);
-            putMsg(result, Status.SUCCESS);
-        } catch (Exception e) {
-            log.error("Delete datasource complete, datasourceId:{}.", datasourceId, e);
-            throw new ServiceException(Status.DELETE_DATA_SOURCE_FAILURE);
+    public void delete(User loginUser, int datasourceId) {
+        // query datasource by id
+        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+        if (dataSource == null) {
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
-        return result;
+        if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
+                DATASOURCE_DELETE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+        dataSourceMapper.deleteById(datasourceId);
+        datasourceUserMapper.deleteByDatasourceId(datasourceId);
     }
 
     /**

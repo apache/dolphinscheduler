@@ -296,6 +296,7 @@ public enum Status {
 
     UPDATE_PROJECT_PREFERENCE_ERROR(10301, "update project preference error", "更新项目偏好设置错误"),
     QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
+    UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
 
     UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
     UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
@@ -439,7 +440,7 @@ public enum Status {
     QUERY_ACCESSTOKEN_LIST_PAGING_ERROR(70012, "query access token list paging error", "分页查询访问token列表错误"),
     UPDATE_ACCESS_TOKEN_ERROR(70013, "update access token error", "更新访问token错误"),
     DELETE_ACCESS_TOKEN_ERROR(70014, "delete access token error", "删除访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist", "访问token不存在"),
+    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
     QUERY_ACCESSTOKEN_BY_USER_ERROR(70016, "query access token by user error", "查询访问指定用户的token错误"),
 
     COMMAND_STATE_COUNT_ERROR(80001, "task instance state count error", "查询各状态任务实例数错误"),
@@ -471,7 +472,10 @@ public enum Status {
             "failed to delete the alert instance, there is an alarm group associated with this alert instance",
             "删除告警实例失败，存在与此告警实例关联的警报组"),
     PROCESS_DEFINITION_VERSION_IS_USED(110013, "this process definition version is used", "此工作流定义版本被使用"),
-
+    ALERT_TEST_SENDING_FAILED(110014, "Alert test sending failed, [{0}]", "alert测试发送失败，[{0}]"),
+    ALERT_CHANNEL_NOT_EXIST(110015, "Alert channel not exist", "alert channel不存在"),
+    SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR(110016, "send test alert plugin instance error", "发送测试告警错误"),
+    ALERT_SERVER_NOT_EXIST(110017, "Alert server does not exist", "Alert server不存在"),
     CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
     ENVIRONMENT_NAME_EXISTS(120002, "this environment name [{0}] already exists", "环境名称[{0}]已经存在"),
     ENVIRONMENT_NAME_IS_NULL(120003, "this environment name shouldn't be empty.", "环境名称不能为空"),
@@ -538,6 +542,7 @@ public enum Status {
     NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT(130020, "Not allow to disable your own account", "不能停用自己的账号"),
     NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP(130030, "Not allow to delete the default alarm group ", "不能删除默认告警组"),
     TIME_ZONE_ILLEGAL(130031, "time zone [{0}] is illegal", "时区参数 [{0}] 不合法"),
+    NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP(130032, "Not allow to update the global alert group ", "不能更新全局告警组"),
 
     QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR(1300001, "login user query k8s namespace list paging error",
             "分页查询k8s名称空间列表错误"),
@@ -567,7 +572,20 @@ public enum Status {
     SCHEDULE_TIME_NUMBER_EXCEED(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
     DELETE_WORKER_GROUP_BY_ID_FAIL_ENV(1400005,
-            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}");
+            "delete worker group fail, for there are [{0}] enviroments using:{1}", "删除工作组失败，有 [{0}] 个环境正在使用：{1}"),
+
+    WORKER_GROUP_DEPENDENT_TASK_EXISTS(1401000,
+            "You can not modify or remove this worker group, cause it has [{0}] dependent tasks like :{1}",
+            "不能修改或删除该Worker组，有 [{0}] 个任务正在使用：{1}"),
+
+    WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS(1401001,
+            "You can not modify or remove this worker group, cause it has [{0}] dependent workflow timings like :{1}",
+            "不能修改或删除该Worker组，有 [{0}] 个工作流定时正在使用：{1}"),
+
+    WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS(1401002,
+            "You can not modify or remove this worker group, cause it has [{0}] dependent environments.",
+            "不能修改或删除该Worker组，有 [{0}] 个环境配置正在使用"),
+            ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;

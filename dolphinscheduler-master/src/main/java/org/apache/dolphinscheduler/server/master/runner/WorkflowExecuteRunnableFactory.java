@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -50,9 +50,6 @@ public class WorkflowExecuteRunnableFactory {
     private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private MasterRpcClient masterRpcClient;
-
-    @Autowired
     private ProcessAlertManager processAlertManager;
 
     @Autowired
@@ -73,6 +70,9 @@ public class WorkflowExecuteRunnableFactory {
     @Autowired
     private WorkflowExecuteContextFactory workflowExecuteContextFactory;
 
+    @Autowired
+    private ListenerEventAlertManager listenerEventAlertManager;
+
     public Optional<WorkflowExecuteRunnable> createWorkflowExecuteRunnable(Command command) throws WorkflowCreateException {
         try {
             Optional<IWorkflowExecuteContext> workflowExecuteRunnableContextOptional =
@@ -82,13 +82,13 @@ public class WorkflowExecuteRunnableFactory {
                     commandService,
                     processService,
                     processInstanceDao,
-                    masterRpcClient,
                     processAlertManager,
                     masterConfig,
                     stateWheelExecuteThread,
                     curingGlobalParamsService,
                     taskInstanceDao,
-                    defaultTaskExecuteRunnableFactory));
+                    defaultTaskExecuteRunnableFactory,
+                    listenerEventAlertManager));
         } catch (Exception ex) {
             throw new WorkflowCreateException("Create workflow execute runnable failed", ex);
         }

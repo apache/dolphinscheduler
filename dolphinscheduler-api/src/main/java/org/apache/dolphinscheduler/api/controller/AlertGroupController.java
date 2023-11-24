@@ -24,16 +24,17 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALERT_GROUP_ERR
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERTGROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_GROUP_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -85,14 +86,12 @@ public class AlertGroupController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_GROUP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result createAlertgroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "groupName") String groupName,
-                                   @RequestParam(value = "description", required = false) String description,
-                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-        Map<String, Object> result =
-                alertGroupService.createAlertgroup(loginUser, groupName, description, alertInstanceIds);
-        return returnDataList(result);
+    public Result<AlertGroup> createAlertGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @RequestParam(value = "groupName") String groupName,
+                                               @RequestParam(value = "description", required = false) String description,
+                                               @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+        AlertGroup alertgroup = alertGroupService.createAlertGroup(loginUser, groupName, description, alertInstanceIds);
+        return Result.success(alertgroup);
     }
 
     /**
@@ -105,11 +104,26 @@ public class AlertGroupController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result list(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result<List<AlertGroup>> list(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
-        Map<String, Object> result = alertGroupService.queryAlertgroup(loginUser);
-        return returnDataList(result);
+        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(loginUser);
+        return Result.success(alertGroups);
+    }
+
+    /**
+     * normal alert group list
+     *
+     * @param loginUser login user
+     * @return normal alert group list
+     */
+    @Operation(summary = "listNormalAlertgroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
+    @GetMapping(value = "/normal-list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
+    public Result<List<AlertGroup>> normalAlertGroupList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+
+        List<AlertGroup> alertGroups = alertGroupService.queryNormalAlertGroups(loginUser);
+        return Result.success(alertGroups);
     }
 
     /**
@@ -130,23 +144,21 @@ public class AlertGroupController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result listPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam(value = "searchVal", required = false) String searchVal,
-                             @RequestParam("pageNo") Integer pageNo,
-                             @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+    public Result<PageInfo<AlertGroup>> listPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                   @RequestParam("pageNo") Integer pageNo,
+                                                   @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
+        PageInfo<AlertGroup> alertGroupPageInfo = alertGroupService.listPaging(loginUser, searchVal, pageNo, pageSize);
+        return Result.success(alertGroupPageInfo);
     }
+
     /**
      * check alarm group detail by Id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return one alert group
      */
 
@@ -157,12 +169,11 @@ public class AlertGroupController extends BaseController {
     @PostMapping(value = "/query")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALERT_GROUP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam("id") Integer id) {
+    public Result<AlertGroup> queryAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @RequestParam("id") Integer id) {
 
-        Map<String, Object> result = alertGroupService.queryAlertGroupById(loginUser, id);
-        return returnDataList(result);
+        AlertGroup alertGroup = alertGroupService.queryAlertGroupById(loginUser, id);
+        return Result.success(alertGroup);
     }
 
     /**
@@ -184,16 +195,14 @@ public class AlertGroupController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_GROUP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result updateAlertgroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @PathVariable(value = "id") int id,
-                                   @RequestParam(value = "groupName") String groupName,
-                                   @RequestParam(value = "description", required = false) String description,
-                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
-
-        Map<String, Object> result =
-                alertGroupService.updateAlertgroup(loginUser, id, groupName, description, alertInstanceIds);
-        return returnDataList(result);
+    public Result<AlertGroup> updateAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @PathVariable(value = "id") int id,
+                                                   @RequestParam(value = "groupName") String groupName,
+                                                   @RequestParam(value = "description", required = false) String description,
+                                                   @RequestParam(value = "alertInstanceIds") String alertInstanceIds) {
+        AlertGroup alertGroup =
+                alertGroupService.updateAlertGroupById(loginUser, id, groupName, description, alertInstanceIds);
+        return Result.success(alertGroup);
     }
 
     /**
@@ -210,11 +219,10 @@ public class AlertGroupController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_GROUP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result delAlertgroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @PathVariable(value = "id") int id) {
-        Map<String, Object> result = alertGroupService.delAlertgroupById(loginUser, id);
-        return returnDataList(result);
+    public Result<Boolean> deleteAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @PathVariable(value = "id") int id) {
+        alertGroupService.deleteAlertGroupById(loginUser, id);
+        return Result.success(true);
     }
 
     /**
@@ -230,7 +238,6 @@ public class AlertGroupController extends BaseController {
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result verifyGroupName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "groupName") String groupName) {
 

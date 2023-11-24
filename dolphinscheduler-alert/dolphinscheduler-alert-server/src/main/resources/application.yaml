@@ -16,6 +16,8 @@
 #
 
 spring:
+  profiles:
+    active: postgresql
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -37,6 +39,20 @@ spring:
       idle-timeout: 600000
       leak-detection-threshold: 0
       initialization-fail-timeout: 1
+
+# Mybatis-plus configuration, you don't need to change it
+mybatis-plus:
+  mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
+  type-aliases-package: org.apache.dolphinscheduler.dao.entity
+  configuration:
+    cache-enabled: false
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
 
 server:
   port: 50053
@@ -65,6 +81,7 @@ alert:
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
   heartbeat-interval: 60s
+  query_alert_threshold: 100
 
 registry:
   type: zookeeper

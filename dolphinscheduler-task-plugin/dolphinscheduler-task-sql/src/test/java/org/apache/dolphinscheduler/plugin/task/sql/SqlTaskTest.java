@@ -18,10 +18,16 @@
 package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +72,15 @@ class SqlTaskTest {
         String hiveLoadSql = "load inpath '/tmp/test_table/dt=${dt}' into table test_table partition(dt=${dt})";
         String expected = "load inpath '/tmp/test_table/dt=?' into table test_table partition(dt=?)";
         Assertions.assertEquals(expected, hiveLoadSql.replaceAll(sqlTask.rgex, "?"));
+
+        Map<Integer, Property> sqlParamsMap = new HashMap<>();
+        Map<Integer, Property> expectedSQLParamsMap = new HashMap<>();
+        expectedSQLParamsMap.put(1, new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+        expectedSQLParamsMap.put(2, new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+        Map<String, Property> paramsMap = new HashMap<>();
+        paramsMap.put("dt", new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+        sqlTask.setSqlParamsMap(hiveLoadSql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
     }
 
     @Test
@@ -74,17 +89,37 @@ class SqlTaskTest {
         String expected = "select id from student where dt=?";
         Assertions.assertEquals(expected, querySql.replaceAll(sqlTask.rgex, "?"));
 
+        Map<Integer, Property> sqlParamsMap = new HashMap<>();
+        Map<Integer, Property> expectedSQLParamsMap = new HashMap<>();
+        expectedSQLParamsMap.put(1, new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+        Map<String, Property> paramsMap = new HashMap<>();
+        paramsMap.put("dt", new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+        sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
+
         querySql = "select id from student where dt=\"${dt}\"";
         expected = "select id from student where dt=?";
         Assertions.assertEquals(expected, querySql.replaceAll(sqlTask.rgex, "?"));
+
+        sqlParamsMap.clear();
+        sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
 
         querySql = "select id from student where dt=${dt}";
         expected = "select id from student where dt=?";
         Assertions.assertEquals(expected, querySql.replaceAll(sqlTask.rgex, "?"));
 
+        sqlParamsMap.clear();
+        sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
+
         querySql = "select id from student where dt=${dt} and gender=1";
         expected = "select id from student where dt=? and gender=1";
         Assertions.assertEquals(expected, querySql.replaceAll(sqlTask.rgex, "?"));
+
+        sqlParamsMap.clear();
+        sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
     }
 
     @Test
@@ -92,5 +127,19 @@ class SqlTaskTest {
         String querySql = "select id from student where year=${year} and month=${month} and gender=1";
         String expected = "select id from student where year=? and month=? and gender=1";
         Assertions.assertEquals(expected, querySql.replaceAll(sqlTask.rgex, "?"));
+
+        Map<Integer, Property> sqlParamsMap = new HashMap<>();
+        Map<Integer, Property> expectedSQLParamsMap = new HashMap<>();
+        expectedSQLParamsMap.put(1, new Property("year", Direct.IN, DataType.VARCHAR, "1970"));
+        expectedSQLParamsMap.put(2, new Property("month", Direct.IN, DataType.VARCHAR, "12"));
+        Map<String, Property> paramsMap = new HashMap<>();
+        paramsMap.put("year", new Property("year", Direct.IN, DataType.VARCHAR, "1970"));
+        paramsMap.put("month", new Property("month", Direct.IN, DataType.VARCHAR, "12"));
+        sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
+    }
+
+    @Test
+    void splitSql() {
     }
 }

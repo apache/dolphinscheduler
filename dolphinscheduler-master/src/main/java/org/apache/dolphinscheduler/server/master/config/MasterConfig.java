@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.server.master.config;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.remote.config.NettyClientConfig;
-import org.apache.dolphinscheduler.remote.config.NettyServerConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
@@ -100,10 +98,6 @@ public class MasterConfig implements Validator {
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
-
-    private NettyClientConfig masterRpcClientConfig = new NettyClientConfig();
-
-    private NettyServerConfig masterRpcServerConfig = new NettyServerConfig();
 
     // ip:listenPort
     private String masterAddress;
@@ -187,7 +181,5 @@ public class MasterConfig implements Validator {
         log.info("Master config: masterAddress -> {} ", masterAddress);
         log.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
         log.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
-        log.info("Master config: masterRpcServerConfig -> {} ", masterRpcServerConfig);
-        log.info("Master config: masterRpcClientConfig -> {} ", masterRpcClientConfig);
     }
 }
