@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import lombok.NonNull;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public abstract class BaseDao<ENTITY, MYBATIS_MAPPER extends BaseMapper<ENTITY>> implements IDao<ENTITY> {
@@ -53,6 +54,14 @@ public abstract class BaseDao<ENTITY, MYBATIS_MAPPER extends BaseMapper<ENTITY>>
             return Collections.emptyList();
         }
         return mybatisMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<ENTITY> queryByCondition(ENTITY queryCondition) {
+        if (queryCondition == null) {
+            throw new IllegalArgumentException("queryCondition can not be null");
+        }
+        return mybatisMapper.selectList(new QueryWrapper<>(queryCondition));
     }
 
     @Override
@@ -86,6 +95,14 @@ public abstract class BaseDao<ENTITY, MYBATIS_MAPPER extends BaseMapper<ENTITY>>
             return true;
         }
         return mybatisMapper.deleteBatchIds(ids) > 0;
+    }
+
+    @Override
+    public boolean deleteByCondition(ENTITY queryCondition) {
+        if (queryCondition == null) {
+            throw new IllegalArgumentException("queryCondition can not be null");
+        }
+        return mybatisMapper.delete(new QueryWrapper<>(queryCondition)) > 0;
     }
 
 }
