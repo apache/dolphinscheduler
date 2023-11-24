@@ -2533,7 +2533,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 .orElseThrow(() -> new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
 
         if (ReleaseState.OFFLINE.equals(workflowDefinition.getReleaseState())) {
-            // do nothing if the workflow is already online
+            // do nothing if the workflow is already offline
             return;
         }
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
