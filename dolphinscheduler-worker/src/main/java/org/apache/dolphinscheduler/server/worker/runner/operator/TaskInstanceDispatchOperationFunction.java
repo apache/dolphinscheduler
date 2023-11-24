@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner.operator;
 
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -55,6 +56,14 @@ public class TaskInstanceDispatchOperationFunction
 
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
                     taskExecutionContext.getTaskInstanceId());
+
+            // check server status, if server is not running, return failed to reject this task
+            if (!ServerLifeCycleManager.isRunning()) {
+                log.error("server is not running. reject task: {}", taskExecutionContext.getProcessInstanceId());
+                return TaskInstanceDispatchResponse.failed(taskExecutionContext.getTaskInstanceId(),
+                        "server is not running");
+            }
+
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
             if (!globalTaskInstanceDispatchQueue.addDispatchTask(taskExecutionContext)) {
