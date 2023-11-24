@@ -25,10 +25,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,25 +32,21 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * user mapper interface
  */
-@CacheConfig(cacheNames = "user", keyGenerator = "cacheKeyGenerator")
 public interface UserMapper extends BaseMapper<User> {
 
     /**
      * select by user id
      */
-    @Cacheable(sync = true)
     User selectById(int id);
 
     /**
      * delete by id
      */
-    @CacheEvict
     int deleteById(int id);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.id")
     int updateById(@Param("et") User user);
 
     /**
