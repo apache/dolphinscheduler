@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -126,19 +125,6 @@ public interface SchedulerService {
                          Integer scheduleId);
 
     /**
-     * set schedule online or offline
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
-     * @param scheduleStatus schedule status
-     */
-    void setScheduleState(User loginUser,
-                          long projectCode,
-                          Integer id,
-                          ReleaseState scheduleStatus);
-
-    /**
      * query schedule
      *
      * @param loginUser login user
@@ -172,15 +158,6 @@ public interface SchedulerService {
      * @return schedule list
      */
     Map<String, Object> queryScheduleList(User loginUser, long projectCode);
-
-    /**
-     * delete schedule
-     *
-     * @param projectId project id
-     * @param scheduleId schedule id
-     * @throws RuntimeException runtime exception
-     */
-    void deleteSchedule(int projectId, int scheduleId);
 
     /**
      * delete schedule by id
@@ -225,4 +202,24 @@ public interface SchedulerService {
                                                               String workerGroup,
                                                               String tenantCode,
                                                               long environmentCode);
+
+    /**
+     * Online the scheduler by scheduler id, if the related workflow definition is not online will throw exception.
+     */
+    void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId);
+
+    /**
+     * Do online scheduler by workflow code, this method will not do permission check.
+     */
+    void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode);
+
+    /**
+     * Offline the scheduler by scheduler id, will not offline the related workflow definition.
+     */
+    void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId);
+
+    /**
+     * Do offline scheduler by workflow code, this method will not do permission check.
+     */
+    void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode);
 }

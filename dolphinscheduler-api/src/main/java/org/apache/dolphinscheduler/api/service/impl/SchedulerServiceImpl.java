@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
@@ -26,7 +27,6 @@ import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -38,26 +38,22 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -96,12 +92,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private ExecutorService executorService;
 
     @Autowired
-    private MonitorService monitorService;
-
-    @Autowired
-    private ProcessService processService;
-
-    @Autowired
     private ScheduleMapper scheduleMapper;
 
     @Autowired
@@ -112,9 +102,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private SchedulerApi schedulerApi;
-
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired
     private EnvironmentMapper environmentMapper;
@@ -437,123 +424,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     /**
-     * set schedule online or offline
-     *
-     * @param loginUser      login user
-     * @param projectCode    project code
-     * @param id             scheduler id
-     * @param scheduleStatus schedule status
-     * @return publish result code
-     */
-    @Override
-    @Transactional
-    public void setScheduleState(User loginUser,
-                                 long projectCode,
-                                 Integer id,
-                                 ReleaseState scheduleStatus) {
-        Project project = projectMapper.queryByCode(projectCode);
-        // check project auth
-        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
-
-        // check schedule exists
-        Schedule scheduleObj = scheduleMapper.selectById(id);
-
-        if (scheduleObj == null) {
-            log.error("Schedule does not exist, scheduleId:{}.", id);
-            throw new ServiceException(Status.SCHEDULE_CRON_NOT_EXISTS, id);
-        }
-        // check schedule release state
-        if (scheduleObj.getReleaseState() == scheduleStatus) {
-            log.warn("Schedule state does not need to change due to schedule state is already {}, scheduleId:{}.",
-                    scheduleObj.getReleaseState().getDescp(), scheduleObj.getId());
-            throw new ServiceException(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, scheduleStatus);
-        }
-        ProcessDefinition processDefinition =
-                processDefinitionMapper.queryByCode(scheduleObj.getProcessDefinitionCode());
-        if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
-            log.error("Process definition does not exist, processDefinitionCode:{}.",
-                    scheduleObj.getProcessDefinitionCode());
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
-                    String.valueOf(scheduleObj.getProcessDefinitionCode()));
-        }
-        List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(projectCode, scheduleObj.getProcessDefinitionCode());
-        if (processTaskRelations.isEmpty()) {
-            log.error("Process task relations do not exist, projectCode:{}, processDefinitionCode:{}.", projectCode,
-                    processDefinition.getCode());
-            throw new ServiceException(Status.PROCESS_DAG_IS_EMPTY);
-        }
-        if (scheduleStatus == ReleaseState.ONLINE) {
-            // check process definition release state
-            if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-                log.warn("Only process definition state is {} can change schedule state, processDefinitionCode:{}.",
-                        ReleaseState.ONLINE.getDescp(), processDefinition.getCode());
-                throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
-            }
-            // check sub process definition release state
-            List<Long> subProcessDefineCodes = new ArrayList<>();
-            processService.recurseFindSubProcess(processDefinition.getCode(), subProcessDefineCodes);
-            if (!subProcessDefineCodes.isEmpty()) {
-                log.info(
-                        "Need to check sub process definition state before change schedule state, subProcessDefineCodes:{}.",
-                        org.apache.commons.lang.StringUtils.join(subProcessDefineCodes, ","));
-                List<ProcessDefinition> subProcessDefinitionList =
-                        processDefinitionMapper.queryByCodes(subProcessDefineCodes);
-                if (subProcessDefinitionList != null && !subProcessDefinitionList.isEmpty()) {
-                    for (ProcessDefinition subProcessDefinition : subProcessDefinitionList) {
-                        /**
-                         * if there is no online process, exit directly
-                         */
-                        if (subProcessDefinition.getReleaseState() != ReleaseState.ONLINE) {
-                            log.warn(
-                                    "Only sub process definition state is {} can change schedule state, subProcessDefinitionCode:{}.",
-                                    ReleaseState.ONLINE.getDescp(), subProcessDefinition.getCode());
-                            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE,
-                                    String.valueOf(subProcessDefinition.getId()));
-                        }
-                    }
-                }
-            }
-        }
-
-        // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
-
-        if (masterServers.isEmpty()) {
-            log.error("Master does not exist.");
-            throw new ServiceException(Status.MASTER_NOT_EXISTS);
-        }
-
-        // set status
-        scheduleObj.setReleaseState(scheduleStatus);
-
-        scheduleMapper.updateById(scheduleObj);
-
-        try {
-            switch (scheduleStatus) {
-                case ONLINE:
-                    log.info("Call master client set schedule online, project id: {}, flow id: {},host: {}",
-                            project.getId(), processDefinition.getId(), masterServers);
-                    setSchedule(project.getId(), scheduleObj);
-                    break;
-                case OFFLINE:
-                    log.info("Call master client set schedule offline, project id: {}, flow id: {},host: {}",
-                            project.getId(), processDefinition.getId(), masterServers);
-                    deleteSchedule(project.getId(), id);
-                    break;
-                default:
-                    throw new ServiceException(Status.SCHEDULE_STATUS_UNKNOWN, scheduleStatus.toString());
-            }
-        } catch (Exception e) {
-            log.error("Set schedule state to {} error, projectCode:{}, scheduleId:{}.", scheduleStatus.getDescp(),
-                    projectCode, scheduleObj.getId());
-            Status status = scheduleStatus == ReleaseState.ONLINE ? Status.PUBLISH_SCHEDULE_ONLINE_ERROR
-                    : Status.OFFLINE_SCHEDULE_ERROR;
-            throw new ServiceException(status, e);
-        }
-    }
-
-    /**
      * query schedule
      *
      * @param loginUser         login user
@@ -667,25 +537,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         putMsg(result, Status.SUCCESS);
 
         return result;
-    }
-
-    public void setSchedule(int projectId, Schedule schedule) {
-        log.info("Set schedule state {}, project id: {}, scheduleId: {}", schedule.getReleaseState().getDescp(),
-                projectId, schedule.getId());
-        schedulerApi.insertOrUpdateScheduleTask(projectId, schedule);
-    }
-
-    /**
-     * delete schedule
-     *
-     * @param projectId  project id
-     * @param scheduleId schedule id
-     * @throws RuntimeException runtime exception
-     */
-    @Override
-    public void deleteSchedule(int projectId, int scheduleId) {
-        log.info("Delete schedule of project, projectId:{}, scheduleId:{}", projectId, scheduleId);
-        schedulerApi.deleteScheduleTask(projectId, scheduleId);
     }
 
     /**
@@ -821,6 +672,71 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, processInstancePriority, workerGroup, tenantCode, environmentCode);
         return result;
+    }
+
+    @Transactional
+    @Override
+    public void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
+        Schedule schedule = scheduleMapper.selectById(schedulerId);
+        doOnlineScheduler(schedule);
+    }
+
+    @Transactional
+    @Override
+    public void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
+        doOnlineScheduler(schedule);
+    }
+
+    private void doOnlineScheduler(Schedule schedule) {
+        if (schedule == null) {
+            return;
+        }
+        if (ReleaseState.ONLINE.equals(schedule.getReleaseState())) {
+            log.debug("The schedule is already online, scheduleId:{}.", schedule.getId());
+            return;
+        }
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
+        if (!ReleaseState.ONLINE.equals(processDefinition.getReleaseState())) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
+        }
+
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        scheduleMapper.updateById(schedule);
+
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
+    }
+
+    @Transactional
+    @Override
+    public void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
+        Schedule schedule = scheduleMapper.selectById(schedulerId);
+        doOfflineScheduler(schedule);
+    }
+
+    @Transactional
+    @Override
+    public void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+        Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
+        doOfflineScheduler(schedule);
+    }
+
+    private void doOfflineScheduler(Schedule schedule) {
+        if (schedule == null) {
+            return;
+        }
+        if (ReleaseState.OFFLINE.equals(schedule.getReleaseState())) {
+            log.debug("The schedule is already offline, scheduleId:{}.", schedule.getId());
+            return;
+        }
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        scheduleMapper.updateById(schedule);
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
+        Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
+        schedulerApi.deleteScheduleTask(project.getId(), schedule.getId());
     }
 
     private void updateSchedule(Map<String, Object> result, Schedule schedule, ProcessDefinition processDefinition,

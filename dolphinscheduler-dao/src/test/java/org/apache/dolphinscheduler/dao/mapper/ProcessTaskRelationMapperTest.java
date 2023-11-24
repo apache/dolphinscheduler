@@ -56,7 +56,7 @@ public class ProcessTaskRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByProcessCode() {
         ProcessTaskRelation processTaskRelation = insertOne();
-        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(1L, 1L);
+        List<ProcessTaskRelation> processTaskRelations = processTaskRelationMapper.queryByProcessCode(1L);
         Assertions.assertNotEquals(0, processTaskRelations.size());
     }
 

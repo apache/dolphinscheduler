@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -180,46 +179,30 @@ public class SchedulerController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * publish schedule setScheduleState
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id scheduler id
-     * @return publish result code
-     */
     @Operation(summary = "online", description = "ONLINE_SCHEDULE_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
-    public Result publishScheduleOnline(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                        @PathVariable("id") Integer id) {
-        schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.ONLINE);
-        return Result.success();
+    public Result<Boolean> publishScheduleOnline(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                 @PathVariable("id") Integer id) {
+        schedulerService.onlineScheduler(loginUser, projectCode, id);
+        return Result.success(true);
     }
 
-    /**
-     * offline schedule
-     *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param id schedule id
-     * @return operation result code
-     */
     @Operation(summary = "offline", description = "OFFLINE_SCHEDULE_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
     @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
-    public Result offlineSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                  @PathVariable("id") Integer id) {
-        schedulerService.setScheduleState(loginUser, projectCode, id, ReleaseState.OFFLINE);
-        return Result.success();
+    public Result<Boolean> offlineSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                           @PathVariable("id") Integer id) {
+        schedulerService.offlineScheduler(loginUser, projectCode, id);
+        return Result.success(true);
     }
 
     /**

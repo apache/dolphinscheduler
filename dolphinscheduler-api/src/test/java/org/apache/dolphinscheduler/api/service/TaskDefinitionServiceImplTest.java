@@ -563,8 +563,8 @@ public class TaskDefinitionServiceImplTest {
 
         // saveTaskRelation
         List<ProcessTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(eq(processDefinition.getProjectCode()),
-                eq(processDefinition.getCode()))).thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(eq(processDefinition.getCode())))
+                .thenReturn(processTaskRelationList);
         Mockito.when(processTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
         Mockito.when(processTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
         int insertResult = processServiceImpl.saveTaskRelation(loginUser, processDefinition.getProjectCode(),

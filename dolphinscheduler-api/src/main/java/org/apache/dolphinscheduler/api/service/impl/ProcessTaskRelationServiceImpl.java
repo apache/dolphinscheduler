@@ -137,7 +137,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
         List<ProcessTaskRelation> processTaskRelationList =
-                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+                processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
         List<ProcessTaskRelation> processTaskRelations = Lists.newArrayList(processTaskRelationList);
         if (!processTaskRelations.isEmpty()) {
             Map<Long, ProcessTaskRelation> preTaskCodeMap =
@@ -327,7 +327,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+                processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             log.error("Process task relations are empty, projectCode:{}, processDefinitionCode:{}.", projectCode,
@@ -514,7 +514,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         long projectCode = processDefinition.getProjectCode();
         long processDefinitionCode = processDefinition.getCode();
         List<ProcessTaskRelation> taskRelations =
-                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+                processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
         List<ProcessTaskRelationLog> taskRelationList =
                 taskRelations.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
 
@@ -675,7 +675,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
+                processTaskRelationMapper.queryByProcessCode(processDefinition.getCode());
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
         List<ProcessTaskRelation> processTaskRelationWaitRemove = Lists.newArrayList();
         for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
@@ -746,7 +746,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinition.getCode());
+                processTaskRelationMapper.queryByProcessCode(processDefinition.getCode());
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
         processTaskRelationList
                 .removeIf(processTaskRelation -> postTaskCodeList.contains(processTaskRelation.getPostTaskCode())
@@ -858,7 +858,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
-                processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode);
+                processTaskRelationMapper.queryByProcessCode(processDefinitionCode);
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList(processTaskRelations);
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             log.error("Process task relations are empty, projectCode:{}, processDefinitionCode:{}.", projectCode,

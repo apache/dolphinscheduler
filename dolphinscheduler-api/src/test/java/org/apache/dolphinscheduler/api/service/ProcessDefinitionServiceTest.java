@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_IMPORT;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
@@ -467,7 +466,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         }
         when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
-        when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
+        when(processTaskRelationMapper.queryByProcessCode(processDefinitionCode))
                 .thenReturn(getProcessTaskRelation());
         putMsg(result, Status.SUCCESS);
 
@@ -608,46 +607,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes);
         Assertions.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
         Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(11L);
-    }
-
-    @Test
-    public void testReleaseProcessDefinition() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        Project project = getProject(projectCode);
-
-        // project check auth fail
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_ONLINE_OFFLINE))
-                .thenReturn(result);
-        Map<String, Object> map = processDefinitionService.releaseProcessDefinition(user, projectCode,
-                processDefinitionCode, ReleaseState.OFFLINE);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
-
-        // project check auth success, processes definition online
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(processDefinitionMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
-        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        processTaskRelation.setProjectCode(projectCode);
-        processTaskRelation.setProcessDefinitionCode(46L);
-        processTaskRelation.setPostTaskCode(123L);
-        processTaskRelationList.add(processTaskRelation);
-        when(processService.findRelationByCode(46L, 1)).thenReturn(processTaskRelationList);
-        Map<String, Object> onlineRes =
-                processDefinitionService.releaseProcessDefinition(user, projectCode, 46, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.SUCCESS, onlineRes.get(Constants.STATUS));
-
-        // project check auth success, processes definition online
-        Map<String, Object> onlineWithResourceRes =
-                processDefinitionService.releaseProcessDefinition(user, projectCode, 46, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.SUCCESS, onlineWithResourceRes.get(Constants.STATUS));
-
-        // release error code
-        Map<String, Object> failRes =
-                processDefinitionService.releaseProcessDefinition(user, projectCode, 46, ReleaseState.getEnum(2));
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, failRes.get(Constants.STATUS));
     }
 
     @Test
@@ -824,7 +783,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         try {
             processDefinitionService.updateProcessDefinition(user, projectCode, "test", 1,
-                    "", "", "", 0, null, "", null, ProcessExecutionTypeEnum.PARALLEL);
+                    "", "", "", 0, null, "", ProcessExecutionTypeEnum.PARALLEL);
             Assertions.fail();
         } catch (ServiceException ex) {
             Assertions.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), ex.getCode());
