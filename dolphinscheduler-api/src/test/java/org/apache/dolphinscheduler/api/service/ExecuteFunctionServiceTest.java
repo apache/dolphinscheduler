@@ -563,9 +563,8 @@ public class ExecuteFunctionServiceTest {
 
     @Test
     public void testStartCheckByProcessDefinedCode() {
-        List<Long> ids = new ArrayList<>();
-        ids.add(1L);
-        Mockito.doNothing().when(processService).recurseFindSubProcess(1, ids);
+        List<Long> ids = Lists.newArrayList(1L);
+        when(processService.findAllSubWorkflowDefinitionCode(1)).thenReturn(ids);
 
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         ProcessDefinition processDefinition = new ProcessDefinition();

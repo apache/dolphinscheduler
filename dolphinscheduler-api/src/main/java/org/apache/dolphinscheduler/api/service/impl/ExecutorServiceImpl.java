@@ -706,8 +706,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        List<Long> codes = new ArrayList<>();
-        processService.recurseFindSubProcess(processDefinition.getCode(), codes);
+        List<Long> codes = processService.findAllSubWorkflowDefinitionCode(processDefinition.getCode());
         if (!codes.isEmpty()) {
             List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codes);
             if (processDefinitionList != null) {
