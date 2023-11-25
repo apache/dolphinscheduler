@@ -15,16 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master;
+package org.apache.dolphinscheduler.dao.model;
 
-import org.apache.dolphinscheduler.extract.base.RpcMethod;
-import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.master.transportor.CacheExpireRequest;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-@RpcService
-public interface IMasterCacheService {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    @RpcMethod
-    void cacheExpire(CacheExpireRequest cacheExpireRequest);
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskInstanceStatusCountDto {
 
+    private TaskExecutionStatus state;
+
+    private int count;
 }

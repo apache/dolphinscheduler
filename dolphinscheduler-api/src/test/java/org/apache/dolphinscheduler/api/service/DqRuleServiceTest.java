@@ -17,17 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -51,7 +49,6 @@ import org.apache.dolphinscheduler.spi.params.base.FormType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -109,22 +106,20 @@ public class DqRuleServiceTest {
                 + "\"statistics_execute_sql\",\"name\":\"统计值计算SQL\",\"type\":\"input\",\"title\":"
                 + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Map<String, Object> result = dqRuleService.getRuleFormCreateJsonById(1);
-        Assertions.assertEquals(json, result.get(Constants.DATA_LIST));
+        String ruleFormCreateJsonById = dqRuleService.getRuleFormCreateJsonById(1);
+        Assertions.assertEquals(json, ruleFormCreateJsonById);
     }
 
     @Test
     public void testQueryAllRuleList() {
         when(dqRuleMapper.selectList(new QueryWrapper<>())).thenReturn(getRuleList());
-        Map<String, Object> result = dqRuleService.queryAllRuleList();
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertDoesNotThrow(() -> dqRuleService.queryAllRuleList());
     }
 
     @Test
     public void testGetDatasourceOptionsById() {
         when(dataSourceMapper.listAllDataSourceByType(DbType.MYSQL.getCode())).thenReturn(dataSourceList());
-        Map<String, Object> result = dqRuleService.queryAllRuleList();
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertDoesNotThrow(() -> dqRuleService.queryAllRuleList());
     }
 
     @Test
@@ -146,15 +141,14 @@ public class DqRuleServiceTest {
         page.setTotal(1);
         page.setRecords(getRuleList());
 
-        when(dqRuleMapper.queryRuleListPaging(
-                any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end))).thenReturn(page);
+        when(dqRuleMapper.queryRuleListPaging(any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end)))
+                .thenReturn(page);
 
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
 
-        Result result = dqRuleService.queryRuleListPaging(
-                loginUser, searchVal, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
+        assertDoesNotThrow(() -> dqRuleService.queryRuleListPaging(loginUser, searchVal, 0, "2020-01-01 00:00:00",
+                "2020-01-02 00:00:00", 1, 10));
     }
 
     private List<DataSource> dataSourceList() {

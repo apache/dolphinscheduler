@@ -15,25 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.queue;
+package org.apache.dolphinscheduler.dao.model;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * queue create response
- */
 @Data
-public class QueueCreateResponse extends Result {
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowDefinitionCountDto {
 
-    private Queue data;
+    private String userName;
 
-    public QueueCreateResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((Queue) result.getData());
-    }
+    private Integer userId;
+
+    private int count;
 }
