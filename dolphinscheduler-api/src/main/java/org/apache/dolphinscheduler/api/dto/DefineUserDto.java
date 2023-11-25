@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.List;
 
@@ -28,11 +28,11 @@ public class DefineUserDto {
 
     private int count;
 
-    private List<DefinitionGroupByUser> userList;
+    private List<WorkflowDefinitionCountDto> userList;
 
-    public DefineUserDto(List<DefinitionGroupByUser> defineGroupByUsers) {
+    public DefineUserDto(List<WorkflowDefinitionCountDto> defineGroupByUsers) {
 
-        for (DefinitionGroupByUser define : defineGroupByUsers) {
+        for (WorkflowDefinitionCountDto define : defineGroupByUsers) {
             count += define.getCount();
         }
         this.userList = defineGroupByUsers;
@@ -46,11 +46,11 @@ public class DefineUserDto {
         this.count = count;
     }
 
-    public List<DefinitionGroupByUser> getUserList() {
+    public List<WorkflowDefinitionCountDto> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<DefinitionGroupByUser> userList) {
+    public void setUserList(List<WorkflowDefinitionCountDto> userList) {
         this.userList = userList;
     }
 }

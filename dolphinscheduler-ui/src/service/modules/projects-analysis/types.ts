@@ -30,19 +30,29 @@ interface UserList {
   count: number
 }
 
-interface TaskCountDto {
-  count: number
-  taskStateType: string
-}
-
 interface ProcessDefinitionRes {
   count: number
   userList: UserList[]
 }
 
-interface TaskStateRes {
+interface WorkflowInstanceCountVo {
   totalCount: number
-  taskCountDtos: TaskCountDto[]
+  workflowInstanceStatusCounts: WorkflowInstanceStatusCountDto[]
+}
+
+interface WorkflowInstanceStatusCountDto {
+  count: number
+  state: string
+}
+
+interface TaskInstanceCountVo {
+  totalCount: number
+  taskInstanceStatusCounts: TaskInstanceStatusCountDto[]
+}
+
+interface TaskInstanceStatusCountDto {
+  count: number
+  state: string
 }
 
 interface TaskQueueRes {
@@ -60,7 +70,8 @@ export {
   CodeReq,
   StateReq,
   ProcessDefinitionRes,
-  TaskStateRes,
+  WorkflowInstanceCountVo,
+  TaskInstanceCountVo,
   TaskQueueRes,
   CommandStateRes
 }

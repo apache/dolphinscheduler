@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -81,7 +84,7 @@ public class LoggerServiceTest {
         loginUser.setId(1);
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setExecutorId(loginUser.getId() + 1);
-        Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         Result result = loggerService.queryLog(loginUser, 2, 1, 1);
         // TASK_INSTANCE_NOT_FOUND
         Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
@@ -98,17 +101,17 @@ public class LoggerServiceTest {
         // PROJECT_NOT_EXIST
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
+        Project project = getProject(1);
+        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         try {
             Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
-                    .checkProjectAndAuthThrowException(loginUser, null, VIEW_LOG);
+                    .checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
             loggerService.queryLog(loginUser, 1, 1, 1);
         } catch (ServiceException serviceException) {
             Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
         }
 
         // USER_NO_OPERATION_PERM
-        Project project = getProject(1);
-        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         try {
             Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
                     .checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
@@ -118,8 +121,8 @@ public class LoggerServiceTest {
         }
 
         // SUCCESS
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
-        Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         result = loggerService.queryLog(loginUser, 1, 1, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
@@ -132,7 +135,7 @@ public class LoggerServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setExecutorId(loginUser.getId() + 1);
-        Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
 
         // task instance is null
         try {
@@ -157,7 +160,7 @@ public class LoggerServiceTest {
         taskInstance.setLogPath("/temp/log");
         try {
             Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
-                    .checkProjectAndAuthThrowException(loginUser, null, DOWNLOAD_LOG);
+                    .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), DOWNLOAD_LOG);
             loggerService.queryLog(loginUser, 1, 1, 1);
         } catch (ServiceException serviceException) {
             Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
@@ -165,7 +168,7 @@ public class LoggerServiceTest {
 
         // USER_NO_OPERATION_PERM
         Project project = getProject(1);
-        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
+        when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         try {
             Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
                     .checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
@@ -175,8 +178,8 @@ public class LoggerServiceTest {
         }
 
         // SUCCESS
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
-        Mockito.when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+        when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         byte[] result = loggerService.getLogBytes(loginUser, 1);
         Assertions.assertEquals(47, result.length);
     }
@@ -184,16 +187,12 @@ public class LoggerServiceTest {
     @Test
     public void testQueryLogInSpecifiedProject() {
         long projectCode = 1L;
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Project project = getProject(projectCode);
 
         User loginUser = new User();
         loginUser.setId(-1);
         loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
         TaskInstance taskInstance = new TaskInstance();
-        Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         taskDefinition.setCode(1L);
@@ -202,17 +201,16 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG)).thenReturn(result);
-        Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        result = loggerService.queryLog(loginUser, projectCode, 1, 1, 1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), ((Status) result.get(Constants.STATUS)).getCode());
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        assertDoesNotThrow(() -> loggerService.queryLog(loginUser, projectCode, 1, 1, 1));
     }
 
     @Test
     public void testGetLogBytesInSpecifiedProject() {
         long projectCode = 1L;
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Project project = getProject(projectCode);
 
         User loginUser = new User();
@@ -229,11 +227,10 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setHost("127.0.0.1:8080");
         taskInstance.setLogPath("/temp/log");
-        Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, DOWNLOAD_LOG))
-                .thenReturn(result);
-        Mockito.when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        Mockito.when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        loggerService.getLogBytes(loginUser, projectCode, 1);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        assertDoesNotThrow(() -> loggerService.getLogBytes(loginUser, projectCode, 1));
     }
 
     /**

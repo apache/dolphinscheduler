@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_NAME
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CAN_USE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -40,9 +39,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -89,13 +86,9 @@ public class K8sNamespaceController extends BaseController {
                                            @RequestParam("pageSize") Integer pageSize,
                                            @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        return k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**
@@ -104,56 +97,21 @@ public class K8sNamespaceController extends BaseController {
      * @param loginUser
      * @param namespace    k8s namespace
      * @param clusterCode  clusterCode
-     * @param limitsCpu    max cpu
-     * @param limitsMemory max memory
      * @return
      */
     @Operation(summary = "createK8sNamespace", description = "CREATE_NAMESPACE_NOTES")
     @Parameters({
             @Parameter(name = "namespace", description = "NAMESPACE", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "limits_cpu", description = "LIMITS_CPU", required = false, schema = @Schema(implementation = double.class)),
-            @Parameter(name = "limits_memory", description = "LIMITS_MEMORY", required = false, schema = @Schema(implementation = int.class))
+            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema = @Schema(implementation = long.class))
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_K8S_NAMESPACE_ERROR)
     public Result createNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
-                                  @RequestParam(value = "clusterCode") Long clusterCode,
-                                  @RequestParam(value = "limitsCpu", required = false) Double limitsCpu,
-                                  @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory) {
+                                  @RequestParam(value = "clusterCode") Long clusterCode) {
         Map<String, Object> result =
-                k8sNamespaceService.createK8sNamespace(loginUser, namespace, clusterCode, limitsCpu, limitsMemory);
-        return returnDataList(result);
-    }
-
-    /**
-     * update namespace,namespace and k8s not allowed update, because may create on k8s,can delete and create new instead
-     *
-     * @param loginUser
-     * @param userName     owner
-     * @param limitsCpu    max cpu
-     * @param limitsMemory max memory
-     * @return
-     */
-    @Operation(summary = "updateK8sNamespace", description = "UPDATE_NAMESPACE_NOTES")
-    @Parameters({
-            @Parameter(name = "id", description = "K8S_NAMESPACE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "userName", description = "OWNER", required = false, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "limitsCpu", description = "LIMITS_CPU", required = false, schema = @Schema(implementation = double.class)),
-            @Parameter(name = "limitsMemory", description = "LIMITS_MEMORY", required = false, schema = @Schema(implementation = int.class))})
-    @PutMapping(value = "/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(UPDATE_K8S_NAMESPACE_ERROR)
-    public Result updateNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @PathVariable(value = "id") int id,
-                                  @RequestParam(value = "userName", required = false) String userName,
-                                  @RequestParam(value = "tag", required = false) String tag,
-                                  @RequestParam(value = "limitsCpu", required = false) Double limitsCpu,
-                                  @RequestParam(value = "limitsMemory", required = false) Integer limitsMemory) {
-        Map<String, Object> result =
-                k8sNamespaceService.updateK8sNamespace(loginUser, id, userName, limitsCpu, limitsMemory);
+                k8sNamespaceService.createK8sNamespace(loginUser, namespace, clusterCode);
         return returnDataList(result);
     }
 

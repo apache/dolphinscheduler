@@ -92,6 +92,8 @@ For example
 
 ![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
 
+Attention: When the variable value contains the `\n` identifier, such as ` value = "hello \n world" `, value needs to be carried out in a special way. You need to use `print('${setValue(key=%s)}' % repr(value))`, otherwise the argument cannot be passed to the subsequent flow.
+
 #### Pass parameter from SubProcess task to downstream
 
 In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
