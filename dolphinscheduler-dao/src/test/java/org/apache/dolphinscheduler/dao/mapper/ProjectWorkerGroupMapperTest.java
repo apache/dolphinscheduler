@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 
 import java.util.Date;
 import java.util.List;
 
-import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 public class ProjectWorkerGroupMapperTest extends BaseDaoTest {
 
@@ -90,9 +90,9 @@ public class ProjectWorkerGroupMapperTest extends BaseDaoTest {
 
         ProjectWorkerGroup projectWorkerGroup = insertOne();
         int delete = projectWorkerGroupMapper.delete(new QueryWrapper<ProjectWorkerGroup>()
-            .lambda()
-            .eq(ProjectWorkerGroup::getProjectCode,projectWorkerGroup.getProjectCode())
-            .eq(ProjectWorkerGroup::getWorkerGroup,projectWorkerGroup.getWorkerGroup()));
+                .lambda()
+                .eq(ProjectWorkerGroup::getProjectCode, projectWorkerGroup.getProjectCode())
+                .eq(ProjectWorkerGroup::getWorkerGroup, projectWorkerGroup.getWorkerGroup()));
 
         Assertions.assertTrue(delete >= 1);
     }
@@ -105,8 +105,8 @@ public class ProjectWorkerGroupMapperTest extends BaseDaoTest {
         ProjectWorkerGroup projectWorkerGroup = insertOne();
         projectWorkerGroup = projectWorkerGroupMapper.selectOne(new QueryWrapper<ProjectWorkerGroup>()
                 .lambda()
-                .eq(ProjectWorkerGroup::getProjectCode,projectWorkerGroup.getProjectCode())
-                .eq(ProjectWorkerGroup::getWorkerGroup,projectWorkerGroup.getWorkerGroup()));
+                .eq(ProjectWorkerGroup::getProjectCode, projectWorkerGroup.getProjectCode())
+                .eq(ProjectWorkerGroup::getWorkerGroup, projectWorkerGroup.getWorkerGroup()));
 
         Assertions.assertNotEquals(null, projectWorkerGroup);
     }

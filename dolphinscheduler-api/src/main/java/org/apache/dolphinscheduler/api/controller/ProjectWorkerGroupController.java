@@ -19,20 +19,20 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION_ERROR;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -40,6 +40,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * project and worker group controller
@@ -76,5 +82,20 @@ public class ProjectWorkerGroupController extends BaseController {
         return projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, workerGroups);
     }
 
+    /**
+     * query worker groups that assigned to the project
+     *
+     * @param projectCode project code
+     * @return worker group list
+     */
+    @Operation(summary = "queryWorkerGroups", description = "QUERY_WORKER_GROUP_LIST")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "123456"))
+    })
+    @GetMapping()
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Object> queryWorkerGroups(@Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return projectWorkerGroupRelationService.queryWorkerGroupsByProject(projectCode);
+    }
 
 }

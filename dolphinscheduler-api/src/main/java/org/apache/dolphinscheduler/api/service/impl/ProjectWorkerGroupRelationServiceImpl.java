@@ -17,17 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
@@ -39,15 +28,33 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.SetUtils;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 /**
  * task definition service impl
  */
 @Service
 @Slf4j
-public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl implements ProjectWorkerGroupRelationService {
+public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
+        implements
+            ProjectWorkerGroupRelationService {
 
     @Autowired
     private ProjectWorkerGroupMapper projectWorkerGroupMapper;
@@ -91,8 +98,9 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
             return result;
         }
 
-        Set<String> workerGroupNames = workerGroupMapper.queryAllWorkerGroup().stream().map(item -> item.getName()).collect(
-            Collectors.toSet());
+        Set<String> workerGroupNames =
+                workerGroupMapper.queryAllWorkerGroup().stream().map(item -> item.getName()).collect(
+                        Collectors.toSet());
 
         Set<String> assignedWorkerGroupNames = workerGroups.stream().collect(Collectors.toSet());
 
@@ -104,16 +112,16 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
         }
 
         Set<String> projectWorkerGroupNames = projectWorkerGroupMapper.selectList(new QueryWrapper<ProjectWorkerGroup>()
-            .lambda()
-            .eq(ProjectWorkerGroup::getProjectCode, projectCode)
-        ).stream().map(item -> item.getWorkerGroup()).collect(Collectors.toSet());
+                .lambda()
+                .eq(ProjectWorkerGroup::getProjectCode, projectCode)).stream().map(item -> item.getWorkerGroup())
+                .collect(Collectors.toSet());
 
-
-        difference = SetUtils.difference(assignedWorkerGroupNames ,projectWorkerGroupNames);
+        difference = SetUtils.difference(assignedWorkerGroupNames, projectWorkerGroupNames);
 
         if (CollectionUtils.isNotEmpty(difference)) {
-            int deleted = projectWorkerGroupMapper.delete(new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode
-            ).in(ProjectWorkerGroup::getWorkerGroup, difference));
+            int deleted = projectWorkerGroupMapper.delete(
+                    new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode)
+                            .in(ProjectWorkerGroup::getWorkerGroup, difference));
             if (deleted > 0) {
                 log.info("Success to delete worker groups [{}] for the project [{}] .", difference, project.getName());
             } else {
@@ -133,9 +141,11 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
                 projectWorkerGroup.setUpdateTime(now);
                 int create = projectWorkerGroupMapper.insert(projectWorkerGroup);
                 if (create > 0) {
-                    log.info("Success to add worker group [{}] for the project [{}] .", workerGroupName, project.getName());
+                    log.info("Success to add worker group [{}] for the project [{}] .", workerGroupName,
+                            project.getName());
                 } else {
-                    log.error("Failed to add worker group [{}] for the project [{}].", workerGroupName, project.getName());
+                    log.error("Failed to add worker group [{}] for the project [{}].", workerGroupName,
+                            project.getName());
                     throw new ServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR, project.getName());
                 }
             });
@@ -154,7 +164,8 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl imple
     public Map<String, Object> queryWorkerGroupsByProject(Long projectCode) {
         Map<String, Object> result = new HashMap<>();
 
-        List<ProjectWorkerGroup> projectWorkerGroups = projectWorkerGroupMapper.selectList(new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode));
+        List<ProjectWorkerGroup> projectWorkerGroups = projectWorkerGroupMapper.selectList(
+                new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode));
         result.put(Constants.DATA_LIST, projectWorkerGroups);
         putMsg(result, Status.SUCCESS);
         return result;

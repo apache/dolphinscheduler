@@ -17,14 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import com.google.common.collect.Lists;
-import com.sun.org.apache.regexp.internal.RE;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import kotlin.jvm.internal.unsafe.MonitorKt;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -37,6 +29,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,6 +42,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -65,13 +63,13 @@ public class ProjectWorkerGroupRelationServiceTest {
 
     protected final static long projectCode = 1L;
 
-
     @Test
     public void testAssignWorkerGroupsToProject() {
         User loginUser = getAdminUser();
 
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(null);
-        Result result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, getWorkerGroups());
+        Result result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
+                getWorkerGroups());
         Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
 
         WorkerGroup workerGroup = new WorkerGroup();
@@ -79,18 +77,21 @@ public class ProjectWorkerGroupRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject());
         Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(Lists.newArrayList(workerGroup));
 
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, getWorkerGroups());
+        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
+                getWorkerGroups());
         Assertions.assertEquals(Status.WORKER_GROUP_NOT_EXIST.getCode(), result.getCode());
     }
 
     @Test
     public void testQueryWorkerGroupsByProject() {
 
-        Mockito.when(projectWorkerGroupMapper.selectList(Mockito.any())).thenReturn(Lists.newArrayList(getProjectWorkerGroup()));
+        Mockito.when(projectWorkerGroupMapper.selectList(Mockito.any()))
+                .thenReturn(Lists.newArrayList(getProjectWorkerGroup()));
 
         Map<String, Object> result = projectWorkerGroupRelationService.queryWorkerGroupsByProject(projectCode);
 
-        ProjectWorkerGroup[] actualValue = ((List<ProjectWorkerGroup>)result.get(Constants.DATA_LIST)).toArray(new ProjectWorkerGroup[0]);
+        ProjectWorkerGroup[] actualValue =
+                ((List<ProjectWorkerGroup>) result.get(Constants.DATA_LIST)).toArray(new ProjectWorkerGroup[0]);
 
         Assertions.assertEquals(actualValue[0].getWorkerGroup(), getProjectWorkerGroup().getWorkerGroup());
     }
@@ -98,7 +99,6 @@ public class ProjectWorkerGroupRelationServiceTest {
     private List<String> getWorkerGroups() {
         return Lists.newArrayList("default");
     }
-
 
     private User getGeneralUser() {
         User loginUser = new User();
