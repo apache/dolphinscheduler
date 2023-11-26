@@ -14,12 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.mapper;
+
+package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.Session;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
 
-public interface SessionMapper extends BaseMapper<Session> {
+public interface SessionDao extends IDao<Session> {
+
+    void deleteByUserId(Integer userId);
+
+    List<Session> queryByUserId(Integer userId);
 
 }
