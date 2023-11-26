@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
+import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.StringUtils;
@@ -160,20 +161,13 @@ public class LoginController extends BaseController {
         return Result.success();
     }
 
-    /**
-     * sign out
-     *
-     * @param loginUser login user
-     * @param request request
-     * @return sign out result
-     */
     @Operation(summary = "signOut", description = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
     @ApiException(SIGN_OUT_ERROR)
     public Result signOut(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
-        sessionService.signOut(ip, loginUser);
+        sessionService.expireSession(loginUser.getId());
         // clear session
         request.removeAttribute(Constants.SESSION_USER);
         return success();
@@ -244,13 +238,10 @@ public class LoginController extends BaseController {
             if (user == null) {
                 user = usersService.createUser(UserType.GENERAL_USER, username, null);
             }
-            String sessionId = sessionService.createSession(user, null);
-            if (sessionId == null) {
-                log.error("Failed to create session, userName:{}.", user.getUserName());
-            }
+            Session session = sessionService.createSessionIfAbsent(user);
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
             response.sendRedirect(String.format("%s?sessionId=%s&authType=%s", oAuth2ClientProperties.getCallbackUrl(),
-                    sessionId, "oauth2"));
+                    session.getId(), "oauth2"));
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
