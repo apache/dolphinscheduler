@@ -28,17 +28,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * process definition mapper interface
  */
-@CacheConfig(cacheNames = "processDefinition", keyGenerator = "cacheKeyGenerator")
 public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
@@ -47,13 +42,11 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return process definition
      */
-    @Cacheable(sync = true)
     ProcessDefinition queryByCode(@Param("code") long code);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.code")
     int updateById(@Param("et") ProcessDefinition processDefinition);
 
     /**
@@ -62,7 +55,6 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return delete result
      */
-    @CacheEvict
     int deleteByCode(@Param("code") long code);
 
     /**

@@ -23,23 +23,16 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * scheduler mapper interface
  */
-@CacheConfig(cacheNames = "schedule", keyGenerator = "cacheKeyGenerator")
 public interface ScheduleMapper extends BaseMapper<Schedule> {
 
-    @CacheEvict(key = "#p0.processDefinitionCode")
     int insert(Schedule entity);
 
-    @CacheEvict(key = "#p0.processDefinitionCode")
     int updateById(@Param("et") Schedule entity);
 
     /**
@@ -48,7 +41,6 @@ public interface ScheduleMapper extends BaseMapper<Schedule> {
      * @param processDefinitionCode processDefinitionCode
      * @return schedule list
      */
-    @Cacheable(sync = true)
     List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
     /**
