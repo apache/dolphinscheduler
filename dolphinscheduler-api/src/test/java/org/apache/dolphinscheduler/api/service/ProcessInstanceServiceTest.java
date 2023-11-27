@@ -20,7 +20,10 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -192,13 +195,23 @@ public class ProcessInstanceServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
-        when(projectMapper.queryByCode(projectCode)).thenReturn(null);
-        Mockito.doThrow(new ServiceException()).when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
-                Mockito.any(), Mockito.any());
-        Assertions.assertThrows(ServiceException.class, () -> {
-            processInstanceService.queryProcessInstanceList(loginUser, projectCode, 46, "2020-01-01 00:00:00",
-                    "2020-01-02 00:00:00", "", "test_user", WorkflowExecutionStatus.SUBMITTED_SUCCESS,
-                    "192.168.xx.xx", "", 1, 10);
+        doThrow(new ServiceException())
+                .when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+        assertThrows(ServiceException.class, () -> {
+            processInstanceService.queryProcessInstanceList(
+                    loginUser,
+                    projectCode,
+                    46,
+                    "2020-01-01 00:00:00",
+                    "2020-01-02 00:00:00",
+                    "",
+                    "test_user",
+                    WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                    "192.168.xx.xx",
+                    "",
+                    1,
+                    10);
         });
 
         Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
@@ -212,13 +225,14 @@ public class ProcessInstanceServiceTest {
         // data parameter check
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(), Mockito.any(),
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
+                Mockito.any(Project.class),
                 Mockito.any());
         when(processDefineMapper.selectById(Mockito.anyInt())).thenReturn(getProcessDefinition());
         when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), Mockito.any(), Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(),
                 eq("192.168.xx.xx"), Mockito.any(), Mockito.any())).thenReturn(pageReturn);
-        Assertions.assertThrows(ServiceException.class, () -> processInstanceService.queryProcessInstanceList(
+        assertThrows(ServiceException.class, () -> processInstanceService.queryProcessInstanceList(
                 loginUser,
                 projectCode,
                 1,
@@ -235,13 +249,20 @@ public class ProcessInstanceServiceTest {
         // project auth success
         putMsg(result, Status.SUCCESS, projectCode);
 
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(processInstanceMapper.queryProcessInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
-                eq(1L), eq(""), eq(""), Mockito.any(),
-                eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
+        when(processInstanceMapper.queryProcessInstanceListPaging(
+                Mockito.any(Page.class),
+                eq(project.getCode()),
+                eq(1L),
+                eq(""),
+                eq(""),
+                Mockito.any(),
+                eq("192.168.xx.xx"),
+                eq(start),
+                eq(end)))
+                        .thenReturn(pageReturn);
         when(usersService.queryUser(processInstance.getExecutorId())).thenReturn(loginUser);
 
         Result successRes =
@@ -554,18 +575,22 @@ public class ProcessInstanceServiceTest {
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-                shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
+        doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode))
+                .when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, INSTANCE_UPDATE);
+        Assertions.assertThrows(ServiceException.class,
+                () -> processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
+                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
 
         // process instance null
         putMsg(result, Status.SUCCESS, projectCode);
         ProcessInstance processInstance = getProcessInstance();
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_UPDATE)).thenReturn(result);
+        doNothing()
+                .when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, INSTANCE_UPDATE);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
-        Assertions.assertThrows(ServiceException.class, () -> {
+        assertThrows(ServiceException.class, () -> {
             processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
                     shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0);
         });
@@ -637,7 +662,7 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.empty());
-        Assertions.assertThrows(ServiceException.class, () -> {
+        assertThrows(ServiceException.class, () -> {
             processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
         });
 
@@ -678,7 +703,7 @@ public class ProcessInstanceServiceTest {
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_DELETE)).thenReturn(result);
 
-        Assertions.assertThrows(ServiceException.class,
+        assertThrows(ServiceException.class,
                 () -> processInstanceService.deleteProcessInstanceById(loginUser, 1));
 
         // not sub process
@@ -689,7 +714,7 @@ public class ProcessInstanceServiceTest {
         when(processService.findProcessInstanceDetailById(1)).thenReturn(Optional.ofNullable(processInstance));
         when(processDefinitionLogMapper.queryByDefinitionCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(new ProcessDefinitionLog());
-        Assertions.assertThrows(ServiceException.class,
+        assertThrows(ServiceException.class,
                 () -> processInstanceService.deleteProcessInstanceById(loginUser, 1));
 
         processInstance.setState(WorkflowExecutionStatus.SUCCESS);
@@ -704,7 +729,7 @@ public class ProcessInstanceServiceTest {
         processDefinition.setProjectCode(0L);
         when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(processService.findProcessInstanceDetailById(Mockito.anyInt())).thenReturn(Optional.empty());
-        Assertions.assertThrows(ServiceException.class,
+        assertThrows(ServiceException.class,
                 () -> processInstanceService.deleteProcessInstanceById(loginUser, 1));
 
         processDefinition.setProjectCode(projectCode);

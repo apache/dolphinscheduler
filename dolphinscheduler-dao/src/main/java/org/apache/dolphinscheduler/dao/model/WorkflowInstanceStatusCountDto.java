@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.dao.model;
 
-import org.apache.dolphinscheduler.common.enums.CacheType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class CacheExpireRequest {
+@AllArgsConstructor
+public class WorkflowInstanceStatusCountDto {
 
-    private CacheType cacheType;
-    private String cacheKey;
+    private WorkflowExecutionStatus state;
+
+    private int count;
 
 }

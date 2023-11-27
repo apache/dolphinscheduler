@@ -15,28 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.dao.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * count definition number group by user
- */
 @Data
-public class DefinitionGroupByUser {
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowDefinitionCountDto {
 
-    /**
-     * user name
-     */
     private String userName;
 
-    /**
-     * user id
-     */
     private Integer userId;
 
-    /**
-     * count number
-     */
     private int count;
 }
