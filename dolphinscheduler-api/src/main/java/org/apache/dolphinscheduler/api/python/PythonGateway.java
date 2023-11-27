@@ -265,11 +265,10 @@ public class PythonGateway {
         if (processDefinition != null) {
             processDefinitionCode = processDefinition.getCode();
             // make sure workflow offline which could edit
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
-                    ReleaseState.OFFLINE);
+            processDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
             processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
-                    null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, taskRelationJson, taskDefinitionJson,
                     executionTypeEnum);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
@@ -290,8 +289,11 @@ public class PythonGateway {
                     warningType,
                     warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
-                ReleaseState.getEnum(releaseState));
+        if (ReleaseState.ONLINE.equals(ReleaseState.getEnum(releaseState))) {
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+        } else if (ReleaseState.OFFLINE.equals(ReleaseState.getEnum(releaseState))) {
+            processDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+        }
         return processDefinitionCode;
     }
 
@@ -346,8 +348,7 @@ public class PythonGateway {
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
-            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode,
-                    ReleaseState.ONLINE);
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, workflowCode,
                     schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
@@ -355,16 +356,15 @@ public class PythonGateway {
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
-            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode,
-                    ReleaseState.OFFLINE);
+            processDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
                     DEFAULT_ENVIRONMENT_CODE);
         }
         if (onlineSchedule) {
             // set workflow online to make sure we can set schedule online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
-            schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
+            schedulerService.onlineScheduler(user, projectCode, scheduleId);
         }
     }
 
@@ -382,8 +382,7 @@ public class PythonGateway {
                 processDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
 
         // make sure workflow online
-        processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(),
-                ReleaseState.ONLINE);
+        processDefinitionService.onlineWorkflowDefinition(user, project.getCode(), processDefinition.getCode());
 
         executorService.execProcessInstance(user,
                 project.getCode(),
@@ -561,8 +560,7 @@ public class PythonGateway {
         // get workflow info
         if (processDefinition != null) {
             // make sure workflow online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(),
-                    ReleaseState.ONLINE);
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinition.getCode());
             result.put("id", processDefinition.getId());
             result.put("name", processDefinition.getName());
             result.put("code", processDefinition.getCode());

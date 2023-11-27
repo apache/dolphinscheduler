@@ -15,16 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.extract.base.RpcMethod;
-import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.master.transportor.CacheExpireRequest;
+import org.apache.dolphinscheduler.dao.entity.Session;
 
-@RpcService
-public interface IMasterCacheService {
+import java.util.List;
 
-    @RpcMethod
-    void cacheExpire(CacheExpireRequest cacheExpireRequest);
+public interface SessionDao extends IDao<Session> {
+
+    void deleteByUserId(Integer userId);
+
+    List<Session> queryByUserId(Integer userId);
 
 }
