@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 public class SessionMapperTest extends BaseDaoTest {
 
     @Autowired
@@ -87,7 +89,8 @@ public class SessionMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByUserId() {
         Session session = insertOne();
-        List<Session> sessions = sessionMapper.queryByUserId(session.getUserId());
+        List<Session> sessions =
+                sessionMapper.selectList(new QueryWrapper<>(Session.builder().userId(session.getUserId()).build()));
         Assertions.assertNotEquals(0, sessions.size());
 
     }
