@@ -32,7 +32,7 @@ public enum Status {
     INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
 
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
-    TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
+//    TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
     USER_NAME_EXIST(10003, "user name already exists", "用户名已存在"),
     USER_NAME_NULL(10004, "user name is null", "用户名不能为空"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),

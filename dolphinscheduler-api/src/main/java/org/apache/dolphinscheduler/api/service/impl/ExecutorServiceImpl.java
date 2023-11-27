@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.TaskStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.ExecuteClient;
 import org.apache.dolphinscheduler.api.executor.ExecuteContext;
@@ -43,6 +44,7 @@ import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -103,6 +105,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.MessageFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -187,6 +190,38 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TenantMapper tenantMapper;
 
     /**
+     * put message to map
+     *
+     * @param result result code
+     * @param taskStatus status
+     * @param statusParams status message
+     */
+    private void putMsg(Map<String, Object> result, TaskStatus taskStatus, Object... statusParams) {
+        result.put(Constants.STATUS, taskStatus);
+        if (statusParams != null && statusParams.length > 0) {
+            result.put(Constants.MSG, MessageFormat.format(taskStatus.getMsg(), statusParams));
+        } else {
+            result.put(Constants.MSG, taskStatus.getMsg());
+        }
+    }
+
+    /**
+     * put message to result object
+     *
+     * @param result result code
+     * @param taskStatus status
+     * @param statusParams status message
+     */
+
+    private void putMsg(Result result, TaskStatus taskStatus, Object... statusParams) {
+        result.setCode(taskStatus.getCode());
+        if (statusParams != null && statusParams.length > 0) {
+            result.setMsg(MessageFormat.format(taskStatus.getMsg(), statusParams));
+        } else {
+            result.setMsg(taskStatus.getMsg());
+        }
+    }
+    /**
      * execute process instance
      *
      * @param loginUser                 login user
@@ -233,7 +268,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             log.warn("Parameter timeout is invalid, timeout:{}.", timeout);
-            putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
+            putMsg(result, TaskStatus.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
 
