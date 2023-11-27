@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.curator.test.TestingServer;
 
 import java.text.MessageFormat;
@@ -77,17 +77,20 @@ public abstract class AbstractControllerTest {
 
     @AfterEach
     public void after() throws Exception {
-        sessionService.signOut("127.0.0.1", user);
+        if (user != null) {
+            sessionService.expireSession(user.getId());
+        }
     }
 
     private void createSession(User loginUser) {
 
         user = loginUser;
 
-        String session = sessionService.createSession(loginUser, "127.0.0.1");
-        sessionId = session;
+        Session session = sessionService.createSessionIfAbsent(loginUser);
+        Assertions.assertNotNull(session);
 
-        Assertions.assertFalse(StringUtils.isEmpty(session));
+        sessionId = session.getId();
+        Assertions.assertNotNull(sessionId);
     }
 
     public Map<String, Object> success() {

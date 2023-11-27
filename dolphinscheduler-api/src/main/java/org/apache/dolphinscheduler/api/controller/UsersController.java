@@ -76,18 +76,6 @@ public class UsersController extends BaseController {
     @Autowired
     private UsersService usersService;
 
-    /**
-     * create user
-     *
-     * @param loginUser login user
-     * @param userName user name
-     * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
-     * @return create result code
-     */
     @Operation(summary = "createUser", description = "CREATE_USER_NOTES")
     @Parameters({
             @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class)),
@@ -172,19 +160,27 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_USER_ERROR)
-    public Result updateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam(value = "id") int id,
-                             @RequestParam(value = "userName") String userName,
-                             @RequestParam(value = "userPassword") String userPassword,
-                             @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
-                             @RequestParam(value = "email") String email,
-                             @RequestParam(value = "tenantId") int tenantId,
-                             @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state,
-                             @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
-        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId,
-                phone, queue, state, timeZone);
-        return returnDataList(result);
+    public Result<User> updateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @RequestParam(value = "id") int id,
+                                   @RequestParam(value = "userName") String userName,
+                                   @RequestParam(value = "userPassword") String userPassword,
+                                   @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
+                                   @RequestParam(value = "email") String email,
+                                   @RequestParam(value = "tenantId") int tenantId,
+                                   @RequestParam(value = "phone", required = false) String phone,
+                                   @RequestParam(value = "state", required = false) int state,
+                                   @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
+        User user = usersService.updateUser(loginUser,
+                id,
+                userName,
+                userPassword,
+                email,
+                tenantId,
+                phone,
+                queue,
+                state,
+                timeZone);
+        return Result.success(user);
     }
 
     /**
