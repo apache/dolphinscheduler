@@ -24,16 +24,19 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.NonNull;
+
 public interface Authenticator {
 
     /**
      * Verifying legality via username and password
+     *
      * @param username user name
      * @param password user password
-     * @param extra extra info
+     * @param ip       client ip
      * @return result object
      */
-    Result<Map<String, String>> authenticate(String username, String password, String extra);
+    Result<Map<String, String>> authenticate(@NonNull String username, String password, @NonNull String ip);
 
     /**
      * Get authenticated user
