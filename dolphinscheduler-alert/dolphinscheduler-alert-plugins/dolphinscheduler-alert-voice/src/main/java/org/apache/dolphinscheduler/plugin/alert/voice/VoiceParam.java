@@ -17,8 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.alert.voice;
 
+import lombok.Data;
 
-
+@Data
 public class VoiceParam {
 
     /**
@@ -48,7 +49,7 @@ public class VoiceParam {
      */
     private String outId;
 
-
+    @Data
     public static class Connection {
 
         /**
@@ -69,85 +70,5 @@ public class VoiceParam {
          * tts Code
          */
         private String ttsCode;
-
-        public String getAddress() {
-            return address;
-        }
-
-        public void setAddress(String address) {
-            this.address = address;
-        }
-
-        public String getAccessKeyId() {
-            return accessKeyId;
-        }
-
-        public void setAccessKeyId(String accessKeyId) {
-            this.accessKeyId = accessKeyId;
-        }
-
-        public String getAccessKeySecret() {
-            return accessKeySecret;
-        }
-
-        public void setAccessKeySecret(String accessKeySecret) {
-            this.accessKeySecret = accessKeySecret;
-        }
-
-        public String getTtsCode() {
-            return ttsCode;
-        }
-
-        public void setTtsCode(String ttsCode) {
-            this.ttsCode = ttsCode;
-        }
-    }
-
-    public String getCalledNumber() {
-        return calledNumber;
-    }
-
-    public void setCalledNumber(String calledNumber) {
-        this.calledNumber = calledNumber;
-    }
-
-    public String getCalledShowNumber() {
-        return calledShowNumber;
-    }
-
-    public void setCalledShowNumber(String calledShowNumber) {
-        this.calledShowNumber = calledShowNumber;
-    }
-
-    public String getTtsCode() {
-        return ttsCode;
-    }
-
-    public void setTtsCode(String ttsCode) {
-        this.ttsCode = ttsCode;
-    }
-
-    public String getTtsParam() {
-        return ttsParam;
-    }
-
-    public void setTtsParam(String ttsParam) {
-        this.ttsParam = ttsParam;
-    }
-
-    public Connection getConnection() {
-        return connection;
-    }
-
-    public void setConnection(Connection connection) {
-        this.connection = connection;
-    }
-
-    public String getOutId() {
-        return outId;
-    }
-
-    public void setOutId(String outId) {
-        this.outId = outId;
     }
 }

@@ -65,7 +65,7 @@ public final class VoiceAlertChannel implements AlertChannel {
         param.setConnection(connection);
 
         SecureRandom secureRandom = new SecureRandom();
-        String outId = String.valueOf((1000 +secureRandom.nextInt(10) * (99999999 -10000000));
+        String outId = String.valueOf((1000 + secureRandom.nextInt(10) * (99999999 - 10000000)));
         param.setOutId(outId);
         return param;
     }
