@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.http;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -84,6 +85,7 @@ public final class HttpAlertChannelFactory implements AlertChannelFactory {
                 InputNumberParam.newBuilder(HttpAlertConstants.NAME_TIMEOUT, HttpAlertConstants.TIMEOUT)
                         .setValue(HttpAlertConstants.DEFAULT_TIMEOUT)
                         .addValidate(Validate.newBuilder()
+                                .setType(DataType.NUMBER.getDataType())
                                 .setRequired(false)
                                 .build())
                         .build();
