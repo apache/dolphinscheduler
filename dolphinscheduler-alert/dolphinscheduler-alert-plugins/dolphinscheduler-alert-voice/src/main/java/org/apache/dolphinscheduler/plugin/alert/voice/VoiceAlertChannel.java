@@ -17,19 +17,20 @@
 
 package org.apache.dolphinscheduler.plugin.alert.voice;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.alert.api.AlertChannel;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
-import org.apache.dolphinscheduler.alert.api.AlertResult;
-
-import java.util.Map;
-
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_ACCESS_KEY_ID;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_ACCESS_KEY_SECRET;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_ADDRESS;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_CALLED_NUMBER;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_CALLED_SHOW_NUMBER;
 import static org.apache.dolphinscheduler.plugin.alert.voice.VoiceAlertConstants.NAME_TTS_CODE;
+
+import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertInfo;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class VoiceAlertChannel implements AlertChannel {
