@@ -56,14 +56,19 @@ public final class VoiceSender {
             RuntimeOptions runtime = new RuntimeOptions();
             SingleCallByTtsResponse response = client.singleCallByTtsWithOptions(singleCallByTtsRequest, runtime);
             if (response == null) {
-                alertResult.setMessage("vocie send error.");
+                alertResult.setMessage("vocie send error:aliyun-vocie response is null");
                 return alertResult;
             }
             SingleCallByTtsResponseBody body = response.getBody();
-            alertResult.setStatus(body.code.toLowerCase().equals("ok") ? "true" : "false");
+            if (body.code.toLowerCase().equals("ok")) {
+                alertResult.setStatus("true");
+                alertResult.setMessage(body.getCallId());
+            } else {
+                alertResult.setMessage("vocie send callbacke error:" + body.getMessage());
+            }
         } catch (Exception e) {
             log.error("vocie send error.", e);
-            alertResult.setMessage("vocie send error.");
+            alertResult.setMessage("vocie send error:" + e.getMessage());
         }
         return alertResult;
     }

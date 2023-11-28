@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.security.SecureRandom;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -43,20 +44,7 @@ public final class VoiceAlertChannel implements AlertChannel {
             return new AlertResult("false", "aliyun-voice params is null");
         }
         VoiceParam voiceParam = buildVoiceParam(paramsMap);
-        VoiceSender voiceSender = new VoiceSender(voiceParam);
-
-        AlertResult alertResult = voiceSender.send();
-        boolean flag = Boolean.parseBoolean(String.valueOf(alertResult.getStatus()));
-        if (flag) {
-            log.info("alert send success");
-            alertResult.setStatus("true");
-            alertResult.setMessage("vocie send success.");
-        } else {
-            alertResult.setMessage("vocie send error.");
-            log.info("alert send error : {}", alertResult.getMessage());
-        }
-
-        return alertResult;
+        return new VoiceSender(voiceParam).send();
     }
 
     public VoiceParam buildVoiceParam(Map<String, String> paramsMap) {
@@ -75,7 +63,9 @@ public final class VoiceAlertChannel implements AlertChannel {
         connection.setAccessKeyId(accessKeyId);
         connection.setAccessKeySecret(accessKeySecret);
         param.setConnection(connection);
-        String outId = String.valueOf((int) (1000 + Math.random() * (99999999 - 1 - 10000000)));
+
+        SecureRandom secureRandom = new SecureRandom();
+        String outId = String.valueOf((1000 +secureRandom.nextInt(10) * (99999999 -10000000));
         param.setOutId(outId);
         return param;
     }
