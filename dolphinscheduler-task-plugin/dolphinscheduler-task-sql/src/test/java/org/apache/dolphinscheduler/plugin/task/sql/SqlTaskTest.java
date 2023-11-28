@@ -68,6 +68,21 @@ class SqlTaskTest {
     }
 
     @Test
+    void testReplaceOriginalValue(){
+        String querySql = "select * from A where a = !{a}";
+        String expected = "select * from A where a = $aa";
+        String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
+        Map<String, Property> sqlParamsMap = new HashMap<>();
+        Property property = new Property();
+        property.setProp("a");
+        property.setType(DataType.LONG);
+        property.setDirect(Direct.IN);
+        property.setValue("$aa");
+        sqlParamsMap.put("a",property);
+        String afterReplace = sqlTask.replaceOriginalValue(querySql, rgexo, sqlParamsMap);
+        Assertions.assertEquals(expected, afterReplace);
+    }
+    @Test
     void testReplacingHiveLoadSql() {
         String hiveLoadSql = "load inpath '/tmp/test_table/dt=${dt}' into table test_table partition(dt=${dt})";
         String expected = "load inpath '/tmp/test_table/dt=?' into table test_table partition(dt=?)";

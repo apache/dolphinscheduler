@@ -477,7 +477,7 @@ public class SqlTask extends AbstractTask {
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
-    private String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
+    public String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
         Pattern pattern = Pattern.compile(rgex);
         while (true) {
             StringBuffer sb = new StringBuffer(content.length());
