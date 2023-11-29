@@ -68,7 +68,7 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) {
-        return masterTaskExecuteHost;
+    protected Host getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) {
+        return masterTaskExecuteHost.get();
     }
 }

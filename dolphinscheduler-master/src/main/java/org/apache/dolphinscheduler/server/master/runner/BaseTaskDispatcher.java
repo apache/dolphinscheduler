@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.NoSuitableWorkerException;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -33,7 +34,6 @@ import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatche
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 
 import java.util.Date;
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,11 +53,9 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
     public void dispatchTask(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
         Host taskInstanceDispatchHost;
         try {
-            taskInstanceDispatchHost = getTaskInstanceDispatchHost(taskExecuteRunnable)
-                    .orElseThrow(() -> new TaskDispatchException("Cannot find the host to execute task."));
-        } catch (WorkerGroupNotFoundException workerGroupNotFoundException) {
-            log.error("Dispatch task: {} failed, worker group not found.",
-                    taskExecuteRunnable.getTaskExecutionContext().getTaskName(), workerGroupNotFoundException);
+            taskInstanceDispatchHost = getTaskInstanceDispatchHost(taskExecuteRunnable);
+        } catch (WorkerGroupNotFoundException | NoSuitableWorkerException e) {
+            log.error("Dispatch task: {} failed.", taskExecuteRunnable.getTaskExecutionContext().getTaskName(), e);
             addDispatchFailedEvent(taskExecuteRunnable);
             return;
         }
@@ -71,7 +69,7 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
 
     protected abstract void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException;
 
-    protected abstract Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
+    protected abstract Host getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) throws NoSuitableWorkerException, WorkerGroupNotFoundException;
 
     protected void addDispatchEvent(TaskExecuteRunnable taskExecuteRunnable) {
         TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();

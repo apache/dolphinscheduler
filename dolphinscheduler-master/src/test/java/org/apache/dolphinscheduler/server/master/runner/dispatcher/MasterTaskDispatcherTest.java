@@ -40,8 +40,7 @@ public class MasterTaskDispatcherTest {
 
         MasterTaskDispatcher masterTaskDispatcher =
                 new MasterTaskDispatcher(taskEventService, masterConfig);
-        Host taskInstanceDispatchHost = masterTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot get the "));
+        Host taskInstanceDispatchHost = masterTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable);
         Assertions.assertEquals(masterConfig.getMasterAddress(), taskInstanceDispatchHost.getAddress());
     }
 }

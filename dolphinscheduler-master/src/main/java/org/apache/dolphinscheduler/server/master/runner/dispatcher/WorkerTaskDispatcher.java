@@ -26,14 +26,13 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispat
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.NoSuitableWorkerException;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
 import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
-
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,9 +72,9 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecuteRunnable) throws WorkerGroupNotFoundException {
+    protected Host getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecuteRunnable) throws WorkerGroupNotFoundException, NoSuitableWorkerException {
         String workerGroup = taskExecuteRunnable.getTaskExecutionContext().getWorkerGroup();
-        return hostManager.select(workerGroup);
+        return hostManager.select(workerGroup).orElseThrow(() -> new NoSuitableWorkerException(workerGroup));
 
     }
 }

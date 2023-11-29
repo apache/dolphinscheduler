@@ -17,9 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.NoSuitableWorkerException;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
@@ -37,17 +41,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class WorkerTaskDispatcherTest {
 
     @Test
-    public void getTaskInstanceDispatchHost() throws WorkerGroupNotFoundException {
+    public void getTaskInstanceDispatchHost() throws WorkerGroupNotFoundException, NoSuitableWorkerException {
         TaskEventService taskEventService = Mockito.mock(TaskEventService.class);
         MasterConfig masterConfig = Mockito.mock(MasterConfig.class);
         HostManager hostManager = Mockito.mock(HostManager.class);
-        Mockito.when(hostManager.select(Mockito.any())).thenReturn(Optional.of(Host.of("localhost:1234")));
+        when(hostManager.select(Mockito.any())).thenReturn(Optional.of(Host.of("localhost:1234")));
+        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
+
         WorkerTaskDispatcher workerTaskDispatcher =
                 new WorkerTaskDispatcher(taskEventService, masterConfig, hostManager);
 
-        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
-        Mockito.when(taskExecuteRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
-        Optional<Host> taskInstanceDispatchHost = workerTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable);
-        Assertions.assertEquals("localhost:1234", taskInstanceDispatchHost.get().getAddress());
+        when(taskExecuteRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
+        Host taskInstanceDispatchHost = workerTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable);
+        Assertions.assertEquals("localhost:1234", taskInstanceDispatchHost.getAddress());
+
+        when(hostManager.select(Mockito.any())).thenReturn(Optional.empty());
+        NoSuitableWorkerException noSuitableWorkerException = assertThrows(NoSuitableWorkerException.class,
+                () -> workerTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable));
+        Assertions.assertEquals("Cannot find suitable Worker for WorkerGroup(null).",
+                noSuitableWorkerException.getMessage());
+
     }
 }
