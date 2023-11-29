@@ -132,8 +132,6 @@ public class KubernetesApplicationManager implements ApplicationManager {
     private KubernetesClient getClient(KubernetesApplicationManagerContext kubernetesApplicationManagerContext) {
         K8sTaskExecutionContext k8sTaskExecutionContext =
                 kubernetesApplicationManagerContext.getK8sTaskExecutionContext();
-        k8sTaskExecutionContext
-                .setConfigYaml(JSONUtils.getNodeString(k8sTaskExecutionContext.getConnectionParams(), "kubeConfig"));
         return cacheClientMap.computeIfAbsent(kubernetesApplicationManagerContext.getLabelValue(),
                 key -> new KubernetesClientBuilder()
                         .withConfig(Config.fromKubeconfig(k8sTaskExecutionContext.getConfigYaml())).build());
