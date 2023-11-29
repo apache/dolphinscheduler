@@ -26,12 +26,12 @@ import org.junit.jupiter.api.Test;
 /**
  * VoiceSenderTest
  */
-public class VoiceSenderTest {
+class VoiceSenderTest {
 
     private static VoiceParam voiceParam = new VoiceParam();
 
     @BeforeEach
-    public void initVoidceParam() {
+    void initVoidceParam() {
         voiceParam.setCalledNumber("12345678910");
         voiceParam.setTtsParam("TTS_2450XXXXX");
         VoiceParam.Connection connection = new VoiceParam.Connection();
@@ -42,7 +42,7 @@ public class VoiceSenderTest {
     }
 
     @Test
-    public void testSendWeChatTableMsg() {
+    void testSendWeChatTableMsg() {
         VoiceSender weChatSender = new VoiceSender(voiceParam);
 
         AlertResult alertResult = weChatSender.send();

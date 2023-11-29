@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
-import java.security.SecureRandom;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,9 +63,8 @@ public final class VoiceAlertChannel implements AlertChannel {
         connection.setAccessKeySecret(accessKeySecret);
         param.setConnection(connection);
 
-        SecureRandom secureRandom = new SecureRandom();
-        String outId = String.valueOf((1000 + secureRandom.nextInt(10) * (99999999 - 10000000)));
-        param.setOutId(outId);
+        // set callback ID
+        param.setOutId(calledShowNumber);
         return param;
     }
 }

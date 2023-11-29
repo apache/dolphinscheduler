@@ -25,11 +25,13 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** VoiceAlertChannelFactoryTest */
-public class VoiceAlertChannelFactoryTest {
+/**
+ * VoiceAlertChannelFactoryTest
+ */
+class VoiceAlertChannelFactoryTest {
 
     @Test
-    public void testGetParams() {
+    void testGetParams() {
         VoiceAlertChannelFactory voiceAlertChannelFactory = new VoiceAlertChannelFactory();
         List<PluginParams> params = voiceAlertChannelFactory.params();
         JSONUtils.toJsonString(params);
@@ -37,7 +39,7 @@ public class VoiceAlertChannelFactoryTest {
     }
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         VoiceAlertChannelFactory voiceAlertChannelFactory = new VoiceAlertChannelFactory();
         AlertChannel alertChannel = voiceAlertChannelFactory.create();
         Assertions.assertNotNull(alertChannel);
