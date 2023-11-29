@@ -161,25 +161,3 @@ Create a task node in the workflow definition, select the worker group and the e
 
 > NOTE: Please make sure you have associated the `Environments` with your `worker groups` if you can not select the `Environment Name` in workflow definition page or when triggering workflows.
 
-## Cluster Management
-
-> Add or update cluster
-> - Each process can be related to zero or several clusters to support multiple environment, now just support k8s.
->
-> Usage cluster
-> - After creation and authorization, k8s namespaces and processes will associate clusters. Each cluster will have separate workflows and task instances running independently.
-
-![create-cluster](../../../../img/new_ui/dev/security/create-cluster.png)
-
-## Namespace Management
-
-> Add or update k8s cluster
-
-- First enter the configuration of the k8s cluster connection into the table `t_ds_k8s` in the database for batch job and will removed later, the creation of the namespace now selects the cluster by drop-down options.
-
-> Add or update namespace
-
-- After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
-
-![create-environment](../../../../img/new_ui/dev/security/create-namespace.png)
-

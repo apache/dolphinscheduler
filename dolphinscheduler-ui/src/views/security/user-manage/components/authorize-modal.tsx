@@ -246,15 +246,6 @@ export const AuthorizeModal = defineComponent({
             />
           </NSpace>
         )}
-        {type === 'authorize_namespace' && (
-          <NTransfer
-            virtualScroll
-            options={this.unauthorizedNamespaces}
-            filterable
-            v-model:value={this.authorizedNamespaces}
-            class={styles.transfer}
-          />
-        )}
       </Modal>
     )
   }
