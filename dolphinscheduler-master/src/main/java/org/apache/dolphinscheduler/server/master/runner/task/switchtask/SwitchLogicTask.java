@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
@@ -39,8 +38,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +46,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
     public static final String TASK_TYPE = "SWITCH";
-
-    private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
     private final ProcessInstance processInstance;
     private final TaskInstance taskInstance;
@@ -94,13 +89,24 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
         // todo: refactor these calculate code
         int finalConditionLocation = switchResultVos.size() - 1;
         int i = 0;
+
+        Map<String, Property> globalParams = JSONUtils
+                .toList(processInstance.getGlobalParams(), Property.class)
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String, Property> varParams = JSONUtils
+                .toList(taskInstance.getVarPool(), Property.class)
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+
         for (SwitchResultVo info : switchResultVos) {
             log.info("Begin to execute {} condition: {} ", (i + 1), info.getCondition());
             if (StringUtils.isEmpty(info.getCondition())) {
                 finalConditionLocation = i;
                 break;
             }
-            String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
+            String content =
+                    SwitchTaskUtils.generateContentWithTaskParams(info.getCondition(), globalParams, varParams);
             log.info("Format condition sentence::{} successfully", content);
             Boolean result;
             try {
@@ -129,39 +135,6 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
         log.info("The switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
         return conditionResult;
-    }
-
-    public String setTaskParams(String content, String rgex) {
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        Map<String, Property> globalParams = JSONUtils
-                .toList(processInstance.getGlobalParams(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        Map<String, Property> varParams = JSONUtils
-                .toList(taskInstance.getVarPool(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        if (varParams.size() > 0) {
-            varParams.putAll(globalParams);
-            globalParams = varParams;
-        }
-        while (m.find()) {
-            String paramName = m.group(1);
-            Property property = globalParams.get(paramName);
-            if (property == null) {
-                return "";
-            }
-            String value;
-            if (ParameterUtils.isNumber(property) || ParameterUtils.isBoolean(property)) {
-                value = "" + ParameterUtils.getParameterValue(property);
-            } else {
-                value = "\"" + ParameterUtils.getParameterValue(property) + "\"";
-            }
-            log.info("paramName:{}，paramValue:{}", paramName, value);
-            content = content.replace("${" + paramName + "}", value);
-        }
-        return content;
     }
 
     private boolean isValidSwitchResult(SwitchResultVo switchResult) {

@@ -15,28 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
+import org.apache.dolphinscheduler.dao.entity.Session;
 
-public class CreateTokenResponse extends Result {
+import java.util.List;
 
-    private AccessToken data;
+public interface SessionDao extends IDao<Session> {
 
-    public CreateTokenResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((AccessToken) result.getData());
-    }
+    void deleteByUserId(Integer userId);
 
-    @Override
-    public AccessToken getData() {
-        return data;
-    }
+    List<Session> queryByUserId(Integer userId);
 
-    public void setData(AccessToken data) {
-        this.data = data;
-    }
 }

@@ -170,23 +170,25 @@
         where worker_group = #{originWorkerGroupName}
     </update>
 
-    <select id="countInstanceStateByProjectCodes"
-            resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
-        select t.state, count(0) as count
-        from t_ds_process_instance t
-        join t_ds_process_definition d on d.code=t.process_definition_code
-        where t.is_sub_process = 0
-        <if test="startTime != null and endTime != null">
-            and t.start_time <![CDATA[ >= ]]> #{startTime} and t.start_time <![CDATA[ <= ]]> #{endTime}
+    <select id="countWorkflowInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto">
+        select state, count(0) as count
+        from t_ds_process_instance
+        where is_sub_process = 0
+        <if test="startTime != null">
+            and start_time <![CDATA[ >= ]]> #{startTime}
         </if>
-        <if test="projectCodes != null and projectCodes.length != 0">
-            and d.project_code in
+        <if test="endTime != null">
+            and start_time <![CDATA[ <= ]]> #{endTime}
+        </if>
+        <if test="projectCodes != null and projectCodes.size() != 0">
+            and project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
         </if>
-        group by t.state
+        group by state
     </select>
+
     <select id="queryByProcessDefineCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
         <include refid="baseSql"/>

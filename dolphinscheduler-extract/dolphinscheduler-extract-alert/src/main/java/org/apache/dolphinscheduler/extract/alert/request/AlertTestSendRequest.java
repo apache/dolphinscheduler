@@ -15,25 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.queue;
+package org.apache.dolphinscheduler.extract.alert.request;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * queue update response
- */
 @Data
-public class QueueUpdateResponse extends Result {
+@NoArgsConstructor
+@AllArgsConstructor
+public class AlertTestSendRequest {
 
-    private Queue data;
+    private int pluginDefineId;
 
-    public QueueUpdateResponse(Result result) {
-        super();
-        this.setCode(result.getCode());
-        this.setMsg(result.getMsg());
-        this.setData((Queue) result.getData());
-    }
+    private String pluginInstanceParams;
 }
