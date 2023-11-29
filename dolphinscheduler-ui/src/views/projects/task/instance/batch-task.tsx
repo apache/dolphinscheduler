@@ -105,7 +105,7 @@ const BatchTaskInstance = defineComponent({
     }
 
     const onClearSearchTime = () => {
-      variables.datePickerRange = null
+      variables.datePickerRange = []
       onSearch()
     }
 
