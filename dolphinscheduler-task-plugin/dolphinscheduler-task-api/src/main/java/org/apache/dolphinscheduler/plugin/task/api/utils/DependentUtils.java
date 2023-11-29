@@ -42,8 +42,7 @@ public class DependentUtils {
             case AND:
                 if (dependResultList.contains(DependResult.FAILED)) {
                     dependResult = DependResult.FAILED;
-                }
-                if (dependResultList.contains(DependResult.WAITING)) {
+                } else if (dependResultList.contains(DependResult.WAITING)) {
                     dependResult = DependResult.WAITING;
                 }
                 break;
