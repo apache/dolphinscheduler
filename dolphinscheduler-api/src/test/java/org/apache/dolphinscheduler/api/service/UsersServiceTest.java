@@ -233,6 +233,13 @@ public class UsersServiceTest {
             result = usersService.updateUser(getLoginUser(), 1,userName,userPassword,"32222s@qq.com",1,"13457864543","queue");
             logger.info(result.toString());
             Assert.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+            //non-admin should not modify tenantId and queue
+            when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
+            result = usersService.updateUser(userMapper.selectById(2), 2,userName,userPassword,"abc@qq.com",1,"13457864543","offline");
+            logger.info(result.toString());
+            Assert.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+
         } catch (Exception e) {
             logger.error("update user error",e);
             Assert.assertTrue(false);
@@ -487,6 +494,21 @@ public class UsersServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         user.setUserName("userTest0001");
         user.setUserPassword("userTest0001");
+        return user;
+    }
+
+    /**
+     * get non-admin user
+     */
+    private User getNonAdminUser(){
+
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        user.setTenantId(2);
+        user.setQueue("queue");
         return user;
     }
 

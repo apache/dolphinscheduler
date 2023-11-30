@@ -278,6 +278,19 @@ public class UsersService extends BaseService {
             putMsg(result, Status.USER_NOT_EXIST, userId);
             return result;
         }
+
+        // non-admin should not modify tenantId and queue
+        if (!isAdmin(loginUser)) {
+            if (user.getTenantId() != tenantId) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+            if (StringUtils.isNotEmpty(queue) && !StringUtils.equals(queue, user.getQueue())) {
+                putMsg(result, Status.USER_NO_OPERATION_PERM);
+                return result;
+            }
+        }
+
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)){
