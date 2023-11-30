@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_PARAME
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_PARAMETER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PARAMETER_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectParameterService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -67,7 +66,6 @@ public class ProjectParameterController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_PARAMETER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProjectParameter(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @RequestParam("projectParameterName") String projectParameterName,
@@ -85,7 +83,6 @@ public class ProjectParameterController extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_PARAMETER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProjectParameter(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @PathVariable("code") Long code,
@@ -102,7 +99,6 @@ public class ProjectParameterController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_PARAMETER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProjectParametersByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @RequestParam("code") long code) {
@@ -117,7 +113,6 @@ public class ProjectParameterController extends BaseController {
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_PARAMETER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result batchDeleteProjectParametersByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
@@ -134,7 +129,6 @@ public class ProjectParameterController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_PARAMETER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectParameterListPaging(
                                                   @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
@@ -142,11 +136,7 @@ public class ProjectParameterController extends BaseController {
                                                   @RequestParam("pageNo") Integer pageNo,
                                                   @RequestParam("pageSize") Integer pageSize) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            log.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
         return projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo,
                 searchVal);
@@ -159,7 +149,6 @@ public class ProjectParameterController extends BaseController {
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_PARAMETER_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectParameterByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable("code") long code) {

@@ -147,6 +147,9 @@ public final class Constants {
 
     public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
 
+    public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
+    public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
+
     /**
      * fetch applicationId way
      */
@@ -303,9 +306,9 @@ public final class Constants {
     public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
-     * time unit second to minutes
+     * unit convertor for minute to second
      */
-    public static final int SEC_2_MINUTES_TIME_UNIT = 60;
+    public static final int MINUTE_2_SECOND_TIME_UNIT = 60;
 
     /***
      *
@@ -485,7 +488,8 @@ public final class Constants {
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
-    public static final long DEPENDENT_ALL_TASK_CODE = 0;
+    public static final long DEPENDENT_ALL_TASK_CODE = -1;
+    public static final long DEPENDENT_WORKFLOW_CODE = 0;
 
     /**
      * preview schedule execute count
@@ -648,10 +652,6 @@ public final class Constants {
      */
     public static final int AUTHORIZE_READABLE_PERM = 4;
 
-    public static final int NORMAL_NODE_STATUS = 0;
-    public static final int ABNORMAL_NODE_STATUS = 1;
-    public static final int BUSY_NODE_STATUE = 2;
-
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
     public static final String START_END_DATE = "startDate,endDate";
@@ -689,8 +689,6 @@ public final class Constants {
      */
     public static final String NAMESPACE = "namespace";
     public static final String CLUSTER = "cluster";
-    public static final String LIMITS_CPU = "limitsCpu";
-    public static final String LIMITS_MEMORY = "limitsMemory";
     public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**

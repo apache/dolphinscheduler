@@ -323,6 +323,33 @@ public class FileUtils {
         return crcString;
     }
 
+    public static void setFileOwner(Path filePath, String fileOwner) throws InterruptedException, IOException {
+        // We use linux command to set the file owner, since jdk api will not use sudo.
+        String command = String.format("sudo chown %s %s", fileOwner, filePath.toString());
+        Runtime.getRuntime().exec(command);
+        Process process = Runtime.getRuntime().exec(command);
+        if (0 != process.waitFor()) {
+            throw new RuntimeException("Set file: " + filePath + " to owner: " + fileOwner + " failed");
+        }
+    }
+
+    public static void setDirectoryOwner(Path filePath, String fileOwner) throws IOException, InterruptedException {
+        // We use linux command to set the file owner, since jdk api will not use sudo.
+        String command = String.format("sudo chown -R %s %s", fileOwner, filePath.toString());
+        Runtime.getRuntime().exec(command);
+        Process process = Runtime.getRuntime().exec(command);
+        if (0 != process.waitFor()) {
+            throw new RuntimeException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
+        }
+    }
+
+    public static void createDirectoryIfNotPresent(Path path) throws IOException {
+        if (Files.exists(path)) {
+            return;
+        }
+        Files.createDirectories(path);
+    }
+
     /**
      * Create a file with '755'.
      */

@@ -18,14 +18,13 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.CHANGE;
-import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.SMALL;
 
 import org.apache.dolphinscheduler.api.dto.RuleDefinition;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -59,9 +58,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
@@ -99,66 +96,44 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
     private DqComparisonTypeMapper dqComparisonTypeMapper;
 
     @Override
-    public Map<String, Object> getRuleFormCreateJsonById(int id) {
-
-        Map<String, Object> result = new HashMap<>();
+    public String getRuleFormCreateJsonById(int id) {
 
         List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryMapper.getRuleInputEntryList(id);
-
         if (ruleInputEntryList == null || ruleInputEntryList.isEmpty()) {
-            putMsg(result, Status.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
-        } else {
-            result.put(DATA_LIST, getRuleFormCreateJson(DqRuleUtils.transformInputEntry(ruleInputEntryList)));
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
         }
-
-        return result;
+        return getRuleFormCreateJson(DqRuleUtils.transformInputEntry(ruleInputEntryList));
     }
 
     @Override
-    public Map<String, Object> queryAllRuleList() {
-        Map<String, Object> result = new HashMap<>();
-
-        List<DqRule> ruleList =
-                dqRuleMapper.selectList(new QueryWrapper<>());
-
-        result.put(DATA_LIST, ruleList);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+    public List<DqRule> queryAllRuleList() {
+        return dqRuleMapper.selectList(new QueryWrapper<>());
     }
 
     @Override
-    public Map<String, Object> getDatasourceOptionsById(int datasourceId) {
-        Map<String, Object> result = new HashMap<>();
+    public List<ParamsOptions> getDatasourceOptionsById(int datasourceId) {
 
         List<DataSource> dataSourceList = dataSourceMapper.listAllDataSourceByType(datasourceId);
-        List<ParamsOptions> options = null;
-        if (CollectionUtils.isNotEmpty(dataSourceList)) {
-            options = new ArrayList<>();
-
-            for (DataSource dataSource : dataSourceList) {
-                ParamsOptions childrenOption =
-                        new ParamsOptions(dataSource.getName(), dataSource.getId(), false);
-                options.add(childrenOption);
-            }
+        if (CollectionUtils.isEmpty(dataSourceList)) {
+            return Collections.emptyList();
         }
 
-        result.put(DATA_LIST, options);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+        List<ParamsOptions> options = new ArrayList<>();
+        for (DataSource dataSource : dataSourceList) {
+            ParamsOptions childrenOption = new ParamsOptions(dataSource.getName(), dataSource.getId(), false);
+            options.add(childrenOption);
+        }
+        return options;
     }
 
     @Override
-    public Result queryRuleListPaging(User loginUser,
-                                      String searchVal,
-                                      Integer ruleType,
-                                      String startTime,
-                                      String endTime,
-                                      Integer pageNo,
-                                      Integer pageSize) {
-        Result result = new Result();
+    public PageInfo<DqRule> queryRuleListPaging(User loginUser,
+                                                String searchVal,
+                                                Integer ruleType,
+                                                String startTime,
+                                                String endTime,
+                                                Integer pageNo,
+                                                Integer pageSize) {
 
         Date start = null;
         Date end = null;
@@ -170,8 +145,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                 end = DateUtils.stringToDate(endTime);
             }
         } catch (Exception e) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
         }
 
         Page<DqRule> page = new Page<>(pageNo, pageSize);
@@ -203,9 +177,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
             pageInfo.setTotalList(dataList);
         }
 
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return pageInfo;
     }
 
     private String getRuleFormCreateJson(List<DqRuleInputEntry> ruleInputEntryList) {
@@ -260,7 +232,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                         .setRequired(inputEntry.getIsValidate())
                         .build())
                 .setProps(paramProps)
-                .setValue(inputEntry.getValue())
+                .setValue(inputEntry.getData())
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();
@@ -302,7 +274,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
         return SelectParam
                 .newBuilder(inputEntry.getField(), inputEntry.getTitle())
                 .setOptions(options)
-                .setValue(inputEntry.getValue())
+                .setValue(inputEntry.getData())
                 .setSize(SMALL)
                 .setPlaceHolder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
@@ -322,7 +294,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                         .setRequired(inputEntry.getIsValidate())
                         .build())
                 .setProps(paramProps)
-                .setValue(inputEntry.getValue())
+                .setValue(inputEntry.getData())
                 .setPlaceholder(inputEntry.getPlaceholder())
                 .setEmit(Boolean.TRUE.equals(inputEntry.getIsEmit()) ? Collections.singletonList(CHANGE) : null)
                 .build();

@@ -51,12 +51,12 @@
         <httpcore.version>4.4.15</httpcore.version>
         <jackson.version>2.13.4</jackson.version>
         <protostuff.version>1.7.2</protostuff.version>
-        <byte-buddy.version>1.9.16</byte-buddy.version>
+        <byte-buddy.version>1.12.11</byte-buddy.version>
         <logback.version>1.2.11</logback.version>
         <hadoop.version>3.2.4</hadoop.version>
         <cron-utils.version>9.1.6</cron-utils.version>
         <h2.version>2.2.220</h2.version>
-        <mysql-connector.version>8.0.16</mysql-connector.version>
+        <mysql-connector.version>8.0.33</mysql-connector.version>
         <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
         <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
@@ -115,7 +115,12 @@
         <casdoor.version>1.6.0</casdoor.version>
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
         <protobuf.version>3.17.2</protobuf.version>
+        <esdk-obs.version>3.23.3</esdk-obs.version>
         <system-lambda.version>1.2.1</system-lambda.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
+        <testcontainer.version>1.17.6</testcontainer.version>
+        <checker-qual.version>3.19.0</checker-qual.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
     </properties>
 
     <dependencyManagement>
@@ -892,18 +897,64 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.zeppelin</groupId>
+                <artifactId>zeppelin-client</artifactId>
+                <version>${zeppelin-client.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.protobuf</groupId>
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.huaweicloud</groupId>
+                <artifactId>esdk-obs-java-bundle</artifactId>
+                <version>${esdk-obs.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
             <dependency>
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-lambda</artifactId>
                 <version>${system-lambda.version}</version>
                 <scope>test</scope>
             </dependency>
+
+            <!-- test dependencies on TestContainers -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mysql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>${checker-qual.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
+
     <profiles>
         <profile>
             <id>zk-3.8</id>

@@ -26,10 +26,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -37,7 +33,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * task definition log mapper interface
  */
-@CacheConfig(cacheNames = "taskDefinition", keyGenerator = "cacheKeyGenerator")
 public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
 
     /**
@@ -47,13 +42,11 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version version
      * @return task definition log
      */
-    @Cacheable(sync = true)
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.code + '_' + #p0.version")
     int updateById(@Param("et") TaskDefinitionLog taskDefinitionLog);
 
     /**
@@ -63,7 +56,6 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version task definition version
      * @return delete result
      */
-    @CacheEvict
     int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**

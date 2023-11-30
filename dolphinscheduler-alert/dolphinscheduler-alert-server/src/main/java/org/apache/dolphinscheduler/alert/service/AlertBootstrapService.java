@@ -37,7 +37,8 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AlertSendStatus;
-import org.apache.dolphinscheduler.remote.command.alert.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -192,7 +193,7 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
             if (alertResult != null) {
                 AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
                         new AlertSendResponse.AlertSendResponseResult(
-                                Boolean.parseBoolean(String.valueOf(alertResult.getStatus())),
+                                Boolean.parseBoolean(alertResult.getStatus()),
                                 alertResult.getMessage());
                 sendResponseStatus = sendResponseStatus && alertSendResponseResult.isSuccess();
                 sendResponseResults.add(alertSendResponseResult);
@@ -300,6 +301,61 @@ public final class AlertBootstrapService extends BaseDaemonThread implements Aut
             log.error("send alert error alert data id :{},", alertData.getId(), e);
             return new AlertResult("false", e.getMessage());
         }
+    }
+
+    public AlertSendResponse syncTestSend(int pluginDefineId, String pluginInstanceParams) {
+
+        boolean sendResponseStatus = true;
+        List<AlertSendResponse.AlertSendResponseResult> sendResponseResults = new ArrayList<>();
+
+        Optional<AlertChannel> alertChannelOptional = alertPluginManager.getAlertChannel(pluginDefineId);
+        if (!alertChannelOptional.isPresent()) {
+            String message = String.format("Test send alert error: the channel doesn't exist, pluginDefineId: %s",
+                    pluginDefineId);
+            AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                    new AlertSendResponse.AlertSendResponseResult();
+            alertSendResponseResult.setSuccess(false);
+            alertSendResponseResult.setMessage(message);
+            sendResponseResults.add(alertSendResponseResult);
+            log.error("Test send alert error : not found plugin {}", pluginDefineId);
+            return new AlertSendResponse(false, sendResponseResults);
+        }
+        AlertChannel alertChannel = alertChannelOptional.get();
+
+        Map<String, String> paramsMap = PluginParamsTransfer.getPluginParamsMap(pluginInstanceParams);
+
+        AlertData alertData = AlertData.builder()
+                .title(AlertConstants.TEST_TITLE)
+                .content(AlertConstants.TEST_CONTENT)
+                .warnType(WarningType.ALL.getCode())
+                .build();
+
+        AlertInfo alertInfo = AlertInfo.builder()
+                .alertData(alertData)
+                .alertParams(paramsMap)
+                .build();
+
+        try {
+            AlertResult alertResult = alertChannel.process(alertInfo);
+            if (alertResult != null) {
+                AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                        new AlertSendResponse.AlertSendResponseResult(
+                                Boolean.parseBoolean(alertResult.getStatus()),
+                                alertResult.getMessage());
+                sendResponseStatus = alertSendResponseResult.isSuccess();
+                sendResponseResults.add(alertSendResponseResult);
+            }
+        } catch (Exception e) {
+            log.error("Test send alert error", e);
+            AlertSendResponse.AlertSendResponseResult alertSendResponseResult =
+                    new AlertSendResponse.AlertSendResponseResult();
+            alertSendResponseResult.setSuccess(false);
+            alertSendResponseResult.setMessage(e.getMessage());
+            sendResponseResults.add(alertSendResponseResult);
+            return new AlertSendResponse(false, sendResponseResults);
+        }
+
+        return new AlertSendResponse(sendResponseStatus, sendResponseResults);
     }
 
     @Override

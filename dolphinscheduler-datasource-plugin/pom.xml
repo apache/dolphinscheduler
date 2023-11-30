@@ -48,10 +48,13 @@
         <module>dolphinscheduler-datasource-azure-sql</module>
         <module>dolphinscheduler-datasource-dameng</module>
         <module>dolphinscheduler-datasource-ssh</module>
+        <module>dolphinscheduler-datasource-zeppelin</module>
         <module>dolphinscheduler-datasource-databend</module>
         <module>dolphinscheduler-datasource-snowflake</module>
         <module>dolphinscheduler-datasource-vertica</module>
         <module>dolphinscheduler-datasource-doris</module>
+        <module>dolphinscheduler-datasource-sagemaker</module>
+        <module>dolphinscheduler-datasource-k8s</module>
     </modules>
 
     <dependencyManagement>

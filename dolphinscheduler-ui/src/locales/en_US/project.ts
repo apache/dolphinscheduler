@@ -243,6 +243,7 @@ export default {
     online: 'Online',
     offline: 'Offline',
     task_name: 'Task Name',
+    task_code: 'Task Code',
     task_type: 'Task Type',
     create_task: 'Create Task',
     workflow_instance: 'Workflow Instance',
@@ -396,6 +397,8 @@ export default {
     image_tips: 'Please enter image',
     image_pull_policy: 'Image pull policy',
     image_pull_policy_tips: 'Please select a image pull policy (required)',
+    pull_secret: 'Pull secret',
+    pull_secret_tips: 'Please enter pull secret',
     command: 'Command',
     command_tips:
       'Please enter the container execution command, for example: ["printenv"]',
@@ -641,6 +644,7 @@ export default {
     hour: 'hour',
     add_dependency: 'Add dependency',
     waiting_dependent_start: 'Waiting Dependent start',
+    dependent_task_parameter_passing: 'Parameter Passing',
     check_interval: 'Check interval',
     check_interval_tips: 'Check interval must be a positive integer',
     waiting_dependent_complete: 'Waiting Dependent complete',
@@ -876,6 +880,10 @@ export default {
     child_node_instance: 'child node instance',
     yarn_queue: 'Yarn Queue',
     yarn_queue_tips: 'Please input yarn queue(optional)',
+    dependent_type: 'Dependency Type',
+    dependent_on_workflow: 'Dependent on workflow',
+    dependent_on_task: 'Dependent on task',
+
   },
   menu: {
     fav: 'Favorites',
@@ -909,6 +917,8 @@ export default {
     preference_manage: 'Project Preference Management',
     instruction_tips: 'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
     success: 'Success',
-    submit: 'Submit'
+    submit: 'Submit',
+    enabled: 'Enabled',
+    disabled: 'Disabled'
   },
 }

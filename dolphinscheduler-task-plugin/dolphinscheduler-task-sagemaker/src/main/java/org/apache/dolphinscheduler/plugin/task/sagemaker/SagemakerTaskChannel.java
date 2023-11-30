@@ -43,7 +43,7 @@ public class SagemakerTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return null;
+        return JSONUtils.parseObject(parameters, SagemakerParameters.class).getResources();
     }
 
 }

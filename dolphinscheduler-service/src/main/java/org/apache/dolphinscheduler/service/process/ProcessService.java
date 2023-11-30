@@ -56,11 +56,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
 
     @Transactional
+    @Nullable
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
@@ -83,7 +86,7 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void recurseFindSubProcess(long parentCode, List<Long> ids);
+    List<Long> findAllSubWorkflowDefinitionCode(long workflowDefinitionCode);
 
     String getTenantForProcess(String tenantCode, int userId);
 

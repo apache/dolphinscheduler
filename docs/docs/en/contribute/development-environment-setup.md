@@ -70,7 +70,7 @@ cd dolphinscheduler
        -Pdocker,release
 ```
 
-When the command is finished you could find them by command `docker imaegs`.
+When the command is finished you could find them by command `docker images`.
 
 - If you want to modify DolphinScheduler source code, build and push Docker images to your registry <HUB_URL>，you can run when finished the modification
 
@@ -209,7 +209,6 @@ spring:
   <root level="INFO">
   +  <appender-ref ref="STDOUT"/>
     <appender-ref ref="APILOGFILE"/>
-    <appender-ref ref="SKYWALKING-LOG"/>
   </root>
   ```
 

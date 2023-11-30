@@ -23,7 +23,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.REMOVE_TASK_INSTANCE_
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -82,23 +81,23 @@ public class TaskInstanceController extends BaseController {
      */
     @Operation(summary = "queryTaskListPaging", description = "QUERY_TASK_INSTANCE_LIST_PAGING_NOTES")
     @Parameters({
-            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", required = false, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "processInstanceId", description = "PROCESS_INSTANCE_ID", schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "processInstanceName", description = "PROCESS_INSTANCE_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskName", description = "TASK_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskCode", description = "TASK_CODE", schema = @Schema(implementation = Long.class)),
             @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema = @Schema(implementation = TaskExecutionStatus.class)),
             @Parameter(name = "host", description = "HOST", schema = @Schema(implementation = String.class)),
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", required = false, schema = @Schema(implementation = TaskExecuteType.class, example = "STREAM")),
+            @Parameter(name = "taskExecuteType", description = "TASK_EXECUTE_TYPE", schema = @Schema(implementation = TaskExecuteType.class, example = "STREAM")),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20")),
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
@@ -106,6 +105,7 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName,
                                       @RequestParam(value = "searchVal", required = false) String searchVal,
                                       @RequestParam(value = "taskName", required = false) String taskName,
+                                      @RequestParam(value = "taskCode", required = false) Long taskCode,
                                       @RequestParam(value = "executorName", required = false) String executorName,
                                       @RequestParam(value = "stateType", required = false) TaskExecutionStatus stateType,
                                       @RequestParam(value = "host", required = false) String host,
@@ -114,18 +114,16 @@ public class TaskInstanceController extends BaseController {
                                       @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
                                       @RequestParam("pageNo") Integer pageNo,
                                       @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = taskInstanceService.queryTaskListPaging(
+        return taskInstanceService.queryTaskListPaging(
                 loginUser,
                 projectCode,
                 processInstanceId,
                 processInstanceName,
                 processDefinitionName,
                 taskName,
+                taskCode,
                 executorName,
                 startTime,
                 endTime,
@@ -135,7 +133,6 @@ public class TaskInstanceController extends BaseController {
                 taskExecuteType,
                 pageNo,
                 pageSize);
-        return result;
     }
 
     /**
@@ -153,7 +150,6 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {
@@ -175,7 +171,6 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/{id}/savepoint")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_SAVEPOINT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> taskSavePoint(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "id") Integer id) {
@@ -197,7 +192,6 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_STOP_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result<Object> stopTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {
@@ -219,7 +213,6 @@ public class TaskInstanceController extends BaseController {
     @DeleteMapping(value = "/{id}/remove-cache")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(REMOVE_TASK_INSTANCE_CACHE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public TaskInstanceRemoveCacheResponse removeTaskInstanceCache(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                    @PathVariable(value = "id") Integer id) {

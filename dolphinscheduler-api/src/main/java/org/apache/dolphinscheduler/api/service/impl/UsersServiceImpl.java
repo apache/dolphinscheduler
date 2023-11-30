@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
+import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -32,7 +33,6 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
@@ -133,6 +133,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
 
+    @Autowired
+    private SessionService sessionService;
+
     /**
      * create user, only system admin have permission
      *
@@ -184,10 +187,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
 
         Tenant tenant = tenantMapper.queryById(tenantId);
-        // resource upload startup
-        if (PropertyUtils.isResourceStorageStartup()) {
-            storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
-        }
+        storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
 
         log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
@@ -228,7 +228,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     /***
-     * create User for ldap and sso login
+     * create User for ldap、Casdoor SSO and OAuth2.0 login
      */
     @Override
     @Transactional
@@ -242,6 +242,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setUserType(userType);
         user.setCreateTime(now);
         user.setUpdateTime(now);
+        user.setTenantId(-1);
         user.setQueue("");
         user.setState(Flag.YES.getCode());
 
@@ -362,102 +363,68 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         return result;
     }
 
-    /**
-     * updateProcessInstance user
-     *
-     * @param userId       user id
-     * @param userName     user name
-     * @param userPassword user password
-     * @param email        email
-     * @param tenantId     tenant id
-     * @param phone        phone
-     * @param queue        queue
-     * @param state        state
-     * @param timeZone     timeZone
-     * @return update result code
-     * @throws Exception exception
-     */
     @Override
-    public Map<String, Object> updateUser(User loginUser, int userId,
-                                          String userName,
-                                          String userPassword,
-                                          String email,
-                                          int tenantId,
-                                          String phone,
-                                          String queue,
-                                          int state,
-                                          String timeZone) throws IOException {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
-
+    @Transactional
+    public User updateUser(User loginUser,
+                           Integer userId,
+                           String userName,
+                           String userPassword,
+                           String email,
+                           Integer tenantId,
+                           String phone,
+                           String queue,
+                           int state,
+                           String timeZone) {
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
+            throw new ServiceException(Status.FUNCTION_DISABLED);
         }
-        if (check(result, !canOperator(loginUser, userId), Status.USER_NO_OPERATION_PERM)) {
-            log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
-                    loginUser.getUserName());
-            return result;
+        if (!canOperator(loginUser, userId)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
+            throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)) {
-                log.warn("Parameter userName check failed.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
-                return result;
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
             }
 
+            // todo: use the db unique index
             User tempUser = userMapper.queryByUserNameAccurately(userName);
-            if (tempUser != null && tempUser.getId() != userId) {
-                log.warn("User name already exists, userName:{}.", tempUser.getUserName());
-                putMsg(result, Status.USER_NAME_EXIST);
-                return result;
+            if (tempUser != null && !userId.equals(tempUser.getId())) {
+                throw new ServiceException(Status.USER_NAME_EXIST);
             }
             user.setUserName(userName);
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
             if (!CheckUtils.checkPasswordLength(userPassword)) {
-                log.warn("Parameter userPassword check failed.");
-                putMsg(result, Status.USER_PASSWORD_LENGTH_ERROR);
-                return result;
+                throw new ServiceException(Status.USER_PASSWORD_LENGTH_ERROR);
             }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
+            sessionService.expireSession(user.getId());
         }
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
-                log.warn("Parameter email check failed.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
-                return result;
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
             }
             user.setEmail(email);
         }
 
         if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
-            log.warn("Parameter phone check failed.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
         }
 
         if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
-            log.warn("Not allow to disable your own account, userId:{}, userName:{}.", user.getId(),
-                    user.getUserName());
-            putMsg(result, Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
-            return result;
+            throw new ServiceException(Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
         }
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                log.warn("Parameter time zone is illegal.");
-                putMsg(result, Status.TIME_ZONE_ILLEGAL, timeZone);
-                return result;
+                throw new ServiceException(Status.TIME_ZONE_ILLEGAL, timeZone);
             }
             user.setTimeZone(timeZone);
         }
@@ -465,20 +432,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setPhone(phone);
         user.setQueue(queue);
         user.setState(state);
-        Date now = new Date();
-        user.setUpdateTime(now);
+        user.setUpdateTime(new Date());
         user.setTenantId(tenantId);
         // updateProcessInstance user
-        int update = userMapper.updateById(user);
-        if (update > 0) {
-            log.info("User is updated and id is :{}.", userId);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            log.error("User update error, userId:{}.", userId);
-            putMsg(result, Status.UPDATE_USER_ERROR);
+        if (userMapper.updateById(user) <= 0) {
+            throw new ServiceException(Status.UPDATE_USER_ERROR);
         }
-
-        return result;
+        return user;
     }
 
     /**
@@ -524,6 +484,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         userMapper.queryTenantCodeByUserId(id);
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
+        sessionService.expireSession(id);
 
         if (userMapper.deleteById(id) > 0) {
             metricsCleanUpService.cleanUpApiResponseTimeMetricsByUserId(id);
@@ -1086,6 +1047,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             user.setTimeZone(TimeZone.getDefault().toZoneId().getId());
         }
 
+        // remove password
+        user.setUserPassword(null);
+
         result.put(Constants.DATA_LIST, user);
 
         putMsg(result, Status.SUCCESS);
@@ -1459,10 +1423,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     @Transactional
-    public User createUserIfNotExists(String userName, String userPassword, String email, String phone,
+    public User createUserIfNotExists(String userName,
+                                      String userPassword,
+                                      String email,
+                                      String phone,
                                       String tenantCode,
                                       String queue,
-                                      int state) throws IOException {
+                                      int state) {
         User user = userMapper.queryByUserNameAccurately(userName);
         if (Objects.isNull(user)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
