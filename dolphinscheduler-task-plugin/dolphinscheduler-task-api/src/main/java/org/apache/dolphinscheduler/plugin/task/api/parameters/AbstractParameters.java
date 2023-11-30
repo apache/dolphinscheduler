@@ -188,7 +188,7 @@ public abstract class AbstractParameters implements IParameters {
         Map<String, String> format = new HashMap<>();
         for (String info : formatResult) {
             if (StringUtils.isNotEmpty(info) && info.contains("=")) {
-                String[] keyValue = info.split("=");
+                String[] keyValue = info.split("=", 2);
                 format.put(keyValue[0], keyValue[1]);
             }
         }
