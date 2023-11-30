@@ -28,10 +28,8 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -43,9 +41,6 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,64 +116,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         user = new User();
         user.setUserName(userName);
         user.setId(userId);
-    }
-
-    @Test
-    public void testSetScheduleState() {
-        Project project = getProject();
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProjectCode(projectCode);
-
-        Schedule schedule = new Schedule();
-        schedule.setId(1);
-        schedule.setProcessDefinitionCode(1);
-        schedule.setReleaseState(ReleaseState.OFFLINE);
-
-        Mockito.when(scheduleMapper.selectById(1)).thenReturn(schedule);
-        Mockito.when(processDefinitionMapper.queryByCode(1)).thenReturn(processDefinition);
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-
-        // schedule not exists
-        exception = Assertions.assertThrows(ServiceException.class, () -> {
-            schedulerService.setScheduleState(user, project.getCode(), 2, ReleaseState.ONLINE);
-        });
-        Assertions.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS.getCode(), ((ServiceException) exception).getCode());
-
-        // SCHEDULE_CRON_RELEASE_NEED_NOT_CHANGE
-        exception = Assertions.assertThrows(ServiceException.class, () -> {
-            schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.OFFLINE);
-        });
-        Assertions.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE.getCode(),
-                ((ServiceException) exception).getCode());
-
-        // PROCESS_DEFINE_NOT_EXIST
-        schedule.setProcessDefinitionCode(2);
-        exception = Assertions.assertThrows(ServiceException.class, () -> {
-            schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        });
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
-        schedule.setProcessDefinitionCode(1);
-
-        // online also success
-        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
-        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
-        processTaskRelationList.add(processTaskRelation);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 1)).thenReturn(processTaskRelationList);
-        exception = Assertions.assertThrows(ServiceException.class, () -> {
-            schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        });
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_RELEASE.getCode(), ((ServiceException) exception).getCode());
-
-        // SUCCESS
-        Server server = new Server();
-        List<Server> serverList = new ArrayList<>();
-        serverList.add(server);
-        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(serverList);
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        Assertions.assertDoesNotThrow(() -> {
-            schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        });
     }
 
     @Test

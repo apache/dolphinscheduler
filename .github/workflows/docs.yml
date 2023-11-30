@@ -70,9 +70,13 @@ jobs:
       - style
       - img-check
       - dead-link
-    if: success()
+    if: always()
     steps:
-      - name: success
+      - name: Status
         run: |
-          echo "Docs check success"
-          exit 0
+          if [[ ${{ contains(needs.*.result, 'failure') }} == 'true' || ${{ contains(needs.*.result, 'cancelled') }} == 'true' ]]; then
+            echo "Build Failed!"
+            exit 1
+          else
+            echo "Build Success!"
+          fi

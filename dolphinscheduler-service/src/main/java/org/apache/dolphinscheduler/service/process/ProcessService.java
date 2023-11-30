@@ -86,7 +86,7 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void recurseFindSubProcess(long parentCode, List<Long> ids);
+    List<Long> findAllSubWorkflowDefinitionCode(long workflowDefinitionCode);
 
     String getTenantForProcess(String tenantCode, int userId);
 
