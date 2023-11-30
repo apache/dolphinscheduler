@@ -101,3 +101,5 @@ d//
 delimiter ;
 CALL drop_t_ds_k8s_namespace_col_pod_request_memory;
 DROP PROCEDURE drop_t_ds_k8s_namespace_col_pod_request_memory;
+
+ALTER TABLE `t_ds_project_parameter` MODIFY COLUMN `param_value` text NOT NULL COMMENT 'project parameter value';
