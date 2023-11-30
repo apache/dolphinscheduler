@@ -666,7 +666,7 @@ CREATE TABLE t_ds_project_parameter
 (
     id              int(11) NOT NULL AUTO_INCREMENT,
     param_name      varchar(255) NOT NULL,
-    param_value     varchar(255) NOT NULL,
+    param_value     text NOT NULL,
     code            bigint(20) NOT NULL,
     project_code    bigint(20) NOT NULL,
     user_id         int(11) DEFAULT NULL,

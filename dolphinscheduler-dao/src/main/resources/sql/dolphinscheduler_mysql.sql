@@ -669,7 +669,7 @@ DROP TABLE IF EXISTS `t_ds_project_parameter`;
 CREATE TABLE `t_ds_project_parameter` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `param_name` varchar(255) NOT NULL COMMENT 'project parameter name',
-  `param_value` varchar(255) NOT NULL COMMENT 'project parameter value',
+  `param_value` text NOT NULL COMMENT 'project parameter value',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
