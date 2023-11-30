@@ -17,22 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopColumnType;
-import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
-import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
-import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
-import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import java.util.List;
-
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DOUBLE_QUOTES;
@@ -50,6 +34,24 @@ import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.QUERY
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.QUERY_WITHOUT_CONDITION;
 import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.TABLE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopColumnType;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopQueryType;
+import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.ISourceGenerator;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceMysqlParameter;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * mysql source generator
  */
@@ -58,7 +60,7 @@ public class MySQLSourceGenerator implements ISourceGenerator {
 
     @Override
     public String generate(
-            SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+                           SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder mysqlSourceSb = new StringBuilder();
 
