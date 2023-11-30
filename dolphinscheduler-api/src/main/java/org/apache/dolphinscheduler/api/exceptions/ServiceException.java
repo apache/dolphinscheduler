@@ -16,7 +16,7 @@
  */
 package org.apache.dolphinscheduler.api.exceptions;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.demo.Status;
 
 import java.text.MessageFormat;
 
@@ -28,7 +28,7 @@ public class ServiceException extends RuntimeException {
     private int code;
 
     public ServiceException() {
-        this(Status.INTERNAL_SERVER_ERROR_ARGS);
+        this(Status.BaseStatus.INTERNAL_SERVER_ERROR_ARGS);
     }
 
     public ServiceException(Status status) {
@@ -40,7 +40,7 @@ public class ServiceException extends RuntimeException {
     }
 
     public ServiceException(String message) {
-        this(Status.INTERNAL_SERVER_ERROR_ARGS, message);
+        this(Status.BaseStatus.INTERNAL_SERVER_ERROR_ARGS, message);
     }
 
     public ServiceException(int code, String message) {
