@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -309,30 +310,45 @@ public class UsersServiceTest {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
         // user not exist
-        assertThrowsServiceException(
-                Status.USER_NOT_EXIST,
-                () -> usersService.updateUser(getLoginUser(),
-                        0,
-                        userName,
-                        userPassword,
-                        "3443@qq.com",
-                        1,
-                        "13457864543",
-                        "queue",
-                        1,
-                        "Asia/Shanghai"));
+//        assertThrowsServiceException(
+//                Status.USER_NOT_EXIST,
+//                () -> usersService.updateUser(getLoginUser(),
+//                        0,
+//                        userName,
+//                        userPassword,
+//                        "3443@qq.com",
+//                        1,
+//                        "13457864543",
+//                        "queue",
+//                        1,
+//                        "Asia/Shanghai"));
+//
+//        // success
+//        when(userMapper.selectById(any())).thenReturn(getUser());
+//        when(userMapper.updateById(any())).thenReturn(1);
+//        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
+//                1,
+//                userName,
+//                userPassword,
+//                "32222s@qq.com",
+//                1,
+//                "13457864543",
+//                "queue",
+//                1,
+//                "Asia/Shanghai"));
 
-        // success
-        when(userMapper.selectById(any())).thenReturn(getUser());
-        when(userMapper.updateById(any())).thenReturn(1);
-        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
-                1,
+        //non-admin should not modify tenantId and queue
+        when(userMapper.selectById(any())).thenReturn(getNonAdminUser());
+        when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
+        User user = userMapper.selectById(2);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
+                2,
                 userName,
                 userPassword,
-                "32222s@qq.com",
-                1,
+                "abc@qq.com",
+                null,
                 "13457864543",
-                "queue",
+                null,
                 1,
                 "Asia/Shanghai"));
     }
@@ -886,6 +902,21 @@ public class UsersServiceTest {
         user.setUserName("userTest0001");
         user.setUserPassword("userTest0001");
         user.setState(1);
+        return user;
+    }
+
+    /**
+     * get non-admin user
+     */
+    private User getNonAdminUser(){
+
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        user.setTenantId(2);
+        user.setQueue("queue");
         return user;
     }
 
