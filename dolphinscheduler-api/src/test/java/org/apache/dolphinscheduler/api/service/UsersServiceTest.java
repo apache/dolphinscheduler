@@ -310,32 +310,32 @@ public class UsersServiceTest {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
         // user not exist
-//        assertThrowsServiceException(
-//                Status.USER_NOT_EXIST,
-//                () -> usersService.updateUser(getLoginUser(),
-//                        0,
-//                        userName,
-//                        userPassword,
-//                        "3443@qq.com",
-//                        1,
-//                        "13457864543",
-//                        "queue",
-//                        1,
-//                        "Asia/Shanghai"));
-//
-//        // success
-//        when(userMapper.selectById(any())).thenReturn(getUser());
-//        when(userMapper.updateById(any())).thenReturn(1);
-//        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
-//                1,
-//                userName,
-//                userPassword,
-//                "32222s@qq.com",
-//                1,
-//                "13457864543",
-//                "queue",
-//                1,
-//                "Asia/Shanghai"));
+        assertThrowsServiceException(
+                Status.USER_NOT_EXIST,
+                () -> usersService.updateUser(getLoginUser(),
+                        0,
+                        userName,
+                        userPassword,
+                        "3443@qq.com",
+                        1,
+                        "13457864543",
+                        "queue",
+                        1,
+                        "Asia/Shanghai"));
+
+        // success
+        when(userMapper.selectById(any())).thenReturn(getUser());
+        when(userMapper.updateById(any())).thenReturn(1);
+        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
+                1,
+                userName,
+                userPassword,
+                "32222s@qq.com",
+                1,
+                "13457864543",
+                "queue",
+                1,
+                "Asia/Shanghai"));
 
         //non-admin should not modify tenantId and queue
         when(userMapper.selectById(any())).thenReturn(getNonAdminUser());
