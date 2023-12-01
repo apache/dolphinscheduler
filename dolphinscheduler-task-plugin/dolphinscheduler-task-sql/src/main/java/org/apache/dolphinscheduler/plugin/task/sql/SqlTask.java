@@ -61,24 +61,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class SqlTask extends AbstractTask {
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * sql parameters
-     */
-    private SqlParameters sqlParameters;
+    private final SqlParameters sqlParameters;
 
-    /**
-     * base datasource
-     */
     private BaseConnectionParam baseConnectionParam;
 
     /**
