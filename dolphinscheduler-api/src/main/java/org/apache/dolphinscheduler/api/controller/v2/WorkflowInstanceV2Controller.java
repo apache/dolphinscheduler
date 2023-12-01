@@ -17,36 +17,27 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.*;
 
 /**
  * workflow instance controller
@@ -71,7 +62,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     public Result queryWorkflowInstanceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestBody WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
         checkPageParams(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
@@ -91,7 +82,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @GetMapping(value = "/{workflowInstanceId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
+    @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result queryWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, workflowInstanceId);
@@ -111,7 +102,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{workflowInstanceId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
+    @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     public Result<Void> deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         processInstanceService.deleteProcessInstanceById(loginUser, workflowInstanceId);
@@ -133,7 +124,7 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{workflowInstanceId}/execute/{executeType}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.EXECUTE_PROCESS_INSTANCE_ERROR)
+    @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @PathVariable("workflowInstanceId") Integer workflowInstanceId,
                           @PathVariable("executeType") ExecuteType executeType) {

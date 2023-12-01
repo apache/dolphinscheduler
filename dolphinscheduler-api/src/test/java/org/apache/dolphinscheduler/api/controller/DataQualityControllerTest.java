@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.mockito.Mockito.when;
-
 import org.apache.dolphinscheduler.api.AssertionsHelper;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -31,13 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +37,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.Mockito.when;
 
 /**
  * process definition controller test
@@ -81,7 +80,7 @@ public class DataQualityControllerTest {
         AssertionsHelper.assertDoesNotThrow(() -> dataQualityController.getRuleFormCreateJsonById(1));
     }
 
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+    private void putMsg(Map<String, Object> result, BaseStatus status, Object... statusParams) {
         result.put(Constants.STATUS, status);
         if (statusParams != null && statusParams.length > 0) {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
@@ -90,7 +89,7 @@ public class DataQualityControllerTest {
         }
     }
 
-    public void putMsg(Result result, Status status, Object... statusParams) {
+    public void putMsg(Result result, BaseStatus status, Object... statusParams) {
         result.setCode(status.getCode());
         if (statusParams != null && statusParams.length > 0) {
             result.setMsg(MessageFormat.format(status.getMsg(), statusParams));
@@ -131,7 +130,7 @@ public class DataQualityControllerTest {
 
         Result<PageInfo<DqRule>> response =
                 dataQualityController.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -140,7 +139,7 @@ public class DataQualityControllerTest {
         when(dqRuleService.queryAllRuleList()).thenReturn(getRuleList());
 
         Result<List<DqRule>> listResult = dataQualityController.queryRuleList();
-        Assertions.assertEquals(Status.SUCCESS.getCode(), listResult.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), listResult.getCode().intValue());
     }
 
     @Test
@@ -159,6 +158,6 @@ public class DataQualityControllerTest {
 
         Result<PageInfo<DqExecuteResult>> pageInfoResult =
                 dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType, 0, start, end, 1, 10);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), pageInfoResult.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), pageInfoResult.getCode().intValue());
     }
 }

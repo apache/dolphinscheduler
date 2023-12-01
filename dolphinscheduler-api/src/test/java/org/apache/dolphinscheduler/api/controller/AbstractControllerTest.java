@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import org.apache.curator.test.TestingServer;
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.RegistryServer;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -27,15 +28,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.apache.curator.test.TestingServer;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +37,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
+
+import javax.annotation.PostConstruct;
+import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * abstract controller test
@@ -95,11 +92,11 @@ public abstract class AbstractControllerTest {
 
     public Map<String, Object> success() {
         Map<String, Object> serviceResult = new HashMap<>();
-        putMsg(serviceResult, Status.SUCCESS);
+        putMsg(serviceResult, BaseStatus.SUCCESS);
         return serviceResult;
     }
 
-    public void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+    public void putMsg(Map<String, Object> result, BaseStatus status, Object... statusParams) {
         result.put(Constants.STATUS, status);
         if (statusParams != null && statusParams.length > 0) {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
@@ -108,7 +105,7 @@ public abstract class AbstractControllerTest {
         }
     }
 
-    public void putMsg(Result<Object> result, Status status, Object... statusParams) {
+    public void putMsg(Result<Object> result, BaseStatus status, Object... statusParams) {
         result.setCode(status.getCode());
         if (statusParams != null && statusParams.length > 0) {
             result.setMsg(MessageFormat.format(status.getMsg(), statusParams));

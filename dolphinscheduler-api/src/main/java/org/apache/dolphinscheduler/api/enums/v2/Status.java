@@ -15,22 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.exceptions;
+package org.apache.dolphinscheduler.api.enums.v2;
 
-import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-/**
- * controller exception annotation
- */
-@Retention(RUNTIME)
-@Target(METHOD)
-public @interface ApiException {
-
-    BaseStatus value();
+public interface Status {
+    int getCode();
+    String getMsg();
 }

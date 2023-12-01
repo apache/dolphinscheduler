@@ -16,12 +16,11 @@
  */
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.api.enums.Status;
-
-import java.util.HashMap;
-
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
 
 public class ResultTest {
 
@@ -30,18 +29,18 @@ public class ResultTest {
         HashMap<String, String> map = new HashMap<>();
         map.put("testdata", "test");
         Result ret = Result.success(map);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), ret.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), ret.getCode().intValue());
     }
 
     @Test
     public void error() {
-        Result ret = Result.error(Status.ACCESS_TOKEN_NOT_EXIST);
-        Assertions.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST.getCode(), ret.getCode().intValue());
+        Result ret = Result.error(BaseStatus.ACCESS_TOKEN_NOT_EXIST);
+        Assertions.assertEquals(BaseStatus.ACCESS_TOKEN_NOT_EXIST.getCode(), ret.getCode().intValue());
     }
 
     @Test
     public void errorWithArgs() {
-        Result ret = Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, "test internal server error");
-        Assertions.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), ret.getCode().intValue());
+        Result ret = Result.errorWithArgs(BaseStatus.INTERNAL_SERVER_ERROR_ARGS, "test internal server error");
+        Assertions.assertEquals(BaseStatus.INTERNAL_SERVER_ERROR_ARGS.getCode(), ret.getCode().intValue());
     }
 }

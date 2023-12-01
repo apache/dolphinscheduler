@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
-
+import com.google.common.primitives.Bytes;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -28,11 +30,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -48,21 +46,16 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogPageQueryResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.google.common.primitives.Bytes;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
 
 /**
  * logger service impl
@@ -102,15 +95,15 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
         if (taskInstance == null) {
             log.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
-            return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
+            return Result.error(BaseStatus.TASK_INSTANCE_NOT_FOUND);
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
             log.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
-            return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
+            return Result.error(BaseStatus.TASK_INSTANCE_HOST_IS_NULL);
         }
         Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
         projectService.checkProjectAndAuthThrowException(loginUser, project, VIEW_LOG);
-        Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
+        Result<ResponseTaskLog> result = new Result<>(BaseStatus.SUCCESS.getCode(), BaseStatus.SUCCESS.getMsg());
         String log = queryLog(taskInstance, skipLineNum, limit);
         int lineNum = log.split("\\r\\n").length;
         result.setData(new ResponseTaskLog(lineNum, log));

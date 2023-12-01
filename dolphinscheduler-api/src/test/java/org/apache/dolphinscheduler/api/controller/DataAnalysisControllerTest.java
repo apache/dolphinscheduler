@@ -17,21 +17,14 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-
-import java.util.Date;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +34,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Date;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * data analysis controller test
@@ -82,7 +80,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 });
         assertThat(result.getCode())
                 .isNotNull()
-                .isEqualTo(Status.SUCCESS.getCode());
+                .isEqualTo(BaseStatus.SUCCESS.getCode());
         projectMapper.deleteById(projectId);
     }
 
@@ -105,7 +103,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 new TypeReference<Result<WorkflowInstanceCountVo>>() {
                 });
         assertThat(result.getCode())
-                .isEqualTo(Status.SUCCESS.getCode());
+                .isEqualTo(BaseStatus.SUCCESS.getCode());
 
         projectMapper.deleteById(projectId);
     }
@@ -123,7 +121,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isEqualTo(BaseStatus.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -135,7 +133,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isEqualTo(BaseStatus.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -147,7 +145,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isEqualTo(BaseStatus.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

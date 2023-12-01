@@ -17,52 +17,28 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.*;
 
 /**
  * users controller
@@ -98,7 +74,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
         Result verifyRet = usersService.verifyUserName(userName);
-        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+        if (verifyRet.getCode() != BaseStatus.SUCCESS.getCode()) {
             return verifyRet;
         }
         Map<String, Object> result =
@@ -513,8 +489,8 @@ public class UsersController extends BaseController {
             Map<String, Object> result = usersService.authorizedUser(loginUser, alertgroupId);
             return returnDataList(result);
         } catch (Exception e) {
-            log.error(Status.AUTHORIZED_USER_ERROR.getMsg(), e);
-            return error(Status.AUTHORIZED_USER_ERROR.getCode(), Status.AUTHORIZED_USER_ERROR.getMsg());
+            log.error(BaseStatus.AUTHORIZED_USER_ERROR.getMsg(), e);
+            return error(BaseStatus.AUTHORIZED_USER_ERROR.getCode(), BaseStatus.AUTHORIZED_USER_ERROR.getMsg());
         }
     }
 
@@ -545,7 +521,7 @@ public class UsersController extends BaseController {
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
         email = ParameterUtils.handleEscapes(email);
         Result<Object> verifyRet = usersService.verifyUserName(userName);
-        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+        if (verifyRet.getCode() != BaseStatus.SUCCESS.getCode()) {
             return verifyRet;
         }
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);

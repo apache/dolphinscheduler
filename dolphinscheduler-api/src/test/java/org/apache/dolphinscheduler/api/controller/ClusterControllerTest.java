@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -179,7 +179,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assertions.assertTrue(result.isStatus(Status.CLUSTER_NAME_EXISTS));
+        Assertions.assertTrue(result.isStatus(BaseStatus.CLUSTER_NAME_EXISTS));
         logger.info("verify cluster return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
