@@ -95,6 +95,7 @@ export function useTargetType(
                 model.targetHiveDatabase = '';
                 model.targetHiveTable = '';
                 model.targetHdfsTargetPath = '';
+                break
             case 'export':
                 model.targetMysqlDatasource = '';
                 model.targetMysqlTable = '';
@@ -102,6 +103,7 @@ export function useTargetType(
                 model.targetMysqlFieldsTerminated = '';
                 model.targetMysqlLinesTerminated = '';
                 model.targetMysqlTable = '';
+                break
             default:
                 model.sourceMysqlDatasource = '';
         }

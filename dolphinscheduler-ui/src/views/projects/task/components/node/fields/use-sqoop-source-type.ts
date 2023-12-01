@@ -77,13 +77,14 @@ export function useSourceType(
         switch (model.modelType) {
             case 'import':
                 model.sourceMysqlDatasource = ''
-
+                break
             case 'export':
                 model.sourceHiveDatabase = ''
                 model.sourceHiveTable = ''
                 model.sourceHivePartitionKey = ''
                 model.sourceHivePartitionValue = ''
                 model.sourceHdfsExportDir = ''
+                break
             default:
                 model.sourceMysqlDatasource = ''
         }
