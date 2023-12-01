@@ -42,9 +42,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
-/**
- * shell task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RemoteShellTask extends AbstractTask {
 
     static final String TASK_ID_PREFIX = "dolphinscheduler-remoteshell-";
@@ -102,7 +102,7 @@ public class RemoteShellTask extends AbstractTask {
             String localFile = buildCommand();
             int exitCode = remoteExecutor.run(taskId, localFile);
             setExitStatusCode(exitCode);
-            remoteShellParameters.dealOutParam(remoteExecutor.getVarPool());
+            remoteShellParameters.dealOutParam(remoteExecutor.getTaskOutputParams());
         } catch (Exception e) {
             log.error("shell task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);

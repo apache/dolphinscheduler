@@ -45,28 +45,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 
+@Slf4j
 public class DinkyTask extends AbstractRemoteTask {
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * dinky parameters
-     */
     private DinkyParameters dinkyParameters;
 
-    /**
-     * constructor
-     *
-     * @param taskExecutionContext taskExecutionContext
-     */
     protected DinkyTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;

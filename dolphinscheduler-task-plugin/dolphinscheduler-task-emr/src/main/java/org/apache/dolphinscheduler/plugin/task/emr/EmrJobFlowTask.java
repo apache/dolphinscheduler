@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.SdkBaseException;
 import com.amazonaws.services.elasticmapreduce.model.ClusterState;
 import com.amazonaws.services.elasticmapreduce.model.ClusterStateChangeReason;
@@ -40,6 +42,7 @@ import com.amazonaws.services.elasticmapreduce.model.TerminateJobFlowsResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Sets;
 
+@Slf4j
 public class EmrJobFlowTask extends AbstractEmrTask {
 
     private final HashSet<String> waitingStateSet = Sets.newHashSet(

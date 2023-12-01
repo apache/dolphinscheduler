@@ -53,19 +53,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.Config;
 
+@Slf4j
 public class SparkTask extends AbstractYarnTask {
 
-    /**
-     * spark parameters
-     */
     private SparkParameters sparkParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     public SparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);

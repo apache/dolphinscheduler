@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.SdkBaseException;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsRequest;
 import com.amazonaws.services.elasticmapreduce.model.AddJobFlowStepsResult;
@@ -45,6 +47,7 @@ import com.google.common.collect.Sets;
  *
  * @since v3.1.0
  */
+@Slf4j
 public class EmrAddStepsTask extends AbstractEmrTask {
 
     private String stepId;

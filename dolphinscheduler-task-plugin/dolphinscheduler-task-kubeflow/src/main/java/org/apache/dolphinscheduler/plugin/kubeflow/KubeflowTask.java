@@ -36,6 +36,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class KubeflowTask extends AbstractRemoteTask {
 
     private final TaskExecutionContext taskExecutionContext;

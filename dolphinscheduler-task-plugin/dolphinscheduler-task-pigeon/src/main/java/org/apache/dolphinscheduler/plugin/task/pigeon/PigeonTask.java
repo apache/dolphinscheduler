@@ -46,12 +46,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 /**
  * TIS DataX Task
  **/
+@Slf4j
 public class PigeonTask extends AbstractRemoteTask {
 
     public static final String KEY_POOL_VAR_PIGEON_HOST = "p_host";

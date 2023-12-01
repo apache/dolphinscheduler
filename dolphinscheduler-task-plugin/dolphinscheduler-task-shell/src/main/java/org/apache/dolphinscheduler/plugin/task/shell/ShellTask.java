@@ -31,9 +31,9 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilde
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-/**
- * shell task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class ShellTask extends AbstractTask {
 
     /**
@@ -60,9 +60,7 @@ public class ShellTask extends AbstractTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -87,7 +85,7 @@ public class ShellTask extends AbstractTask {
             TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setProcessId(commandExecuteResult.getProcessId());
-            shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            shellParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current Shell task has been interrupted", e);

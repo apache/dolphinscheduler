@@ -58,11 +58,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * In DataQualityTask, the input parameters will be converted into DataQualityConfiguration,
  * which will be converted into a string as the parameter of DataQualityApplication,
  * and DataQualityApplication is spark application
  */
+@Slf4j
 public class DataQualityTask extends AbstractYarnTask {
 
     /**

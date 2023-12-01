@@ -40,21 +40,15 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.base.Preconditions;
 
-/**
- * python task
- */
+@Slf4j
 public class PythonTask extends AbstractTask {
 
-    /**
-     * python parameters
-     */
     protected PythonParameters pythonParameters;
 
-    /**
-     * shell command executor
-     */
     private ShellCommandExecutor shellCommandExecutor;
 
     protected TaskExecutionContext taskRequest;
@@ -70,9 +64,7 @@ public class PythonTask extends AbstractTask {
         super(taskRequest);
         this.taskRequest = taskRequest;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
     }
 
     @Override
@@ -104,8 +96,8 @@ public class PythonTask extends AbstractTask {
             TaskResponse taskResponse = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
-            pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            setTaskOutputParams(shellCommandExecutor.getTaskOutputParams());
+            pythonParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (Exception e) {
             log.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);

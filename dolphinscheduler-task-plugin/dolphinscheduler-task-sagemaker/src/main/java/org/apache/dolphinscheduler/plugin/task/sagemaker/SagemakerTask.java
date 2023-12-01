@@ -39,6 +39,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -52,6 +54,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 /**
  * SagemakerTask task, Used to start Sagemaker pipeline
  */
+@Slf4j
 public class SagemakerTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper = JsonMapper.builder()
