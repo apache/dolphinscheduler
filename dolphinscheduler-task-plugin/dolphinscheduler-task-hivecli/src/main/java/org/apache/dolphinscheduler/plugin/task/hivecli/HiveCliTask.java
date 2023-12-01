@@ -53,6 +53,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class HiveCliTask extends AbstractRemoteTask {
 
     private HiveCliParameters hiveCliParameters;
@@ -65,9 +68,7 @@ public class HiveCliTask extends AbstractRemoteTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class HiveCliTask extends AbstractRemoteTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
+            setTaskOutputParams(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current HiveCLI Task has been interrupted", e);
