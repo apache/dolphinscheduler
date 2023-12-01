@@ -25,8 +25,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VI
 import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
-import org.apache.dolphinscheduler.common.exception.FileOperateException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -325,41 +323,23 @@ public class FileUtils {
         return crcString;
     }
 
-    public static void setFileOwner(Path filePath, String fileOwner) throws FileOperateException {
-        try {
-            // We use linux command to set the file owner, since jdk api will not use sudo.
-            String command = String.format("sudo chown %s %s", fileOwner, filePath.toString());
-            Runtime.getRuntime().exec(command);
-            Process process = Runtime.getRuntime().exec(command);
-            int exitCode = process.waitFor();
-            if (0 != exitCode) {
-                throw new FileOperateException(
-                        "Set file: " + filePath + " to owner: " + fileOwner + " failed, existCode(" + exitCode + ")");
-            }
-        } catch (FileOperateException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
-
+    public static void setFileOwner(Path filePath, String fileOwner) throws InterruptedException, IOException {
+        // We use linux command to set the file owner, since jdk api will not use sudo.
+        String command = String.format("sudo chown %s %s", fileOwner, filePath.toString());
+        Runtime.getRuntime().exec(command);
+        Process process = Runtime.getRuntime().exec(command);
+        if (0 != process.waitFor()) {
+            throw new RuntimeException("Set file: " + filePath + " to owner: " + fileOwner + " failed");
         }
     }
 
-    public static void setDirectoryOwner(Path filePath, String fileOwner) throws FileOperateException {
-        try {
-            // We use linux command to set the file owner, since jdk api will not use sudo.
-            String command = String.format("sudo chown -R %s %s", fileOwner, filePath.toString());
-            Runtime.getRuntime().exec(command);
-            Process process = Runtime.getRuntime().exec(command);
-            int exitCode = process.waitFor();
-            if (0 != exitCode) {
-                throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner
-                        + " failed, existCode(" + exitCode + ")");
-            }
-        } catch (FileOperateException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
-
+    public static void setDirectoryOwner(Path filePath, String fileOwner) throws IOException, InterruptedException {
+        // We use linux command to set the file owner, since jdk api will not use sudo.
+        String command = String.format("sudo chown -R %s %s", fileOwner, filePath.toString());
+        Runtime.getRuntime().exec(command);
+        Process process = Runtime.getRuntime().exec(command);
+        if (0 != process.waitFor()) {
+            throw new RuntimeException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
         }
     }
 

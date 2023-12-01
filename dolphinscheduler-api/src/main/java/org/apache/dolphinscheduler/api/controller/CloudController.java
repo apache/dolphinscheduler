@@ -17,32 +17,22 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_RESOURCE_GROUP_ERROR;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.CloudService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.*;
 
 /**
  * cloud controller
@@ -67,7 +57,7 @@ public class CloudController extends BaseController {
     @ApiException(LIST_AZURE_DATA_FACTORY_ERROR)
     public Result listDataFactory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> factoryNames = cloudService.listDataFactory(loginUser);
-        return success(Status.SUCCESS.getMsg(), factoryNames);
+        return success(BaseStatus.SUCCESS.getMsg(), factoryNames);
     }
 
     /**
@@ -82,7 +72,7 @@ public class CloudController extends BaseController {
     @ApiException(LIST_AZURE_RESOURCE_GROUP_ERROR)
     public Result listResourceGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> resourceGroupNames = cloudService.listResourceGroup(loginUser);
-        return success(Status.SUCCESS.getMsg(), resourceGroupNames);
+        return success(BaseStatus.SUCCESS.getMsg(), resourceGroupNames);
     }
 
     /**
@@ -99,6 +89,6 @@ public class CloudController extends BaseController {
                                @RequestParam("factoryName") String factoryName,
                                @RequestParam("resourceGroupName") String resourceGroupName) {
         List<String> pipelineNames = cloudService.listPipeline(loginUser, factoryName, resourceGroupName);
-        return success(Status.SUCCESS.getMsg(), pipelineNames);
+        return success(BaseStatus.SUCCESS.getMsg(), pipelineNames);
     }
 }

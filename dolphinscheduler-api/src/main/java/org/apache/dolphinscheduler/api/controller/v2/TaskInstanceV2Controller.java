@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceSuccessResponse;
@@ -51,6 +45,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.*;
 
 /**
  * task instance controller

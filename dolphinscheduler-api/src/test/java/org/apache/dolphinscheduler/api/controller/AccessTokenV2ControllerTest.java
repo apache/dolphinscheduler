@@ -17,23 +17,22 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * access token v2 controller test
@@ -56,7 +55,7 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -77,7 +76,7 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -96,6 +95,6 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
     }
 }

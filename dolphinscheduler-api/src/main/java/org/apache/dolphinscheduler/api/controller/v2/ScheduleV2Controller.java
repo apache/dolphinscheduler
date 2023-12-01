@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
@@ -53,6 +47,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.*;
 
 /**
  * schedule controller

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 
 import java.text.MessageFormat;
 
@@ -51,7 +51,7 @@ public class Result<T> {
         this.msg = msg;
     }
 
-    public Result(Status status) {
+    public Result(BaseStatus status) {
         if (status != null) {
             this.code = status.getCode();
             this.msg = status.getMsg();
@@ -72,7 +72,7 @@ public class Result<T> {
      * @return resule
      */
     public static <T> Result<T> success(T data) {
-        return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
+        return new Result<>(BaseStatus.SUCCESS.getCode(), BaseStatus.SUCCESS.getMsg(), data);
     }
 
     public static <T> Result<T> success() {
@@ -80,14 +80,14 @@ public class Result<T> {
     }
 
     public boolean isSuccess() {
-        return this.isStatus(Status.SUCCESS);
+        return this.isStatus(BaseStatus.SUCCESS);
     }
 
     public boolean isFailed() {
         return !this.isSuccess();
     }
 
-    public boolean isStatus(Status status) {
+    public boolean isStatus(BaseStatus status) {
         return this.code != null && this.code.equals(status.getCode());
     }
 
@@ -97,7 +97,7 @@ public class Result<T> {
      * @param status status
      * @return result
      */
-    public static <T> Result<T> error(Status status) {
+    public static <T> Result<T> error(BaseStatus status) {
         return new Result<>(status);
     }
 
@@ -108,7 +108,7 @@ public class Result<T> {
      * @param args args
      * @return result
      */
-    public static <T> Result<T> errorWithArgs(Status status, Object... args) {
+    public static <T> Result<T> errorWithArgs(BaseStatus status, Object... args) {
         return new Result<>(status.getCode(), MessageFormat.format(status.getMsg(), args));
     }
 
@@ -147,6 +147,6 @@ public class Result<T> {
     }
 
     public Boolean checkResult() {
-        return this.code == Status.SUCCESS.getCode();
+        return this.code == BaseStatus.SUCCESS.getCode();
     }
 }

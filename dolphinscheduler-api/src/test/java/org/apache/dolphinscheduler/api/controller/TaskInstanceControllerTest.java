@@ -17,16 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -35,7 +26,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -46,6 +36,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class TaskInstanceControllerTest extends AbstractControllerTest {
 
@@ -63,8 +59,8 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         Integer pageSize = 20;
         PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
         result.setData(pageInfo);
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.SUCCESS.getMsg());
+        result.setCode(BaseStatus.SUCCESS.getCode());
+        result.setMsg(BaseStatus.SUCCESS.getMsg());
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(""), any(), eq(""), any(),
                 any(),
@@ -73,7 +69,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
                 "", 1L, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
                 TaskExecuteType.BATCH, pageNo, pageSize);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(BaseStatus.SUCCESS.getCode()), taskResult.getCode());
     }
 
     @Disabled
@@ -83,7 +79,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("taskInstanceId", "104");
 
         Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        putMsg(mockResult, BaseStatus.SUCCESS);
         when(taskInstanceService.forceTaskSuccess(any(User.class), anyLong(), anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success", "cxc_1113")
@@ -94,7 +90,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
 }

@@ -17,31 +17,15 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.RunMode;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -49,9 +33,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * executor controller test
@@ -87,7 +78,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
                     JsonObject.class);
 
     final ImmutableMap<String, Object> executeServiceResult =
-            ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
+            ImmutableMap.of(Constants.STATUS, BaseStatus.SUCCESS, Constants.DATA_LIST, "Test Data");
 
     @MockBean(name = "executorServiceImpl")
     private ExecutorService executorService;
@@ -273,7 +264,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("processInstanceId", Integer.toString(processInstanceId));
         paramsMap.add("executeType", String.valueOf(executeType));
         final Map<String, Object> executeServiceResult = new HashMap<>();
-        executeServiceResult.put(Constants.STATUS, Status.SUCCESS);
+        executeServiceResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         executeServiceResult.put(Constants.DATA_LIST, "Test Data");
 
         final JsonObject expectResponseContent = gson

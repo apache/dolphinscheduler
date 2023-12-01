@@ -17,58 +17,32 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
-
-import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
-import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.RunMode;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.*;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.*;
 
 /**
  * executor controller
@@ -281,7 +255,7 @@ public class ExecutorController extends BaseController {
                     testFlag,
                     complementDependentMode, null, allLevelDependent, executionOrder);
 
-            if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
+            if (!BaseStatus.SUCCESS.equals(result.get(Constants.STATUS))) {
                 log.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
                         processDefinitionCode);
                 startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
@@ -292,7 +266,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR,
+            putMsg(result, BaseStatus.BATCH_START_PROCESS_INSTANCE_ERROR,
                     String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
@@ -356,7 +330,7 @@ public class ExecutorController extends BaseController {
                 try {
                     Map<String, Object> singleResult =
                             execService.execute(loginUser, projectCode, processInstanceId, executeType);
-                    if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
+                    if (!BaseStatus.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
                         log.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
@@ -365,14 +339,14 @@ public class ExecutorController extends BaseController {
                                 projectCode, processInstanceId);
                 } catch (Exception e) {
                     executeFailedIdList
-                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(BaseStatus.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
             }
         }
         if (!executeFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
+            putMsg(result, BaseStatus.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return returnDataList(result);
     }

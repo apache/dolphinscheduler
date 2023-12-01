@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.impl.ProjectPreferenceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,7 +50,7 @@ public class ProjectPreferenceControllerTest {
                 Mockito.anyString())).thenReturn(getSuccessResult());
 
         Result result = projectPreferenceController.updateProjectPreference(loginUser, 1, "value");
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
     }
 
     @Test
@@ -61,7 +60,7 @@ public class ProjectPreferenceControllerTest {
         Mockito.when(projectPreferenceService.queryProjectPreferenceByProjectCode(Mockito.any(), Mockito.anyLong()))
                 .thenReturn(getSuccessResult());
         Result result = projectPreferenceController.queryProjectPreferenceByProjectCode(loginUser, 1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
     }
 
     @Test
@@ -72,7 +71,7 @@ public class ProjectPreferenceControllerTest {
                 projectPreferenceService.enableProjectPreference(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(getSuccessResult());
         Result result = projectPreferenceController.enableProjectPreference(loginUser, 1, 1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
     }
 
     private User getGeneralUser() {
@@ -85,8 +84,8 @@ public class ProjectPreferenceControllerTest {
 
     private Result getSuccessResult() {
         Result result = new Result();
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.SUCCESS.getMsg());
+        result.setCode(BaseStatus.SUCCESS.getCode());
+        result.setMsg(BaseStatus.SUCCESS.getMsg());
         return result;
     }
 

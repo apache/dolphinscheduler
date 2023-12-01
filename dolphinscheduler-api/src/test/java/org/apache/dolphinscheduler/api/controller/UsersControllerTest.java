@@ -17,18 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -38,6 +29,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * users controller test
@@ -64,7 +63,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.CREATE_USER_ERROR.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.CREATE_USER_ERROR.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -87,7 +86,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.UPDATE_USER_ERROR.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.UPDATE_USER_ERROR.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -104,7 +103,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -123,7 +122,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -141,7 +140,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -159,7 +158,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -177,7 +176,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -195,7 +194,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -208,7 +207,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -225,7 +224,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -244,7 +243,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -263,7 +262,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -279,7 +278,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -296,7 +295,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.USER_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -310,7 +309,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -330,7 +329,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -347,7 +346,7 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -365,6 +364,6 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 }

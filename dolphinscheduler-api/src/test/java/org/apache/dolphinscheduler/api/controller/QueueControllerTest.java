@@ -17,17 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -36,6 +28,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * queue controller test
@@ -61,7 +57,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -81,7 +77,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("query list-paging queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -100,7 +96,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("create queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -120,7 +116,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info("update queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 
@@ -142,7 +138,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.QUEUE_VALUE_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.QUEUE_VALUE_EXIST.getCode(), result.getCode().intValue());
 
         // queue name exist
         paramsMap.clear();
@@ -158,7 +154,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.QUEUE_NAME_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.QUEUE_NAME_EXIST.getCode(), result.getCode().intValue());
 
         // success
         paramsMap.clear();
@@ -174,7 +170,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
@@ -192,7 +188,7 @@ public class QueueControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.QUEUE_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.QUEUE_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info("delete queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 }

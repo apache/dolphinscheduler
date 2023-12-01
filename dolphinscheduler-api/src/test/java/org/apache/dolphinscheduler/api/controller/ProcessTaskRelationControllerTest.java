@@ -17,25 +17,24 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * process task relation controller test
@@ -48,7 +47,7 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryDownstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(
                 processTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
@@ -62,13 +61,13 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryUpstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(
                 processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
@@ -82,6 +81,6 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 }

@@ -17,23 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_HEADER_UNKNOWN;
-import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_FORWARDED_FOR;
-import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_REAL_IP;
-
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 
-import org.apache.commons.lang3.StringUtils;
-
+import javax.servlet.http.HttpServletRequest;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import static org.apache.dolphinscheduler.common.constants.Constants.*;
 
 /**
  * base controller
@@ -89,9 +85,9 @@ public class BaseController {
      * @return result code
      */
     public Result returnDataList(Map<String, Object> result) {
-        Status status = (Status) result.get(Constants.STATUS);
-        if (status == Status.SUCCESS) {
-            String msg = Status.SUCCESS.getMsg();
+        org.apache.dolphinscheduler.api.enums.v2.Status status = (BaseStatus) result.get(Constants.STATUS);
+        if (status == BaseStatus.SUCCESS) {
+            String msg = BaseStatus.SUCCESS.getMsg();
             Object datalist = result.get(Constants.DATA_LIST);
             return success(msg, datalist);
         } else {
@@ -108,8 +104,8 @@ public class BaseController {
      */
     public Result success() {
         Result result = new Result();
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.SUCCESS.getMsg());
+        result.setCode(BaseStatus.SUCCESS.getCode());
+        result.setMsg(BaseStatus.SUCCESS.getMsg());
 
         return result;
     }
@@ -122,7 +118,7 @@ public class BaseController {
      */
     public Result success(String msg) {
         Result result = new Result();
-        result.setCode(Status.SUCCESS.getCode());
+        result.setCode(BaseStatus.SUCCESS.getCode());
         result.setMsg(msg);
 
         return result;
@@ -146,7 +142,7 @@ public class BaseController {
      * @return success result code
      */
     public Result success(Object list) {
-        return getResult(Status.SUCCESS.getMsg(), list);
+        return getResult(BaseStatus.SUCCESS.getMsg(), list);
     }
 
     /**
@@ -173,8 +169,8 @@ public class BaseController {
     public Result success(Object totalList, Integer currentPage,
                           Integer total, Integer totalPage) {
         Result result = new Result();
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.SUCCESS.getMsg());
+        result.setCode(BaseStatus.SUCCESS.getCode());
+        result.setMsg(BaseStatus.SUCCESS.getMsg());
 
         Map<String, Object> map = new HashMap<>(8);
         map.put(Constants.TOTAL_LIST, totalList);
@@ -206,7 +202,7 @@ public class BaseController {
      * @param status status
      * @param statusParams object messages
      */
-    protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
+    protected void putMsg(Map<String, Object> result, BaseStatus status, Object... statusParams) {
         result.put(Constants.STATUS, status);
         if (statusParams != null && statusParams.length > 0) {
             result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
@@ -222,7 +218,7 @@ public class BaseController {
      * @param status status
      * @param statusParams status parameters
      */
-    protected void putMsg(Result result, Status status, Object... statusParams) {
+    protected void putMsg(Result result, BaseStatus status, Object... statusParams) {
         result.setCode(status.getCode());
 
         if (statusParams != null && statusParams.length > 0) {
@@ -242,7 +238,7 @@ public class BaseController {
      */
     private Result getResult(String msg, Object list) {
         Result result = new Result();
-        result.setCode(Status.SUCCESS.getCode());
+        result.setCode(BaseStatus.SUCCESS.getCode());
         result.setMsg(msg);
 
         result.setData(list);

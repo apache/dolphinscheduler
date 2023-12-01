@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.api.exceptions;
 
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.utils.Result;
-
 import lombok.extern.slf4j.Slf4j;
-
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -46,9 +44,9 @@ public class ApiExceptionHandler {
         ApiException ce = hm.getMethodAnnotation(ApiException.class);
         log.error("Meet en unknown exception: ", e);
         if (ce == null) {
-            return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, e.getMessage());
+            return Result.errorWithArgs(BaseStatus.INTERNAL_SERVER_ERROR_ARGS, e.getMessage());
         }
-        Status st = ce.value();
+        BaseStatus st = ce.value();
         return Result.error(st);
     }
 
