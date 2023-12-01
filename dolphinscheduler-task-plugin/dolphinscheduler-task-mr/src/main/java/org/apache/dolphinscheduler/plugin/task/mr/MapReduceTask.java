@@ -30,9 +30,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * mapreduce task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MapReduceTask extends AbstractYarnTask {
 
     /**
@@ -41,20 +41,10 @@ public class MapReduceTask extends AbstractYarnTask {
      */
     private static final String MAPREDUCE_COMMAND = TaskConstants.HADOOP;
 
-    /**
-     * mapreduce parameters
-     */
     private MapReduceParameters mapreduceParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * constructor
-     * @param taskExecutionContext taskExecutionContext
-     */
     public MapReduceTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
