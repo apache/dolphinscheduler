@@ -148,6 +148,7 @@ public enum ExceptionStatus {
     LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
     ADD_TASK_TYPE_ERROR(10200, "add task type error", "添加任务类型错误"),
     DELETE_TASK_TYPE_ERROR(10200, "delete task type error", "删除任务类型错误"),
+    QUERY_TASK_INSTANCE_ERROR(10205, "query task instance error", "查询任务实例错误"),
     LIST_AZURE_DATA_FACTORY_ERROR(10208, "list azure data factory error", "查询AZURE数据工厂列表错误"),
     LIST_AZURE_RESOURCE_GROUP_ERROR(10209, "list azure resource group error", "查询AZURE资源组列表错误"),
     LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR(10210, "list azure data factory pipeline error", "查询AZURE数据工厂pipeline列表错误"),
