@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.exceptions;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
@@ -32,5 +32,5 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 public @interface ApiException {
 
-    Status value();
+    ExceptionStatus value();
 }
