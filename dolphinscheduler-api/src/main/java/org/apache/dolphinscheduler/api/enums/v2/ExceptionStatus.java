@@ -22,6 +22,8 @@ public enum ExceptionStatus {
     VERIFY_DATASOURCE_NAME_FAILURE(10039, "verify datasource name failure", "验证数据源名称失败"),
     AUTHORIZED_DATA_SOURCE(10041, "authorized data source", "授权数据源失败"),
     QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
+    QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error", "查询任务实例日志错误"),
+    DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR(10104, "download task instance log file error", "下载任务日志文件错误"),
     QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
     QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
     LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
