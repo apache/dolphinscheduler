@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus;
 
 import java.text.MessageFormat;
 
@@ -52,6 +53,13 @@ public class Result<T> {
     }
 
     public Result(Status status) {
+        if (status != null) {
+            this.code = status.getCode();
+            this.msg = status.getMsg();
+        }
+    }
+
+    public Result(ExceptionStatus status) {
         if (status != null) {
             this.code = status.getCode();
             this.msg = status.getMsg();
@@ -97,7 +105,7 @@ public class Result<T> {
      * @param status status
      * @return result
      */
-    public static <T> Result<T> error(Status status) {
+    public static <T> Result<T> error(ExceptionStatus status) {
         return new Result<>(status);
     }
 
@@ -108,7 +116,7 @@ public class Result<T> {
      * @param args args
      * @return result
      */
-    public static <T> Result<T> errorWithArgs(Status status, Object... args) {
+    public static <T> Result<T> errorWithArgs(ExceptionStatus status, Object... args) {
         return new Result<>(status.getCode(), MessageFormat.format(status.getMsg(), args));
     }
 
