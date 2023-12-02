@@ -347,7 +347,7 @@ public class UsersServiceTest {
                 "abc@qq.com",
                 null,
                 "13457864543",
-                null,
+                "offline",
                 1,
                 "Asia/Shanghai"));
     }
