@@ -22,8 +22,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
 
@@ -36,12 +38,14 @@ import org.springframework.web.method.HandlerMethod;
 public class ApiExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Object> exceptionHandler(ServiceException e, HandlerMethod hm) {
         log.error("{} Meet a ServiceException: {}", hm.getShortLogMessage(), e.getMessage());
         return new Result<>(e.getCode(), e.getMessage());
     }
 
     @ExceptionHandler(Throwable.class)
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     public Result<Object> exceptionHandler(Throwable e, HandlerMethod hm) {
         ApiException ce = hm.getMethodAnnotation(ApiException.class);
         log.error("Meet en unknown exception: ", e);
