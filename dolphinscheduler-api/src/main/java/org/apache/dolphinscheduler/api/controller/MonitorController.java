@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
-
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -43,6 +39,10 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_MASTERS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_WORKERS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DATABASE_STATE_ERROR;
 
 /**
  * monitor controller
