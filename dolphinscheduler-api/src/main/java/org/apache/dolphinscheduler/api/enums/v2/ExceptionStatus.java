@@ -13,6 +13,14 @@ public enum ExceptionStatus {
     LIST_PAGING_ALERT_GROUP_ERROR(10029, "list paging alert group error", "分页查询告警组错误"),
     UPDATE_ALERT_GROUP_ERROR(10030, "update alert group error", "更新告警组错误"),
     DELETE_ALERT_GROUP_ERROR(10031, "delete alert group error", "删除告警组错误"),
+    CREATE_DATASOURCE_ERROR(10033, "create datasource error", "创建数据源错误"),
+    UPDATE_DATASOURCE_ERROR(10034, "update datasource error", "更新数据源错误"),
+    QUERY_DATASOURCE_ERROR(10035, "query datasource error", "查询数据源错误"),
+    CONNECT_DATASOURCE_FAILURE(10036, "connect datasource failure", "建立数据源连接失败"),
+    CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
+    DELETE_DATA_SOURCE_FAILURE(10038, "delete data source failure", "删除数据源失败"),
+    VERIFY_DATASOURCE_NAME_FAILURE(10039, "verify datasource name failure", "验证数据源名称失败"),
+    AUTHORIZED_DATA_SOURCE(10041, "authorized data source", "授权数据源失败"),
     QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
     QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
     LIST_AZURE_DATA_FACTORY_ERROR(10208, "list azure data factory error", "查询AZURE数据工厂列表错误"),
@@ -30,7 +38,8 @@ public enum ExceptionStatus {
     QUERY_ACCESSTOKEN_BY_USER_ERROR(70016, "query access token by user error", "查询访问指定用户的token错误"),
     COMMAND_STATE_COUNT_ERROR(80001, "task instance state count error", "查询各状态任务实例数错误"),
     QUEUE_COUNT_ERROR(90001, "queue count error", "查询队列数据错误"),
-
+    KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
+    UNAUTHORIZED_DATASOURCE(10040, "unauthorized datasource", "未经授权的数据源"),
     UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(110005, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR(110006, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
     GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),
@@ -46,9 +55,12 @@ public enum ExceptionStatus {
     QUERY_RULE_LIST_ERROR(1200014, "query rule list error", "获取规则列表错误"),
     QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR(1200016, "query execute result list paging error", "获取数据质量任务结果分页错误"),
     GET_DATASOURCE_OPTIONS_ERROR(1200017, "get datasource options error", "获取数据源Options错误"),
+    GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),
+    GET_DATASOURCE_TABLE_COLUMNS_ERROR(1200019, "get datasource table columns error", "获取数据源表列名错误"),
     QUERY_CLUSTER_BY_CODE_ERROR(1200028, "not found cluster [{0}] ", "查询集群编码[{0}]不存在"),
     QUERY_CLUSTER_ERROR(1200029, "login user query cluster error", "分页查询集群列表错误"),
     VERIFY_CLUSTER_ERROR(1200030, "verify cluster error", "验证集群信息错误"),
+    GET_DATASOURCE_DATABASES_ERROR(1200035, "get datasource databases error", "获取数据库列表错误"),
     ;
 
     private final int code;

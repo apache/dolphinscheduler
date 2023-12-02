@@ -17,20 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_DATABASES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
@@ -69,6 +55,19 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_DATA_SOURCE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CONNECTION_TEST_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CONNECT_DATASOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_DATA_SOURCE_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.KERBEROS_STARTUP_STATE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UNAUTHORIZED_DATASOURCE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_DATASOURCE_NAME_FAILURE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_DATASOURCE_DATABASES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_DATASOURCE_TABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_DATASOURCE_ERROR;
 /**
  * data source controller
  */
