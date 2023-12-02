@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -337,7 +336,7 @@ public class UsersServiceTest {
                 1,
                 "Asia/Shanghai"));
 
-        //non-admin should not modify tenantId and queue
+        // non-admin should not modify tenantId and queue
         when(userMapper.selectById(any())).thenReturn(getNonAdminUser());
         when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
         User user = userMapper.selectById(2);
@@ -907,8 +906,10 @@ public class UsersServiceTest {
 
     /**
      * get non-admin user
+     *
+     * @return user
      */
-    private User getNonAdminUser(){
+    private User getNonAdminUser() {
 
         User user = new User();
         user.setId(2);
