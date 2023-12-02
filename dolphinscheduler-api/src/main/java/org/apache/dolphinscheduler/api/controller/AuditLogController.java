@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUDIT_LOG_LIST_PAGING;
-
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
@@ -43,6 +41,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUDIT_LOG_LIST_PAGING;
 
 @Tag(name = "AUDIT_LOG_TAG")
 @RestController
