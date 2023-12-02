@@ -88,6 +88,13 @@ public enum ExceptionStatus {
     LIST_AZURE_RESOURCE_GROUP_ERROR(10209, "list azure resource group error", "查询AZURE资源组列表错误"),
     LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR(10210, "list azure data factory pipeline error", "查询AZURE数据工厂pipeline列表错误"),
     NOT_SUPPORT_SSO(10211, "Not support SSO login.", "不支持SSO登录"),
+    CREATE_PROJECT_PARAMETER_ERROR(10214, "create project parameter error", "创建项目参数错误"),
+
+    UPDATE_PROJECT_PARAMETER_ERROR(10215, "update project parameter error", "更新项目参数错误"),
+
+    DELETE_PROJECT_PARAMETER_ERROR(10216, "delete project parameter error {0}", "删除项目参数错误 {0}"),
+
+    QUERY_PROJECT_PARAMETER_ERROR(10217, "query project parameter error", "查询项目参数错误"),
     TASK_INSTANCE_STATE_COUNT_ERROR(50011, "task instance state count error", "查询各状态任务实例数错误"),
     COUNT_PROCESS_INSTANCE_STATE_ERROR(50012, "count process instance state error", "查询各状态流程实例数错误"),
     COUNT_PROCESS_DEFINITION_USER_ERROR(50013, "count process definition user error", "查询各用户流程定义数错误"),
