@@ -60,6 +60,7 @@
         <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
         <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
+        <ngdbc.version>2.4.51</ngdbc.version>
         <slf4j.version>1.7.36</slf4j.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
@@ -417,6 +418,13 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.sap.cloud.db.jdbc</groupId>
+                <artifactId>ngdbc</artifactId>
+                <version>${ngdbc.version}</version>
             </dependency>
             <!-- sl4j -->
             <dependency>
