@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.GroupStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -214,7 +215,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -228,7 +229,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -246,7 +247,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
