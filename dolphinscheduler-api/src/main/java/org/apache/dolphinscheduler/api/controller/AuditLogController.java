@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUDIT_LOG_LIST_PAGING;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUDIT_LOG_LIST_PAGING;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
