@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.REMOVE_TASK_INSTANCE_CACHE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -50,6 +44,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.FORCE_TASK_SUCCESS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.REMOVE_TASK_INSTANCE_CACHE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.TASK_SAVEPOINT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.TASK_STOP_ERROR;
 
 /**
  * task instance controller
