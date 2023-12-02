@@ -35,6 +35,12 @@ public enum ExceptionStatus {
     QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR(110009, "query all alert plugin instance error", "查询所有告警实例失败"),
     LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR(110011, "query plugin instance page error", "分页查询告警实例失败"),
     SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR(110016, "send test alert plugin instance error", "发送测试告警错误"),
+    CREATE_CLUSTER_ERROR(120020, "create cluster error", "创建集群失败"),
+    UPDATE_CLUSTER_ERROR(120024, "update cluster [{0}] info error", "更新集群[{0}]信息失败"),
+    DELETE_CLUSTER_ERROR(120025, "delete cluster error", "删除集群信息失败"),
+    QUERY_CLUSTER_BY_CODE_ERROR(1200028, "not found cluster [{0}] ", "查询集群编码[{0}]不存在"),
+    QUERY_CLUSTER_ERROR(1200029, "login user query cluster error", "分页查询集群列表错误"),
+    VERIFY_CLUSTER_ERROR(1200030, "verify cluster error", "验证集群信息错误"),
     ;
 
     private final int code;
