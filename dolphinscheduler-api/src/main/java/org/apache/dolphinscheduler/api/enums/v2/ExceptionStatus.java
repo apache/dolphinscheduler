@@ -23,6 +23,7 @@ public enum ExceptionStatus {
     AUTHORIZED_DATA_SOURCE(10041, "authorized data source", "授权数据源失败"),
     QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
     QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
+    LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
     LIST_AZURE_DATA_FACTORY_ERROR(10208, "list azure data factory error", "查询AZURE数据工厂列表错误"),
     LIST_AZURE_RESOURCE_GROUP_ERROR(10209, "list azure resource group error", "查询AZURE资源组列表错误"),
     LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR(10210, "list azure data factory pipeline error", "查询AZURE数据工厂pipeline列表错误"),
