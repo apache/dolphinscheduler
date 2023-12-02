@@ -7,7 +7,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public enum ExceptionStatus {
-
+    REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
     /*token error*/
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     GENERATE_TOKEN_ERROR(70011, "generate token error", "生成token错误"),
