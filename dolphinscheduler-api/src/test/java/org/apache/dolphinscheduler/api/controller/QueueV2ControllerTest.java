@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.dto.queue.QueueQueryRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueUpdateRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueVerifyRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -139,7 +140,7 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.QUEUE_VALUE_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(ExceptionStatus.QUEUE_VALUE_EXIST.getCode(), result.getCode().intValue());
 
         // queue name exist
         queueVerifyRequest.setQueue(NOT_EXISTS_NAME);
@@ -153,7 +154,7 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
                 .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.QUEUE_NAME_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(ExceptionStatus.QUEUE_NAME_EXIST.getCode(), result.getCode().intValue());
 
         // success
         queueVerifyRequest.setQueue(NOT_EXISTS_NAME);
