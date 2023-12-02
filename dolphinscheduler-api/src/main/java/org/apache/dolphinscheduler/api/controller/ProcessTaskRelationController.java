@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_EDGE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
-
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -49,6 +44,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_PROCESS_TASK_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DATA_IS_NOT_VALID;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_EDGE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_TASK_PROCESS_RELATION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_PROCESS_RELATION_ERROR;
 
 /**
  * process task relation controller
@@ -88,9 +89,9 @@ public class ProcessTaskRelationController extends BaseController {
                                             @RequestParam(name = "postTaskCode", required = true) long postTaskCode) {
         Map<String, Object> result = new HashMap<>();
         if (postTaskCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "postTaskCode");
+            putMsg(result, Status.DATA_IS_NOT_VALID, "postTaskCode");
         } else if (processDefinitionCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+            putMsg(result, Status.DATA_IS_NOT_VALID, "processDefinitionCode");
         } else {
             result = processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode,
                     preTaskCode, postTaskCode);
