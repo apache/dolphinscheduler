@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_QUEUE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_QUEUE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
-
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -53,6 +47,11 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_QUEUE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_QUEUE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_QUEUE_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_QUEUE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_QUEUE_ERROR;
 /**
  * queue controller
  */
