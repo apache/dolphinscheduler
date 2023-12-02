@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.COMMAND_STATE_COUNT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_INSTANCE_STATE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUEUE_COUNT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_INSTANCE_STATE_COUNT_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
@@ -51,6 +45,11 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.COMMAND_STATE_COUNT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.COUNT_PROCESS_DEFINITION_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.COUNT_PROCESS_INSTANCE_STATE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUEUE_COUNT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.TASK_INSTANCE_STATE_COUNT_ERROR;
 /**
  * data analysis controller
  */

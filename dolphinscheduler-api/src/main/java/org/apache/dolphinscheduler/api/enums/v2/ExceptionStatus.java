@@ -8,11 +8,19 @@ import java.util.Optional;
 
 public enum ExceptionStatus {
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
+    CREATE_ALERT_GROUP_ERROR(10027, "create alert group error", "创建告警组错误"),
+    QUERY_ALL_ALERTGROUP_ERROR(10028, "query all alertgroup error", "查询告警组错误"),
+    LIST_PAGING_ALERT_GROUP_ERROR(10029, "list paging alert group error", "分页查询告警组错误"),
+    UPDATE_ALERT_GROUP_ERROR(10030, "update alert group error", "更新告警组错误"),
+    DELETE_ALERT_GROUP_ERROR(10031, "delete alert group error", "删除告警组错误"),
     QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
+    QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
     LIST_AZURE_DATA_FACTORY_ERROR(10208, "list azure data factory error", "查询AZURE数据工厂列表错误"),
     LIST_AZURE_RESOURCE_GROUP_ERROR(10209, "list azure resource group error", "查询AZURE资源组列表错误"),
     LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR(10210, "list azure data factory pipeline error", "查询AZURE数据工厂pipeline列表错误"),
-
+    TASK_INSTANCE_STATE_COUNT_ERROR(50011, "task instance state count error", "查询各状态任务实例数错误"),
+    COUNT_PROCESS_INSTANCE_STATE_ERROR(50012, "count process instance state error", "查询各状态流程实例数错误"),
+    COUNT_PROCESS_DEFINITION_USER_ERROR(50013, "count process definition user error", "查询各用户流程定义数错误"),
     /*token error*/
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     GENERATE_TOKEN_ERROR(70011, "generate token error", "生成token错误"),
@@ -20,13 +28,8 @@ public enum ExceptionStatus {
     UPDATE_ACCESS_TOKEN_ERROR(70013, "update access token error", "更新访问token错误"),
     DELETE_ACCESS_TOKEN_ERROR(70014, "delete access token error", "删除访问token错误"),
     QUERY_ACCESSTOKEN_BY_USER_ERROR(70016, "query access token by user error", "查询访问指定用户的token错误"),
-
-    CREATE_ALERT_GROUP_ERROR(10027, "create alert group error", "创建告警组错误"),
-    QUERY_ALL_ALERTGROUP_ERROR(10028, "query all alertgroup error", "查询告警组错误"),
-    LIST_PAGING_ALERT_GROUP_ERROR(10029, "list paging alert group error", "分页查询告警组错误"),
-    UPDATE_ALERT_GROUP_ERROR(10030, "update alert group error", "更新告警组错误"),
-    DELETE_ALERT_GROUP_ERROR(10031, "delete alert group error", "删除告警组错误"),
-    QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
+    COMMAND_STATE_COUNT_ERROR(80001, "task instance state count error", "查询各状态任务实例数错误"),
+    QUEUE_COUNT_ERROR(90001, "queue count error", "查询队列数据错误"),
 
     UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(110005, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR(110006, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
