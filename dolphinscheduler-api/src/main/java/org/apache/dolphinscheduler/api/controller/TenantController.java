@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TENANT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TENANT_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
-
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -54,6 +47,12 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_TENANT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_TENANT_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TENANT_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TENANT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_TENANT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_OS_TENANT_CODE_ERROR;
 /**
  * tenant controller
  */
