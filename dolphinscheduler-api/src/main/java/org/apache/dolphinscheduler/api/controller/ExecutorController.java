@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
-
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -69,6 +63,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CHECK_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.EXECUTE_PROCESS_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_EXECUTING_WORKFLOW_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.START_PROCESS_INSTANCE_ERROR;
 
 /**
  * executor controller

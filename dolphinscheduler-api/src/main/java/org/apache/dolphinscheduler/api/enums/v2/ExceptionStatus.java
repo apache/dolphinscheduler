@@ -23,6 +23,7 @@ public enum ExceptionStatus {
     AUTHORIZED_DATA_SOURCE(10041, "authorized data source", "授权数据源失败"),
     QUERY_AUDIT_LOG_LIST_PAGING(10057, "query resources list paging", "分页查询资源列表错误"),
     QUERY_ALERT_GROUP_ERROR(10180, "query alert group error", "查询告警组错误"),
+    QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
     LIST_TASK_TYPE_ERROR(10200, "list task type error", "查询任务类型列表错误"),
     LIST_AZURE_DATA_FACTORY_ERROR(10208, "list azure data factory error", "查询AZURE数据工厂列表错误"),
     LIST_AZURE_RESOURCE_GROUP_ERROR(10209, "list azure resource group error", "查询AZURE资源组列表错误"),
@@ -30,6 +31,10 @@ public enum ExceptionStatus {
     TASK_INSTANCE_STATE_COUNT_ERROR(50011, "task instance state count error", "查询各状态任务实例数错误"),
     COUNT_PROCESS_INSTANCE_STATE_ERROR(50012, "count process instance state error", "查询各状态流程实例数错误"),
     COUNT_PROCESS_DEFINITION_USER_ERROR(50013, "count process definition user error", "查询各用户流程定义数错误"),
+    START_PROCESS_INSTANCE_ERROR(50014, "start process instance error", "运行工作流实例错误"),
+    EXECUTE_PROCESS_INSTANCE_ERROR(50015, "execute process instance error", "操作工作流实例错误"),
+    CHECK_PROCESS_DEFINITION_ERROR(50016, "check process definition error", "工作流定义错误"),
+    BATCH_EXECUTE_PROCESS_INSTANCE_ERROR(50058, "change process instance status error: {0}", "修改工作实例状态错误: {0}"),
     /*token error*/
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     GENERATE_TOKEN_ERROR(70011, "generate token error", "生成token错误"),
