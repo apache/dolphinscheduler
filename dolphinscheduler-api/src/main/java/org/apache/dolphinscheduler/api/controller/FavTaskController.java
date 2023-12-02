@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -46,6 +42,10 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.ADD_TASK_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_TASK_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_TASK_TYPE_ERROR;
 
 /**
  * fav controller

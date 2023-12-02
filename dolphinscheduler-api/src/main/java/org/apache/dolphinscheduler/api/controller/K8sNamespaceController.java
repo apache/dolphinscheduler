@@ -17,14 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_K8S_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_K8S_NAMESPACE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CAN_USE_K8S_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_ERROR;
-
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -51,6 +43,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_K8S_NAMESPACE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_K8S_NAMESPACE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_NAMESPACE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_CAN_USE_K8S_NAMESPACE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_UNAUTHORIZED_NAMESPACE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_K8S_NAMESPACE_ERROR;
 
 /**
  * k8s namespace controller

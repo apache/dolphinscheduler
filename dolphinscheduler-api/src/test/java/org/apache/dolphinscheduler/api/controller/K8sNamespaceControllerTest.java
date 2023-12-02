@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -113,7 +114,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.VERIFY_K8S_NAMESPACE_ERROR.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(ExceptionStatus.VERIFY_K8S_NAMESPACE_ERROR.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify namespace return result:{}", mvcResult.getResponse().getContentAsString());
     }
