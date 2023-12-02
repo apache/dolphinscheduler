@@ -190,6 +190,12 @@ public enum ExceptionStatus {
     CREATE_ENVIRONMENT_ERROR(120001, "create environment error", "创建环境失败"),
     UPDATE_CLUSTER_ERROR(120024, "update cluster [{0}] info error", "更新集群[{0}]信息失败"),
     DELETE_CLUSTER_ERROR(120025, "delete cluster error", "删除集群信息失败"),
+    CLOSE_TASK_GROUP_ERROR(130011, "close task group error", "关闭任务组错误"),
+    CREATE_TASK_GROUP_ERROR(130008, "create task group error", "创建任务组错误"),
+    UPDATE_TASK_GROUP_ERROR(130009, "update task group list error", "更新任务组错误"),
+    QUERY_TASK_GROUP_LIST_ERROR(130010, "query task group list error", "查询任务组列表错误"),
+    START_TASK_GROUP_ERROR(130012, "start task group error", "启动任务组错误"),
+    QUERY_TASK_GROUP_QUEUE_LIST_ERROR(130013, "query task group queue list error", "查询任务组队列列表错误"),
     QUERY_ENVIRONMENT_BY_CODE_ERROR(1200009, "not found environment code [{0}] ", "查询环境编码[{0}]不存在"),
     QUERY_ENVIRONMENT_ERROR(1200010, "login user query environment error", "分页查询环境列表错误"),
     VERIFY_ENVIRONMENT_ERROR(1200011, "verify environment error", "验证环境信息错误"),
@@ -212,6 +218,7 @@ public enum ExceptionStatus {
     QUERY_UNAUTHORIZED_NAMESPACE_ERROR(1300012, "query unauthorized namespace error", "查询未授权命名空间错误"),
     QUERY_AUTHORIZED_NAMESPACE_ERROR(1300013, "query authorized namespace error", "查询授权命名空间错误"),
     QUERY_CAN_USE_K8S_NAMESPACE_ERROR(1300018, "login user query can used namespace list error", "查询可用命名空间错误"),
+
     QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR(1300100, "query process definition all variables error",
             "查询工作流自定义变量信息错误"),;
 
