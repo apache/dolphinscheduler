@@ -337,7 +337,6 @@ public class UsersServiceTest {
                 "Asia/Shanghai"));
 
         // non-admin should not modify tenantId and queue
-        when(userMapper.selectById(any())).thenReturn(getNonAdminUser());
         when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
         User user = userMapper.selectById(2);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
