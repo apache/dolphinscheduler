@@ -186,6 +186,7 @@ public enum ExceptionStatus {
     QUEUE_COUNT_ERROR(90001, "queue count error", "查询队列数据错误"),
     KERBEROS_STARTUP_STATE(100001, "get kerberos startup state error", "获取kerberos启动状态错误"),
     UNAUTHORIZED_DATASOURCE(10040, "unauthorized datasource", "未经授权的数据源"),
+    QUERY_PLUGINS_ERROR(110003, "query plugins error", "查询插件错误"),
     UPDATE_ALERT_PLUGIN_INSTANCE_ERROR(110005, "update alert plugin instance error", "更新告警组和告警组插件实例错误"),
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR(110006, "delete alert plugin instance error", "删除告警组和告警组插件实例错误"),
     GET_ALERT_PLUGIN_INSTANCE_ERROR(110007, "get alert plugin instance error", "获取告警组和告警组插件实例错误"),

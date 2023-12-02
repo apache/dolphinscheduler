@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PLUGINS_ERROR;
-
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -44,6 +42,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PLUGINS_ERROR;
 /**
  * ui plugin controller
  * Some plugins (such as alert plugin) need to provide UI interfaces to users.
