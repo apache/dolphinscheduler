@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.extract.common.transportor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +24,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LogicTaskInstanceLogPageQueryResponse {
+public class TaskInstanceLogFileDownloadResponse {
 
-    private String logContent;
+    private byte[] logBytes;
 
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.worker.transportor;
+package org.apache.dolphinscheduler.extract.common.transportor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

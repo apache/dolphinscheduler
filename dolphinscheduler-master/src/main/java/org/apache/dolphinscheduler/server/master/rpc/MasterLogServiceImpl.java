@@ -17,14 +17,17 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
-import org.apache.dolphinscheduler.extract.master.IMasterLogService;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskInstanceLogFileDownloadRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskInstanceLogFileDownloadResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskInstanceLogPageQueryRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.ILogService;
+import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 
-import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -33,18 +36,18 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class MasterLogServiceImpl implements IMasterLogService {
+public class MasterLogServiceImpl implements ILogService {
 
     @Override
-    public LogicTaskInstanceLogFileDownloadResponse getLogicTaskInstanceWholeLogFileBytes(LogicTaskInstanceLogFileDownloadRequest logicTaskInstanceLogFileDownloadRequest) {
+    public TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest logicTaskInstanceLogFileDownloadRequest) {
         byte[] bytes =
                 LogUtils.getFileContentBytes(logicTaskInstanceLogFileDownloadRequest.getTaskInstanceLogAbsolutePath());
         // todo: if file not exists, return error result
-        return new LogicTaskInstanceLogFileDownloadResponse(bytes);
+        return new TaskInstanceLogFileDownloadResponse(bytes);
     }
 
     @Override
-    public LogicTaskInstanceLogPageQueryResponse pageQueryLogicTaskInstanceLog(LogicTaskInstanceLogPageQueryRequest taskInstanceLogPageQueryRequest) {
+    public TaskInstanceLogPageQueryResponse pageQueryTaskInstanceLog(TaskInstanceLogPageQueryRequest taskInstanceLogPageQueryRequest) {
 
         List<String> lines = LogUtils.readPartFileContent(
                 taskInstanceLogPageQueryRequest.getTaskInstanceLogAbsolutePath(),
@@ -52,18 +55,16 @@ public class MasterLogServiceImpl implements IMasterLogService {
                 taskInstanceLogPageQueryRequest.getLimit());
 
         String logContent = LogUtils.rollViewLogLines(lines);
-        return new LogicTaskInstanceLogPageQueryResponse(logContent);
+        return new TaskInstanceLogPageQueryResponse(logContent);
     }
 
     @Override
-    public void removeLogicTaskInstanceLog(String taskInstanceLogAbsolutePath) {
-        File taskLogFile = new File(taskInstanceLogAbsolutePath);
-        try {
-            if (taskLogFile.exists()) {
-                taskLogFile.delete();
-            }
-        } catch (Exception e) {
-            log.error("Remove LogicTaskInstanceLog error", e);
-        }
+    public GetAppIdResponse getAppId(GetAppIdRequest getAppIdRequest) {
+        return new GetAppIdResponse(Collections.emptyList());
+    }
+
+    @Override
+    public void removeTaskInstanceLog(String taskInstanceLogAbsolutePath) {
+        FileUtils.deleteFile(taskInstanceLogAbsolutePath);
     }
 }
