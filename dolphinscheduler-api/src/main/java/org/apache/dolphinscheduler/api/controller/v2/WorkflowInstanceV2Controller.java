@@ -47,7 +47,11 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.*;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.EXECUTE_PROCESS_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_INSTANCE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
+
 
 /**
  * workflow instance controller

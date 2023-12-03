@@ -46,7 +46,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_PROCESS_TASK_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DATA_IS_NOT_VALID;
 import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_EDGE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_TASK_PROCESS_RELATION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_PROCESS_RELATION_ERROR;
