@@ -17,6 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_TASK_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_SCHEDULE_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_LIST;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_TASK_DEFINITION_ERROR;
+
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
@@ -47,13 +53,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_SCHEDULE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_TASK_DEFINITION_ERROR;
 
 /**
  * task definition controller

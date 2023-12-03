@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CLOSE_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_GROUP_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_GROUP_QUEUE_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.START_TASK_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_TASK_GROUP_ERROR;
+
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
@@ -41,13 +48,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CLOSE_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_GROUP_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_TASK_GROUP_QUEUE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.START_TASK_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_TASK_GROUP_ERROR;
 
 /**
  * task group controller

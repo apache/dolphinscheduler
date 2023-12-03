@@ -215,7 +215,8 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(),
+                result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -229,7 +230,8 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(),
+                result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -247,7 +249,8 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(GroupStatus.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP.getCode(),
+                result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 

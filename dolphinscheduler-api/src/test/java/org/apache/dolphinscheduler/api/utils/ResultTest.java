@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus;
 
 import java.util.HashMap;
 
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

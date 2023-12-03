@@ -17,6 +17,22 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_USER_BY_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_USER_INFO_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_DATASOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_K8S_NAMESPACE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_USER_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.REVOKE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UNAUTHORIZED_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.USER_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_USERNAME_ERROR;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -47,22 +63,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_USER_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_USER_INFO_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_K8S_NAMESPACE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GRANT_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_USER_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.REVOKE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UNAUTHORIZED_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.USER_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_USERNAME_ERROR;
 
 /**
  * users controller

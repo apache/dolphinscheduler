@@ -17,6 +17,13 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GENERATE_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_ACCESSTOKEN_BY_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_ACCESSTOKEN_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_ACCESS_TOKEN_ERROR;
+
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -46,13 +53,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_ACCESS_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GENERATE_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_ACCESSTOKEN_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_ACCESSTOKEN_BY_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_ACCESS_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_ACCESS_TOKEN_ERROR;
 
 /**
  * access token controller

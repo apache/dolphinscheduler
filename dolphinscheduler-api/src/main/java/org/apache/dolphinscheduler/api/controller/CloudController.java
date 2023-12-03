@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_AZURE_DATA_FACTORY_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_AZURE_RESOURCE_GROUP_ERROR;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.CloudService;
@@ -39,10 +43,6 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_AZURE_DATA_FACTORY_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_AZURE_RESOURCE_GROUP_ERROR;
 /**
  * cloud controller
  */

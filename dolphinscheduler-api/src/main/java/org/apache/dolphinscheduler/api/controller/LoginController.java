@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.IP_IS_EMPTY;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.NOT_SUPPORT_SSO;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.SIGN_OUT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.USER_LOGIN_FAILURE;
+
 import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -65,11 +70,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.IP_IS_EMPTY;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.NOT_SUPPORT_SSO;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.SIGN_OUT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.USER_LOGIN_FAILURE;
 
 /**
  * login controller

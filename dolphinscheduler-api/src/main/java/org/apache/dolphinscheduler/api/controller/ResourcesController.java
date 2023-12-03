@@ -17,6 +17,30 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_FILE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZE_RESOURCE_TREE;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DOWNLOAD_RESOURCE_FILE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.EDIT_RESOURCE_FILE_ON_LINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DATASOURCE_BY_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_RESOURCES_LIST_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_RESOURCES_LIST_PAGING;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_UDF_FUNCTION_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.RESOURCE_FILE_IS_EMPTY;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.RESOURCE_NOT_EXIST;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UNAUTHORIZED_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_RESOURCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_UDF_FUNCTION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_UDF_FUNCTION_NAME_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VIEW_UDF_FUNCTION_ERROR;
+
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -61,30 +85,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_FILE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZED_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.AUTHORIZE_RESOURCE_TREE;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DOWNLOAD_RESOURCE_FILE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.EDIT_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DATASOURCE_BY_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_RESOURCES_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_RESOURCES_LIST_PAGING;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_UDF_FUNCTION_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.RESOURCE_FILE_IS_EMPTY;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.RESOURCE_NOT_EXIST;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UNAUTHORIZED_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_UDF_FUNCTION_NAME_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VIEW_UDF_FUNCTION_ERROR;
 /**
  * resources controller
  */

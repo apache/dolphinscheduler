@@ -17,6 +17,16 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_PROJECT;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_USER;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_UNAUTHORIZED_PROJECT_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_PROJECT_ERROR;
+
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -44,16 +54,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_PROJECT;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_AUTHORIZED_USER;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_UNAUTHORIZED_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_PROJECT_ERROR;
 
 /**
  * project controller

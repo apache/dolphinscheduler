@@ -19,12 +19,13 @@ package org.apache.dolphinscheduler.api.enums.v2;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
 import java.util.Optional;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
 public enum ExceptionStatus {
+
     INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
     CREATE_ALERT_GROUP_ERROR(10027, "create alert group error", "创建告警组错误"),
@@ -279,7 +280,7 @@ public enum ExceptionStatus {
     private final String enMsg;
     private final String zhMsg;
 
-    ExceptionStatus (int code, String enMsg, String zhMsg) {
+    ExceptionStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

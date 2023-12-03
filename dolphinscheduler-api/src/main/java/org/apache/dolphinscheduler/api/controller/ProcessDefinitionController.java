@@ -17,6 +17,25 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_COPY_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_MOVE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROCESS_DEFINITION_VERSION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.IMPORT_PROCESS_DEFINE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_LIST;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.RELEASE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.SWITCH_PROCESS_DEFINITION_VERSION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_PROCESS_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -55,25 +74,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_COPY_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.BATCH_MOVE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_PROCESS_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.GET_TASKS_LIST_BY_PROCESS_DEFINITION_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.IMPORT_PROCESS_DEFINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_DETAIL_OF_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_ALL_VARIABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_PROCESS_DEFINITION_VERSIONS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.RELEASE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.SWITCH_PROCESS_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
 
 /**
  * process definition controller
