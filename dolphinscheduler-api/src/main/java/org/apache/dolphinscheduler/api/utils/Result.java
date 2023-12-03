@@ -102,10 +102,20 @@ public class Result<T> {
     /**
      * Call this function if there is any error
      *
-     * @param status status
+     * @param ExceptionStatus status
      * @return result
      */
     public static <T> Result<T> error(ExceptionStatus status) {
+        return new Result<>(status);
+    }
+
+    /**
+     * Call this function if there is any error
+     *
+     * @param Status status
+     * @return result
+     */
+    public static <T> Result<T> error(Status status) {
         return new Result<>(status);
     }
 
