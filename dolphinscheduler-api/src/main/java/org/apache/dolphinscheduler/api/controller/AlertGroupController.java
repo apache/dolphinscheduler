@@ -50,7 +50,12 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.*;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.CREATE_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.DELETE_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.LIST_PAGING_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_ALERT_GROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.QUERY_ALL_ALERTGROUP_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.ExceptionStatus.UPDATE_ALERT_GROUP_ERROR;
 
 /**
  * alert group controller
@@ -67,8 +72,8 @@ public class AlertGroupController extends BaseController {
     /**
      * create alert group
      *
-     * @param loginUser login user
-     * @param groupName group name
+     * @param loginUser   login user
+     * @param groupName   group name
      * @param description description
      * @return create result code
      */
@@ -125,9 +130,9 @@ public class AlertGroupController extends BaseController {
      * paging query alarm group list
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return alert group list page
      */
     @Operation(summary = "queryAlertGroupListPaging", description = "QUERY_ALERT_GROUP_LIST_PAGING_NOTES")
@@ -174,9 +179,9 @@ public class AlertGroupController extends BaseController {
     /**
      * updateProcessInstance alert group
      *
-     * @param loginUser login user
-     * @param id alert group id
-     * @param groupName group name
+     * @param loginUser   login user
+     * @param id          alert group id
+     * @param groupName   group name
      * @param description description
      * @return update result code
      */
@@ -204,7 +209,7 @@ public class AlertGroupController extends BaseController {
      * delete alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return delete result code
      */
     @Operation(summary = "delAlertgroupById", description = "DELETE_ALERT_GROUP_BY_ID_NOTES")
