@@ -97,7 +97,7 @@ zookeeper:
     size: "20Gi"
     storageClass: "-"
 
-etcd:
+registryEtcd:
   enabled: false
   endpoints: ""
   namespace: "dolphinscheduler"
@@ -111,6 +111,18 @@ etcd:
     keyCertChainFile: "etcd-certs/client.crt"
     keyFile: "etcd-certs/client.pem"
 
+registryJdbc:
+  enabled: false
+  termRefreshInterval: 2s
+  termExpireTimes: 3
+  hikariConfig:
+    # Default use same Dolphinscheduler's database, if you want to use other database please change `enabled` to `true` and change other configs
+    enabled: false
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcurl: jdbc:mysql://
+    username: ""
+    password: ""
+
 ## If exists external registry and set zookeeper.enable value to false, the external registry will be used.
 externalRegistry:
   registryPluginName: "zookeeper"
@@ -118,7 +130,9 @@ externalRegistry:
 
 security:
   authentication:
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
+    # IF you set type `LDAP`, below config will be effective
     ldap:
       urls: ldap://ldap.forumsys.com:389/
       basedn: dc=example,dc=com
@@ -300,6 +314,8 @@ common:
     storage: "20Gi"
 
 master:
+  ## Enable or disable the Master component
+  enabled: true
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
   ## Replicas is the desired number of replicas of the given Template.
@@ -387,6 +403,8 @@ master:
       annotations: {}
 
 worker:
+  ## Enable or disable the Worker component
+  enabled: true
   ## PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
   ## Replicas is the desired number of replicas of the given Template.
@@ -504,6 +522,8 @@ worker:
 
 
 alert:
+  ## Enable or disable the Alert-Server component
+  enabled: true
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
   replicas: 1
   ## The deployment strategy to use to replace existing pods with new ones.
@@ -581,6 +601,8 @@ alert:
 
 
 api:
+  ## Enable or disable the API-Server component
+  enabled: true
   ## Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
   replicas: "1"
   ## The deployment strategy to use to replace existing pods with new ones.
@@ -670,6 +692,24 @@ api:
       annotations: {}
   env:
     JAVA_OPTS: "-Xms512m -Xmx512m -Xmn256m"
+  taskTypeFilter:
+    # -- Enable or disable the task type filter
+    # -- If set to true, the API-Server will return tasks of a specific type set in api.taskTypeFilter.task
+    # -- Note: This feature only filters tasks to return a specific type on the WebUI. However, you can still create any task that DolphinScheduler supports via the API.
+    enabled: false
+    # -- @param taskTypeFilter.taskType task type
+    # -- ref: https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-api/src/main/resources/task-type-config.yaml
+    task: {}
+    #  example task sets
+    #  universal:
+    #    - 'SQL'
+    #  cloud: []
+    #  logic: []
+    #  dataIntegration: []
+    #  dataQuality: []
+    #  machineLearning: []
+    #  other: []
+
 
 ingress:
   enabled: false

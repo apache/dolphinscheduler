@@ -25,34 +25,25 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * process task relation mapper interface
  */
-@CacheConfig(cacheNames = "processTaskRelation", keyGenerator = "cacheKeyGenerator")
 public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelation> {
 
     /**
      * process task relation by projectCode and processCode
      *
-     * @param projectCode projectCode
      * @param processCode processCode
      * @return ProcessTaskRelation list
      */
-    @Cacheable(unless = "#result == null || #result.size() == 0")
-    List<ProcessTaskRelation> queryByProcessCode(@Param("projectCode") long projectCode,
-                                                 @Param("processCode") long processCode);
+    List<ProcessTaskRelation> queryByProcessCode(@Param("processCode") long processCode);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.projectCode + '_' + #p0.processDefinitionCode")
     int updateById(@Param("et") ProcessTaskRelation processTaskRelation);
 
     /**
@@ -62,7 +53,6 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
      * @param processCode processCode
      * @return int
      */
-    @CacheEvict
     int deleteByCode(@Param("projectCode") long projectCode, @Param("processCode") long processCode);
 
     /**
@@ -225,4 +215,14 @@ public interface ProcessTaskRelationMapper extends BaseMapper<ProcessTaskRelatio
 
     void deleteByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode,
                                         @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
+
+    /**
+     * process task relation by taskCode and postTaskVersion
+     *
+     * @param taskCode taskCode
+     * @param postTaskVersion postTaskVersion
+     * @return ProcessTaskRelation
+     */
+    List<ProcessTaskRelation> queryProcessTaskRelationByTaskCodeAndTaskVersion(@Param("taskCode") long taskCode,
+                                                                               @Param("postTaskVersion") long postTaskVersion);
 }

@@ -35,8 +35,6 @@ public class TaskConstants {
 
     public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
 
-    public static final String SETVALUE_REGEX = "[\\$#]\\{setValue\\((.*?)\\)}";
-
     /**
      * string false
      */

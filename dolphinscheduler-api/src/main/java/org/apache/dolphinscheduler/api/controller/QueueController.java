@@ -25,12 +25,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -72,8 +74,9 @@ public class QueueController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
-    public Result queryList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        return queueService.queryList(loginUser);
+    public Result<List<Queue>> queryList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<Queue> queues = queueService.queryList(loginUser);
+        return Result.success(queues);
     }
 
     /**
@@ -94,18 +97,15 @@ public class QueueController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
-    public Result queryQueueListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam("pageNo") Integer pageNo,
-                                       @RequestParam(value = "searchVal", required = false) String searchVal,
-                                       @RequestParam("pageSize") Integer pageSize) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+    public Result<PageInfo<Queue>> queryQueueListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @RequestParam("pageNo") Integer pageNo,
+                                                        @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                        @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = queueService.queryList(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        PageInfo<Queue> queuePageInfo = queueService.queryList(loginUser, searchVal, pageNo, pageSize);
+        return Result.success(queuePageInfo);
     }
 
     /**
@@ -124,10 +124,10 @@ public class QueueController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
-    public Result createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName) {
-        return queueService.createQueue(loginUser, queue, queueName);
+    public Result<Queue> createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @RequestParam(value = "queue") String queue,
+                                     @RequestParam(value = "queueName") String queueName) {
+        return Result.success(queueService.createQueue(loginUser, queue, queueName));
     }
 
     /**
@@ -148,11 +148,11 @@ public class QueueController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
-    public Result updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @PathVariable(value = "id") int id,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName) {
-        return queueService.updateQueue(loginUser, id, queue, queueName);
+    public Result<Queue> updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @PathVariable(value = "id") int id,
+                                     @RequestParam(value = "queue") String queue,
+                                     @RequestParam(value = "queueName") String queueName) {
+        return Result.success(queueService.updateQueue(loginUser, id, queue, queueName));
     }
 
     /**
@@ -169,10 +169,10 @@ public class QueueController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_QUEUE_BY_ID_ERROR)
-    public Result deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @PathVariable(value = "id") int id) throws Exception {
-        Map<String, Object> result = queueService.deleteQueueById(loginUser, id);
-        return returnDataList(result);
+    public Result<Boolean> deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @PathVariable(value = "id") int id) throws Exception {
+        queueService.deleteQueueById(loginUser, id);
+        return Result.success(true);
     }
 
     /**
@@ -191,9 +191,10 @@ public class QueueController extends BaseController {
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_QUEUE_ERROR)
-    public Result verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName) {
-        return queueService.verifyQueue(queue, queueName);
+    public Result<Boolean> verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "queue") String queue,
+                                       @RequestParam(value = "queueName") String queueName) {
+        queueService.verifyQueue(queue, queueName);
+        return Result.success(true);
     }
 }

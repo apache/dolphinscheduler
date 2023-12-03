@@ -28,22 +28,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * executive task
- */
+@Slf4j
 public abstract class AbstractTask {
 
-    protected final Logger log = LoggerFactory.getLogger(AbstractTask.class);
+    private static String groupName1 = "paramName1";
+    private static String groupName2 = "paramName2";
+    public String rgex = String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", groupName1, groupName2);
 
-    public String rgex = "['\"]\\$\\{(.*?)}['\"]|\\$\\{(.*?)}";
-
-    /**
-     * varPool string
-     */
-    protected String varPool;
+    @Getter
+    @Setter
+    protected Map<String, String> taskOutputParams;
 
     /**
      * taskExecutionContext
@@ -88,14 +86,6 @@ public abstract class AbstractTask {
     public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
     public abstract void cancel() throws TaskException;
-
-    public void setVarPool(String varPool) {
-        this.varPool = varPool;
-    }
-
-    public String getVarPool() {
-        return varPool;
-    }
 
     /**
      * get exit status code
@@ -198,7 +188,11 @@ public abstract class AbstractTask {
         int index = 1;
         while (m.find()) {
 
-            String paramName = m.group(1);
+            String paramName = m.group(groupName1);
+            if (paramName == null) {
+                paramName = m.group(groupName2);
+            }
+
             Property prop = paramsPropsMap.get(paramName);
 
             if (prop == null) {

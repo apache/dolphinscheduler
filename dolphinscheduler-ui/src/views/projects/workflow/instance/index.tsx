@@ -128,20 +128,22 @@ export default defineComponent({
             {{
               default: () => t('project.workflow.delete'),
               trigger: () => (
-                <NButton
-                  tag='div'
-                  type='primary'
-                  disabled={this.checkedRowKeys.length <= 0}
-                  style='position: absolute; bottom: 10px; left: 10px;'
-                  class='btn-delete-all'
-                >
-                  <NPopconfirm onPositiveClick={this.handleBatchDelete}>
-                    {{
-                      default: () => t('project.workflow.delete_confirm'),
-                      trigger: () => t('project.workflow.delete')
-                    }}
-                  </NPopconfirm>
-                </NButton>
+                <NPopconfirm onPositiveClick={this.handleBatchDelete}>
+                  {{
+                    default: () => t('project.workflow.delete_confirm'),
+                    trigger: () => (
+                      <NButton
+                        tag='div'
+                        type='primary'
+                        disabled={this.checkedRowKeys.length <= 0}
+                        style='position: absolute; bottom: 10px; left: 10px;'
+                        class='btn-delete-all'
+                      >
+                        {t('project.workflow.delete')}
+                      </NButton>
+                    )
+                  }}
+                </NPopconfirm>
               )
             }}
           </NTooltip>

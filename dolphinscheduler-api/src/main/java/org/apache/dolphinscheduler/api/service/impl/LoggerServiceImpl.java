@@ -56,7 +56,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,13 +77,13 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    ProjectMapper projectMapper;
+    private ProjectMapper projectMapper;
 
     @Autowired
-    ProjectService projectService;
+    private ProjectService projectService;
 
     @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     /**
      * view log
@@ -148,28 +147,20 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, Object> queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
-        Project project = projectMapper.queryByCode(projectCode);
+    public String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, VIEW_LOG);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
         // check whether the task instance can be found
         TaskInstance task = taskInstanceDao.queryById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND);
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
-        String log = queryLog(task, skipLineNum, limit);
-        result.put(Constants.DATA_LIST, log);
-        return result;
+        return queryLog(task, skipLineNum, limit);
     }
 
     /**
@@ -182,12 +173,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     public byte[] getLogBytes(User loginUser, long projectCode, int taskInstId) {
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, DOWNLOAD_LOG);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            throw new ServiceException("user has no permission");
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
+
         // check whether the task instance can be found
         TaskInstance task = taskInstanceDao.queryById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
@@ -261,7 +249,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 log.error("Error while getting log from remote target", e);
             }
         }
-        sb.append(logContent);
+        if (logContent != null) {
+            sb.append(logContent);
+        }
         return sb.toString();
     }
 

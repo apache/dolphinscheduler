@@ -22,21 +22,25 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 
-import org.slf4j.Logger;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.yaml.snakeyaml.Yaml;
 
 public abstract class AbstractK8sTaskExecutor {
 
-    protected Logger log;
     protected TaskExecutionContext taskRequest;
     protected K8sUtils k8sUtils;
     protected Yaml yaml;
-
-    protected AbstractK8sTaskExecutor(Logger log, TaskExecutionContext taskRequest) {
-        this.log = log;
+    protected volatile Map<String, String> taskOutputParams;
+    protected AbstractK8sTaskExecutor(TaskExecutionContext taskRequest) {
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
         this.yaml = new Yaml();
+        this.taskOutputParams = new HashMap<>();
+    }
+    public Map<String, String> getTaskOutputParams() {
+        return taskOutputParams;
     }
 
     public abstract TaskResponse run(String k8sParameterStr) throws Exception;

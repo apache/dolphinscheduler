@@ -15,6 +15,7 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
 * [SubProcess](../task/sub-process.md)
+* [Kubernetes](../task/kubernetes.md)
 
 当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubProcess 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
 
@@ -90,6 +91,8 @@ Node_mysql 运行结果如下：
 如
 ![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
 
+注意： 当变量 value 中含有 `\n` 标识，如 `value = "hello \n world"`， 则需要将 value 进行特殊进行，需要使用 `print('${setValue(key=%s)}' % repr(value))`, 否则参数无法传递到后面的流程。
+
 #### SubProcess 任务传递参数
 
 在子流程的工作流定义中定义方向是 OUT 的变量作为输出参数，可以将这些参数传递到子流程节点的下游任务。
@@ -115,3 +118,13 @@ Node_mysql 运行结果如下：
 ![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
 
 虽然在 A 任务中输出 var1 和 var2 两个参数，但是工作流定义中只定义了 var1 的 OUT 变量，下游任务成功输出 var1，证明var1 参数参照预期的值在该工作流中传递。
+
+#### Kubernetes 任务传递参数
+
+在Kubernetes任务中不同的程序开发语言可能会采用不同的日志框架，DolphinScheduler为了兼容不同的日志框架，提供了一种通用的日志数据格式，即 `${(key=value)}` 或 `#{(key=value)}`，用户可以在应用程序的终端日志中输出以这种格式的日志数据，key 为对应参数的 prop，value 为该参数的值。DolphinScheduler会捕捉输出日志中的 `${(key=value)}` 和 `#{(key=value)}` 来进行参数捕捉，从而传递到下游。
+
+如下图所示：
+
+![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
+
+另外需要特别注意的是，并非总是可以收集pod日志，如果用户重定向日志输出流，我们既不能收集日志使用，也不能使用输出参数。
