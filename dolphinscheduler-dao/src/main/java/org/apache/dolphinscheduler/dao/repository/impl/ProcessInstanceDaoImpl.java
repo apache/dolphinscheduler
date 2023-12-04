@@ -53,6 +53,12 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
         }
     }
 
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED, rollbackFor = Exception.class)
+    public void performTransactionalUpsert(ProcessInstance processInstance) {
+        this.upsertProcessInstance(processInstance);
+    }
+
     /**
      * find last scheduler process instance in the date interval
      *
