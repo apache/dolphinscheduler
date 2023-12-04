@@ -20,9 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.v2.AuditStatus.QUERY_AUDIT_LOG_LIST_PAGING;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.exceptions.AuditApiException;
-import org.apache.dolphinscheduler.api.exceptions.PluginApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
