@@ -17,19 +17,20 @@
 
 package org.apache.dolphinscheduler.api.exceptions;
 
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
-
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.GroupStatus;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * controller exception annotation
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface ApiException {
-    Status value();
+public @interface GroupApiException {
+    GroupStatus value();
 }
