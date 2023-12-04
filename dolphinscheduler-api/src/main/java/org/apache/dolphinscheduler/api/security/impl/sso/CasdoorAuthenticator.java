@@ -27,6 +27,8 @@ import java.security.MessageDigest;
 
 import javax.servlet.http.HttpServletRequest;
 
+import lombok.NonNull;
+
 import org.casbin.casdoor.entity.CasdoorUser;
 import org.casbin.casdoor.service.CasdoorAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +48,7 @@ public class CasdoorAuthenticator extends AbstractSsoAuthenticator {
     private String adminUserName;
 
     @Override
-    public User login(String state, String code, String extra) {
+    public User login(@NonNull String state, String code) {
         ServletRequestAttributes servletRequestAttributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (servletRequestAttributes == null) {

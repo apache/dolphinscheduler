@@ -37,6 +37,7 @@ export default defineComponent({
     // fullname is now the id of resources
     const fullName = String(router.currentRoute.value.query.prefix || '')
     const tenantCode = String(router.currentRoute.value.query.tenantCode || '')
+    const alias = String(router.currentRoute.value.query.alias || '')
 
     const { state } = useForm()
     const { getResourceView, handleUpdateContent } = useEdit(state)
@@ -61,6 +62,7 @@ export default defineComponent({
     return {
       componentName,
       resourceViewRef,
+      alias,
       handleReturn,
       handleFileContent,
       ...toRefs(state)
@@ -73,7 +75,7 @@ export default defineComponent({
         {this.resourceViewRef.isReady.value ? (
           <div class={styles['file-edit-content']}>
             <h2>
-              <span>{this.resourceViewRef.state.value.alias}</span>
+              <span>{this.alias}</span>
             </h2>
             <NForm
               rules={this.rules}

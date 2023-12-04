@@ -92,6 +92,8 @@ For example
 
 ![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
 
+Attention: When the variable value contains the `\n` identifier, such as ` value = "hello \n world" `, value needs to be carried out in a special way. You need to use `print('${setValue(key=%s)}' % repr(value))`, otherwise the argument cannot be passed to the subsequent flow.
+
 #### Pass parameter from SubProcess task to downstream
 
 In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
@@ -120,7 +122,7 @@ Although the two parameters var1 and var2 are output in the A task, only the `OU
 
 #### Pass parameter from Kubernetes task to downstream
 
-Different programming languages may use different logging frameworks in Kubernetes tasks. To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)dsVal}`. Users can output log data in the format `${(key=value)dsVal}` in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter. DolphinScheduler will capture the `${(key=value)dsVal}` in the output logs to capture the parameters and pass them downstream.
+Different programming languages may use different logging frameworks in Kubernetes tasks. To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)}` or `#{(key=value)}`. Users can output log data in the format in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter. DolphinScheduler will capture the `${(key=value)}` or `#{(key=value)}` in the output logs to capture the parameters and pass them downstream.
 
 For example
 

@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * linkis task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class LinkisTask extends AbstractRemoteTask {
 
     /**
@@ -76,9 +76,7 @@ public class LinkisTask extends AbstractRemoteTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -107,7 +105,7 @@ public class LinkisTask extends AbstractRemoteTask {
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(findTaskId(commandExecuteResult.getResultString()));
             setProcessId(commandExecuteResult.getProcessId());
-            linkisParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            linkisParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current Linkis task has been interrupted", e);

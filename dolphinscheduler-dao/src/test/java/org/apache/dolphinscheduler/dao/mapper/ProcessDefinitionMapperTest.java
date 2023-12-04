@@ -20,12 +20,12 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
 import java.util.List;
@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 public class ProcessDefinitionMapperTest extends BaseDaoTest {
 
@@ -296,10 +297,8 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         processDefinition.setUserId(user.getId());
         processDefinitionMapper.updateById(processDefinition);
 
-        Long[] projectCodes = new Long[1];
-        projectCodes[0] = processDefinition.getProjectCode();
-        List<DefinitionGroupByUser> processDefinitions =
-                processDefinitionMapper.countDefinitionByProjectCodes(projectCodes);
+        List<WorkflowDefinitionCountDto> processDefinitions = processDefinitionMapper
+                .countDefinitionByProjectCodes(Lists.newArrayList(processDefinition.getProjectCode()));
         Assertions.assertNotEquals(0, processDefinitions.size());
     }
 

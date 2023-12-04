@@ -669,7 +669,7 @@ DROP TABLE IF EXISTS `t_ds_project_parameter`;
 CREATE TABLE `t_ds_project_parameter` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `param_name` varchar(255) NOT NULL COMMENT 'project parameter name',
-  `param_value` varchar(255) NOT NULL COMMENT 'project parameter value',
+  `param_value` text NOT NULL COMMENT 'project parameter value',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
@@ -1282,11 +1282,11 @@ CREATE TABLE `t_ds_dq_rule_input_entry` (
     `field` varchar(255) DEFAULT NULL,
     `type` varchar(255) DEFAULT NULL,
     `title` varchar(255) DEFAULT NULL,
-    `value` varchar(255)  DEFAULT NULL,
+    `data` varchar(255)  DEFAULT NULL,
     `options` text DEFAULT NULL,
     `placeholder` varchar(255) DEFAULT NULL,
     `option_source_type` int(11) DEFAULT NULL,
-    `value_type` int(11) DEFAULT NULL,
+    `data_type` int(11) DEFAULT NULL,
     `input_type` int(11) DEFAULT NULL,
     `is_show` tinyint(1) DEFAULT '1',
     `can_edit` tinyint(1) DEFAULT '1',
@@ -1298,97 +1298,97 @@ CREATE TABLE `t_ds_dq_rule_input_entry` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(1, 'src_connector_type', 'select', '$t(src_connector_type)', '', '[{"label":"HIVE","value":"HIVE"},{"label":"JDBC","value":"JDBC"}]', 'please select source connector type', 2, 2, 0, 1, 1, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(2, 'src_datasource_id', 'select', '$t(src_datasource_id)', '', NULL, 'please select source datasource id', 1, 2, 0, 1, 1, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(3, 'src_table', 'select', '$t(src_table)', NULL, NULL, 'Please enter source table name', 0, 0, 0, 1, 1, 1, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(4, 'src_filter', 'input', '$t(src_filter)', NULL, NULL, 'Please enter filter expression', 0, 3, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(5, 'src_field', 'select', '$t(src_field)', NULL, NULL, 'Please enter column, only single column is supported', 0, 0, 0, 1, 1, 0, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(6, 'statistics_name', 'input', '$t(statistics_name)', NULL, NULL, 'Please enter statistics name, the alias in statistics execute sql', 0, 0, 1, 0, 0, 0, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(7, 'check_type', 'select', '$t(check_type)', '0', '[{"label":"Expected - Actual","value":"0"},{"label":"Actual - Expected","value":"1"},{"label":"Actual / Expected","value":"2"},{"label":"(Expected - Actual) / Expected","value":"3"}]', 'please select check type', 0, 0, 3, 1, 1, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(8, 'operator', 'select', '$t(operator)', '0', '[{"label":"=","value":"0"},{"label":"<","value":"1"},{"label":"<=","value":"2"},{"label":">","value":"3"},{"label":">=","value":"4"},{"label":"!=","value":"5"}]', 'please select operator', 0, 0, 3, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(9, 'threshold', 'input', '$t(threshold)', NULL, NULL, 'Please enter threshold, number is needed', 0, 2, 3, 1, 1, 0, 1, current_timestamp, current_timestamp);
 INSERT Ignore INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(10, 'failure_strategy', 'select', '$t(failure_strategy)', '0', '[{"label":"Alert","value":"0"},{"label":"Block","value":"1"}]', 'please select failure strategy', 0, 0, 3, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(11, 'target_connector_type', 'select', '$t(target_connector_type)', '', '[{"label":"HIVE","value":"HIVE"},{"label":"JDBC","value":"JDBC"}]', 'Please select target connector type', 2, 0, 0, 1, 1, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(12, 'target_datasource_id', 'select', '$t(target_datasource_id)', '', NULL, 'Please select target datasource', 1, 2, 0, 1, 1, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(13, 'target_table', 'select', '$t(target_table)', NULL, NULL, 'Please enter target table', 0, 0, 0, 1, 1, 1, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(14, 'target_filter', 'input', '$t(target_filter)', NULL, NULL, 'Please enter target filter expression', 0, 3, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(15, 'mapping_columns', 'group', '$t(mapping_columns)', NULL, '[{"field":"src_field","props":{"placeholder":"Please input src field","rows":0,"disabled":false,"size":"small"},"type":"input","title":"src_field"},{"field":"operator","props":{"placeholder":"Please input operator","rows":0,"disabled":false,"size":"small"},"type":"input","title":"operator"},{"field":"target_field","props":{"placeholder":"Please input target field","rows":0,"disabled":false,"size":"small"},"type":"input","title":"target_field"}]', 'please enter mapping columns', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(16, 'statistics_execute_sql', 'textarea', '$t(statistics_execute_sql)', NULL, NULL, 'Please enter statistics execute sql', 0, 3, 0, 1, 1, 0, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(17, 'comparison_name', 'input', '$t(comparison_name)', NULL, NULL, 'Please enter comparison name, the alias in comparison execute sql', 0, 0, 0, 0, 0, 0, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(18, 'comparison_execute_sql', 'textarea', '$t(comparison_execute_sql)', NULL, NULL, 'Please enter comparison execute sql', 0, 3, 0, 1, 1, 0, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(19, 'comparison_type', 'select', '$t(comparison_type)', '', NULL, 'Please enter comparison title', 3, 0, 2, 1, 0, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(20, 'writer_connector_type', 'select', '$t(writer_connector_type)', '', '[{"label":"MYSQL","value":"0"},{"label":"POSTGRESQL","value":"1"}]', 'please select writer connector type', 0, 2, 0, 1, 1, 1, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(21, 'writer_datasource_id', 'select', '$t(writer_datasource_id)', '', NULL, 'please select writer datasource id', 1, 2, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(22, 'target_field', 'select', '$t(target_field)', NULL, NULL, 'Please enter column, only single column is supported', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(23, 'field_length', 'input', '$t(field_length)', NULL, NULL, 'Please enter length limit', 0, 3, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(24, 'logic_operator', 'select', '$t(logic_operator)', '=', '[{"label":"=","value":"="},{"label":"<","value":"<"},{"label":"<=","value":"<="},{"label":">","value":">"},{"label":">=","value":">="},{"label":"<>","value":"<>"}]', 'please select logic operator', 0, 0, 3, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(25, 'regexp_pattern', 'input', '$t(regexp_pattern)', NULL, NULL, 'Please enter regexp pattern', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(26, 'deadline', 'input', '$t(deadline)', NULL, NULL, 'Please enter deadline', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(27, 'datetime_format', 'input', '$t(datetime_format)', NULL, NULL, 'Please enter datetime format', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(28, 'enum_list', 'input', '$t(enum_list)', NULL, NULL, 'Please enter enumeration', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(29, 'begin_time', 'input', '$t(begin_time)', NULL, NULL, 'Please enter begin time', 0, 0, 0, 1, 1, 0, 0, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(30, 'src_database', 'select', '$t(src_database)', NULL, NULL, 'Please select source database', 0, 0, 0, 1, 1, 1, 1, current_timestamp, current_timestamp);
 INSERT IGNORE INTO `t_ds_dq_rule_input_entry`
-(`id`, `field`, `type`, `title`, `value`, `options`, `placeholder`, `option_source_type`, `value_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
+(`id`, `field`, `type`, `title`, `data`, `options`, `placeholder`, `option_source_type`, `data_type`, `input_type`, `is_show`, `can_edit`, `is_emit`, `is_validate`, `create_time`, `update_time`)
 VALUES(31, 'target_database', 'select', '$t(target_database)', NULL, NULL, 'Please select target database', 0, 0, 0, 1, 1, 1, 1, current_timestamp, current_timestamp);
 
 --
