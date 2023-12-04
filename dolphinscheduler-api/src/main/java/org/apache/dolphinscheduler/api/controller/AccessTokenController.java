@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ACCESS_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GENERATE_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_BY_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.CREATE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.DELETE_ACCESS_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.GENERATE_TOKEN_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.QUERY_ACCESSTOKEN_BY_USER_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.QUERY_ACCESSTOKEN_LIST_PAGING_ERROR;
+import static org.apache.dolphinscheduler.api.enums.v2.BaseStatus.UPDATE_ACCESS_TOKEN_ERROR;
 
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.exceptions.BaseApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -82,7 +82,7 @@ public class AccessTokenController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_ACCESS_TOKEN_ERROR)
+    @BaseApiException(CREATE_ACCESS_TOKEN_ERROR)
     public Result<AccessToken> createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "userId") int userId,
                                            @RequestParam(value = "expireTime") String expireTime,
@@ -103,7 +103,7 @@ public class AccessTokenController extends BaseController {
     @Parameter(hidden = true)
     @PostMapping(value = "/generate")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(GENERATE_TOKEN_ERROR)
+    @BaseApiException(GENERATE_TOKEN_ERROR)
     public Result<String> generateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "userId") int userId,
                                         @RequestParam(value = "expireTime") String expireTime) {
@@ -128,7 +128,7 @@ public class AccessTokenController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ACCESSTOKEN_LIST_PAGING_ERROR)
+    @BaseApiException(QUERY_ACCESSTOKEN_LIST_PAGING_ERROR)
     public Result<PageInfo<AccessToken>> queryAccessTokenList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam("pageNo") Integer pageNo,
                                                               @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -154,7 +154,7 @@ public class AccessTokenController extends BaseController {
     })
     @GetMapping(value = "/user/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ACCESSTOKEN_BY_USER_ERROR)
+    @BaseApiException(QUERY_ACCESSTOKEN_BY_USER_ERROR)
     public Result<List<AccessToken>> queryAccessTokenByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                             @PathVariable("userId") Integer userId) {
         List<AccessToken> accessTokens = accessTokenService.queryAccessTokenByUser(loginUser, userId);
@@ -171,7 +171,7 @@ public class AccessTokenController extends BaseController {
     @Parameter(hidden = true)
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_ACCESS_TOKEN_ERROR)
+    @BaseApiException(DELETE_ACCESS_TOKEN_ERROR)
     public Result<Boolean> delAccessTokenById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @PathVariable(value = "id") int id) {
         accessTokenService.deleteAccessTokenById(loginUser, id);
@@ -197,7 +197,7 @@ public class AccessTokenController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
+    @BaseApiException(UPDATE_ACCESS_TOKEN_ERROR)
     public Result<AccessToken> updateToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int id,
                                            @RequestParam(value = "userId") int userId,
