@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUDIT_LOG_LIST_PAGING;
+import static org.apache.dolphinscheduler.api.enums.v2.AuditStatus.QUERY_AUDIT_LOG_LIST_PAGING;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.exceptions.AuditApiException;
+import org.apache.dolphinscheduler.api.exceptions.PluginApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -77,7 +79,7 @@ public class AuditLogController extends BaseController {
     })
     @GetMapping(value = "/audit-log-list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
+    @AuditApiException(QUERY_AUDIT_LOG_LIST_PAGING)
     public Result<PageInfo<AuditDto>> queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam("pageNo") Integer pageNo,
                                                               @RequestParam("pageSize") Integer pageSize,

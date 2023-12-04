@@ -26,7 +26,7 @@ import static org.apache.dolphinscheduler.api.enums.v2.PluginStatus.SEND_TEST_AL
 import static org.apache.dolphinscheduler.api.enums.v2.PluginStatus.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.PluginException;
+import org.apache.dolphinscheduler.api.exceptions.PluginApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -90,7 +90,7 @@ public class AlertPluginInstanceController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @PluginException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<AlertPluginInstance> createAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                                                  @RequestParam(value = "instanceName") String instanceName,
@@ -109,7 +109,7 @@ public class AlertPluginInstanceController extends BaseController {
     })
     @PostMapping(value = "/test-send")
     @ResponseStatus(HttpStatus.OK)
-    @PluginException(SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<Boolean> testSendAlertPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
                                                        @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
         alertPluginInstanceService.testSend(pluginDefineId, pluginInstanceParams);
@@ -133,7 +133,7 @@ public class AlertPluginInstanceController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PluginException(UPDATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(UPDATE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<AlertPluginInstance> updateAlertPluginInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                      @PathVariable(value = "id") int id,
                                                                      @RequestParam(value = "instanceName") String instanceName,
@@ -157,7 +157,7 @@ public class AlertPluginInstanceController extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PluginException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<Boolean> deleteAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @PathVariable(value = "id") int id) {
 
@@ -175,7 +175,7 @@ public class AlertPluginInstanceController extends BaseController {
     @Operation(summary = "getAlertPluginInstance", description = "GET_ALERT_PLUGIN_INSTANCE_NOTES")
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @PluginException(GET_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(GET_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<AlertPluginInstance> getAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @PathVariable(value = "id") int id) {
         AlertPluginInstance alertPluginInstance = alertPluginInstanceService.getById(loginUser, id);
@@ -191,7 +191,7 @@ public class AlertPluginInstanceController extends BaseController {
     @Operation(summary = "queryAlertPluginInstanceList", description = "QUERY_ALL_ALERT_PLUGIN_INSTANCE_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    @PluginException(QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<List<AlertPluginInstanceVO>> getAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<AlertPluginInstanceVO> alertPluginInstanceVOS = alertPluginInstanceService.queryAll();
         return Result.success(alertPluginInstanceVOS);
@@ -239,7 +239,7 @@ public class AlertPluginInstanceController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @PluginException(LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR)
+    @PluginApiException(LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<PageInfo<AlertPluginInstanceVO>> listPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam(value = "searchVal", required = false) String searchVal,
                                                               @RequestParam("pageNo") Integer pageNo,
