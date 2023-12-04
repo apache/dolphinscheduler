@@ -24,7 +24,8 @@ import static org.apache.dolphinscheduler.api.enums.v2.GroupStatus.QUERY_ALERT_G
 import static org.apache.dolphinscheduler.api.enums.v2.GroupStatus.QUERY_ALL_ALERTGROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.v2.GroupStatus.UPDATE_ALERT_GROUP_ERROR;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.GroupStatus;
 import org.apache.dolphinscheduler.api.exceptions.GroupApiException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -245,11 +246,11 @@ public class AlertGroupController extends BaseController {
         Result result = new Result();
         if (exist) {
             log.error("group {} has exist, can't create again.", groupName);
-            result.setCode(Status.ALERT_GROUP_EXIST.getCode());
-            result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
+            result.setCode(GroupStatus.ALERT_GROUP_EXIST.getCode());
+            result.setMsg(GroupStatus.ALERT_GROUP_EXIST.getMsg());
         } else {
-            result.setCode(Status.SUCCESS.getCode());
-            result.setMsg(Status.SUCCESS.getMsg());
+            result.setCode(BaseStatus.SUCCESS.getCode());
+            result.setMsg(BaseStatus.SUCCESS.getMsg());
         }
         return result;
     }

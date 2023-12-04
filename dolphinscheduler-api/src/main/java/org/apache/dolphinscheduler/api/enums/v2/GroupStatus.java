@@ -26,6 +26,7 @@ import java.util.Optional;
  * group status enum
  */
 public enum GroupStatus {
+    ALERT_GROUP_EXIST(10012, "alarm group already exists", "告警组名称已存在"),
     CREATE_ALERT_GROUP_ERROR(10027, "create alert group error", "创建告警组错误"),
     QUERY_ALL_ALERTGROUP_ERROR(10028, "query all alertgroup error", "查询告警组错误"),
     LIST_PAGING_ALERT_GROUP_ERROR(10029, "list paging alert group error", "分页查询告警组错误"),
