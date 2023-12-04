@@ -815,6 +815,23 @@ public class UsersServiceTest {
     }
 
     /**
+     * get non-admin user
+     *
+     * @return user
+     */
+    private User getNonAdminUser() {
+
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        user.setTenantId(2);
+        user.setQueue("queue");
+        return user;
+    }
+
+    /**
      * get tenant
      *
      * @return tenant
