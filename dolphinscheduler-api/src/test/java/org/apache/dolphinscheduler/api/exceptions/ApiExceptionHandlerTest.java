@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.controller.AccessTokenController;
 import org.apache.dolphinscheduler.api.controller.ProcessDefinitionController;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.WorkFlowStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -39,7 +40,7 @@ public class ApiExceptionHandlerTest {
                 controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assertions.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.CREATE_ACCESS_TOKEN_ERROR.getCode(), result.getCode().intValue());
     }
 
     @Test
@@ -50,6 +51,6 @@ public class ApiExceptionHandlerTest {
                 controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assertions.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(WorkFlowStatus.QUERY_PROCESS_DEFINITION_LIST.getCode(), result.getCode().intValue());
     }
 }
