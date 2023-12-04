@@ -335,6 +335,20 @@ public class UsersServiceTest {
                 "queue",
                 1,
                 "Asia/Shanghai"));
+
+        // non-admin should not modify tenantId and queue
+        when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
+        User user = userMapper.selectById(2);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
+                2,
+                userName,
+                userPassword,
+                "abc@qq.com",
+                null,
+                "13457864543",
+                "offline",
+                1,
+                "Asia/Shanghai"));
     }
 
     @Test
@@ -886,6 +900,23 @@ public class UsersServiceTest {
         user.setUserName("userTest0001");
         user.setUserPassword("userTest0001");
         user.setState(1);
+        return user;
+    }
+
+    /**
+     * get non-admin user
+     *
+     * @return user
+     */
+    private User getNonAdminUser() {
+
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        user.setTenantId(2);
+        user.setQueue("queue");
         return user;
     }
 
