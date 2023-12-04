@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.exceptions;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
 
 import java.lang.annotation.Retention;
@@ -31,6 +30,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface PluginException {
+public @interface PluginApiException {
     PluginStatus value();
 }
