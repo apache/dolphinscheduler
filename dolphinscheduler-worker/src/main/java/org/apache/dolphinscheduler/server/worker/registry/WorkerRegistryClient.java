@@ -128,4 +128,7 @@ public class WorkerRegistryClient implements AutoCloseable {
         log.info("Worker registry client closed");
     }
 
+    public boolean isAvailable() {
+        return registryClient.isConnected();
+    }
 }
