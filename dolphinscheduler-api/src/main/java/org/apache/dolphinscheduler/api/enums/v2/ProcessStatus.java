@@ -23,7 +23,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum ProcessStatus implements Status {
 
-    PROCESS_DEFINITION_NAME_EXIST(10168, "process definition name {0} already exists", "工作流定义名称[{0}]已存在"),;
+    PROCESS_DEFINITION_NAME_EXIST(10168, "process definition name {0} already exists", "工作流定义名称[{0}]已存在"),
+    PROCESS_DEFINE_NOT_EXIST(50003, "process definition {0} does not exist", "工作流定义[{0}]不存在"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
