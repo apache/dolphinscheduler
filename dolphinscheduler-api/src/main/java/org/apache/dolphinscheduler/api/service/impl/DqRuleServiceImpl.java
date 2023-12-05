@@ -21,7 +21,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.CHANGE;
 import static org.apache.dolphinscheduler.common.constants.Constants.SMALL;
 
 import org.apache.dolphinscheduler.api.dto.RuleDefinition;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.RuleStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -100,7 +101,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
 
         List<DqRuleInputEntry> ruleInputEntryList = dqRuleInputEntryMapper.getRuleInputEntryList(id);
         if (ruleInputEntryList == null || ruleInputEntryList.isEmpty()) {
-            throw new ServiceException(Status.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
+            throw new ServiceException(RuleStatus.QUERY_RULE_INPUT_ENTRY_LIST_ERROR);
         }
         return getRuleFormCreateJson(DqRuleUtils.transformInputEntry(ruleInputEntryList));
     }
@@ -145,7 +146,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                 end = DateUtils.stringToDate(endTime);
             }
         } catch (Exception e) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
         }
 
         Page<DqRule> page = new Page<>(pageNo, pageSize);
