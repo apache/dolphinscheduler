@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -64,7 +61,6 @@ public class AccessTokenV2Controller extends BaseController {
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
     @Parameter(name = "createTokenRequest", description = "createTokenRequest", required = true, schema = @Schema(implementation = CreateTokenRequest.class))
-    @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     public Result<AccessToken> createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody CreateTokenRequest createTokenRequest) {
         AccessToken accessToken = accessTokenService.createToken(loginUser,
