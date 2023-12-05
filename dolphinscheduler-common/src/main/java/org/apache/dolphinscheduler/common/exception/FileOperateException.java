@@ -15,33 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.utils;
+package org.apache.dolphinscheduler.common.exception;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+public class FileOperateException extends BaseException {
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+    public FileOperateException(String message) {
+        super(message);
+    }
 
-import lombok.experimental.UtilityClass;
-
-@UtilityClass
-public class VarPoolUtils {
-
-    static final Pattern DSVALUE_REGEX = Pattern.compile(TaskConstants.DSVALUE_REGEX);
-    public static final String VAR_SUFFIX = ")dsVal}";
-
-    public static final String VAR_DELIMITER = "$VarPool$";
-    /**
-     * find var pool
-     *
-     * @param line
-     * @return
-     */
-    public static String findVarPool(String line) {
-        Matcher matcher = DSVALUE_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
+    public FileOperateException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

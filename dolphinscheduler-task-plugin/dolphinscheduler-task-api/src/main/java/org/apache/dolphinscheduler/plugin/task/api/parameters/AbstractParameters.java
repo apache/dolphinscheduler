@@ -24,21 +24,21 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-/**
- * job params related class
- */
+@Slf4j
 public abstract class AbstractParameters implements IParameters {
 
     @Override
@@ -130,7 +130,7 @@ public abstract class AbstractParameters implements IParameters {
         }
     }
 
-    public void dealOutParam(String result) {
+    public void dealOutParam(Map<String, String> taskOutputParams) {
         if (CollectionUtils.isEmpty(localParams)) {
             return;
         }
@@ -138,19 +138,18 @@ public abstract class AbstractParameters implements IParameters {
         if (CollectionUtils.isEmpty(outProperty)) {
             return;
         }
-        if (StringUtils.isEmpty(result)) {
+        if (MapUtils.isEmpty(taskOutputParams)) {
             outProperty.forEach(this::addPropertyToValPool);
             return;
         }
-        Map<String, String> taskResult = getMapByString(result);
-        if (taskResult.size() == 0) {
-            return;
-        }
+
         for (Property info : outProperty) {
-            String propValue = taskResult.get(info.getProp());
+            String propValue = taskOutputParams.get(info.getProp());
             if (StringUtils.isNotEmpty(propValue)) {
                 info.setValue(propValue);
                 addPropertyToValPool(info);
+            } else {
+                log.warn("Cannot find the output parameter {} in the task output parameters", info.getProp());
             }
         }
     }
@@ -176,23 +175,6 @@ public abstract class AbstractParameters implements IParameters {
             allParams.add(param);
         }
         return allParams;
-    }
-
-    /**
-     * shell's result format is key=value$VarPool$key=value$VarPool$
-     * @param result
-     * @return
-     */
-    public static Map<String, String> getMapByString(String result) {
-        String[] formatResult = result.split("\\$VarPool\\$");
-        Map<String, String> format = new HashMap<>();
-        for (String info : formatResult) {
-            if (StringUtils.isNotEmpty(info) && info.contains("=")) {
-                String[] keyValue = info.split("=");
-                format.put(keyValue[0], keyValue[1]);
-            }
-        }
-        return format;
     }
 
     public ResourceParametersHelper getResources() {

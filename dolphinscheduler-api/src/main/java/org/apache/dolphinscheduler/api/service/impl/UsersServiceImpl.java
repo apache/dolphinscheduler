@@ -385,6 +385,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (user == null) {
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
+
+        // non-admin should not modify tenantId and queue
+        if (!isAdmin(loginUser)) {
+            if (tenantId != null && user.getTenantId() != tenantId) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+            if (StringUtils.isNotEmpty(queue) && !StringUtils.equals(queue, user.getQueue())) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+        }
+
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)) {
