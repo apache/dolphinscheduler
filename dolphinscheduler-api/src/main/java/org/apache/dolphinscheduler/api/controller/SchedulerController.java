@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;

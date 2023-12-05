@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.enums.v2;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
 public enum ClusterStatus implements Status {
+
     CLUSTER_NAME_EXISTS(120021, "this cluster name [{0}] already exists", "集群名称[{0}]已经存在"),
     ;
     private final int code;

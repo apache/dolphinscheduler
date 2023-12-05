@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
