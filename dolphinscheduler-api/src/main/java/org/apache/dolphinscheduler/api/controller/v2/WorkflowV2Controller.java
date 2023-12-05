@@ -17,16 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -74,7 +68,6 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_WORKFLOWS_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
     public Result<ProcessDefinition> createWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @RequestBody WorkflowCreateRequest workflowCreateRequest) {
         ProcessDefinition processDefinition =
@@ -95,7 +88,6 @@ public class WorkflowV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     public Result deleteWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @PathVariable("code") Long code) {
         processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
@@ -113,7 +105,6 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "update", description = "UPDATE_WORKFLOWS_NOTES")
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
     public Result<ProcessDefinition> updateWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @PathVariable("code") Long code,
                                                     @RequestBody WorkflowUpdateRequest workflowUpdateRequest) {
@@ -132,7 +123,6 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "get", description = "GET_WORKFLOWS_NOTES")
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     public Result<ProcessDefinition> getWorkflow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @PathVariable("code") Long code) {
         ProcessDefinition processDefinition = processDefinitionService.getProcessDefinition(loginUser, code);
@@ -149,7 +139,6 @@ public class WorkflowV2Controller extends BaseController {
     @Operation(summary = "get", description = "FILTER_WORKFLOWS_NOTES")
     @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     public Result<PageInfo<ProcessDefinition>> filterWorkflows(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                @RequestBody WorkflowFilterRequest workflowFilterRequest) {
         PageInfo<ProcessDefinition> processDefinitions =

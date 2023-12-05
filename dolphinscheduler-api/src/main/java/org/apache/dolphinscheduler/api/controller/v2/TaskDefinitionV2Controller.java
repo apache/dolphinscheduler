@@ -17,17 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_DEFINITION_LIST;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
 import org.apache.dolphinscheduler.api.dto.task.TaskUpdateRequest;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -75,7 +68,6 @@ public class TaskDefinitionV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_TASK_DEFINITION_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_TASK_DEFINITION_ERROR)
     public Result<TaskDefinition> createTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @RequestBody TaskCreateRequest taskCreateRequest) {
         TaskDefinition taskDefinition = taskDefinitionService.createTaskDefinitionV2(loginUser, taskCreateRequest);
@@ -94,7 +86,6 @@ public class TaskDefinitionV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
     public Result deleteTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @PathVariable("code") Long code) {
         taskDefinitionService.deleteTaskDefinitionByCode(loginUser, code);
@@ -115,7 +106,6 @@ public class TaskDefinitionV2Controller extends BaseController {
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_TASK_DEFINITION_ERROR)
     public Result<TaskDefinition> updateTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @PathVariable("code") Long code,
                                                        @RequestBody TaskUpdateRequest taskUpdateRequest) {
@@ -137,7 +127,6 @@ public class TaskDefinitionV2Controller extends BaseController {
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DETAIL_OF_TASK_DEFINITION_ERROR)
     public Result<TaskDefinition> getTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @PathVariable("code") Long code) {
         TaskDefinition taskDefinition = taskDefinitionService.getTaskDefinition(loginUser, code);
@@ -154,7 +143,6 @@ public class TaskDefinitionV2Controller extends BaseController {
     @Operation(summary = "get", description = "FILTER_TASK_DEFINITION_NOTES")
     @PostMapping(value = "/query", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_DEFINITION_LIST)
     public Result<PageInfo<TaskDefinition>> filterTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestBody TaskFilterRequest taskFilterRequest) {
         PageInfo<TaskDefinition> taskDefinitions =
