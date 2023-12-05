@@ -27,7 +27,7 @@ public enum PluginStatus implements Status {
     DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012,
             "failed to delete the alert instance, there is an alarm group associated with this alert instance",
             "删除告警实例失败，存在与此告警实例关联的警报组"),
-    ;
+            ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;

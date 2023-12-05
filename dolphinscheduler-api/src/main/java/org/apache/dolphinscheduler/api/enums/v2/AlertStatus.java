@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.enums.v2;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
 public enum AlertStatus implements Status {
+
     ALERT_TEST_SENDING_FAILED(110014, "Alert test sending failed, [{0}]", "alert测试发送失败，[{0}]"),
     ALERT_SERVER_NOT_EXIST(110017, "Alert server does not exist", "Alert server不存在"),;
     private final int code;
