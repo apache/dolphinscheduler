@@ -23,6 +23,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.DataSourceStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
@@ -120,7 +124,7 @@ public class DataSourceServiceTest {
         postgreSqlDatasourceParam.setName(dataSourceName);
 
         // USER_NO_OPERATION_PERM
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
 
         // DATASOURCE_EXIST
@@ -131,7 +135,7 @@ public class DataSourceServiceTest {
         when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(dataSourceList);
         passResourcePermissionCheckService();
 
-        assertThrowsServiceException(Status.DATASOURCE_EXIST,
+        assertThrowsServiceException(DataSourceStatus.DATASOURCE_EXIST,
                 () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
 
         try (
@@ -167,14 +171,14 @@ public class DataSourceServiceTest {
 
         // RESOURCE_NOT_EXIST
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
-        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST,
+        assertThrowsServiceException(ResourceStatus.RESOURCE_NOT_EXIST,
                 () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
 
         // USER_NO_OPERATION_PERM
         DataSource dataSource = new DataSource();
         dataSource.setUserId(0);
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
 
         // DATASOURCE_EXIST
@@ -191,7 +195,7 @@ public class DataSourceServiceTest {
         when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName()))
                 .thenReturn(dataSourceList);
         passResourcePermissionCheckService();
-        assertThrowsServiceException(Status.DATASOURCE_EXIST,
+        assertThrowsServiceException(DataSourceStatus.DATASOURCE_EXIST,
                 () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
 
         try (
@@ -221,7 +225,8 @@ public class DataSourceServiceTest {
     public void connectionTest() {
         int dataSourceId = -1;
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
-        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST, () -> dataSourceService.connectionTest(dataSourceId));
+        assertThrowsServiceException(ResourceStatus.RESOURCE_NOT_EXIST,
+                () -> dataSourceService.connectionTest(dataSourceId));
     }
 
     @Test
@@ -230,14 +235,14 @@ public class DataSourceServiceTest {
         int dataSourceId = 1;
         // resource not exist
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
-        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST,
+        assertThrowsServiceException(ResourceStatus.RESOURCE_NOT_EXIST,
                 () -> dataSourceService.delete(loginUser, dataSourceId));
 
         // user no operation perm
         DataSource dataSource = new DataSource();
         dataSource.setUserId(0);
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> dataSourceService.delete(loginUser, dataSourceId));
 
         // success
@@ -322,7 +327,7 @@ public class DataSourceServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         String dataSourceName = "dataSource1";
         when(dataSourceMapper.queryDataSourceByName(dataSourceName)).thenReturn(getDataSourceList());
-        assertThrowsServiceException(Status.DATASOURCE_EXIST,
+        assertThrowsServiceException(DataSourceStatus.DATASOURCE_EXIST,
                 () -> dataSourceService.verifyDataSourceName(dataSourceName));
     }
 
@@ -505,7 +510,7 @@ public class DataSourceServiceTest {
             when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
 
-            assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
+            assertThrowsServiceException(BaseStatus.CONNECTION_TEST_FAILURE,
                     () -> dataSourceService.checkConnection(dataSourceType, connectionParam));
 
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);

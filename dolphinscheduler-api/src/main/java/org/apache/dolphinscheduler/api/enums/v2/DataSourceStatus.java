@@ -21,21 +21,17 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum BaseStatus implements Status {
+public enum DataSourceStatus implements Status {
 
-    SUCCESS(0, "success", "成功"),
-    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
-    REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
-    SAVE_ERROR(10136, "save error", "保存错误"),
-    CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
-    CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
-    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),;
+    DATASOURCE_EXIST(10015, "data source name already exists", "数据源名称已存在"),
+    QUERY_DATASOURCE_ERROR(10035, "query datasource error", "查询数据源错误"),
+    DATASOURCE_CONNECT_FAILED(10016, "data source connection failed", "建立数据源连接失败"),
+    GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    BaseStatus(int code, String enMsg, String zhMsg) {
+    DataSourceStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

@@ -21,21 +21,15 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum BaseStatus implements Status {
+public enum ResourceStatus implements Status {
 
-    SUCCESS(0, "success", "成功"),
-    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
-    REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
-    SAVE_ERROR(10136, "save error", "保存错误"),
-    CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
-    CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
-    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),;
+    RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
+    RESOURCE_EXIST(20005, "resource already exists", "资源已存在"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    BaseStatus(int code, String enMsg, String zhMsg) {
+    ResourceStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
