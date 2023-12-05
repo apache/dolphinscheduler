@@ -22,6 +22,7 @@ import java.util.Locale;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum ProcessStatus implements Status {
+
     CREATE_PROCESS_DEFINITION_ERROR(10105, "create process definition error", "创建工作流错误"),
     UPDATE_PROCESS_DEFINITION_ERROR(10107, "update process definition error", "更新工作流定义错误"),
     COPY_PROCESS_DEFINITION_ERROR(10149, "copy process definition from {0} to {1} error : {2}",

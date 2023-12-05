@@ -437,7 +437,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     log.error(
                             "Generate task definition list failed, the given task definition parameter is invalided, taskName: {}, taskDefinition: {}",
                             taskDefinitionLog.getName(), taskDefinitionLog);
-                    throw new ServiceException(ProcessStatus.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
+                    throw new ServiceException(ProcessStatus.PROCESS_NODE_S_PARAMETER_INVALID,
+                            taskDefinitionLog.getName());
                 }
             }
             return taskDefinitionLogs;
@@ -995,7 +996,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 this.deleteProcessDefinitionByCode(loginUser, process.getCode());
                 metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(process.getCode());
             } catch (Exception e) {
-                throw new ServiceException(ProcessStatus.DELETE_PROCESS_DEFINE_ERROR, process.getName(), e.getMessage());
+                throw new ServiceException(ProcessStatus.DELETE_PROCESS_DEFINE_ERROR, process.getName(),
+                        e.getMessage());
             }
         }
         putMsg(result, BaseStatus.SUCCESS);
@@ -2256,12 +2258,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 log.error(
                         "Copy process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
                         srcProjectCode, targetProjectCode, failedProcess);
-                putMsg(result, ProcessStatus.COPY_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
+                putMsg(result, ProcessStatus.COPY_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode,
+                        failedProcess);
             } else {
                 log.error(
                         "Move process definition error, srcProjectCode:{}, targetProjectCode:{}, failedProcessList:{}.",
                         srcProjectCode, targetProjectCode, failedProcess);
-                putMsg(result, ProcessStatus.MOVE_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode, failedProcess);
+                putMsg(result, ProcessStatus.MOVE_PROCESS_DEFINITION_ERROR, srcProjectCode, targetProjectCode,
+                        failedProcess);
             }
         } else {
             log.info("Batch {} process definition complete, srcProjectCode:{}, targetProjectCode:{}.",
@@ -2516,7 +2520,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
 
         ProcessDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode)
-                .orElseThrow(() -> new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
+                .orElseThrow(
+                        () -> new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
 
         if (ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             // do nothing if the workflow is already online
@@ -2536,7 +2541,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
 
         ProcessDefinition workflowDefinition = processDefinitionDao.queryByCode(workflowDefinitionCode)
-                .orElseThrow(() -> new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
+                .orElseThrow(
+                        () -> new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
 
         if (ReleaseState.OFFLINE.equals(workflowDefinition.getReleaseState())) {
             // do nothing if the workflow is already offline
@@ -2649,7 +2655,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         for (Long subWorkflowDefinitionCode : allSubWorkflowDefinitionCodes) {
             ProcessDefinition subWorkflowDefinition = processDefinitionDao.queryByCode(subWorkflowDefinitionCode)
-                    .orElseThrow(() -> new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
+                    .orElseThrow(
+                            () -> new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowDefinitionCode));
             if (!ReleaseState.ONLINE.equals(subWorkflowDefinition.getReleaseState())) {
                 throw new ServiceException(
                         "SubWorkflowDefinition " + subWorkflowDefinition.getName() + " is not online");
