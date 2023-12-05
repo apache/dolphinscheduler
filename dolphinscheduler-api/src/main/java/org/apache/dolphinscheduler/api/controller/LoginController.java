@@ -18,13 +18,9 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
-import static org.apache.dolphinscheduler.api.enums.Status.NOT_SUPPORT_SSO;
-import static org.apache.dolphinscheduler.api.enums.Status.SIGN_OUT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.USER_LOGIN_FAILURE;
 
 import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
@@ -107,7 +103,6 @@ public class LoginController extends BaseController {
             @Parameter(name = "userPassword", description = "USER_PASSWORD", required = true, schema = @Schema(implementation = String.class))
     })
     @PostMapping(value = "/login")
-    @ApiException(USER_LOGIN_FAILURE)
     public Result login(@RequestParam(value = "userName") String userName,
                         @RequestParam(value = "userPassword") String userPassword,
                         HttpServletRequest request,
@@ -148,7 +143,6 @@ public class LoginController extends BaseController {
      */
     @Operation(summary = "sso login", description = "SSO_LOGIN_NOTES")
     @GetMapping(value = "/login/sso")
-    @ApiException(NOT_SUPPORT_SSO)
     public Result ssoLogin(HttpServletRequest request) {
         if (authenticator instanceof AbstractSsoAuthenticator) {
             String randomState = UUID.randomUUID().toString();
@@ -163,7 +157,6 @@ public class LoginController extends BaseController {
 
     @Operation(summary = "signOut", description = "SIGNOUT_NOTES")
     @PostMapping(value = "/signOut")
-    @ApiException(SIGN_OUT_ERROR)
     public Result signOut(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           HttpServletRequest request) {
         String ip = getClientIpAddress(request);
