@@ -17,16 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_PROJECT;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_USER;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectCreateResponse;
@@ -37,7 +27,6 @@ import org.apache.dolphinscheduler.api.dto.project.ProjectQueryResponse;
 import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateRequest;
 import org.apache.dolphinscheduler.api.dto.project.ProjectUpdateResponse;
 import org.apache.dolphinscheduler.api.dto.user.UserListResponse;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -87,7 +76,6 @@ public class ProjectV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_PROJECT_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROJECT_ERROR)
     public ProjectCreateResponse createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestBody ProjectCreateRequest projectCreateRequest) {
         Result result = projectService.createProject(loginUser, projectCreateRequest.getProjectName(),
@@ -106,7 +94,6 @@ public class ProjectV2Controller extends BaseController {
     @Operation(summary = "update", description = "UPDATE_PROJECT_NOTES")
     @PutMapping(value = "/{code}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROJECT_ERROR)
     public ProjectUpdateResponse updateProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable("code") Long code,
                                                @RequestBody ProjectUpdateRequest projectUpdateReq) {
@@ -128,7 +115,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
     public ProjectQueryResponse queryProjectByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @PathVariable("code") long code) {
         Result result = projectService.queryByCode(loginUser, code);
@@ -150,7 +136,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     public Result<PageInfo<Project>> queryProjectListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                             ProjectQueryRequest projectQueryReq) {
         checkPageParams(projectQueryReq.getPageNo(), projectQueryReq.getPageSize());
@@ -172,7 +157,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROJECT_ERROR)
     public ProjectDeleteResponse deleteProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable("code") Long code) {
         Result result = projectService.deleteProject(loginUser, code);
@@ -192,7 +176,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
     public ProjectListResponse queryUnauthorizedProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam("userId") Integer userId) {
         Result result = projectService.queryUnauthorizedProject(loginUser, userId);
@@ -212,7 +195,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_AUTHORIZED_PROJECT)
     public ProjectListResponse queryAuthorizedProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @RequestParam("userId") Integer userId) {
         Result result = projectService.queryAuthorizedProject(loginUser, userId);
@@ -232,7 +214,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_AUTHORIZED_USER)
     public UserListResponse queryAuthorizedUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @RequestParam("projectCode") Long projectCode) {
         Result result = projectService.queryAuthorizedUser(loginUser, projectCode);
@@ -251,7 +232,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(value = "/created-and-authed")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
     public ProjectListResponse queryProjectCreatedAndAuthorizedByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Result result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         return new ProjectListResponse(result);
@@ -269,7 +249,6 @@ public class ProjectV2Controller extends BaseController {
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     public ProjectListResponse queryAllProjectList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Result result = projectService.queryAllProjectList(loginUser);
         return new ProjectListResponse(result);
@@ -284,7 +263,6 @@ public class ProjectV2Controller extends BaseController {
     @Operation(summary = "queryAllProjectListForDependent", description = "QUERY_ALL_PROJECT_LIST_FOR_DEPENDENT_NOTES")
     @GetMapping(value = "/list-dependent")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     public ProjectListResponse queryAllProjectListForDependent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Result result = projectService.queryAllProjectListForDependent();
         return new ProjectListResponse(result);
