@@ -24,6 +24,10 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public enum TaskStatus implements Status {
 
     TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
+    TASK_INSTANCE_NOT_FOUND(10008, "task instance not found", "任务实例不存在"),
+    TASK_INSTANCE_NOT_EXISTS(10020, "task instance {0} does not exist", "任务实例[{0}]不存在"),
+    TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE(10021, "task instance {0} is not sub process instance", "任务实例[{0}]不是子流程实例"),
+    TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
     EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
     START_TASK_INSTANCE_ERROR(50059, "start task instance error", "运行任务流实例错误"),

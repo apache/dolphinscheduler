@@ -24,6 +24,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public enum ProjectStatus implements Status {
 
     PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
+    PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
     ;
     private final int code;
     private final String enMsg;

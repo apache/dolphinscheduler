@@ -29,8 +29,12 @@ public enum BaseStatus implements Status {
     MASTER_NOT_EXISTS(10025, "master does not exist", "无可用master节点"),
     SAVE_ERROR(10136, "save error", "保存错误"),
     CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
+    DATA_IS_NOT_VALID(50017, "data {0} not valid", "数据[{0}]无效"),
+    DATA_IS_NULL(50018, "data {0} is null", "数据[{0}]不能为空"),
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
+    NEGTIVE_SIZE_NUMBER_ERROR(80002, "query size number error", "查询size错误"),
+    START_TIME_BIGGER_THAN_END_TIME_ERROR(80003, "start time bigger than end time error", "开始时间在结束时间之后错误"),
     DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),;
     private final int code;
     private final String enMsg;

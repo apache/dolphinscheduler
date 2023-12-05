@@ -34,8 +34,11 @@ public enum ProcessStatus implements Status {
     PROCESS_INSTANCE_STATE_OPERATION_ERROR(50006,
             "the status of process instance {0} is {1},Cannot perform {2} operation",
             "工作流实例[{0}]的状态是[{1}]，无法执行[{2}]操作"),
+    SUB_PROCESS_INSTANCE_NOT_EXIST(50007, "the task belong to process instance does not exist", "子工作流实例不存在"),
     PROCESS_INSTANCE_EXECUTING_COMMAND(50009, "process instance {0} is executing the command, please wait ...",
             "工作流实例[{0}]正在执行命令，请稍等..."),
+    PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE(50010, "process instance {0} is not sub process instance",
+            "工作流实例[{0}]不是子工作流实例"),
     START_PROCESS_INSTANCE_ERROR(50014, "start process instance error", "运行工作流实例错误"),
     EXECUTE_PROCESS_INSTANCE_ERROR(50015, "execute process instance error", "操作工作流实例错误"),
     BATCH_EXECUTE_PROCESS_INSTANCE_ERROR(50058, "change process instance status error: {0}", "修改工作实例状态错误: {0}"),;
