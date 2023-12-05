@@ -20,18 +20,29 @@ package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,15 +54,18 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
     public static final String TASK_TYPE = "SUB_PROCESS";
     private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
     private final ProcessInstanceDao processInstanceDao;
+    private final ProcessInstanceMapDao processInstanceMapDao;
 
     public SubWorkflowLogicTask(TaskExecutionContext taskExecutionContext,
                                 ProcessInstanceExecCacheManager processInstanceExecCacheManager,
-                                ProcessInstanceDao processInstanceDao) {
+                                ProcessInstanceDao processInstanceDao,
+                                ProcessInstanceMapDao processInstanceMapDao) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubProcessParameters>() {
                 }));
         this.processInstanceExecCacheManager = processInstanceExecCacheManager;
         this.processInstanceDao = processInstanceDao;
+        this.processInstanceMapDao = processInstanceMapDao;
     }
 
     @Override
@@ -131,6 +145,43 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
         } catch (Exception e) {
             log.error("Send kill request to SubWorkflow's master: {} failed", subProcessInstance.getHost(), e);
         }
+    }
+
+    @Override
+    public List<Property> getVarPool() {
+        List<Property> taskInstanceProps = getTaskParameters().getVarPool();
+        ProcessInstanceMap processInstanceMap = processInstanceMapDao.queryWorkProcessMapByParent(
+                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
+        ProcessInstance childProcessInstance = processInstanceDao.queryById(processInstanceMap.getProcessInstanceId());
+        if (!StringUtils.isBlank(childProcessInstance.getVarPool())) {
+            Map<String, String> currentInstanceMap =
+                    taskInstanceProps.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
+            List<Property> childProps = JSONUtils.toList(childProcessInstance.getVarPool(), Property.class);
+            Map<String, String> childProcessMap =
+                    childProps.stream().filter(property -> property.getDirect() == Direct.OUT)
+                            .collect(Collectors.toMap(Property::getProp, Property::getValue));
+            List<Property> allProps = new ArrayList<>();
+            allProps.addAll(childProps.stream().filter(property -> property.getDirect() == Direct.OUT)
+                    .collect(Collectors.toList()));
+            // overwrite existing parameter value of type out
+            taskInstanceProps.forEach(property -> {
+                if (property.getDirect() == Direct.OUT &&
+                        StringUtils.isNotBlank(childProcessMap.get(property.getProp()))) {
+                    property.setValue(childProcessMap.get(property.getProp()));
+                }
+                allProps.add(property);
+            });
+
+            // add parameters that do not exist
+            childProps.forEach(property -> {
+                if (!currentInstanceMap.containsKey(property.getProp())) {
+                    allProps.add(property);
+                }
+            });
+            return allProps;
+        }
+
+        return taskInstanceProps;
     }
 
     private void sendToSubProcess(TaskExecutionContext taskExecutionContext,

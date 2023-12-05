@@ -166,7 +166,7 @@ public abstract class MasterTaskExecutor implements Runnable {
     protected void sendTaskResult() {
         try {
             taskExecutionContext.setEndTime(System.currentTimeMillis());
-            taskExecutionContext.setVarPool(JSONUtils.toJsonString(logicTask.getTaskParameters().getVarPool()));
+            taskExecutionContext.setVarPool(JSONUtils.toJsonString(logicTask.getVarPool()));
             logicTaskInstanceExecutionEventSenderManager.getLogicTaskInstanceExecutionFinishEventSender()
                     .sendMessage(taskExecutionContext);
             log.info("Send task status: {} to master: {} successfully",

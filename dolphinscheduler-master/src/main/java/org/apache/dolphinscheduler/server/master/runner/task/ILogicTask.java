@@ -18,8 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
+
+import java.util.List;
 
 public interface ILogicTask {
 
@@ -31,4 +34,7 @@ public interface ILogicTask {
 
     TaskExecutionContext getTaskExecutionContext();
 
+    default List<Property> getVarPool() {
+        return getTaskParameters().getVarPool();
+    }
 }
