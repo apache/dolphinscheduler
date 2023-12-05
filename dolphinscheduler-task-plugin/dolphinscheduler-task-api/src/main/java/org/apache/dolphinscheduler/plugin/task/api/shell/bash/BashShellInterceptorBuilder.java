@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell.bash;
 
-import org.apache.dolphinscheduler.common.exception.FileOperateException;
 import org.apache.dolphinscheduler.plugin.task.api.shell.BaseLinuxShellInterceptorBuilder;
 
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class BashShellInterceptorBuilder
     }
 
     @Override
-    public BashShellInterceptor build() throws FileOperateException, IOException {
+    public BashShellInterceptor build() throws IOException {
         generateShellScript();
         List<String> bootstrapCommand = generateBootstrapCommand();
         return new BashShellInterceptor(bootstrapCommand, shellDirectory);

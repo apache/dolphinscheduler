@@ -92,6 +92,10 @@ public class TaskExecutionCheckerUtils {
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
             Path executePath = Paths.get(taskExecutionContext.getExecutePath());
             FileUtils.createDirectoryIfNotPresent(executePath);
+            if (OSUtils.isSudoEnable()
+                    && !TenantConstants.DEFAULT_TENANT_CODE.equals(taskExecutionContext.getTenantCode())) {
+                FileUtils.setDirectoryOwner(executePath, taskExecutionContext.getTenantCode());
+            }
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }
@@ -132,6 +136,11 @@ public class TaskExecutionCheckerUtils {
                     Path localFileAbsolutePath = Paths.get(execLocalPath, fileName);
                     storageOperate.download(actualTenant, fullName, localFileAbsolutePath.toString(), true);
                     log.info("Download resource file {} under: {} successfully", fileName, localFileAbsolutePath);
+                    if (OSUtils.isSudoEnable() && !TenantConstants.DEFAULT_TENANT_CODE.equals(tenant)) {
+                        FileUtils.setFileOwner(localFileAbsolutePath, taskExecutionContext.getTenantCode());
+                        log.info("Set file {} owner to {} successfully", localFileAbsolutePath,
+                                taskExecutionContext.getTenantCode());
+                    }
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics.recordWorkerResourceDownloadSize(Files.size(localFileAbsolutePath));
