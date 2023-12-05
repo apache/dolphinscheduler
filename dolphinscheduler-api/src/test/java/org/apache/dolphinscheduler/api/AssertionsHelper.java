@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 
 import org.junit.jupiter.api.Assertions;
