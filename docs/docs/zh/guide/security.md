@@ -8,7 +8,10 @@
 - 队列是在执行 spark、mapreduce 等程序，需要用到“队列”参数时使用的。
 - 管理员进入安全中心 -> 队列管理页面，点击“创建队列”按钮，创建队列。
 
-![create-queue](../../../img/new_ui/dev/security/create-queue.png)
+
+> 注意：目前仅有 admin 用户可以修改队列。
+
+![create-queue](../../../../img/new_ui/dev/security/create-queue.png)
 
 ## 添加租户
 
@@ -16,7 +19,10 @@
 - 租户编码：**租户编码是 Linux上 的用户，唯一，不能重复**
 - 管理员进入安全中心->租户管理页面，点击“创建租户”按钮，创建租户。
 
-![create-tenant](../../../img/new_ui/dev/security/create-tenant.png)
+
+> 注意：目前仅有 admin 用户可以修改租户。
+
+![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
 ## 创建普通用户
 

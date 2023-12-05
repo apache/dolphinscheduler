@@ -9,7 +9,10 @@ Administrator login, default username/password: admin/dolphinscheduler123
 - The queue is used when executing programs such as spark and mapreduce, and the "queue" parameter needs to be used.
 - The administrator enters the `Security Center->Queue Management` page and clicks the "Create Queue" button to create a new queue.
 
-![create-queue](../../../img/new_ui/dev/security/create-queue.png)
+
+> Note: Currently, only admin users can modify queues.
+
+![create-queue](../../../../img/new_ui/dev/security/create-queue.png)
 
 ## Add Tenant
 
@@ -17,7 +20,9 @@ Administrator login, default username/password: admin/dolphinscheduler123
 - Tenant Code: **The tenant code is the user on Linux, unique and cannot be repeated**
 - The administrator enters the `Security Center->Tenant Management` page, and clicks the `Create Tenant` button to create a tenant.
 
-![create-tenant](../../../img/new_ui/dev/security/create-tenant.png)
+> Note: Currently, only admin users can modify tenant.
+
+![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
 ## Create Normal User
 
