@@ -19,12 +19,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
-
 import org.apache.dolphinscheduler.api.configuration.DynamicTaskTypeConfiguration;
 import org.apache.dolphinscheduler.api.dto.taskType.DynamicTaskInfo;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -65,7 +62,6 @@ public class DynamicTaskTypeController extends BaseController {
     @Operation(summary = "listTaskCates", description = "LIST_TASK_TYPE_CATES")
     @GetMapping(value = "/taskCategories")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
     public Result listDynamicTaskCategories(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> taskCategories = dynamicTaskTypeConfiguration.getTaskCategories();
         return success(Status.SUCCESS.getMsg(), taskCategories);
@@ -80,7 +76,6 @@ public class DynamicTaskTypeController extends BaseController {
     @Operation(summary = "listDynamicTaskTypes", description = "LIST_DYNAMIC_TASK_TYPES")
     @GetMapping(value = "/{taskCategory}/taskTypes")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
     public Result listDynamicTaskTypes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @PathVariable("taskCategory") String taskCategory) {
         List<DynamicTaskInfo> taskTypes = dynamicTaskTypeConfiguration.getTaskTypesByCategory(taskCategory);
