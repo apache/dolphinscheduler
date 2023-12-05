@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GENERATE_TOKEN_ERROR;
-
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -78,7 +74,6 @@ public class AccessTokenController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_ACCESS_TOKEN_ERROR)
     public Result<AccessToken> createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "userId") int userId,
                                            @RequestParam(value = "expireTime") String expireTime,
@@ -99,7 +94,6 @@ public class AccessTokenController extends BaseController {
     @Parameter(hidden = true)
     @PostMapping(value = "/generate")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(GENERATE_TOKEN_ERROR)
     public Result<String> generateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "userId") int userId,
                                         @RequestParam(value = "expireTime") String expireTime) {
