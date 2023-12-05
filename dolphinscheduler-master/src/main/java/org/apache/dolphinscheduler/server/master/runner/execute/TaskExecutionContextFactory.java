@@ -83,13 +83,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
@@ -423,15 +423,23 @@ public class TaskExecutionContextFactory {
         dataSource.setUserName(hikariDataSource.getUsername());
         JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
         if (jdbcInfo != null) {
-            Properties properties = new Properties();
-            properties.setProperty(USER, hikariDataSource.getUsername());
-            properties.setProperty(PASSWORD, hikariDataSource.getPassword());
-            properties.setProperty(DATABASE, jdbcInfo.getDatabase());
-            properties.setProperty(ADDRESS, jdbcInfo.getAddress());
-            properties.setProperty(OTHER, jdbcInfo.getParams());
-            properties.setProperty(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            ObjectNode objectNode = JSONUtils.createObjectNode();
+            objectNode.put(USER, hikariDataSource.getUsername());
+            objectNode.put(PASSWORD, hikariDataSource.getPassword());
+            objectNode.put(DATABASE, jdbcInfo.getDatabase());
+            objectNode.put(ADDRESS, jdbcInfo.getAddress());
+            objectNode.put(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            Map<String, String> map = new HashMap<>();
+            String[] params = jdbcInfo.getParams().split("&");
+            for (String param : params) {
+                String[] keyValue = param.split("=");
+                String key = keyValue[0];
+                String value = keyValue.length > 1 ? keyValue[1] : "";
+                map.put(key, value);
+            }
+            objectNode.putPOJO(OTHER, map);
             dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
-            dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
+            dataSource.setConnectionParams(objectNode.toString());
         }
 
         return dataSource;
