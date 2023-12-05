@@ -15,19 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.worker.transportor;
+package org.apache.dolphinscheduler.extract.common.transportor;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class GetAppIdRequest {
+@NoArgsConstructor
+public class TaskInstanceLogPageQueryRequest {
 
-    private int taskInstanceId;
+    private Integer taskInstanceId;
 
-    private String logPath;
+    private String taskInstanceLogAbsolutePath;
+
+    private int skipLineNum;
+    private int limit;
 
 }

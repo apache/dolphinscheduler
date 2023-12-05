@@ -15,19 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.worker;
+package org.apache.dolphinscheduler.extract.common;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
-import org.apache.dolphinscheduler.extract.worker.transportor.GetAppIdRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.GetAppIdResponse;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogFileDownloadRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogFileDownloadResponse;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogPageQueryRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 
 @RpcService
-public interface IWorkerLogService {
+public interface ILogService {
 
     @RpcMethod
     TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest);
@@ -40,4 +40,5 @@ public interface IWorkerLogService {
 
     @RpcMethod
     void removeTaskInstanceLog(String taskInstanceLogAbsolutePath);
+
 }
