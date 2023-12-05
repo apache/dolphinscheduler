@@ -116,10 +116,9 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.DqRuleUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IMasterLogService;
+import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
-import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -130,7 +129,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -516,15 +514,9 @@ public class ProcessServiceImpl implements ProcessService {
             if (StringUtils.isEmpty(taskInstance.getHost()) || StringUtils.isEmpty(taskLogPath)) {
                 continue;
             }
-            if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-                IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
-                masterLogService.removeLogicTaskInstanceLog(taskLogPath);
-            } else {
-                IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
-                iWorkerLogService.removeTaskInstanceLog(taskLogPath);
-            }
+            ILogService iLogService =
+                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
+            iLogService.removeTaskInstanceLog(taskLogPath);
         }
     }
 

@@ -23,18 +23,19 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-extract</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dolphinscheduler-extract</artifactId>
-    <packaging>pom</packaging>
-    <modules>
-        <module>dolphinscheduler-extract-base</module>
-        <module>dolphinscheduler-extract-master</module>
-        <module>dolphinscheduler-extract-worker</module>
-        <module>dolphinscheduler-extract-alert</module>
-        <module>dolphinscheduler-extract-common</module>
-    </modules>
+    <groupId>org.apache.dolphinscheduler</groupId>
+    <artifactId>dolphinscheduler-extract-common</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
