@@ -65,7 +65,6 @@ public class ProjectParameterController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROJECT_PARAMETER_ERROR)
     public Result createProjectParameter(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @RequestParam("projectParameterName") String projectParameterName,
@@ -82,7 +81,6 @@ public class ProjectParameterController extends BaseController {
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROJECT_PARAMETER_ERROR)
     public Result updateProjectParameter(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @PathVariable("code") Long code,
@@ -98,7 +96,6 @@ public class ProjectParameterController extends BaseController {
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROJECT_PARAMETER_ERROR)
     public Result deleteProjectParametersByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @RequestParam("code") long code) {
@@ -112,7 +109,6 @@ public class ProjectParameterController extends BaseController {
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROJECT_PARAMETER_ERROR)
     public Result batchDeleteProjectParametersByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
@@ -128,7 +124,6 @@ public class ProjectParameterController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROJECT_PARAMETER_ERROR)
     public Result queryProjectParameterListPaging(
                                                   @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
@@ -148,7 +143,6 @@ public class ProjectParameterController extends BaseController {
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROJECT_PARAMETER_ERROR)
     public Result queryProjectParameterByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable("code") long code) {
