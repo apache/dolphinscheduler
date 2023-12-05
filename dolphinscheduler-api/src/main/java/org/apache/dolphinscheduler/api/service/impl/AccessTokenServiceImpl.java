@@ -21,7 +21,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_UPDATE;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -91,7 +92,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     public List<AccessToken> queryAccessTokenByUser(User loginUser, Integer userId) {
         // no permission
         if (loginUser.getUserType().equals(UserType.GENERAL_USER) && loginUser.getId() != userId) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         userId = loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId;
         // query access token for specified user
@@ -115,12 +116,12 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         // 1. check permission
         if (!(canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_CREATE)
                 || loginUser.getId() == userId)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         // 2. check if user is existed
         if (userId <= 0) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR,
                     "User id: " + userId + " should not less than or equals to 0.");
         }
 
@@ -142,7 +143,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         if (insert > 0) {
             return accessToken;
         }
-        throw new ServiceException(Status.CREATE_ACCESS_TOKEN_ERROR);
+        throw new ServiceException(BaseStatus.CREATE_ACCESS_TOKEN_ERROR);
     }
 
     /**
@@ -168,17 +169,17 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     @Override
     public void deleteAccessTokenById(User loginUser, int id) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_DELETE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
-            throw new ServiceException(Status.ACCESS_TOKEN_NOT_EXIST, id);
+            throw new ServiceException(BaseStatus.ACCESS_TOKEN_NOT_EXIST, id);
         }
 
         // admin can operate all, non-admin can operate their own
         if (accessToken.getUserId() != loginUser.getId() && !loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         accessTokenMapper.deleteById(id);
     }
@@ -197,18 +198,18 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         // 1. check permission
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, ACCESS_TOKEN_UPDATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         // 2. check if token is existed
         AccessToken accessToken = accessTokenMapper.selectById(id);
         if (accessToken == null) {
             log.error("Access token does not exist, accessTokenId:{}.", id);
-            throw new ServiceException(Status.ACCESS_TOKEN_NOT_EXIST, id);
+            throw new ServiceException(BaseStatus.ACCESS_TOKEN_NOT_EXIST, id);
         }
         // admin can operate all, non-admin can operate their own
         if (accessToken.getUserId() != loginUser.getId() && !loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         // 3. generate access token if absent
@@ -224,7 +225,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         int i = accessTokenMapper.updateById(accessToken);
         if (i <= 0) {
-            throw new ServiceException(Status.ACCESS_TOKEN_NOT_EXIST, id);
+            throw new ServiceException(BaseStatus.ACCESS_TOKEN_NOT_EXIST, id);
         }
         return accessToken;
     }

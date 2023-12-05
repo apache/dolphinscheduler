@@ -26,7 +26,8 @@ public enum BaseStatus implements Status {
     SUCCESS(0, "success", "成功"),
     INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
-    ;
+    CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
+    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;

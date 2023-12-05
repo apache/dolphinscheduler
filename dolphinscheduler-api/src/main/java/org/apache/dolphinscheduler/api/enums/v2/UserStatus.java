@@ -21,15 +21,15 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum PluginStatus implements Status {
+public enum UserStatus implements Status {
 
-    PLUGIN_INSTANCE_ALREADY_EXISTS(110010, "plugin instance already exists", "该告警插件实例已存在"),
+    USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    PluginStatus(int code, String enMsg, String zhMsg) {
+    UserStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
