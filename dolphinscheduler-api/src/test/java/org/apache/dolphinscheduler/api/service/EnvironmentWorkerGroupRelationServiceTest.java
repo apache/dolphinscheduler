@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.impl.EnvironmentWorkerGroupRelationServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
@@ -56,7 +56,7 @@ public class EnvironmentWorkerGroupRelationServiceTest {
                 .thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
         Map<String, Object> result = relationService.queryEnvironmentWorkerGroupRelation(1L);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -65,7 +65,7 @@ public class EnvironmentWorkerGroupRelationServiceTest {
                 .thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
         Map<String, Object> result = relationService.queryAllEnvironmentWorkerGroupRelationList();
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
 }
