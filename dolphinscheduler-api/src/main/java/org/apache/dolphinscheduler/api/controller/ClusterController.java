@@ -17,15 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_CLUSTER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_CLUSTER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_CLUSTER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_CLUSTER_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.ClusterDto;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ClusterService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -80,7 +72,6 @@ public class ClusterController extends BaseController {
     })
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_CLUSTER_ERROR)
     public Result<Long> createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("name") String name,
                                       @RequestParam("config") String config,
@@ -109,7 +100,6 @@ public class ClusterController extends BaseController {
     })
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_CLUSTER_ERROR)
     public Result<Cluster> updateCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("code") Long code,
                                          @RequestParam("name") String name,
@@ -131,7 +121,6 @@ public class ClusterController extends BaseController {
     })
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_CLUSTER_BY_CODE_ERROR)
     public Result<ClusterDto> queryClusterByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @RequestParam("clusterCode") Long clusterCode) {
 
@@ -155,7 +144,6 @@ public class ClusterController extends BaseController {
     })
     @GetMapping(value = "/list-paging")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_CLUSTER_ERROR)
     public Result<PageInfo<ClusterDto>> queryClusterListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                @RequestParam(value = "searchVal", required = false) String searchVal,
                                                                @RequestParam("pageSize") Integer pageSize,
@@ -180,7 +168,6 @@ public class ClusterController extends BaseController {
     })
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_CLUSTER_ERROR)
     public Result<Boolean> deleteCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("clusterCode") Long clusterCode) {
 
@@ -197,7 +184,6 @@ public class ClusterController extends BaseController {
     @Operation(summary = "queryAllClusterList", description = "QUERY_ALL_CLUSTER_LIST_NOTES")
     @GetMapping(value = "/query-cluster-list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_CLUSTER_ERROR)
     public Result<List<ClusterDto>> queryAllClusterList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<ClusterDto> clusterDtos = clusterService.queryAllClusterList();
         return Result.success(clusterDtos);
@@ -216,7 +202,6 @@ public class ClusterController extends BaseController {
     })
     @PostMapping(value = "/verify-cluster")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_CLUSTER_ERROR)
     public Result<Boolean> verifyCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "clusterName") String clusterName) {
         clusterService.verifyCluster(clusterName);
