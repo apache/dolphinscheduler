@@ -31,13 +31,13 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class GlobalTaskInstanceDispatchQueue {
+public class GlobalTaskInstanceWaitingQueue {
 
     private final WorkerConfig workerConfig;
 
     private final BlockingQueue<TaskExecutionContext> blockingQueue;
 
-    public GlobalTaskInstanceDispatchQueue(WorkerConfig workerConfig) {
+    public GlobalTaskInstanceWaitingQueue(WorkerConfig workerConfig) {
         this.workerConfig = workerConfig;
         this.blockingQueue = new ArrayBlockingQueue<>(workerConfig.getExecThreads());
     }

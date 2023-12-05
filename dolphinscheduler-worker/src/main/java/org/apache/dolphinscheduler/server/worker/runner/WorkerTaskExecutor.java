@@ -67,9 +67,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-public abstract class WorkerTaskExecuteRunnable implements Runnable {
+public abstract class WorkerTaskExecutor implements Runnable {
 
-    protected static final Logger log = LoggerFactory.getLogger(WorkerTaskExecuteRunnable.class);
+    protected static final Logger log = LoggerFactory.getLogger(WorkerTaskExecutor.class);
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
@@ -80,13 +80,13 @@ public abstract class WorkerTaskExecuteRunnable implements Runnable {
 
     protected @Nullable AbstractTask task;
 
-    protected WorkerTaskExecuteRunnable(
-                                        @NonNull TaskExecutionContext taskExecutionContext,
-                                        @NonNull WorkerConfig workerConfig,
-                                        @NonNull WorkerMessageSender workerMessageSender,
-                                        @NonNull TaskPluginManager taskPluginManager,
-                                        @Nullable StorageOperate storageOperate,
-                                        @NonNull WorkerRegistryClient workerRegistryClient) {
+    protected WorkerTaskExecutor(
+                                 @NonNull TaskExecutionContext taskExecutionContext,
+                                 @NonNull WorkerConfig workerConfig,
+                                 @NonNull WorkerMessageSender workerMessageSender,
+                                 @NonNull TaskPluginManager taskPluginManager,
+                                 @Nullable StorageOperate storageOperate,
+                                 @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;

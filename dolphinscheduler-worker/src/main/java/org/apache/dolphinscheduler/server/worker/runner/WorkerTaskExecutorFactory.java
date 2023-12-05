@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.execute;
+package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+public interface WorkerTaskExecutorFactory<T> {
 
-public interface MasterDelayTaskExecuteRunnableFactory<T extends MasterDelayTaskExecuteRunnable> {
-
-    T createWorkerTaskExecuteRunnable(TaskExecutionContext taskExecutionContext);
-
+    T createWorkerTaskExecutor();
 }

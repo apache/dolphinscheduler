@@ -15,9 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.runner;
+package org.apache.dolphinscheduler.server.master.runner;
 
-public interface WorkerTaskExecuteRunnableFactory<T> {
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-    T createWorkerTaskExecuteRunnable();
+/**
+ * This interface is used to define a task which is executing.
+ * todo: split to MasterTaskExecuteRunnable and WorkerTaskExecuteRunnable
+ */
+public interface TaskExecuteRunnable {
+
+    void dispatch();
+
+    void kill();
+
+    void pause();
+
+    void timeout();
+
+    ProcessInstance getWorkflowInstance();
+
+    TaskInstance getTaskInstance();
+
+    TaskExecutionContext getTaskExecutionContext();
 }

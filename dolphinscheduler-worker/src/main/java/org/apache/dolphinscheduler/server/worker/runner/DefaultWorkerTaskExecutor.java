@@ -17,29 +17,27 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
-import java.util.concurrent.Delayed;
-import java.util.concurrent.TimeUnit;
-
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
 
-public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRunnable implements Delayed {
+public class DefaultWorkerTaskExecutor extends WorkerTaskExecutor {
 
-    protected WorkerDelayTaskExecuteRunnable(@NonNull TaskExecutionContext taskExecutionContext,
-                                             @NonNull WorkerConfig workerConfig,
-                                             @NonNull WorkerMessageSender workerMessageSender,
-                                             @NonNull TaskPluginManager taskPluginManager,
-                                             @Nullable StorageOperate storageOperate,
-                                             @NonNull WorkerRegistryClient workerRegistryClient) {
+    public DefaultWorkerTaskExecutor(@NonNull TaskExecutionContext taskExecutionContext,
+                                     @NonNull WorkerConfig workerConfig,
+                                     @NonNull WorkerMessageSender workerMessageSender,
+                                     @NonNull TaskPluginManager taskPluginManager,
+                                     @Nullable StorageOperate storageOperate,
+                                     @NonNull WorkerRegistryClient workerRegistryClient) {
         super(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
@@ -49,21 +47,20 @@ public abstract class WorkerDelayTaskExecuteRunnable extends WorkerTaskExecuteRu
     }
 
     @Override
-    public long getDelay(TimeUnit unit) {
-        TaskExecutionContext taskExecutionContext = getTaskExecutionContext();
-        return unit.convert(
-                DateUtils.getRemainTime(
-                        DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                        taskExecutionContext.getDelayTime() * 60L),
-                TimeUnit.SECONDS);
+    public void executeTask(TaskCallBack taskCallBack) throws TaskException {
+        if (task == null) {
+            throw new IllegalArgumentException("The task plugin instance is not initialized");
+        }
+        task.handle(taskCallBack);
     }
 
     @Override
-    public int compareTo(Delayed o) {
-        if (o == null) {
-            return 1;
-        }
-        return Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
+    protected void afterExecute() {
+        super.afterExecute();
     }
 
+    @Override
+    protected void afterThrowing(Throwable throwable) throws TaskException {
+        super.afterThrowing(throwable);
+    }
 }

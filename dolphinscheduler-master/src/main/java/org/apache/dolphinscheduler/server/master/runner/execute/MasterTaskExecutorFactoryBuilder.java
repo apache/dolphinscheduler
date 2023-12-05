@@ -28,24 +28,27 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Sets;
 
+/**
+ * Use to create MasterTaskExecutorFactory
+ */
 @Component
-public class MasterTaskExecuteRunnableFactoryBuilder {
+public class MasterTaskExecutorFactoryBuilder {
 
     @Autowired
-    private AsyncMasterDelayTaskExecuteRunnableFactory asyncMasterDelayTaskExecuteRunnableFactory;
+    private AsyncMasterTaskExecutorFactory asyncMasterTaskExecutorFactory;
 
     @Autowired
-    private SyncMasterDelayTaskExecuteRunnableFactory syncMasterDelayTaskExecuteRunnableFactory;
+    private SyncMasterTaskExecutorFactory syncMasterTaskExecutorFactory;
 
     private static final Set<String> ASYNC_TASK_TYPE = Sets.newHashSet(
             DependentLogicTask.TASK_TYPE,
             SubWorkflowLogicTask.TASK_TYPE,
             DynamicLogicTask.TASK_TYPE);
 
-    public MasterDelayTaskExecuteRunnableFactory<? extends MasterDelayTaskExecuteRunnable> createWorkerDelayTaskExecuteRunnableFactory(String taskType) {
+    public MasterTaskExecutorFactory<? extends MasterTaskExecutor> createMasterTaskExecutorFactory(String taskType) {
         if (ASYNC_TASK_TYPE.contains(taskType)) {
-            return asyncMasterDelayTaskExecuteRunnableFactory;
+            return asyncMasterTaskExecutorFactory;
         }
-        return syncMasterDelayTaskExecuteRunnableFactory;
+        return syncMasterTaskExecutorFactory;
     }
 }

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueue;
 
 import org.springframework.stereotype.Component;
@@ -24,8 +25,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogicTaskExecuteRunnableDispatchOperator extends BaseTaskExecuteRunnableDispatchOperator {
 
-    public LogicTaskExecuteRunnableDispatchOperator(GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue) {
-        super(globalTaskDispatchWaitingQueue);
+    public LogicTaskExecuteRunnableDispatchOperator(GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue,
+                                                    TaskInstanceDao taskInstanceDao) {
+        super(globalTaskDispatchWaitingQueue, taskInstanceDao);
     }
 
 }

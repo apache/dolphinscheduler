@@ -17,28 +17,36 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.concurrent.DelayQueue;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.springframework.stereotype.Component;
 
-@Slf4j
+/**
+ *
+ */
 @Component
-public class GlobalTaskDispatchWaitingQueue {
+public class GlobalMasterTaskExecuteRunnableQueue {
 
-    private final DelayQueue<DefaultTaskExecuteRunnable> queue = new DelayQueue<>();
+    private final BlockingQueue<MasterTaskExecutor> masterTaskExecutorBlockingQueue =
+            new LinkedBlockingQueue<>();
 
-    public void submitNeedToDispatchTaskExecuteRunnable(DefaultTaskExecuteRunnable priorityTaskExecuteRunnable) {
-        queue.put(priorityTaskExecuteRunnable);
+    public boolean submitMasterTaskExecuteRunnable(MasterTaskExecutor masterTaskExecutor) {
+        return masterTaskExecutorBlockingQueue.offer(masterTaskExecutor);
     }
 
-    public DefaultTaskExecuteRunnable takeNeedToDispatchTaskExecuteRunnable() throws InterruptedException {
-        return queue.take();
+    public MasterTaskExecutor takeMasterTaskExecuteRunnable() throws InterruptedException {
+        return masterTaskExecutorBlockingQueue.take();
     }
 
-    public int getWaitingDispatchTaskNumber() {
-        return queue.size();
+    public boolean removeMasterTaskExecuteRunnable(MasterTaskExecutor masterTaskExecutor) {
+        return masterTaskExecutorBlockingQueue.remove(masterTaskExecutor);
+    }
+
+    public int size() {
+        return masterTaskExecutorBlockingQueue.size();
     }
 
 }
