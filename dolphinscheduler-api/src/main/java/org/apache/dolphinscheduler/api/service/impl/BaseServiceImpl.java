@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.BaseService;
@@ -176,7 +177,7 @@ public class BaseServiceImpl implements BaseService {
             start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
                 log.warn("Parameter startDateStr is invalid.");
-                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
+                throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             }
         }
         return start;
