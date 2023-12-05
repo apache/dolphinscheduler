@@ -17,22 +17,18 @@
 
 package org.apache.dolphinscheduler.api.enums.v2;
 
-import java.util.Locale;
-
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum PluginStatus implements Status {
+import java.util.Locale;
 
-    PLUGIN_INSTANCE_ALREADY_EXISTS(110010, "plugin instance already exists", "该告警插件实例已存在"),
-    DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED(110012,
-            "failed to delete the alert instance, there is an alarm group associated with this alert instance",
-            "删除告警实例失败，存在与此告警实例关联的警报组"),
-    ;
+public enum AlertStatus implements Status {
+    ALERT_TEST_SENDING_FAILED(110014, "Alert test sending failed, [{0}]", "alert测试发送失败，[{0}]"),
+    ALERT_SERVER_NOT_EXIST(110017, "Alert server does not exist", "Alert server不存在"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    PluginStatus(int code, String enMsg, String zhMsg) {
+    AlertStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

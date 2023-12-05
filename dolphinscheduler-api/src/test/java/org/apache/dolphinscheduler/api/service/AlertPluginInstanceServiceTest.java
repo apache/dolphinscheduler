@@ -24,7 +24,9 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.AlertStatus;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -189,7 +191,7 @@ public class AlertPluginInstanceServiceTest {
                 1, ALART_INSTANCE_CREATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 null, 0, baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.PLUGIN_INSTANCE_ALREADY_EXISTS,
+        assertThrowsServiceException(PluginStatus.PLUGIN_INSTANCE_ALREADY_EXISTS,
                 () -> alertPluginInstanceService.create(user, 1, "test", normalInstanceType, warningType, uiParams));
         when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
         AlertPluginInstance alertPluginInstance =
@@ -200,7 +202,7 @@ public class AlertPluginInstanceServiceTest {
     @Test
     public void testSendAlert() {
         Mockito.when(registryClient.getServerList(RegistryNodeType.ALERT_SERVER)).thenReturn(new ArrayList<>());
-        assertThrowsServiceException(Status.ALERT_SERVER_NOT_EXIST,
+        assertThrowsServiceException(AlertStatus.ALERT_SERVER_NOT_EXIST,
                 () -> alertPluginInstanceService.testSend(1, uiParams));
         AlertSendResponse.AlertSendResponseResult alertResult = new AlertSendResponse.AlertSendResponseResult();
         alertResult.setSuccess(true);
@@ -209,7 +211,7 @@ public class AlertPluginInstanceServiceTest {
         server.setHost("127.0.0.1");
         Mockito.when(registryClient.getServerList(RegistryNodeType.ALERT_SERVER))
                 .thenReturn(Collections.singletonList(server));
-        assertThrowsServiceException(Status.ALERT_TEST_SENDING_FAILED,
+        assertThrowsServiceException(AlertStatus.ALERT_TEST_SENDING_FAILED,
                 () -> alertPluginInstanceService.testSend(1, uiParams));
     }
 
@@ -233,7 +235,7 @@ public class AlertPluginInstanceServiceTest {
         when(alertGroupMapper.selectById(2)).thenReturn(globalAlertGroup);
         when(alertGroupMapper.updateById(Mockito.any())).thenReturn(1);
 
-        assertThrowsServiceException(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED,
+        assertThrowsServiceException(PluginStatus.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED,
                 () -> alertPluginInstanceService.deleteById(user, 1));
 
         when(alertPluginInstanceMapper.deleteById(9)).thenReturn(1);
@@ -250,7 +252,7 @@ public class AlertPluginInstanceServiceTest {
                 ALERT_PLUGIN_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0,
                 baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.SAVE_ERROR,
+        assertThrowsServiceException(BaseStatus.SAVE_ERROR,
                 () -> alertPluginInstanceService.updateById(user, 1, "testUpdate", warningType, uiParams));
 
         when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(1);
