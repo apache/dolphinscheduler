@@ -62,7 +62,6 @@ public class ProjectPreferenceController extends BaseController {
     })
     @PutMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(UPDATE_PROJECT_PREFERENCE_ERROR)
     public Result updateProjectPreference(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "projectPreferences", required = true) String projectPreferences) {
@@ -72,7 +71,6 @@ public class ProjectPreferenceController extends BaseController {
     @Operation(summary = "queryProjectPreferenceByProjectCode", description = "QUERY_PROJECT_PREFERENCE_NOTES")
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROJECT_PREFERENCE_ERROR)
     public Result queryProjectPreferenceByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         return projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
@@ -84,7 +82,6 @@ public class ProjectPreferenceController extends BaseController {
     })
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROJECT_PREFERENCE_STATE_ERROR)
     public Result enableProjectPreference(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "state", required = true) int state) {

@@ -73,7 +73,6 @@ public class QueueController extends BaseController {
     @Operation(summary = "queryList", description = "QUERY_QUEUE_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_QUEUE_LIST_ERROR)
     public Result<List<Queue>> queryList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<Queue> queues = queueService.queryList(loginUser);
         return Result.success(queues);
@@ -96,7 +95,6 @@ public class QueueController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_QUEUE_LIST_ERROR)
     public Result<PageInfo<Queue>> queryQueueListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam("pageNo") Integer pageNo,
                                                         @RequestParam(value = "searchVal", required = false) String searchVal,
@@ -123,7 +121,6 @@ public class QueueController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_QUEUE_ERROR)
     public Result<Queue> createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "queue") String queue,
                                      @RequestParam(value = "queueName") String queueName) {
@@ -147,7 +144,6 @@ public class QueueController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(UPDATE_QUEUE_ERROR)
     public Result<Queue> updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable(value = "id") int id,
                                      @RequestParam(value = "queue") String queue,
@@ -168,7 +164,6 @@ public class QueueController extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_QUEUE_BY_ID_ERROR)
     public Result<Boolean> deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int id) throws Exception {
         queueService.deleteQueueById(loginUser, id);
@@ -190,7 +185,6 @@ public class QueueController extends BaseController {
     })
     @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_QUEUE_ERROR)
     public Result<Boolean> verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "queue") String queue,
                                        @RequestParam(value = "queueName") String queueName) {
