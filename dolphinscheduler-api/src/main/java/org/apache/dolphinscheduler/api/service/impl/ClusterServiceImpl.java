@@ -18,7 +18,10 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.dto.ClusterDto;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ClusterStatus;
+import org.apache.dolphinscheduler.api.enums.v2.K8SStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.service.ClusterService;
@@ -79,14 +82,14 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     @Override
     public Long createCluster(User loginUser, String name, String config, String desc) {
         if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         checkParams(name, config);
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null) {
-            throw new ServiceException(Status.CLUSTER_NAME_EXISTS, name);
+            throw new ServiceException(ClusterStatus.CLUSTER_NAME_EXISTS, name);
         }
 
         Cluster cluster = new Cluster();
@@ -101,7 +104,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         if (clusterMapper.insert(cluster) > 0) {
             return cluster.getCode();
         }
-        throw new ServiceException(Status.CREATE_CLUSTER_ERROR);
+        throw new ServiceException(ClusterStatus.CREATE_CLUSTER_ERROR);
     }
 
     /**
@@ -166,7 +169,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         Cluster cluster = clusterMapper.queryByClusterCode(code);
 
         if (cluster == null) {
-            throw new ServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, code);
+            throw new ServiceException(ClusterStatus.QUERY_CLUSTER_BY_CODE_ERROR, code);
         }
         ClusterDto dto = new ClusterDto();
         BeanUtils.copyProperties(cluster, dto);
@@ -183,7 +186,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Cluster cluster = clusterMapper.queryByClusterName(name);
         if (cluster == null) {
-            throw new ServiceException(Status.QUERY_CLUSTER_BY_NAME_ERROR, name);
+            throw new ServiceException(ClusterStatus.QUERY_CLUSTER_BY_NAME_ERROR, name);
         }
         ClusterDto dto = new ClusterDto();
         BeanUtils.copyProperties(cluster, dto);
@@ -199,21 +202,21 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     @Override
     public void deleteClusterByCode(User loginUser, Long code) {
         if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         Long relatedNamespaceNumber = k8sNamespaceMapper
                 .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
 
         if (relatedNamespaceNumber > 0) {
-            throw new ServiceException(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
+            throw new ServiceException(ClusterStatus.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
         }
 
         int delete = clusterMapper.deleteByCode(code);
         if (delete > 0) {
             return;
         }
-        throw new ServiceException(Status.DELETE_CLUSTER_ERROR);
+        throw new ServiceException(ClusterStatus.DELETE_CLUSTER_ERROR);
     }
 
     /**
@@ -232,23 +235,23 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
                                        String config,
                                        String desc) {
         if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         if (checkDescriptionLength(desc)) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+            throw new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
         }
 
         checkParams(name, config);
 
         Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
         if (clusterExistByName != null && !clusterExistByName.getCode().equals(code)) {
-            throw new ServiceException(Status.CLUSTER_NAME_EXISTS, name);
+            throw new ServiceException(ClusterStatus.CLUSTER_NAME_EXISTS, name);
         }
 
         Cluster clusterExist = clusterMapper.queryByClusterCode(code);
         if (clusterExist == null) {
-            throw new ServiceException(Status.CLUSTER_NOT_EXISTS, name);
+            throw new ServiceException(ClusterStatus.CLUSTER_NOT_EXISTS, name);
         }
 
         if (!Constants.K8S_LOCAL_TEST_CLUSTER_CODE.equals(clusterExist.getCode())
@@ -256,7 +259,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             try {
                 k8sManager.getAndUpdateK8sClient(code, true);
             } catch (Exception e) {
-                throw new ServiceException(Status.K8S_CLIENT_OPS_ERROR, name);
+                throw new ServiceException(K8SStatus.K8S_CLIENT_OPS_ERROR, name);
             }
         }
 
@@ -279,21 +282,21 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     public void verifyCluster(String clusterName) {
 
         if (StringUtils.isEmpty(clusterName)) {
-            throw new ServiceException(Status.CLUSTER_NAME_IS_NULL);
+            throw new ServiceException(ClusterStatus.CLUSTER_NAME_IS_NULL);
         }
 
         Cluster cluster = clusterMapper.queryByClusterName(clusterName);
         if (cluster != null) {
-            throw new ServiceException(Status.CLUSTER_NAME_EXISTS);
+            throw new ServiceException(ClusterStatus.CLUSTER_NAME_EXISTS);
         }
     }
 
     protected void checkParams(String name, String config) {
         if (StringUtils.isEmpty(name)) {
-            throw new ServiceException(Status.CLUSTER_NAME_IS_NULL);
+            throw new ServiceException(ClusterStatus.CLUSTER_NAME_IS_NULL);
         }
         if (StringUtils.isEmpty(config)) {
-            throw new ServiceException(Status.CLUSTER_CONFIG_IS_NULL);
+            throw new ServiceException(ClusterStatus.CLUSTER_CONFIG_IS_NULL);
         }
     }
 

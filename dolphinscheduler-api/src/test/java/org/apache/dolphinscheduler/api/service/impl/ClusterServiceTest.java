@@ -23,7 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.ClusterDto;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ClusterStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -87,22 +88,22 @@ public class ClusterServiceTest {
 
     @Test
     public void testCreateCluster() {
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> {
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM, () -> {
             User loginUser = getGeneralUser();
             clusterService.createCluster(loginUser, clusterName, getConfig(), getDesc());
         });
 
-        assertThrowsServiceException(Status.CLUSTER_CONFIG_IS_NULL, () -> {
+        assertThrowsServiceException(ClusterStatus.CLUSTER_CONFIG_IS_NULL, () -> {
             User loginUser = getAdminUser();
             clusterService.createCluster(loginUser, clusterName, "", getDesc());
         });
 
         final User loginUser = getAdminUser();
-        assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL,
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_IS_NULL,
                 () -> clusterService.createCluster(loginUser, "", getConfig(), getDesc()));
 
         when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
-        assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS,
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_EXISTS,
                 () -> clusterService.createCluster(loginUser, clusterName, getConfig(), getDesc()));
 
         when(clusterMapper.insert(Mockito.any(Cluster.class))).thenReturn(1);
@@ -113,26 +114,28 @@ public class ClusterServiceTest {
     @Test
     public void testCheckParams() {
         assertDoesNotThrow(() -> clusterService.checkParams(clusterName, getConfig()));
-        assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL, () -> clusterService.checkParams("", getConfig()));
-        assertThrowsServiceException(Status.CLUSTER_CONFIG_IS_NULL, () -> clusterService.checkParams(clusterName, ""));
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_IS_NULL,
+                () -> clusterService.checkParams("", getConfig()));
+        assertThrowsServiceException(ClusterStatus.CLUSTER_CONFIG_IS_NULL,
+                () -> clusterService.checkParams(clusterName, ""));
     }
 
     @Test
     public void testUpdateClusterByCode() {
         final User loginUser = getGeneralUser();
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> clusterService.updateClusterByCode(loginUser, 1L, clusterName, getConfig(), getDesc()));
 
         final User adminUser = getAdminUser();
-        assertThrowsServiceException(Status.CLUSTER_CONFIG_IS_NULL,
+        assertThrowsServiceException(ClusterStatus.CLUSTER_CONFIG_IS_NULL,
                 () -> clusterService.updateClusterByCode(adminUser, 1L, clusterName, "", getDesc()));
-        assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL,
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_IS_NULL,
                 () -> clusterService.updateClusterByCode(adminUser, 1L, "", getConfig(), getDesc()));
-        assertThrowsServiceException(Status.CLUSTER_NOT_EXISTS,
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NOT_EXISTS,
                 () -> clusterService.updateClusterByCode(adminUser, 2L, clusterName, getConfig(), getDesc()));
 
         when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
-        assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS,
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_EXISTS,
                 () -> clusterService.updateClusterByCode(adminUser, 2L, clusterName, getConfig(), getDesc()));
 
         when(clusterMapper.updateById(Mockito.any(Cluster.class))).thenReturn(1);
@@ -162,7 +165,7 @@ public class ClusterServiceTest {
     @Test
     public void testQueryClusterByName() {
         when(clusterMapper.queryByClusterName(clusterName)).thenReturn(null);
-        assertThrowsServiceException(Status.QUERY_CLUSTER_BY_NAME_ERROR,
+        assertThrowsServiceException(ClusterStatus.QUERY_CLUSTER_BY_NAME_ERROR,
                 () -> clusterService.queryClusterByName(clusterName));
 
         when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
@@ -173,7 +176,8 @@ public class ClusterServiceTest {
     @Test
     public void testQueryClusterByCode() {
         when(clusterMapper.queryByClusterCode(1L)).thenReturn(null);
-        assertThrowsServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, () -> clusterService.queryClusterByCode(1L));
+        assertThrowsServiceException(ClusterStatus.QUERY_CLUSTER_BY_CODE_ERROR,
+                () -> clusterService.queryClusterByCode(1L));
 
         when(clusterMapper.queryByClusterCode(1L)).thenReturn(getCluster());
         ClusterDto clusterDto = clusterService.queryClusterByCode(1L);
@@ -182,7 +186,7 @@ public class ClusterServiceTest {
 
     @Test
     public void testDeleteClusterByCode() {
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> {
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM, () -> {
             User loginUser = getGeneralUser();
             clusterService.deleteClusterByCode(loginUser, 1L);
         });
@@ -192,16 +196,17 @@ public class ClusterServiceTest {
         assertDoesNotThrow(() -> clusterService.deleteClusterByCode(adminUser, 1L));
 
         when(k8sNamespaceMapper.selectCount(Mockito.any())).thenReturn(1L);
-        assertThrowsServiceException(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS,
+        assertThrowsServiceException(ClusterStatus.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS,
                 () -> clusterService.deleteClusterByCode(adminUser, 1L));
     }
 
     @Test
     public void testVerifyCluster() {
-        assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL, () -> clusterService.verifyCluster(""));
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_IS_NULL, () -> clusterService.verifyCluster(""));
 
         when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
-        assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS, () -> clusterService.verifyCluster(clusterName));
+        assertThrowsServiceException(ClusterStatus.CLUSTER_NAME_EXISTS,
+                () -> clusterService.verifyCluster(clusterName));
     }
 
     private Cluster getCluster() {
