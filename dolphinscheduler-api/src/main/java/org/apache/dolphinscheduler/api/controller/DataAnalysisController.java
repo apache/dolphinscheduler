@@ -17,14 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.COMMAND_STATE_COUNT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_INSTANCE_STATE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUEUE_COUNT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_INSTANCE_STATE_COUNT_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
@@ -70,7 +63,6 @@ public class DataAnalysisController extends BaseController {
     })
     @GetMapping(value = "/task-state-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_INSTANCE_STATE_COUNT_ERROR)
     public Result<TaskInstanceCountVo> getTaskInstanceStateCount(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestParam(value = "startDate", required = false) String startDate,
                                                                  @RequestParam(value = "endDate", required = false) String endDate,
@@ -90,7 +82,6 @@ public class DataAnalysisController extends BaseController {
     })
     @GetMapping(value = "/process-state-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COUNT_PROCESS_INSTANCE_STATE_ERROR)
     public Result<WorkflowInstanceCountVo> getWorkflowInstanceStateCount(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                          @RequestParam(value = "startDate", required = false) String startDate,
                                                                          @RequestParam(value = "endDate", required = false) String endDate,
@@ -108,7 +99,6 @@ public class DataAnalysisController extends BaseController {
     })
     @GetMapping(value = "/define-user-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COUNT_PROCESS_DEFINITION_USER_ERROR)
     public Result<WorkflowDefinitionCountVo> countDefinitionByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                    @RequestParam(value = "projectCode", required = false) Long projectCode) {
         if (projectCode == null) {
@@ -126,7 +116,6 @@ public class DataAnalysisController extends BaseController {
     @Operation(summary = "countCommandState", description = "COUNT_COMMAND_STATE_NOTES")
     @GetMapping(value = "/command-state-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(COMMAND_STATE_COUNT_ERROR)
     public Result<List<CommandStateCount>> countCommandState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         List<CommandStateCount> commandStateCounts = dataAnalysisService.countCommandState(loginUser);
@@ -142,7 +131,6 @@ public class DataAnalysisController extends BaseController {
     @Operation(summary = "countQueueState", description = "COUNT_QUEUE_STATE_NOTES")
     @GetMapping(value = "/queue-count")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUEUE_COUNT_ERROR)
     public Result<Map<String, Integer>> countQueueState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         Map<String, Integer> stringIntegerMap = dataAnalysisService.countQueueState(loginUser);

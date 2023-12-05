@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_AZURE_RESOURCE_GROUP_ERROR;
-
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.CloudService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -64,7 +59,6 @@ public class CloudController extends BaseController {
     @Operation(summary = "listDataFactory", description = "LIST_DATA_FACTORY")
     @GetMapping(value = "/azure/datafactory/factories")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_AZURE_DATA_FACTORY_ERROR)
     public Result listDataFactory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> factoryNames = cloudService.listDataFactory(loginUser);
         return success(Status.SUCCESS.getMsg(), factoryNames);
@@ -79,7 +73,6 @@ public class CloudController extends BaseController {
     @Operation(summary = "listResourceGroup", description = "LIST_RESOURCE_GROUP")
     @GetMapping(value = "/azure/datafactory/resourceGroups")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_AZURE_RESOURCE_GROUP_ERROR)
     public Result listResourceGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> resourceGroupNames = cloudService.listResourceGroup(loginUser);
         return success(Status.SUCCESS.getMsg(), resourceGroupNames);
@@ -94,7 +87,6 @@ public class CloudController extends BaseController {
     @Operation(summary = "listPipeline", description = "LIST_PIPELINE")
     @GetMapping(value = "/azure/datafactory/pipelines")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_AZURE_DATA_FACTORY_PIPELINE_ERROR)
     public Result listPipeline(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @RequestParam("factoryName") String factoryName,
                                @RequestParam("resourceGroupName") String resourceGroupName) {
