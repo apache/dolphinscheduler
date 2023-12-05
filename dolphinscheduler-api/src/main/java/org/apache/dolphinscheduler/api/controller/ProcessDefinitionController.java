@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -576,7 +577,7 @@ public class ProcessDefinitionController extends BaseController {
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @PathVariable("code") long workflowDefinitionCode) {
         processDefinitionService.deleteProcessDefinitionByCode(loginUser, workflowDefinitionCode);
-        return new Result(Status.SUCCESS);
+        return new Result(BaseStatus.SUCCESS);
     }
 
     /**

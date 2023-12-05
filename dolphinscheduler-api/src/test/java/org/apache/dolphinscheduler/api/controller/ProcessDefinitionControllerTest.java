@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -46,6 +47,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletResponse;
+import oshi.driver.linux.proc.ProcessStat;
 
 /**
  * process definition controller test
@@ -136,7 +138,7 @@ public class ProcessDefinitionControllerTest {
                 .thenReturn(result);
 
         Result response = processDefinitionController.verifyProcessDefinitionName(user, projectCode, name, 0);
-        Assertions.assertTrue(response.isStatus(Status.PROCESS_DEFINITION_NAME_EXIST));
+        Assertions.assertTrue(response.isStatus(ProcessStatus.PROCESS_DEFINITION_NAME_EXIST));
     }
 
     @Test

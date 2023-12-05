@@ -17,21 +17,18 @@
 
 package org.apache.dolphinscheduler.api.enums.v2;
 
-import java.util.Locale;
-
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum BaseStatus implements Status {
+import java.util.Locale;
 
-    SUCCESS(0, "success", "成功"),
-    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
-    REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
+public enum EnvironmentStatus implements Status {
+    ENVIRONMENT_NAME_EXISTS(120002, "this environment name [{0}] already exists", "环境名称[{0}]已经存在"),
     ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    BaseStatus(int code, String enMsg, String zhMsg) {
+    EnvironmentStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

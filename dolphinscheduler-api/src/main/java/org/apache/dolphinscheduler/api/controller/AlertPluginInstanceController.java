@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -201,7 +202,7 @@ public class AlertPluginInstanceController extends BaseController {
         boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(alertInstanceName);
         if (exist) {
             log.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
-            return Result.error(Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
+            return Result.error(PluginStatus.PLUGIN_INSTANCE_ALREADY_EXISTS);
         } else {
             return Result.success();
         }

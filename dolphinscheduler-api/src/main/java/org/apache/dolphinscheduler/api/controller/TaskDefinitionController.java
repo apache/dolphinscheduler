@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -262,7 +263,7 @@ public class TaskDefinitionController extends BaseController {
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @PathVariable(value = "code") long code) {
         taskDefinitionService.deleteTaskDefinitionByCode(loginUser, code);
-        return new Result(Status.SUCCESS);
+        return new Result(BaseStatus.SUCCESS);
     }
 
     /**

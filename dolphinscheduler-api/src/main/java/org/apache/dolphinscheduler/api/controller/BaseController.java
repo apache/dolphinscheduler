@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_FORW
 import static org.apache.dolphinscheduler.common.constants.Constants.HTTP_X_REAL_IP;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -49,10 +50,10 @@ public class BaseController {
      */
     public void checkPageParams(int pageNo, int pageSize) throws ServiceException {
         if (pageNo <= 0) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.PAGE_NUMBER);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.PAGE_NUMBER);
         }
         if (pageSize <= 0) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.PAGE_SIZE);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.PAGE_SIZE);
         }
     }
 

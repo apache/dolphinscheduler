@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -242,7 +243,7 @@ public class SchedulerController extends BaseController {
                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                      @PathVariable("id") Integer id) {
         schedulerService.deleteSchedulesById(loginUser, id);
-        return new Result(Status.SUCCESS);
+        return new Result(BaseStatus.SUCCESS);
     }
 
     /**
