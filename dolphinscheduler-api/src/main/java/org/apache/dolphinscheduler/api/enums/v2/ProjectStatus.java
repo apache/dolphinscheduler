@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.enums.v2;
 
-import org.springframework.context.i18n.LocaleContextHolder;
-
 import java.util.Locale;
 
+import org.springframework.context.i18n.LocaleContextHolder;
+
 public enum ProjectStatus implements Status {
+
     PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
     ;
     private final int code;
