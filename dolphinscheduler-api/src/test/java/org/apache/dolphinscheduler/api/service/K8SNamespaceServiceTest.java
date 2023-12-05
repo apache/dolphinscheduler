@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.K8SStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -109,16 +111,16 @@ public class K8SNamespaceServiceTest {
         Map<String, Object> result =
                 k8sNamespaceService.createK8sNamespace(getLoginUser(), null, clusterCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
         // k8s is null
         result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, null);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
         // correct
         Mockito.when(clusterMapper.queryByClusterCode(Mockito.anyLong())).thenReturn(getCluster());
         result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, clusterCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -129,22 +131,22 @@ public class K8SNamespaceServiceTest {
         // namespace null
         Result result = k8sNamespaceService.verifyNamespaceK8s(null, clusterCode);
         logger.info(result.toString());
-        Assertions.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
+        Assertions.assertEquals(result.getCode().intValue(), BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         // k8s null
         result = k8sNamespaceService.verifyNamespaceK8s(namespace, null);
         logger.info(result.toString());
-        Assertions.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
+        Assertions.assertEquals(result.getCode().intValue(), BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         // exist
         result = k8sNamespaceService.verifyNamespaceK8s(namespace, clusterCode);
         logger.info(result.toString());
-        Assertions.assertEquals(result.getCode().intValue(), Status.K8S_NAMESPACE_EXIST.getCode());
+        Assertions.assertEquals(result.getCode().intValue(), K8SStatus.K8S_NAMESPACE_EXIST.getCode());
 
         // not exist
         result = k8sNamespaceService.verifyNamespaceK8s(namespace, 9999L);
         logger.info(result.toString());
-        Assertions.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
+        Assertions.assertEquals(result.getCode().intValue(), BaseStatus.SUCCESS.getCode());
     }
 
     @Test
@@ -154,7 +156,7 @@ public class K8SNamespaceServiceTest {
 
         Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -173,7 +175,7 @@ public class K8SNamespaceServiceTest {
         // test non-admin user
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setId(3);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2));
     }
 
@@ -193,7 +195,7 @@ public class K8SNamespaceServiceTest {
         // test non-admin user
         loginUser.setId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 3));
     }
 

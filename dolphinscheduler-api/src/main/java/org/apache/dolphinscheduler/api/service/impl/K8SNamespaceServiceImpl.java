@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ClusterStatus;
+import org.apache.dolphinscheduler.api.enums.v2.K8SStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
@@ -81,7 +84,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         Result result = new Result();
         if (!isAdmin(loginUser)) {
             log.warn("Only admin can query namespace list, current login user name:{}.", loginUser.getUserName());
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -94,7 +97,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         pageInfo.setTotal(count);
         pageInfo.setTotalList(k8sNamespaceList.getRecords());
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -111,31 +114,31 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     public Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         if (StringUtils.isEmpty(namespace)) {
             log.warn("Parameter namespace is empty.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.NAMESPACE);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.NAMESPACE);
             return result;
         }
 
         if (clusterCode == null) {
             log.warn("Parameter clusterCode is null.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.CLUSTER);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.CLUSTER);
             return result;
         }
 
         if (checkNamespaceExistInDb(namespace, clusterCode)) {
             log.warn("K8S namespace already exists.");
-            putMsg(result, Status.K8S_NAMESPACE_EXIST, namespace, clusterCode);
+            putMsg(result, K8SStatus.K8S_NAMESPACE_EXIST, namespace, clusterCode);
             return result;
         }
 
         Cluster cluster = clusterMapper.queryByClusterCode(clusterCode);
         if (cluster == null) {
             log.error("Cluster does not exist, clusterCode:{}", clusterCode);
-            putMsg(result, Status.CLUSTER_NOT_EXISTS, namespace, clusterCode);
+            putMsg(result, ClusterStatus.CLUSTER_NOT_EXISTS, namespace, clusterCode);
             return result;
         }
 
@@ -147,7 +150,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             log.error("Generate cluster code error.", e);
         }
         if (code == 0L) {
-            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating cluster code");
+            putMsg(result, BaseStatus.INTERNAL_SERVER_ERROR_ARGS, "Error generating cluster code");
             return result;
         }
 
@@ -166,14 +169,14 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
                 k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj);
             } catch (Exception e) {
                 log.error("Namespace create to k8s error", e);
-                putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
+                putMsg(result, K8SStatus.K8S_CLIENT_OPS_ERROR, e.getMessage());
                 return result;
             }
         }
 
         k8sNamespaceMapper.insert(k8sNamespaceObj);
         log.info("K8s namespace create complete, namespace:{}.", k8sNamespaceObj.getNamespace());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -190,23 +193,23 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         Result<Object> result = new Result<>();
         if (StringUtils.isEmpty(namespace)) {
             log.warn("Parameter namespace is empty.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.NAMESPACE);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.NAMESPACE);
             return result;
         }
 
         if (clusterCode == null) {
             log.warn("Parameter clusterCode is null.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.CLUSTER);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.CLUSTER);
             return result;
         }
 
         if (checkNamespaceExistInDb(namespace, clusterCode)) {
             log.warn("K8S namespace already exists.");
-            putMsg(result, Status.K8S_NAMESPACE_EXIST, namespace, clusterCode);
+            putMsg(result, K8SStatus.K8S_NAMESPACE_EXIST, namespace, clusterCode);
             return result;
         }
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -221,19 +224,19 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     public Map<String, Object> deleteNamespaceById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         K8sNamespace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
         if (k8sNamespaceObj == null) {
             log.error("K8s namespace does not exist, namespaceId:{}.", id);
-            putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
+            putMsg(result, K8SStatus.K8S_NAMESPACE_NOT_EXIST, id);
             return result;
         }
 
         k8sNamespaceMapper.deleteById(id);
         log.info("K8s namespace delete complete, namespace:{}.", k8sNamespaceObj.getNamespace());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -258,7 +261,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     public Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         // query all namespace list, this auth does not like project
         List<K8sNamespace> namespaceList = k8sNamespaceMapper.selectList(null);
@@ -270,7 +273,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
             resultList = getUnauthorizedNamespaces(namespaceSet, authedProjectList);
         }
         result.put(Constants.DATA_LIST, resultList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -286,12 +289,12 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         Map<String, Object> result = new HashMap<>();
 
         if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         List<K8sNamespace> namespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
         result.put(Constants.DATA_LIST, namespaces);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
