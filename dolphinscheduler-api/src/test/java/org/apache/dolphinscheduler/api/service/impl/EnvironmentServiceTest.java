@@ -26,6 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.EnvironmentStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -104,19 +106,19 @@ public class EnvironmentServiceTest {
                 loginUser.getId(), ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> environmentService
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM, () -> environmentService
                 .createEnvironment(loginUser, environmentName, getConfig(), getDesc(), workerGroups));
 
         User adminUser = getAdminUser();
-        assertThrowsServiceException(Status.ENVIRONMENT_CONFIG_IS_NULL,
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_CONFIG_IS_NULL,
                 () -> environmentService.createEnvironment(adminUser, environmentName, "", getDesc(), workerGroups));
-        assertThrowsServiceException(Status.ENVIRONMENT_NAME_IS_NULL,
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_NAME_IS_NULL,
                 () -> environmentService.createEnvironment(adminUser, "", getConfig(), getDesc(), workerGroups));
-        assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
                 () -> environmentService.createEnvironment(adminUser, environmentName, getConfig(), getDesc(), "test"));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        assertThrowsServiceException(Status.ENVIRONMENT_NAME_EXISTS, () -> environmentService
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_NAME_EXISTS, () -> environmentService
                 .createEnvironment(adminUser, environmentName, getConfig(), getDesc(), workerGroups));
 
         when(environmentMapper.insert(any(Environment.class))).thenReturn(1);
@@ -128,7 +130,7 @@ public class EnvironmentServiceTest {
 
     @Test
     public void testCheckParams() {
-        assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
                 () -> environmentService.checkParams(environmentName, getConfig(), "test"));
     }
 
@@ -139,21 +141,21 @@ public class EnvironmentServiceTest {
                 ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null, 0,
                 baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> environmentService
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM, () -> environmentService
                 .updateEnvironmentByCode(loginUser, 1L, environmentName, getConfig(), getDesc(), workerGroups));
 
         final User adminUser = getAdminUser();
-        assertThrowsServiceException(Status.ENVIRONMENT_CONFIG_IS_NULL, () -> environmentService
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_CONFIG_IS_NULL, () -> environmentService
                 .updateEnvironmentByCode(adminUser, 1L, environmentName, "", getDesc(), workerGroups));
 
-        assertThrowsServiceException(Status.ENVIRONMENT_NAME_IS_NULL, () -> environmentService
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_NAME_IS_NULL, () -> environmentService
                 .updateEnvironmentByCode(adminUser, 1L, "", getConfig(), getDesc(), workerGroups));
 
-        assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, () -> environmentService
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_WORKER_GROUPS_IS_INVALID, () -> environmentService
                 .updateEnvironmentByCode(adminUser, 1L, environmentName, getConfig(), getDesc(), "test"));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        assertThrowsServiceException(Status.ENVIRONMENT_NAME_EXISTS, () -> environmentService
+        assertThrowsServiceException(EnvironmentStatus.ENVIRONMENT_NAME_EXISTS, () -> environmentService
                 .updateEnvironmentByCode(adminUser, 2L, environmentName, getConfig(), getDesc(), workerGroups));
 
         when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(1);
