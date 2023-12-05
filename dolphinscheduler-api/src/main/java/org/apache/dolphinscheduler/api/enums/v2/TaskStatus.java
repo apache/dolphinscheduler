@@ -21,22 +21,20 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum BaseStatus implements Status {
+public enum TaskStatus implements Status {
 
-    SUCCESS(0, "success", "成功"),
-    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
-    REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
-    MASTER_NOT_EXISTS(10025, "master does not exist", "无可用master节点"),
-    SAVE_ERROR(10136, "save error", "保存错误"),
-    CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
-    CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
-    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),;
+    TASK_TIMEOUT_PARAMS_ERROR(10002, "task timeout parameter is not valid", "任务超时参数无效"),
+    EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
+            "请先保存后再执行"),
+    START_TASK_INSTANCE_ERROR(50059, "start task instance error", "运行任务流实例错误"),
+    TASK_PARALLELISM_PARAMS_ERROR(50080, "task parallelism parameter is not valid", "任务并行度参数无效"),
+    TASK_COMPLEMENT_DATA_DATE_ERROR(50081, "The range of date for complementing date is not valid", "补数选择的日期范围无效"),
+    TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    BaseStatus(int code, String enMsg, String zhMsg) {
+    TaskStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

@@ -29,7 +29,10 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
+import org.apache.dolphinscheduler.api.enums.v2.WorkFlowStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.ExecuteClient;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -276,7 +279,7 @@ public class ExecuteFunctionServiceTest {
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
     }
@@ -303,7 +306,7 @@ public class ExecuteFunctionServiceTest {
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
     }
@@ -329,7 +332,7 @@ public class ExecuteFunctionServiceTest {
                     false,
                     ExecutionOrder.DESC_ORDER);
         } catch (ServiceException e) {
-            Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
+            Assertions.assertEquals(ProcessStatus.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
     }
 
@@ -413,7 +416,7 @@ public class ExecuteFunctionServiceTest {
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
 
@@ -439,7 +442,7 @@ public class ExecuteFunctionServiceTest {
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
 
@@ -465,7 +468,7 @@ public class ExecuteFunctionServiceTest {
                 false,
                 ExecutionOrder.DESC_ORDER);
 
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(2)).createCommand(any(Command.class));
     }
 
@@ -491,7 +494,7 @@ public class ExecuteFunctionServiceTest {
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
     }
@@ -536,7 +539,7 @@ public class ExecuteFunctionServiceTest {
                 processDefinitionVersion)).thenReturn(processDefinition);
         Map<String, Object> result =
                 executorService.execute(loginUser, projectCode, processInstanceId, ExecuteType.REPEAT_RUNNING);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -558,7 +561,7 @@ public class ExecuteFunctionServiceTest {
                 ComplementDependentMode.OFF_MODE, null,
                 false,
                 ExecutionOrder.DESC_ORDER);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -575,7 +578,7 @@ public class ExecuteFunctionServiceTest {
                 .thenReturn(processDefinitionList);
 
         Map<String, Object> result = executorService.startCheckByProcessDefinedCode(1L);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     private List<Server> getMasterServersList() {
@@ -609,7 +612,7 @@ public class ExecuteFunctionServiceTest {
 
     private Map<String, Object> checkProjectAndAuth() {
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.STATUS, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -672,24 +675,25 @@ public class ExecuteFunctionServiceTest {
         when(processInstanceMock.getState().isFinished()).thenReturn(false);
         WorkflowExecuteResponse responseInstanceIsNotFinished =
                 executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
-        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED.getCode(),
+        Assertions.assertEquals(WorkFlowStatus.WORKFLOW_INSTANCE_IS_NOT_FINISHED.getCode(),
                 responseInstanceIsNotFinished.getCode());
 
         when(processInstanceMock.getState().isFinished()).thenReturn(true);
         WorkflowExecuteResponse responseStartNodeListError =
                 executorService.executeTask(loginUser, projectCode, processInstanceId, "1234567870,", taskDependType);
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), responseStartNodeListError.getCode());
+        Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                responseStartNodeListError.getCode());
 
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(null);
         WorkflowExecuteResponse responseNotDefineTask =
                 executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
-        Assertions.assertEquals(Status.EXECUTE_NOT_DEFINE_TASK.getCode(), responseNotDefineTask.getCode());
+        Assertions.assertEquals(TaskStatus.EXECUTE_NOT_DEFINE_TASK.getCode(), responseNotDefineTask.getCode());
 
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(Mockito.anyLong())).thenReturn(1);
         Mockito.when(commandService.verifyIsNeedCreateCommand(any())).thenReturn(true);
         WorkflowExecuteResponse responseSuccess =
                 executorService.executeTask(loginUser, projectCode, processInstanceId, startNodeList, taskDependType);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), responseSuccess.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), responseSuccess.getCode());
 
     }
 

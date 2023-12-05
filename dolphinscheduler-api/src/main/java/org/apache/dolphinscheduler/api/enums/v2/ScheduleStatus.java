@@ -21,22 +21,17 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum BaseStatus implements Status {
+public enum ScheduleStatus implements Status {
 
-    SUCCESS(0, "success", "成功"),
-    INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
-    REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
-    MASTER_NOT_EXISTS(10025, "master does not exist", "无可用master节点"),
-    SAVE_ERROR(10136, "save error", "保存错误"),
-    CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
-    CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
-    ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
-    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),;
+    SCHEDULE_CRON_NOT_EXISTS(10022, "scheduler crontab {0} does not exist", "调度配置定时表达式[{0}]不存在"),
+    SCHEDULE_CRON_ONLINE_FORBID_UPDATE(10023, "online status does not allow update operations", "调度配置上线状态不允许修改"),
+    SCHEDULE_CRON_CHECK_FAILED(10024, "scheduler crontab expression validation failure: {0}", "调度配置定时表达式验证失败: {0}"),
+    SCHEDULE_TIME_NUMBER_EXCEED(1400003, "The number of complement dates exceed 100.", "补数日期个数超过100"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    BaseStatus(int code, String enMsg, String zhMsg) {
+    ScheduleStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
