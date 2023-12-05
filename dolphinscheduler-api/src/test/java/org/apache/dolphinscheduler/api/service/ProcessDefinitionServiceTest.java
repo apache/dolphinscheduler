@@ -36,6 +36,9 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -244,7 +247,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project not found
         try {
-            doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
+            doThrow(new ServiceException(ProjectStatus.PROJECT_NOT_EXIST)).when(projectService)
                     .checkProjectAndAuthThrowException(user, projectCode, WORKFLOW_DEFINITION);
             processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, "", "", 1, 5, 0);
         } catch (ServiceException serviceException) {
@@ -489,7 +492,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project check auth fail
         when(processDefinitionDao.queryByCode(6L)).thenReturn(Optional.of(getProcessDefinition()));
-        doThrow(new ServiceException(Status.PROJECT_NOT_FOUND)).when(projectService)
+        doThrow(new ServiceException(ProjectStatus.PROJECT_NOT_FOUND)).when(projectService)
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION_DELETE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 6L));
@@ -883,7 +886,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project permission error
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
+        doThrow(new ServiceException(UserStatus.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
@@ -892,7 +895,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // description too long
         workflowCreateRequest.setDescription(taskDefinitionJson);
-        doThrow(new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
+        doThrow(new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
@@ -939,7 +942,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project permission error
         when(projectMapper.queryByName(project.getName())).thenReturn(project);
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
+        doThrow(new ServiceException(UserStatus.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
                 .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.filterProcessDefinition(user, workflowFilterRequest));
@@ -958,7 +961,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionMapper.queryByCode(processDefinitionCode))
                 .thenReturn(this.getProcessDefinition());
         when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject(projectCode));
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
+        doThrow(new ServiceException(UserStatus.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
                 .when(projectService)
                 .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
@@ -999,7 +1002,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         processDefinition = this.getProcessDefinition();
         when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject(projectCode));
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
+        doThrow(new ServiceException(UserStatus.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode))
                 .when(projectService)
                 .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
@@ -1009,7 +1012,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // error description too long
         workflowUpdateRequest.setDescription(taskDefinitionJson);
-        doThrow(new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
+        doThrow(new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR)).when(projectService)
                 .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_UPDATE);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateSingleProcessDefinition(user, processDefinitionCode, workflowUpdateRequest));

@@ -31,6 +31,7 @@ public enum BaseStatus implements Status {
     CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
     DATA_IS_NOT_VALID(50017, "data {0} not valid", "数据[{0}]无效"),
     DATA_IS_NULL(50018, "data {0} is null", "数据[{0}]不能为空"),
+    MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
     CREATE_ACCESS_TOKEN_ERROR(70010, "create access token error", "创建访问token错误"),
     ACCESS_TOKEN_NOT_EXIST(70015, "access token not exist, tokenId {0}", "访问token不存在, {0}"),
     NEGTIVE_SIZE_NUMBER_ERROR(80002, "query size number error", "查询size错误"),

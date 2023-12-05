@@ -30,6 +30,7 @@ public enum TaskStatus implements Status {
     TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
     EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
+    TASK_DEFINE_NOT_EXIST(50030, "task definition [{0}] does not exist", "任务定义[{0}]不存在"),
     START_TASK_INSTANCE_ERROR(50059, "start task instance error", "运行任务流实例错误"),
     TASK_PARALLELISM_PARAMS_ERROR(50080, "task parallelism parameter is not valid", "任务并行度参数无效"),
     TASK_COMPLEMENT_DATA_DATE_ERROR(50081, "The range of date for complementing date is not valid", "补数选择的日期范围无效"),

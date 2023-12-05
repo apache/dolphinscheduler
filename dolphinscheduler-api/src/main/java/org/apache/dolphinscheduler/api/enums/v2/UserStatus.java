@@ -24,6 +24,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 public enum UserStatus implements Status {
 
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
+    USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
     ;
     private final int code;
     private final String enMsg;

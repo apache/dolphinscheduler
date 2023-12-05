@@ -26,6 +26,7 @@ public enum DataSourceStatus implements Status {
     DATASOURCE_EXIST(10015, "data source name already exists", "数据源名称已存在"),
     QUERY_DATASOURCE_ERROR(10035, "query datasource error", "查询数据源错误"),
     DATASOURCE_CONNECT_FAILED(10016, "data source connection failed", "建立数据源连接失败"),
+    DATASOURCE_NAME_ILLEGAL(10172, "datasource name illegal", "数据源名称不合法"),
     GET_DATASOURCE_TABLES_ERROR(1200018, "get datasource tables error", "获取数据源表列表错误"),;
     private final int code;
     private final String enMsg;
