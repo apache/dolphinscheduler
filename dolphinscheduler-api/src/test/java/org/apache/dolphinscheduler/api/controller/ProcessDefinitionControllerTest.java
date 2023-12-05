@@ -47,6 +47,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletResponse;
+import oshi.driver.linux.proc.ProcessStat;
 
 /**
  * process definition controller test
