@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_PREFERENCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR;
-
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectPreferenceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
