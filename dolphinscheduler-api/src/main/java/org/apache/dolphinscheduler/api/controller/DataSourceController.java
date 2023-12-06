@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -302,7 +302,7 @@ public class DataSourceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result<Object> getKerberosStartupState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
-        return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
+        return success(BaseStatus.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
 
     @Operation(summary = "tables", description = "GET_DATASOURCE_TABLES_NOTES")
