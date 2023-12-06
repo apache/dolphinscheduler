@@ -32,9 +32,9 @@ public enum BaseStatus implements Status {
     NAME_EXIST(10135, "name {0} already exists", "名称[{0}]已存在"),
     SAVE_ERROR(10136, "save error", "保存错误"),
     CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
+    STATE_CODE_ERROR(10212, "state inconsistency or state and code not pair", "状态码前后不一致或状态码和code不匹配"),
     DATA_IS_NOT_VALID(50017, "data {0} not valid", "数据[{0}]无效"),
     DATA_IS_NULL(50018, "data {0} is null", "数据[{0}]不能为空"),
-
     MAIN_TABLE_USING_VERSION(50053, "the version that the master table is using", "主表正在使用该版本"),
     DELETE_EDGE_ERROR(50055, "delete edge error", "删除工作流任务连接线错误"),
     S3_CANNOT_RENAME(60003, "directory cannot be renamed", "S3无法重命名文件夹"),
