@@ -80,9 +80,7 @@ import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowStateEvent;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
@@ -467,12 +465,13 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
      * release task group
      *
      */
-    public void releaseTaskGroup(TaskInstance taskInstance) throws InterruptedException {
+    public void releaseTaskGroup(TaskInstance taskInstance) {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         // todo: use Integer
         if (taskInstance.getTaskGroupId() <= 0) {
             log.info("The current TaskInstance: {} doesn't use taskGroup, no need to release taskGroup",
                     taskInstance.getName());
+            return;
         }
         TaskInstance nextTaskInstance = processService.releaseTaskGroup(taskInstance);
         if (nextTaskInstance == null) {
@@ -1349,9 +1348,11 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 TaskExecutionStatus state = existTaskInstance.getState();
                 if (state == TaskExecutionStatus.RUNNING_EXECUTION
                         || state == TaskExecutionStatus.DISPATCH
-                        || state == TaskExecutionStatus.SUBMITTED_SUCCESS) {
+                        || state == TaskExecutionStatus.SUBMITTED_SUCCESS
+                        || state == TaskExecutionStatus.DELAY_EXECUTION) {
                     // try to take over task instance
                     if (state != TaskExecutionStatus.SUBMITTED_SUCCESS
+                            && state != TaskExecutionStatus.DELAY_EXECUTION
                             && tryToTakeOverTaskInstance(existTaskInstance)) {
                         log.info("Success take over task {}", existTaskInstance.getName());
                         continue;
@@ -1359,6 +1360,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         // set the task instance state to fault tolerance
                         existTaskInstance.setFlag(Flag.NO);
                         existTaskInstance.setState(TaskExecutionStatus.NEED_FAULT_TOLERANCE);
+                        releaseTaskGroup(existTaskInstance);
+
                         validTaskMap.remove(existTaskInstance.getTaskCode());
                         taskInstanceDao.updateById(existTaskInstance);
                         existTaskInstance = cloneTolerantTaskInstance(existTaskInstance);
@@ -1446,12 +1449,12 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             ITaskInstanceOperator iTaskInstanceOperator =
                     SingletonJdkDynamicRpcClientProxyFactory
                             .getProxyClient(taskInstance.getHost(), ITaskInstanceOperator.class);
-            UpdateWorkflowHostResponse updateWorkflowHostResponse = iTaskInstanceOperator.updateWorkflowInstanceHost(
+            UpdateWorkflowHostResponse response = iTaskInstanceOperator.updateWorkflowInstanceHost(
                     new UpdateWorkflowHostRequest(taskInstance.getId(), masterConfig.getMasterAddress()));
-            if (!updateWorkflowHostResponse.isSuccess()) {
+            if (!response.isSuccess()) {
                 log.error(
-                        "Takeover TaskInstance failed, receive a failed response from worker: {}, will try to create a new TaskInstance",
-                        taskInstance.getHost());
+                        "Takeover TaskInstance failed, receive a failed response: {} from worker: {}, will try to create a new TaskInstance",
+                        response, taskInstance.getHost());
                 return false;
             }
 
