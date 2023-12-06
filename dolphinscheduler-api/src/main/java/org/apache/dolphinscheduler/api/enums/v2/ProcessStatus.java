@@ -64,6 +64,8 @@ public enum ProcessStatus implements Status {
             "工作流实例[{0}]正在执行命令，请稍等..."),
     PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE(50010, "process instance {0} is not sub process instance",
             "工作流实例[{0}]不是子工作流实例"),
+    BATCH_START_PROCESS_INSTANCE_ERROR(50014, "batch start process instance error: {0}", "批量运行工作流实例错误: {0}"),
+    PROCESS_INSTANCE_ERROR(50014, "process instance delete error: {0}", "工作流实例删除[{0}]错误"),
     START_PROCESS_INSTANCE_ERROR(50014, "start process instance error", "运行工作流实例错误"),
     EXECUTE_PROCESS_INSTANCE_ERROR(50015, "execute process instance error", "操作工作流实例错误"),
     PROCESS_NODE_HAS_CYCLE(50019, "process node has cycle", "流程节点间存在循环依赖"),

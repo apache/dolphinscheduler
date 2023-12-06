@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -272,7 +273,7 @@ public class ExecutorController extends BaseController {
                     testFlag,
                     complementDependentMode, null, allLevelDependent, executionOrder);
 
-            if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
+            if (!BaseStatus.SUCCESS.equals(result.get(Constants.STATUS))) {
                 log.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
                         processDefinitionCode);
                 startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
@@ -283,7 +284,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR,
+            putMsg(result, ProcessStatus.BATCH_START_PROCESS_INSTANCE_ERROR,
                     String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
@@ -345,7 +346,7 @@ public class ExecutorController extends BaseController {
                 try {
                     Map<String, Object> singleResult =
                             execService.execute(loginUser, projectCode, processInstanceId, executeType);
-                    if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
+                    if (!BaseStatus.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
                         log.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
@@ -354,14 +355,15 @@ public class ExecutorController extends BaseController {
                                 projectCode, processInstanceId);
                 } catch (Exception e) {
                     executeFailedIdList
-                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(ProcessStatus.PROCESS_INSTANCE_ERROR.getMsg(),
+                                    strProcessInstanceId));
                 }
             }
         }
         if (!executeFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
+            putMsg(result, ProcessStatus.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return returnDataList(result);
     }
