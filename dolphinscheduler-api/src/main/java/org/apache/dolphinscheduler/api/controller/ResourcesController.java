@@ -17,10 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_FILE_IS_EMPTY;
-import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_NOT_EXIST;
-
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
+import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -354,7 +352,8 @@ public class ResourcesController extends BaseController {
                                        @RequestParam(value = "currentDir") String currentDir) {
         if (StringUtils.isEmpty(content)) {
             log.error("resource file contents are not allowed to be empty");
-            return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
+            return error(ResourceStatus.RESOURCE_FILE_IS_EMPTY.getCode(),
+                    ResourceStatus.RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.onlineCreateResource(loginUser, type, fileName, fileSuffix, content, currentDir);
     }
@@ -379,7 +378,8 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "content") String content) {
         if (StringUtils.isEmpty(content)) {
             log.error("The resource file contents are not allowed to be empty");
-            return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
+            return error(ResourceStatus.RESOURCE_FILE_IS_EMPTY.getCode(),
+                    ResourceStatus.RESOURCE_FILE_IS_EMPTY.getMsg());
         }
         return resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);
     }
@@ -400,7 +400,7 @@ public class ResourcesController extends BaseController {
                                            @RequestParam(value = "fullName") String fullName) throws Exception {
         Resource file = resourceService.downloadResource(loginUser, fullName);
         if (file == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RESOURCE_NOT_EXIST.getMsg());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResourceStatus.RESOURCE_NOT_EXIST.getMsg());
         }
         return ResponseEntity
                 .ok()

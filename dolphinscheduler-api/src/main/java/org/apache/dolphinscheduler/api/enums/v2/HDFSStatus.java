@@ -23,6 +23,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum HDFSStatus implements Status {
 
+    HDFS_NOT_STARTUP(60001, "hdfs not startup", "hdfs未启用"),
     HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),
     HDFS_COPY_FAIL(20010, "hdfs copy {0} -> {1} fail", "hdfs复制失败：[{0}] -> [{1}]"),;
     private final int code;
