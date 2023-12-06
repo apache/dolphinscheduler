@@ -25,7 +25,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.enums.v2.EnvironmentStatus;
 import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
@@ -173,7 +173,7 @@ public class EnvironmentServiceTest {
 
         Map<String, Object> result = environmentService.queryAllEnvironmentList(getAdminUser());
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         List<Environment> list = (List<Environment>) (result.get(Constants.DATA_LIST));
         Assertions.assertEquals(1, list.size());
@@ -198,12 +198,12 @@ public class EnvironmentServiceTest {
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(EnvironmentStatus.QUERY_ENVIRONMENT_BY_NAME_ERROR, result.get(Constants.STATUS));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         result = environmentService.queryEnvironmentByName(environmentName);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -211,12 +211,12 @@ public class EnvironmentServiceTest {
         when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(null);
         Map<String, Object> result = environmentService.queryEnvironmentByCode(1L);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, result.get(Constants.STATUS));
+        Assertions.assertEquals(EnvironmentStatus.QUERY_ENVIRONMENT_BY_CODE_ERROR, result.get(Constants.STATUS));
 
         when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
         result = environmentService.queryEnvironmentByCode(1L);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -228,31 +228,31 @@ public class EnvironmentServiceTest {
                 0, baseServiceLogger)).thenReturn(true);
         Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         loginUser = getAdminUser();
         when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
         result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(EnvironmentStatus.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS, result.get(Constants.STATUS));
 
         when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
         when(environmentMapper.deleteByCode(1L)).thenReturn(1);
         result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testVerifyEnvironment() {
         Map<String, Object> result = environmentService.verifyEnvironment("");
         logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        Assertions.assertEquals(EnvironmentStatus.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         result = environmentService.verifyEnvironment(environmentName);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
+        Assertions.assertEquals(EnvironmentStatus.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
     }
 
     private Environment getEnvironment() {
