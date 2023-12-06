@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UDFStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UdfFuncServiceImpl;
@@ -114,7 +116,7 @@ public class UdfFuncServiceTest {
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
+        Assertions.assertEquals(ResourceStatus.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         // success
         try {
             Mockito.when(storageOperate.exists("String")).thenReturn(true);
@@ -126,7 +128,7 @@ public class UdfFuncServiceTest {
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", "", UdfType.HIVE);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getMsg(), result.getMsg());
     }
 
     @Test
@@ -140,7 +142,7 @@ public class UdfFuncServiceTest {
         // resource not exist
         Result<Object> result = udfFuncService.queryUdfFuncDetail(getLoginUser(), 2);
         logger.info(result.toString());
-        Assertions.assertTrue(Status.RESOURCE_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertTrue(ResourceStatus.RESOURCE_NOT_EXIST.getCode() == result.getCode());
         // success
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW, serviceLogger)).thenReturn(true);
@@ -148,7 +150,7 @@ public class UdfFuncServiceTest {
                 serviceLogger)).thenReturn(true);
         result = udfFuncService.queryUdfFuncDetail(getLoginUser(), 1);
         logger.info(result.toString());
-        Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assertions.assertTrue(BaseStatus.SUCCESS.getCode() == result.getCode());
     }
 
     @Test
@@ -164,7 +166,7 @@ public class UdfFuncServiceTest {
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
-        Assertions.assertTrue(Status.UDF_FUNCTION_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertTrue(UDFStatus.UDF_FUNCTION_NOT_EXIST.getCode() == result.getCode());
 
         // RESOURCE_NOT_EXIST
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1,
@@ -176,7 +178,7 @@ public class UdfFuncServiceTest {
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
-        Assertions.assertTrue(Status.RESOURCE_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertTrue(ResourceStatus.RESOURCE_NOT_EXIST.getCode() == result.getCode());
 
         // success
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1,
@@ -191,7 +193,7 @@ public class UdfFuncServiceTest {
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
                 "UdfFuncServiceTest", "UdfFuncServiceTest", UdfType.HIVE, "");
         logger.info(result.toString());
-        Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assertions.assertTrue(BaseStatus.SUCCESS.getCode() == result.getCode());
 
     }
 
@@ -235,7 +237,7 @@ public class UdfFuncServiceTest {
                 .thenReturn(getList());
         Result<Object> result = udfFuncService.queryUdfFuncList(user, UdfType.HIVE.ordinal());
         logger.info(result.toString());
-        Assertions.assertTrue(Status.SUCCESS.getCode() == result.getCode());
+        Assertions.assertTrue(BaseStatus.SUCCESS.getCode() == result.getCode());
         List<UdfFunc> udfFuncList = (List<UdfFunc>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(udfFuncList));
     }
@@ -251,7 +253,7 @@ public class UdfFuncServiceTest {
         Mockito.when(udfUserMapper.deleteByUdfFuncId(Mockito.anyInt())).thenReturn(1);
         Result result = udfFuncService.delete(getLoginUser(), 122);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getMsg(), result.getMsg());
     }
 
     @Test
@@ -266,11 +268,11 @@ public class UdfFuncServiceTest {
         Mockito.when(udfFuncMapper.queryUdfByIdStr(null, "UdfFuncServiceTest")).thenReturn(getList());
         Result result = udfFuncService.verifyUdfFuncByName(getLoginUser(), "test");
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getMsg(), result.getMsg());
         // exist
         result = udfFuncService.verifyUdfFuncByName(getLoginUser(), "UdfFuncServiceTest");
         logger.info(result.toString());
-        Assertions.assertEquals(Status.UDF_FUNCTION_EXISTS.getMsg(), result.getMsg());
+        Assertions.assertEquals(UDFStatus.UDF_FUNCTION_EXISTS.getMsg(), result.getMsg());
     }
 
     private Set<Integer> getSetIds() {

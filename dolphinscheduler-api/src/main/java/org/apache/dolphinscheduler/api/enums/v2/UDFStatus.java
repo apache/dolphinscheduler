@@ -27,6 +27,8 @@ public enum UDFStatus implements Status {
     VIEW_UDF_FUNCTION_ERROR(10066, "view udf function error", "查询UDF函数错误"),
     UPDATE_UDF_FUNCTION_ERROR(10067, "update udf function error", "更新UDF函数错误"),
     QUERY_UDF_FUNCTION_LIST_PAGING_ERROR(10068, "query udf function list paging error", "分页查询UDF函数列表错误"),
+    UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
+    UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
     UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar", "UDF资源文件后缀名只支持[jar]"),
     UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}", "udf函数绑定了资源文件[{0}]"),;
     private final int code;
