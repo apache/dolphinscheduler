@@ -37,6 +37,7 @@ public enum ResourceStatus implements Status {
     RESOURCE_FILE_EXIST(20011, "resource file {0} already exists in hdfs,please delete it or change name!",
             "资源文件[{0}]在hdfs中已存在，请删除或修改资源名"),
     RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists !", "资源文件[{0}]不存在"),
+    RESOURCE_IS_USED(20014, "resource file is used by process definition", "资源文件被上线的流程定义使用了"),
     RESOURCE_NOT_EXIST_OR_NO_PERMISSION(20016,
             "resource not exist or no permission,please view the task node and remove error resource",
             "请检查任务节点并移除无权限或者已删除的资源"),
