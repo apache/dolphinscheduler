@@ -21,15 +21,17 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum TanentStatus implements Status {
+public enum TenantStatus implements Status {
 
     TENANT_NOT_EXIST(10017, "tenant [{0}] not exists", "租户[{0}]不存在"),
+    DELETE_TENANT_BY_ID_FAIL_TENANTS(10309, "delete queue by id fail, for there are {0} tenants using it",
+            "删除队列失败，有[{0}]个租户正在使用"),
     ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    TanentStatus(int code, String enMsg, String zhMsg) {
+    TenantStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
