@@ -17,6 +17,7 @@
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 
 import java.util.HashMap;
 
@@ -35,13 +36,13 @@ public class ResultTest {
 
     @Test
     public void error() {
-        Result ret = Result.error(Status.ACCESS_TOKEN_NOT_EXIST);
+        Result ret = Result.error(BaseStatus.ACCESS_TOKEN_NOT_EXIST);
         Assertions.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST.getCode(), ret.getCode().intValue());
     }
 
     @Test
     public void errorWithArgs() {
-        Result ret = Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, "test internal server error");
+        Result ret = Result.errorWithArgs(BaseStatus.INTERNAL_SERVER_ERROR_ARGS, "test internal server error");
         Assertions.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), ret.getCode().intValue());
     }
 }
