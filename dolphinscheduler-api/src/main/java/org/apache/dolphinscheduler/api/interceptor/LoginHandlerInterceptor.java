@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.interceptor;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -87,7 +87,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
             response.setStatus(HttpStatus.SC_UNAUTHORIZED);
-            log.info(Status.USER_DISABLED.getMsg());
+            log.info(UserStatus.USER_DISABLED.getMsg());
             return false;
         }
         request.setAttribute(Constants.SESSION_USER, user);
