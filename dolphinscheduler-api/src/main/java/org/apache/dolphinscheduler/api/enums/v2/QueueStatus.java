@@ -21,17 +21,23 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum TenantStatus implements Status {
+public enum QueueStatus implements Status {
 
-    TENANT_NOT_EXIST(10017, "tenant [{0}] not exists", "租户[{0}]不存在"),
-    DELETE_TENANT_BY_ID_FAIL_TENANTS(10309, "delete queue by id fail, for there are {0} tenants using it",
-            "删除队列失败，有[{0}]个租户正在使用"),
-            ;
+    CREATE_QUEUE_ERROR(10127, "create queue error", "创建队列错误"),
+    QUEUE_NOT_EXIST(10128, "queue {0} not exists", "队列ID[{0}]不存在"),
+    QUEUE_VALUE_EXIST(10129, "queue value {0} already exists", "队列值[{0}]已存在"),
+    QUEUE_NAME_EXIST(10130, "queue name {0} already exists", "队列名称[{0}]已存在"),
+    UPDATE_QUEUE_ERROR(10131, "update queue error", "更新队列信息错误"),
+    NEED_NOT_UPDATE_QUEUE(10132, "no content changes, no updates are required", "数据未变更，不需要更新队列信息"),
+    VERIFY_QUEUE_ERROR(10133, "verify queue error", "验证队列信息错误"),
+    DELETE_QUEUE_BY_ID_ERROR(10307, "delete queue by id error", "删除队列错误"),
+    DELETE_QUEUE_BY_ID_FAIL_USERS(10308, "delete queue by id fail, for there are {0} users using it",
+            "删除队列失败，有[{0}]个用户正在使用"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    TenantStatus(int code, String enMsg, String zhMsg) {
+    QueueStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

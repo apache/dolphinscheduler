@@ -38,8 +38,8 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ScheduleStatus;
-import org.apache.dolphinscheduler.api.enums.v2.TanentStatus;
 import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
 import org.apache.dolphinscheduler.api.enums.v2.WorkFlowStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.ExecuteClient;
@@ -392,7 +392,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                throw new ServiceException(TanentStatus.TENANT_NOT_EXIST, tenantCode);
+                throw new ServiceException(TenantStatus.TENANT_NOT_EXIST, tenantCode);
             }
         }
     }

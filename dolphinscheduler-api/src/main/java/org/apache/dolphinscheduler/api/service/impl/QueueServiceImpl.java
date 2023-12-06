@@ -21,7 +21,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.QueueStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -75,13 +78,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     private void validQueue(Queue queue) throws ServiceException {
         if (StringUtils.isEmpty(queue.getQueue())) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
         } else if (StringUtils.isEmpty(queue.getQueueName())) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
         } else if (checkQueueExist(queue.getQueue())) {
-            throw new ServiceException(Status.QUEUE_VALUE_EXIST, queue.getQueue());
+            throw new ServiceException(QueueStatus.QUEUE_VALUE_EXIST, queue.getQueue());
         } else if (checkQueueNameExist(queue.getQueueName())) {
-            throw new ServiceException(Status.QUEUE_NAME_EXIST, queue.getQueueName());
+            throw new ServiceException(QueueStatus.QUEUE_NAME_EXIST, queue.getQueueName());
         }
     }
 
@@ -95,21 +98,21 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         // Check the exists queue and the necessary of update operation, in not exist checker have to use updateQueue to
         // avoid NPE
         if (Objects.isNull(existsQueue)) {
-            throw new ServiceException(Status.QUEUE_NOT_EXIST, updateQueue.getQueue());
+            throw new ServiceException(QueueStatus.QUEUE_NOT_EXIST, updateQueue.getQueue());
         } else if (Objects.equals(existsQueue, updateQueue)) {
-            throw new ServiceException(Status.NEED_NOT_UPDATE_QUEUE);
+            throw new ServiceException(QueueStatus.NEED_NOT_UPDATE_QUEUE);
         }
         // Check the update queue parameters
         else if (StringUtils.isEmpty(updateQueue.getQueue())) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
         } else if (StringUtils.isEmpty(updateQueue.getQueueName())) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE_NAME);
         } else if (!Objects.equals(updateQueue.getQueue(), existsQueue.getQueue())
                 && checkQueueExist(updateQueue.getQueue())) {
-            throw new ServiceException(Status.QUEUE_VALUE_EXIST, updateQueue.getQueue());
+            throw new ServiceException(QueueStatus.QUEUE_VALUE_EXIST, updateQueue.getQueue());
         } else if (!Objects.equals(updateQueue.getQueueName(), existsQueue.getQueueName())
                 && checkQueueNameExist(updateQueue.getQueueName())) {
-            throw new ServiceException(Status.QUEUE_NAME_EXIST, updateQueue.getQueueName());
+            throw new ServiceException(QueueStatus.QUEUE_NAME_EXIST, updateQueue.getQueueName());
         }
     }
 
@@ -166,7 +169,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Queue createQueue(User loginUser, String queue, String queueName) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.QUEUE, YARN_QUEUE_CREATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         Queue queueObj = new Queue(queueName, queue);
@@ -188,7 +191,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Override
     public Queue updateQueue(User loginUser, int id, String queue, String queueName) {
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.QUEUE, YARN_QUEUE_UPDATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         Queue updateQueue = new Queue(id, queueName, queue);
@@ -219,30 +222,30 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     public void deleteQueueById(User loginUser, int id) throws Exception {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         Queue queue = queueMapper.selectById(id);
         if (Objects.isNull(queue)) {
             log.error("Queue does not exist");
-            throw new ServiceException(Status.QUEUE_NOT_EXIST);
+            throw new ServiceException(QueueStatus.QUEUE_NOT_EXIST);
         }
 
         List<Tenant> tenantList = tenantMapper.queryTenantListByQueueId(queue.getId());
         if (CollectionUtils.isNotEmpty(tenantList)) {
             log.warn("Delete queue failed, because there are {} tenants using it.", tenantList.size());
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());
+            throw new ServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());
         }
 
         List<User> userList = userMapper.queryUserListByQueue(queue.getQueueName());
         if (CollectionUtils.isNotEmpty(userList)) {
             log.warn("Delete queue failed, because there are {} users using it.", userList.size());
-            throw new ServiceException(Status.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
+            throw new ServiceException(QueueStatus.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
         }
 
         int delete = queueMapper.deleteById(id);
         if (delete <= 0) {
-            throw new ServiceException(Status.DELETE_QUEUE_BY_ID_ERROR);
+            throw new ServiceException(QueueStatus.DELETE_QUEUE_BY_ID_ERROR);
         }
 
     }
