@@ -33,6 +33,9 @@ public enum ProjectStatus implements Status {
     PROJECT_PARAMETER_NOT_EXISTS(10219, "project parameter {0} not exists", "项目参数[{0}]不存在"),
     PROJECT_PARAMETER_CODE_EMPTY(10220, "project parameter code empty", "项目参数code为空"),
     CREATE_PROJECT_PREFERENCE_ERROR(10300, "create project preference error", "创建项目偏好设置错误"),
+    UPDATE_PROJECT_PREFERENCE_ERROR(10301, "update project preference error", "更新项目偏好设置错误"),
+    QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
+    UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
     PROJECT_PROCESS_NOT_MATCH(50054, "the project and the process is not match", "项目和工作流不匹配"),
     ;
     private final int code;

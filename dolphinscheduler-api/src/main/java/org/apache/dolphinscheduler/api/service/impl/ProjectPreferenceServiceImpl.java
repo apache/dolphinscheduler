@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
 import org.apache.dolphinscheduler.api.service.ProjectPreferenceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -83,10 +84,10 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
             if (projectPreferenceMapper.insert(projectPreference) > 0) {
                 log.info("Project preference is created and id is :{}", projectPreference.getId());
                 result.setData(projectPreference);
-                putMsg(result, Status.SUCCESS);
+                putMsg(result, BaseStatus.SUCCESS);
             } else {
                 log.error("Project preference create error, projectCode:{}.", projectPreference.getProjectCode());
-                putMsg(result, Status.CREATE_PROJECT_PREFERENCE_ERROR);
+                putMsg(result, ProjectStatus.CREATE_PROJECT_PREFERENCE_ERROR);
             }
         } else {
             projectPreference.setPreferences(preferences);
@@ -96,10 +97,10 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
             if (projectPreferenceMapper.updateById(projectPreference) > 0) {
                 log.info("Project preference is updated and id is :{}", projectPreference.getId());
                 result.setData(projectPreference);
-                putMsg(result, Status.SUCCESS);
+                putMsg(result, BaseStatus.SUCCESS);
             } else {
                 log.error("Project preference update error, projectCode:{}.", projectPreference.getProjectCode());
-                putMsg(result, Status.UPDATE_PROJECT_PREFERENCE_ERROR);
+                putMsg(result, ProjectStatus.UPDATE_PROJECT_PREFERENCE_ERROR);
             }
         }
         return result;
@@ -121,7 +122,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
 
         result.setData(projectPreference);
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -140,7 +141,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
                         projectCode));
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         if (Objects.nonNull(projectPreference) && projectPreference.getState() != state) {
             projectPreference.setState(state);
             projectPreference.setUpdateTime(new Date());
@@ -150,7 +151,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
             } else {
                 log.error("Failed to update the state of the project preference, projectCode:{}.",
                         projectPreference.getProjectCode());
-                putMsg(result, Status.UPDATE_PROJECT_PREFERENCE_STATE_ERROR);
+                putMsg(result, ProjectStatus.UPDATE_PROJECT_PREFERENCE_STATE_ERROR);
             }
         }
         return result;
