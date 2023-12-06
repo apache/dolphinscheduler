@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -48,7 +48,7 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryDownstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(
                 processTaskRelationService.queryDownstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
@@ -62,13 +62,13 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryUpstreamRelation() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(
                 processTaskRelationService.queryUpstreamRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(mockResult);
@@ -82,6 +82,6 @@ public class ProcessTaskRelationControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 }

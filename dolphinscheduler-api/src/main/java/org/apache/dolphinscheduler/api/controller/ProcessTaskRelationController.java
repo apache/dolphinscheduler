@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
-
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -82,9 +81,9 @@ public class ProcessTaskRelationController extends BaseController {
                                             @RequestParam(name = "postTaskCode", required = true) long postTaskCode) {
         Map<String, Object> result = new HashMap<>();
         if (postTaskCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "postTaskCode");
+            putMsg(result, BaseStatus.DATA_IS_NOT_VALID, "postTaskCode");
         } else if (processDefinitionCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+            putMsg(result, BaseStatus.DATA_IS_NOT_VALID, "processDefinitionCode");
         } else {
             result = processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode,
                     preTaskCode, postTaskCode);
