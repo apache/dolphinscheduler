@@ -168,7 +168,8 @@ export default {
     user_password: 'Password',
     user_password_tips:
       'Please enter a password containing letters and numbers with a length between 6 and 20',
-    confirm_password_tips: 'The both of password and confirm password are not same.',
+    confirm_password_tips:
+      'The both of password and confirm password are not same.',
     user_type: 'User Type',
     ordinary_user: 'Ordinary users',
     administrator: 'Administrator',
@@ -216,6 +217,7 @@ export default {
     confirm: 'Confirm',
     cancel: 'Cancel',
     submit: 'Submit',
+    test_send: 'Test Send',
     create_alarm_instance: 'Create Alarm Instance',
     select_plugin: 'Select plugin',
     select_plugin_tips: 'Select Alarm plugin',
@@ -249,6 +251,7 @@ export default {
     headerParams: 'Headers',
     bodyParams: 'Body',
     contentField: 'Content Field',
+    timeout: 'Timeout(s)',
     Keyword: 'Keyword',
     userParams: 'User Params',
     path: 'Script Path',
@@ -269,7 +272,9 @@ export default {
     AtUserIds: 'At User Ids',
     MsgType: 'Msg Type',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}All"
+    IsAtAll: "{'@'}All",
+    annotations: 'Annotations',
+    generatorURL: 'GeneratorURL',
   },
   k8s_namespace: {
     create_namespace: 'Create Namespace',

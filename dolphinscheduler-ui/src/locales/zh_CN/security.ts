@@ -213,6 +213,7 @@ export default {
     confirm: '确定',
     cancel: '取消',
     submit: '提交',
+    test_send: '测试发送',
     create_alarm_instance: '创建告警实例',
     select_plugin: '选择插件',
     select_plugin_tips: '请选择告警插件',
@@ -246,6 +247,7 @@ export default {
     headerParams: '请求头',
     bodyParams: '请求体',
     contentField: '内容字段',
+    timeout: '超时时间（秒）',
     Keyword: '关键词',
     userParams: '自定义参数',
     path: '脚本路径',
@@ -269,7 +271,9 @@ export default {
     AtUserIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
-    IsAtAll: "{'@'}所有人"
+    IsAtAll: "{'@'}所有人",
+    annotations: '注释',
+    generatorURL: '生成地址',
   },
   k8s_namespace: {
     create_namespace: '创建命名空间',

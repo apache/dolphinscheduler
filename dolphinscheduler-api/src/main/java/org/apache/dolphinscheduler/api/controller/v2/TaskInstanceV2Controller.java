@@ -24,11 +24,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
 import org.apache.dolphinscheduler.api.controller.BaseController;
-import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceListPagingResponse;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceSuccessResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -90,15 +90,13 @@ public class TaskInstanceV2Controller extends BaseController {
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
-    public TaskInstanceListPagingResponse queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<TaskInstance>> queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                               TaskInstanceQueryRequest taskInstanceQueryReq) {
-        Result result = checkPageParams(taskInstanceQueryReq.getPageNo(), taskInstanceQueryReq.getPageSize());
-        if (!result.checkResult()) {
-            return new TaskInstanceListPagingResponse(result);
-        }
+        checkPageParams(taskInstanceQueryReq.getPageNo(), taskInstanceQueryReq.getPageSize());
+
         String searchVal = ParameterUtils.handleEscapes(taskInstanceQueryReq.getSearchVal());
-        result = taskInstanceService.queryTaskListPaging(loginUser, projectCode,
+        return taskInstanceService.queryTaskListPaging(loginUser, projectCode,
                 taskInstanceQueryReq.getProcessInstanceId(), taskInstanceQueryReq.getProcessInstanceName(),
                 taskInstanceQueryReq.getProcessDefinitionName(),
                 taskInstanceQueryReq.getTaskName(), taskInstanceQueryReq.getTaskCode(),
@@ -107,7 +105,6 @@ public class TaskInstanceV2Controller extends BaseController {
                 taskInstanceQueryReq.getStateType(), taskInstanceQueryReq.getHost(),
                 taskInstanceQueryReq.getTaskExecuteType(), taskInstanceQueryReq.getPageNo(),
                 taskInstanceQueryReq.getPageSize());
-        return new TaskInstanceListPagingResponse(result);
     }
 
     /**

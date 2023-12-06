@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import java.util.TimeZone;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -44,6 +46,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
  *
  * @since v3.1.0
  */
+@Slf4j
 public abstract class AbstractEmrTask extends AbstractRemoteTask {
 
     final TaskExecutionContext taskExecutionContext;
