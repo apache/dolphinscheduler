@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.api.security.impl.sso;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -121,19 +122,19 @@ public class CasdoorAuthenticatorTest extends AbstractControllerTest {
         Objects.requireNonNull(request.getSession()).setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         Result result = casdoorAuthenticator.authenticate(state, code, ip);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), (int) result.getCode());
         Assertions.assertNull(request.getSession().getAttribute(Constants.SSO_LOGIN_USER_STATE));
 
         Objects.requireNonNull(request.getSession()).setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         result = casdoorAuthenticator.authenticate("fake_state", code, ip);
-        Assertions.assertEquals(Status.STATE_CODE_ERROR.getCode(), (int) result.getCode());
+        Assertions.assertEquals(BaseStatus.STATE_CODE_ERROR.getCode(), (int) result.getCode());
 
         Objects.requireNonNull(request.getSession()).setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
         when(sessionService.createSessionIfAbsent(mockUser)).thenReturn(null);
         result = casdoorAuthenticator.authenticate(state, code, ip);
-        Assertions.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
+        Assertions.assertEquals(UserStatus.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
         Objects.requireNonNull(request.getSession()).setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
@@ -141,6 +142,6 @@ public class CasdoorAuthenticatorTest extends AbstractControllerTest {
         when(usersService.getUserByUserName(casdoorUsername)).thenReturn(null);
         when(usersService.createUser(userType, casdoorUsername, casdoorEmail)).thenReturn(null);
         result = casdoorAuthenticator.authenticate(state, code, ip);
-        Assertions.assertEquals(Status.STATE_CODE_ERROR.getCode(), (int) result.getCode());
+        Assertions.assertEquals(BaseStatus.STATE_CODE_ERROR.getCode(), (int) result.getCode());
     }
 }
