@@ -20,7 +20,10 @@ package org.apache.dolphinscheduler.api.service;
 import static org.mockito.ArgumentMatchers.isA;
 
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProcessTaskRelationServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -281,7 +284,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(getProcessDefinition());
         Mockito.when(
@@ -303,7 +306,7 @@ public class ProcessTaskRelationServiceTest {
 
         Mockito.when(processTaskRelationMapper.batchInsert(processTaskRelationList)).thenReturn(1);
         Mockito.when(processTaskRelationLogMapper.batchInsert(processTaskRelationLogList)).thenReturn(1);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -315,7 +318,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
 
         List<ProcessTaskRelation> processTaskRelationList = getProcessTaskDownstreamRelationList(projectCode, taskCode);
@@ -351,7 +354,7 @@ public class ProcessTaskRelationServiceTest {
         }
         Map<String, Object> relation = processTaskRelationService
                 .queryDownstreamRelation(user, projectCode, taskCode);
-        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, relation.get(Constants.STATUS));
         Assertions.assertEquals(2, ((List) relation.get("data")).size());
     }
 
@@ -364,7 +367,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         List<ProcessTaskRelation> processTaskRelationList = getProcessTaskUpstreamRelationList(projectCode, taskCode);
 
@@ -399,7 +402,7 @@ public class ProcessTaskRelationServiceTest {
         }
         Map<String, Object> relation = processTaskRelationService
                 .queryUpstreamRelation(user, projectCode, taskCode);
-        Assertions.assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, relation.get(Constants.STATUS));
         Assertions.assertEquals(2, ((List) relation.get("data")).size());
     }
 
@@ -411,7 +414,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
@@ -431,7 +434,7 @@ public class ProcessTaskRelationServiceTest {
                 .thenReturn(1);
         Map<String, Object> result1 =
                 processTaskRelationService.deleteDownstreamRelation(user, projectCode, "123", taskCode);
-        Assertions.assertEquals(Status.SUCCESS, result1.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result1.get(Constants.STATUS));
     }
 
     @Test
@@ -442,7 +445,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         List<ProcessTaskRelation> processTaskRelationList = Lists.newArrayList();
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
         processTaskRelation.setProjectCode(projectCode);
@@ -461,7 +464,7 @@ public class ProcessTaskRelationServiceTest {
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
                 1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -475,7 +478,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         Mockito.when(
                 processTaskRelationMapper.queryByCode(projectCode, processDefinitionCode, preTaskCode, postTaskCode))
@@ -501,7 +504,7 @@ public class ProcessTaskRelationServiceTest {
 
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
                 1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -514,7 +517,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
         processTaskRelation.setProjectCode(projectCode);
@@ -532,7 +535,7 @@ public class ProcessTaskRelationServiceTest {
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
                 1, relationLogs, Lists.newArrayList(), Boolean.TRUE)).thenReturn(0);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -543,16 +546,17 @@ public class ProcessTaskRelationServiceTest {
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error project without permissions
         Mockito.when(processDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE)).thenReturn(getProcessDefinition());
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject(PROJECT_CODE));
-        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
+        Mockito.doThrow(new ServiceException(UserStatus.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, getProject(PROJECT_CODE), null);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error insert process task relation
@@ -562,7 +566,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(taskDefinitionMapper.queryByCode(isA(Long.class))).thenReturn(getTaskDefinition());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.CREATE_PROCESS_TASK_RELATION_ERROR.getCode(),
+        Assertions.assertEquals(ProcessStatus.CREATE_PROCESS_TASK_RELATION_ERROR.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error insert process task relation log
@@ -570,7 +574,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(processTaskRelationLogMapper.insert(isA(ProcessTaskRelationLog.class))).thenReturn(0);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processTaskRelationService.createProcessTaskRelationV2(user, taskRelationCreateRequest));
-        Assertions.assertEquals(Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR.getCode(),
+        Assertions.assertEquals(ProcessStatus.CREATE_PROCESS_TASK_RELATION_LOG_ERROR.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
@@ -590,7 +594,7 @@ public class ProcessTaskRelationServiceTest {
                 .thenReturn(getMultiProcessTaskRelations());
         exception = Assertions.assertThrows(ServiceException.class, () -> processTaskRelationService
                 .deleteTaskProcessRelationV2(user, UPSTREAM_TASK_CODE, DOWNSTREAM_TASK_CODE));
-        Assertions.assertEquals(Status.PROCESS_TASK_RELATION_NOT_EXPECT.getCode(),
+        Assertions.assertEquals(ProcessStatus.PROCESS_TASK_RELATION_NOT_EXPECT.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
