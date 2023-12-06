@@ -32,6 +32,8 @@ public enum TaskStatus implements Status {
             "the status of task instance {0} is {1},Cannot perform force success operation",
             "任务实例[{0}]的状态是[{1}]，无法执行强制成功操作"),
     TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
+    DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, cause used by other tasks: {1}",
+            "删除任务 {0} 失败，被其他任务引用：{1}"),
     EXECUTE_NOT_DEFINE_TASK(10206, "please save and try again",
             "请先保存后再执行"),
     TASK_INSTANCE_NOT_DYNAMIC_TASK(10213, "task instance {0} is not dynamic", "任务实例[{0}]不是Dynamic类型"),

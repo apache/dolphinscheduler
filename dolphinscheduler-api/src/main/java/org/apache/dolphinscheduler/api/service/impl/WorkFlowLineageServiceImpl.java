@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -82,7 +84,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     public List<WorkFlowLineage> queryWorkFlowLineageByName(long projectCode, String workFlowName) {
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
+            throw new ServiceException(ProjectStatus.PROJECT_NOT_FOUND, projectCode);
         }
         return workFlowLineageMapper.queryWorkFlowLineageByName(projectCode, workFlowName);
     }
@@ -91,7 +93,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     public Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long sourceWorkFlowCode) {
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
+            throw new ServiceException(ProjectStatus.PROJECT_NOT_FOUND, projectCode);
         }
         List<WorkFlowLineage> workFlowLineages = new ArrayList<>();
         Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
@@ -162,7 +164,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
             log.error("Project does not exist, projectCode:{}.", projectCode);
-            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
         List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineage(projectCode);
@@ -206,7 +208,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineagesMap.values());
         workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
         result.put(Constants.DATA_LIST, workFlowLists);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -263,8 +265,9 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                 task -> String.format(Constants.FORMAT_S_S_COLON, task.getProcessDefinitionName(), task.getTaskName()))
                 .collect(Collectors.joining(Constants.COMMA));
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
-        return Optional.of(MessageFormat.format(Status.DELETE_TASK_USE_BY_OTHER_FAIL.getMsg(), taskDefinition.getName(),
-                taskDepStr));
+        return Optional
+                .of(MessageFormat.format(TaskStatus.DELETE_TASK_USE_BY_OTHER_FAIL.getMsg(), taskDefinition.getName(),
+                        taskDepStr));
     }
 
     /**
