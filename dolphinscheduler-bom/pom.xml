@@ -418,14 +418,15 @@
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
-                <scope>test</scope>
             </dependency>
 
             <dependency>
                 <groupId>com.sap.cloud.db.jdbc</groupId>
                 <artifactId>ngdbc</artifactId>
                 <version>${ngdbc.version}</version>
+                <scope>test</scope>
             </dependency>
+
             <!-- sl4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>

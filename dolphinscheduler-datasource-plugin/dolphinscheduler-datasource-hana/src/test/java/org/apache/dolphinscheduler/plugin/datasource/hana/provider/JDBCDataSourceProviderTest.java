@@ -29,24 +29,24 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class JDBCDataSourceProviderTest {
+class JDBCDataSourceProviderTest {
 
     @Test
-    public void testCreateJdbcDataSource() {
+    void testCreateJdbcDataSource() {
         try (
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
             HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
             mockedJDBCDataSourceProvider
-                    .when(() -> JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
+                    .when(() -> JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any()))
                     .thenReturn(dataSource);
             Assertions.assertNotNull(
-                    JDBCDataSourceProvider.createJdbcDataSource(new HanaConnectionParam(), DbType.HANA));
+                    JDBCDataSourceProvider.createOneSessionJdbcDataSource(new HanaConnectionParam(), DbType.HANA));
         }
     }
 
     @Test
-    public void testCreateOneSessionJdbcDataSource() {
+    void testCreateOneSessionJdbcDataSource() {
         try (
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
