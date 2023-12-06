@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -64,7 +64,7 @@ public class FavTaskController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result listTaskType(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<FavTaskDto> favTaskList = favTaskService.getFavTaskList(loginUser);
-        return success(Status.SUCCESS.getMsg(), favTaskList);
+        return success(BaseStatus.SUCCESS.getMsg(), favTaskList);
     }
 
     /**
