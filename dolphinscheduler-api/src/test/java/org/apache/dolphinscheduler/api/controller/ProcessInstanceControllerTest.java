@@ -24,7 +24,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -54,7 +57,7 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryProcessInstanceList() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(processInstanceService
                 .queryProcessInstanceList(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
                         Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
@@ -79,13 +82,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.PROJECT_NOT_FOUND);
+        mockResult.put(Constants.STATUS, ProjectStatus.PROJECT_NOT_FOUND);
         Mockito
                 .when(processInstanceService.queryTaskListByProcessId(Mockito.any(), Mockito.anyLong(), Mockito.any()))
                 .thenReturn(mockResult);
@@ -98,13 +101,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testUpdateProcessInstance() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(processInstanceService
                 .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
@@ -135,13 +138,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryProcessInstanceById() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(
                 processInstanceService.queryProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(mockResult);
@@ -153,13 +156,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.TASK_INSTANCE_NOT_EXISTS);
+        mockResult.put(Constants.STATUS, TaskStatus.TASK_INSTANCE_NOT_EXISTS);
         Mockito.when(processInstanceService.querySubProcessInstanceByTaskId(Mockito.any(), Mockito.anyLong(),
                 Mockito.anyInt())).thenReturn(mockResult);
 
@@ -173,13 +176,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TaskStatus.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryParentInstanceBySubId() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE);
+        mockResult.put(Constants.STATUS, ProcessStatus.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE);
         Mockito.when(
                 processInstanceService.queryParentInstanceBySubId(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(mockResult);
@@ -194,14 +197,14 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(),
+        Assertions.assertEquals(ProcessStatus.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(),
                 result.getCode().intValue());
     }
 
     @Test
     public void testViewVariables() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(processInstanceService.viewVariables(1113L, 123)).thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
@@ -211,13 +214,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.doNothing().when(processInstanceService).deleteProcessInstanceById(Mockito.any(), Mockito.anyInt());
 
         MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/process-instances/{id}", "1113", "123")
@@ -228,13 +231,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testBatchDeleteProcessInstanceByIds() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.PROCESS_INSTANCE_NOT_EXIST);
+        mockResult.put(Constants.STATUS, ProcessStatus.PROCESS_INSTANCE_NOT_EXIST);
 
         Mockito.doNothing().when(processInstanceService).deleteProcessInstanceById(Mockito.any(), Mockito.anyInt());
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/process-instances/batch-delete", "1113")
@@ -246,13 +249,13 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void queryProcessInstancesByTriggerCode() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
 
         Mockito.when(processInstanceService
                 .queryByTriggerCode(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
@@ -266,6 +269,6 @@ public class ProcessInstanceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
     }
 }

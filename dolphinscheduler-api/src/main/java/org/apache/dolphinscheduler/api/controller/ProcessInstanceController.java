@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -313,7 +314,7 @@ public class ProcessInstanceController extends BaseController {
                                                                                 @RequestParam("taskId") Integer taskId) {
         List<DynamicSubWorkflowDto> dynamicSubWorkflowDtos =
                 processInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
-        return new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
+        return new Result(BaseStatus.SUCCESS.getCode(), BaseStatus.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
     }
 
     /**
@@ -389,14 +390,16 @@ public class ProcessInstanceController extends BaseController {
                 } catch (Exception e) {
                     log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
-                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(ProcessStatus.PROCESS_INSTANCE_ERROR.getMsg(),
+                                    strProcessInstanceId));
                 }
             }
         }
         if (!deleteFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join("\n", deleteFailedIdList));
+            putMsg(result, ProcessStatus.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,
+                    String.join("\n", deleteFailedIdList));
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return returnDataList(result);
     }

@@ -26,6 +26,8 @@ public enum ProcessStatus implements Status {
     CREATE_PROCESS_DEFINITION_ERROR(10105, "create process definition error", "创建工作流错误"),
     UPDATE_PROCESS_DEFINITION_ERROR(10107, "update process definition error", "更新工作流定义错误"),
     UPDATE_PROCESS_INSTANCE_ERROR(10115, "update process instance error", "更新工作流实例错误"),
+    BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR(10117, "batch delete process instance by ids {0} error",
+            "批量删除工作流实例错误: {0}"),
     COPY_PROCESS_DEFINITION_ERROR(10149, "copy process definition from {0} to {1} error : {2}",
             "从{0}复制工作流到{1}错误 : {2}"),
     MOVE_PROCESS_DEFINITION_ERROR(10150, "move process definition from {0} to {1} error : {2}",
