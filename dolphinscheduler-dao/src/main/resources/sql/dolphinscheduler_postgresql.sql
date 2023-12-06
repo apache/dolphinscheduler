@@ -835,7 +835,6 @@ CREATE TABLE t_ds_task_instance (
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
 create index idx_cache_key on t_ds_task_instance (cache_key);
-create index idx_task_instance_pid_code_end_time on t_ds_task_instance (process_instance_id, task_code, end_time);
 
 --
 -- Table structure for table t_ds_tenant

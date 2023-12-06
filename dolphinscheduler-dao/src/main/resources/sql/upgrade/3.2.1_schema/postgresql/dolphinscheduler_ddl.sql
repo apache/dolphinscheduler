@@ -23,6 +23,3 @@ ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_request_cpu";
 ALTER TABLE "t_ds_k8s_namespace" DROP COLUMN IF EXISTS "pod_request_memory";
 
 ALTER TABLE t_ds_project_parameter ALTER COLUMN param_value TYPE text;
-
-create index if not exists idx_task_instance_pid_code_end_time on t_ds_task_instance (process_instance_id, task_code, end_time);
-analyze t_ds_task_instance;
