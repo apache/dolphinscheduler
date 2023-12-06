@@ -32,7 +32,7 @@ public class MasterTaskExecutorBootstrap implements AutoCloseable {
     private GlobalTaskDispatchWaitingQueueLooper globalTaskDispatchWaitingQueueLooper;
 
     @Autowired
-    private MasterDelayTaskExecuteRunnableDelayQueueLooper masterDelayTaskExecuteRunnableDelayQueueLooper;
+    private GlobalMasterTaskExecuteRunnableQueueLooper globalMasterTaskExecuteRunnableQueueLooper;
 
     @Autowired
     private AsyncMasterTaskDelayQueueLooper asyncMasterTaskDelayQueueLooper;
@@ -40,7 +40,7 @@ public class MasterTaskExecutorBootstrap implements AutoCloseable {
     public synchronized void start() {
         log.info("MasterTaskExecutorBootstrap starting...");
         globalTaskDispatchWaitingQueueLooper.start();
-        masterDelayTaskExecuteRunnableDelayQueueLooper.start();
+        globalMasterTaskExecuteRunnableQueueLooper.start();
         asyncMasterTaskDelayQueueLooper.start();
         log.info("MasterTaskExecutorBootstrap started...");
     }
@@ -51,8 +51,8 @@ public class MasterTaskExecutorBootstrap implements AutoCloseable {
         try (
                 final GlobalTaskDispatchWaitingQueueLooper globalTaskDispatchWaitingQueueLooper1 =
                         globalTaskDispatchWaitingQueueLooper;
-                final MasterDelayTaskExecuteRunnableDelayQueueLooper masterDelayTaskExecuteRunnableDelayQueueLooper1 =
-                        masterDelayTaskExecuteRunnableDelayQueueLooper;
+                final GlobalMasterTaskExecuteRunnableQueueLooper globalMasterTaskExecuteRunnableQueueLooper1 =
+                        globalMasterTaskExecuteRunnableQueueLooper;
                 final AsyncMasterTaskDelayQueueLooper asyncMasterTaskDelayQueueLooper1 =
                         asyncMasterTaskDelayQueueLooper) {
             // closed the resource

@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterDelayTaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableThreadPool;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorHolder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorThreadPool;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,17 +31,17 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class MasterDelayTaskExecuteRunnableDelayQueueLooper extends BaseDaemonThread implements AutoCloseable {
+public class GlobalMasterTaskExecuteRunnableQueueLooper extends BaseDaemonThread implements AutoCloseable {
 
     @Autowired
-    private MasterDelayTaskExecuteRunnableDelayQueue masterDelayTaskExecuteRunnableDelayQueue;
+    private GlobalMasterTaskExecuteRunnableQueue globalMasterTaskExecuteRunnableQueue;
 
     @Autowired
-    private MasterTaskExecuteRunnableThreadPool masterTaskExecuteRunnableThreadPool;
+    private MasterTaskExecutorThreadPool masterTaskExecutorThreadPool;
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
-    public MasterDelayTaskExecuteRunnableDelayQueueLooper() {
+    public GlobalMasterTaskExecuteRunnableQueueLooper() {
         super("MasterDelayTaskExecuteRunnableDelayQueueLooper");
     }
 
@@ -53,7 +53,7 @@ public class MasterDelayTaskExecuteRunnableDelayQueueLooper extends BaseDaemonTh
         }
         log.info("MasterDelayTaskExecuteRunnableDelayQueueLooper starting...");
         super.start();
-        masterTaskExecuteRunnableThreadPool.start();
+        masterTaskExecutorThreadPool.start();
         log.info("MasterDelayTaskExecuteRunnableDelayQueueLooper started...");
     }
 
@@ -61,10 +61,10 @@ public class MasterDelayTaskExecuteRunnableDelayQueueLooper extends BaseDaemonTh
     public void run() {
         while (RUNNING_FLAG.get()) {
             try {
-                final MasterDelayTaskExecuteRunnable masterDelayTaskExecuteRunnable =
-                        masterDelayTaskExecuteRunnableDelayQueue.takeMasterDelayTaskExecuteRunnable();
-                masterTaskExecuteRunnableThreadPool.submitMasterTaskExecuteRunnable(masterDelayTaskExecuteRunnable);
-                MasterTaskExecuteRunnableHolder.putMasterTaskExecuteRunnable(masterDelayTaskExecuteRunnable);
+                final MasterTaskExecutor masterTaskExecutor =
+                        globalMasterTaskExecuteRunnableQueue.takeMasterTaskExecuteRunnable();
+                masterTaskExecutorThreadPool.submitMasterTaskExecutor(masterTaskExecutor);
+                MasterTaskExecutorHolder.putMasterTaskExecuteRunnable(masterTaskExecutor);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
                 log.warn("MasterDelayTaskExecuteRunnableDelayQueueLooper has been interrupted, will stop loop");

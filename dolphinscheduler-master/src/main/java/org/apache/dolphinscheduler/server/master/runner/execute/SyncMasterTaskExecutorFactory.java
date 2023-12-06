@@ -17,35 +17,29 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
+import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
 @Slf4j
 @Component
-public class MasterTaskExecuteRunnableThreadPool {
+public class SyncMasterTaskExecutorFactory
+        implements
+            MasterTaskExecutorFactory<SyncMasterTaskExecutor> {
 
     @Autowired
-    private MasterConfig masterConfig;
+    private LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
+    @Autowired
+    private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
 
-    private ListeningExecutorService listeningExecutorService;
-
-    public synchronized void start() {
-        log.info("MasterTaskExecuteRunnableThreadPool starting...");
-        this.listeningExecutorService = MoreExecutors.listeningDecorator(ThreadUtils.newDaemonFixedThreadExecutor(
-                "MasterTaskExecuteRunnableThread", masterConfig.getMasterTaskExecuteThreadPoolSize()));
-        log.info("MasterTaskExecuteRunnableThreadPool started...");
+    @Override
+    public SyncMasterTaskExecutor createMasterTaskExecutor(TaskExecutionContext taskExecutionContext) {
+        return new SyncMasterTaskExecutor(taskExecutionContext, logicTaskPluginFactoryBuilder,
+                logicTaskInstanceExecutionEventSenderManager);
     }
-
-    public void submitMasterTaskExecuteRunnable(MasterTaskExecuteRunnable masterTaskExecuteRunnable) {
-        listeningExecutorService.submit(masterTaskExecuteRunnable);
-    }
-
 }

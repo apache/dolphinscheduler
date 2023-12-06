@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueueLooper;
+import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceWaitingQueueLooper;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -68,7 +68,7 @@ public class WorkerServer implements IStoppable {
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private GlobalTaskInstanceDispatchQueueLooper globalTaskInstanceDispatchQueueLooper;
+    private GlobalTaskInstanceWaitingQueueLooper globalTaskInstanceWaitingQueueLooper;
 
     /**
      * worker server startup, not use web service
@@ -91,7 +91,7 @@ public class WorkerServer implements IStoppable {
         this.workerManagerThread.start();
 
         this.messageRetryRunner.start();
-        this.globalTaskInstanceDispatchQueueLooper.start();
+        this.globalTaskInstanceWaitingQueueLooper.start();
 
         /*
          * registry hooks, which are called before the process exits

@@ -25,8 +25,9 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.DelayQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.annotation.Nullable;
 
@@ -41,28 +42,22 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class WorkerManagerThread implements Runnable {
 
-    private final DelayQueue<WorkerDelayTaskExecuteRunnable> waitSubmitQueue;
+    private final BlockingQueue<WorkerTaskExecutor> waitSubmitQueue;
     private final WorkerExecService workerExecService;
-    private final WorkerConfig workerConfig;
 
     private final int workerExecThreads;
 
-    /**
-     * running task
-     */
-    private final ConcurrentHashMap<Integer, WorkerTaskExecuteRunnable> taskExecuteThreadMap =
-            new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, WorkerTaskExecutor> taskExecuteThreadMap = new ConcurrentHashMap<>();
 
     public WorkerManagerThread(WorkerConfig workerConfig) {
-        this.workerConfig = workerConfig;
         workerExecThreads = workerConfig.getExecThreads();
-        this.waitSubmitQueue = new DelayQueue<>();
+        this.waitSubmitQueue = new LinkedBlockingQueue<>();
         workerExecService = new WorkerExecService(
                 ThreadUtils.newDaemonFixedThreadExecutor("Worker-Execute-Thread", workerConfig.getExecThreads()),
                 taskExecuteThreadMap);
     }
 
-    public @Nullable WorkerTaskExecuteRunnable getTaskExecuteThread(Integer taskInstanceId) {
+    public @Nullable WorkerTaskExecutor getTaskExecuteThread(Integer taskInstanceId) {
         return taskExecuteThreadMap.get(taskInstanceId);
     }
 
@@ -95,7 +90,7 @@ public class WorkerManagerThread implements Runnable {
                 .forEach(waitSubmitQueue::remove);
     }
 
-    public boolean offer(WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable) {
+    public boolean offer(WorkerTaskExecutor workerDelayTaskExecuteRunnable) {
         return waitSubmitQueue.add(workerDelayTaskExecuteRunnable);
     }
 
@@ -122,8 +117,8 @@ public class WorkerManagerThread implements Runnable {
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 if (this.getThreadPoolQueueSize() <= workerExecThreads) {
-                    final WorkerDelayTaskExecuteRunnable workerDelayTaskExecuteRunnable = waitSubmitQueue.take();
-                    workerExecService.submit(workerDelayTaskExecuteRunnable);
+                    WorkerTaskExecutor workerTaskExecutor = waitSubmitQueue.take();
+                    workerExecService.submit(workerTaskExecutor);
                 } else {
                     WorkerServerMetrics.incWorkerOverloadCount();
                     log.info("Exec queue is full, waiting submit queue {}, waiting exec queue size {}",

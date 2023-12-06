@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
 
 import java.util.Optional;
 

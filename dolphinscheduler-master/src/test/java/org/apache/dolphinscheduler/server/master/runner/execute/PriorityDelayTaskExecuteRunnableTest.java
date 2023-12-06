@@ -21,12 +21,14 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.PriorityDelayTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class PriorityTaskExecuteRunnableTest {
+public class PriorityDelayTaskExecuteRunnableTest {
 
     @Test
     public void testCompareTo() {
@@ -46,9 +48,9 @@ public class PriorityTaskExecuteRunnableTest {
 
         TaskExecutionContext context1 = new TaskExecutionContext();
         TaskExecutionContext context2 = new TaskExecutionContext();
-        PriorityTaskExecuteRunnable p1 =
+        PriorityDelayTaskExecuteRunnable p1 =
                 new DefaultTaskExecuteRunnable(workflowInstance, t1, context1, taskOperatorManager);
-        PriorityTaskExecuteRunnable p2 =
+        PriorityDelayTaskExecuteRunnable p2 =
                 new DefaultTaskExecuteRunnable(workflowInstance, t2, context2, taskOperatorManager);
 
         Assertions.assertEquals(0, p1.compareTo(p2));

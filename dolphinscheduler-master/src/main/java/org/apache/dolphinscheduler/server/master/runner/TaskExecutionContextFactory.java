@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.execute;
+package org.apache.dolphinscheduler.server.master.runner;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.ADDRESS;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATABASE;

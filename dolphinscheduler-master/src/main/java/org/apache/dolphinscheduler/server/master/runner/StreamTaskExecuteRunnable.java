@@ -57,9 +57,7 @@ import org.apache.dolphinscheduler.server.master.event.StateEventHandleException
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.WorkerTaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecutionContextFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;

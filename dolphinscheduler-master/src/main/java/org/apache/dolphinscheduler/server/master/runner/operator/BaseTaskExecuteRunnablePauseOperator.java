@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -17,19 +17,41 @@
 
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueue;
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 
+import java.util.concurrent.TimeUnit;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class BaseTaskExecuteRunnableDispatchOperator implements TaskExecuteRunnableOperator {
 
     private final GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue;
 
-    public BaseTaskExecuteRunnableDispatchOperator(GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue) {
+    private final TaskInstanceDao taskInstanceDao;
+
+    public BaseTaskExecuteRunnableDispatchOperator(
+                                                   GlobalTaskDispatchWaitingQueue globalTaskDispatchWaitingQueue,
+                                                   TaskInstanceDao taskInstanceDao) {
         this.globalTaskDispatchWaitingQueue = globalTaskDispatchWaitingQueue;
+        this.taskInstanceDao = taskInstanceDao;
     }
 
     @Override
     public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
+        long remainTime = taskExecuteRunnable.getDelay(TimeUnit.SECONDS);
+        TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
+        if (remainTime > 0) {
+            taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
+            taskInstanceDao.updateById(taskInstance);
+            log.info("Current taskInstance: {} is choose delay execution, delay time: {}/s, remainTime: {}/s",
+                    taskInstance.getName(),
+                    taskInstance.getDelayTime(), remainTime);
+        }
         globalTaskDispatchWaitingQueue.submitNeedToDispatchTaskExecuteRunnable(taskExecuteRunnable);
     }
 }

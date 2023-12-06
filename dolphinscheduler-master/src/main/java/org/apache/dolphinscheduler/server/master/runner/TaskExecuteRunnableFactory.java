@@ -15,29 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.execute;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
 
 /**
- * This interface is used to define a task which is executing.
- * todo: split to MasterTaskExecuteRunnable and WorkerTaskExecuteRunnable
+ * Use to create TaskExecuteRunnable
+ *
+ * @param <T> TaskExecuteRunnable
  */
-public interface TaskExecuteRunnable extends Comparable<TaskExecuteRunnable> {
+public interface TaskExecuteRunnableFactory<T extends TaskExecuteRunnable> {
 
-    void dispatch();
+    T createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException;
 
-    void kill();
-
-    void pause();
-
-    void timeout();
-
-    ProcessInstance getWorkflowInstance();
-
-    TaskInstance getTaskInstance();
-
-    TaskExecutionContext getTaskExecutionContext();
 }

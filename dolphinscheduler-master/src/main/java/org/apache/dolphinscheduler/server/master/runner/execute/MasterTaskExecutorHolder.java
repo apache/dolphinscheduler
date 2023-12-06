@@ -25,20 +25,20 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @UtilityClass
-public class MasterTaskExecuteRunnableHolder {
+public class MasterTaskExecutorHolder {
 
-    private static final Map<Integer, MasterTaskExecuteRunnable> SUBMITTED_MASTER_TASK_MAP = new ConcurrentHashMap<>();
+    private static final Map<Integer, MasterTaskExecutor> SUBMITTED_MASTER_TASK_MAP = new ConcurrentHashMap<>();
 
-    public void putMasterTaskExecuteRunnable(MasterTaskExecuteRunnable masterTaskExecuteRunnable) {
-        SUBMITTED_MASTER_TASK_MAP.put(masterTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId(),
-                masterTaskExecuteRunnable);
+    public void putMasterTaskExecuteRunnable(MasterTaskExecutor masterTaskExecutor) {
+        SUBMITTED_MASTER_TASK_MAP.put(masterTaskExecutor.getTaskExecutionContext().getTaskInstanceId(),
+                masterTaskExecutor);
     }
 
-    public MasterTaskExecuteRunnable getMasterTaskExecuteRunnable(Integer taskInstanceId) {
+    public MasterTaskExecutor getMasterTaskExecutor(Integer taskInstanceId) {
         return SUBMITTED_MASTER_TASK_MAP.get(taskInstanceId);
     }
 
-    public void removeMasterTaskExecuteRunnable(Integer taskInstanceId) {
+    public void removeMasterTaskExecutor(Integer taskInstanceId) {
         SUBMITTED_MASTER_TASK_MAP.remove(taskInstanceId);
     }
 

@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;

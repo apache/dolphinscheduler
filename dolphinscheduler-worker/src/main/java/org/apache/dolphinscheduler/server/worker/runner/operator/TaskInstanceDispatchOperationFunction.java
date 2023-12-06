@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.TaskMetrics;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueue;
+import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceWaitingQueue;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +41,7 @@ public class TaskInstanceDispatchOperationFunction
     private WorkerConfig workerConfig;
 
     @Autowired
-    private GlobalTaskInstanceDispatchQueue globalTaskInstanceDispatchQueue;
+    private GlobalTaskInstanceWaitingQueue globalTaskInstanceWaitingQueue;
 
     @Override
     public TaskInstanceDispatchResponse operate(TaskInstanceDispatchRequest taskInstanceDispatchRequest) {
@@ -57,7 +57,7 @@ public class TaskInstanceDispatchOperationFunction
                     taskExecutionContext.getTaskInstanceId());
             TaskMetrics.incrTaskTypeExecuteCount(taskExecutionContext.getTaskType());
 
-            if (!globalTaskInstanceDispatchQueue.addDispatchTask(taskExecutionContext)) {
+            if (!globalTaskInstanceWaitingQueue.addDispatchTask(taskExecutionContext)) {
                 log.error("Submit task: {} to wait queue error, current queue size: {} is full",
                         taskExecutionContext.getTaskName(), workerConfig.getExecThreads());
                 return TaskInstanceDispatchResponse.failed(taskExecutionContext.getTaskInstanceId(),

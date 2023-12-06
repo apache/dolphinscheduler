@@ -17,11 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-public interface TaskExecuteRunnableFactory<T extends TaskExecuteRunnable> {
+public interface MasterTaskExecutorFactory<T extends MasterTaskExecutor> {
 
-    T createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException;
+    T createMasterTaskExecutor(TaskExecutionContext taskExecutionContext);
 
 }

@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheMana
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,12 +53,12 @@ public class StreamingTaskInstanceOperatorImpl implements IStreamingTaskInstance
                 log.error("Cannot find TaskExecutionContext for taskInstance: {}", taskInstanceId);
                 return TaskInstanceTriggerSavepointResponse.fail("Cannot find TaskExecutionContext");
             }
-            WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
-            if (workerTaskExecuteRunnable == null) {
+            WorkerTaskExecutor workerTaskExecutor = workerManager.getTaskExecuteThread(taskInstanceId);
+            if (workerTaskExecutor == null) {
                 log.error("Cannot find WorkerTaskExecuteRunnable for taskInstance: {}", taskInstanceId);
                 return TaskInstanceTriggerSavepointResponse.fail("Cannot find WorkerTaskExecuteRunnable");
             }
-            AbstractTask task = workerTaskExecuteRunnable.getTask();
+            AbstractTask task = workerTaskExecutor.getTask();
             if (task == null) {
                 log.error("Cannot find StreamTask for taskInstance:{}", taskInstanceId);
                 return TaskInstanceTriggerSavepointResponse.fail("Cannot find StreamTask");

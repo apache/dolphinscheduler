@@ -28,27 +28,34 @@ import javax.annotation.Nullable;
 
 import lombok.NonNull;
 
-public class DefaultWorkerDelayTaskExecuteRunnableFactory
-        extends
-            WorkerDelayTaskExecuteRunnableFactory<DefaultWorkerDelayTaskExecuteRunnable> {
+public class DefaultWorkerTaskExecutorFactory
+        implements
+            WorkerTaskExecutorFactory<DefaultWorkerTaskExecutor> {
 
-    protected DefaultWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
-                                                           @NonNull WorkerConfig workerConfig,
-                                                           @NonNull WorkerMessageSender workerMessageSender,
-                                                           @NonNull TaskPluginManager taskPluginManager,
-                                                           @Nullable StorageOperate storageOperate,
-                                                           @NonNull WorkerRegistryClient workerRegistryClient) {
-        super(taskExecutionContext,
-                workerConfig,
-                workerMessageSender,
-                taskPluginManager,
-                storageOperate,
-                workerRegistryClient);
+    private final @NonNull TaskExecutionContext taskExecutionContext;
+    private final @NonNull WorkerConfig workerConfig;
+    private final @NonNull WorkerMessageSender workerMessageSender;
+    private final @NonNull TaskPluginManager taskPluginManager;
+    private final @Nullable StorageOperate storageOperate;
+    private final @NonNull WorkerRegistryClient workerRegistryClient;
+
+    public DefaultWorkerTaskExecutorFactory(@NonNull TaskExecutionContext taskExecutionContext,
+                                            @NonNull WorkerConfig workerConfig,
+                                            @NonNull WorkerMessageSender workerMessageSender,
+                                            @NonNull TaskPluginManager taskPluginManager,
+                                            @Nullable StorageOperate storageOperate,
+                                            @NonNull WorkerRegistryClient workerRegistryClient) {
+        this.taskExecutionContext = taskExecutionContext;
+        this.workerConfig = workerConfig;
+        this.workerMessageSender = workerMessageSender;
+        this.taskPluginManager = taskPluginManager;
+        this.storageOperate = storageOperate;
+        this.workerRegistryClient = workerRegistryClient;
     }
 
     @Override
-    public DefaultWorkerDelayTaskExecuteRunnable createWorkerTaskExecuteRunnable() {
-        return new DefaultWorkerDelayTaskExecuteRunnable(
+    public DefaultWorkerTaskExecutor createWorkerTaskExecutor() {
+        return new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,

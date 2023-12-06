@@ -35,16 +35,16 @@ import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFact
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class MasterTaskExecuteRunnable implements Runnable {
+public abstract class MasterTaskExecutor implements Runnable {
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
     protected final LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
     protected ILogicTask logicTask;
 
-    public MasterTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
-                                     LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                     LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
+    public MasterTaskExecutor(TaskExecutionContext taskExecutionContext,
+                              LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
+                              LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
         this.taskExecutionContext = taskExecutionContext;
         this.logicTaskPluginFactoryBuilder = logicTaskPluginFactoryBuilder;
         this.logicTaskInstanceExecutionEventSenderManager = logicTaskInstanceExecutionEventSenderManager;
@@ -68,7 +68,7 @@ public abstract class MasterTaskExecuteRunnable implements Runnable {
                 "Get a exception when execute the task, sent the task execute result to master, the current task execute result is {}",
                 taskExecutionContext.getCurrentExecutionStatus());
         MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
-        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecutorHolder.removeMasterTaskExecutor(taskExecutionContext.getTaskInstanceId());
         log.info("Get a exception when execute the task, removed the TaskExecutionContext");
         closeLogAppender();
     }

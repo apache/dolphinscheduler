@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
 
 import java.util.Date;
 import java.util.Optional;

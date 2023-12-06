@@ -30,7 +30,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-public class DefaultWorkerDelayTaskExecuteRunnableTest {
+public class DefaultWorkerTaskExecutorTest {
 
     private TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
 
@@ -54,7 +54,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .processDefineId(0)
                 .firstSubmitTime(System.currentTimeMillis())
                 .build();
-        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
+        WorkerTaskExecutor workerTaskExecutor = new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
@@ -62,7 +62,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 storageOperate,
                 workerRegistryClient);
 
-        Assertions.assertAll(workerTaskExecuteRunnable::run);
+        Assertions.assertAll(workerTaskExecutor::run);
         Assertions.assertEquals(TaskExecutionStatus.SUCCESS, taskExecutionContext.getCurrentExecutionStatus());
     }
 
@@ -78,7 +78,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 .taskParams(
                         "{\"localParams\":[],\"resourceList\":[],\"type\":\"POSTGRESQL\",\"datasource\":null,\"sql\":\"select * from t_ds_user\",\"sqlType\":\"0\",\"preStatements\":[],\"postStatements\":[],\"segmentSeparator\":\"\",\"displayRows\":10,\"conditionResult\":\"null\",\"dependence\":\"null\",\"switchResult\":\"null\",\"waitStartTimeout\":null}")
                 .build();
-        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = new DefaultWorkerDelayTaskExecuteRunnable(
+        WorkerTaskExecutor workerTaskExecutor = new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
@@ -86,7 +86,7 @@ public class DefaultWorkerDelayTaskExecuteRunnableTest {
                 storageOperate,
                 workerRegistryClient);
 
-        Assertions.assertAll(workerTaskExecuteRunnable::run);
+        Assertions.assertAll(workerTaskExecutor::run);
         Assertions.assertEquals(TaskExecutionStatus.FAILURE, taskExecutionContext.getCurrentExecutionStatus());
     }
 }

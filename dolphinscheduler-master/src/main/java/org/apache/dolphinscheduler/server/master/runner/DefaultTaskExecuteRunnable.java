@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.execute;
+package org.apache.dolphinscheduler.server.master.runner;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
-public class DefaultTaskExecuteRunnable extends PriorityTaskExecuteRunnable {
+public class DefaultTaskExecuteRunnable extends PriorityDelayTaskExecuteRunnable {
 
     private final TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 

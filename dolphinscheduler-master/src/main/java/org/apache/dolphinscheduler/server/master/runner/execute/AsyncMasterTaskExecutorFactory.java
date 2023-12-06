@@ -21,25 +21,29 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.message.LogicTaskInstanceExecutionEventSenderManager;
 import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFactoryBuilder;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
-public class SyncMasterDelayTaskExecuteRunnableFactory
+public class AsyncMasterTaskExecutorFactory
         implements
-            MasterDelayTaskExecuteRunnableFactory<SyncMasterDelayTaskExecuteRunnable> {
+            MasterTaskExecutorFactory<AsyncMasterTaskExecutor> {
 
     @Autowired
     private LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder;
+
     @Autowired
     private LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager;
 
+    @Autowired
+    private AsyncMasterTaskDelayQueue asyncTaskDelayQueue;
+
     @Override
-    public SyncMasterDelayTaskExecuteRunnable createWorkerTaskExecuteRunnable(TaskExecutionContext taskExecutionContext) {
-        return new SyncMasterDelayTaskExecuteRunnable(taskExecutionContext, logicTaskPluginFactoryBuilder,
-                logicTaskInstanceExecutionEventSenderManager);
+    public AsyncMasterTaskExecutor createMasterTaskExecutor(TaskExecutionContext taskExecutionContext) {
+        return new AsyncMasterTaskExecutor(taskExecutionContext,
+                logicTaskPluginFactoryBuilder,
+                logicTaskInstanceExecutionEventSenderManager,
+                asyncTaskDelayQueue);
     }
+
 }
