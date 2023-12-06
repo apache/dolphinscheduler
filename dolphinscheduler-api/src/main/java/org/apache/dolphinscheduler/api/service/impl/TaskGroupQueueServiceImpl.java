@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -75,7 +75,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
         if (projectIds.isEmpty()) {
             result.put(Constants.DATA_LIST, pageInfo);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
             return result;
         }
         List<Project> projects = projectMapper.selectBatchIds(projectIds);
@@ -86,7 +86,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         pageInfo.setTotalList(taskGroupQueue.getRecords());
 
         result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -129,7 +129,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         pageInfo.setTotalList(taskGroupQueue.getRecords());
 
         result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
