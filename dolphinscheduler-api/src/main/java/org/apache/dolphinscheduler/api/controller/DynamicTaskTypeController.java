@@ -21,7 +21,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.configuration.DynamicTaskTypeConfiguration;
 import org.apache.dolphinscheduler.api.dto.taskType.DynamicTaskInfo;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -64,7 +64,7 @@ public class DynamicTaskTypeController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result listDynamicTaskCategories(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> taskCategories = dynamicTaskTypeConfiguration.getTaskCategories();
-        return success(Status.SUCCESS.getMsg(), taskCategories);
+        return success(BaseStatus.SUCCESS.getMsg(), taskCategories);
     }
 
     /**
@@ -79,7 +79,7 @@ public class DynamicTaskTypeController extends BaseController {
     public Result listDynamicTaskTypes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @PathVariable("taskCategory") String taskCategory) {
         List<DynamicTaskInfo> taskTypes = dynamicTaskTypeConfiguration.getTaskTypesByCategory(taskCategory);
-        return success(Status.SUCCESS.getMsg(), taskTypes);
+        return success(BaseStatus.SUCCESS.getMsg(), taskTypes);
     }
 
 }
