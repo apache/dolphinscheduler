@@ -27,6 +27,7 @@ public enum BaseStatus implements Status {
     INTERNAL_SERVER_ERROR_ARGS(10000, "Internal Server Error: {0}", "服务端异常: {0}"),
     REQUEST_PARAMS_NOT_VALID_ERROR(10001, "request parameter {0} is not valid", "请求参数[{0}]无效"),
     MASTER_NOT_EXISTS(10025, "master does not exist", "无可用master节点"),
+    NAME_NULL(10134, "name must be not null", "名称不能为空"),
     SAVE_ERROR(10136, "save error", "保存错误"),
     CONNECTION_TEST_FAILURE(10037, "connection test failure", "测试数据源连接失败"),
     DATA_IS_NOT_VALID(50017, "data {0} not valid", "数据[{0}]无效"),

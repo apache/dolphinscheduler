@@ -49,7 +49,14 @@ public enum TaskStatus implements Status {
     TASK_DEFINITION_NOT_EXISTS(50064, "task definition {0} do not exists", "任务定义 {0} 不存在"),
     TASK_PARALLELISM_PARAMS_ERROR(50080, "task parallelism parameter is not valid", "任务并行度参数无效"),
     TASK_COMPLEMENT_DATA_DATE_ERROR(50081, "The range of date for complementing date is not valid", "补数选择的日期范围无效"),
+    TASK_GROUP_NAME_EXSIT(130001, "this task group name is repeated in a project", "该任务组名称在一个项目中已经使用"),
+    TASK_GROUP_SIZE_ERROR(130002, "task group size error", "任务组大小应该为大于1的整数"),
+    TASK_GROUP_STATUS_ERROR(130003, "task group status error", "任务组已经被关闭"),
+    CREATE_TASK_GROUP_ERROR(130008, "create task group error", "创建任务组错误"),
+    UPDATE_TASK_GROUP_ERROR(130009, "update task group list error", "更新任务组错误"),
     TASK_GROUP_QUEUE_ALREADY_START(130017, "task group queue already start", "节点已经获取任务组资源"),
+    TASK_GROUP_STATUS_CLOSED(130018, "The task group has been closed.", "任务组已经被关闭"),
+    TASK_GROUP_STATUS_OPENED(130019, "The task group has been opened.", "任务组已经被开启"),
     ;
     private final int code;
     private final String enMsg;
