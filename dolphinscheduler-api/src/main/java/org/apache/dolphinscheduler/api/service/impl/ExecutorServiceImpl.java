@@ -34,7 +34,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SCHEDULE_TI
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ScheduleStatus;
@@ -434,7 +433,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 executeType));
 
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.STATUS, BaseStatus.SUCCESS);
         return result;
     }
 
