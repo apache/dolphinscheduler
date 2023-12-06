@@ -27,11 +27,11 @@ import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFact
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SyncMasterDelayTaskExecuteRunnable extends MasterDelayTaskExecuteRunnable {
+public class SyncMasterTaskExecutor extends MasterTaskExecutor {
 
-    public SyncMasterDelayTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
-                                              LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                              LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
+    public SyncMasterTaskExecutor(TaskExecutionContext taskExecutionContext,
+                                  LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
+                                  LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager) {
         super(taskExecutionContext, logicTaskPluginFactoryBuilder, logicTaskInstanceExecutionEventSenderManager);
     }
 
@@ -56,7 +56,7 @@ public class SyncMasterDelayTaskExecuteRunnable extends MasterDelayTaskExecuteRu
                 taskExecutionContext.getCurrentExecutionStatus().name());
         closeLogAppender();
         MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskExecutionContext.getTaskInstanceId());
-        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskExecutionContext.getTaskInstanceId());
+        MasterTaskExecutorHolder.removeMasterTaskExecutor(taskExecutionContext.getTaskInstanceId());
     }
 
 }

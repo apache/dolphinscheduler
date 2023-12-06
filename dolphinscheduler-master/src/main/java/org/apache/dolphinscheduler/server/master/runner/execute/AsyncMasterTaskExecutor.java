@@ -26,14 +26,14 @@ import org.apache.dolphinscheduler.server.master.runner.task.LogicTaskPluginFact
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class AsyncMasterDelayTaskExecuteRunnable extends MasterDelayTaskExecuteRunnable {
+public class AsyncMasterTaskExecutor extends MasterTaskExecutor {
 
     private final AsyncMasterTaskDelayQueue asyncMasterTaskDelayQueue;
 
-    public AsyncMasterDelayTaskExecuteRunnable(TaskExecutionContext taskExecutionContext,
-                                               LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
-                                               LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager,
-                                               AsyncMasterTaskDelayQueue asyncTaskDelayQueue) {
+    public AsyncMasterTaskExecutor(TaskExecutionContext taskExecutionContext,
+                                   LogicTaskPluginFactoryBuilder logicTaskPluginFactoryBuilder,
+                                   LogicTaskInstanceExecutionEventSenderManager logicTaskInstanceExecutionEventSenderManager,
+                                   AsyncMasterTaskDelayQueue asyncTaskDelayQueue) {
         super(taskExecutionContext, logicTaskPluginFactoryBuilder, logicTaskInstanceExecutionEventSenderManager);
         this.asyncMasterTaskDelayQueue = asyncTaskDelayQueue;
     }

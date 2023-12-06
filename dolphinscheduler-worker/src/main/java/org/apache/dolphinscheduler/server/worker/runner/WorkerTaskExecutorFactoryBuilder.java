@@ -30,15 +30,15 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class WorkerTaskExecuteRunnableFactoryBuilder {
+public class WorkerTaskExecutorFactoryBuilder {
 
-    public static WorkerDelayTaskExecuteRunnableFactory<?> createWorkerDelayTaskExecuteRunnableFactory(@NonNull TaskExecutionContext taskExecutionContext,
-                                                                                                       @NonNull WorkerConfig workerConfig,
-                                                                                                       @NonNull WorkerMessageSender workerMessageSender,
-                                                                                                       @NonNull TaskPluginManager taskPluginManager,
-                                                                                                       @Nullable StorageOperate storageOperate,
-                                                                                                       @NonNull WorkerRegistryClient workerRegistryClient) {
-        return new DefaultWorkerDelayTaskExecuteRunnableFactory(taskExecutionContext,
+    public static WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(@NonNull TaskExecutionContext taskExecutionContext,
+                                                                                                          @NonNull WorkerConfig workerConfig,
+                                                                                                          @NonNull WorkerMessageSender workerMessageSender,
+                                                                                                          @NonNull TaskPluginManager taskPluginManager,
+                                                                                                          @Nullable StorageOperate storageOperate,
+                                                                                                          @NonNull WorkerRegistryClient workerRegistryClient) {
+        return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
                 taskPluginManager,

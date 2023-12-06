@@ -15,62 +15,57 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner.execute;
+package org.apache.dolphinscheduler.server.master.runner;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-import org.jetbrains.annotations.NotNull;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
-public abstract class PriorityTaskExecuteRunnable implements TaskExecuteRunnable, Comparable<TaskExecuteRunnable> {
+public abstract class PriorityDelayTaskExecuteRunnable extends BaseTaskExecuteRunnable implements Delayed {
 
-    private final ProcessInstance workflowInstance;
-    private final TaskInstance taskInstance;
-    private final TaskExecutionContext taskExecutionContext;
-
-    public PriorityTaskExecuteRunnable(ProcessInstance workflowInstance,
-                                       TaskInstance taskInstance,
-                                       TaskExecutionContext taskExecutionContext) {
-        this.taskInstance = checkNotNull(taskInstance);
-        this.workflowInstance = checkNotNull(workflowInstance);
-        this.taskExecutionContext = checkNotNull(taskExecutionContext);
+    public PriorityDelayTaskExecuteRunnable(ProcessInstance workflowInstance,
+                                            TaskInstance taskInstance,
+                                            TaskExecutionContext taskExecutionContext) {
+        super(workflowInstance, taskInstance, taskExecutionContext);
     }
 
     @Override
-    public ProcessInstance getWorkflowInstance() {
-        return workflowInstance;
+    public long getDelay(TimeUnit unit) {
+        return unit.convert(
+                DateUtils.getRemainTime(taskExecutionContext.getFirstSubmitTime(),
+                        taskExecutionContext.getDelayTime() * 60L),
+                TimeUnit.SECONDS);
     }
 
     @Override
-    public TaskInstance getTaskInstance() {
-        return taskInstance;
-    }
-
-    @Override
-    public TaskExecutionContext getTaskExecutionContext() {
-        return taskExecutionContext;
-    }
-
-    @Override
-    public int compareTo(@NotNull TaskExecuteRunnable other) {
+    public int compareTo(Delayed o) {
+        if (o == null) {
+            return 1;
+        }
+        int delayTimeCompareResult =
+                Long.compare(this.getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
+        if (delayTimeCompareResult != 0) {
+            return delayTimeCompareResult;
+        }
+        PriorityDelayTaskExecuteRunnable other = (PriorityDelayTaskExecuteRunnable) o;
         // the smaller dispatch fail times, the higher priority
         int dispatchFailTimesCompareResult = taskExecutionContext.getDispatchFailTimes()
                 - other.getTaskExecutionContext().getDispatchFailTimes();
         if (dispatchFailTimesCompareResult != 0) {
             return dispatchFailTimesCompareResult;
         }
-
         int workflowInstancePriorityCompareResult = workflowInstance.getProcessInstancePriority().getCode()
                 - other.getWorkflowInstance().getProcessInstancePriority().getCode();
         if (workflowInstancePriorityCompareResult != 0) {
             return workflowInstancePriorityCompareResult;
         }
-        int workflowInstanceIdCompareResult = workflowInstance.getId() - other.getWorkflowInstance().getId();
+        long workflowInstanceIdCompareResult = workflowInstance.getId().compareTo(other.getWorkflowInstance().getId());
         if (workflowInstanceIdCompareResult != 0) {
-            return workflowInstanceIdCompareResult;
+            return workflowInstancePriorityCompareResult;
         }
         int taskInstancePriorityCompareResult = taskInstance.getTaskInstancePriority().getCode()
                 - other.getTaskInstance().getTaskInstancePriority().getCode();
@@ -84,21 +79,7 @@ public abstract class PriorityTaskExecuteRunnable implements TaskExecuteRunnable
             return -taskGroupPriorityCompareResult;
         }
         // The task instance shouldn't be equals
-        return taskInstance.getId() - other.getTaskInstance().getId();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof PriorityTaskExecuteRunnable) {
-            PriorityTaskExecuteRunnable other = (PriorityTaskExecuteRunnable) obj;
-            return compareTo(other) == 0;
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return taskInstance.getId();
+        return taskInstance.getId().compareTo(other.getTaskInstance().getId());
     }
 
 }

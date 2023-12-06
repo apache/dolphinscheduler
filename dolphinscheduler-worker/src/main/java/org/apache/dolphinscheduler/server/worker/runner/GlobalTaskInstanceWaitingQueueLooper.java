@@ -18,12 +18,9 @@
 package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -36,10 +33,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class GlobalTaskInstanceDispatchQueueLooper extends BaseDaemonThread {
+public class GlobalTaskInstanceWaitingQueueLooper extends BaseDaemonThread {
 
     @Autowired
-    private GlobalTaskInstanceDispatchQueue globalTaskInstanceDispatchQueue;
+    private GlobalTaskInstanceWaitingQueue globalTaskInstanceWaitingQueue;
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -59,7 +56,7 @@ public class GlobalTaskInstanceDispatchQueueLooper extends BaseDaemonThread {
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
-    protected GlobalTaskInstanceDispatchQueueLooper() {
+    protected GlobalTaskInstanceWaitingQueueLooper() {
         super("GlobalTaskDispatchQueueLooper");
     }
 
@@ -72,39 +69,25 @@ public class GlobalTaskInstanceDispatchQueueLooper extends BaseDaemonThread {
     public void run() {
         while (true) {
             try {
-                TaskExecutionContext taskExecutionContext = globalTaskInstanceDispatchQueue.take();
+                TaskExecutionContext taskExecutionContext = globalTaskInstanceWaitingQueue.take();
                 LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
                 LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
 
-                int delayTime = taskExecutionContext.getDelayTime();
-                if (delayTime > 0) {
-                    // delay task process
-                    long remainTime =
-                            DateUtils.getRemainTime(
-                                    DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
-                                    delayTime * 60L);
-                    if (remainTime > 0) {
-                        log.info("Current taskInstance is choose delay execution, delay time: {}s", remainTime);
-                        taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.DELAY_EXECUTION);
-                        // todo: use delay running event
-                        workerMessageSender.sendMessage(taskExecutionContext,
-                                ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
-                    }
-                }
-                WorkerDelayTaskExecuteRunnable workerTaskExecuteRunnable = WorkerTaskExecuteRunnableFactoryBuilder
-                        .createWorkerDelayTaskExecuteRunnableFactory(
+                WorkerTaskExecutor workerTaskExecutor = WorkerTaskExecutorFactoryBuilder
+                        .createWorkerTaskExecutorFactory(
                                 taskExecutionContext,
                                 workerConfig,
                                 workerMessageSender,
                                 taskPluginManager,
                                 storageOperate,
                                 workerRegistryClient)
-                        .createWorkerTaskExecuteRunnable();
-                if (workerManager.offer(workerTaskExecuteRunnable)) {
+                        .createWorkerTaskExecutor();
+                if (workerManager.offer(workerTaskExecutor)) {
                     log.info("Success submit WorkerDelayTaskExecuteRunnable to WorkerManagerThread's waiting queue");
                 }
             } catch (InterruptedException e) {
                 log.error("GlobalTaskDispatchQueueLooper interrupted");
+                Thread.currentThread().interrupt();
                 break;
             } catch (Exception ex) {
                 log.error("GlobalTaskDispatchQueueLooper error", ex);
