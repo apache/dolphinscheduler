@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectParameterService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -86,7 +87,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         if (projectParameter != null) {
             log.warn("ProjectParameter {} already exists.", projectParameter.getParamName());
-            putMsg(result, Status.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameter.getParamName());
+            putMsg(result, ProjectStatus.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameter.getParamName());
             return result;
         }
 
@@ -105,17 +106,17 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
                     .build();
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("Generate project parameter code error.", e);
-            putMsg(result, Status.CREATE_PROJECT_PARAMETER_ERROR);
+            putMsg(result, ProjectStatus.CREATE_PROJECT_PARAMETER_ERROR);
             return result;
         }
 
         if (projectParameterMapper.insert(projectParameter) > 0) {
             log.info("Project parameter is created and id is :{}", projectParameter.getId());
             result.setData(projectParameter);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Project parameter create error, projectName:{}.", projectParameter.getParamName());
-            putMsg(result, Status.CREATE_PROJECT_PARAMETER_ERROR);
+            putMsg(result, ProjectStatus.CREATE_PROJECT_PARAMETER_ERROR);
         }
         return result;
     }
@@ -136,7 +137,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         // check project parameter exists
         if (projectParameter == null || projectCode != projectParameter.getProjectCode()) {
             log.error("Project parameter does not exist, code:{}.", code);
-            putMsg(result, Status.PROJECT_PARAMETER_NOT_EXISTS, String.valueOf(code));
+            putMsg(result, ProjectStatus.PROJECT_PARAMETER_NOT_EXISTS, String.valueOf(code));
             return result;
         }
 
@@ -149,7 +150,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         if (tempProjectParameter != null) {
             log.error("Project parameter name {} already exists", projectParameterName);
-            putMsg(result, Status.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameterName);
+            putMsg(result, ProjectStatus.PROJECT_PARAMETER_ALREADY_EXISTS, projectParameterName);
             return result;
         }
 
@@ -159,10 +160,10 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         if (projectParameterMapper.updateById(projectParameter) > 0) {
             log.info("Project parameter is updated and id is :{}", projectParameter.getId());
             result.setData(projectParameter);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Project parameter update error, {}.", projectParameterName);
-            putMsg(result, Status.UPDATE_PROJECT_PARAMETER_ERROR);
+            putMsg(result, ProjectStatus.UPDATE_PROJECT_PARAMETER_ERROR);
         }
         return result;
     }
@@ -182,7 +183,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         // check project parameter exists
         if (projectParameter == null || projectCode != projectParameter.getProjectCode()) {
             log.error("Project parameter does not exist, code:{}.", code);
-            putMsg(result, Status.PROJECT_PARAMETER_NOT_EXISTS, String.valueOf(code));
+            putMsg(result, ProjectStatus.PROJECT_PARAMETER_NOT_EXISTS, String.valueOf(code));
             return result;
         }
 
@@ -191,10 +192,10 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         if (projectParameterMapper.deleteById(projectParameter.getId()) > 0) {
             log.info("Project parameter is deleted and id is :{}.", projectParameter.getId());
             result.setData(Boolean.TRUE);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Project parameter delete error, {}.", projectParameter.getParamName());
-            putMsg(result, Status.DELETE_PROJECT_PARAMETER_ERROR);
+            putMsg(result, ProjectStatus.DELETE_PROJECT_PARAMETER_ERROR);
         }
         return result;
     }
@@ -205,7 +206,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         if (StringUtils.isEmpty(codes)) {
             log.error("Project parameter codes is empty, projectCode is {}.", projectCode);
-            putMsg(result, Status.PROJECT_PARAMETER_CODE_EMPTY);
+            putMsg(result, ProjectStatus.PROJECT_PARAMETER_CODE_EMPTY);
             return result;
         }
 
@@ -221,18 +222,18 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         String diffCodeString = diffCode.stream().map(String::valueOf).collect(Collectors.joining(Constants.COMMA));
         if (CollectionUtils.isNotEmpty(diffCode)) {
             log.error("Project parameter does not exist, codes:{}.", diffCodeString);
-            throw new ServiceException(Status.PROJECT_PARAMETER_NOT_EXISTS, diffCodeString);
+            throw new ServiceException(ProjectStatus.PROJECT_PARAMETER_NOT_EXISTS, diffCodeString);
         }
 
         for (ProjectParameter projectParameter : projectParameterList) {
             try {
                 this.deleteProjectParametersByCode(loginUser, projectCode, projectParameter.getCode());
             } catch (Exception e) {
-                throw new ServiceException(Status.DELETE_PROJECT_PARAMETER_ERROR, e.getMessage());
+                throw new ServiceException(ProjectStatus.DELETE_PROJECT_PARAMETER_ERROR, e.getMessage());
             }
         }
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -258,7 +259,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         pageInfo.setTotal((int) iPage.getTotal());
         pageInfo.setTotalList(projectParameterList);
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -275,12 +276,12 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         if (projectParameter == null || projectCode != projectParameter.getProjectCode()) {
             log.error("Project parameter does not exist, code:{}.", code);
-            putMsg(result, Status.PROJECT_PARAMETER_NOT_EXISTS, String.valueOf(code));
+            putMsg(result, ProjectStatus.PROJECT_PARAMETER_NOT_EXISTS, String.valueOf(code));
             return result;
         }
 
         result.setData(projectParameter);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 }
