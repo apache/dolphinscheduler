@@ -47,7 +47,8 @@ public enum BaseStatus implements Status {
     VERIFY_PARAMETER_NAME_FAILED(1300009, "The file name verify failed", "文件命名校验失败"),
     STORE_OPERATE_CREATE_ERROR(1300010, "create the resource failed", "存储操作失败"),
     FUNCTION_DISABLED(1400002, "The current feature is disabled.", "当前功能已被禁用"),
-    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),;
+    DESCRIPTION_TOO_LONG_ERROR(1400004, "description is too long error", "描述过长"),
+    ;
     private final int code;
     private final String enMsg;
     private final String zhMsg;

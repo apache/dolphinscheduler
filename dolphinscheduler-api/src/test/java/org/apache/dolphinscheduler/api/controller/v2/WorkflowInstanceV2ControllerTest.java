@@ -24,7 +24,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -68,7 +68,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
                 new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
         pageInfo.setTotalList(Collections.singletonList(new ProcessInstance()));
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         Mockito.when(processInstanceService.queryProcessInstanceList(any(),
                 any(WorkflowInstanceQueryRequest.class))).thenReturn(result);
@@ -84,7 +84,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
 
         Map<String, Object> result = new HashMap<>();
         result.put(DATA_LIST, new ProcessInstance());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         Mockito.when(processInstanceService.queryProcessInstanceById(any(), eq(1))).thenReturn(result);
         Result result1 = workflowInstanceV2Controller.queryWorkflowInstanceById(loginUser, 1);
@@ -105,7 +105,7 @@ public class WorkflowInstanceV2ControllerTest extends AbstractControllerTest {
         User loginUser = getLoginUser();
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         Mockito.when(execService.execute(any(), eq(1), any(ExecuteType.class))).thenReturn(result);
 

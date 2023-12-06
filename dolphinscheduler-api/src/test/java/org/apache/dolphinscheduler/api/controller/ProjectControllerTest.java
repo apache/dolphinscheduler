@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -70,25 +71,25 @@ public class ProjectControllerTest {
     @Test
     public void testUpdateProject() {
         Result result = new Result();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         long projectCode = 1L;
         String projectName = "test";
         String desc = "";
         Mockito.when(projectService.update(user, projectCode, projectName, desc)).thenReturn(result);
         Result response = projectController.updateProject(user, projectCode, projectName, desc);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryProjectByCode() {
         Result result = new Result();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         long projectCode = 1L;
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject());
         Mockito.when(projectService.queryByCode(user, projectCode)).thenReturn(result);
         Result response = projectController.queryProjectByCode(user, projectCode);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -108,29 +109,29 @@ public class ProjectControllerTest {
     @Test
     public void testQueryUnauthorizedProject() {
         Result result = new Result();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         Mockito.when(projectService.queryUnauthorizedProject(user, 2)).thenReturn(result);
         Result response = projectController.queryUnauthorizedProject(user, 2);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryAuthorizedProject() {
         Result result = new Result();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         Mockito.when(projectService.queryAuthorizedProject(user, 2)).thenReturn(result);
         Result response = projectController.queryAuthorizedProject(user, 2);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
     public void testQueryAuthorizedUser() {
         Result result = new Result();
-        this.putMsg(result, Status.SUCCESS);
+        this.putMsg(result, BaseStatus.SUCCESS);
 
         Mockito.when(this.projectService.queryAuthorizedUser(this.user, 3682329499136L)).thenReturn(result);
         Result response = this.projectController.queryAuthorizedUser(this.user, 3682329499136L);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -138,20 +139,20 @@ public class ProjectControllerTest {
         User user = new User();
         user.setId(0);
         Result result = new Result();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         Mockito.when(projectService.queryAllProjectList(user)).thenReturn(result);
         Result response = projectController.queryAllProjectList(user);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
     @Test
     public void testQueryAllProjectListForDependent() {
         User user = new User();
         user.setId(0);
         Result result = new Result();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         Mockito.when(projectService.queryAllProjectListForDependent()).thenReturn(result);
         Result response = projectController.queryAllProjectListForDependent(user);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
     private Project getProject() {
         Project project = new Project();

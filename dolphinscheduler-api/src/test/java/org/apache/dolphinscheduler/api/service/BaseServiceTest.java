@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -75,7 +74,7 @@ public class BaseServiceTest {
 
         Map<String, Object> result = new HashMap<>();
         baseService.putMsg(result, BaseStatus.SUCCESS);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         // has params
         baseService.putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, "test");
 

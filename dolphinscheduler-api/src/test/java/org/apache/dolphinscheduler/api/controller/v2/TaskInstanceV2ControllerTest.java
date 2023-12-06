@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -70,7 +70,7 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
                 new PageInfo<>(taskInstanceQueryReq.getPageNo(), taskInstanceQueryReq.getPageSize());
         pageInfo.setTotalList(Collections.singletonList(new TaskInstance()));
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(taskInstanceQueryReq.getProcessInstanceId()),
                 eq(taskInstanceQueryReq.getProcessInstanceName()), eq(taskInstanceQueryReq.getProcessInstanceName()),
@@ -79,19 +79,19 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
                 eq(taskInstanceQueryReq.getSearchVal()), Mockito.any(), eq(taskInstanceQueryReq.getHost()),
                 eq(taskInstanceQueryReq.getTaskExecuteType()), any(), any())).thenReturn(result);
         Result taskResult = taskInstanceV2Controller.queryTaskListPaging(null, 1L, taskInstanceQueryReq);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(BaseStatus.SUCCESS.getCode()), taskResult.getCode());
     }
 
     @Test
     public void testForceTaskSuccess() {
 
         Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        putMsg(mockResult, BaseStatus.SUCCESS);
 
         when(taskInstanceService.forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
 
         Result taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(BaseStatus.SUCCESS.getCode()), taskResult.getCode());
 
     }
 
@@ -99,12 +99,12 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     public void testTaskSavePoint() {
 
         Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        putMsg(mockResult, BaseStatus.SUCCESS);
 
         when(taskInstanceService.taskSavePoint(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
 
         Result taskResult = taskInstanceV2Controller.taskSavePoint(null, 1L, 1);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(BaseStatus.SUCCESS.getCode()), taskResult.getCode());
 
     }
 
@@ -112,12 +112,12 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     public void testStopTask() {
 
         Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        putMsg(mockResult, BaseStatus.SUCCESS);
 
         when(taskInstanceService.stopTask(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
 
         Result taskResult = taskInstanceV2Controller.stopTask(null, 1L, 1);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
+        Assertions.assertEquals(Integer.valueOf(BaseStatus.SUCCESS.getCode()), taskResult.getCode());
 
     }
 
