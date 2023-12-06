@@ -23,7 +23,7 @@ import java.util.Optional;
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
- * status enum      // todo #4855 One category one interval
+ * status enum
  */
 public enum Status {
 

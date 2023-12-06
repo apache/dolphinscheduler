@@ -17,10 +17,8 @@
 package org.apache.dolphinscheduler.api.enums;
 
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
-import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
 
 import java.util.Locale;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,17 +39,5 @@ public class StatusTest {
 
         LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
         Assertions.assertEquals("成功", BaseStatus.SUCCESS.getMsg());
-    }
-
-    @Test
-    public void testGetStatusByCode() {
-        // FAILURE
-        Optional<Status> optional = Status.findStatusBy(1);
-        Assertions.assertFalse(optional.isPresent());
-
-        // SUCCESS
-        optional = Status.findStatusBy(10018);
-        Assertions.assertTrue(optional.isPresent());
-        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, optional.get());
     }
 }
