@@ -35,9 +35,10 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ScheduleStatus;
 import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProcessDefinitionServiceImpl;
@@ -222,16 +223,16 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Project project = getProject(projectCode);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
 
         // project not found
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         Map<String, Object> map = processDefinitionService.queryProcessDefinitionList(user, projectCode);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
         // project check auth success
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         List<ProcessDefinition> resourceList = new ArrayList<>();
@@ -239,7 +240,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionMapper.queryAllDefinitionList(project.getCode())).thenReturn(resourceList);
         Map<String, Object> checkSuccessRes =
                 processDefinitionService.queryProcessDefinitionList(user, projectCode);
-        Assertions.assertEquals(Status.SUCCESS, checkSuccessRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, checkSuccessRes.get(Constants.STATUS));
     }
 
     @Test
@@ -251,11 +252,11 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                     .checkProjectAndAuthThrowException(user, projectCode, WORKFLOW_DEFINITION);
             processDefinitionService.queryProcessDefinitionListPaging(user, projectCode, "", "", 1, 5, 0);
         } catch (ServiceException serviceException) {
-            Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
+            Assertions.assertEquals(ProjectStatus.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
         }
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         user.setId(1);
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, projectCode, WORKFLOW_DEFINITION);
         long processDefinitionCode1 = 1L;
@@ -319,16 +320,16 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Project project = getProject(projectCode);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
 
         // project check auth fail
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         Map<String, Object> map = processDefinitionService.queryProcessDefinitionByCode(user, 1L, 1L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
         // project check auth success, instance not exist
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         DagData dagData = new DagData(getProcessDefinition(), null, null);
@@ -336,16 +337,16 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         Map<String, Object> instanceNotexitRes =
                 processDefinitionService.queryProcessDefinitionByCode(user, projectCode, 1L);
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, instanceNotexitRes.get(Constants.STATUS));
 
         // instance exit
         when(processDefinitionMapper.queryByCode(46L)).thenReturn(getProcessDefinition());
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         Map<String, Object> successRes =
                 processDefinitionService.queryProcessDefinitionByCode(user, projectCode, 46L);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
@@ -355,34 +356,34 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Project project = getProject(projectCode);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
 
         // project check auth fail
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         Map<String, Object> map =
                 processDefinitionService.queryProcessDefinitionByName(user, projectCode, "test_def");
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
         // project check auth success, instance not exist
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         when(processDefinitionMapper.queryByDefineName(project.getCode(), "test_def")).thenReturn(null);
 
         Map<String, Object> instanceNotExitRes =
                 processDefinitionService.queryProcessDefinitionByName(user, projectCode, "test_def");
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, instanceNotExitRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, instanceNotExitRes.get(Constants.STATUS));
 
         // instance exit
         when(processDefinitionMapper.queryByDefineName(project.getCode(), "test"))
                 .thenReturn(getProcessDefinition());
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         Map<String, Object> successRes =
                 processDefinitionService.queryProcessDefinitionByName(user, projectCode, "test");
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
@@ -391,7 +392,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         Mockito.doReturn(result)
                 .when(projectService)
                 .checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY);
@@ -399,15 +400,15 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // copy project definition ids empty test
         Map<String, Object> map =
                 processDefinitionService.batchCopyProcessDefinition(user, projectCode, StringUtils.EMPTY, 2L);
-        Assertions.assertEquals(Status.PROCESS_DEFINITION_CODES_IS_EMPTY, map.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINITION_CODES_IS_EMPTY, map.get(Constants.STATUS));
 
         // project check auth fail
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY))
                 .thenReturn(result);
         Map<String, Object> map1 = processDefinitionService.batchCopyProcessDefinition(
                 user, projectCode, String.valueOf(project.getId()), 2L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map1.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, map1.get(Constants.STATUS));
 
         // project check auth success, target project name not equal project name, check auth target project fail
         Project project1 = getProject(projectCodeOther);
@@ -416,7 +417,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .when(projectService)
                 .checkProjectAndAuth(user, project1, projectCodeOther, WORKFLOW_BATCH_COPY);
 
-        putMsg(result, Status.SUCCESS, projectCodeOther);
+        putMsg(result, BaseStatus.SUCCESS, projectCodeOther);
         ProcessDefinition definition = getProcessDefinition();
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(definition);
@@ -434,7 +435,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         Map<String, Object> map3 = processDefinitionService.batchCopyProcessDefinition(
                 user, projectCodeOther, String.valueOf(processDefinitionCode), projectCode);
-        Assertions.assertEquals(Status.SUCCESS, map3.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, map3.get(Constants.STATUS));
     }
 
     @Test
@@ -446,7 +447,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(projectMapper.queryByCode(projectCodeOther)).thenReturn(project2);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
 
         when(projectService.checkProjectAndAuth(user, project1, projectCode, TASK_DEFINITION_MOVE))
                 .thenReturn(result);
@@ -471,11 +472,11 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processService.saveProcessDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         when(processTaskRelationMapper.queryByProcessCode(processDefinitionCode))
                 .thenReturn(getProcessTaskRelation());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         Map<String, Object> successRes = processDefinitionService.batchMoveProcessDefinition(
                 user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
@@ -488,7 +489,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 2L));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // project check auth fail
         when(processDefinitionDao.queryByCode(6L)).thenReturn(Optional.of(getProcessDefinition()));
@@ -496,7 +498,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION_DELETE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 6L));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
 
         // project check auth success, instance not exist
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, project,
@@ -504,14 +506,15 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionDao.queryByCode(1L)).thenReturn(Optional.empty());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 1L));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         ProcessDefinition processDefinition = getProcessDefinition();
         // user no auth
         when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM.getCode(), ((ServiceException) exception).getCode());
 
         // process definition online
         user.setUserType(UserType.ADMIN_USER);
@@ -519,7 +522,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_STATE_ONLINE.getCode(),
+                ((ServiceException) exception).getCode());
 
         // scheduler list elements > 1
         processDefinition.setReleaseState(ReleaseState.OFFLINE);
@@ -537,7 +541,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ScheduleStatus.SCHEDULE_STATE_ONLINE.getCode(),
+                ((ServiceException) exception).getCode());
 
         // process used by other task, sub process
         user.setUserType(UserType.ADMIN_USER);
@@ -546,7 +551,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(ImmutableSet.copyOf(getTaskMainInfo()));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL.getCode(),
+        Assertions.assertEquals(ProcessStatus.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL.getCode(),
                 ((ServiceException) exception).getCode());
 
         // delete success
@@ -575,7 +580,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(processDefinitionList);
         Throwable exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, twoCodes));
-        String formatter = MessageFormat.format(Status.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(),
+        String formatter = MessageFormat.format(ProcessStatus.BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR.getMsg(),
                 "12[process definition not exist]");
         Assertions.assertEquals(formatter, exception.getMessage());
 
@@ -589,14 +594,15 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // process definition online
         user.setUserType(UserType.ADMIN_USER);
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         process.setReleaseState(ReleaseState.ONLINE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes));
         String subFormatter =
-                MessageFormat.format(Status.PROCESS_DEFINE_STATE_ONLINE.getMsg(), process.getName());
+                MessageFormat.format(ProcessStatus.PROCESS_DEFINE_STATE_ONLINE.getMsg(), process.getName());
         formatter =
-                MessageFormat.format(Status.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(), subFormatter);
+                MessageFormat.format(ProcessStatus.DELETE_PROCESS_DEFINE_ERROR.getMsg(), process.getName(),
+                        subFormatter);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // delete success
@@ -604,11 +610,11 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(process));
         when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
                 .thenReturn(Collections.emptySet());
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(11L);
         Map<String, Object> deleteSuccess =
                 processDefinitionService.batchDeleteProcessDefinitionByCodes(user, projectCode, singleCodes);
-        Assertions.assertEquals(Status.SUCCESS, deleteSuccess.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, deleteSuccess.get(Constants.STATUS));
         Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(11L);
     }
 
@@ -619,38 +625,38 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project check auth fail
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_CREATE))
                 .thenReturn(result);
         Map<String, Object> map = processDefinitionService.verifyProcessDefinitionName(user,
                 projectCode, "test_pdf", 0);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
 
         // project check auth success, process not exist
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(processDefinitionMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(null);
         Map<String, Object> processNotExistRes =
                 processDefinitionService.verifyProcessDefinitionName(user, projectCode, "test_pdf", 0);
-        Assertions.assertEquals(Status.SUCCESS, processNotExistRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, processNotExistRes.get(Constants.STATUS));
 
         // process exist
         when(processDefinitionMapper.verifyByDefineName(project.getCode(), "test_pdf"))
                 .thenReturn(getProcessDefinition());
         Map<String, Object> processExistRes = processDefinitionService.verifyProcessDefinitionName(user,
                 projectCode, "test_pdf", 0);
-        Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINITION_NAME_EXIST, processExistRes.get(Constants.STATUS));
     }
 
     @Test
     public void testCheckProcessNodeList() {
         Map<String, Object> dataNotValidRes = processDefinitionService.checkProcessNodeList(null, null);
-        Assertions.assertEquals(Status.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.DATA_IS_NOT_VALID, dataNotValidRes.get(Constants.STATUS));
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
 
         Map<String, Object> taskEmptyRes =
                 processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs);
-        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, taskEmptyRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DAG_IS_EMPTY, taskEmptyRes.get(Constants.STATUS));
     }
 
     @Test
@@ -660,22 +666,22 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project check auth fail
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         // process definition not exist
         when(processDefinitionMapper.queryByCode(46L)).thenReturn(null);
         Map<String, Object> processDefinitionNullRes =
                 processDefinitionService.getTaskNodeListByDefinitionCode(user, projectCode, 46L);
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
         // success
         ProcessDefinition processDefinition = getProcessDefinition();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(processService.genDagData(Mockito.any())).thenReturn(new DagData(processDefinition, null, null));
         when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
         Map<String, Object> dataNotValidRes =
                 processDefinitionService.getTaskNodeListByDefinitionCode(user, projectCode, 46L);
-        Assertions.assertEquals(Status.SUCCESS, dataNotValidRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, dataNotValidRes.get(Constants.STATUS));
     }
 
     @Test
@@ -685,7 +691,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         // project check auth fail
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         // process definition not exist
         String defineCodes = "46";
@@ -694,9 +700,9 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionMapper.queryByCodes(defineCodeSet)).thenReturn(null);
         Map<String, Object> processNotExistRes =
                 processDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, defineCodes);
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processNotExistRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, processNotExistRes.get(Constants.STATUS));
 
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         ProcessDefinition processDefinition = getProcessDefinition();
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         processDefinitionList.add(processDefinition);
@@ -710,7 +716,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         Map<String, Object> successRes =
                 processDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, defineCodes);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
@@ -718,7 +724,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Map<String, Object> result = new HashMap<>();
         Project project = getProject(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
                 .thenReturn(result);
         ProcessDefinition processDefinition = getProcessDefinition();
@@ -727,14 +733,14 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionMapper.queryAllDefinitionList(projectCode)).thenReturn(processDefinitionList);
         Map<String, Object> successRes =
                 processDefinitionService.queryAllProcessDefinitionByProjectCode(user, projectCode);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, successRes.get(Constants.STATUS));
     }
 
     @Test
     public void testViewTree() {
         Project project1 = getProject(projectCode);
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectMapper.queryByCode(1)).thenReturn(project1);
         when(projectService.checkProjectAndAuth(user, project1, projectCode, WORKFLOW_TREE_VIEW))
                 .thenReturn(result);
@@ -742,22 +748,22 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         ProcessDefinition processDefinition = getProcessDefinition();
         Map<String, Object> processDefinitionNullRes =
                 processDefinitionService.viewTree(user, processDefinition.getProjectCode(), 46, 10);
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
         // task instance not existproject
-        putMsg(result, Status.SUCCESS, projectCode);
+        putMsg(result, BaseStatus.SUCCESS, projectCode);
         when(projectMapper.queryByCode(1)).thenReturn(project1);
         when(projectService.checkProjectAndAuth(user, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
         when(processDefinitionMapper.queryByCode(46L)).thenReturn(processDefinition);
         when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNullRes =
                 processDefinitionService.viewTree(user, processDefinition.getProjectCode(), 46, 10);
-        Assertions.assertEquals(Status.SUCCESS, taskNullRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, taskNullRes.get(Constants.STATUS));
 
         // task instance exist
         Map<String, Object> taskNotNuLLRes =
                 processDefinitionService.viewTree(user, processDefinition.getProjectCode(), 46, 10);
-        Assertions.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
     }
 
     @Test
@@ -767,13 +773,13 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         Project project1 = getProject(1);
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.STATUS, BaseStatus.SUCCESS);
         when(projectMapper.queryByCode(1)).thenReturn(project1);
         when(projectService.checkProjectAndAuth(user, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
         when(processService.genDagGraph(processDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNotNuLLRes =
                 processDefinitionService.viewTree(user, processDefinition.getProjectCode(), 46, 10);
-        Assertions.assertEquals(Status.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, taskNotNuLLRes.get(Constants.STATUS));
     }
 
     @Test
@@ -789,7 +795,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                     "", "", "", 0, null, "", ProcessExecutionTypeEnum.PARALLEL);
             Assertions.fail();
         } catch (ServiceException ex) {
-            Assertions.assertEquals(Status.DATA_IS_NOT_VALID.getCode(), ex.getCode());
+            Assertions.assertEquals(BaseStatus.DATA_IS_NOT_VALID.getCode(), ex.getCode());
         }
     }
 
@@ -799,7 +805,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         Project project = getProject(projectCode);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND);
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         processDefinitionService.batchExportProcessDefinitionByCodes(user, projectCode, "1", null);
 
@@ -841,7 +847,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
         Project project = getProject(projectCode);
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.STATUS, BaseStatus.SUCCESS);
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_IMPORT))
                 .thenReturn(result);
@@ -855,7 +861,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                                 .thenReturn(0);
         result = processDefinitionService.importSqlProcessDefinition(user, projectCode, mockMultipartFile);
 
-        Assertions.assertEquals(result.get(Constants.STATUS), Status.SUCCESS);
+        Assertions.assertEquals(result.get(Constants.STATUS), BaseStatus.SUCCESS);
     }
 
     @Test
@@ -882,7 +888,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // project not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
 
         // project permission error
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
@@ -890,7 +896,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // description too long
@@ -899,7 +905,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(BaseStatus.DESCRIPTION_TOO_LONG_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
         workflowCreateRequest.setDescription(EMPTY_STRING);
 
         // duplicate process definition name
@@ -908,7 +915,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(this.getProcessDefinition());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.createSingleProcessDefinition(user, workflowCreateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINITION_NAME_EXIST.getCode(),
                 ((ServiceException) exception).getCode());
 
         when(processDefinitionMapper.verifyByDefineName(project.getCode(), name)).thenReturn(null);
@@ -946,7 +953,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.filterProcessDefinition(user, workflowFilterRequest));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
     }
 
@@ -955,7 +962,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // project permission error
         when(processDefinitionMapper.queryByCode(processDefinitionCode))
@@ -966,7 +974,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
@@ -987,7 +995,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
 
         // error old process definition in release state
         processDefinition = this.getProcessDefinition();
@@ -995,7 +1004,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateSingleProcessDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_ALLOWED_EDIT.getCode(),
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINE_NOT_ALLOWED_EDIT.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error project permission
@@ -1007,7 +1016,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_DEFINITION);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.getProcessDefinition(user, processDefinitionCode));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error description too long
@@ -1016,7 +1025,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .checkProjectAndAuthThrowException(user, this.getProject(projectCode), WORKFLOW_UPDATE);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateSingleProcessDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.DESCRIPTION_TOO_LONG_ERROR.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(BaseStatus.DESCRIPTION_TOO_LONG_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
         workflowUpdateRequest.setDescription(EMPTY_STRING);
 
         // error new definition name already exists
@@ -1026,7 +1036,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(this.getProcessDefinition());
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateSingleProcessDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.PROCESS_DEFINITION_NAME_EXIST.getCode(),
+        Assertions.assertEquals(ProcessStatus.PROCESS_DEFINITION_NAME_EXIST.getCode(),
                 ((ServiceException) exception).getCode());
 
         when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(processDefinition);
@@ -1038,7 +1048,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
         exception = Assertions.assertThrows(ServiceException.class, () -> processDefinitionService
                 .updateSingleProcessDefinition(user, processDefinitionCode, workflowUpdateRequest));
-        Assertions.assertEquals(Status.UPDATE_PROCESS_DEFINITION_ERROR.getCode(),
+        Assertions.assertEquals(ProcessStatus.UPDATE_PROCESS_DEFINITION_ERROR.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
@@ -1070,7 +1080,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         ProcessDefinition processDefinition = getProcessDefinition();
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
 
         // project check auth fail
         when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
@@ -1080,7 +1090,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
                 processDefinitionService.viewVariables(user, processDefinition.getProjectCode(),
                         processDefinition.getCode());
 
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
     }
 
     /**

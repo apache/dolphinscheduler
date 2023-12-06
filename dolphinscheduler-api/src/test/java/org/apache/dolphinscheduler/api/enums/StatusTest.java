@@ -16,11 +16,12 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+
 import java.util.Locale;
 import java.util.Optional;
 
-import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
-import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.i18n.LocaleContextHolder;
