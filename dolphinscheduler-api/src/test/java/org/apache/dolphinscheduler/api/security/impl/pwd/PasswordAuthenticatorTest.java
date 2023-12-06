@@ -21,7 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -91,14 +92,14 @@ public class PasswordAuthenticatorTest extends AbstractControllerTest {
         when(usersService.queryUser("test", "test")).thenReturn(mockUser);
         when(sessionService.createSessionIfAbsent(mockUser)).thenReturn(mockSession);
         Result result = authenticator.authenticate("test", "test", "127.0.0.1");
-        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
         mockUser.setState(0);
         when(usersService.queryUser("test", "test")).thenReturn(mockUser);
         when(sessionService.createSessionIfAbsent(mockUser)).thenReturn(mockSession);
         Result result1 = authenticator.authenticate("test", "test", "127.0.0.1");
-        Assertions.assertEquals(Status.USER_DISABLED.getCode(), (int) result1.getCode());
+        Assertions.assertEquals(UserStatus.USER_DISABLED.getCode(), (int) result1.getCode());
         logger.info(result1.toString());
     }
 
