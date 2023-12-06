@@ -21,19 +21,15 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-public enum UserStatus implements Status {
+public enum HDFSStatus implements Status {
 
-    USER_NOT_EXIST(10010, "user {0} not exists", "用户[{0}]不存在"),
-    USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
-    USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
-    USER_NO_WRITE_PROJECT_PERM(30003, "user [{0}] does not have write permission for project [{1}]",
-            "当前用户[{0}]没有[{1}]项目的写权限"),
-    NO_CURRENT_OPERATING_PERMISSION(1400001, "The current user does not have this permission.", "当前用户无此权限"),;
+    HDFS_OPERATION_ERROR(10006, "hdfs operation error", "hdfs操作错误"),
+    HDFS_COPY_FAIL(20010, "hdfs copy {0} -> {1} fail", "hdfs复制失败：[{0}] -> [{1}]"),;
     private final int code;
     private final String enMsg;
     private final String zhMsg;
 
-    UserStatus(int code, String enMsg, String zhMsg) {
+    HDFSStatus(int code, String enMsg, String zhMsg) {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;

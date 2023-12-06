@@ -31,7 +31,12 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.HDFSStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UDFStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -146,14 +151,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Result<Object> result = new Result<>();
         if (FileUtils.directoryTraversal(name)) {
             log.warn("Parameter name is invalid, name:{}.", RegexUtils.escapeNRT(name));
-            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            putMsg(result, BaseStatus.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -161,7 +166,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -172,7 +177,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             if (checkResourceExists(fullName)) {
                 log.error("resource directory {} has exist, can't recreate", fullName);
-                putMsg(result, Status.RESOURCE_EXIST);
+                putMsg(result, ResourceStatus.RESOURCE_EXIST);
                 return result;
             }
         } catch (Exception e) {
@@ -212,7 +217,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -220,12 +225,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
         result = verifyFile(name, type, file);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (!result.getCode().equals(BaseStatus.SUCCESS.getCode())) {
             return result;
         }
 
@@ -237,7 +242,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             if (checkResourceExists(currDirNFileName)) {
                 log.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(name));
-                putMsg(result, Status.RESOURCE_EXIST);
+                putMsg(result, ResourceStatus.RESOURCE_EXIST);
                 return result;
             }
         } catch (Exception e) {
@@ -248,7 +253,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     "Resource file's name is longer than max full name length, fullName:{}, " +
                             "fullNameSize:{}, maxFullNameSize:{}",
                     RegexUtils.escapeNRT(name), currDirNFileName.length(), Constants.RESOURCE_FULL_NAME_MAX_LENGTH);
-            putMsg(result, Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
+            putMsg(result, ResourceStatus.RESOURCE_FULL_NAME_TOO_LONG_ERROR);
             return result;
         }
 
@@ -256,14 +261,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!upload(loginUser, currDirNFileName, file, type)) {
             log.error("upload resource: {} file: {} failed.", RegexUtils.escapeNRT(name),
                     RegexUtils.escapeNRT(file.getOriginalFilename()));
-            putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
+            putMsg(result, BaseStatus.STORE_OPERATE_CREATE_ERROR);
             throw new ServiceException(
                     String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
         } else
             ApiServerMetrics.recordApiResourceUploadSize(file.getSize());
         log.info("Upload resource file complete, resourceName:{}, fileName:{}.",
                 RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -338,7 +343,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -346,7 +351,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -357,7 +362,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resource = storageOperate.getFileStatus(resourceFullName, defaultPath, resTenantCode, type);
         } catch (Exception e) {
             log.error("Get file status fail, resource path: {}", resourceFullName, e);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             throw new ServiceException((String.format("Get file status fail, resource path: %s", resourceFullName)));
         }
 
@@ -365,7 +370,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (resource.isDirectory() && storageOperate.returnStorageType().equals(ResUploadType.S3)
                 && !resource.getFileName().equals(name)) {
             log.warn("Directory in S3 storage can not be renamed.");
-            putMsg(result, Status.S3_CANNOT_RENAME);
+            putMsg(result, BaseStatus.S3_CANNOT_RENAME);
             return result;
         }
 
@@ -383,7 +388,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             try {
                 if (checkResourceExists(fullName)) {
                     log.error("resource {} already exists, can't recreate", fullName);
-                    putMsg(result, Status.RESOURCE_EXIST);
+                    putMsg(result, ResourceStatus.RESOURCE_EXIST);
                     return result;
                 }
             } catch (Exception e) {
@@ -393,7 +398,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         result = verifyFile(name, type, file);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (!result.getCode().equals(BaseStatus.SUCCESS.getCode())) {
             return result;
         }
 
@@ -417,7 +422,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (!upload(loginUser, fullName, file, type)) {
                 log.error("Storage operation error, resourceName:{}, originFileName:{}.",
                         name, RegexUtils.escapeNRT(file.getOriginalFilename()));
-                putMsg(result, Status.HDFS_OPERATION_ERROR);
+                putMsg(result, HDFSStatus.HDFS_OPERATION_ERROR);
                 throw new ServiceException(
                         String.format("upload resource: %s file: %s failed.", name, file.getOriginalFilename()));
             }
@@ -439,12 +444,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             log.info("start  copy {} -> {}", originFullName, destHdfsFileName);
             storageOperate.copy(originFullName, destHdfsFileName, true, true);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } catch (Exception e) {
             log.error(MessageFormat.format(" copy {0} -> {1} fail", originFullName, destHdfsFileName), e);
-            putMsg(result, Status.HDFS_COPY_FAIL);
+            putMsg(result, HDFSStatus.HDFS_COPY_FAIL);
             throw new ServiceException(MessageFormat.format(
-                    Status.HDFS_COPY_FAIL.getMsg(), originFullName, destHdfsFileName));
+                    HDFSStatus.HDFS_COPY_FAIL.getMsg(), originFullName, destHdfsFileName));
         }
 
         return result;
@@ -452,18 +457,18 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     private Result<Object> verifyFile(String name, ResourceType type, MultipartFile file) {
         Result<Object> result = new Result<>();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         if (FileUtils.directoryTraversal(name)) {
             log.warn("Parameter file alias name verify failed, fileAliasName:{}.", RegexUtils.escapeNRT(name));
-            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            putMsg(result, BaseStatus.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 
         if (file != null && FileUtils.directoryTraversal(Objects.requireNonNull(file.getOriginalFilename()))) {
             log.warn("File original name verify failed, fileOriginalName:{}.",
                     RegexUtils.escapeNRT(file.getOriginalFilename()));
-            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            putMsg(result, BaseStatus.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 
@@ -472,7 +477,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (file.isEmpty()) {
                 log.warn("Parameter file is empty, fileOriginalName:{}.",
                         RegexUtils.escapeNRT(file.getOriginalFilename()));
-                putMsg(result, Status.RESOURCE_FILE_IS_EMPTY);
+                putMsg(result, ResourceStatus.RESOURCE_FILE_IS_EMPTY);
                 return result;
             }
 
@@ -485,21 +490,21 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 // rename file suffix and original suffix must be consistent
                 log.warn("Rename file suffix and original suffix must be consistent, fileOriginalName:{}.",
                         RegexUtils.escapeNRT(file.getOriginalFilename()));
-                putMsg(result, Status.RESOURCE_SUFFIX_FORBID_CHANGE);
+                putMsg(result, ResourceStatus.RESOURCE_SUFFIX_FORBID_CHANGE);
                 return result;
             }
 
             // If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
             if (Constants.UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
-                log.warn(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
-                putMsg(result, Status.UDF_RESOURCE_SUFFIX_NOT_JAR);
+                log.warn(UDFStatus.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
+                putMsg(result, UDFStatus.UDF_RESOURCE_SUFFIX_NOT_JAR);
                 return result;
             }
             if (file.getSize() > Constants.MAX_FILE_SIZE) {
                 log.warn(
                         "Resource file size is larger than max file size, fileOriginalName:{}, fileSize:{}, maxFileSize:{}.",
                         RegexUtils.escapeNRT(file.getOriginalFilename()), file.getSize(), Constants.MAX_FILE_SIZE);
-                putMsg(result, Status.RESOURCE_SIZE_EXCEED_LIMIT);
+                putMsg(result, ResourceStatus.RESOURCE_SIZE_EXCEED_LIMIT);
                 return result;
             }
         }
@@ -534,7 +539,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -544,7 +549,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)
                 || (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir))) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -552,7 +557,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         try {
             resourcesList = queryStorageEntityList(loginUser, fullName, type, tenantCode, false);
         } catch (ServiceException e) {
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
 
@@ -568,7 +573,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         pageInfo.setTotal(filteredResourceList.size());
         pageInfo.setTotalList(slicedResourcesList);
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -648,13 +653,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             if (!storageOperate.mkdir(tenantCode, fullName)) {
                 log.error("create resource directory {} failed", fullName);
-                putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
+                putMsg(result, BaseStatus.STORE_OPERATE_CREATE_ERROR);
                 // throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
             }
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } catch (Exception e) {
             log.error("create resource directory {} failed", fullName);
-            putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
+            putMsg(result, BaseStatus.STORE_OPERATE_CREATE_ERROR);
             throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
         }
     }
@@ -712,14 +717,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         Map<String, Object> result = new HashMap<>();
         if (storageOperate == null) {
             result.put(Constants.DATA_LIST, Collections.emptyList());
-            result.put(Constants.STATUS, Status.SUCCESS);
+            result.put(Constants.STATUS, BaseStatus.SUCCESS);
             return result;
         }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return null;
         }
 
@@ -764,7 +769,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         Visitor resourceTreeVisitor = new ResourceTreeVisitor(resourcesList);
         result.put(Constants.DATA_LIST, resourceTreeVisitor.visit(defaultPath).getChildren());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -783,14 +788,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
             log.error("tenant not exists");
-            putMsg(result, Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            putMsg(result, TenantStatus.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
             return result;
         }
 
@@ -813,7 +818,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         List<StorageEntity> resources = new ResourceFilter(suffix, new ArrayList<>(allResourceList)).filter();
         Visitor visitor = new ResourceTreeVisitor(resources);
         result.setData(visitor.visit("").getChildren());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -855,7 +860,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -863,7 +868,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -873,13 +878,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resource = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, null);
         } catch (Exception e) {
             log.error(e.getMessage() + " Resource path: {}", fullName, e);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
         }
 
         if (resource == null) {
             log.error("Resource does not exist, resource full name:{}.", fullName);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
 
@@ -896,7 +901,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (CollectionUtils.isNotEmpty(udfFuncs)) {
                 log.warn("Resource can not be deleted because it is bound by UDF functions, udfFuncIds:{}",
                         udfFuncs);
-                putMsg(result, Status.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
+                putMsg(result, UDFStatus.UDF_RESOURCE_IS_BOUND, udfFuncs.get(0).getFuncName());
                 return result;
             }
         }
@@ -904,7 +909,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         // delete file on hdfs,S3
         storageOperate.delete(fullName, allChildren, true);
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -948,11 +953,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser) {
         Result<Object> result = new Result<>();
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         if (checkResourceExists(fullName)) {
             log.error("Resource with same name exists so can not create again, resourceType:{}, resourceName:{}.",
                     type, RegexUtils.escapeNRT(fullName));
-            putMsg(result, Status.RESOURCE_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_EXIST);
         }
 
         return result;
@@ -972,14 +977,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                                                   String resTenantCode) {
         Result<Object> result = new Result<>();
         if (StringUtils.isBlank(fileName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR);
             return result;
         }
 
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -987,7 +992,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -1001,11 +1006,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             file = storageOperate.getFileStatus(defaultPath + fileName, defaultPath, resTenantCode, type);
         } catch (Exception e) {
             log.error(e.getMessage() + " Resource path: {}", defaultPath + fileName, e);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.setData(file);
         return result;
     }
@@ -1025,7 +1030,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -1033,7 +1038,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -1047,11 +1052,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             file = storageOperate.getFileStatus(fullName, defaultPath, resTenantCode, type);
         } catch (Exception e) {
             log.error(e.getMessage() + " Resource path: {}", fullName, e);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             throw new ServiceException(String.format(e.getMessage() + " Resource path: %s", fullName));
         }
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.setData(file);
         return result;
     }
@@ -1073,7 +1078,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -1081,7 +1086,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -1093,7 +1098,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (!strList.contains(nameSuffix)) {
                 log.error("Resource suffix does not support view,resourceFullName:{}, suffix:{}.", fullName,
                         nameSuffix);
-                putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
+                putMsg(result, ResourceStatus.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
@@ -1106,17 +1111,17 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 ApiServerMetrics.recordApiResourceDownloadSize(size);
             } else {
                 log.error("read file {} not exist in storage", fullName);
-                putMsg(result, Status.RESOURCE_FILE_NOT_EXIST, fullName);
+                putMsg(result, ResourceStatus.RESOURCE_FILE_NOT_EXIST, fullName);
                 return result;
             }
 
         } catch (Exception e) {
             log.error("Resource {} read failed", fullName, e);
-            putMsg(result, Status.HDFS_OPERATION_ERROR);
+            putMsg(result, HDFSStatus.HDFS_OPERATION_ERROR);
             return result;
         }
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         Map<String, Object> map = new HashMap<>();
         map.put(ALIAS, fullName);
         map.put(CONTENT, String.join("\n", content));
@@ -1145,7 +1150,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -1153,13 +1158,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
         if (FileUtils.directoryTraversal(fileName)) {
             log.warn("File name verify failed, fileName:{}.", RegexUtils.escapeNRT(fileName));
-            putMsg(result, Status.VERIFY_PARAMETER_NAME_FAILED);
+            putMsg(result, BaseStatus.VERIFY_PARAMETER_NAME_FAILED);
             return result;
         }
 
@@ -1170,7 +1175,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             List<String> strList = Arrays.asList(resourceViewSuffixes.split(","));
             if (!strList.contains(nameSuffix)) {
                 log.warn("Resource suffix does not support view, suffix:{}.", nameSuffix);
-                putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
+                putMsg(result, ResourceStatus.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
@@ -1186,12 +1191,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         result = verifyResourceName(fullName, type, loginUser);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (!result.getCode().equals(BaseStatus.SUCCESS.getCode())) {
             return result;
         }
 
         result = uploadContentToStorage(loginUser, fullName, tenantCode, content);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (!result.getCode().equals(BaseStatus.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         }
         return result;
@@ -1212,7 +1217,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String fullName = defaultPath + filepath;
 
         Result<Object> result = uploadContentToStorage(user, fullName, user.getTenantCode(), resourceContent);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
+        if (result.getCode() != BaseStatus.SUCCESS.getCode()) {
             throw new ServiceException(result.getMsg());
         }
         return storageOperate.getFileStatus(fullName, defaultPath, user.getTenantCode(), ResourceType.FILE);
@@ -1235,7 +1240,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -1243,7 +1248,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -1252,13 +1257,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resource = storageOperate.getFileStatus(fullName, "", resTenantCode, ResourceType.FILE);
         } catch (Exception e) {
             log.error("error occurred when fetching resource information ,  resource full name {}", fullName);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
 
         if (resource == null) {
             log.error("Resource does not exist, resource full name:{}.", fullName);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
 
@@ -1270,14 +1275,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             if (!strList.contains(nameSuffix)) {
                 log.warn("Resource suffix does not support view, resource full name:{}, suffix:{}.",
                         fullName, nameSuffix);
-                putMsg(result, Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
+                putMsg(result, ResourceStatus.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW);
                 return result;
             }
         }
 
         result = uploadContentToStorage(loginUser, resource.getFullName(), resTenantCode, content);
 
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
+        if (!result.getCode().equals(BaseStatus.SUCCESS.getCode())) {
             throw new ServiceException(result.getMsg());
         } else
             log.info("Update resource content complete, resource full name:{}.", fullName);
@@ -1300,7 +1305,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 // write file fail
                 log.error("Write file error, fileName:{}, content:{}.", localFilename,
                         RegexUtils.escapeNRT(content));
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
                 return result;
             }
 
@@ -1322,12 +1327,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         } catch (Exception e) {
             log.error("Upload content to storage error, tenantCode:{}, destFileName:{}.", tenantCode, localFilename,
                     e);
-            result.setCode(Status.HDFS_OPERATION_ERROR.getCode());
+            result.setCode(HDFSStatus.HDFS_OPERATION_ERROR.getCode());
             result.setMsg(String.format("copy %s to hdfs %s fail", localFilename, fullName));
             return result;
         }
         log.info("Upload content to storage complete, tenantCode:{}, destFileName:{}.", tenantCode, localFilename);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1379,7 +1384,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
 
@@ -1404,7 +1409,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         result.put(Constants.DATA_LIST, list);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1425,7 +1430,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -1442,7 +1447,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     storageOperate.listFilesStatus(baseFolder, baseFolder, tenantCode, ResourceType.FILE));
         } catch (Exception e) {
             log.error("delete data transfer data error", e);
-            putMsg(result, Status.DELETE_RESOURCE_ERROR);
+            putMsg(result, ResourceStatus.DELETE_RESOURCE_ERROR);
             return result;
         }
 
@@ -1465,7 +1470,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         result.setSuccessList(successList);
         result.setFailedList(failList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1503,7 +1508,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 .collect(Collectors.toList());
         Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
         result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1518,7 +1523,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> unauthorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
 
@@ -1541,7 +1546,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             resultList = new ArrayList<>(udfFuncSet);
         }
         result.put(Constants.DATA_LIST, resultList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1556,12 +1561,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         List<UdfFunc> udfFuncs = udfFunctionMapper.queryAuthedUdfFunc(userId);
         result.put(Constants.DATA_LIST, udfFuncs);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1576,7 +1581,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
 
@@ -1592,7 +1597,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         log.info(jsonTreeStr);
         result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1607,14 +1612,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public Result<Object> queryResourceBaseDir(User loginUser, ResourceType type) {
         Result<Object> result = new Result<>();
         if (storageOperate == null) {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
             result.setData(EMPTY_STRING);
             return result;
         }
         User user = userMapper.selectById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
-            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
+            putMsg(result, UserStatus.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
 
@@ -1622,14 +1627,14 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
             log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
         String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
                 : storageOperate.getDir(type, tenantCode);
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.setData(baseDir);
 
         return result;
@@ -1742,7 +1747,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private String getTenantCode(User user) {
         Tenant tenant = tenantMapper.queryById(user.getTenantId());
         if (tenant == null) {
-            throw new ServiceException(Status.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
+            throw new ServiceException(TenantStatus.CURRENT_LOGIN_USER_TENANT_NOT_EXIST);
         }
         return tenant.getTenantCode();
     }
