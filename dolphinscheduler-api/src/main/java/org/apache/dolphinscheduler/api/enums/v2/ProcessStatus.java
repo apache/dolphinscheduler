@@ -78,6 +78,7 @@ public enum ProcessStatus implements Status {
             "批量删除工作流定义错误: {0}"),
     DELETE_PROCESS_DEFINE_BY_CODES_ERROR(50026, "delete process definition by codes error: {0}",
             "删除工作流定义错误: {0}"),
+    BATCH_EXPORT_PROCESS_DEFINE_BY_IDS_ERROR(50028, "batch export process definition by ids error", "批量导出工作流定义错误"),
     IMPORT_PROCESS_DEFINE_ERROR(50029, "import process definition error", "导入工作流定义错误"),
     CREATE_PROCESS_TASK_RELATION_ERROR(50032, "create process task relation error", "创建工作流任务关系错误"),
     PROCESS_TASK_RELATION_EXIST(50034, "process task relation is already exist, processCode:[{0}]",
