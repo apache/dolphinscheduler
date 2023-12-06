@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.enums.v2.DataSourceStatus;
 import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
@@ -340,7 +339,7 @@ public class DataSourceServiceTest {
         try {
             dataSourceService.queryDataSource(Mockito.anyInt(), loginUser);
         } catch (Exception e) {
-            Assertions.assertTrue(e.getMessage().contains(Status.RESOURCE_NOT_EXIST.getMsg()));
+            Assertions.assertTrue(e.getMessage().contains(ResourceStatus.RESOURCE_NOT_EXIST.getMsg()));
         }
 
         DataSource dataSource = getOracleDataSource(1);
@@ -528,7 +527,7 @@ public class DataSourceServiceTest {
         try {
             dataSourceService.getDatabases(datasourceId);
         } catch (Exception e) {
-            Assertions.assertTrue(e.getMessage().contains(Status.QUERY_DATASOURCE_ERROR.getMsg()));
+            Assertions.assertTrue(e.getMessage().contains(DataSourceStatus.QUERY_DATASOURCE_ERROR.getMsg()));
         }
 
         when(dataSourceMapper.selectById(datasourceId)).thenReturn(dataSource);
@@ -542,7 +541,7 @@ public class DataSourceServiceTest {
         try {
             dataSourceService.getDatabases(datasourceId);
         } catch (Exception e) {
-            Assertions.assertTrue(e.getMessage().contains(Status.GET_DATASOURCE_TABLES_ERROR.getMsg()));
+            Assertions.assertTrue(e.getMessage().contains(DataSourceStatus.GET_DATASOURCE_TABLES_ERROR.getMsg()));
         }
 
         dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
@@ -551,7 +550,7 @@ public class DataSourceServiceTest {
         try {
             dataSourceService.getDatabases(datasourceId);
         } catch (Exception e) {
-            Assertions.assertTrue(e.getMessage().contains(Status.DATASOURCE_CONNECT_FAILED.getMsg()));
+            Assertions.assertTrue(e.getMessage().contains(DataSourceStatus.DATASOURCE_CONNECT_FAILED.getMsg()));
         }
         connection.close();
         dataSourceUtils.close();
