@@ -23,7 +23,13 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum ProjectStatus implements Status {
 
+    DELETE_PROJECT_ERROR(10050, "delete project error", "删除项目错误"),
     PROJECT_NOT_FOUND(10018, "project {0} not found ", "项目[{0}]不存在"),
+    PROJECT_ALREADY_EXISTS(10019, "project {0} already exists", "项目名称[{0}]已存在"),
+    UPDATE_PROJECT_ERROR(10046, "update project error", "更新项目信息错误"),
+    CREATE_PROJECT_ERROR(10048, "create project error", "创建项目错误"),
+    DELETE_PROJECT_ERROR_DEFINES_NOT_NULL(10137, "please delete the process definitions in project first!",
+            "请先删除全部工作流定义"),
     PROJECT_NOT_EXIST(10190, "This project was not found. Please refresh page.", "该项目不存在,请刷新页面"),
     CREATE_PROJECT_PARAMETER_ERROR(10214, "create project parameter error", "创建项目参数错误"),
     UPDATE_PROJECT_PARAMETER_ERROR(10215, "update project parameter error", "更新项目参数错误"),
