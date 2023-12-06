@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.IP_IS_EMPTY;
-
 import org.apache.dolphinscheduler.api.configuration.OAuth2Configuration;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.security.impl.AbstractSsoAuthenticator;
 import org.apache.dolphinscheduler.api.service.SessionService;
@@ -109,19 +108,19 @@ public class LoginController extends BaseController {
                         HttpServletResponse response) {
         // user name check
         if (StringUtils.isEmpty(userName)) {
-            return error(Status.USER_NAME_NULL.getCode(),
-                    Status.USER_NAME_NULL.getMsg());
+            return error(UserStatus.USER_NAME_NULL.getCode(),
+                    UserStatus.USER_NAME_NULL.getMsg());
         }
 
         // user ip check
         String ip = getClientIpAddress(request);
         if (StringUtils.isEmpty(ip)) {
-            return error(IP_IS_EMPTY.getCode(), IP_IS_EMPTY.getMsg());
+            return error(BaseStatus.IP_IS_EMPTY.getCode(), BaseStatus.IP_IS_EMPTY.getMsg());
         }
 
         // verify username and password
         Result<Map<String, String>> result = authenticator.authenticate(userName, userPassword, ip);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
+        if (result.getCode() != BaseStatus.SUCCESS.getCode()) {
             return result;
         }
 
