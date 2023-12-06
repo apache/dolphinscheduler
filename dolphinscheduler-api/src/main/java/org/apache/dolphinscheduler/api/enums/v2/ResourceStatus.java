@@ -37,6 +37,9 @@ public enum ResourceStatus implements Status {
     RESOURCE_FILE_EXIST(20011, "resource file {0} already exists in hdfs,please delete it or change name!",
             "资源文件[{0}]在hdfs中已存在，请删除或修改资源名"),
     RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists !", "资源文件[{0}]不存在"),
+    RESOURCE_NOT_EXIST_OR_NO_PERMISSION(20016,
+            "resource not exist or no permission,please view the task node and remove error resource",
+            "请检查任务节点并移除无权限或者已删除的资源"),
     RESOURCE_FULL_NAME_TOO_LONG_ERROR(1300015, "resource's fullname is too long error", "资源文件名过长"),;
     private final int code;
     private final String enMsg;
