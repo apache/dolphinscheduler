@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
@@ -50,18 +51,18 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
         Map<String, Object> result = new HashMap<>();
         if (!pluginType.getHasUi()) {
             log.warn("Plugin does not have UI.");
-            putMsg(result, Status.PLUGIN_NOT_A_UI_COMPONENT);
+            putMsg(result, PluginStatus.PLUGIN_NOT_A_UI_COMPONENT);
             return result;
         }
         List<PluginDefine> pluginDefines = pluginDefineMapper.queryByPluginType(pluginType.getDesc());
 
         if (CollectionUtils.isEmpty(pluginDefines)) {
             log.warn("Query plugins result is null, check status of plugins.");
-            putMsg(result, Status.QUERY_PLUGINS_RESULT_IS_NULL);
+            putMsg(result, PluginStatus.QUERY_PLUGINS_RESULT_IS_NULL);
             return result;
         }
         // pluginDefines=buildPluginParams(pluginDefines);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefines);
         return result;
     }
@@ -72,12 +73,12 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
         PluginDefine pluginDefine = pluginDefineMapper.queryDetailById(id);
         if (null == pluginDefine) {
             log.warn("Query plugins result is empty, pluginId:{}.", id);
-            putMsg(result, Status.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL);
+            putMsg(result, PluginStatus.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL);
             return result;
         }
         // String params=pluginDefine.getPluginParams();
         // pluginDefine.setPluginParams(parseParams(params));
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefine);
         return result;
     }
