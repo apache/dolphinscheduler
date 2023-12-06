@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -80,7 +81,7 @@ public class UsersController extends BaseController {
                              @RequestParam(value = "phone", required = false) String phone,
                              @RequestParam(value = "state", required = false) int state) throws Exception {
         Result verifyRet = usersService.verifyUserName(userName);
-        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+        if (verifyRet.getCode() != BaseStatus.SUCCESS.getCode()) {
             return verifyRet;
         }
         Map<String, Object> result =
@@ -477,8 +478,8 @@ public class UsersController extends BaseController {
             Map<String, Object> result = usersService.authorizedUser(loginUser, alertgroupId);
             return returnDataList(result);
         } catch (Exception e) {
-            log.error(Status.AUTHORIZED_USER_ERROR.getMsg(), e);
-            return error(Status.AUTHORIZED_USER_ERROR.getCode(), Status.AUTHORIZED_USER_ERROR.getMsg());
+            log.error(UserStatus.AUTHORIZED_USER_ERROR.getMsg(), e);
+            return error(UserStatus.AUTHORIZED_USER_ERROR.getCode(), UserStatus.AUTHORIZED_USER_ERROR.getMsg());
         }
     }
 
@@ -508,7 +509,7 @@ public class UsersController extends BaseController {
         repeatPassword = ParameterUtils.handleEscapes(repeatPassword);
         email = ParameterUtils.handleEscapes(email);
         Result<Object> verifyRet = usersService.verifyUserName(userName);
-        if (verifyRet.getCode() != Status.SUCCESS.getCode()) {
+        if (verifyRet.getCode() != BaseStatus.SUCCESS.getCode()) {
             return verifyRet;
         }
         Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);

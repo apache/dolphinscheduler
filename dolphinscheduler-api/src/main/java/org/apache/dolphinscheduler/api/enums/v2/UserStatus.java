@@ -29,6 +29,7 @@ public enum UserStatus implements Status {
     CREATE_USER_ERROR(10090, "create user error", "创建用户错误"),
     UPDATE_USER_ERROR(10092, "update user error", "更新用户错误"),
     DELETE_USER_BY_ID_ERROR(10093, "delete user by id error", "删除用户错误"),
+    AUTHORIZED_USER_ERROR(10102, "authorized user error", "查询授权用户错误"),
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
     USER_NO_WRITE_PROJECT_PERM(30003, "user [{0}] does not have write permission for project [{1}]",
