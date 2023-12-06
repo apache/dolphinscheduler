@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
