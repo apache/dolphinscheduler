@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.CloudService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -61,7 +61,7 @@ public class CloudController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result listDataFactory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> factoryNames = cloudService.listDataFactory(loginUser);
-        return success(Status.SUCCESS.getMsg(), factoryNames);
+        return success(BaseStatus.SUCCESS.getMsg(), factoryNames);
     }
 
     /**
@@ -75,7 +75,7 @@ public class CloudController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Result listResourceGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<String> resourceGroupNames = cloudService.listResourceGroup(loginUser);
-        return success(Status.SUCCESS.getMsg(), resourceGroupNames);
+        return success(BaseStatus.SUCCESS.getMsg(), resourceGroupNames);
     }
 
     /**
@@ -91,6 +91,6 @@ public class CloudController extends BaseController {
                                @RequestParam("factoryName") String factoryName,
                                @RequestParam("resourceGroupName") String resourceGroupName) {
         List<String> pipelineNames = cloudService.listPipeline(loginUser, factoryName, resourceGroupName);
-        return success(Status.SUCCESS.getMsg(), pipelineNames);
+        return success(BaseStatus.SUCCESS.getMsg(), pipelineNames);
     }
 }
