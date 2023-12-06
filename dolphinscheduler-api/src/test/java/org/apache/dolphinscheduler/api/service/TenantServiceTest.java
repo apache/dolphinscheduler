@@ -25,7 +25,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
@@ -113,21 +114,21 @@ public class TenantServiceTest {
                 baseServiceLogger)).thenReturn(true);
         // check exist
         String emptyTenantCode = "";
-        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+        assertThrowsServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR,
                 () -> tenantService.createTenant(loginUser, emptyTenantCode, 1, tenantDesc));
 
         // check tenant code too long
         String longStr =
                 "this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string_this_is_a_very_long_string";
-        assertThrowsServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR,
+        assertThrowsServiceException(TenantStatus.TENANT_FULL_NAME_TOO_LONG_ERROR,
                 () -> tenantService.createTenant(loginUser, longStr, 1, tenantDesc));
 
         // check tenant code invalid
-        assertThrowsServiceException(Status.CHECK_OS_TENANT_CODE_ERROR,
+        assertThrowsServiceException(TenantStatus.CHECK_OS_TENANT_CODE_ERROR,
                 () -> tenantService.createTenant(getLoginUser(), "%!1111", 1, tenantDesc));
 
         // check exist
-        assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
+        assertThrowsServiceException(TenantStatus.OS_TENANT_CODE_EXIST,
                 () -> tenantService.createTenant(loginUser, tenantCode, 1, tenantDesc));
 
         // success
@@ -139,7 +140,7 @@ public class TenantServiceTest {
         when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
 
         // tenantCode exist
-        assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
+        assertThrowsServiceException(TenantStatus.OS_TENANT_CODE_EXIST,
                 () -> tenantService.verifyTenantCode(getTenant().getTenantCode()));
 
         // success
@@ -173,7 +174,7 @@ public class TenantServiceTest {
         when(tenantMapper.updateById(any())).thenReturn(1);
 
         // update not exists tenant
-        assertThrowsServiceException(Status.TENANT_NOT_EXIST,
+        assertThrowsServiceException(TenantStatus.TENANT_NOT_EXIST,
                 () -> tenantService.updateTenant(getLoginUser(), 912222, tenantCode, 1, tenantDesc));
 
         // success
@@ -197,22 +198,23 @@ public class TenantServiceTest {
         when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
         // TENANT_NOT_EXIST
-        assertThrowsServiceException(Status.TENANT_NOT_EXIST, () -> tenantService.deleteTenantById(getLoginUser(), 12));
+        assertThrowsServiceException(TenantStatus.TENANT_NOT_EXIST,
+                () -> tenantService.deleteTenantById(getLoginUser(), 12));
 
         // DELETE_TENANT_BY_ID_FAIL
-        assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL,
+        assertThrowsServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL,
                 () -> tenantService.deleteTenantById(getLoginUser(), 1));
 
         // DELETE_TENANT_BY_ID_FAIL_DEFINES
         when(processInstanceMapper.queryByTenantCodeAndStatus(any(), any())).thenReturn(Collections.emptyList());
         when(tenantMapper.queryById(2)).thenReturn(getTenant(2));
-        assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES,
+        assertThrowsServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL_DEFINES,
                 () -> tenantService.deleteTenantById(getLoginUser(), 2));
 
         // DELETE_TENANT_BY_ID_FAIL_USERS
         when(tenantMapper.queryById(3)).thenReturn(getTenant(3));
         when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
-        assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS,
+        assertThrowsServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL_USERS,
                 () -> tenantService.deleteTenantById(getLoginUser(), 3));
 
         // success
@@ -225,7 +227,7 @@ public class TenantServiceTest {
     public void testVerifyTenantCode() {
         when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
         // tenantCode exist
-        assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
+        assertThrowsServiceException(TenantStatus.OS_TENANT_CODE_EXIST,
                 () -> tenantService.verifyTenantCode(getTenant().getTenantCode()));
         // success
         assertDoesNotThrow(() -> tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf"));

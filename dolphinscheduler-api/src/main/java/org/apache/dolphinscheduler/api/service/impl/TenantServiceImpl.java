@@ -22,7 +22,9 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_UPDATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TENANT_FULL_NAME_MAX_LENGTH;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.TenantService;
@@ -93,13 +95,13 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      */
     private void createTenantValid(Tenant tenant) throws ServiceException {
         if (StringUtils.isEmpty(tenant.getTenantCode())) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, tenant.getTenantCode());
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, tenant.getTenantCode());
         } else if (StringUtils.length(tenant.getTenantCode()) > TENANT_FULL_NAME_MAX_LENGTH) {
-            throw new ServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
+            throw new ServiceException(TenantStatus.TENANT_FULL_NAME_TOO_LONG_ERROR);
         } else if (!RegexUtils.isValidLinuxUserName(tenant.getTenantCode())) {
-            throw new ServiceException(Status.CHECK_OS_TENANT_CODE_ERROR);
+            throw new ServiceException(TenantStatus.CHECK_OS_TENANT_CODE_ERROR);
         } else if (checkTenantExists(tenant.getTenantCode())) {
-            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenant.getTenantCode());
+            throw new ServiceException(TenantStatus.OS_TENANT_CODE_EXIST, tenant.getTenantCode());
         }
     }
 
@@ -113,18 +115,18 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         // Check the exists tenant
         if (Objects.isNull(existsTenant)) {
             log.error("Tenant does not exist.");
-            throw new ServiceException(Status.TENANT_NOT_EXIST);
+            throw new ServiceException(TenantStatus.TENANT_NOT_EXIST);
         }
         // Check the update tenant parameters
         else if (StringUtils.isEmpty(updateTenant.getTenantCode())) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, updateTenant.getTenantCode());
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, updateTenant.getTenantCode());
         } else if (StringUtils.length(updateTenant.getTenantCode()) > TENANT_FULL_NAME_MAX_LENGTH) {
-            throw new ServiceException(Status.TENANT_FULL_NAME_TOO_LONG_ERROR);
+            throw new ServiceException(TenantStatus.TENANT_FULL_NAME_TOO_LONG_ERROR);
         } else if (!RegexUtils.isValidLinuxUserName(updateTenant.getTenantCode())) {
-            throw new ServiceException(Status.CHECK_OS_TENANT_CODE_ERROR);
+            throw new ServiceException(TenantStatus.CHECK_OS_TENANT_CODE_ERROR);
         } else if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())
                 && checkTenantExists(updateTenant.getTenantCode())) {
-            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, updateTenant.getTenantCode());
+            throw new ServiceException(TenantStatus.OS_TENANT_CODE_EXIST, updateTenant.getTenantCode());
         }
     }
 
@@ -145,10 +147,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                int queueId,
                                String desc) throws Exception {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_CREATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+            throw new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
         }
         Tenant tenant = new Tenant(tenantCode, desc, queueId);
         createTenantValid(tenant);
@@ -199,10 +201,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                              String desc) throws Exception {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_UPDATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+            throw new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
         }
         Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
         Tenant existsTenant = tenantMapper.queryById(id);
@@ -216,7 +218,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
         int update = tenantMapper.updateById(updateTenant);
         if (update <= 0) {
-            throw new ServiceException(Status.UPDATE_TENANT_ERROR);
+            throw new ServiceException(TenantStatus.UPDATE_TENANT_ERROR);
         }
     }
 
@@ -233,32 +235,32 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     public void deleteTenantById(User loginUser, int id) throws Exception {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         Tenant tenant = tenantMapper.queryById(id);
         if (Objects.isNull(tenant)) {
-            throw new ServiceException(Status.TENANT_NOT_EXIST);
+            throw new ServiceException(TenantStatus.TENANT_NOT_EXIST);
         }
 
         List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
         if (CollectionUtils.isNotEmpty(processInstances)) {
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
+            throw new ServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
         }
 
         List<Schedule> schedules = scheduleMapper.queryScheduleListByTenant(tenant.getTenantCode());
         if (CollectionUtils.isNotEmpty(schedules)) {
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, schedules.size());
+            throw new ServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL_DEFINES, schedules.size());
         }
 
         List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(userList)) {
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
+            throw new ServiceException(TenantStatus.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }
 
         int delete = tenantMapper.deleteById(id);
         if (delete <= 0) {
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_ERROR);
+            throw new ServiceException(TenantStatus.DELETE_TENANT_BY_ID_ERROR);
         }
 
         processInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
@@ -296,7 +298,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Override
     public void verifyTenantCode(String tenantCode) {
         if (checkTenantExists(tenantCode)) {
-            throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenantCode);
+            throw new ServiceException(TenantStatus.OS_TENANT_CODE_EXIST, tenantCode);
         }
     }
 
@@ -323,7 +325,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
         if (tenant != null) {
             result.put(Constants.DATA_LIST, tenant);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return result;
     }
