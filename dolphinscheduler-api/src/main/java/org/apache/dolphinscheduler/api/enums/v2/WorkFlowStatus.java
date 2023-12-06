@@ -23,6 +23,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 public enum WorkFlowStatus implements Status {
 
+    QUERY_WORKFLOW_LINEAGE_ERROR(10161, "query workflow lineage error", "查询血缘失败"),
     WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
             "工作流实例未结束，不能执行此操作"),;
     private final int code;

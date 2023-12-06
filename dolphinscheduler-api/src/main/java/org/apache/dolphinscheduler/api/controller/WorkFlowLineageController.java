@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_LINEAGE_ERROR;
 import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.WorkFlowStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -95,8 +95,9 @@ public class WorkFlowLineageController extends BaseController {
             Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
             return returnDataList(result);
         } catch (Exception e) {
-            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
-            return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
+            log.error(WorkFlowStatus.QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
+            return error(WorkFlowStatus.QUERY_WORKFLOW_LINEAGE_ERROR.getCode(),
+                    WorkFlowStatus.QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }
 
@@ -127,7 +128,7 @@ public class WorkFlowLineageController extends BaseController {
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 }
