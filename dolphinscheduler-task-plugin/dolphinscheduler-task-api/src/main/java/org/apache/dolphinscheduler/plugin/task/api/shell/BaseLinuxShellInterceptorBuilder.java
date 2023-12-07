@@ -66,6 +66,11 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
 
     protected List<String> generateBootstrapCommand() {
         if (sudoEnable) {
+            if (!TenantConstants.BOOTSTRAPT_SYSTEM_USER.equals(runUser)) {
+                // Set the tenant owner as the working directory
+                FileUtils.setDirectoryOwner(Paths.get(shellDirectory), runUser);
+            }
+
             return bootstrapCommandInSudoMode();
         }
         return bootstrapCommandInNormalMode();
