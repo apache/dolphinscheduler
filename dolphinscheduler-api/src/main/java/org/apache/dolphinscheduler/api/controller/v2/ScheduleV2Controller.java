@@ -17,17 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_SCHEDULE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_SCHEDULE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SCHEDULE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_SCHEDULE_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -75,7 +68,6 @@ public class ScheduleV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_SCHEDULE_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_SCHEDULE_ERROR)
     public Result<Schedule> createSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody ScheduleCreateRequest scheduleCreateRequest) {
         Schedule schedule = schedulerService.createSchedulesV2(loginUser, scheduleCreateRequest);
@@ -94,7 +86,6 @@ public class ScheduleV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
     public Result deleteSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @PathVariable("id") Integer id) {
         schedulerService.deleteSchedulesById(loginUser, id);
@@ -112,7 +103,6 @@ public class ScheduleV2Controller extends BaseController {
     @Operation(summary = "update", description = "UPDATE_SCHEDULE_NOTES")
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_SCHEDULE_ERROR)
     public Result<Schedule> updateSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable("id") Integer id,
                                            @RequestBody ScheduleUpdateRequest scheduleUpdateRequest) {
@@ -130,7 +120,6 @@ public class ScheduleV2Controller extends BaseController {
     @Operation(summary = "get", description = "GET_SCHEDULE_BY_ID_NOTES")
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_SCHEDULE_LIST_ERROR)
     public Result<Schedule> getSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable("id") Integer id) {
         Schedule schedule = schedulerService.getSchedule(loginUser, id);
@@ -147,7 +136,6 @@ public class ScheduleV2Controller extends BaseController {
     @Operation(summary = "get", description = "QUERY_SCHEDULE_LIST_PAGING_NOTES")
     @PostMapping(value = "/filter", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_SCHEDULE_LIST_PAGING_ERROR)
     public Result<PageInfo<Schedule>> filterSchedule(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @RequestBody ScheduleFilterRequest scheduleFilterRequest) {
         PageInfo<Schedule> schedules = schedulerService.filterSchedules(loginUser, scheduleFilterRequest);
