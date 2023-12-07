@@ -17,17 +17,11 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_QUEUE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.queue.QueueCreateRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueQueryRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueUpdateRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueVerifyRequest;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -76,7 +70,6 @@ public class QueueV2Controller extends BaseController {
     @Operation(summary = "queryList", description = "QUERY_QUEUE_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_QUEUE_LIST_ERROR)
     public Result<List<Queue>> queryList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<Queue> queues = queueService.queryList(loginUser);
         return Result.success(queues);
@@ -97,7 +90,6 @@ public class QueueV2Controller extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_QUEUE_LIST_ERROR)
     public Result<PageInfo<Queue>> queryQueueListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         QueueQueryRequest queueQueryRequest) {
         checkPageParams(queueQueryRequest.getPageNo(), queueQueryRequest.getPageSize());
@@ -118,7 +110,6 @@ public class QueueV2Controller extends BaseController {
     @Operation(summary = "createQueue", description = "CREATE_QUEUE_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_QUEUE_ERROR)
     public Result<Queue> createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestBody QueueCreateRequest queueCreateRequest) {
         return Result.success(
@@ -139,7 +130,6 @@ public class QueueV2Controller extends BaseController {
     })
     @PutMapping(value = "/{id}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(UPDATE_QUEUE_ERROR)
     public Result<Queue> updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable(value = "id") int id,
                                      @RequestBody QueueUpdateRequest queueUpdateRequest) {
@@ -157,7 +147,6 @@ public class QueueV2Controller extends BaseController {
     @Operation(summary = "verifyQueue", description = "VERIFY_QUEUE_NOTES")
     @PostMapping(value = "/verify", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_QUEUE_ERROR)
     public Result<Boolean> verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestBody QueueVerifyRequest queueVerifyRequest) {
         queueService.verifyQueue(queueVerifyRequest.getQueue(), queueVerifyRequest.getQueueName());
