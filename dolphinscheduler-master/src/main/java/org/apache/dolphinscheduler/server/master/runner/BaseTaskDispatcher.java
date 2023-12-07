@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -92,7 +91,7 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
                 .appIds(taskExecutionContext.getAppIds())
                 .processId(taskExecutionContext.getProcessId())
                 .varPool(taskExecutionContext.getVarPool())
-                .startTime(DateUtils.timeStampToDate(taskExecutionContext.getStartTime()))
+                .startTime(new Date())
                 .endTime(new Date())
                 .event(TaskEventType.RESULT)
                 .build();
