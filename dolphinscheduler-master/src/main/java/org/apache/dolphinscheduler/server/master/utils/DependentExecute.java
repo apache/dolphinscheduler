@@ -316,12 +316,21 @@ public class DependentExecute {
      */
     private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
 
-        // Task instance cannot run without process instance,
-        // we should only use `scheduleTime` to search for process instances,
-        // as `dateInterval` is calculated based on the `scheduleTime` of the
-        // process instance where the `dependent` node is located.
+        ProcessInstance lastSchedulerProcess =
+                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
 
-        return processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+        ProcessInstance lastManualProcess =
+                processInstanceDao.queryLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+
+        if (lastManualProcess == null) {
+            return lastSchedulerProcess;
+        }
+        if (lastSchedulerProcess == null) {
+            return lastManualProcess;
+        }
+
+        // In the time range, there are both manual and scheduled workflow instances, return the last workflow instance
+        return lastManualProcess.getId() > lastSchedulerProcess.getId() ? lastManualProcess : lastSchedulerProcess;
     }
 
     /**
