@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_OPTIONS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_RULE_FORM_CREATE_JSON_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RULE_LIST_PAGING_ERROR;
-
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.service.DqRuleService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -77,7 +70,6 @@ public class DataQualityController extends BaseController {
     })
     @GetMapping(value = "/getRuleFormCreateJson")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(GET_RULE_FORM_CREATE_JSON_ERROR)
     public Result<String> getRuleFormCreateJsonById(@RequestParam(value = "ruleId") int ruleId) {
         String ruleFormCreateJsonById = dqRuleService.getRuleFormCreateJsonById(ruleId);
         return Result.success(ruleFormCreateJsonById);
@@ -103,7 +95,6 @@ public class DataQualityController extends BaseController {
     })
     @GetMapping(value = "/rule/page")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_RULE_LIST_PAGING_ERROR)
     public Result<PageInfo<DqRule>> queryRuleListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @RequestParam(value = "searchVal", required = false) String searchVal,
                                                         @RequestParam(value = "ruleType", required = false) Integer ruleType,
@@ -127,7 +118,6 @@ public class DataQualityController extends BaseController {
     @Operation(summary = "queryRuleList", description = "QUERY_RULE_LIST_NOTES")
     @GetMapping(value = "/ruleList")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_RULE_LIST_ERROR)
     public Result<List<DqRule>> queryRuleList() {
         List<DqRule> dqRules = dqRuleService.queryAllRuleList();
         return Result.success(dqRules);
@@ -158,7 +148,6 @@ public class DataQualityController extends BaseController {
     })
     @GetMapping(value = "/result/page")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_EXECUTE_RESULT_LIST_PAGING_ERROR)
     public Result<PageInfo<DqExecuteResult>> queryExecuteResultListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                                                           @RequestParam(value = "ruleType", required = false) Integer ruleType,
@@ -187,7 +176,6 @@ public class DataQualityController extends BaseController {
     })
     @GetMapping(value = "/getDatasourceOptionsById")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(GET_DATASOURCE_OPTIONS_ERROR)
     public Result<List<ParamsOptions>> getDatasourceOptionsById(@RequestParam(value = "datasourceId") int datasourceId) {
         List<ParamsOptions> paramsOptions = dqRuleService.getDatasourceOptionsById(datasourceId);
         return Result.success(paramsOptions);
