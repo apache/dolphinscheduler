@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.api.controller.v2;
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -71,7 +69,6 @@ public class WorkflowInstanceV2Controller extends BaseController {
     @Operation(summary = "queryWorkflowInstanceListPaging", description = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     public Result queryWorkflowInstanceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestBody WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
         checkPageParams(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
@@ -91,7 +88,6 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @GetMapping(value = "/{workflowInstanceId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result queryWorkflowInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, workflowInstanceId);
@@ -111,7 +107,6 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{workflowInstanceId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
     public Result<Void> deleteWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable("workflowInstanceId") Integer workflowInstanceId) {
         processInstanceService.deleteProcessInstanceById(loginUser, workflowInstanceId);
@@ -133,7 +128,6 @@ public class WorkflowInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{workflowInstanceId}/execute/{executeType}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.EXECUTE_PROCESS_INSTANCE_ERROR)
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @PathVariable("workflowInstanceId") Integer workflowInstanceId,
                           @PathVariable("executeType") ExecuteType executeType) {
