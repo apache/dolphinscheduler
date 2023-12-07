@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
-
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.DelayQueue;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class GlobalTaskDispatchWaitingQueue {
 
-    private final PriorityBlockingQueue<DefaultTaskExecuteRunnable> queue = new PriorityBlockingQueue<>();
+    private final DelayQueue<DefaultTaskExecuteRunnable> queue = new DelayQueue<>();
 
     public void submitNeedToDispatchTaskExecuteRunnable(DefaultTaskExecuteRunnable priorityTaskExecuteRunnable) {
         queue.put(priorityTaskExecuteRunnable);
