@@ -16,9 +16,11 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
 public class HttpUtilsTest {
 
     @Test
@@ -29,14 +31,11 @@ public class HttpUtilsTest {
 
         // test invalid certification HTTPS URL
         String response2 = HttpUtils.get("https://poc.bzzt.net");
-        assertNull(response2, "Response should be null for ainvalid certification https URL and throw exception in console");
-
+        assertNull(response2,
+                "Response should be null for an invalid certification https URL and throw exception in console");
 
         // test valid certification HTTPS URL
         String response3 = HttpUtils.get("https://www.google.com/");
         assertNotNull(response3, "Response should not be null for a valid certification https URL");
-
-
     }
-
 }
