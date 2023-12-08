@@ -20,17 +20,14 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.audit.AuditMessage;
 import org.apache.dolphinscheduler.api.audit.AuditPublishService;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.AuditResourceType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,14 +71,17 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      * @param userName          query user name
      * @param pageNo            page number
      * @param pageSize          page size
-     * @return  audit log string data
+     * @return audit log string data
      */
     @Override
-    public Result queryLogListPaging(User loginUser, AuditResourceType resourceType,
-                                     AuditOperationType operationType, String startDate,
-                                     String endDate, String userName,
-                                     Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public PageInfo<AuditDto> queryLogListPaging(User loginUser,
+                                                 AuditResourceType resourceType,
+                                                 AuditOperationType operationType,
+                                                 String startDate,
+                                                 String endDate,
+                                                 String userName,
+                                                 Integer pageNo,
+                                                 Integer pageSize) {
 
         int[] resourceArray = null;
         if (resourceType != null) {
@@ -93,20 +93,18 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             opsArray = new int[]{operationType.getCode()};
         }
 
-        Date start = (Date) checkAndParseDateParameters(startDate);
-        Date end = (Date) checkAndParseDateParameters(endDate);
+        Date start = checkAndParseDateParameters(startDate);
+        Date end = checkAndParseDateParameters(endDate);
 
-        Page<AuditLog> page = new Page<>(pageNo, pageSize);
-        IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(page, resourceArray, opsArray, userName, start, end);
-        List<AuditLog> logList = logIPage != null ? logIPage.getRecords() : new ArrayList<>();
+        IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(new Page<>(pageNo, pageSize), resourceArray, opsArray,
+                userName, start, end);
+        List<AuditDto> auditDtos =
+                logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
+
         PageInfo<AuditDto> pageInfo = new PageInfo<>(pageNo, pageSize);
-
-        List<AuditDto> auditDtos = logList.stream().map(this::transformAuditLog).collect(Collectors.toList());
-        pageInfo.setTotal((int) (auditDtos != null ? auditDtos.size() : 0L));
+        pageInfo.setTotal((int) auditDtos.size());
         pageInfo.setTotalList(auditDtos);
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return pageInfo;
     }
 
     /**

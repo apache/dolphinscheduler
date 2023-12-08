@@ -46,24 +46,18 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.collect.Maps;
 
-/**
- * procedure task
- */
+@Slf4j
 public class ProcedureTask extends AbstractTask {
 
-    /**
-     * procedure parameters
-     */
-    private ProcedureParameters procedureParameters;
+    private final ProcedureParameters procedureParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+    private final ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
     /**
      * constructor

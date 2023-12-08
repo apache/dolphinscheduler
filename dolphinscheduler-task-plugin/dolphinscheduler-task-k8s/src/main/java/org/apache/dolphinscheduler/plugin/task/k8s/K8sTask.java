@@ -43,26 +43,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
+@Slf4j
 public class K8sTask extends AbstractK8sTask {
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * task parameters
-     */
     private K8sTaskParameters k8sTaskParameters;
 
     private K8sTaskExecutionContext k8sTaskExecutionContext;
 
     private K8sConnectionParam k8sConnectionParam;
-    /**
-     * @param taskRequest taskRequest
-     */
     public K8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
@@ -121,8 +114,8 @@ public class K8sTask extends AbstractK8sTask {
     }
 
     @Override
-    protected void dealOutParam(String result) {
-        this.k8sTaskParameters.dealOutParam(result);
+    protected void dealOutParam(Map<String, String> taskOutputParams) {
+        this.k8sTaskParameters.dealOutParam(taskOutputParams);
     }
 
     public List<NodeSelectorRequirement> convertToNodeSelectorRequirements(List<NodeSelectorExpression> expressions) {
