@@ -597,6 +597,7 @@ export function formatModel(data: ITaskData) {
     const targetParams: ISqoopTargetParams = JSON.parse(
       data.taskParams.targetParams
     )
+    params.targetType = data.taskParams.targetType
     params.targetHiveDatabase = targetParams.hiveDatabase
     params.targetHiveTable = targetParams.hiveTable
     params.targetHiveCreateTable = targetParams.createHiveTable

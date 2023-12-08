@@ -31,7 +31,7 @@ export function useTargetType(
     const rdbmsSpan = ref(0)
     const dataSourceSpan = ref(0)
     const updateSpan = ref(0)
-
+    const isChange: any = ref(false)
     const rdbmsSourceTypes = ref([
         {
             label: 'MYSQL',
@@ -90,6 +90,10 @@ export function useTargetType(
     }
 
     const resetValue = () => {
+        if (!isChange.value) {
+            isChange.value = true
+            return
+        }
         switch (model.modelType) {
             case 'import':
                 model.targetHiveDatabase = '';

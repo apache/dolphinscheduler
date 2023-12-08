@@ -34,6 +34,7 @@ export function useSourceType(
     const hiveSpan = ref(0)
     const hdfsSpan = ref(0)
     const datasourceSpan = ref(24)
+    const isChange: any = ref(false)
     const rdbmsSourceTypes = ref([
         {
             label: 'MYSQL',
@@ -74,6 +75,10 @@ export function useSourceType(
             unCustomSpan.value && rdbmsSourceTypes.value.some(source => source.value === model.sourceType) ? 24 : 0
     }
     const resetValue = () => {
+        if (!isChange.value) {
+            isChange.value = true
+            return
+        }
         switch (model.modelType) {
             case 'import':
                 model.sourceMysqlDatasource = ''
