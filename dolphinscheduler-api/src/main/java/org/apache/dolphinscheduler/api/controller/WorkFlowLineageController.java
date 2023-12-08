@@ -69,32 +69,25 @@ public class WorkFlowLineageController extends BaseController {
     @Operation(summary = "queryLineageByWorkFlowName", description = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
     public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                     @RequestParam(value = "workFlowName", required = false) String workFlowName) {
-        try {
-            workFlowName = ParameterUtils.handleEscapes(workFlowName);
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
-            return returnDataList(result);
-        } catch (Exception e) {
-            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
-            return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
-        }
+        workFlowName = ParameterUtils.handleEscapes(workFlowName);
+        List<WorkFlowLineage> workFlowLineages =
+                workFlowLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
+        return Result.success(workFlowLineages);
     }
 
     @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
     @GetMapping(value = "/{workFlowCode}")
     @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
-        try {
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
-            return returnDataList(result);
-        } catch (Exception e) {
-            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
-            return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
-        }
+        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        return Result.success(result);
     }
 
     @Operation(summary = "queryWorkFlowList", description = "QUERY_WORKFLOW_LINEAGE_NOTES")

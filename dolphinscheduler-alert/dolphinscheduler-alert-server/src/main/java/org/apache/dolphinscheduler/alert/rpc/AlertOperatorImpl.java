@@ -20,6 +20,7 @@ import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +43,16 @@ public class AlertOperatorImpl implements IAlertOperator {
                 alertSendRequest.getContent(),
                 alertSendRequest.getWarnType());
         log.info("Handle AlertSendRequest finish: {}", alertSendResponse);
+        return alertSendResponse;
+    }
+
+    @Override
+    public AlertSendResponse sendTestAlert(AlertTestSendRequest alertSendRequest) {
+        log.info("Received AlertTestSendRequest : {}", alertSendRequest);
+        AlertSendResponse alertSendResponse = alertBootstrapService.syncTestSend(
+                alertSendRequest.getPluginDefineId(),
+                alertSendRequest.getPluginInstanceParams());
+        log.info("Handle AlertTestSendRequest finish: {}", alertSendResponse);
         return alertSendResponse;
     }
 }

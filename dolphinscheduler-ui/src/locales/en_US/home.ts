@@ -38,5 +38,6 @@ export default {
   serial_wait: 'SERIAL_WAIT',
   dispatch: 'DISPATCH',
   ready_block: 'READY_BLOCK',
-  block: 'BLOCK'
+  block: 'BLOCK',
+  wait_to_run: 'WAIT_TO_RUN'
 }

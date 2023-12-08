@@ -77,11 +77,11 @@ public final class AlertPluginManager {
             String name = entry.getKey();
             AlertChannelFactory factory = entry.getValue();
 
-            log.info("Registering alert plugin: {} - {}", name, factory.getClass());
+            log.info("Registering alert plugin: {} - {}", name, factory.getClass().getSimpleName());
 
             final AlertChannel alertChannel = factory.create();
 
-            log.info("Registered alert plugin: {} - {}", name, factory.getClass());
+            log.info("Registered alert plugin: {} - {}", name, factory.getClass().getSimpleName());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
 

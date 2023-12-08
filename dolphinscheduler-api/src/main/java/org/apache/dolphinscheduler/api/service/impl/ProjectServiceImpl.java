@@ -41,9 +41,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -142,8 +143,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             log.info("Project is created and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
-            permissionPostHandle(AuthorizationType.PROJECTS, loginUser.getId(),
-                    Collections.singletonList(project.getId()), log);
         } else {
             log.error("Project create error, projectName:{}.", project.getName());
             putMsg(result, Status.CREATE_PROJECT_ERROR);
@@ -159,9 +158,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     public static void checkDesc(Result result, String desc) {
         if (!StringUtils.isEmpty(desc) && desc.codePointCount(0, desc.length()) > 255) {
-            log.warn("Parameter description check failed.");
-            result.setCode(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
-            result.setMsg(MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+            result.setCode(Status.DESCRIPTION_TOO_LONG_ERROR.getCode());
+            result.setMsg(Status.DESCRIPTION_TOO_LONG_ERROR.getMsg());
         } else {
             result.setCode(Status.SUCCESS.getCode());
         }
@@ -243,7 +241,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     }
 
     @Override
-    public void checkProjectAndAuthThrowException(User loginUser, long projectCode, String permission) {
+    public void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) {
+        if (projectCode == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
         Project project = projectMapper.queryByCode(projectCode);
         checkProjectAndAuthThrowException(loginUser, project, permission);
     }
@@ -317,6 +318,32 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
         }
         return checkResult;
+    }
+
+    @Override
+    public void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        checkHasProjectWritePermissionThrowException(loginUser, project);
+    }
+
+    @Override
+    public void checkHasProjectWritePermissionThrowException(User loginUser, Project project) {
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, null);
+        }
+        // case 1: user is admin
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            return;
+        }
+        // case 2: user is project owner
+        if (project.getUserId().equals(loginUser.getId())) {
+            return;
+        }
+        // case 3: check user permission level
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+        if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+            throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+        }
     }
 
     @Override
@@ -811,5 +838,21 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public List<Long> getAuthorizedProjectCodes(User loginUser) {
+        if (loginUser == null) {
+            throw new IllegalArgumentException("loginUser can not be null");
+        }
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return Collections.emptyList();
+        }
+        return projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
     }
 }

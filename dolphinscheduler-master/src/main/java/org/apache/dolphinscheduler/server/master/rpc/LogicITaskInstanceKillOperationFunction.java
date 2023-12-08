@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillReque
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.MasterDelayTaskExecuteRunnableDelayQueue;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecuteRunnableHolder;
+import org.apache.dolphinscheduler.server.master.runner.GlobalMasterTaskExecuteRunnableQueue;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorHolder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +38,7 @@ public class LogicITaskInstanceKillOperationFunction
             ITaskInstanceOperationFunction<LogicTaskKillRequest, LogicTaskKillResponse> {
 
     @Autowired
-    private MasterDelayTaskExecuteRunnableDelayQueue masterDelayTaskExecuteRunnableDelayQueue;
+    private GlobalMasterTaskExecuteRunnableQueue globalMasterTaskExecuteRunnableQueue;
 
     @Override
     public LogicTaskKillResponse operate(LogicTaskKillRequest taskKillRequest) {
@@ -46,16 +46,16 @@ public class LogicITaskInstanceKillOperationFunction
         try {
             LogUtils.setTaskInstanceIdMDC(taskKillRequest.getTaskInstanceId());
             log.info("Received killLogicTask request: {}", taskKillRequest);
-            final MasterTaskExecuteRunnable masterTaskExecuteRunnable =
-                    MasterTaskExecuteRunnableHolder.getMasterTaskExecuteRunnable(taskInstanceId);
-            if (masterTaskExecuteRunnable == null) {
+            final MasterTaskExecutor masterTaskExecutor =
+                    MasterTaskExecutorHolder.getMasterTaskExecutor(taskInstanceId);
+            if (masterTaskExecutor == null) {
                 log.error("Cannot find the MasterTaskExecuteRunnable, this task may already been killed");
                 return LogicTaskKillResponse.fail("Cannot find the MasterTaskExecuteRunnable");
             }
             try {
-                masterTaskExecuteRunnable.cancelTask();
-                masterDelayTaskExecuteRunnableDelayQueue
-                        .removeMasterDelayTaskExecuteRunnable(masterTaskExecuteRunnable);
+                masterTaskExecutor.cancelTask();
+                globalMasterTaskExecuteRunnableQueue
+                        .removeMasterTaskExecuteRunnable(masterTaskExecutor);
                 return LogicTaskKillResponse.success();
             } catch (MasterTaskExecuteException e) {
                 log.error("Cancel MasterTaskExecuteRunnable failed ", e);
@@ -63,7 +63,7 @@ public class LogicITaskInstanceKillOperationFunction
             } finally {
                 // todo: If cancel failed, we cannot remove the context?
                 MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskInstanceId);
-                MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskInstanceId);
+                MasterTaskExecutorHolder.removeMasterTaskExecutor(taskInstanceId);
             }
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
