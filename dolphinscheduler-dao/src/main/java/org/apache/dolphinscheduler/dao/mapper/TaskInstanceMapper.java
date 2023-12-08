@@ -170,18 +170,14 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
      * find last task instance list in the date interval
      *
      * @param taskCodes taskCodes
-     * @param startTime startTime
-     * @param endTime endTime
      * @param testFlag testFlag
      * @return task instance list
      */
-    List<TaskInstance> findLastTaskInstances(@Param("taskCodes") Set<Long> taskCodes,
-                                             @Param("startTime") Date startTime,
-                                             @Param("endTime") Date endTime,
+    List<TaskInstance> findLastTaskInstances(@Param("processInstanceId") Integer processInstanceId,
+                                             @Param("taskCodes") Set<Long> taskCodes,
                                              @Param("testFlag") int testFlag);
 
-    TaskInstance findLastTaskInstance(@Param("taskCode") long depTaskCode,
-                                      @Param("startTime") Date startTime,
-                                      @Param("endTime") Date endTime,
+    TaskInstance findLastTaskInstance(@Param("processInstanceId") Integer processInstanceId,
+                                      @Param("taskCode") long depTaskCode,
                                       @Param("testFlag") int testFlag);
 }
