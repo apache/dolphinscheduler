@@ -20,32 +20,34 @@ package org.apache.dolphinscheduler.server.master.runner.execute;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 
 @Slf4j
 @Component
-public class MasterTaskExecutorThreadPool {
+public class MasterSyncTaskExecutorThreadPool implements IMasterTaskExecutorThreadPool<SyncMasterTaskExecutor> {
 
-    @Autowired
-    private MasterConfig masterConfig;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
-    private ListeningExecutorService listeningExecutorService;
-
-    public synchronized void start() {
-        log.info("MasterTaskExecuteRunnableThreadPool starting...");
-        this.listeningExecutorService = MoreExecutors.listeningDecorator(ThreadUtils.newDaemonFixedThreadExecutor(
-                "MasterTaskExecuteRunnableThread", masterConfig.getMasterTaskExecuteThreadPoolSize()));
-        log.info("MasterTaskExecuteRunnableThreadPool started...");
+    public MasterSyncTaskExecutorThreadPool(MasterConfig masterConfig) {
+        this.threadPoolExecutor = ThreadUtils.newDaemonFixedThreadExecutor("MasterSyncTaskExecutorThreadPool",
+                masterConfig.getMasterSyncTaskExecutorThreadPoolSize());
     }
 
-    public void submitMasterTaskExecutor(MasterTaskExecutor masterTaskExecutor) {
-        listeningExecutorService.submit(masterTaskExecutor);
+    @Override
+    public boolean submitMasterTaskExecutor(SyncMasterTaskExecutor syncMasterTaskExecutor) {
+        synchronized (MasterSyncTaskExecutorThreadPool.class) {
+            // todo: check if the thread pool is overload
+            threadPoolExecutor.submit(syncMasterTaskExecutor);
+            return true;
+        }
     }
 
+    @Override
+    public boolean removeMasterTaskExecutor(SyncMasterTaskExecutor syncMasterTaskExecutor) {
+        return threadPoolExecutor.remove(syncMasterTaskExecutor);
+    }
 }
