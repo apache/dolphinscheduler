@@ -93,7 +93,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.COM_HANA_DB_JDBC_DRIVER;
+        return DataSourceConstants.HANA_VALIDATION_QUERY;
     }
 
     @Override
