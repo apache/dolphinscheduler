@@ -100,6 +100,9 @@ public class TaskResultEventHandler implements TaskEventHandler {
             processService.changeOutParam(taskInstance);
             taskInstanceDao.updateById(taskInstance);
             sendAckToWorker(taskEvent);
+        } catch (NullPointerException nullPointerException) {
+            throw new TaskEventHandleError("Cannot find worker group: Can not find worker group default",
+                    nullPointerException);
         } catch (Exception ex) {
             TaskInstanceUtils.copyTaskInstance(oldTaskInstance, taskInstance);
             throw new TaskEventHandleError("Handle task result event error, save taskInstance to db error", ex);
