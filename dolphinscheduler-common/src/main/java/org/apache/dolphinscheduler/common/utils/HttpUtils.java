@@ -24,7 +24,6 @@ import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
@@ -39,6 +38,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
 import javax.net.ssl.SSLContext;
 
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +98,7 @@ public class HttpUtils {
     }
 
     private static class HttpClientInstance {
+
         private static final CloseableHttpClient httpClient = getHttpClientBuilder().build();
     }
 
@@ -136,7 +137,8 @@ public class HttpUtils {
         try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
             // Check if the response status is 200 (OK)
             if (response.getStatusLine().getStatusCode() != 200) {
-                log.error("HTTP GET request to {} returned status code: {}", httpGet.getURI(), response.getStatusLine().getStatusCode());
+                log.error("HTTP GET request to {} returned status code: {}", httpGet.getURI(),
+                        response.getStatusLine().getStatusCode());
                 return null;
             }
 
