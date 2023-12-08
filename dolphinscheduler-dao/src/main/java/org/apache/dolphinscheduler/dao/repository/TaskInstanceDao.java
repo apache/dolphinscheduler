@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
 import java.util.List;
 import java.util.Set;
