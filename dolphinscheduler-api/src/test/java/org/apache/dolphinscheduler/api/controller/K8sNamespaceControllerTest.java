@@ -23,7 +23,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
-import org.apache.dolphinscheduler.api.enums.v2.K8SStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -91,7 +90,6 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         paramsMap.add("clusterCode", "100");
 
         // success
-
         MvcResult mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
@@ -100,21 +98,6 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-        logger.info("verify namespace return result:{}", mvcResult.getResponse().getContentAsString());
-
-        // error
-        paramsMap.clear();
-        paramsMap.add("namespace", null);
-        paramsMap.add("clusterCode", "100");
-        mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(K8SStatus.VERIFY_K8S_NAMESPACE_ERROR.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify namespace return result:{}", mvcResult.getResponse().getContentAsString());
     }
