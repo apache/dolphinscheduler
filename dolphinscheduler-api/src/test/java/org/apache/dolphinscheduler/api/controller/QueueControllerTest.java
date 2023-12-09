@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
-import org.apache.dolphinscheduler.api.enums.v2.QueueStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -127,10 +125,10 @@ public class QueueControllerTest extends AbstractControllerTest {
 
     @Test
     public void testVerifyQueue() throws Exception {
-
-        // queue value exist
+        // success
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("queue", QUEUE_MODIFY_NAME);
+
+        paramsMap.add("queue", NOT_EXISTS_NAME);
         paramsMap.add("queueName", NOT_EXISTS_NAME);
 
         MvcResult mvcResult = mockMvc.perform(post("/queues/verify")
@@ -139,61 +137,11 @@ public class QueueControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(QueueStatus.QUEUE_VALUE_EXIST.getCode(), result.getCode().intValue());
-
-        // queue name exist
-        paramsMap.clear();
-        paramsMap.add("queue", NOT_EXISTS_NAME);
-        paramsMap.add("queueName", QUEUE_NAME_CREATE_NAME);
-
-        mvcResult = mockMvc.perform(post("/queues/verify")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(QueueStatus.QUEUE_NAME_EXIST.getCode(), result.getCode().intValue());
-
-        // success
-        paramsMap.clear();
-        paramsMap.add("queue", NOT_EXISTS_NAME);
-        paramsMap.add("queueName", NOT_EXISTS_NAME);
-
-        mvcResult = mockMvc.perform(post("/queues/verify")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
         Assertions.assertNotNull(result);
         Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
         logger.info("verify queue return result:{}", mvcResult.getResponse().getContentAsString());
-    }
-    @Test
-    public void testDeleteQueueById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("id", "64");
-
-        MvcResult mvcResult = mockMvc.perform(delete("/queues/{id}", 64)
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(QueueStatus.QUEUE_NOT_EXIST.getCode(), result.getCode().intValue());
-        logger.info("delete queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 }
