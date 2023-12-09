@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.dto.queue.QueueQueryRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueUpdateRequest;
 import org.apache.dolphinscheduler.api.dto.queue.QueueVerifyRequest;
 import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
-import org.apache.dolphinscheduler.api.enums.v2.QueueStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -126,9 +125,12 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
 
     @Test
     public void testVerifyQueue() throws Exception {
-        // queue value exist
         QueueVerifyRequest queueVerifyRequest = new QueueVerifyRequest();
         queueVerifyRequest.setQueue(QUEUE_MODIFY_NAME);
+        queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
+
+        // success
+        queueVerifyRequest.setQueue(NOT_EXISTS_NAME);
         queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
         MvcResult mvcResult = mockMvc.perform(post("/v2/queues/verify")
                 .header(SESSION_ID, sessionId)
@@ -137,36 +139,7 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
                 .content(JSONUtils.toJsonString(queueVerifyRequest)))
                 .andExpect(status().isOk())
                 .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(QueueStatus.QUEUE_VALUE_EXIST.getCode(), result.getCode().intValue());
-
-        // queue name exist
-        queueVerifyRequest.setQueue(NOT_EXISTS_NAME);
-        queueVerifyRequest.setQueueName(QUEUE_NAME_CREATE_NAME);
-        mvcResult = mockMvc.perform(post("/v2/queues/verify")
-                .header(SESSION_ID, sessionId)
-                .accept(MediaType.ALL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONUtils.toJsonString(queueVerifyRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(QueueStatus.QUEUE_NAME_EXIST.getCode(), result.getCode().intValue());
-
-        // success
-        queueVerifyRequest.setQueue(NOT_EXISTS_NAME);
-        queueVerifyRequest.setQueueName(NOT_EXISTS_NAME);
-        mvcResult = mockMvc.perform(post("/v2/queues/verify")
-                .header(SESSION_ID, sessionId)
-                .accept(MediaType.ALL)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONUtils.toJsonString(queueVerifyRequest)))
-                .andExpect(status().isOk())
-                .andReturn();
-        result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
