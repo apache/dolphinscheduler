@@ -214,7 +214,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             }
             return sb.toString();
         } catch (Throwable ex) {
-            throw new ServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR, ex);
+            throw new ServiceException(TaskStatus.QUERY_TASK_INSTANCE_LOG_ERROR, ex);
         }
     }
 
@@ -245,7 +245,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             return Bytes.concat(head, logBytes);
         } catch (Exception ex) {
             log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
-            throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
+            throw new ServiceException(TaskStatus.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
         }
 
     }

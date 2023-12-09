@@ -27,6 +27,8 @@ public enum TaskStatus implements Status {
     TASK_INSTANCE_NOT_FOUND(10008, "task instance not found", "任务实例不存在"),
     TASK_INSTANCE_NOT_EXISTS(10020, "task instance {0} does not exist", "任务实例[{0}]不存在"),
     TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE(10021, "task instance {0} is not sub process instance", "任务实例[{0}]不是子流程实例"),
+    QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error", "查询任务实例日志错误"),
+    DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR(10104, "download task instance log file error", "下载任务日志文件错误"),
     FORCE_TASK_SUCCESS_ERROR(10165, "force task success error", "强制成功任务实例错误"),
     TASK_INSTANCE_STATE_OPERATION_ERROR(10166,
             "the status of task instance {0} is {1},Cannot perform force success operation",
