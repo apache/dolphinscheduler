@@ -88,7 +88,7 @@ public class PodOperation implements AbstractK8sOperation {
     }
 
     @Override
-    public Watch createBatchWatcher(String jobName, CountDownLatch countDownLatch,
+    public Watch createBatchWatcher(CountDownLatch countDownLatch,
                                     TaskResponse taskResponse, HasMetadata hasMetadata,
                                     TaskExecutionContext taskRequest) {
         Watcher<Pod> watcher = new Watcher<Pod>() {
@@ -124,7 +124,7 @@ public class PodOperation implements AbstractK8sOperation {
             }
         };
         return client.pods().inNamespace(hasMetadata.getMetadata().getNamespace())
-                .withName(jobName)
+                .withName(hasMetadata.getMetadata().getName())
                 .watch(watcher);
     }
 

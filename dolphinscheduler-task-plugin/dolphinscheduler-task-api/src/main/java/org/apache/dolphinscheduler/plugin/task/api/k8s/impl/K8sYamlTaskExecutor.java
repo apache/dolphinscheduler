@@ -36,9 +36,9 @@ import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.YamlContent;
-import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -61,14 +61,14 @@ public class K8sYamlTaskExecutor extends AbstractK8sTaskExecutor {
     private AbstractK8sOperation abstractK8sOperation;
 
     public K8sYamlTaskExecutor(TaskExecutionContext taskRequest) {
-        super(taskRequest);
+        super(log,taskRequest);
     }
 
 
     public void registerBatchWatcher(String taskInstanceId, TaskResponse taskResponse) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        try ( abstractK8sOperation.createBatchWatcher(metadata.getMetadata().getName())) {
+        try (Watch watch = abstractK8sOperation.createBatchWatcher(countDownLatch,taskResponse,metadata,taskRequest)) {
             boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                     || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
             if (timeoutFlag) {
@@ -95,15 +95,18 @@ public class K8sYamlTaskExecutor extends AbstractK8sTaskExecutor {
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
-            TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (
-                LogWatch watcher = abstractK8sOperation.getLogWatcher(containerName,metadata.getMetadata().getNamespace())) {
+                    LogWatch watcher = abstractK8sOperation.getLogWatcher(containerName,metadata.getMetadata().getNamespace())) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
-                        taskOutputParameterParser.appendParseLog(line);
+
+                        if (line.endsWith(VarPoolUtils.VAR_SUFFIX)) {
+                            varPool.append(VarPoolUtils.findVarPool(line));
+                            varPool.append(VarPoolUtils.VAR_DELIMITER);
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -112,7 +115,6 @@ public class K8sYamlTaskExecutor extends AbstractK8sTaskExecutor {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
                 podLogOutputIsFinished = true;
             }
-            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         });
 
         collectPodLogExecutorService.shutdown();

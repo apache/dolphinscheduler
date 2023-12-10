@@ -26,7 +26,7 @@ public interface AbstractK8sOperation{
 
     int getState(HasMetadata hasMetadata);
 
-    Watch createBatchWatcher(String jobName, CountDownLatch countDownLatch,
+    Watch createBatchWatcher(CountDownLatch countDownLatch,
                              TaskResponse taskResponse, HasMetadata hasMetadata,
                              TaskExecutionContext taskRequest);
 
@@ -35,13 +35,13 @@ public interface AbstractK8sOperation{
     default void setTaskStatus(HasMetadata metadata,int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
             if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
-                log.info("[K8sYamlJobExecutor-{}] killed", metadata.getMetadata().getName());
+                //log.info("[K8sYamlJobExecutor-{}] killed", metadata.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_KILL);
             } else if (jobStatus == EXIT_CODE_SUCCESS) {
-                log.info("[K8sYamlJobExecutor-{}] succeed in k8s", metadata.getMetadata().getName());
+                //log.info("[K8sYamlJobExecutor-{}] succeed in k8s", metadata.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {
-                log.error("[K8sYamlJobExecutor-{}] fail in k8s", metadata.getMetadata().getName());
+                //log.error("[K8sYamlJobExecutor-{}] fail in k8s", metadata.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
             }
         }

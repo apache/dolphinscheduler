@@ -29,11 +29,14 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 import io.fabric8.kubernetes.client.dsl.RollableScalableResource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManagerContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sOperation;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.YamlContent;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SLEEP_TIME_MILLIS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
@@ -62,9 +65,10 @@ public class DeploymentOperation implements AbstractK8sOperation {
     }
 
     @Override
-    public Watch createBatchWatcher(String jobName, Watcher<HasMetadata> watcher) {
+    public Watch createBatchWatcher(CountDownLatch countDownLatch, TaskResponse taskResponse, HasMetadata hasMetadata, TaskExecutionContext taskRequest) {
         return null;
     }
+
 
     @Override
     public LogWatch getLogWatcher(String labelValue, String namespace) {

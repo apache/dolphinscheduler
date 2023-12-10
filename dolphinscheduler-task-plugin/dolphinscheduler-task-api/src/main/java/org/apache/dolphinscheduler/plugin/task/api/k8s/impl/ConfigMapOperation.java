@@ -22,8 +22,13 @@ import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sOperation;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.YamlContent;
+
+import java.util.concurrent.CountDownLatch;
 
 public class ConfigMapOperation implements AbstractK8sOperation {
     private KubernetesClient client;
@@ -48,7 +53,14 @@ public class ConfigMapOperation implements AbstractK8sOperation {
     }
 
     @Override
-    public Watch createBatchWatcher(String jobName, Watcher<HasMetadata> watcher) {
+    public Watch createBatchWatcher(CountDownLatch countDownLatch, TaskResponse taskResponse, HasMetadata hasMetadata, TaskExecutionContext taskRequest) {
         return null;
     }
+
+    @Override
+    public LogWatch getLogWatcher(String labelValue, String namespace) {
+        return null;
+    }
+
+
 }
