@@ -54,6 +54,9 @@ public class K8sTaskParameters extends AbstractParameters {
     private String kubeConfig;
     private int datasource;
     private String type;
+    private String yamlContent;
+    private int customCofig;
+
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(image);

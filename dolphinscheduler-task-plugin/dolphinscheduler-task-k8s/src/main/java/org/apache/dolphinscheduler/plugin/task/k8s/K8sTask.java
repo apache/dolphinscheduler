@@ -21,13 +21,18 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.k8s.param.K8sConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sYamlTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -58,6 +63,10 @@ public class K8sTask extends AbstractK8sTask {
     private K8sTaskParameters k8sTaskParameters;
 
     private K8sTaskExecutionContext k8sTaskExecutionContext;
+    /**
+     * process task
+     */
+    private AbstractK8sTaskExecutor abstractK8sTaskExecutor;
 
     private K8sConnectionParam k8sConnectionParam;
     /**
@@ -86,6 +95,12 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());
         k8sTaskParameters.setKubeConfig(kubeConfig);
         log.info("Initialize k8s task params:{}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
+
+        if(k8sTaskParameters.getCustomCofig() == 0){
+            this.abstractK8sTaskExecutor = new K8sTaskExecutor(taskRequest);
+        }else {
+            this.abstractK8sTaskExecutor = new K8sYamlTaskExecutor(taskRequest);
+        }
     }
 
     @Override
@@ -98,6 +113,26 @@ public class K8sTask extends AbstractK8sTask {
         return k8sTaskParameters;
     }
 
+
+    @Override
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
+        try {
+        if(k8sTaskParameters.getCustomCofig() == 0){
+
+                TaskResponse response = abstractK8sTaskExecutor.run(buildCommand());
+                setExitStatusCode(response.getExitStatusCode());
+                setAppIds(response.getAppIds());
+                dealOutParam(abstractK8sTaskExecutor.getTaskOutputParams());
+
+        }else {
+            abstractK8sTaskExecutor.run(k8sTaskParameters.getYamlContent());
+        }
+        } catch (Exception e) {
+            log.error("k8s task submit failed with error");
+            exitStatusCode = -1;
+            throw new TaskException("Execute k8s task error", e);
+        }
+    }
     @Override
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();

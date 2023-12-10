@@ -19,13 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOG_LINES;
 
+import io.fabric8.kubernetes.api.model.*;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 
 import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobList;
 import io.fabric8.kubernetes.client.Config;
@@ -33,6 +35,8 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
+import org.apache.dolphinscheduler.plugin.task.api.YamlType;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.YamlContent;
 
 @Slf4j
 public class K8sUtils {
@@ -90,6 +94,7 @@ public class K8sUtils {
         }
     }
 
+
     public String getPodLog(String jobName, String namespace) {
         try {
             List<Pod> podList = client.pods().inNamespace(namespace).list().getItems();
@@ -120,4 +125,7 @@ public class K8sUtils {
         }
     }
 
+    public KubernetesClient getClient() {
+        return client;
+    }
 }

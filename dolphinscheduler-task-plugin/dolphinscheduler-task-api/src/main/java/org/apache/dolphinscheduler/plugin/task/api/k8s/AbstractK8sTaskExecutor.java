@@ -43,6 +43,12 @@ public abstract class AbstractK8sTaskExecutor {
         return varPool.toString();
     }
 
+    /**
+     *
+     * @param k8sParameterStr  when the k8s task type is custom configuration ,the parameter is  K8sTaskMainParameters.class .otherwise the parameter is k8s yaml contents
+     * @return
+     * @throws Exception
+     */
     public abstract TaskResponse run(String k8sParameterStr) throws Exception;
 
     public abstract void cancelApplication(String k8sParameterStr);
