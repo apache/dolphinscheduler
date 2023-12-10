@@ -16,42 +16,24 @@
  */
 
 import { axios } from '@/service/service'
-import { ListReq, WorkerGroupReq, IdReq } from './types'
+import {UpdateProjectWorkerGroupsReq} from "@/service/modules/projects-worker-group/types";
 
-export function queryAllWorkerGroupsPaging(params: ListReq): any {
+export function queryWorkerGroupsByProjectCode(
+  projectCode: number
+): any {
   return axios({
-    url: '/worker-groups',
-    method: 'get',
-    params
+    url: `/projects/${projectCode}/worker-group`,
+    method: 'get'
   })
 }
 
-export function saveWorkerGroup(data: WorkerGroupReq): any {
+export function assignWorkerGroups(
+  data: UpdateProjectWorkerGroupsReq,
+  projectCode: number
+): any {
   return axios({
-    url: '/worker-groups',
+    url: `/projects/${projectCode}/worker-group`,
     method: 'post',
     data
-  })
-}
-
-export function queryAllWorkerGroups(): any {
-  return axios({
-    url: '/worker-groups/all',
-    method: 'get'
-  })
-}
-
-export function queryWorkerAddressList(): any {
-  return axios({
-    url: '/worker-groups/worker-address-list',
-    method: 'get'
-  })
-}
-
-export function deleteById(id: IdReq): any {
-  return axios({
-    url: `/worker-groups/${id.id}`,
-    method: 'delete',
-    params: id
   })
 }

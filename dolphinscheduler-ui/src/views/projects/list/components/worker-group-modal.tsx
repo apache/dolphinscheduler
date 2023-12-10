@@ -22,13 +22,15 @@ import {
   toRefs,
   watch
 } from 'vue'
-import {NForm, NFormItem, NInput, NTransfer} from 'naive-ui'
-import { useForm } from './use-form'
+import { NTransfer} from 'naive-ui'
+import { reactive, ref, SetupContext } from 'vue'
 import Modal from '@/components/modal'
 import { useUserStore } from '@/store/user/user'
 import type { UserInfoRes } from '@/service/modules/users/types'
 import styles from "@/views/security/user-manage/index.module.scss";
 import {useWorkerGroup} from "@/views/projects/list/components/use-worker-group";
+import {queryAllWorkerGroups} from "@/service/modules/worker-groups";
+import {Option} from "naive-ui/es/transfer/src/interface";
 
 const props = {
   showModalRef: {
@@ -59,8 +61,18 @@ const WorkerGroupModal = defineComponent({
     }
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
-    variables.model.assignedWorkerGroups = [1]
-    variables.model.unassignedWorkerGroups = [{label:'a',value:2}]
+    const workerGroupOptions: Option[] =
+
+    const createWorkerGroupOptions = () => {
+      queryAllWorkerGroups().then((res: any) => {
+        console.log(res)
+      })
+    }
+
+    // const assignedWorkerGroups = ref([1])
+
+    variables.model.assignedWorkerGroups
+    // variables.model.workerGroupOptions = createWorkerGroupOptions()
 
     watch(
         () => props.row,
@@ -88,6 +100,8 @@ const WorkerGroupModal = defineComponent({
               virtualScroll
               filterable
               class={styles.transfer}
+              options={}
+              value={this.assignedWorkerGroups}
           />
         </Modal>
     )

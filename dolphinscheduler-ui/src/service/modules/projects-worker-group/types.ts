@@ -15,43 +15,20 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import { ListReq, WorkerGroupReq, IdReq } from './types'
-
-export function queryAllWorkerGroupsPaging(params: ListReq): any {
-  return axios({
-    url: '/worker-groups',
-    method: 'get',
-    params
-  })
+interface ProjectWorkerGroup {
+  id: number
+  projectCode: number
+  workerGroup: string
+  createTime: string
+  updateTime: string
 }
 
-export function saveWorkerGroup(data: WorkerGroupReq): any {
-  return axios({
-    url: '/worker-groups',
-    method: 'post',
-    data
-  })
+
+interface UpdateProjectWorkerGroupsReq {
+  workerGroups: string[]
 }
 
-export function queryAllWorkerGroups(): any {
-  return axios({
-    url: '/worker-groups/all',
-    method: 'get'
-  })
-}
-
-export function queryWorkerAddressList(): any {
-  return axios({
-    url: '/worker-groups/worker-address-list',
-    method: 'get'
-  })
-}
-
-export function deleteById(id: IdReq): any {
-  return axios({
-    url: `/worker-groups/${id.id}`,
-    method: 'delete',
-    params: id
-  })
+export {
+  ProjectWorkerGroup,
+  UpdateProjectWorkerGroupsReq
 }

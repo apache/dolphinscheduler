@@ -18,7 +18,6 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref, SetupContext } from 'vue'
 import { useUserStore } from '@/store/user/user'
-import type { Option } from 'naive-ui/es/transfer/src/interface'
 import type { UserInfoRes } from '@/service/modules/users/types'
 
 export function useWorkerGroup(
@@ -33,10 +32,13 @@ export function useWorkerGroup(
       projectName: '',
       description: '',
       userName: (userStore.getUserInfo as UserInfoRes).userName,
-      assignedWorkerGroups: []  as number[],
-      unassignedWorkerGroups: [] as Option[]
+      assignedWorkerGroups: ref([] as number[])
     }
   })
+
+  const getAssignedWorkerGroups = (projectCode: number) => {
+
+  }
 
   const handleValidate = (statusRef: number) => {
 
@@ -50,5 +52,5 @@ export function useWorkerGroup(
 
   }
 
-  return { variables, t, handleValidate }
+  return { variables, t, handleValidate, getAssignedWorkerGroups }
 }
