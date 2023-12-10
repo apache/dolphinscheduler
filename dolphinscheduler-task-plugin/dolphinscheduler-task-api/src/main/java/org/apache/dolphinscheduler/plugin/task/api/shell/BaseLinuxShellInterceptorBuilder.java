@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
+import org.apache.dolphinscheduler.common.exception.FileOperateException;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
@@ -64,8 +66,12 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         log.info("Final Shell file is : \n{}", finalScript);
     }
 
-    protected List<String> generateBootstrapCommand() {
+    protected List<String> generateBootstrapCommand() throws FileOperateException {
         if (sudoEnable) {
+            if (!TenantConstants.BOOTSTRAPT_SYSTEM_USER.equals(runUser)) {
+                // Set the tenant owner as the working directory
+                FileUtils.setDirectoryOwner(Paths.get(shellDirectory), runUser);
+            }
             return bootstrapCommandInSudoMode();
         }
         return bootstrapCommandInNormalMode();

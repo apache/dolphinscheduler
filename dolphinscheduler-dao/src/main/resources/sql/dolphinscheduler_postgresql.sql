@@ -594,7 +594,7 @@ DROP TABLE IF EXISTS t_ds_project_parameter;
 CREATE TABLE t_ds_project_parameter (
   id int NOT NULL  ,
   param_name varchar(255) NOT NULL ,
-  param_value varchar(255) NOT NULL ,
+  param_value text NOT NULL ,
   code bigint NOT NULL,
   project_code bigint NOT NULL,
   user_id int DEFAULT NULL ,
