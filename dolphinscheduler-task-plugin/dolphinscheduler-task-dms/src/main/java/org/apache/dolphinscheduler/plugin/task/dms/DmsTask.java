@@ -27,8 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,12 +35,15 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
+@Slf4j
 public class DmsTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
@@ -235,9 +237,8 @@ public class DmsTask extends AbstractRemoteTask {
     public void convertJsonParameters() throws TaskException {
         // create a new parameter object using the json data if the json data is not empty
         if (parameters.getIsJsonFormat() && parameters.getJsonData() != null) {
-            // combining local and global parameters
             String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),
-                    ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+                    ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));
 
             boolean isRestartTask = parameters.getIsRestartTask();
             try {

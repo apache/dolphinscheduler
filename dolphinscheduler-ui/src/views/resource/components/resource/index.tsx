@@ -19,10 +19,12 @@ import { useRouter } from 'vue-router'
 import {
   defineComponent,
   onMounted,
+  onUnmounted,
   ref,
   getCurrentInstance,
   PropType,
-  toRefs
+  toRefs,
+  watch
 } from 'vue'
 import {
   NIcon,
@@ -36,7 +38,8 @@ import {
 } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { SearchOutlined } from '@vicons/antd'
-import { useTable } from './table/use-table'
+import { useTable, useDetailPageStore } from './table/use-table'
+import { useIsDetailPageStore, isEmpty } from './edit/use-edit'
 import { useFileStore } from '@/store/file/file'
 import Card from '@/components/card'
 import ResourceFolderModal from './folder'
@@ -44,9 +47,9 @@ import ResourceUploadModal from './upload'
 import ResourceRenameModal from './rename'
 import styles from './index.module.scss'
 import type { Router } from 'vue-router'
-import Search from "@/components/input-search"
-import { ResourceType } from "@/views/resource/components/resource/types";
-
+import Search from '@/components/input-search'
+import { ResourceType } from '@/views/resource/components/resource/types'
+import { useUserStore } from '@/store/user/user'
 
 const props = {
   resourceType: {
@@ -65,13 +68,14 @@ export default defineComponent({
 
     const {
       variables,
-      columnsRef,
       tableWidth,
       requestData,
       updateList,
-      handleCreateFile,
+      createColumns,
+      handleCreateFile
     } = useTable()
 
+    const userStore = useUserStore()
 
     variables.resourceType = props.resourceType
 
@@ -102,37 +106,80 @@ export default defineComponent({
     const handleRenameFile = () => {
       variables.renameShowRef = true
     }
+    const detailPageStore = useDetailPageStore()   
+    const isDetailPageStore = useIsDetailPageStore()
+    
+    const handleDetailBackList = () => {
+      if(isDetailPageStore.getIsDetailPage){
+        variables.resourceType = detailPageStore.getResourceType  
+        variables.fullName = detailPageStore.getFullName 
+        variables.tenantCode = detailPageStore.getTenantCode 
+        variables.searchRef = detailPageStore.getSearchValue 
+        variables.pagination.page = detailPageStore.getPage 
+        variables.pagination.pageSize = detailPageStore.getPageSize 
+        if(!isEmpty(variables.searchRef)){
+          handleConditions()
+        }
+	detailPageStore.$reset()
+	isDetailPageStore.$reset()
+      } else {
+	  detailPageStore.$reset()
+	  isDetailPageStore.$reset()
+      }
+    }
 
+    onUnmounted(() => {
+      isDetailPageStore.$reset()
+    })
     onMounted(() => {
+      handleDetailBackList()
+      createColumns(variables)
       fileStore.setCurrentDir(variables.fullName)
-      breadListRef.value = fileStore.getCurrentDir.replace(/\/+$/g, '')
-        .split('/').slice(2) as Array<string>
+      breadListRef.value = fileStore.getCurrentDir
+        .replace(/\/+$/g, '')
+        .split('/')
+        .slice(2) as Array<string>
       requestData()
-
     })
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
     const handleBread = (index: number) => {
-      const breadName = variables.fullName.split('/').slice(0, index+3).join('/')+'/'
+      const breadName =
+        variables.fullName
+          .split('/')
+          .slice(0, index + 3)
+          .join('/') + '/'
       goBread(breadName)
     }
 
     const goBread = (fullName: string) => {
       const { resourceType, tenantCode } = variables
-      if (fullName === '') {
-        router.push({ name: resourceType === 'UDF' ? 'resource-manage' : 'file-manage' })
+      const baseDir =
+        resourceType === 'UDF'
+          ? userStore.getBaseUdfDir
+          : userStore.getBaseResDir
+      if (fullName === '' || !fullName.startsWith(baseDir)) {
+        router.push({
+          name: resourceType === 'UDF' ? 'resource-manage' : 'file-manage'
+        })
       } else {
         router.push({
-          name: resourceType === 'UDF' ? 'resource-sub-manage' : 'resource-file-subdirectory',
-          query: { prefix: fullName, tenantCode: tenantCode}
+          name:
+            resourceType === 'UDF'
+              ? 'resource-sub-manage'
+              : 'resource-file-subdirectory',
+          query: { prefix: fullName, tenantCode: tenantCode }
         })
       }
     }
 
+    watch(useI18n().locale, () => {
+      createColumns(variables)
+    })
+
     return {
       breadListRef,
-      columnsRef,
       tableWidth,
       updateList,
       handleConditions,
@@ -155,12 +202,12 @@ export default defineComponent({
       handleCreateFolder,
       handleCreateFile,
       handleUploadFile,
-      columnsRef,
-      tableWidth,
+      tableWidth
     } = this
-    const manageTitle = this.resourceType === 'UDF'
-      ? t('resource.udf.udf_resources')
-      : t('resource.file.file_manage')
+    const manageTitle =
+      this.resourceType === 'UDF'
+        ? t('resource.udf.udf_resources')
+        : t('resource.file.file_manage')
 
     return (
       <NSpace vertical>
@@ -174,27 +221,26 @@ export default defineComponent({
               >
                 {t('resource.file.create_folder')}
               </NButton>
-              {this.resourceType !== 'UDF' &&
-                  <NButton onClick={handleCreateFile} class='btn-create-file'>
-                    {t('resource.file.create_file')}
-                  </NButton>
-              }
+              {this.resourceType !== 'UDF' && (
+                <NButton onClick={handleCreateFile} class='btn-create-file'>
+                  {t('resource.file.create_file')}
+                </NButton>
+              )}
               <NButton onClick={handleUploadFile} class='btn-upload-resource'>
                 {this.resourceType === 'UDF'
                   ? t('resource.udf.upload_udf_resources')
-                  : t('resource.file.upload_files')
-                }
+                  : t('resource.file.upload_files')}
               </NButton>
             </NButtonGroup>
             <NSpace>
               <Search
-                placeholder = {t('resource.file.enter_keyword_tips')}
+                placeholder={t('resource.file.enter_keyword_tips')}
                 v-model:value={this.searchRef}
                 onSearch={handleConditions}
               />
               <NButton size='small' type='primary' onClick={handleConditions}>
                 <NIcon>
-                  <SearchOutlined/>
+                  <SearchOutlined />
                 </NIcon>
               </NButton>
             </NSpace>
@@ -208,9 +254,12 @@ export default defineComponent({
                   <NBreadcrumbItem>
                     <NButton
                       text
-                      disabled={index > 0 && index === this.breadListRef!.length - 1}
+                      disabled={
+                        index > 0 && index === this.breadListRef!.length - 1
+                      }
                       onClick={() => this.handleBread(index)}
-                    >{index === 0 ? manageTitle : item}
+                    >
+                      {index === 0 ? manageTitle : item}
                     </NButton>
                   </NBreadcrumbItem>
                 ))}
@@ -220,7 +269,7 @@ export default defineComponent({
               <NSpace vertical>
                 <NDataTable
                   remote
-                  columns={columnsRef}
+                  columns={this.columns}
                   data={this.resourceList?.table}
                   striped
                   size={'small'}

@@ -20,9 +20,11 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -63,14 +65,14 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     List<String> queryNeedFailoverProcessInstanceHost(@Param("states") int[] stateArray);
 
     /**
-     * query process instance by tenantId and stateArray
+     * query process instance by tenantCode and stateArray
      *
-     * @param tenantId tenantId
+     * @param tenantCode tenantCode
      * @param states   states array
      * @return process instance list
      */
-    List<ProcessInstance> queryByTenantIdAndStatus(@Param("tenantId") int tenantId,
-                                                   @Param("states") int[] states);
+    List<ProcessInstance> queryByTenantCodeAndStatus(@Param("tenantCode") String tenantCode,
+                                                     @Param("states") int[] states);
 
     /**
      * @param workerGroupName workerGroupName
@@ -139,14 +141,14 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                      @Param("destState") WorkflowExecutionStatus destState);
 
     /**
-     * update process instance by tenantId
+     * update process instance by tenantCode
      *
-     * @param originTenantId originTenantId
-     * @param destTenantId   destTenantId
+     * @param originTenantCode originTenantCode
+     * @param destTenantCode   destTenantCode
      * @return update result
      */
-    int updateProcessInstanceByTenantId(@Param("originTenantId") int originTenantId,
-                                        @Param("destTenantId") int destTenantId);
+    int updateProcessInstanceByTenantCode(@Param("originTenantCode") String originTenantCode,
+                                          @Param("destTenantCode") String destTenantCode);
 
     /**
      * update process instance by worker groupId
@@ -168,10 +170,10 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param projectCodes projectCodes
      * @return ExecuteStatusCount list
      */
-    List<ExecuteStatusCount> countInstanceStateByProjectCodes(
-                                                              @Param("startTime") Date startTime,
-                                                              @Param("endTime") Date endTime,
-                                                              @Param("projectCodes") Long[] projectCodes);
+    List<WorkflowInstanceStatusCountDto> countWorkflowInstanceStateByProjectCodes(
+                                                                                  @Param("startTime") Date startTime,
+                                                                                  @Param("endTime") Date endTime,
+                                                                                  @Param("projectCodes") Collection<Long> projectCodes);
 
     /**
      * query process instance by processDefinitionCode

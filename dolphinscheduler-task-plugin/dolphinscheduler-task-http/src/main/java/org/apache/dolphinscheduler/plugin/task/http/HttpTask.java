@@ -29,8 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.Charsets;
@@ -53,8 +52,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class HttpTask extends AbstractTask {
 
     /**
@@ -140,14 +142,15 @@ public class HttpTask extends AbstractTask {
         if (CollectionUtils.isNotEmpty(httpParameters.getHttpParams())) {
             for (HttpProperty httpProperty : httpParameters.getHttpParams()) {
                 String jsonObject = JSONUtils.toJsonString(httpProperty);
-                String params = ParameterUtils.convertParameterPlaceholders(jsonObject, ParamUtils.convert(paramsMap));
+                String params =
+                        ParameterUtils.convertParameterPlaceholders(jsonObject, ParameterUtils.convert(paramsMap));
                 log.info("http request params：{}", params);
                 httpPropertyList.add(JSONUtils.parseObject(params, HttpProperty.class));
             }
         }
         addRequestParams(builder, httpPropertyList);
         String requestUrl =
-                ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParamUtils.convert(paramsMap));
+                ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParameterUtils.convert(paramsMap));
         HttpUriRequest request = builder.setUri(requestUrl).build();
         setHeaders(request, httpPropertyList);
         return client.execute(request);

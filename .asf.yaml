@@ -16,7 +16,7 @@
 #
 
 github:
-  description: Apache DolphinScheduler is the modern data workflow orchestration platform with powerful user interface, dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available `out of the box`
+  description: Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code
   homepage: https://dolphinscheduler.apache.org/
   labels:
     - cloud-native
@@ -30,6 +30,7 @@ github:
     - workflow-schedule
     - powerful-data-pipelines
     - data-pipelines
+  dependabot_updates: false
   enabled_merge_buttons:
     squash: true
     merge: false
@@ -37,6 +38,8 @@ github:
   protected_branches:
     dev:
       required_status_checks:
+        # strict means "Require branches to be up to date before merging".
+        strict: true
         contexts:
           - Build
           - Unit Test

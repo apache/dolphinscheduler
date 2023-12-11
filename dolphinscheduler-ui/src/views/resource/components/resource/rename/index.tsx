@@ -26,7 +26,7 @@ import { useI18n } from 'vue-i18n'
 import Modal from '@/components/modal'
 import { useForm } from './use-form'
 import { useRename } from './use-rename'
-import type { ResourceType } from "@/views/resource/components/resource/types";
+import type { ResourceType } from '@/views/resource/components/resource/types'
 
 const props = {
   show: {
@@ -60,7 +60,13 @@ export default defineComponent({
   props,
   emits: ['updateList', 'update:show'],
   setup(props, ctx) {
-    const { state, resetForm } = useForm(props.resourceType!,props.fullName, props.name, props.description, props.userName)
+    const { state, resetForm } = useForm(
+      props.resourceType!,
+      props.fullName,
+      props.name,
+      props.description,
+      props.userName
+    )
     const { handleRenameFile } = useRename(state)
     const hideModal = () => {
       ctx.emit('update:show', false)
@@ -103,15 +109,6 @@ export default defineComponent({
               v-model={[this.renameForm.name, 'value']}
               placeholder={t('resource.file.enter_name_tips')}
               class='input-name'
-            />
-          </NFormItem>
-          <NFormItem label={t('resource.file.description')} path='description'>
-            <NInput
-              allowInput={this.trim}
-              type='textarea'
-              v-model={[this.renameForm.description, 'value']}
-              placeholder={t('resource.file.enter_description_tips')}
-              class='input-description'
             />
           </NFormItem>
         </NForm>

@@ -23,12 +23,16 @@ import {
   DownloadOutlined,
   FormOutlined,
   EditOutlined,
-  InfoCircleFilled,
   UploadOutlined
 } from '@vicons/antd'
 import _ from 'lodash'
 import { useI18n } from 'vue-i18n'
-import { ResourceFileTableData, IRenameResource, IRtDisb, IReuploadResource } from '../types'
+import {
+  ResourceFileTableData,
+  IRenameResource,
+  IRtDisb,
+  IReuploadResource
+} from '../types'
 import { fileTypeArr } from '@/common/common'
 import { downloadResource, deleteResource } from '@/service/modules/resources'
 import type { Router } from 'vue-router'
@@ -43,7 +47,7 @@ const props = {
     default: {
       name: '',
       description: '',
-      user_name: '',
+      user_name: ''
     }
   }
 }
@@ -63,19 +67,43 @@ export default defineComponent({
       return !(flag && size < 1000000)
     }
 
-    const handleEditFile = (item: {fullName: string, user_name: string }) => {
-      router.push({ name: 'resource-file-edit', query: {prefix: item.fullName, tenantCode: item.user_name} })
+    const handleEditFile = (item: {
+      fullName: string
+      user_name: string
+      alias: string
+    }) => {
+      router.push({
+        name: 'resource-file-edit',
+        query: {
+          prefix: item.fullName,
+          tenantCode: item.user_name,
+          alias: item.alias
+        }
+      })
     }
 
-    const handleDeleteFile = (fullNameObj: {fullName: string, tenantCode: string}) => {
+    const handleDeleteFile = (fullNameObj: {
+      fullName: string
+      tenantCode: string
+    }) => {
       deleteResource(fullNameObj).then(() => emit('updateList'))
     }
 
-    const handleReuploadFile: IReuploadResource = (name: string, description: string, fullName: string, user_name: string) => {
+    const handleReuploadFile: IReuploadResource = (
+      name: string,
+      description: string,
+      fullName: string,
+      user_name: string
+    ) => {
       emit('reuploadResource', name, description, fullName, user_name)
     }
 
-    const handleRenameFile: IRenameResource = (name: string, description: string, fullName: string, user_name: string) => {
+    const handleRenameFile: IRenameResource = (
+      name: string,
+      description: string,
+      fullName: string,
+      user_name: string
+    ) => {
       emit('renameResource', name, description, fullName, user_name)
     }
 
@@ -93,31 +121,35 @@ export default defineComponent({
     const { t } = useI18n()
     return (
       <NSpace>
-        { this.row.type !== 'UDF' &&
-        <NTooltip trigger={'hover'}>
-          {{
-            default: () => t('resource.file.edit'),
-            trigger: () => (
-              <NButton
-                size='tiny'
-                type='info'
-                disabled={this.rtDisb(this.row.name, this.row.size)}
-                tag='div'
-                onClick={() => {
-                  this.handleEditFile({fullName:this.row.fullName, user_name:this.row.user_name})
-                }}
-                style={{ marginRight: '-5px' }}
-                circle
-                class='btn-edit'
-              >
-                <NIcon>
-                  <FormOutlined />
-                </NIcon>
-              </NButton>
-            )
-          }}
-        </NTooltip>
-        }
+        {this.row.type !== 'UDF' && (
+          <NTooltip trigger={'hover'}>
+            {{
+              default: () => t('resource.file.edit'),
+              trigger: () => (
+                <NButton
+                  size='tiny'
+                  type='info'
+                  disabled={this.rtDisb(this.row.name, this.row.size)}
+                  tag='div'
+                  onClick={() => {
+                    this.handleEditFile({
+                      fullName: this.row.fullName,
+                      user_name: this.row.user_name,
+                      alias: this.row.alias
+                    })
+                  }}
+                  style={{ marginRight: '-5px' }}
+                  circle
+                  class='btn-edit'
+                >
+                  <NIcon>
+                    <FormOutlined />
+                  </NIcon>
+                </NButton>
+              )
+            }}
+          </NTooltip>
+        )}
         <NTooltip trigger={'hover'}>
           {{
             default: () => t('resource.file.reupload'),
@@ -139,7 +171,7 @@ export default defineComponent({
                 class='btn-reupload'
               >
                 <NIcon>
-                  <UploadOutlined/>
+                  <UploadOutlined />
                 </NIcon>
               </NButton>
             )
@@ -159,9 +191,7 @@ export default defineComponent({
                     this.row.fullName,
                     this.row.user_name
                   )
-                }
-
-                }
+                }}
                 style={{ marginRight: '-5px' }}
                 circle
                 class='btn-rename'
@@ -184,7 +214,9 @@ export default defineComponent({
                 tag='div'
                 circle
                 style={{ marginRight: '-5px' }}
-                onClick={() => downloadResource({fullName: this.row.fullName})}
+                onClick={() =>
+                  downloadResource({ fullName: this.row.fullName })
+                }
                 class='btn-download'
               >
                 <NIcon>
@@ -198,29 +230,27 @@ export default defineComponent({
           {{
             default: () => t('resource.file.delete'),
             trigger: () => (
-              <NButton size='tiny' type='error' circle class='btn-delete'>
-                <NPopconfirm
-                  positive-text={t('resource.file.confirm')}
-                  negative-text={t('resource.file.cancel')}
-                  onPositiveClick={() => {
-                    this.handleDeleteFile({fullName: this.row.fullName, tenantCode: this.row.user_name})
-                  }}
-                >
-                  {{
-                    default: () => t('resource.file.delete_confirm'),
-                    icon: () => (
-                      <NIcon>
-                        <InfoCircleFilled />
-                      </NIcon>
-                    ),
-                    trigger: () => (
+              <NPopconfirm
+                positive-text={t('resource.file.confirm')}
+                negative-text={t('resource.file.cancel')}
+                onPositiveClick={() => {
+                  this.handleDeleteFile({
+                    fullName: this.row.fullName,
+                    tenantCode: this.row.user_name
+                  })
+                }}
+              >
+                {{
+                  default: () => t('resource.file.delete_confirm'),
+                  trigger: () => (
+                    <NButton size='tiny' type='error' circle class='btn-delete'>
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
-                    )
-                  }}
-                </NPopconfirm>
-              </NButton>
+                    </NButton>
+                  )
+                }}
+              </NPopconfirm>
             )
           }}
         </NTooltip>

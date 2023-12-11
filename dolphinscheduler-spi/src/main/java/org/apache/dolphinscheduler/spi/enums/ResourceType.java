@@ -28,7 +28,8 @@ public enum ResourceType {
      * 0 file, 1 udf
      */
     FILE(0, "file"),
-    UDF(1, "udf");
+    UDF(1, "udf"),
+    ALL(2, "all");
 
     ResourceType(int code, String descp) {
         this.code = code;

@@ -15,34 +15,31 @@
 # limitations under the License.
 #
 
-/.github/ @kezhenxu94 @SbloodyS
-/deploy/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-alert/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-e2e/ @kezhenxu94 @SbloodyS
+/.github/ @SbloodyS
+/deploy/ @caishunfeng
+/dolphinscheduler-alert/ @caishunfeng
+/dolphinscheduler-e2e/ @SbloodyS
 /dolphinscheduler-api-test/ @SbloodyS
-/dolphinscheduler-registry/ @kezhenxu94 @caishunfeng @ruanwenjun
+/dolphinscheduler-registry/ @caishunfeng @ruanwenjun
 /dolphinscheduler-api/ @caishunfeng @SbloodyS
 /dolphinscheduler-dao/ @caishunfeng @SbloodyS
 /dolphinscheduler-dao/src/main/resources/sql/ @zhongjiajie
 /dolphinscheduler-common/ @caishunfeng
-/dolphinscheduler-standalone-server/ @kezhenxu94 @caishunfeng
+/dolphinscheduler-standalone-server/ @caishunfeng
 /dolphinscheduler-datasource-plugin/ @caishunfeng
-/dolphinscheduler-dist/ @kezhenxu94 @caishunfeng
-/dolphinscheduler-meter/ @caishunfeng @kezhenxu94 @ruanwenjun @EricGao888
+/dolphinscheduler-dist/ @caishunfeng
+/dolphinscheduler-meter/ @caishunfeng @ruanwenjun @EricGao888
 /dolphinscheduler-scheduler-plugin/ @caishunfeng
 /dolphinscheduler-master/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-service/ @caishunfeng
-/dolphinscheduler-remote/ @caishunfeng
+/dolphinscheduler-extract/ @caishunfeng @ruanwenjun
 /dolphinscheduler-spi/ @caishunfeng
 /dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @zhuangchong
 /dolphinscheduler-tools/ @caishunfeng @SbloodyS @zhongjiajie @EricGao888
 /script/ @caishunfeng @SbloodyS @zhongjiajie @EricGao888
 /dolphinscheduler-ui/ @songjianet @Amy0104
-/docs/ @zhongjiajie @Tianqi-Dotes @EricGao888
-/licenses/ @kezhenxu94 @zhongjiajie
-/images/ @zhongjiajie @Tianqi-Dotes @EricGao888
+/docs/ @zhongjiajie @EricGao888
+/licenses/ @zhongjiajie
+/images/ @zhongjiajie @EricGao888
 /style/ @caishunfeng
-
-# All pom files
-pom.xml @kezhenxu94

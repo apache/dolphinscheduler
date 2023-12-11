@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -91,22 +92,20 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testGetConnection() throws ExecutionException {
+    public void testGetConnection() throws ExecutionException, SQLException {
         try (
                 MockedStatic<PropertyUtils> mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
             mockedStaticPropertyUtils.when(() -> PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
 
             MySQLConnectionParam connectionParam = new MySQLConnectionParam();
             connectionParam.setUser("root");
             connectionParam.setPassword("123456");
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
 
             Assertions.assertNotNull(connection);
         }

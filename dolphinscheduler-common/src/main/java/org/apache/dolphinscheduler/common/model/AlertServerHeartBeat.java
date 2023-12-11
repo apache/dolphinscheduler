@@ -33,7 +33,8 @@ public class AlertServerHeartBeat implements HeartBeat {
     private long reportTime;
     private double cpuUsage;
     private double memoryUsage;
-    private double loadAverage;
     private double availablePhysicalMemorySize;
-    private String alertServerAddress;
+
+    private String host;
+    private int port;
 }

@@ -28,10 +28,7 @@
     <name>${project.artifactId}</name>
     <dependencies>
         <!-- dolphinscheduler -->
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-remote</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-meter</artifactId>
@@ -52,6 +49,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-alert</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
@@ -62,7 +64,7 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-kubernetes-fabric8-config</artifactId>
+            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
         </dependency>
     </dependencies>
 

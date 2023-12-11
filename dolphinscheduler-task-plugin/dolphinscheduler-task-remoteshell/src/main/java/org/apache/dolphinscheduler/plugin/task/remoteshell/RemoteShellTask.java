@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.remoteshell;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
@@ -30,9 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.SystemUtils;
@@ -43,9 +42,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Map;
 
-/**
- * shell task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class RemoteShellTask extends AbstractTask {
 
     static final String TASK_ID_PREFIX = "dolphinscheduler-remoteshell-";
@@ -103,7 +102,7 @@ public class RemoteShellTask extends AbstractTask {
             String localFile = buildCommand();
             int exitCode = remoteExecutor.run(taskId, localFile);
             setExitStatusCode(exitCode);
-            remoteShellParameters.dealOutParam(remoteExecutor.getVarPool());
+            remoteShellParameters.dealOutParam(remoteExecutor.getTaskOutputParams());
         } catch (Exception e) {
             log.error("shell task error", e);
             setExitStatusCode(EXIT_CODE_FAILURE);
@@ -167,9 +166,8 @@ public class RemoteShellTask extends AbstractTask {
     }
 
     private String parseScript(String script) {
-        // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
     }
 
     public void initRemoteExecutor() {

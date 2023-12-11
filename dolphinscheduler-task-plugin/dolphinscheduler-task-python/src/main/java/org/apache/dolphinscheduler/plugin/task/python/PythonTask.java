@@ -27,8 +27,9 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.io.FileUtils;
 
@@ -39,28 +40,20 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.base.Preconditions;
 
-/**
- * python task
- */
+@Slf4j
 public class PythonTask extends AbstractTask {
 
-    /**
-     * python parameters
-     */
     protected PythonParameters pythonParameters;
 
-    /**
-     * shell command executor
-     */
     private ShellCommandExecutor shellCommandExecutor;
 
     protected TaskExecutionContext taskRequest;
 
-    protected static final String PYTHON_HOME = "PYTHON_HOME";
-
-    private static final String DEFAULT_PYTHON_VERSION = "python";
+    protected static final String PYTHON_LAUNCHER = "PYTHON_LAUNCHER";
 
     /**
      * constructor
@@ -71,9 +64,7 @@ public class PythonTask extends AbstractTask {
         super(taskRequest);
         this.taskRequest = taskRequest;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
     }
 
     @Override
@@ -87,6 +78,7 @@ public class PythonTask extends AbstractTask {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
@@ -97,13 +89,15 @@ public class PythonTask extends AbstractTask {
 
             // create this file
             createPythonCommandFileIfNotExists(pythonScriptContent, pythonScriptFile);
-            String command = buildPythonExecuteCommand(pythonScriptFile);
 
-            TaskResponse taskResponse = shellCommandExecutor.run(command, taskCallBack);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .appendScript(buildPythonExecuteCommand(pythonScriptFile));
+
+            TaskResponse taskResponse = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
-            pythonParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            setTaskOutputParams(shellCommandExecutor.getTaskOutputParams());
+            pythonParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (Exception e) {
             log.error("python task failure", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
@@ -166,13 +160,12 @@ public class PythonTask extends AbstractTask {
      * build python script content
      *
      * @return raw python script
-     * @throws Exception exception
      */
-    protected String buildPythonScriptContent() throws Exception {
+    protected String buildPythonScriptContent() {
         log.info("raw python script : {}", pythonParameters.getRawScript());
         String rawPythonScript = pythonParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         Map<String, Property> paramsMap = mergeParamsWithContext(pythonParameters);
-        return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParamUtils.convert(paramsMap));
+        return ParameterUtils.convertParameterPlaceholders(rawPythonScript, ParameterUtils.convert(paramsMap));
     }
 
     protected Map<String, Property> mergeParamsWithContext(AbstractParameters parameters) {
@@ -182,7 +175,7 @@ public class PythonTask extends AbstractTask {
 
     /**
      * Build the python task command.
-     * If user have set the 'PYTHON_HOME' environment, we will use the 'PYTHON_HOME',
+     * If user have set the 'PYTHON_LAUNCHER' environment, we will use the 'PYTHON_LAUNCHER',
      * if not, we will default use python.
      *
      * @param pythonFile Python file, cannot be empty.
@@ -191,7 +184,7 @@ public class PythonTask extends AbstractTask {
     protected String buildPythonExecuteCommand(String pythonFile) {
         Preconditions.checkNotNull(pythonFile, "Python file cannot be null");
 
-        String pythonHome = String.format("${%s}", PYTHON_HOME);
+        String pythonHome = String.format("${%s}", PYTHON_LAUNCHER);
 
         return pythonHome + " " + pythonFile;
     }

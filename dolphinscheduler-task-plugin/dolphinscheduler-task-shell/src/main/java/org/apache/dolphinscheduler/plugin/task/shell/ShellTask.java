@@ -25,24 +25,15 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.apache.commons.lang3.SystemUtils;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
-import java.util.Map;
-
-/**
- * shell task
- */
+@Slf4j
 public class ShellTask extends AbstractTask {
 
     /**
@@ -69,9 +60,7 @@ public class ShellTask extends AbstractTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -85,15 +74,18 @@ public class ShellTask extends AbstractTask {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            // construct process
-            String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, taskCallBack);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .appendScript(shellParameters.getRawScript());
+
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setProcessId(commandExecuteResult.getProcessId());
-            shellParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            shellParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current Shell task has been interrupted", e);
@@ -116,48 +108,9 @@ public class ShellTask extends AbstractTask {
         }
     }
 
-    /**
-     * create command
-     *
-     * @return file name
-     * @throws Exception exception
-     */
-    private String buildCommand() throws Exception {
-        // generate scripts
-        String fileName = String.format("%s/%s_node.%s",
-                taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId(), SystemUtils.IS_OS_WINDOWS ? "bat" : "sh");
-
-        File file = new File(fileName);
-        Path path = file.toPath();
-
-        if (Files.exists(path)) {
-            // this shouldn't happen
-            log.warn("The command file: {} is already exist", path);
-            return fileName;
-        }
-
-        String script = shellParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
-        script = parseScript(script);
-        shellParameters.setRawScript(script);
-
-        log.info("raw script : {}", shellParameters.getRawScript());
-        log.info("task execute path : {}", taskExecutionContext.getExecutePath());
-
-        FileUtils.createFileWith755(path);
-        Files.write(path, shellParameters.getRawScript().getBytes(), StandardOpenOption.APPEND);
-
-        return fileName;
-    }
-
     @Override
     public AbstractParameters getParameters() {
         return shellParameters;
     }
 
-    private String parseScript(String script) {
-        // combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-    }
 }

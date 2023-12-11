@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -64,8 +65,8 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
-import org.apache.dolphinscheduler.remote.processor.StateEventCallbackService;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.TriggerRelationService;
@@ -133,6 +134,9 @@ public class ExecuteFunctionServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
+    private TenantMapper tenantMapper;
+
+    @Mock
     private ProjectServiceImpl projectService;
 
     @Mock
@@ -156,9 +160,6 @@ public class ExecuteFunctionServiceTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
 
-    @Mock
-    private StateEventCallbackService stateEventCallbackService;
-
     private int processDefinitionId = 1;
 
     private int processDefinitionVersion = 1;
@@ -167,7 +168,7 @@ public class ExecuteFunctionServiceTest {
 
     private int processInstanceId = 1;
 
-    private int tenantId = 1;
+    private String tenantCode = "root";
 
     private int userId = 1;
 
@@ -199,7 +200,6 @@ public class ExecuteFunctionServiceTest {
         // processDefinition
         processDefinition.setId(processDefinitionId);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
-        processDefinition.setTenantId(tenantId);
         processDefinition.setUserId(userId);
         processDefinition.setVersion(1);
         processDefinition.setCode(1L);
@@ -210,7 +210,6 @@ public class ExecuteFunctionServiceTest {
         processInstance.setProjectCode(projectCode);
         processInstance.setState(WorkflowExecutionStatus.FAILURE);
         processInstance.setExecutorId(userId);
-        processInstance.setTenantId(tenantId);
         processInstance.setHost("127.0.0.1:5678");
         processInstance.setProcessDefinitionVersion(1);
         processInstance.setProcessDefinitionCode(1L);
@@ -240,7 +239,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START))
                 .thenReturn(checkProjectAndAuth());
         Mockito.when(processDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(this.processDefinition);
-        Mockito.when(processService.getTenantForProcess(tenantId, userId)).thenReturn(new Tenant());
+        Mockito.when(processService.getTenantForProcess(tenantCode, userId)).thenReturn(tenantCode);
         doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
         Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
@@ -255,13 +254,6 @@ public class ExecuteFunctionServiceTest {
                 .thenReturn(processTaskRelations);
     }
 
-    @Test
-    public void testForceStartTaskInstance() {
-
-        Map<String, Object> result = executorService.forceStartTaskInstance(loginUser, taskQueueId);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
     /**
      * not complement
      */
@@ -270,6 +262,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -277,9 +270,12 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 10, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, null,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -293,6 +289,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -300,9 +297,12 @@ public class ExecuteFunctionServiceTest {
                 null, "123456789,987654321",
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, null,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
 
@@ -312,6 +312,7 @@ public class ExecuteFunctionServiceTest {
     public void testComplementWithOldStartNodeList() {
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = new HashMap<>();
         try {
             result = executorService.execProcessInstance(loginUser, projectCode,
@@ -321,9 +322,12 @@ public class ExecuteFunctionServiceTest {
                     null, "1123456789,987654321",
                     null, null, null,
                     RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0,
+                    Constants.DRY_RUN_FLAG_NO,
                     Constants.TEST_FLAG_NO,
-                    ComplementDependentMode.OFF_MODE, null);
+                    ComplementDependentMode.OFF_MODE, null,
+                    false,
+                    ExecutionOrder.DESC_ORDER);
         } catch (ServiceException e) {
             Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
@@ -369,8 +373,23 @@ public class ExecuteFunctionServiceTest {
         command.setProcessDefinitionCode(processDefinitionCode);
         command.setExecutorId(1);
 
-        int count = executorService.createComplementDependentCommand(schedules, command);
+        // not enable allLevelDependent
+        int count = executorService.createComplementDependentCommand(schedules, command, false);
         Assertions.assertEquals(1, count);
+
+        // enable allLevelDependent
+        DependentProcessDefinition childDependent = new DependentProcessDefinition();
+        childDependent.setProcessDefinitionCode(3);
+        childDependent.setProcessDefinitionVersion(1);
+        childDependent.setTaskDefinitionCode(4);
+        childDependent.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        childDependent.setTaskParams(
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
+        Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+                dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent))
+                .thenReturn(Lists.newArrayList());
+        int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);
+        Assertions.assertEquals(2, allLevelDependentCount);
     }
 
     /**
@@ -381,6 +400,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2022-01-07 12:12:12\",\"complementEndDate\":\"2022-01-06 12:12:12\"}",
@@ -388,9 +408,11 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 2, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.START_PROCESS_INSTANCE_ERROR, result.get(Constants.STATUS));
         verify(commandService, times(0)).createCommand(any(Command.class));
     }
@@ -403,6 +425,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -410,9 +433,12 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, null,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(1)).createCommand(any(Command.class));
     }
@@ -425,6 +451,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(zeroSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -432,12 +459,14 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 0, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 2, Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        verify(commandService, times(31)).createCommand(any(Command.class));
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
 
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        verify(commandService, times(2)).createCommand(any(Command.class));
     }
 
     /**
@@ -448,6 +477,7 @@ public class ExecuteFunctionServiceTest {
 
         Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(oneSchedulerList());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -455,9 +485,12 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         verify(commandService, times(15)).createCommand(any(Command.class));
 
@@ -481,15 +514,16 @@ public class ExecuteFunctionServiceTest {
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW,
                 Constants.DEFAULT_WORKER_GROUP,
+                tenantCode,
                 100L,
                 110,
                 null,
-                0,
+                null,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
-                ComplementDependentMode.OFF_MODE,
-                null));
-
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER));
     }
 
     @Test
@@ -497,7 +531,7 @@ public class ExecuteFunctionServiceTest {
         when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
-        when(processInstanceDao.queryByWorkflowInstanceId(processInstanceId)).thenReturn(processInstance);
+        when(processInstanceDao.queryOptionalById(processInstanceId)).thenReturn(Optional.of(processInstance));
         when(processDefinitionService.queryWorkflowDefinitionThrowExceptionIfNotFound(processDefinitionCode,
                 processDefinitionVersion)).thenReturn(processDefinition);
         Map<String, Object> result =
@@ -510,6 +544,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(commandService.verifyIsNeedCreateCommand(any(Command.class))).thenReturn(true);
         Mockito.when(projectService.checkProjectAndAuth(loginUser, project, projectCode, RERUN))
                 .thenReturn(checkProjectAndAuth());
+        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(new Tenant());
         Map<String, Object> result = executorService.execProcessInstance(loginUser, projectCode,
                 processDefinitionCode,
                 "{\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}",
@@ -517,17 +552,19 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, 100L, 110, null, 15, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
-                ComplementDependentMode.OFF_MODE, null);
+                ComplementDependentMode.OFF_MODE, null,
+                false,
+                ExecutionOrder.DESC_ORDER);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
     public void testStartCheckByProcessDefinedCode() {
-        List<Long> ids = new ArrayList<>();
-        ids.add(1L);
-        Mockito.doNothing().when(processService).recurseFindSubProcess(1, ids);
+        List<Long> ids = Lists.newArrayList(1L);
+        when(processService.findAllSubWorkflowDefinitionCode(1)).thenReturn(ids);
 
         List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         ProcessDefinition processDefinition = new ProcessDefinition();
@@ -630,7 +667,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(processService.findProcessDefinition(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(processDefinition);
 
-        Mockito.when(processService.getTenantForProcess(Mockito.anyInt(), Mockito.anyInt())).thenReturn(new Tenant());
+        Mockito.when(processService.getTenantForProcess(Mockito.anyString(), Mockito.anyInt())).thenReturn(tenantCode);
 
         when(processInstanceMock.getState().isFinished()).thenReturn(false);
         WorkflowExecuteResponse responseInstanceIsNotFinished =

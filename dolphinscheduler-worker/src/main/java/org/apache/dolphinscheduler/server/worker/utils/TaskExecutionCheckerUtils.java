@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
-import org.apache.dolphinscheduler.common.exception.StorageOperateNoConfiguredException;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -34,20 +32,14 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.UserPrincipal;
-import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.slf4j.Logger;
 
 @Slf4j
 public class TaskExecutionCheckerUtils {
@@ -99,53 +91,50 @@ public class TaskExecutionCheckerUtils {
             taskExecutionContext.setExecutePath(execLocalPath);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(execLocalPath));
             Path executePath = Paths.get(taskExecutionContext.getExecutePath());
-            createDirectory(executePath);
-            if (!TenantConstants.DEFAULT_TENANT_CODE.equals(taskExecutionContext.getTenantCode())) {
-                setOwner(executePath, taskExecutionContext.getTenantCode());
-            }
+            FileUtils.createDirectoryIfNotPresent(executePath);
         } catch (Throwable ex) {
             throw new TaskException("Cannot create process execute dir", ex);
         }
     }
 
     public static void downloadResourcesIfNeeded(StorageOperate storageOperate,
-                                                 TaskExecutionContext taskExecutionContext, Logger logger) {
+                                                 TaskExecutionContext taskExecutionContext) {
         String execLocalPath = taskExecutionContext.getExecutePath();
+        String tenant = taskExecutionContext.getTenantCode();
+        String actualTenant =
+                TenantConstants.DEFAULT_TENANT_CODE.equals(tenant) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER : tenant;
+
         Map<String, String> projectRes = taskExecutionContext.getResources();
         if (MapUtils.isEmpty(projectRes)) {
             return;
         }
         List<Pair<String, String>> downloadFiles = new ArrayList<>();
-        projectRes.forEach((key, value) -> {
-            File resFile = new File(execLocalPath, key);
+        projectRes.keySet().forEach(fullName -> {
+            String fileName = storageOperate.getResourceFileName(actualTenant, fullName);
+            projectRes.put(fullName, fileName);
+            File resFile = new File(execLocalPath, fileName);
             boolean notExist = !resFile.exists();
             if (notExist) {
-                downloadFiles.add(Pair.of(key, value));
+                downloadFiles.add(Pair.of(fullName, fileName));
             } else {
-                logger.info("file : {} exists ", resFile.getName());
+                log.warn("Resource file : {} already exists will not download again ", resFile.getName());
             }
         });
-        if (!downloadFiles.isEmpty() && !PropertyUtils.getResUploadStartupState()) {
-            throw new StorageOperateNoConfiguredException("Storage service config does not exist!");
-        }
 
         if (CollectionUtils.isNotEmpty(downloadFiles)) {
             for (Pair<String, String> fileDownload : downloadFiles) {
                 try {
                     String fullName = fileDownload.getLeft();
-                    // we do not actually get & need tenantCode with this implementation right now.
-                    String tenantCode = fileDownload.getRight();
-                    // TODO: Need a better way to get fileName because this implementation is tricky.
-                    String fileName = storageOperate.getResourceFileName(fullName);
-                    logger.info("get resource file from path:{}", fullName);
+                    String fileName = fileDownload.getRight();
 
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(tenantCode, fullName, execLocalPath + File.separator + fileName, false,
-                            true);
+
+                    Path localFileAbsolutePath = Paths.get(execLocalPath, fileName);
+                    storageOperate.download(actualTenant, fullName, localFileAbsolutePath.toString(), true);
+                    log.info("Download resource file {} under: {} successfully", fileName, localFileAbsolutePath);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
-                    WorkerServerMetrics.recordWorkerResourceDownloadSize(
-                            Files.size(Paths.get(execLocalPath, fileName)));
+                    WorkerServerMetrics.recordWorkerResourceDownloadSize(Files.size(localFileAbsolutePath));
                     WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
                 } catch (Exception e) {
                     WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
@@ -155,29 +144,4 @@ public class TaskExecutionCheckerUtils {
         }
     }
 
-    private static void createDirectory(Path filePath) {
-        if (Files.exists(filePath)) {
-            return;
-        }
-        try {
-            Files.createDirectories(filePath);
-        } catch (IOException e) {
-            throw new TaskException("Create directory " + filePath + " failed ", e);
-        }
-    }
-
-    private static void setOwner(Path filePath, String tenant) {
-        try {
-            if (!OSUtils.isSudoEnable()) {
-                // we need to open sudo, then we can change the owner.
-                return;
-            }
-            UserPrincipalLookupService userPrincipalLookupService =
-                    FileSystems.getDefault().getUserPrincipalLookupService();
-            UserPrincipal tenantPrincipal = userPrincipalLookupService.lookupPrincipalByName(tenant);
-            Files.setOwner(filePath, tenantPrincipal);
-        } catch (IOException e) {
-            throw new TaskException("Set tenant directory " + filePath + " permission failed, tenant: " + tenant, e);
-        }
-    }
 }

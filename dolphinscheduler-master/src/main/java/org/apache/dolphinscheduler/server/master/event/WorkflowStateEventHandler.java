@@ -35,7 +35,8 @@ public class WorkflowStateEventHandler implements StateEventHandler {
     public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleException {
         WorkflowStateEvent workflowStateEvent = (WorkflowStateEvent) stateEvent;
-        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        ProcessInstance processInstance =
+                workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         ProcessDefinition processDefinition = processInstance.getProcessDefinition();
         measureProcessState(workflowStateEvent, processInstance.getProcessDefinitionCode().toString());
 
@@ -62,10 +63,13 @@ public class WorkflowStateEventHandler implements StateEventHandler {
             }
             workflowExecuteRunnable.endProcess();
         }
-        if (processInstance.getState().isReadyStop()) {
-            workflowExecuteRunnable.killAllTasks();
-        }
 
+        if (workflowStateEvent.getStatus().isReadyStop()) {
+            workflowExecuteRunnable.refreshProcessInstance(processInstance.getId());
+            if (processInstance.getState().isReadyStop()) {
+                workflowExecuteRunnable.killAllTasks();
+            }
+        }
         return true;
     }
 

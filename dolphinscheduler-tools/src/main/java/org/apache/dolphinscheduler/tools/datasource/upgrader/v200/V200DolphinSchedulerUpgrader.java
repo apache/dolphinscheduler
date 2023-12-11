@@ -32,15 +32,15 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.upgrade.JsonSplitDao;
-import org.apache.dolphinscheduler.dao.upgrade.ProcessDefinitionDao;
-import org.apache.dolphinscheduler.dao.upgrade.ProjectDao;
-import org.apache.dolphinscheduler.dao.upgrade.ScheduleDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.tools.datasource.dao.UpgradeDao;
+import org.apache.dolphinscheduler.tools.datasource.dao.JsonSplitDao;
+import org.apache.dolphinscheduler.tools.datasource.dao.ProcessDefinitionDao;
+import org.apache.dolphinscheduler.tools.datasource.dao.ProjectDao;
+import org.apache.dolphinscheduler.tools.datasource.dao.ScheduleDao;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerUpgrader;
 import org.apache.dolphinscheduler.tools.datasource.upgrader.DolphinSchedulerVersion;
+import org.apache.dolphinscheduler.tools.datasource.upgrader.UpgradeDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -144,8 +144,6 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
             ObjectNode jsonObject = JSONUtils.parseObject(entry.getValue());
             ProcessDefinition processDefinition = processDefinitionMap.get(entry.getKey());
             if (processDefinition != null) {
-                processDefinition
-                        .setTenantId(jsonObject.get("tenantId") == null ? -1 : jsonObject.get("tenantId").asInt());
                 processDefinition.setTimeout(jsonObject.get("timeout").asInt());
                 processDefinition.setGlobalParams(jsonObject.get("globalParams").toString());
             } else {

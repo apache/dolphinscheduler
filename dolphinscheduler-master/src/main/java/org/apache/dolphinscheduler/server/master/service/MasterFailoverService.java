@@ -91,7 +91,7 @@ public class MasterFailoverService {
     }
 
     public void failoverMaster(String masterHost) {
-        String failoverPath = RegistryNodeType.MASTER_FAILOVER_LOCK + "/" + masterHost;
+        String failoverPath = RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath() + "/" + masterHost;
         try {
             registryClient.getLock(failoverPath);
             doFailoverMaster(masterHost);
@@ -128,9 +128,8 @@ public class MasterFailoverService {
                 needFailoverProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
 
         for (ProcessInstance processInstance : needFailoverProcessInstanceList) {
-            try (
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext =
-                            LogUtils.setWorkflowInstanceIdMDC(processInstance.getId())) {
+            try {
+                LogUtils.setWorkflowInstanceIdMDC(processInstance.getId());
                 log.info("WorkflowInstance failover starting");
                 if (!checkProcessInstanceNeedFailover(masterStartupTimeOptional, processInstance)) {
                     continue;
@@ -140,6 +139,8 @@ public class MasterFailoverService {
                         processInstance.getProcessDefinitionCode().toString());
                 processService.processNeedFailoverProcessInstances(processInstance);
                 log.info("WorkflowInstance failover finished");
+            } finally {
+                LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
 

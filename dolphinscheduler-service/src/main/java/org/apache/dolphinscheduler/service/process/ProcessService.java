@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -57,13 +56,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
 
     @Transactional
+    @Nullable
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
+
+    ProcessInstance constructProcessInstance(Command command,
+                                             String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
     Optional<ProcessInstance> findProcessInstanceDetailById(int processId);
 
@@ -81,19 +86,19 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void recurseFindSubProcess(long parentCode, List<Long> ids);
+    List<Long> findAllSubWorkflowDefinitionCode(long workflowDefinitionCode);
 
-    Tenant getTenantForProcess(int tenantId, int userId);
+    String getTenantForProcess(String tenantCode, int userId);
 
     Environment findEnvironmentByCode(Long environmentCode);
 
     void setSubProcessParam(ProcessInstance subProcessInstance);
 
-    TaskInstance submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
-                                     long commitInterval);
+    boolean submitTaskWithRetry(ProcessInstance processInstance, TaskInstance taskInstance, int commitRetryTimes,
+                                long commitInterval);
 
     @Transactional
-    TaskInstance submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
+    boolean submitTask(ProcessInstance processInstance, TaskInstance taskInstance);
 
     void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task);
 
@@ -169,7 +174,7 @@ public interface ProcessService {
 
     boolean isTaskOnline(long taskCode);
 
-    DAG<String, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
+    DAG<Long, TaskNode, TaskNodeRelation> genDagGraph(ProcessDefinition processDefinition);
 
     DagData genDagData(ProcessDefinition processDefinition);
 
@@ -228,8 +233,6 @@ public interface ProcessService {
     public String findConfigYamlByName(String clusterName);
 
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
-
-    Integer queryTestDataSourceId(Integer onlineDataSourceId);
 
     void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 }

@@ -45,6 +45,10 @@ interface IOption {
   value: string | number
 }
 
+interface IRenderOption extends IOption {
+  filterLabel: string
+}
+
 interface ITaskPriorityOption extends SelectOption {
   icon: VNode
   color: string
@@ -62,12 +66,24 @@ interface ILocalParam {
   value?: string
 }
 
+interface ILabel {
+  label: string
+  value: string
+}
+
+interface IMatchExpression {
+  key: string
+  operator: string
+  values: string
+}
+
 interface IResponseJsonItem extends Omit<IJsonItemParams, 'type'> {
   type: 'input' | 'select' | 'radio' | 'group'
   emit: 'change'[]
 }
 
 interface IDependentItemOptions {
+  dependentTypeOptions?: IOption[]
   definitionCodeOptions?: IOption[]
   depTaskCodeOptions?: IOption[]
   dateOptions?: IOption[]
@@ -84,6 +100,8 @@ interface IDependentItem {
   definitionCode?: number
   cycle?: 'month' | 'week' | 'day' | 'hour'
   dateValue?: string
+  dependentType?: 'DEPENDENT_ON_WORKFLOW' | 'DEPENDENT_ON_TASK'
+  parameterPassing?: boolean
 }
 
 interface IDependTask {
@@ -98,13 +116,21 @@ interface ISwitchResult {
   nextNode?: number
 }
 
+interface IDependentParameters {
+  checkInterval?: number
+  failurePolicy?: 'DEPENDENT_FAILURE_FAILURE' | 'DEPENDENT_FAILURE_WAITING'
+  failureWaitingTime?: number
+  relation?: RelationType
+  dependTaskList?: IDependTask[]
+}
+
 /*
  * resourceName: resource full name
  * res: resource file name
  */
 interface ISourceItem {
-  id?: number,
-  resourceName: string,
+  id?: number
+  resourceName: string
   res?: string
 }
 
@@ -200,6 +226,8 @@ interface ISparkParameters {
   executorMemory?: string
   numExecutors?: number
   others?: string
+  yarnQueue?: string
+  sqlExecutionType?: string
 }
 
 interface IRuleParameters {
@@ -211,6 +239,7 @@ interface IRuleParameters {
   operator?: string
   src_connector_type?: number
   src_datasource_id?: number
+  src_database?: string
   src_table?: string
   field_length?: number
   begin_time?: string
@@ -225,6 +254,7 @@ interface IRuleParameters {
   statistics_name?: string
   target_connector_type?: number
   target_datasource_id?: number
+  target_database?: string
   target_table?: string
   threshold?: string
   mapping_columns?: string
@@ -292,10 +322,7 @@ interface ITaskParams {
   switchResult?: ISwitchResult
   dependTaskList?: IDependTask[]
   nextNode?: number
-  dependence?: {
-    relation?: RelationType
-    dependTaskList?: IDependTask[]
-  }
+  dependence?: IDependentParameters
   customConfig?: number
   json?: string
   dsType?: string
@@ -316,11 +343,16 @@ interface ITaskParams {
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string
   restEndpoint?: string
+  zeppelinUsername?: string
+  username?: string
+  zeppelinPassword?: string
+  password?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
   hiveCliOptions?: string
   hiveSqlScript?: string
   hiveCliTaskExecutionType?: string
+  sqlExecutionType?: string
   noteId?: string
   paragraphId?: string
   condaEnvName?: string
@@ -329,6 +361,7 @@ interface ITaskParams {
   parameters?: string
   kernel?: string
   engine?: string
+  startupScript?: string
   executionTimeout?: string
   startTimeout?: string
   processDefinitionCode?: number
@@ -345,7 +378,12 @@ interface ITaskParams {
   minCpuCores?: string
   minMemorySpace?: string
   image?: string
+  imagePullPolicy?: string
+  pullSecret?: string
   command?: string
+  args?: string
+  customizedLabels?: ILabel[]
+  nodeSelectors?: IMatchExpression[]
   algorithm?: string
   params?: string
   searchParams?: string
@@ -408,6 +446,13 @@ interface ITaskParams {
   factoryName?: string
   resourceGroupName?: string
   pipelineName?: string
+  maxNumOfSubWorkflowInstances?: number
+  degreeOfParallelism?: number
+  filterCondition?: string
+  listParameters?: Array<any>
+  yarnQueue?: string
+  awsRegion?: string
+  kubeConfig?: string
 }
 
 interface INodeData
@@ -425,6 +470,7 @@ interface INodeData
     >,
     ISqoopTargetData,
     ISqoopSourceData,
+    IDependentParameters,
     Omit<IRuleParameters, 'mapping_columns'> {
   id?: string
   taskType?: ITaskType
@@ -473,7 +519,7 @@ interface ITaskData
   > {
   name?: string
   taskPriority?: string
-  isCache?: "YES" | "NO"
+  isCache?: 'YES' | 'NO'
   timeoutFlag?: 'OPEN' | 'CLOSE'
   timeoutNotifyStrategy?: string | []
   taskParams?: ITaskParams
@@ -488,6 +534,7 @@ export {
   INodeData,
   ITaskParams,
   IOption,
+  IRenderOption,
   IDataBase,
   ModelType,
   SourceType,
@@ -502,5 +549,6 @@ export {
   FormRules,
   IJsonItemParams,
   IResponseJsonItem,
-  IDateType
+  IDateType,
+  IDependentParameters
 }

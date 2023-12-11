@@ -141,6 +141,15 @@ public final class Constants {
 
     public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
 
+    public static final String AZURE_BLOB_STORAGE_CONNECTION_STRING = "resource.azure.blob.storage.connection.string";
+
+    public static final String AZURE_BLOB_STORAGE_CONTAINER_NAME = "resource.azure.blob.storage.container.name";
+
+    public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
+
+    public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
+    public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
+
     /**
      * fetch applicationId way
      */
@@ -297,9 +306,9 @@ public final class Constants {
     public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
 
     /**
-     * time unit second to minutes
+     * unit convertor for minute to second
      */
-    public static final int SEC_2_MINUTES_TIME_UNIT = 60;
+    public static final int MINUTE_2_SECOND_TIME_UNIT = 60;
 
     /***
      *
@@ -476,17 +485,11 @@ public final class Constants {
     public static final String BLOCKING_CONDITION = "blockingCondition";
     public static final String ALERT_WHEN_BLOCKING = "alertWhenBlocking";
 
-    /**
-     * master/worker server use for zk
-     */
-    public static final String MASTER_TYPE = "master";
-    public static final String WORKER_TYPE = "worker";
-    public static final String DELETE_OP = "delete";
-    public static final String ADD_OP = "add";
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
-    public static final long DEPENDENT_ALL_TASK_CODE = 0;
+    public static final long DEPENDENT_ALL_TASK_CODE = -1;
+    public static final long DEPENDENT_WORKFLOW_CODE = 0;
 
     /**
      * preview schedule execute count
@@ -538,6 +541,11 @@ public final class Constants {
      * loginUserFromKeytab path
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+    /**
+     * sso.login.user.state
+     */
+    public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
 
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
@@ -644,10 +652,6 @@ public final class Constants {
      */
     public static final int AUTHORIZE_READABLE_PERM = 4;
 
-    public static final int NORMAL_NODE_STATUS = 0;
-    public static final int ABNORMAL_NODE_STATUS = 1;
-    public static final int BUSY_NODE_STATUE = 2;
-
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
     public static final String START_END_DATE = "startDate,endDate";
@@ -656,18 +660,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-    /**
-     * network interface preferred
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
-            "dolphin.scheduler.network.interface.preferred";
-
-    /**
-     * network IP gets priority, default inner outer
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
-            "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -697,8 +689,6 @@ public final class Constants {
      */
     public static final String NAMESPACE = "namespace";
     public static final String CLUSTER = "cluster";
-    public static final String LIMITS_CPU = "limitsCpu";
-    public static final String LIMITS_MEMORY = "limitsMemory";
     public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**
@@ -839,4 +829,22 @@ public final class Constants {
     public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
 
     public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
+
+    /**
+     * remote logging for GCS
+     */
+    public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
+
+    public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
+
+    /**
+     * data quality
+     */
+    public static final String DATABASES_QUERY = "show databases";
+    public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
+
+    /**
+     * K8S sensitive param
+     */
+    public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 }

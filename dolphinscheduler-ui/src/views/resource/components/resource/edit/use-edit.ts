@@ -19,7 +19,11 @@ import { useI18n } from 'vue-i18n'
 import type { Router } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import { updateResourceContent, viewResource } from '@/service/modules/resources'
+import {
+  updateResourceContent,
+  viewResource
+} from '@/service/modules/resources'
+import { defineStore } from 'pinia'
 
 export function useEdit(state: any) {
   const { t } = useI18n()
@@ -41,13 +45,11 @@ export function useEdit(state: any) {
   const handleUpdateContent = (fullName: string, tenantCode: string) => {
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
-        await updateResourceContent(
-          {
-            ...state.fileForm,
-            tenantCode: tenantCode,
-            fullName: fullName,
-          },
-        )
+        await updateResourceContent({
+          ...state.fileForm,
+          tenantCode: tenantCode,
+          fullName: fullName
+        })
 
         window.$message.success(t('resource.file.success'))
         router.go(-1)
@@ -59,4 +61,30 @@ export function useEdit(state: any) {
     getResourceView,
     handleUpdateContent
   }
+}
+
+export const useIsDetailPageStore = defineStore("isDetailPage", {
+  state:() => {
+    return {
+      isDetailPage:false
+    }
+  },
+  getters: {
+    getIsDetailPage(): boolean {
+      return this.isDetailPage
+    }
+  },
+  actions: {
+    setIsDetailPage(isDetailPage: boolean) {
+      this.isDetailPage = isDetailPage
+    }
+  }
+})
+
+export const isEmpty = (string: any): boolean => {
+    if(string === '' || string === undefined || string === null){
+        return true
+    }else{
+        return false
+    }
 }

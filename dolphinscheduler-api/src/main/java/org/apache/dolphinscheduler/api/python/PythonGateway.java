@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.python;
 
-import org.apache.dolphinscheduler.api.configuration.PythonGatewayConfiguration;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -33,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
+import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
@@ -93,6 +95,7 @@ public class PythonGateway {
 
     private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
     private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
+    private static final ExecutionOrder DEFAULT_EXECUTION_ORDER = ExecutionOrder.DESC_ORDER;
     private static final int DEFAULT_DRY_RUN = 0;
     private static final int DEFAULT_TEST_FLAG = 0;
     private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
@@ -142,7 +145,7 @@ public class PythonGateway {
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
-    private PythonGatewayConfiguration pythonGatewayConfiguration;
+    private ApiConfig apiConfig;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -262,17 +265,20 @@ public class PythonGateway {
         if (processDefinition != null) {
             processDefinitionCode = processDefinition.getCode();
             // make sure workflow offline which could edit
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
-                    ReleaseState.OFFLINE);
+            processDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
             processDefinitionService.updateProcessDefinition(user, projectCode, name,
                     processDefinitionCode, description, globalParams,
-                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, taskRelationJson, taskDefinitionJson,
                     executionTypeEnum);
         } else {
             Map<String, Object> result = processDefinitionService.createProcessDefinition(user, projectCode, name,
                     description, globalParams,
-                    null, timeout, user.getTenantCode(), taskRelationJson, taskDefinitionJson, otherParamsJson,
+                    null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
+            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+                log.error(result.get(Constants.MSG).toString());
+                throw new ServiceException(result.get(Constants.MSG).toString());
+            }
             processDefinition = (ProcessDefinition) result.get(Constants.DATA_LIST);
             processDefinitionCode = processDefinition.getCode();
         }
@@ -283,8 +289,11 @@ public class PythonGateway {
                     warningType,
                     warningGroupId);
         }
-        processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinitionCode,
-                ReleaseState.getEnum(releaseState));
+        if (ReleaseState.ONLINE.equals(ReleaseState.getEnum(releaseState))) {
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+        } else if (ReleaseState.OFFLINE.equals(ReleaseState.getEnum(releaseState))) {
+            processDefinitionService.offlineWorkflowDefinition(user, projectCode, processDefinitionCode);
+        }
         return processDefinitionCode;
     }
 
@@ -339,23 +348,23 @@ public class PythonGateway {
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
-            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode,
-                    ReleaseState.ONLINE);
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
             Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, workflowCode,
                     schedule, WarningType.valueOf(warningType),
-                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
+                    DEFAULT_ENVIRONMENT_CODE);
             scheduleId = (int) result.get("scheduleId");
         } else {
             scheduleId = scheduleObj.getId();
-            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode,
-                    ReleaseState.OFFLINE);
+            processDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
             schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
-                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, DEFAULT_ENVIRONMENT_CODE);
+                    warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
+                    DEFAULT_ENVIRONMENT_CODE);
         }
         if (onlineSchedule) {
             // set workflow online to make sure we can set schedule online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, workflowCode, ReleaseState.ONLINE);
-            schedulerService.setScheduleState(user, projectCode, scheduleId, ReleaseState.ONLINE);
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
+            schedulerService.onlineScheduler(user, projectCode, scheduleId);
         }
     }
 
@@ -373,8 +382,7 @@ public class PythonGateway {
                 processDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
 
         // make sure workflow online
-        processDefinitionService.releaseProcessDefinition(user, project.getCode(), processDefinition.getCode(),
-                ReleaseState.ONLINE);
+        processDefinitionService.onlineWorkflowDefinition(user, project.getCode(), processDefinition.getCode());
 
         executorService.execProcessInstance(user,
                 project.getCode(),
@@ -389,6 +397,7 @@ public class PythonGateway {
                 DEFAULT_RUN_MODE,
                 DEFAULT_PRIORITY,
                 workerGroup,
+                user.getTenantCode(),
                 DEFAULT_ENVIRONMENT_CODE,
                 timeout,
                 null,
@@ -396,7 +405,9 @@ public class PythonGateway {
                 DEFAULT_DRY_RUN,
                 DEFAULT_TEST_FLAG,
                 COMPLEMENT_DEPENDENT_MODE,
-                processDefinition.getVersion());
+                processDefinition.getVersion(),
+                false,
+                DEFAULT_EXECUTION_ORDER);
     }
 
     // side object
@@ -441,7 +452,7 @@ public class PythonGateway {
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {
         User user = usersService.queryUser(userName);
-        projectService.update(user, projectCode, projectName, desc, userName);
+        projectService.update(user, projectCode, projectName, desc);
     }
 
     public void deleteProject(String userName, Long projectCode) {
@@ -549,8 +560,7 @@ public class PythonGateway {
         // get workflow info
         if (processDefinition != null) {
             // make sure workflow online
-            processDefinitionService.releaseProcessDefinition(user, projectCode, processDefinition.getCode(),
-                    ReleaseState.ONLINE);
+            processDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinition.getCode());
             result.put("id", processDefinition.getId());
             result.put("name", processDefinition.getName());
             result.put("code", processDefinition.getCode());
@@ -677,13 +687,14 @@ public class PythonGateway {
 
     @PostConstruct
     public void init() {
-        if (pythonGatewayConfiguration.isEnabled()) {
+        if (apiConfig.getPythonGateway().isEnabled()) {
             this.start();
         }
     }
 
     private void start() {
         try {
+            ApiConfig.PythonGatewayConfiguration pythonGatewayConfiguration = apiConfig.getPythonGateway();
             InetAddress gatewayHost = InetAddress.getByName(pythonGatewayConfiguration.getGatewayServerAddress());
             GatewayServerBuilder serverBuilder = new GatewayServer.GatewayServerBuilder()
                     .entryPoint(this)

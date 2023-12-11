@@ -113,7 +113,7 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
 
         List<WorkFlowLineage> workFlowLineages = workFlowLineageMapper
                 .queryWorkFlowLineageByName(processDefinition.getProjectCode(), processDefinition.getName());
-        Assertions.assertNotEquals(workFlowLineages.size(), 0);
+        Assertions.assertNotEquals(0, workFlowLineages.size());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         List<ProcessLineage> workFlowLineages =
                 workFlowLineageMapper.queryProcessLineageByCode(processTaskRelation.getProjectCode(),
                         processTaskRelation.getProcessDefinitionCode());
-        Assertions.assertNotEquals(workFlowLineages.size(), 0);
+        Assertions.assertNotEquals(0, workFlowLineages.size());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         insertOneProcessTaskRelation();
         List<ProcessLineage> workFlowLineages =
                 workFlowLineageMapper.queryProcessLineage(processDefinition.getProjectCode());
-        Assertions.assertNotEquals(workFlowLineages.size(), 0);
+        Assertions.assertNotEquals(0, workFlowLineages.size());
     }
 
     @Test

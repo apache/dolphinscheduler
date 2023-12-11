@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.REGISTRY_DO
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 
 import lombok.Data;
@@ -47,7 +49,7 @@ public class WorkerConfig implements Validator {
     private boolean tenantAutoCreate = true;
     private boolean tenantDistributedUser = false;
     private int maxCpuLoadAvg = -1;
-    private double reservedMemory = 0.3;
+    private double reservedMemory = 0.1;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     /**
@@ -75,7 +77,9 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getMaxCpuLoadAvg() <= 0) {
             workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
         }
-        workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+        if (StringUtils.isEmpty(workerConfig.getWorkerAddress())) {
+            workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
+        }
 
         workerConfig.setWorkerRegistryPath(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerConfig.getWorkerAddress());
         printConfig();
@@ -91,7 +95,7 @@ public class WorkerConfig implements Validator {
         log.info("Worker config: maxCpuLoadAvg -> {}", maxCpuLoadAvg);
         log.info("Worker config: reservedMemory -> {}", reservedMemory);
         log.info("Worker config: registryDisconnectStrategy -> {}", registryDisconnectStrategy);
-        log.info("Worker config: workerAddress -> {}", registryDisconnectStrategy);
+        log.info("Worker config: workerAddress -> {}", workerAddress);
         log.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
         log.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
     }

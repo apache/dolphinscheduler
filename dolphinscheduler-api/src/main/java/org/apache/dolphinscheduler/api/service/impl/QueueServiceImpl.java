@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TENANT_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.YARN_QUEUE_UPDATE;
 
@@ -24,19 +25,20 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +48,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -64,12 +65,15 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private TenantMapper tenantMapper;
+
     /**
      * Check the queue new object valid or not
      *
      * @param queue The queue object want to create
      */
-    private void createQueueValid(Queue queue) throws ServiceException {
+    private void validQueue(Queue queue) throws ServiceException {
         if (StringUtils.isEmpty(queue.getQueue())) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.QUEUE);
         } else if (StringUtils.isEmpty(queue.getQueueName())) {
@@ -116,91 +120,73 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public Result queryList(User loginUser) {
-        Result result = new Result();
+    public List<Queue> queryList(User loginUser) {
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
                 loginUser.getId(), log);
         if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
             ids = ids.isEmpty() ? new HashSet<>() : ids;
             ids.add(Constants.DEFAULT_QUEUE_ID);
         }
-        List<Queue> queueList = queueMapper.selectBatchIds(ids);
-        result.setData(queueList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return queueMapper.selectBatchIds(ids);
     }
 
     /**
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
     @Override
-    public Result queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-        Result result = new Result();
+    public PageInfo<Queue> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         PageInfo<Queue> pageInfo = new PageInfo<>(pageNo, pageSize);
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
                 loginUser.getId(), log);
         if (ids.isEmpty()) {
-            result.setData(pageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return pageInfo;
         }
         Page<Queue> page = new Page<>(pageNo, pageSize);
         IPage<Queue> queueList = queueMapper.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
         Integer count = (int) queueList.getTotal();
         pageInfo.setTotal(count);
         pageInfo.setTotalList(queueList.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+        return pageInfo;
     }
 
     /**
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
     @Override
-    @Transactional
-    public Result createQueue(User loginUser, String queue, String queueName) {
-        Result result = new Result();
+    public Queue createQueue(User loginUser, String queue, String queueName) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.QUEUE, YARN_QUEUE_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         Queue queueObj = new Queue(queueName, queue);
-        createQueueValid(queueObj);
+        validQueue(queueObj);
         queueMapper.insert(queueObj);
 
-        result.setData(queueObj);
-        log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
-        putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.QUEUE, loginUser.getId(), Collections.singletonList(queueObj.getId()),
-                log);
-        return result;
+        return queueObj;
     }
 
     /**
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */
     @Override
-    public Result updateQueue(User loginUser, int id, String queue, String queueName) {
-        Result result = new Result();
+    public Queue updateQueue(User loginUser, int id, String queue, String queueName) {
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.QUEUE, YARN_QUEUE_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -218,9 +204,47 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         }
 
         queueMapper.updateById(updateQueue);
-        result.setData(updateQueue);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return updateQueue;
+    }
+
+    /**
+     * delete queue
+     *
+     * @param loginUser login user
+     * @param id        queue id
+     * @return delete result code
+     * @throws Exception exception
+     */
+    @Override
+    public void deleteQueueById(User loginUser, int id) throws Exception {
+
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        Queue queue = queueMapper.selectById(id);
+        if (Objects.isNull(queue)) {
+            log.error("Queue does not exist");
+            throw new ServiceException(Status.QUEUE_NOT_EXIST);
+        }
+
+        List<Tenant> tenantList = tenantMapper.queryTenantListByQueueId(queue.getId());
+        if (CollectionUtils.isNotEmpty(tenantList)) {
+            log.warn("Delete queue failed, because there are {} tenants using it.", tenantList.size());
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());
+        }
+
+        List<User> userList = userMapper.queryUserListByQueue(queue.getQueueName());
+        if (CollectionUtils.isNotEmpty(userList)) {
+            log.warn("Delete queue failed, because there are {} users using it.", userList.size());
+            throw new ServiceException(Status.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
+        }
+
+        int delete = queueMapper.deleteById(id);
+        if (delete <= 0) {
+            throw new ServiceException(Status.DELETE_QUEUE_BY_ID_ERROR);
+        }
+
     }
 
     /**
@@ -231,14 +255,9 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     @Override
-    public Result<Object> verifyQueue(String queue, String queueName) {
-        Result<Object> result = new Result<>();
-
+    public void verifyQueue(String queue, String queueName) {
         Queue queueValidator = new Queue(queueName, queue);
-        createQueueValid(queueValidator);
-        result.setData(queueValidator);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        validQueue(queueValidator);
     }
 
     /**
@@ -293,7 +312,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return existsQueue;
         }
         Queue queueObj = new Queue(queueName, queue);
-        createQueueValid(queueObj);
+        validQueue(queueObj);
         queueMapper.insert(queueObj);
         log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         return queueObj;

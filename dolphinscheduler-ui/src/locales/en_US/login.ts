@@ -21,5 +21,7 @@ export default {
   userName_tips: 'Please enter your username',
   userPassword: 'Password',
   userPassword_tips: 'Please enter your password',
-  login: 'Login'
+  login: 'Login',
+  loginWithOAuth2: 'login with OAuth2',
+  ssoLogin: 'SSO Login'
 }

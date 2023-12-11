@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, toRefs, withKeys } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted,
+  toRefs,
+  withKeys
+} from 'vue'
 import styles from './index.module.scss'
 import {
   NInput,
@@ -23,7 +29,10 @@ import {
   NSwitch,
   NForm,
   NFormItem,
-  useMessage
+  useMessage,
+  NSpace,
+  NDivider,
+  NImage
 } from 'naive-ui'
 import { useForm } from './use-form'
 import { useTranslate } from './use-translate'
@@ -31,15 +40,16 @@ import { useLogin } from './use-login'
 import { useLocalesStore } from '@/store/locales/locales'
 import { useThemeStore } from '@/store/theme/theme'
 import cookies from 'js-cookie'
+import { ssoLoginUrl } from '@/service/modules/login'
+import type { OAuth2Provider } from '@/service/modules/login/types'
 
 const login = defineComponent({
   name: 'login',
   setup() {
     window.$message = useMessage()
-
     const { state, t, locale } = useForm()
     const { handleChange } = useTranslate(locale)
-    const { handleLogin } = useLogin(state)
+    const { handleLogin, handleGetOAuth2Provider, oauth2Providers, gotoOAuth2Page, handleRedirect } = useLogin(state)
     const localesStore = useLocalesStore()
     const themeStore = useThemeStore()
 
@@ -51,13 +61,34 @@ const login = defineComponent({
 
     cookies.set('language', localesStore.getLocales, { path: '/' })
 
+    onMounted(async () => {
+      const ssoLoginUrlRes = await ssoLoginUrl()
+      state.loginForm.ssoLoginUrl = ssoLoginUrlRes
+      if (state.loginForm.ssoLoginUrl) {
+        const url = new URL(window.location.href)
+        const ssoState = url.searchParams.get('state')
+        const ssoCode = url.searchParams.get('code')
+        if (ssoState && ssoCode) {
+          state.loginForm.userName = ssoState
+          state.loginForm.userPassword = ssoCode
+          handleLogin()
+        }
+      } else {
+        state.loginForm.ssoLoginUrl = ''
+      }
+      handleRedirect()
+    })
+
+    handleGetOAuth2Provider()
     return {
       t,
       handleChange,
       handleLogin,
       ...toRefs(state),
       localesStore,
-      trim
+      trim,
+      oauth2Providers,
+      gotoOAuth2Page
     }
   },
   render() {
@@ -80,7 +111,10 @@ const login = defineComponent({
           <div class={styles.logo}>
             <div class={styles['logo-img']} />
           </div>
-          <div class={styles['form-model']}>
+          <div
+            class={styles['form-model']}
+            v-show={this.loginForm.ssoLoginUrl.length === 0}
+          >
             <NForm rules={this.rules} ref='loginFormRef'>
               <NFormItem
                 label={this.t('login.userName')}
@@ -127,6 +161,31 @@ const login = defineComponent({
               {this.t('login.login')}
             </NButton>
           </div>
+          <div
+            class={styles['form-model']}
+            v-show={this.loginForm.ssoLoginUrl.length !== 0}
+          >
+            <a href={this.loginForm.ssoLoginUrl} style='text-decoration:none'>
+              <NButton
+                class='btn-login-sso'
+                round
+                type='info'
+                style={{ width: '100%', marginTop: '30px' }}
+                onClick={this.handleLogin}
+              >
+                {this.t('login.ssoLogin')}
+              </NButton>
+            </a>
+          </div>
+            {this.oauth2Providers.length > 0 && <NDivider >
+              {this.t('login.loginWithOAuth2')}
+            </NDivider>}
+
+            <NSpace class={styles['oauth2-provider']} justify="center">
+              {this.oauth2Providers?.map((e: OAuth2Provider) => {
+                return (e.iconUri ? <div onClick={() => this.gotoOAuth2Page(e)}><NImage preview-disabled width="30" src={e.iconUri}></NImage> </div> : <NButton onClick={() => this.gotoOAuth2Page(e)}>{e.provider}</NButton>)
+              })}
+            </NSpace>
         </div>
       </div>
     )

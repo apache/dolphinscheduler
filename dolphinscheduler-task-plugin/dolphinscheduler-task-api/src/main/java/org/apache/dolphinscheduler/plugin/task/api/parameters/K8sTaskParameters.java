@@ -17,34 +17,63 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Label;
+import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * k8s task parameters
  */
 @Data
+@Slf4j
 public class K8sTaskParameters extends AbstractParameters {
 
     private String image;
     private String namespace;
     private String command;
+    private String args;
+    private String pullSecret;
+    private String imagePullPolicy;
     private double minCpuCores;
     private double minMemorySpace;
-
+    private List<Label> customizedLabels;
+    private List<NodeSelectorExpression> nodeSelectors;
+    private String kubeConfig;
+    private int datasource;
+    private String type;
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(image) && StringUtils.isNotEmpty(namespace);
+        return StringUtils.isNotEmpty(image);
     }
-
+    public K8sTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
+        k8sTaskExecutionContext.setConnectionParams(
+                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
+        return k8sTaskExecutionContext;
+    }
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
+    }
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+        resources.put(ResourceType.DATASOURCE, datasource);
+        return resources;
     }
 }

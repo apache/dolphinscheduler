@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
@@ -104,13 +103,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
-            return result;
-        }
 
         // verify udf func name exist
         if (checkUdfFuncNameExists(funcName)) {
@@ -156,7 +148,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         udfFuncMapper.insert(udf);
         log.info("UDF function create complete, udfFuncName:{}.", udf.getFuncName());
         putMsg(result, Status.SUCCESS);
-        permissionPostHandle(AuthorizationType.UDF, loginUser.getId(), Collections.singletonList(udf.getId()), log);
         return result;
     }
 
@@ -242,14 +233,6 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             return result;
         }
 
-        // if resource upload startup
-        if (!PropertyUtils.getResUploadStartupState()) {
-            log.error("Storage does not start up, resource upload startup state: {}.",
-                    PropertyUtils.getResUploadStartupState());
-            putMsg(result, Status.HDFS_NOT_STARTUP);
-            return result;
-        }
-
         // verify udfFuncName is exist
         if (!funcName.equals(udf.getFuncName())) {
             if (checkUdfFuncNameExists(funcName)) {
@@ -264,7 +247,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         try {
             doesResExist = storageOperate.exists(fullName);
         } catch (Exception e) {
-            log.error("udf resource checking error", fullName);
+            log.error("udf resource :{} checking error", fullName, e);
             result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
             result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
             return result;

@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
-
 /**
  * logger service
  */
@@ -58,7 +56,7 @@ public interface LoggerService {
      * @param limit       limit
      * @return log string data
      */
-    Map<String, Object> queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit);
+    String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit);
 
     /**
      * get log bytes

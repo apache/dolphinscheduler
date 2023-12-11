@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -35,10 +36,10 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
+import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.log.LogClient;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -85,9 +86,6 @@ public class FailoverServiceTest {
     @Mock
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
-    @Mock
-    private LogClient logClient;
-
     private static int masterPort = 5678;
     private static int workerPort = 1234;
 
@@ -114,7 +112,6 @@ public class FailoverServiceTest {
                 processService,
                 workflowExecuteThreadPool,
                 cacheManager,
-                logClient,
                 taskInstanceDao);
 
         failoverService = new FailoverService(masterFailoverService, workerFailoverService);
@@ -136,6 +133,7 @@ public class FailoverServiceTest {
         processInstance.setHistoryCmd("xxx");
         processInstance.setCommandType(CommandType.STOP);
         processInstance.setProcessDefinitionCode(123L);
+        processInstance.setProcessDefinition(new ProcessDefinition());
 
         masterTaskInstance = new TaskInstance();
         masterTaskInstance.setId(1);
@@ -152,7 +150,7 @@ public class FailoverServiceTest {
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(processInstance));
         doNothing().when(processService).processNeedFailoverProcessInstances(Mockito.any(ProcessInstance.class));
-        given(taskInstanceDao.findValidTaskListByProcessId(Mockito.anyInt(), Mockito.anyInt()))
+        given(taskInstanceDao.queryValidTaskListByWorkflowInstanceId(Mockito.anyInt(), Mockito.anyInt()))
                 .willReturn(Lists.newArrayList(masterTaskInstance, workerTaskInstance));
 
         Thread.sleep(1000);
@@ -197,7 +195,10 @@ public class FailoverServiceTest {
         workerTaskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         WorkflowExecuteRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecuteRunnable.class);
         Mockito.when(workflowExecuteRunnable.getAllTaskInstances()).thenReturn(Lists.newArrayList(workerTaskInstance));
-        Mockito.when(workflowExecuteRunnable.getProcessInstance()).thenReturn(processInstance);
+
+        IWorkflowExecuteContext workflowExecuteRunnableContext = Mockito.mock(IWorkflowExecuteContext.class);
+        Mockito.when(workflowExecuteRunnable.getWorkflowExecuteContext()).thenReturn(workflowExecuteRunnableContext);
+        Mockito.when(workflowExecuteRunnableContext.getWorkflowInstance()).thenReturn(processInstance);
 
         Mockito.when(cacheManager.getAll()).thenReturn(Lists.newArrayList(workflowExecuteRunnable));
         Mockito.when(cacheManager.getByProcessInstanceId(Mockito.anyInt())).thenReturn(workflowExecuteRunnable);
