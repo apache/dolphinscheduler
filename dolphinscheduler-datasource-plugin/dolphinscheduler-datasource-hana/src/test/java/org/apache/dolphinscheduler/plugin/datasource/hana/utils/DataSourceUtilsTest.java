@@ -115,7 +115,7 @@ class DataSourceUtilsTest {
         hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.HANA, hanaConnectionParam);
         Assertions.assertEquals(
-                "jdbc:sap://localhost:30015?reconnect=true",
+                "jdbc:sap://localhost:30015&reconnect=true",
                 jdbcUrl);
     }
 
