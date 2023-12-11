@@ -26,41 +26,41 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AsyncTaskCallbackFunctionImpl implements AsyncTaskCallbackFunction {
 
-    private final AsyncMasterDelayTaskExecuteRunnable asyncMasterDelayTaskExecuteRunnable;
+    private final AsyncMasterTaskExecutor asyncMasterTaskExecuteRunnable;
 
-    public AsyncTaskCallbackFunctionImpl(@NonNull AsyncMasterDelayTaskExecuteRunnable asyncMasterDelayTaskExecuteRunnable) {
-        this.asyncMasterDelayTaskExecuteRunnable = asyncMasterDelayTaskExecuteRunnable;
+    public AsyncTaskCallbackFunctionImpl(@NonNull AsyncMasterTaskExecutor asyncMasterTaskExecuteRunnable) {
+        this.asyncMasterTaskExecuteRunnable = asyncMasterTaskExecuteRunnable;
     }
 
     @Override
     public void executeSuccess() {
-        asyncMasterDelayTaskExecuteRunnable.getTaskExecutionContext()
+        asyncMasterTaskExecuteRunnable.getTaskExecutionContext()
                 .setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
         executeFinished();
     }
 
     @Override
     public void executeFailed() {
-        asyncMasterDelayTaskExecuteRunnable.getTaskExecutionContext()
+        asyncMasterTaskExecuteRunnable.getTaskExecutionContext()
                 .setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         executeFinished();
     }
 
     @Override
     public void executeThrowing(Throwable throwable) {
-        asyncMasterDelayTaskExecuteRunnable.afterThrowing(throwable);
+        asyncMasterTaskExecuteRunnable.afterThrowing(throwable);
     }
 
     private void executeFinished() {
         TaskInstanceLogHeader.printFinalizeTaskHeader();
-        int taskInstanceId = asyncMasterDelayTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId();
+        int taskInstanceId = asyncMasterTaskExecuteRunnable.getTaskExecutionContext().getTaskInstanceId();
         MasterTaskExecutionContextHolder.removeTaskExecutionContext(taskInstanceId);
-        MasterTaskExecuteRunnableHolder.removeMasterTaskExecuteRunnable(taskInstanceId);
+        MasterTaskExecutorHolder.removeMasterTaskExecutor(taskInstanceId);
         log.info("Task execute finished, removed the TaskExecutionContext");
-        asyncMasterDelayTaskExecuteRunnable.sendTaskResult();
+        asyncMasterTaskExecuteRunnable.sendTaskResult();
         log.info(
                 "Execute task finished, will send the task execute result to master, the current task execute result is {}",
-                asyncMasterDelayTaskExecuteRunnable.getTaskExecutionContext().getCurrentExecutionStatus().name());
-        asyncMasterDelayTaskExecuteRunnable.closeLogAppender();
+                asyncMasterTaskExecuteRunnable.getTaskExecutionContext().getCurrentExecutionStatus().name());
+        asyncMasterTaskExecuteRunnable.closeLogAppender();
     }
 }

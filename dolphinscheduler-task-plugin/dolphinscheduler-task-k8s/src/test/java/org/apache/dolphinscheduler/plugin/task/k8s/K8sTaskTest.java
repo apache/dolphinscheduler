@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils.VAR_DELIMITER;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -47,6 +46,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
+import com.google.common.collect.ImmutableMap;
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 
 public class K8sTaskTest {
@@ -167,7 +167,7 @@ public class K8sTaskTest {
 
     @Test
     public void testDealOutParam() {
-        String result = "key=123" + VAR_DELIMITER;
+        Map<String, String> result = ImmutableMap.of("key", "123");
         k8sTask.getParameters().localParams.add(new Property("key", Direct.OUT, DataType.VARCHAR, "value"));
         k8sTask.dealOutParam(result);
         k8sTask.getParameters().getVarPool().forEach(property -> {

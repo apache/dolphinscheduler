@@ -52,8 +52,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class HttpTask extends AbstractTask {
 
     /**
