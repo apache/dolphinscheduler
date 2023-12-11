@@ -860,5 +860,11 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>e2e</id>
+            <modules>
+                <module>dolphinscheduler-e2e</module>
+            </modules>
+        </profile>
     </profiles>
 </project>
