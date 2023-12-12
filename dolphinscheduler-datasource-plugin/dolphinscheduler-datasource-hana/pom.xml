@@ -28,12 +28,7 @@
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
 
-    <properties>
-        <ngdbc.version>2.4.51</ngdbc.version>
-    </properties>
-
     <dependencies>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
@@ -49,14 +44,6 @@
         <dependency>
             <groupId>com.sap.cloud.db.jdbc</groupId>
             <artifactId>ngdbc</artifactId>
-            <version>${ngdbc.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <type>jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
