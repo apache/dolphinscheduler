@@ -528,5 +528,4 @@ helm install dolphinscheduler-gpu-worker . \
 
 ## Appendix-Configuration
 
-Ref: [DolphinScheduler Helm Charts](https://github.com/apache/dolphinscheduler/blob/dev/deploy/kubernetes/dolphinscheduler/README.md)
-
+Ref: [DolphinScheduler Helm Charts](https://github.com/apache/dolphinscheduler/blob/dev/deploy/kubernetes/dolphinscheduler/README.md) <!-- markdown-link-check-disable-line -->
