@@ -65,7 +65,7 @@ public class DataSourceConstants {
     public static final String KYUUBI_VALIDATION_QUERY = "select 1";
     public static final String VERTICA_VALIDATION_QUERY = "select 1";
 
-    public static final String HANA_VALIDATION_QUERY = "select 1";
+    public static final String HANA_VALIDATION_QUERY = "select 1 from DUMMY";
 
     /**
      * jdbc url
