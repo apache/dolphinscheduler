@@ -42,6 +42,7 @@ type IDataBase =
   | 'ZEPPELIN'
   | 'SAGEMAKER'
   | 'K8S'
+  | 'DOLPHINDB'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -65,6 +66,7 @@ type IDataBaseLabel =
   | 'ZEPPELIN'
   | 'SAGEMAKER'
   | 'K8S'
+  | 'DOLPHINDB'
 
 interface IDataSource {
   id?: number

@@ -39,6 +39,7 @@ public class DataSourceProcessorManager {
 
     public void installProcessor() {
 
+        log.info("Start to load datasource plugins------------------------------------------");
         ServiceLoader.load(DataSourceProcessor.class).forEach(factory -> {
             final String name = factory.getDbType().name();
 
@@ -51,6 +52,7 @@ public class DataSourceProcessorManager {
             log.info("done register processor: {}", name);
 
         });
+        log.info("End------------------------------------------");
     }
 
     private void loadDatasourceClient(DataSourceProcessor processor) {

@@ -63,6 +63,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.dolphindb.jdbc.JDBCResultSet;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -245,6 +246,13 @@ public class SqlTask extends AbstractTask {
     private String resultProcess(ResultSet resultSet) throws Exception {
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
         if (resultSet != null) {
+            JDBCResultSet jdbcResultSet = resultSet.unwrap(JDBCResultSet.class);
+            if (jdbcResultSet.getResult().isVector() || jdbcResultSet.getResult().isScalar()) {
+                log.info("display sql result {} rows as follows:", 1);
+                log.info("row {} : {}", 1, jdbcResultSet.getResult().getString());
+                return jdbcResultSet.getResult().getString();
+            }
+
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
 
@@ -333,10 +341,15 @@ public class SqlTask extends AbstractTask {
                                  String handlerType) throws Exception {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
-            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind)) {
-                result = statement.executeUpdate();
-                log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
-                        sqlBind.getSql());
+            try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBind);) {
+                if (DbType.valueOf(sqlParameters.getType()).equals(DbType.DOLPHINDB)) {
+                    statement.executeQuery();
+                    log.info("{} statement execute for sql: {}", handlerType, sqlBind.getSql());
+                } else {
+                    result = statement.executeUpdate();
+                    log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
+                            sqlBind.getSql());
+                }
             }
         }
         return String.valueOf(result);
