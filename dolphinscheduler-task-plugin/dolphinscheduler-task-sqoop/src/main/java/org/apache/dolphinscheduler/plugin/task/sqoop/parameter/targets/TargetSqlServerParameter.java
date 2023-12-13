@@ -20,26 +20,18 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
 
 /**
- * target hdfs parameter
+ * target sqlServer parameter
  */
-public class TargetHdfsParameter extends TargetCommonParameter {
+public class TargetSqlServerParameter extends TargetCommonParameter {
 
     /**
-     * target dir
+     * target table
      */
-    private String targetPath;
+    private String targetTable;
     /**
-     * delete target dir
+     * target columns
      */
-    private boolean deleteTargetDir;
-    /**
-     * file type
-     */
-    private String fileType;
-    /**
-     * compression codec
-     */
-    private String compressionCodec;
+    private String targetColumns;
     /**
      * fields terminated
      */
@@ -48,37 +40,37 @@ public class TargetHdfsParameter extends TargetCommonParameter {
      * lines terminated
      */
     private String linesTerminated;
+    /**
+     * pre query
+     */
+    private String preQuery;
+    /**
+     * is update
+     */
+    private boolean isUpdate;
+    /**
+     * target update key
+     */
+    private String targetUpdateKey;
+    /**
+     * target update mode
+     */
+    private String targetUpdateMode;
 
-    public String getTargetPath() {
-        return targetPath;
+    public String getTargetTable() {
+        return targetTable;
     }
 
-    public void setTargetPath(String targetPath) {
-        this.targetPath = targetPath;
+    public void setTargetTable(String targetTable) {
+        this.targetTable = targetTable;
     }
 
-    public boolean isDeleteTargetDir() {
-        return deleteTargetDir;
+    public String getTargetColumns() {
+        return targetColumns;
     }
 
-    public void setDeleteTargetDir(boolean deleteTargetDir) {
-        this.deleteTargetDir = deleteTargetDir;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getCompressionCodec() {
-        return compressionCodec;
-    }
-
-    public void setCompressionCodec(String compressionCodec) {
-        this.compressionCodec = compressionCodec;
+    public void setTargetColumns(String targetColumns) {
+        this.targetColumns = targetColumns;
     }
 
     public String getFieldsTerminated() {
@@ -97,4 +89,35 @@ public class TargetHdfsParameter extends TargetCommonParameter {
         this.linesTerminated = linesTerminated;
     }
 
+    public String getPreQuery() {
+        return preQuery;
+    }
+
+    public void setPreQuery(String preQuery) {
+        this.preQuery = preQuery;
+    }
+
+    public boolean getIsUpdate() {
+        return isUpdate;
+    }
+
+    public void setUpdate(boolean update) {
+        isUpdate = update;
+    }
+
+    public String getTargetUpdateKey() {
+        return targetUpdateKey;
+    }
+
+    public void setTargetUpdateKey(String targetUpdateKey) {
+        this.targetUpdateKey = targetUpdateKey;
+    }
+
+    public String getTargetUpdateMode() {
+        return targetUpdateMode;
+    }
+
+    public void setTargetUpdateMode(String targetUpdateMode) {
+        this.targetUpdateMode = targetUpdateMode;
+    }
 }

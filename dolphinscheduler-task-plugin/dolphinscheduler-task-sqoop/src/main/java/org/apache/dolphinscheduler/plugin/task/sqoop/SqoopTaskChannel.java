@@ -30,7 +30,6 @@ public class SqoopTaskChannel implements TaskChannel {
 
     @Override
     public void cancelApplication(boolean status) {
-
     }
 
     @Override

@@ -15,25 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
-
-import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParameter;
+package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
 /**
- * source hdfs parameter
+ * target common parameter
  */
-public class SourceHdfsParameter extends SourceCommonParameter {
+public class TargetCommonParameter {
 
     /**
-     * export dir
+     * target datasource
      */
-    private String exportDir;
+    protected int targetDatasource;
 
-    public String getExportDir() {
-        return exportDir;
+    public int getTargetDatasource() {
+        return targetDatasource;
     }
 
-    public void setExportDir(String exportDir) {
-        this.exportDir = exportDir;
+    public void setTargetDatasource(int targetDatasource) {
+        this.targetDatasource = targetDatasource;
     }
+
 }
