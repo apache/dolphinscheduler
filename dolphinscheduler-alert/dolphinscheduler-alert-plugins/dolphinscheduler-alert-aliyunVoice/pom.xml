@@ -24,7 +24,7 @@
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dolphinscheduler-alert-voice</artifactId>
+    <artifactId>dolphinscheduler-alert-aliyunVoice</artifactId>
     <packaging>jar</packaging>
 
     <dependencies>

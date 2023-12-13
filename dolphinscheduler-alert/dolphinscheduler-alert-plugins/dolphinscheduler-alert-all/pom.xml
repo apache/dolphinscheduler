@@ -84,7 +84,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-alert-voice</artifactId>
+            <artifactId>dolphinscheduler-alert-aliyunVoice</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
