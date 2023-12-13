@@ -122,6 +122,7 @@
         <testcontainer.version>1.17.6</testcontainer.version>
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
+        <aliyun-voice.version>2.1.4</aliyun-voice.version>
     </properties>
 
     <dependencyManagement>
@@ -960,7 +961,11 @@
                 <artifactId>checker-qual</artifactId>
                 <version>${checker-qual.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dyvmsapi20170525</artifactId>
+                <version>${aliyun-voice.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
