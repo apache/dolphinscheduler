@@ -539,7 +539,7 @@ export default {
     model_type: 'ModelType',
     form: 'Form',
     table: 'Table',
-    table_tips: 'Please enter Mysql Table(required)',
+    table_tips: 'Please enter Table(required)',
     column_type: 'ColumnType',
     all_columns: 'All Columns',
     some_columns: 'Some Columns',
