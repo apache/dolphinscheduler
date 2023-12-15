@@ -37,6 +37,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -46,7 +48,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
@@ -54,10 +56,9 @@ import org.testcontainers.utility.DockerImageName;
 import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+
     private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
 
     private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
@@ -67,14 +68,14 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private final int DOCKER_PORT = 12345;
 
     private RemoteWebDriver driver;
-    private DockerComposeContainer<?> compose;
+    private ComposeContainer compose;
     private BrowserWebDriverContainer<?> browser;
     private HostAndPort address;
     private String rootPath;
 
     private Path record;
 
-    private final String serviceName = "dolphinscheduler_1";
+    private final String serviceName = "dolphinscheduler";
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -101,10 +102,10 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver = new RemoteWebDriver(browser.getSeleniumAddress(), new ChromeOptions());
 
         driver.manage().timeouts()
-              .implicitlyWait(Duration.ofSeconds(10))
-              .pageLoadTimeout(Duration.ofSeconds(10));
+                .implicitlyWait(Duration.ofSeconds(10))
+                .pageLoadTimeout(Duration.ofSeconds(10));
         driver.manage().window()
-              .maximize();
+                .maximize();
 
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
@@ -112,9 +113,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
         final Class<?> clazz = context.getRequiredTestClass();
         Stream.of(clazz.getDeclaredFields())
-              .filter(it -> Modifier.isStatic(it.getModifiers()))
-              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-              .forEach(it -> setDriver(clazz, it));
+                .filter(it -> Modifier.isStatic(it.getModifiers()))
+                .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+                .forEach(it -> setDriver(clazz, it));
     }
 
     private void runInLocal() {
@@ -126,8 +127,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private void runInDockerContainer(ExtensionContext context) {
         compose = createDockerCompose(context);
         compose.start();
-
-        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, DOCKER_PORT));
+        address =
+                HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, DOCKER_PORT));
         rootPath = "/dolphinscheduler/ui/";
     }
 
@@ -181,8 +182,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     public void beforeEach(ExtensionContext context) {
         final Object instance = context.getRequiredTestInstance();
         Stream.of(instance.getClass().getDeclaredFields())
-              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-              .forEach(it -> setDriver(instance, it));
+                .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+                .forEach(it -> setDriver(instance, it));
     }
 
     private void setDriver(Object object, Field field) {
@@ -194,22 +195,24 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         }
     }
 
-    private DockerComposeContainer<?> createDockerCompose(ExtensionContext context) {
+    private ComposeContainer createDockerCompose(ExtensionContext context) {
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
-                                       .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
-                                       .filter(Objects::nonNull)
-                                       .map(URL::getPath)
-                                       .map(File::new)
-                                       .collect(Collectors.toList());
-        compose = new DockerComposeContainer<>(files)
-            .withPull(true)
-            .withTailChildContainers(true)
-            .withLocalCompose(true)
-            .withExposedService(serviceName, DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
-            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
-            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
+                .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
+                .filter(Objects::nonNull)
+                .map(URL::getPath)
+                .map(File::new)
+                .collect(Collectors.toList());
+        ComposeContainer compose = new ComposeContainer(files)
+                .withPull(true)
+                .withTailChildContainers(true)
+                .withLocalCompose(true)
+                .withExposedService(
+                        serviceName,
+                        DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
+                .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+                .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;
     }
