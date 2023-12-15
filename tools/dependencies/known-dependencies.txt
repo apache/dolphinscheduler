@@ -486,3 +486,17 @@ azure-storage-blob-12.21.0.jar
 azure-storage-internal-avro-12.6.0.jar
 vertica-jdbc-12.0.4-0.jar
 esdk-obs-java-bundle-3.23.3.jar
+dyvmsapi20170525-2.1.4.jar
+alibabacloud-gateway-spi-0.0.1.jar
+credentials-java-0.2.2.jar
+endpoint-util-0.0.7.jar
+openapiutil-0.1.14.jar
+tea-1.1.14.jar
+tea-openapi-0.2.2.jar
+tea-rpc-0.0.11.jar
+tea-rpc-util-0.1.3.jar
+tea-util-0.2.13.jar
+dom4j-2.1.3.jar
+jaxb-core-2.3.0.jar
+jaxb-impl-2.3.0.jar
+
