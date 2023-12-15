@@ -101,10 +101,10 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver = new RemoteWebDriver(browser.getSeleniumAddress(), new ChromeOptions());
 
         driver.manage().timeouts()
-                .implicitlyWait(Duration.ofSeconds(10))
-                .pageLoadTimeout(Duration.ofSeconds(10));
+              .implicitlyWait(Duration.ofSeconds(10))
+              .pageLoadTimeout(Duration.ofSeconds(10));
         driver.manage().window()
-                .maximize();
+              .maximize();
 
         driver.get(new URL("http", address.getHost(), address.getPort(), rootPath).toString());
 
@@ -112,9 +112,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
         final Class<?> clazz = context.getRequiredTestClass();
         Stream.of(clazz.getDeclaredFields())
-                .filter(it -> Modifier.isStatic(it.getModifiers()))
-                .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-                .forEach(it -> setDriver(clazz, it));
+              .filter(it -> Modifier.isStatic(it.getModifiers()))
+              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+              .forEach(it -> setDriver(clazz, it));
     }
 
     private void runInLocal() {
@@ -181,8 +181,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     public void beforeEach(ExtensionContext context) {
         final Object instance = context.getRequiredTestInstance();
         Stream.of(instance.getClass().getDeclaredFields())
-                .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
-                .forEach(it -> setDriver(instance, it));
+              .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
+              .forEach(it -> setDriver(instance, it));
     }
 
     private void setDriver(Object object, Field field) {
@@ -198,12 +198,13 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
-                .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
-                .filter(Objects::nonNull)
-                .map(URL::getPath)
-                .map(File::new)
-                .collect(Collectors.toList());
-        ComposeContainer compose = new ComposeContainer(files)
+                                       .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
+                                       .filter(Objects::nonNull)
+                                       .map(URL::getPath)
+                                       .map(File::new)
+                                       .collect(Collectors.toList());
+									   
+       ComposeContainer compose = new ComposeContainer(files)
                 .withPull(true)
                 .withTailChildContainers(true)
                 .withLocalCompose(true)
@@ -212,6 +213,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                         DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
                 .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
+	   
+
         return compose;
     }
 }
