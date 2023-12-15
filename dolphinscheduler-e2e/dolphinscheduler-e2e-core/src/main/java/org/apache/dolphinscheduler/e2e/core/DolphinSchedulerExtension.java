@@ -37,8 +37,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.extern.slf4j.Slf4j;
-
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
@@ -56,9 +54,10 @@ import org.testcontainers.utility.DockerImageName;
 import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
-
     private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
 
     private final boolean M1_CHIP_FLAG = Objects.equals(System.getProperty("m1_chip"), "true");
@@ -127,8 +126,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private void runInDockerContainer(ExtensionContext context) {
         compose = createDockerCompose(context);
         compose.start();
-        address =
-                HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, DOCKER_PORT));
+
+        address = HostAndPort.fromParts("host.testcontainers.internal", compose.getServicePort(serviceName, DOCKER_PORT));
         rootPath = "/dolphinscheduler/ui/";
     }
 
@@ -213,7 +212,6 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                         DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
                 .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
-
         return compose;
     }
 }
