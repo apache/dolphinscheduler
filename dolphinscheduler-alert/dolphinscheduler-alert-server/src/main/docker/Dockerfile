@@ -15,7 +15,8 @@
 # limitations under the License.
 #
 
-FROM eclipse-temurin:8-jre
+ARG JAVA_VERSION=8
+FROM eclipse-temurin:${JAVA_VERSION}-jre
 
 ENV DOCKER true
 ENV TZ Asia/Shanghai

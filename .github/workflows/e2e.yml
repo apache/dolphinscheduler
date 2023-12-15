@@ -47,6 +47,9 @@ jobs:
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
@@ -68,7 +71,9 @@ jobs:
           -Dmaven.test.skip \
           -Dmaven.javadoc.skip \
           -Dspotless.skip=true \
-          -Pdocker,release -Ddocker.tag=ci \
+          -Pdocker,release \
+          -Ddocker.java.version=${{ matrix.java }} \
+          -Ddocker.tag=ci \
           -pl dolphinscheduler-standalone-server -am
       - name: Export Docker Images
         run: |
