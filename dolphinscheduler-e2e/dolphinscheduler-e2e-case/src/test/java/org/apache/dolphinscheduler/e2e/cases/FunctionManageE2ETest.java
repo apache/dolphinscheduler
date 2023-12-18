@@ -20,6 +20,7 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import lombok.SneakyThrows;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.Constants;
@@ -42,8 +43,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
 
-import lombok.SneakyThrows;
-
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -53,11 +53,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class FunctionManageE2ETest {
-
     private static RemoteWebDriver browser;
 
     private static final String tenant = System.getProperty("user.name");
@@ -96,15 +94,13 @@ public class FunctionManageE2ETest {
                 .extracting(WebElement::getText)
                 .anyMatch(it -> it.contains(tenant)));
 
-        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar",
-                testUploadUdfFilePath.toFile().getAbsolutePath());
+        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
 
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        new By.ByClassName("name")));
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
 
         UdfManagePage udfManagePage = userPage.update(user, user, email, phone, tenant)
                 .goToNav(ResourcePage.class)
@@ -119,9 +115,9 @@ public class FunctionManageE2ETest {
     @SneakyThrows
     public static void cleanup() {
         Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
 
         Files.deleteIfExists(testUploadUdfFilePath);
     }
@@ -152,9 +148,9 @@ public class FunctionManageE2ETest {
         page.createUdfFunction(testUdfFunctionName, testClassName, testUploadUdfFileName, testDescription);
 
         Awaitility.await().untilAsserted(() -> assertThat(page.functionList())
-                .as("Function list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testUdfFunctionName)));
+            .as("Function list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testUdfFunctionName)));
     }
 
     @Test
@@ -167,9 +163,9 @@ public class FunctionManageE2ETest {
         page.renameUdfFunction(testUdfFunctionName, testRenameUdfFunctionName);
 
         Awaitility.await().pollDelay(Duration.ofSeconds(2)).untilAsserted(() -> assertThat(page.functionList())
-                .as("Function list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testRenameUdfFunctionName)));
+            .as("Function list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testRenameUdfFunctionName)));
     }
 
     @Test
@@ -183,8 +179,10 @@ public class FunctionManageE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.functionList()).noneMatch(
-                            it -> it.getText().contains(testRenameUdfFunctionName));
+                page.functionList()
+            ).noneMatch(
+                it -> it.getText().contains(testRenameUdfFunctionName)
+            );
         });
     }
 }

@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -26,13 +27,13 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class EnvironmentE2ETest {
@@ -54,7 +55,8 @@ class EnvironmentE2ETest {
         new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
-                .goToTab(EnvironmentPage.class);
+                .goToTab(EnvironmentPage.class)
+        ;
     }
 
     @Test
@@ -78,8 +80,10 @@ class EnvironmentE2ETest {
         final EnvironmentPage page = new EnvironmentPage(browser);
         page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
 
-        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("already exists"));
+        Awaitility.await().untilAsserted(() ->
+                assertThat(browser.findElement(By.tagName("body")).getText())
+                        .contains("already exists")
+        );
 
         page.createEnvironmentForm().buttonCancel().click();
     }
@@ -88,8 +92,7 @@ class EnvironmentE2ETest {
     @Order(30)
     void testEditEnvironment() {
         final EnvironmentPage page = new EnvironmentPage(browser);
-        page.update(environmentName, editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc,
-                editEnvironmentWorkerGroup);
+        page.update(environmentName, editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc, editEnvironmentWorkerGroup);
 
         Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -111,11 +114,12 @@ class EnvironmentE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.environmentList())
-                            .as("Environment list should not contain deleted environment")
-                            .noneMatch(
-                                    it -> it.getText().contains(environmentName)
-                                            || it.getText().contains(editEnvironmentName));
+                    page.environmentList()
+            )
+            .as("Environment list should not contain deleted environment")
+            .noneMatch(
+                    it -> it.getText().contains(environmentName) || it.getText().contains(editEnvironmentName)
+            );
         });
     }
 }

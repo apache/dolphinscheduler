@@ -25,15 +25,14 @@ import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class ProjectE2ETest {
-
     private static final String project = "test-project-1";
 
     private static RemoteWebDriver browser;
@@ -60,8 +59,10 @@ class ProjectE2ETest {
         Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(
-                    page.projectList()).noneMatch(
-                            it -> it.getText().contains(project));
+                    page.projectList()
+            ).noneMatch(
+                    it -> it.getText().contains(project)
+            );
         });
     }
 }

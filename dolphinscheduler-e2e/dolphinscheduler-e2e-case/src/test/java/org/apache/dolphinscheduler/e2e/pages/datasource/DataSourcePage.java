@@ -20,23 +20,27 @@
 
 package org.apache.dolphinscheduler.e2e.pages.datasource;
 
+import lombok.Getter;
+
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.security.Key;
 import java.time.Duration;
 import java.util.List;
-
-import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 
 @Getter
 public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem {
@@ -54,7 +58,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     private WebElement buttonConfirm;
 
     @FindBys({
-            @FindBy(className = "dialog-source-modal"),
+        @FindBy(className = "dialog-source-modal"),
     })
     private WebElement dataSourceModal;
 
@@ -66,18 +70,16 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         createDataSourceForm = new CreateDataSourceForm();
     }
 
-    public DataSourcePage createDataSource(String dataSourceType, String dataSourceName, String dataSourceDescription,
-                                           String ip, String port, String userName, String password, String database,
+    public DataSourcePage createDataSource(String dataSourceType, String dataSourceName, String dataSourceDescription, String ip, String port, String userName, String password, String database,
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
         new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("dialog-source-modal")));
+            new By.ByClassName("dialog-source-modal")));
 
-        dataSourceModal().findElement(By.className(dataSourceType.toUpperCase() + "-box")).click();
+        dataSourceModal().findElement(By.className(dataSourceType.toUpperCase()+"-box")).click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.textToBePresentInElement(
-                driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
+        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
@@ -100,13 +102,13 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
     public DataSourcePage delete(String name) {
         dataSourceItemsList()
-                .stream()
-                .filter(it -> it.getText().contains(name))
-                .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in data source list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(name))
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No delete button in data source list"))
+            .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -115,7 +117,6 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
     @Getter
     public class CreateDataSourceForm {
-
         CreateDataSourceForm() {
             PageFactory.initElements(driver, this);
         }

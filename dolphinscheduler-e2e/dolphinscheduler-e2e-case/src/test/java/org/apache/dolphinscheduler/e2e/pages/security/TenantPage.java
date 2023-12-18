@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
 
-import lombok.Getter;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -34,9 +32,10 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
+import lombok.Getter;
+
 @Getter
 public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
-
     @FindBy(className = "btn-create-tenant")
     private WebElement buttonCreateTenant;
 
@@ -44,8 +43,8 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     private List<WebElement> tenantList;
 
     @FindBys({
-            @FindBy(className = "n-popconfirm__action"),
-            @FindBy(className = "n-button--primary-type"),
+        @FindBy(className = "n-popconfirm__action"),
+        @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -77,12 +76,12 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     public TenantPage update(String tenant, String description) {
         tenantList().stream()
-                .filter(it -> it.findElement(By.className("tenant-code")).getAttribute("innerHTML").contains(tenant))
-                .flatMap(it -> it.findElements(By.className("edit")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No edit button in tenant list"))
-                .click();
+            .filter(it -> it.findElement(By.className("tenant-code")).getAttribute("innerHTML").contains(tenant))
+            .flatMap(it -> it.findElements(By.className("edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No edit button in tenant list"))
+            .click();
 
         editTenantForm().inputDescription().sendKeys(Keys.CONTROL + "a");
         editTenantForm().inputDescription().sendKeys(Keys.BACK_SPACE);
@@ -94,13 +93,13 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     public TenantPage delete(String tenant) {
         tenantList()
-                .stream()
-                .filter(it -> it.getText().contains(tenant))
-                .flatMap(it -> it.findElements(By.className("delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in user list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(tenant))
+            .flatMap(it -> it.findElements(By.className("delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No delete button in user list"))
+            .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -109,7 +108,6 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     @Getter
     public class TenantForm {
-
         TenantForm() {
             PageFactory.initElements(driver, this);
         }

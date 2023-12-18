@@ -20,11 +20,11 @@
 
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
+import lombok.Getter;
+
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
-
-import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -34,10 +34,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
-
     @FindBy(className = "btn-create-udf-function")
     private WebElement buttonCreateUdfFunction;
 
@@ -62,12 +63,10 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         renameUdfFunctionBox = new RenameUdfFunctionBox();
     }
 
-    public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName,
-                                                String description) {
+    public FunctionManagePage createUdfFunction(String udfFunctionName, String className, String udfResourceName, String description) {
         buttonCreateUdfFunction().click();
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();",
-                createUdfFunctionBox().radioFunctionType());
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", createUdfFunctionBox().radioFunctionType());
 
         createUdfFunctionBox().inputFunctionName().sendKeys(udfFunctionName);
 
@@ -78,11 +77,11 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
         createUdfFunctionBox().buttonUdfResourceDropDown().click();
 
         createUdfFunctionBox().selectUdfResource()
-                .stream()
-                .filter(it -> it.getAttribute("innerHTML").contains(udfResourceName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format("No %s in udf resource list", udfResourceName)))
-                .click();
+            .stream()
+            .filter(it -> it.getAttribute("innerHTML").contains(udfResourceName))
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException(String.format("No %s in udf resource list", udfResourceName)))
+            .click();
 
         createUdfFunctionBox().buttonSubmit().click();
 
@@ -91,13 +90,13 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FunctionManagePage renameUdfFunction(String currentName, String afterName) {
         functionList()
-                .stream()
-                .filter(it -> it.getText().contains(currentName))
-                .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No rename button in function manage list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(currentName))
+            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No rename button in function manage list"))
+            .click();
 
         renameUdfFunctionBox().inputFunctionName().sendKeys(Keys.CONTROL + "a");
         renameUdfFunctionBox().inputFunctionName().sendKeys(Keys.BACK_SPACE);
@@ -110,13 +109,13 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FunctionManagePage deleteUdfFunction(String udfFunctionName) {
         functionList()
-                .stream()
-                .filter(it -> it.getText().contains(udfFunctionName))
-                .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No delete button in udf resource list"))
-                .click();
+            .stream()
+            .filter(it -> it.getText().contains(udfFunctionName))
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No delete button in udf resource list"))
+            .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -125,7 +124,6 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class CreateUdfFunctionBox {
-
         CreateUdfFunctionBox() {
             PageFactory.initElements(driver, this);
         }
@@ -172,7 +170,6 @@ public class FunctionManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class RenameUdfFunctionBox {
-
         RenameUdfFunctionBox() {
             PageFactory.initElements(driver, this);
         }

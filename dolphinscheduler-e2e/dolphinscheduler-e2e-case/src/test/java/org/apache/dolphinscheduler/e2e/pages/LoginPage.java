@@ -20,11 +20,7 @@
 package org.apache.dolphinscheduler.e2e.pages;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-
-import java.time.Duration;
-
-import lombok.Getter;
-import lombok.SneakyThrows;
+import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -33,18 +29,22 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import lombok.Getter;
+import lombok.SneakyThrows;
+
+import java.time.Duration;
+
 @Getter
 public final class LoginPage extends NavBarPage {
-
     @FindBys({
-            @FindBy(className = "input-user-name"),
-            @FindBy(tagName = "input"),
+        @FindBy(className = "input-user-name"),
+        @FindBy(tagName = "input"),
     })
     private WebElement inputUsername;
 
-    @FindBys({
-            @FindBy(className = "input-password"),
-            @FindBy(tagName = "input"),
+    @FindBys( {
+        @FindBy(className = "input-password"),
+        @FindBy(tagName = "input"),
     })
     private WebElement inputPassword;
 
@@ -60,8 +60,7 @@ public final class LoginPage extends NavBarPage {
 
     @SneakyThrows
     public NavBarPage login(String username, String password) {
-        new WebDriverWait(driver, Duration.ofSeconds(30))
-                .until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
+        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
 
         buttonSwitchLanguage().click();
 
@@ -70,7 +69,7 @@ public final class LoginPage extends NavBarPage {
         buttonLogin().click();
 
         new WebDriverWait(driver, Duration.ofSeconds(30))
-                .until(ExpectedConditions.urlContains("/home"));
+            .until(ExpectedConditions.urlContains("/home"));
 
         return new NavBarPage(driver);
     }

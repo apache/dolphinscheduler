@@ -23,17 +23,16 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
 
-import lombok.Getter;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
+import lombok.Getter;
+
 @Getter
 public final class NamespacePage extends NavBarPage implements SecurityPage.Tab {
-
     @FindBy(id = "btnCreateNamespace")
     private WebElement buttonCreateNamespace;
 
@@ -60,8 +59,7 @@ public final class NamespacePage extends NavBarPage implements SecurityPage.Tab 
     public NamespacePage update(String namespaceName, String editNamespaceName, String editNamespaceValue) {
         namespaceList()
                 .stream()
-                .filter(it -> it.findElement(By.className("namespaceName")).getAttribute("innerHTML")
-                        .contains(namespaceName))
+                .filter(it -> it.findElement(By.className("namespaceName")).getAttribute("innerHTML").contains(namespaceName))
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
@@ -77,7 +75,6 @@ public final class NamespacePage extends NavBarPage implements SecurityPage.Tab 
 
     @Getter
     public class NamespaceForm {
-
         NamespaceForm() {
             PageFactory.initElements(driver, this);
         }

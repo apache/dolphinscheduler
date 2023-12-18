@@ -24,13 +24,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import lombok.RequiredArgsConstructor;
-
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 final class TestDescription implements org.testcontainers.lifecycle.TestDescription {
-
     private static final String UNKNOWN_NAME = "unknown";
 
     private final ExtensionContext context;

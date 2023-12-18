@@ -40,7 +40,6 @@ import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/datasource-hive/docker-compose.yaml")
 public class HiveDataSourceE2ETest {
-
     private static RemoteWebDriver browser;
 
     private static final String tenant = System.getProperty("user.name");
@@ -70,8 +69,9 @@ public class HiveDataSourceE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-                .login(user, password)
-                .goToNav(DataSourcePage.class);
+            .login(user, password)
+            .goToNav(DataSourcePage.class);
+
 
     }
 
@@ -80,16 +80,15 @@ public class HiveDataSourceE2ETest {
     void testCreateHiveDataSource() {
         final DataSourcePage page = new DataSourcePage(browser);
 
-        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, hivePassword,
-                database, jdbcParams);
+        page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, hivePassword, database, jdbcParams);
 
         new WebDriverWait(page.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));
 
         Awaitility.await().untilAsserted(() -> assertThat(page.dataSourceItemsList())
-                .as("DataSource list should contain newly-created database")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(dataSourceName)));
+            .as("DataSource list should contain newly-created database")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(dataSourceName)));
     }
 
     @Test
@@ -103,8 +102,10 @@ public class HiveDataSourceE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.dataSourceItemsList()).noneMatch(
-                            it -> it.getText().contains(dataSourceName));
+                page.dataSourceItemsList()
+            ).noneMatch(
+                it -> it.getText().contains(dataSourceName)
+            );
         });
     }
 }

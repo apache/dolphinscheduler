@@ -41,8 +41,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Comparator;
 
-import lombok.SneakyThrows;
-
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -52,11 +51,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
+
+import lombok.SneakyThrows;
 
 @DolphinScheduler(composeFiles = "docker/file-manage/docker-compose.yaml")
 public class UdfManageE2ETest {
-
     private static RemoteWebDriver browser;
 
     private static final String tenant = System.getProperty("user.name");
@@ -82,35 +81,34 @@ public class UdfManageE2ETest {
     @BeforeAll
     public static void setup() {
         TenantPage tenantPage = new LoginPage(browser)
-                .login(user, password)
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class)
-                .create(tenant);
+            .login(user, password)
+            .goToNav(SecurityPage.class)
+            .goToTab(TenantPage.class)
+            .create(tenant);
 
         Awaitility.await().untilAsserted(() -> assertThat(tenantPage.tenantList())
-                .as("Tenant list should contain newly-created tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant)));
+            .as("Tenant list should contain newly-created tenant")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(tenant)));
 
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
-                .goToTab(UserPage.class);
+            .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20))
-                .until(ExpectedConditions.visibilityOfElementLocated(
-                        new By.ByClassName("name")));
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
+                new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
-                .goToNav(ResourcePage.class)
-                .goToTab(UdfManagePage.class);
+            .goToNav(ResourcePage.class)
+            .goToTab(UdfManagePage.class);
     }
 
     @AfterAll
     @SneakyThrows
     public static void cleanup() {
         Files.walk(Constants.HOST_CHROME_DOWNLOAD_PATH)
-                .sorted(Comparator.reverseOrder())
-                .map(Path::toFile)
-                .forEach(File::delete);
+            .sorted(Comparator.reverseOrder())
+            .map(Path::toFile)
+            .forEach(File::delete);
 
         Files.deleteIfExists(testUploadUdfFilePath);
     }
@@ -121,31 +119,31 @@ public class UdfManageE2ETest {
         final UdfManagePage page = new UdfManagePage(browser);
 
         new WebDriverWait(page.driver(), Duration.ofSeconds(20))
-                .until(ExpectedConditions.urlContains("/resource-manage"));
+            .until(ExpectedConditions.urlContains("/resource-manage"));
         page.createDirectory(testDirectoryName);
         Awaitility.await().untilAsserted(() -> assertThat(page.udfList())
-                .as("File list should contain newly-created file")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(testDirectoryName)));
+            .as("File list should contain newly-created file")
+            .extracting(WebElement::getText)
+            .anyMatch(it -> it.contains(testDirectoryName)));
     }
 
-    // when s3 the directory cannot be renamed
-    // @Test
-    // @Order(20)
-    // void testRenameDirectory() {
-    // final UdfManagePage page = new UdfManagePage(browser);
-    //
-    // page.rename(testDirectoryName, testRenameDirectoryName);
-    //
-    // await().untilAsserted(() -> {
-    // browser.navigate().refresh();
-    //
-    // assertThat(page.udfList())
-    // .as("File list should contain newly-created file")
-    // .extracting(WebElement::getText)
-    // .anyMatch(it -> it.contains(testRenameDirectoryName));
-    // });
-    // }
+//when s3  the directory cannot be renamed
+//    @Test
+//    @Order(20)
+//    void testRenameDirectory() {
+//        final UdfManagePage page = new UdfManagePage(browser);
+//
+//        page.rename(testDirectoryName, testRenameDirectoryName);
+//
+//        await().untilAsserted(() -> {
+//            browser.navigate().refresh();
+//
+//            assertThat(page.udfList())
+//                .as("File list should contain newly-created file")
+//                .extracting(WebElement::getText)
+//                .anyMatch(it -> it.contains(testRenameDirectoryName));
+//        });
+//    }
 
     @Test
     @Order(30)
@@ -157,8 +155,10 @@ public class UdfManageE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.udfList()).noneMatch(
-                            it -> it.getText().contains(testDirectoryName));
+                page.udfList()
+            ).noneMatch(
+                it -> it.getText().contains(testDirectoryName)
+            );
         });
     }
 
@@ -168,14 +168,13 @@ public class UdfManageE2ETest {
     void testUploadUdf() {
         final UdfManagePage page = new UdfManagePage(browser);
 
-        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar",
-                testUploadUdfFilePath.toFile().getAbsolutePath());
+        downloadFile("https://repo1.maven.org/maven2/org/apache/hive/hive-jdbc/3.1.2/hive-jdbc-3.1.2.jar", testUploadUdfFilePath.toFile().getAbsolutePath());
         page.uploadFile(testUploadUdfFilePath.toFile().getAbsolutePath());
         Awaitility.await().untilAsserted(() -> {
             assertThat(page.udfList())
-                    .as("File list should contain newly-created file")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(testUploadUdfFileName));
+                .as("File list should contain newly-created file")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(testUploadUdfFileName));
         });
     }
 
@@ -205,9 +204,9 @@ public class UdfManageE2ETest {
 
         Awaitility.await().untilAsserted(() -> {
             assertThat(page.udfList())
-                    .as("File list should contain newly-created file")
-                    .extracting(WebElement::getText)
-                    .anyMatch(it -> it.contains(testUploadUdfRenameFileName));
+                .as("File list should contain newly-created file")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(testUploadUdfRenameFileName));
         });
     }
 
@@ -221,8 +220,10 @@ public class UdfManageE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.udfList()).noneMatch(
-                            it -> it.getText().contains(testUploadUdfRenameFileName));
+                page.udfList()
+            ).noneMatch(
+                it -> it.getText().contains(testUploadUdfRenameFileName)
+            );
         });
     }
 }

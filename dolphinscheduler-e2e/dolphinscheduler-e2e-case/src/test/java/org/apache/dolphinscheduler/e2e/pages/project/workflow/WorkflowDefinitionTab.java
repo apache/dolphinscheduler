@@ -27,8 +27,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import lombok.Getter;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -37,9 +35,10 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
+import lombok.Getter;
+
 @Getter
 public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDetailPage.Tab {
-
     @FindBy(className = "btn-create-process")
     private WebElement buttonCreateProcess;
 
@@ -62,8 +61,8 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
     private WebElement buttonConfirm;
 
     @FindBys({
-            @FindBy(className = "n-dialog__action"),
-            @FindBy(className = "n-button--default-type"),
+        @FindBy(className = "n-dialog__action"),
+        @FindBy(className = "n-button--default-type"),
     })
     private WebElement publishSuccessButtonCancel;
 
@@ -92,13 +91,13 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
     public WorkflowDefinitionTab publish(String workflow) {
         workflowList()
-                .stream()
-                .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
-                .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find publish button in workflow definition"))
-                .click();
+            .stream()
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
+            .flatMap(it -> it.findElements(By.className("btn-publish")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Can not find publish button in workflow definition"))
+            .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -109,13 +108,13 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
     public WorkflowRunDialog run(String workflow) {
         workflowList()
-                .stream()
-                .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
-                .flatMap(it -> it.findElements(By.className("btn-run")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find run button in workflow definition"))
-                .click();
+            .stream()
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
+            .flatMap(it -> it.findElements(By.className("btn-run")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Can not find run button in workflow definition"))
+            .click();
 
         return new WorkflowRunDialog(this);
     }
@@ -137,18 +136,19 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
 
     public WorkflowDefinitionTab delete(String workflow) {
         Awaitility.await().untilAsserted(() -> assertThat(workflowList())
-                .as("Workflow list should contain newly-created workflow")
-                .anyMatch(
-                        it -> it.getText().contains(workflow)));
+            .as("Workflow list should contain newly-created workflow")
+            .anyMatch(
+                it -> it.getText().contains(workflow)
+            ));
 
         workflowList()
-                .stream()
-                .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
-                .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find delete button in workflow definition"))
-                .click();
+            .stream()
+            .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
+            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
+            .filter(WebElement::isDisplayed)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("Can not find delete button in workflow definition"))
+            .click();
 
         return this;
     }
