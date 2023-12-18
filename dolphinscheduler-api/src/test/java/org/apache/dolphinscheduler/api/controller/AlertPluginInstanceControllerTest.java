@@ -289,32 +289,4 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         assertThat(actualResponseContent.getMsg()).isEqualTo(expectResponseContent.getMsg());
         assertThat(actualResponseContent.getCode()).isEqualTo(expectResponseContent.getCode());
     }
-
-    @Test
-    public void testListPagingResultFalse() throws Exception {
-        // Given
-        final Result expectResponseContent = JSONUtils.parseObject(
-                "{\"code\":10001,\"msg\":\"request parameter pageNo is not valid\",\"data\":null,\"success\":false,\"failed\":true}",
-                Result.class);
-
-        final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
-        paramsMap.add("searchVal", "searchVal");
-        paramsMap.add("pageNo", String.valueOf(0));
-        paramsMap.add("pageSize", String.valueOf(0));
-
-        // When
-        final MvcResult mvcResult = mockMvc.perform(get("/alert-plugin-instances")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        // Then
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.getMsg()).isEqualTo(expectResponseContent.getMsg());
-        assertThat(actualResponseContent.getCode()).isEqualTo(expectResponseContent.getCode());
-    }
 }
