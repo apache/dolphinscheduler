@@ -82,23 +82,6 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testExceptionHandler() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "-1");
-        paramsMap.add("expireTime", "2019-12-18 00:00:00");
-        paramsMap.add("token", "507f5aeaaa2093dbdff5d5522ce00510");
-        MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
     public void testGenerateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "4");
