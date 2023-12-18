@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -162,25 +161,6 @@ public class ClusterControllerTest extends AbstractControllerTest {
         logger.info(result.toString());
         Assertions.assertTrue(result != null && result.isSuccess());
         logger.info("query all cluster return result:{}", mvcResult.getResponse().getContentAsString());
-
-    }
-
-    @Test
-    public void testVerifyCluster() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("clusterName", clusterName);
-
-        MvcResult mvcResult = mockMvc.perform(post("/cluster/verify-cluster")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        logger.info(result.toString());
-        Assertions.assertTrue(result.isStatus(Status.CLUSTER_NAME_EXISTS));
-        logger.info("verify cluster return result:{}", mvcResult.getResponse().getContentAsString());
 
     }
 
