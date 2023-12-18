@@ -25,6 +25,7 @@ RUN apt update ; \
     apt install -y sudo ; \
     rm -rf /var/lib/apt/lists/*
 
+
 WORKDIR $DOLPHINSCHEDULER_HOME
 
 ADD ./target/standalone-server $DOLPHINSCHEDULER_HOME

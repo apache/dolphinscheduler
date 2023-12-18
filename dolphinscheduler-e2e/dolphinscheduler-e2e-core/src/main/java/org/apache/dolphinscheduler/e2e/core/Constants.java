@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.e2e.core;
 
-import lombok.experimental.UtilityClass;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import lombok.experimental.UtilityClass;
+
 @UtilityClass
 public final class Constants {
+
     /**
      * tmp directory path
      */

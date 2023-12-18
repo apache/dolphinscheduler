@@ -75,5 +75,7 @@
         </if>
         <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="MASTERLOGFILE"/>
+        <appender-ref ref="STDOUT"/>
+
     </root>
 </configuration>

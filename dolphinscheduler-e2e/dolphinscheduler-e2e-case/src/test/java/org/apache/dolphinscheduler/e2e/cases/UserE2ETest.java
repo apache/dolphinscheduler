@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -31,7 +30,6 @@ import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
 import java.time.Duration;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -41,9 +39,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class UserE2ETest {
+
     private static final String tenant = System.getProperty("user.name");
     private static final String user = "test_user";
     private static final String password = "testUser123";
@@ -77,9 +77,9 @@ class UserE2ETest {
     @AfterAll
     public static void cleanup() {
         new NavBarPage(browser)
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .delete(tenant);
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class)
+                .delete(tenant);
     }
 
     @Test
@@ -93,9 +93,9 @@ class UserE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.userList())
-                .as("User list should contain newly-created user")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(user));
+                    .as("User list should contain newly-created user")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(user));
         });
     }
 
@@ -106,10 +106,8 @@ class UserE2ETest {
 
         page.create(user, password, email, phone, tenant);
 
-        Awaitility.await().untilAsserted(() ->
-            assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("already exists")
-        );
+        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists"));
 
         page.createUserForm().buttonCancel().click();
     }
@@ -129,12 +127,12 @@ class UserE2ETest {
         Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.userList())
-                .as("User list should contain newly-modified User")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(editUser));
+                    .as("User list should contain newly-modified User")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(editUser));
         });
     }
-    
+
     @Test
     @Order(40)
     void testDeleteUser() {
@@ -146,10 +144,8 @@ class UserE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                page.userList()
-            ).noneMatch(
-                it -> it.getText().contains(user) || it.getText().contains(editUser)
-            );
+                    page.userList()).noneMatch(
+                            it -> it.getText().contains(user) || it.getText().contains(editUser));
         });
     }
 }

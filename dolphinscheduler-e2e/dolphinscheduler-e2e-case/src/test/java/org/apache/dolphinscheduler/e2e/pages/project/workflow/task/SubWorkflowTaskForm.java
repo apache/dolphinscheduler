@@ -21,7 +21,11 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
+import java.time.Duration;
+import java.util.List;
+
 import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -30,11 +34,9 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
-import java.util.List;
-
 @Getter
 public final class SubWorkflowTaskForm extends TaskNodeForm {
+
     @FindBys({
             @FindBy(className = "select-child-node"),
             @FindBy(className = "n-base-selection"),
@@ -46,7 +48,6 @@ public final class SubWorkflowTaskForm extends TaskNodeForm {
 
     private WebDriver driver;
 
-
     public SubWorkflowTaskForm(WorkflowForm parent) {
         super(parent);
 
@@ -54,12 +55,14 @@ public final class SubWorkflowTaskForm extends TaskNodeForm {
     }
 
     public SubWorkflowTaskForm childNode(String node) {
-        new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
-        
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
+
         btnSelectChildNodeDropdown().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.visibilityOfElementLocated(By.className(
-                "n-base-select-option__content")));
+        new WebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.className(
+                        "n-base-select-option__content")));
 
         selectChildNode()
                 .stream()

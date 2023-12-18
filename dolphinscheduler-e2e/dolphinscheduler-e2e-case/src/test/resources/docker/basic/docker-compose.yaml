@@ -19,7 +19,7 @@ version: "3.8"
 
 services:
   dolphinscheduler:
-    image: apache/dolphinscheduler-standalone-server:ci
+    image: apache/dolphinscheduler-standalone-server:3.2.0
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
