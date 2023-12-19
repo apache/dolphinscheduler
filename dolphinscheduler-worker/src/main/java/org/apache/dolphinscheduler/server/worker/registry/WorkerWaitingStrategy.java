@@ -69,6 +69,7 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
                 throw new ServerLifeCycleException(
                         String.format("Waiting to reconnect to registry in %s failed", maxWaitingTime), ex);
             }
+
         } catch (ServerLifeCycleException e) {
             String errorMessage = String.format(
                     "Disconnect from registry and change the current status to waiting error, the current server state is %s, will stop the current server",
