@@ -37,8 +37,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.auto.service.AutoService;
@@ -140,6 +138,16 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         switchResultVos.add(switchResultVo);
         int finalConditionLocation = switchResultVos.size() - 1;
         int i = 0;
+
+        Map<String, Property> globalParams = JSONUtils
+                .toList(processInstance.getGlobalParams(), Property.class)
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+        Map<String, Property> varParams = JSONUtils
+                .toList(taskInstance.getVarPool(), Property.class)
+                .stream()
+                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+
         conditionResult = DependResult.SUCCESS;
         for (SwitchResultVo info : switchResultVos) {
             logger.info("the {} execution ", (i + 1));
@@ -148,7 +156,8 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
                 finalConditionLocation = i;
                 break;
             }
-            String content = setTaskParams(info.getCondition().replaceAll("'", "\""), rgex);
+            String content =
+                    SwitchTaskUtils.generateContentWithTaskParams(info.getCondition(), globalParams, varParams);
             logger.info("format condition sentence::{}", content);
             Boolean result = null;
             try {
@@ -189,37 +198,6 @@ public class SwitchTaskProcessor extends BaseTaskProcessor {
         taskInstance.setEndTime(new Date());
         taskInstance.setState(status);
         processService.updateTaskInstance(taskInstance);
-    }
-
-    public String setTaskParams(String content, String rgex) {
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
-        Map<String, Property> globalParams = JSONUtils
-                .toList(processInstance.getGlobalParams(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        Map<String, Property> varParams = JSONUtils
-                .toList(taskInstance.getVarPool(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
-        if (varParams.size() > 0) {
-            varParams.putAll(globalParams);
-            globalParams = varParams;
-        }
-        while (m.find()) {
-            String paramName = m.group(1);
-            Property property = globalParams.get(paramName);
-            if (property == null) {
-                return "";
-            }
-            String value = property.getValue();
-            if (!org.apache.commons.lang3.math.NumberUtils.isCreatable(value)) {
-                value = "\"" + value + "\"";
-            }
-            logger.info("paramName:{}，paramValue:{}", paramName, value);
-            content = content.replace("${" + paramName + "}", value);
-        }
-        return content;
     }
 
     /**
