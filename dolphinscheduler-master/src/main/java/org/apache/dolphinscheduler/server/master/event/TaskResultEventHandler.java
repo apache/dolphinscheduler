@@ -35,10 +35,13 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class TaskResultEventHandler implements TaskEventHandler {
 
     @Autowired
@@ -99,11 +102,13 @@ public class TaskResultEventHandler implements TaskEventHandler {
             taskInstance.setVarPool(taskEvent.getVarPool());
             processService.changeOutParam(taskInstance);
             taskInstanceDao.updateById(taskInstance);
-            sendAckToWorker(taskEvent);
         } catch (Exception ex) {
             TaskInstanceUtils.copyTaskInstance(oldTaskInstance, taskInstance);
             throw new TaskEventHandleError("Handle task result event error, save taskInstance to db error", ex);
         }
+
+        sendAckToWorker(taskEvent);
+
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskEvent.getProcessInstanceId())
                 .taskInstanceId(taskEvent.getTaskInstanceId())
@@ -115,11 +120,16 @@ public class TaskResultEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
-                SingletonJdkDynamicRpcClientProxyFactory
-                        .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
-        instanceExecutionEventAckListener.handleTaskInstanceExecutionFinishEventAck(
-                TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));
+        try {
+            ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
+                    SingletonJdkDynamicRpcClientProxyFactory
+                            .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
+            instanceExecutionEventAckListener.handleTaskInstanceExecutionFinishEventAck(
+                    TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));
+        } catch (Exception e) {
+            // master ignore the exception, worker will retry to send this TaskEventType.RESULT event again.
+            log.error("send ack to worker error, taskInstanceId: {}", taskEvent.getTaskInstanceId(), e);
+        }
     }
 
     @Override
