@@ -21,6 +21,7 @@ import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
+import { ResourceFileV2 } from '@/service/modules/resources/types'
 
 export function useResources(
   span: number | Ref<number> = 24,
@@ -33,6 +34,7 @@ export function useResources(
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
+  const allResourceFullName = ref([] as string[])
 
   const getResources = async () => {
     if (taskStore.resources.length) {
@@ -43,9 +45,39 @@ export function useResources(
     resourcesLoading.value = true
     const res = await queryResourceList({ type: 'FILE', fullName: '' })
     utils.removeUselessChildren(res)
+    allResourceFullName.value = getFullNameList(res)
     resourcesOptions.value = res || []
     resourcesLoading.value = false
     taskStore.updateResource(res)
+  }
+
+  /**
+   * get fullName list
+   * @param nodes resource list
+   * @returns fullName list
+   */
+  const getFullNameList = (nodes: ResourceFileV2[]) => {
+    if (!nodes) {
+      return []
+    }
+    let result: string[] = []
+    for (const { fullName, children } of nodes) {
+      if (fullName) {
+        result.push(fullName)
+      }
+      if (children) {
+        result = result.concat(getFullNameList(children))
+      }
+    }
+    return result
+  }
+
+  /**
+   * validate resource exist
+   * @param name resource name
+   */
+  const validateResourceExist = (name: string): boolean => {
+    return allResourceFullName.value.includes(name)
   }
 
   onMounted(() => {
@@ -69,12 +101,36 @@ export function useResources(
       placeholder: t('project.node.resources_tips'),
       keyField: 'fullName',
       labelField: 'name',
+      disabledField: 'disable',
       loading: resourcesLoading
     },
     validate: {
-      trigger: ['input', 'blur'],
+      trigger: ['blur'],
       required: required,
-      validator(validate: any, value: IResource[]) {
+      validator(validate: any, value: string[]) {
+        if (value) {
+          const errorNames: string[] = []
+          value.forEach((item) => {
+            if (!validateResourceExist(item)) {
+              errorNames.push(item)
+            }
+          })
+          if (errorNames.length > 0) {
+            errorNames.forEach((item) => {
+              // delete select node
+              value.splice(value.indexOf(item), 1)
+              resourcesOptions.value.push({
+                fullName: item,
+                name: item,
+                disable: true
+              })
+            })
+            return new Error(
+              t('project.node.useless_resources_tips') + errorNames.join(' ; ')
+            )
+          }
+        }
+
         if (isRef(required) ? required.value : required) {
           if (!value || value.length == 0) {
             return new Error(t('project.node.resources_tips'))
