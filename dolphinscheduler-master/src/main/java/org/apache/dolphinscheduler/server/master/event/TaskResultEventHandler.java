@@ -128,7 +128,7 @@ public class TaskResultEventHandler implements TaskEventHandler {
                     TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));
         } catch (Exception e) {
             // master ignore the exception, worker will retry to send this TaskEventType.RESULT event again.
-            log.error("send ack to worker error, taskInstanceId: {}", taskEvent.getTaskInstanceId(), e);
+            log.warn("send ack to worker error, taskInstanceId: {}", taskEvent.getTaskInstanceId(), e);
         }
     }
 
