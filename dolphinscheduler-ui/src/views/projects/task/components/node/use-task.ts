@@ -57,7 +57,6 @@ export function useTask({
     }
 
     const {model, json} = nodes[data.taskType || 'SHELL'](params)
-    debugger
     jsonRef.value = json
     model.preTasks = taskStore.getPreTasks
     model.name = taskStore.getName
