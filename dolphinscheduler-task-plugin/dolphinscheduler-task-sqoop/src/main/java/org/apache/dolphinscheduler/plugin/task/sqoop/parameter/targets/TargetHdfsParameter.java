@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
+
 /**
  * target hdfs parameter
  */
-public class TargetHdfsParameter {
+public class TargetHdfsParameter extends TargetCommonParameter {
 
     /**
      * target dir

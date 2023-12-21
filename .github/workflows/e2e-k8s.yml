@@ -71,7 +71,7 @@ jobs:
         run: |
           # install kubectl
           curl -LO "https://dl.k8s.io/release/v1.28.3/bin/linux/amd64/kubectl"
-          sudo chmod +x kubectl /usr/local/bin/kubectl
+          sudo chmod +x kubectl
           sudo mv kubectl /usr/local/bin/kubectl
 
           # install kind

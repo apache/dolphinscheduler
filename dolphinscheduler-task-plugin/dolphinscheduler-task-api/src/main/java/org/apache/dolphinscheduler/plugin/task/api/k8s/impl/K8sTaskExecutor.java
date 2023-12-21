@@ -46,10 +46,10 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,8 +66,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.AffinityBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
@@ -86,14 +85,15 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 /**
  * K8sTaskExecutor used to submit k8s task to K8S
  */
+@Slf4j
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private Job job;
     protected boolean podLogOutputIsFinished = false;
     protected Future<?> podLogOutputFuture;
 
-    public K8sTaskExecutor(Logger logger, TaskExecutionContext taskRequest) {
-        super(logger, taskRequest);
+    public K8sTaskExecutor(TaskExecutionContext taskRequest) {
+        super(taskRequest);
     }
 
     public void buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
@@ -305,6 +305,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
+            TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), containerName)) {
@@ -313,11 +314,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
-
-                        if (line.endsWith(VarPoolUtils.VAR_SUFFIX)) {
-                            varPool.append(VarPoolUtils.findVarPool(line));
-                            varPool.append(VarPoolUtils.VAR_DELIMITER);
-                        }
+                        taskOutputParameterParser.appendParseLog(line);
                     }
                 }
             } catch (Exception e) {
@@ -326,6 +323,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
                 podLogOutputIsFinished = true;
             }
+            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         });
 
         collectPodLogExecutorService.shutdown();

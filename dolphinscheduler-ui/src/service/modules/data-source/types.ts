@@ -39,6 +39,9 @@ type IDataBase =
   | 'HANA'
   | 'DORIS'
   | 'KYUUBI'
+  | 'ZEPPELIN'
+  | 'SAGEMAKER'
+  | 'K8S'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -59,6 +62,9 @@ type IDataBaseLabel =
   | 'OCEANBASE'
   | 'SSH'
   | 'KYUUBI'
+  | 'ZEPPELIN'
+  | 'SAGEMAKER'
+  | 'K8S'
 
 interface IDataSource {
   id?: number
@@ -80,6 +86,9 @@ interface IDataSource {
   connectType?: string
   other?: object
   endpoint?: string
+  restEndpoint?: string
+  kubeConfig?: string
+  namespace?: string
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string

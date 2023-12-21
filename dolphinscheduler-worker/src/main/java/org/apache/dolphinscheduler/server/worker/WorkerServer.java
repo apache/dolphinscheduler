@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueueLooper;
+import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceWaitingQueueLooper;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -43,16 +43,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = DataSourceAutoConfiguration.class)
-})
+@ComponentScan(basePackages = "org.apache.dolphinscheduler")
 @Slf4j
 public class WorkerServer implements IStoppable {
 
@@ -72,7 +68,7 @@ public class WorkerServer implements IStoppable {
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private GlobalTaskInstanceDispatchQueueLooper globalTaskInstanceDispatchQueueLooper;
+    private GlobalTaskInstanceWaitingQueueLooper globalTaskInstanceWaitingQueueLooper;
 
     /**
      * worker server startup, not use web service
@@ -95,7 +91,7 @@ public class WorkerServer implements IStoppable {
         this.workerManagerThread.start();
 
         this.messageRetryRunner.start();
-        this.globalTaskInstanceDispatchQueueLooper.start();
+        this.globalTaskInstanceWaitingQueueLooper.start();
 
         /*
          * registry hooks, which are called before the process exits

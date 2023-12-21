@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -100,6 +101,9 @@ public class ServerNodeManager implements InitializingBean {
 
     @Autowired
     private MasterConfig masterConfig;
+
+    @Autowired
+    private ListenerEventAlertManager listenerEventAlertManager;
 
     private final List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
 
@@ -171,6 +175,7 @@ public class ServerNodeManager implements InitializingBean {
                     } else if (type == Type.REMOVE) {
                         log.info("Worker node : {} down.", path);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
+                        listenerEventAlertManager.publishServerDownListenerEvent(path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
@@ -203,6 +208,7 @@ public class ServerNodeManager implements InitializingBean {
                     } else if (type.equals(Type.REMOVE)) {
                         log.info("master node : {} down.", path);
                         alertDao.sendServerStoppedAlert(1, path, "MASTER");
+                        listenerEventAlertManager.publishServerDownListenerEvent(path, "MASTER");
                     }
                 } catch (Exception ex) {
                     log.error("MasterNodeListener capture data change and get data failed.", ex);
