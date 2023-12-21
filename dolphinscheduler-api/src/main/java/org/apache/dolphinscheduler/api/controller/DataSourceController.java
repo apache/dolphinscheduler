@@ -17,22 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_DATA_SOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECTION_TEST_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CONNECT_DATASOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_DATA_SOURCE_FAILURE;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_DATABASES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GET_DATASOURCE_TABLE_COLUMNS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.KERBEROS_STARTUP_STATE;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOURCE;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
-
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -91,7 +76,6 @@ public class DataSourceController extends BaseController {
     @Operation(summary = "createDataSource", description = "CREATE_DATA_SOURCE_NOTES")
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_DATASOURCE_ERROR)
     public Result<DataSource> createDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @Parameter(name = "dataSourceParam", description = "DATA_SOURCE_PARAM", required = true) @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
@@ -115,7 +99,6 @@ public class DataSourceController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_DATASOURCE_ERROR)
     public Result<DataSource> updateDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable(value = "id") Integer id,
                                                @RequestBody String jsonStr) {
@@ -139,7 +122,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATASOURCE_ERROR)
     public Result<Object> queryDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @PathVariable("id") int id) {
         BaseDataSourceParamDTO dataSource = dataSourceService.queryDataSource(id, loginUser);
@@ -159,7 +141,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATASOURCE_ERROR)
     public Result<Object> queryDataSourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam("type") DbType type) {
         List<DataSource> datasourceList = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
@@ -183,7 +164,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATASOURCE_ERROR)
     public Result<Object> queryDataSourceListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @RequestParam(value = "searchVal", required = false) String searchVal,
                                                     @RequestParam("pageNo") Integer pageNo,
@@ -206,7 +186,6 @@ public class DataSourceController extends BaseController {
     @Operation(summary = "connectDataSource", description = "CONNECT_DATA_SOURCE_NOTES")
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CONNECT_DATASOURCE_FAILURE)
     public Result<Boolean> connectDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
@@ -229,7 +208,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/{id}/connect-test")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CONNECTION_TEST_FAILURE)
     public Result<Boolean> connectionTest(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @PathVariable("id") int id) {
         dataSourceService.connectionTest(id);
@@ -249,7 +227,6 @@ public class DataSourceController extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_DATA_SOURCE_FAILURE)
     public Result<Boolean> deleteDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable("id") int id) {
         dataSourceService.delete(loginUser, id);
@@ -269,7 +246,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_DATASOURCE_NAME_FAILURE)
     public Result<Boolean> verifyDataSourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @RequestParam(value = "name") String name) {
         dataSourceService.verifyDataSourceName(name);
@@ -289,7 +265,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UNAUTHORIZED_DATASOURCE)
     public Result<Object> unAuthDatasource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
 
@@ -310,7 +285,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(AUTHORIZED_DATA_SOURCE)
     public Result<Object> authedDatasource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
         List<DataSource> authedDatasourceList = dataSourceService.authedDatasource(loginUser, userId);
@@ -326,10 +300,9 @@ public class DataSourceController extends BaseController {
     @Operation(summary = "getKerberosStartupState", description = "GET_USER_INFO_NOTES")
     @GetMapping(value = "/kerberos-startup-state")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(KERBEROS_STARTUP_STATE)
     public Result<Object> getKerberosStartupState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         // if upload resource is HDFS and kerberos startup is true , else false
-        return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
+        return success(BaseStatus.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
 
     @Operation(summary = "tables", description = "GET_DATASOURCE_TABLES_NOTES")
@@ -339,7 +312,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(GET_DATASOURCE_TABLES_ERROR)
     public Result<Object> getTables(@RequestParam("datasourceId") Integer datasourceId,
                                     @RequestParam(value = "database") String database) {
         List<ParamsOptions> options = dataSourceService.getTables(datasourceId, database);
@@ -354,7 +326,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
     public Result<Object> getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
                                           @RequestParam("tableName") String tableName,
                                           @RequestParam(value = "database") String database) {
@@ -368,7 +339,6 @@ public class DataSourceController extends BaseController {
     })
     @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(GET_DATASOURCE_DATABASES_ERROR)
     public Result<Object> getDatabases(@RequestParam("datasourceId") Integer datasourceId) {
         List<ParamsOptions> options = dataSourceService.getDatabases(datasourceId);
         return Result.success(options);

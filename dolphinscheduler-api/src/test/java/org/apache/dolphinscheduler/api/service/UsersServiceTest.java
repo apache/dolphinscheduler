@@ -25,7 +25,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
@@ -172,42 +175,42 @@ public class UsersServiceTest {
             Map<String, Object> result =
                     usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userName = "userTest0001";
             userPassword = "userTest000111111111111111";
             // password error
             result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userPassword = "userTest0001";
             email = "1q.com";
             // email error
             result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             email = "122222@qq.com";
             phone = "2233";
             // phone error
             result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             phone = "13456432345";
             // tenantId not exists
             result = usersService.createUser(user, userName, userPassword, email, tenantId, phone, queueName, state);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.TENANT_NOT_EXIST, result.get(Constants.STATUS));
+            Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST, result.get(Constants.STATUS));
             // success
             Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
             result = usersService.createUser(user, userName, userPassword, email, 1, phone, queueName, state);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
-            logger.error(Status.CREATE_USER_ERROR.getMsg(), e);
+            logger.error(UserStatus.CREATE_USER_ERROR.getMsg(), e);
             Assertions.assertTrue(false);
         }
     }
@@ -270,7 +273,7 @@ public class UsersServiceTest {
                 serviceLogger)).thenReturn(false);
         Map<String, Object> result = usersService.queryUserList(user);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // success
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
@@ -294,12 +297,12 @@ public class UsersServiceTest {
         // no operate
         Result result = usersService.queryUserList(user, "userTest", 1, 10);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), (int) result.getCode());
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM.getCode(), (int) result.getCode());
 
         // success
         user.setUserType(UserType.ADMIN_USER);
         result = usersService.queryUserList(user, "userTest", 1, 10);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), (int) result.getCode());
         PageInfo<User> pageInfo = (PageInfo<User>) result.getData();
         Assertions.assertTrue(pageInfo.getTotalList().size() > 0);
     }
@@ -310,7 +313,7 @@ public class UsersServiceTest {
         String userPassword = "userTest0001";
         // user not exist
         assertThrowsServiceException(
-                Status.USER_NOT_EXIST,
+                UserStatus.USER_NOT_EXIST,
                 () -> usersService.updateUser(getLoginUser(),
                         0,
                         userName,
@@ -339,7 +342,7 @@ public class UsersServiceTest {
         // non-admin should not modify tenantId and queue
         when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
         User user = userMapper.selectById(2);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
                 2,
                 userName,
                 userPassword,
@@ -361,25 +364,25 @@ public class UsersServiceTest {
             // no operate
             Map<String, Object> result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+            Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
             // user not exist
             loginUser.setUserType(UserType.ADMIN_USER);
             result = usersService.deleteUserById(loginUser, 3);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+            Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
             // user is project owner
             Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(Lists.newArrayList(new Project()));
             result = usersService.deleteUserById(loginUser, 1);
-            Assertions.assertEquals(Status.TRANSFORM_PROJECT_OWNERSHIP, result.get(Constants.STATUS));
+            Assertions.assertEquals(ProjectStatus.TRANSFORM_PROJECT_OWNERSHIP, result.get(Constants.STATUS));
 
             // success
             Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(null);
             Mockito.doNothing().when(metricsCleanUpService).cleanUpApiResponseTimeMetricsByUserId(Mockito.anyInt());
             result = usersService.deleteUserById(loginUser, 1);
             logger.info(result.toString());
-            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
             Mockito.verify(metricsCleanUpService, times(1)).cleanUpApiResponseTimeMetricsByUserId(Mockito.anyInt());
         } catch (Exception e) {
             logger.error("delete user error", e);
@@ -400,13 +403,13 @@ public class UsersServiceTest {
         when(userMapper.selectById(userId)).thenReturn(null);
         Map<String, Object> result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // SUCCESS
         when(userMapper.selectById(userId)).thenReturn(getUser());
         result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -421,13 +424,13 @@ public class UsersServiceTest {
         when(userMapper.selectById(userId)).thenReturn(null);
         Map<String, Object> result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // SUCCESS
         when(userMapper.selectById(userId)).thenReturn(getUser());
         result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -444,33 +447,33 @@ public class UsersServiceTest {
         User loginUser = new User();
         Map<String, Object> result = this.usersService.grantProjectByCode(loginUser, 999, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // ERROR: PROJECT_NOT_FOUNT
         result = this.usersService.grantProjectByCode(loginUser, authorizer, 999);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, result.get(Constants.STATUS));
+        Assertions.assertEquals(ProjectStatus.PROJECT_NOT_FOUND, result.get(Constants.STATUS));
 
         // ERROR: USER_NO_OPERATION_PERM
         loginUser.setId(999);
         loginUser.setUserType(UserType.GENERAL_USER);
         result = this.usersService.grantProjectByCode(loginUser, authorizer, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // SUCCESS: USER IS PROJECT OWNER
         loginUser.setId(projectCreator);
         loginUser.setUserType(UserType.GENERAL_USER);
         result = this.usersService.grantProjectByCode(loginUser, authorizer, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         // SUCCESS: USER IS ADMINISTRATOR
         loginUser.setId(999);
         loginUser.setUserType(UserType.ADMIN_USER);
         result = this.usersService.grantProjectByCode(loginUser, authorizer, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -484,13 +487,13 @@ public class UsersServiceTest {
         loginUser.setId(0);
         Map<String, Object> result = this.usersService.revokeProject(loginUser, 1, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
         result = this.usersService.revokeProject(loginUser, 2, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // success
         Project project = new Project();
@@ -498,7 +501,7 @@ public class UsersServiceTest {
         Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(project);
         result = this.usersService.revokeProject(loginUser, 1, projectCode);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -511,19 +514,19 @@ public class UsersServiceTest {
         User loginUser = new User();
         Map<String, Object> result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
         // user not exist
         loginUser.setUserType(UserType.ADMIN_USER);
         result = this.usersService.revokeProjectById(loginUser, 2, projectId);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // success
         Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(new Project());
         result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -536,13 +539,13 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = usersService.grantResources(loginUser, 2, resourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
         // success
         when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
         when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
         result = usersService.grantResources(loginUser, 1, resourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
     }
 
@@ -556,12 +559,12 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
         // success
         when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
         result = usersService.grantUDFFunction(loginUser, 1, udfIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -574,12 +577,12 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         Map<String, Object> result = usersService.grantNamespaces(loginUser, 2, namespaceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
         // success
         when(k8sNamespaceUserMapper.deleteNamespaceRelation(0, 1)).thenReturn(1);
         result = usersService.grantNamespaces(loginUser, 1, namespaceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -594,21 +597,21 @@ public class UsersServiceTest {
         when(userMapper.selectById(userId)).thenReturn(null);
         Map<String, Object> result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
         // test admin user
         when(userMapper.selectById(userId)).thenReturn(getUser());
         when(datasourceUserMapper.deleteByUserId(Mockito.anyInt())).thenReturn(1);
         result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         // test non-admin user
         loginUser.setId(2);
         loginUser.setUserType(UserType.GENERAL_USER);
         result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
     }
 
@@ -627,7 +630,7 @@ public class UsersServiceTest {
         // get admin user
         Map<String, Object> result = usersService.getUserInfo(loginUser);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         User tempUser = (User) result.get(Constants.DATA_LIST);
         // check userName
         Assertions.assertEquals("admin", tempUser.getUserName());
@@ -639,7 +642,7 @@ public class UsersServiceTest {
         when(alertGroupMapper.queryByUserId(1)).thenReturn(getAlertGroups());
         result = usersService.getUserInfo(loginUser);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         tempUser = (User) result.get(Constants.DATA_LIST);
         // check userName
         Assertions.assertEquals("userTest0001", tempUser.getUserName());
@@ -651,13 +654,13 @@ public class UsersServiceTest {
         // no operate
         Map<String, Object> result = usersService.queryAllGeneralUsers(loginUser);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         // success
         loginUser.setUserType(UserType.ADMIN_USER);
         when(userMapper.queryAllGeneralUser()).thenReturn(getUserList());
         result = usersService.queryAllGeneralUsers(loginUser);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         List<User> userList = (List<User>) result.get(Constants.DATA_LIST);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(userList));
     }
@@ -667,12 +670,12 @@ public class UsersServiceTest {
         // not exist user
         Result result = usersService.verifyUserName("admin89899");
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getMsg(), result.getMsg());
         // exist user
         when(userMapper.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
         result = usersService.verifyUserName("userTest0001");
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NAME_EXIST.getMsg(), result.getMsg());
+        Assertions.assertEquals(UserStatus.USER_NAME_EXIST.getMsg(), result.getMsg());
     }
 
     @Test
@@ -684,11 +687,11 @@ public class UsersServiceTest {
         Map<String, Object> result = usersService.unauthorizedUser(loginUser, 2);
         logger.info(result.toString());
         loginUser.setUserType(UserType.ADMIN_USER);
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         // success
         result = usersService.unauthorizedUser(loginUser, 2);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
     }
 
     @Test
@@ -698,11 +701,11 @@ public class UsersServiceTest {
         // no operate
         Map<String, Object> result = usersService.authorizedUser(loginUser, 2);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
         // success
         loginUser.setUserType(UserType.ADMIN_USER);
         result = usersService.authorizedUser(loginUser, 2);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         List<User> userList = (List<User>) result.get(Constants.DATA_LIST);
         logger.info(result.toString());
         Assertions.assertTrue(CollectionUtils.isNotEmpty(userList));
@@ -717,30 +720,30 @@ public class UsersServiceTest {
         try {
             // userName error
             Map<String, Object> result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userName = "userTest0002";
             userPassword = "userTest000111111111111111";
             // password error
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             userPassword = "userTest0002";
             email = "1q.com";
             // email error
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // repeatPassword error
             email = "7400@qq.com";
             repeatPassword = "userPassword";
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // success
             repeatPassword = "userTest0002";
             result = usersService.registerUser(userName, userPassword, repeatPassword, email);
-            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         } catch (Exception e) {
             Assertions.assertTrue(false);
@@ -755,28 +758,28 @@ public class UsersServiceTest {
         try {
             // not admin
             Map<String, Object> result = usersService.activateUser(user, userName);
-            Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+            Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
             // userName error
             user.setUserType(UserType.ADMIN_USER);
             result = usersService.activateUser(user, userName);
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // user not exist
             userName = "userTest10013";
             result = usersService.activateUser(user, userName);
-            Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+            Assertions.assertEquals(UserStatus.USER_NOT_EXIST, result.get(Constants.STATUS));
 
             // user state error
             userName = "userTest0001";
             when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
             result = usersService.activateUser(user, userName);
-            Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
 
             // success
             when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getDisabledUser());
             result = usersService.activateUser(user, userName);
-            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
             Assertions.assertTrue(false);
         }
@@ -795,7 +798,7 @@ public class UsersServiceTest {
         try {
             // not admin
             Map<String, Object> result = usersService.batchActivateUser(user, userNames);
-            Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+            Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
             // batch activate user names
             user.setUserType(UserType.ADMIN_USER);
@@ -811,7 +814,7 @@ public class UsersServiceTest {
 
             Assertions.assertEquals(1, totalSuccess);
             Assertions.assertEquals(3, totalFailed);
-            Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+            Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         } catch (Exception e) {
             Assertions.assertTrue(false);
         }

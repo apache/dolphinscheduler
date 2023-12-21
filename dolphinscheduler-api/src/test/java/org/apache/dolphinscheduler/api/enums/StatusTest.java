@@ -16,8 +16,9 @@
  */
 package org.apache.dolphinscheduler.api.enums;
 
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+
 import java.util.Locale;
-import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,28 +28,16 @@ public class StatusTest {
 
     @Test
     public void testGetCode() {
-        Assertions.assertEquals(0, Status.SUCCESS.getCode());
-        Assertions.assertNotEquals(0, Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
+        Assertions.assertEquals(0, BaseStatus.SUCCESS.getCode());
+        Assertions.assertNotEquals(0, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
     }
 
     @Test
     public void testGetMsg() {
         LocaleContextHolder.setLocale(Locale.US);
-        Assertions.assertEquals("success", Status.SUCCESS.getMsg());
+        Assertions.assertEquals("success", BaseStatus.SUCCESS.getMsg());
 
         LocaleContextHolder.setLocale(Locale.SIMPLIFIED_CHINESE);
-        Assertions.assertEquals("成功", Status.SUCCESS.getMsg());
-    }
-
-    @Test
-    public void testGetStatusByCode() {
-        // FAILURE
-        Optional<Status> optional = Status.findStatusBy(1);
-        Assertions.assertFalse(optional.isPresent());
-
-        // SUCCESS
-        optional = Status.findStatusBy(10018);
-        Assertions.assertTrue(optional.isPresent());
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, optional.get());
+        Assertions.assertEquals("成功", BaseStatus.SUCCESS.getMsg());
     }
 }

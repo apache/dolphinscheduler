@@ -24,7 +24,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.HDFSStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -64,7 +66,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     @Test
     public void testQuerytResourceList() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(resourcesService.queryResourceList(Mockito.any(), Mockito.any(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
@@ -80,14 +82,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryResourceListPaging() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(resourcesService.queryResourceListPaging(
                 Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
                 Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
@@ -111,14 +113,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testVerifyResourceName() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
+        mockResult.setCode(TenantStatus.TENANT_NOT_EXIST.getCode());
         Mockito.when(resourcesService.verifyResourceName(Mockito.anyString(), Mockito.any(), Mockito.any()))
                 .thenReturn(mockResult);
 
@@ -135,14 +137,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testViewResource() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.HDFS_NOT_STARTUP.getCode());
+        mockResult.setCode(HDFSStatus.HDFS_NOT_STARTUP.getCode());
         Mockito.when(resourcesService.readResource(Mockito.any(),
                 Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(mockResult);
@@ -162,14 +164,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.HDFS_NOT_STARTUP.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(HDFSStatus.HDFS_NOT_STARTUP.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testOnlineCreateResource() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
+        mockResult.setCode(TenantStatus.TENANT_NOT_EXIST.getCode());
         Mockito.when(resourcesService
                 .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
@@ -193,14 +195,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUpdateResourceContent() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
+        mockResult.setCode(TenantStatus.TENANT_NOT_EXIST.getCode());
         Mockito.when(resourcesService.updateResourceContent(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
@@ -220,7 +222,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -245,7 +247,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateUdfFunc() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
+        mockResult.setCode(TenantStatus.TENANT_NOT_EXIST.getCode());
         Mockito.when(udfFuncService
                 .createUdfFunction(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any()))
@@ -270,14 +272,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testViewUIUdfFunction() throws Exception {
         Result<Object> mockResult = new Result<>();
-        putMsg(mockResult, Status.TENANT_NOT_EXIST);
+        putMsg(mockResult, TenantStatus.TENANT_NOT_EXIST);
         Mockito.when(udfFuncService
                 .queryUdfFuncDetail(Mockito.any(), Mockito.anyInt()))
                 .thenReturn(mockResult);
@@ -290,14 +292,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUpdateUdfFunc() throws Exception {
         Result<Object> mockResult = new Result<>();
-        mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
+        mockResult.setCode(TenantStatus.TENANT_NOT_EXIST.getCode());
         Mockito.when(udfFuncService
                 .updateUdfFunc(Mockito.any(), Mockito.anyInt(), Mockito.anyString(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.any(),
@@ -324,14 +326,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(TenantStatus.TENANT_NOT_EXIST.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryUdfFuncList() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(udfFuncService.queryUdfFuncListPaging(Mockito.any(), Mockito.anyString(), Mockito.anyInt(),
                 Mockito.anyInt())).thenReturn(mockResult);
 
@@ -349,14 +351,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testQueryResourceList() throws Exception {
         Result<Object> mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(udfFuncService.queryUdfFuncList(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -371,14 +373,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testVerifyUdfFuncName() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(udfFuncService.verifyUdfFuncByName(Mockito.any(), Mockito.anyString())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -393,14 +395,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testAuthorizedFile() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(resourcesService.authorizedFile(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -415,14 +417,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testAuthorizedUDFFunction() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(resourcesService.authorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -437,14 +439,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testUnauthUDFFunc() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        mockResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         Mockito.when(resourcesService.unauthorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -459,14 +461,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testDeleteUdfFunc() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(udfFuncService.delete(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(delete("/resources/udf-func/{id}", "123")
@@ -477,14 +479,14 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
     @Test
     public void testDeleteResource() throws Exception {
         Result mockResult = new Result<>();
-        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setCode(BaseStatus.SUCCESS.getCode());
         Mockito.when(resourcesService.delete(Mockito.any(), Mockito.anyString(),
                 Mockito.anyString()))
                 .thenReturn(mockResult);
@@ -500,7 +502,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
 
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

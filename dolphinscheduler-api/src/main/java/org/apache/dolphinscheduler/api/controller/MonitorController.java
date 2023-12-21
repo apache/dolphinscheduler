@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
-
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -64,7 +59,6 @@ public class MonitorController extends BaseController {
     @Operation(summary = "listMaster", description = "MASTER_LIST_NOTES")
     @GetMapping(value = "/masters")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_MASTERS_ERROR)
     public Result<List<Server>> listMaster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<Server> servers = monitorService.queryMaster(loginUser);
         return Result.success(servers);
@@ -79,7 +73,6 @@ public class MonitorController extends BaseController {
     @Operation(summary = "listWorker", description = "WORKER_LIST_NOTES")
     @GetMapping(value = "/workers")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_WORKERS_ERROR)
     public Result<List<WorkerServerModel>> listWorker(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<WorkerServerModel> workerServerModels = monitorService.queryWorker(loginUser);
         return Result.success(workerServerModels);
@@ -94,7 +87,7 @@ public class MonitorController extends BaseController {
     @Operation(summary = "queryDatabaseState", description = "QUERY_DATABASE_STATE_NOTES")
     @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATABASE_STATE_ERROR)
+
     public Result<List<DatabaseMetrics>> queryDatabaseState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<DatabaseMetrics> databaseMetrics = monitorService.queryDatabaseState(loginUser);
         return Result.success(databaseMetrics);

@@ -17,16 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceSuccessResponse;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -89,7 +82,6 @@ public class TaskInstanceV2Controller extends BaseController {
     })
     @GetMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     public Result<PageInfo<TaskInstance>> queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                               TaskInstanceQueryRequest taskInstanceQueryReq) {
@@ -121,7 +113,6 @@ public class TaskInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{id}/savepoint")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_SAVEPOINT_ERROR)
     public Result<Object> taskSavePoint(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "id") Integer id) {
@@ -142,7 +133,6 @@ public class TaskInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_STOP_ERROR)
     public Result<Object> stopTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {
@@ -163,7 +153,6 @@ public class TaskInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{id}/force-success", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(FORCE_TASK_SUCCESS_ERROR)
     public TaskInstanceSuccessResponse forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                         @PathVariable(value = "id") Integer id) {
@@ -185,7 +174,6 @@ public class TaskInstanceV2Controller extends BaseController {
     })
     @PostMapping(value = "/{taskInstanceId}", consumes = {"application/json"})
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_INSTANCE_ERROR)
     public TaskInstance queryTaskInstanceByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @PathVariable(value = "taskInstanceId") Long taskInstanceId) {

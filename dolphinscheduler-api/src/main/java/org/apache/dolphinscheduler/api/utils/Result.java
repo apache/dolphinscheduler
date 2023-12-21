@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 
 import java.text.MessageFormat;
 
@@ -72,7 +73,7 @@ public class Result<T> {
      * @return resule
      */
     public static <T> Result<T> success(T data) {
-        return new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), data);
+        return new Result<>(BaseStatus.SUCCESS.getCode(), BaseStatus.SUCCESS.getMsg(), data);
     }
 
     public static <T> Result<T> success() {
@@ -80,7 +81,7 @@ public class Result<T> {
     }
 
     public boolean isSuccess() {
-        return this.isStatus(Status.SUCCESS);
+        return this.isStatus(BaseStatus.SUCCESS);
     }
 
     public boolean isFailed() {
@@ -147,6 +148,6 @@ public class Result<T> {
     }
 
     public Boolean checkResult() {
-        return this.code == Status.SUCCESS.getCode();
+        return this.code == BaseStatus.SUCCESS.getCode();
     }
 }

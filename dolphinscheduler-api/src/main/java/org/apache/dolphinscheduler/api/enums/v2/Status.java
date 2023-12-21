@@ -15,15 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.exception;
+package org.apache.dolphinscheduler.api.enums.v2;
 
-public class FileOperateException extends BaseException {
+public interface Status {
 
-    public FileOperateException(String message) {
-        super(message);
-    }
-
-    public FileOperateException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    int getCode();
+    String getMsg();
 }

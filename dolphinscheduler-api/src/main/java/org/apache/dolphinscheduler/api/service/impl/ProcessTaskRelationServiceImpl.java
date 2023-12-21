@@ -25,7 +25,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationFilterRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -121,18 +124,18 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             log.error("Process definition does not exist, processCode:{}.", processDefinitionCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         if (processDefinition.getProjectCode() != projectCode) {
             log.error("Process definition's project does not match project {}.", projectCode);
-            putMsg(result, Status.PROJECT_PROCESS_NOT_MATCH);
+            putMsg(result, ProjectStatus.PROJECT_PROCESS_NOT_MATCH);
             return result;
         }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
@@ -146,7 +149,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                                     processTaskRelation -> processTaskRelation));
             if (!preTaskCodeMap.isEmpty()) {
                 if (preTaskCodeMap.containsKey(preTaskCode) || (!preTaskCodeMap.containsKey(0L) && preTaskCode == 0L)) {
-                    putMsg(result, Status.PROCESS_TASK_RELATION_EXIST, String.valueOf(processDefinitionCode));
+                    putMsg(result, ProcessStatus.PROCESS_TASK_RELATION_EXIST, String.valueOf(processDefinitionCode));
                     return result;
                 }
                 if (preTaskCodeMap.containsKey(0L) && preTaskCode != 0L) {
@@ -185,7 +188,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         processTaskRelationLog.setOperateTime(new Date());
         int result = processTaskRelationLogMapper.insert(processTaskRelationLog);
         if (result <= 0) {
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR,
+            throw new ServiceException(ProcessStatus.CREATE_PROCESS_TASK_RELATION_LOG_ERROR,
                     processTaskRelationLog.getPreTaskCode(), processTaskRelationLog.getPostTaskCode());
         }
         return processTaskRelationLog;
@@ -204,7 +207,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         int result = processTaskRelationLogMapper.batchInsert(processTaskRelationLogs);
         if (result != processTaskRelationLogs.size()) {
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_LOG_ERROR);
+            throw new ServiceException(ProcessStatus.CREATE_PROCESS_TASK_RELATION_LOG_ERROR);
         }
         return processTaskRelationLogs;
     }
@@ -237,7 +240,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         ProcessDefinition processDefinition =
                 processDefinitionMapper.queryByCode(processTaskRelation.getProcessDefinitionCode());
         if (processDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST,
+            throw new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST,
                     String.valueOf(processTaskRelation.getProcessDefinitionCode()));
         }
         if (processTaskRelation.getProjectCode() == 0) {
@@ -250,7 +253,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         this.updateVersions(processTaskRelation);
         int insert = processTaskRelationMapper.insert(processTaskRelation);
         if (insert <= 0) {
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR, processTaskRelation.getPreTaskCode(),
+            throw new ServiceException(ProcessStatus.CREATE_PROCESS_TASK_RELATION_ERROR,
+                    processTaskRelation.getPreTaskCode(),
                     processTaskRelation.getPostTaskCode());
         }
         this.persist2ProcessTaskRelationLog(loginUser, processTaskRelation);
@@ -279,8 +283,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (insertVersion <= 0) {
             log.error("Update process definition error, projectCode:{}, processDefinitionCode:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode());
-            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            putMsg(result, ProcessStatus.UPDATE_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(ProcessStatus.UPDATE_PROCESS_DEFINITION_ERROR);
         } else
             log.info(
                     "Update process definition complete, new version is {}, projectCode:{}, processDefinitionCode:{}.",
@@ -304,26 +308,26 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         if (taskCode == 0) {
             log.error(
                     "Delete task process relation error due to parameter taskCode is 0, projectCode:{}, processDefinitionCode:{}.",
                     projectCode, processDefinitionCode);
-            putMsg(result, Status.DELETE_TASK_PROCESS_RELATION_ERROR);
+            putMsg(result, TaskStatus.DELETE_TASK_PROCESS_RELATION_ERROR);
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             log.error("Process definition does not exist, processDefinitionCode:{}.", processDefinitionCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (null == taskDefinition) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
+            putMsg(result, TaskStatus.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
@@ -332,7 +336,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             log.error("Process task relations are empty, projectCode:{}, processDefinitionCode:{}.", projectCode,
                     processDefinitionCode);
-            putMsg(result, Status.DATA_IS_NULL, "processTaskRelationList");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "processTaskRelationList");
             return result;
         }
         List<Long> downstreamList = Lists.newArrayList();
@@ -349,7 +353,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             log.warn(
                     "Relation can not be deleted because task has downstream tasks:[{}], projectCode:{}, processDefinitionCode:{}, taskDefinitionCode:{}.",
                     downstream, projectCode, processDefinitionCode, taskCode);
-            putMsg(result, Status.TASK_HAS_DOWNSTREAM, downstream);
+            putMsg(result, TaskStatus.TASK_HAS_DOWNSTREAM, downstream);
             return result;
         }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
@@ -360,13 +364,13 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             int deleteTaskDefinition = taskDefinitionMapper.deleteByCode(taskCode);
             if (0 == deleteTaskDefinition) {
                 log.error("Delete task definition error, taskDefinitionCode:{}.", taskCode);
-                putMsg(result, Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
-                throw new ServiceException(Status.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+                putMsg(result, TaskStatus.DELETE_TASK_DEFINE_BY_CODE_ERROR);
+                throw new ServiceException(TaskStatus.DELETE_TASK_DEFINE_BY_CODE_ERROR);
             } else
                 log.info("Delete {} type task definition complete, taskDefinitionCode:{}.",
                         taskDefinition.getTaskType(), taskCode);
         }
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -393,7 +397,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
 
         List<ProcessTaskRelation> processTaskRelations = processTaskRelationIPage.getRecords();
         if (processTaskRelations.size() != 1) {
-            throw new ServiceException(Status.PROCESS_TASK_RELATION_NOT_EXPECT, 1, processTaskRelations.size());
+            throw new ServiceException(ProcessStatus.PROCESS_TASK_RELATION_NOT_EXPECT, 1, processTaskRelations.size());
         }
 
         ProcessTaskRelation processTaskRelationDb = processTaskRelations.get(0);
@@ -418,7 +422,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                                                                              TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {
         TaskDefinition downstreamTask = taskDefinitionMapper.queryByCode(taskCode);
         if (downstreamTask == null) {
-            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
+            throw new ServiceException(TaskStatus.TASK_DEFINE_NOT_EXIST, taskCode);
         }
         List<Long> upstreamTaskCodes = taskRelationUpdateUpstreamRequest.getUpstreams();
 
@@ -440,7 +444,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                     processDefinitionMapper.queryByCode(taskRelationUpdateUpstreamRequest.getWorkflowCode());
         }
         if (processDefinition == null) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR,
                     taskRelationUpdateUpstreamRequest.toString());
         }
         processDefinition.setUpdateTime(new Date());
@@ -449,7 +453,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             insertVersion =
                     this.saveProcessDefine(loginUser, processDefinition);
             if (insertVersion <= 0) {
-                throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+                throw new ServiceException(ProcessStatus.UPDATE_PROCESS_DEFINITION_ERROR);
             }
         }
         // get new relation to create and out of date relation to delete
@@ -467,7 +471,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (CollectionUtils.isNotEmpty(taskCodeDeletes)) {
             int delete = processTaskRelationMapper.deleteBatchIds(taskCodeDeletes);
             if (delete != taskCodeDeletes.size()) {
-                throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_DELETE_ERROR, taskCodeDeletes);
+                throw new ServiceException(ProcessStatus.PROCESS_TASK_RELATION_BATCH_DELETE_ERROR, taskCodeDeletes);
             }
         }
 
@@ -480,7 +484,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 // 0 for DAG root, should not, it may already exists and skip to create anymore
                 TaskDefinition upstreamTask = taskDefinitionMapper.queryByCode(createCode);
                 if (upstreamTask == null) {
-                    throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, createCode);
+                    throw new ServiceException(TaskStatus.TASK_DEFINE_NOT_EXIST, createCode);
                 }
                 upstreamCode = upstreamTask.getCode();
                 version = upstreamTask.getVersion();
@@ -493,7 +497,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         int batchInsert = processTaskRelationMapper.batchInsert(processTaskRelations);
         if (batchInsert != processTaskRelations.size()) {
-            throw new ServiceException(Status.PROCESS_TASK_RELATION_BATCH_CREATE_ERROR, taskCodeCreates);
+            throw new ServiceException(ProcessStatus.PROCESS_TASK_RELATION_BATCH_CREATE_ERROR, taskCodeCreates);
         }
 
         // batch sync to process task relation log
@@ -501,7 +505,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (saveTaskRelationResult != Constants.EXIT_CODE_SUCCESS) {
             log.error("Save process task relations error, projectCode:{}, processCode:{}, processVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
-            throw new ServiceException(Status.CREATE_PROCESS_TASK_RELATION_ERROR);
+            throw new ServiceException(ProcessStatus.CREATE_PROCESS_TASK_RELATION_ERROR);
         }
         log.info("Save process task relations complete, projectCode:{}, processCode:{}, processVersion:{}.",
                 processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
@@ -600,14 +604,14 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             log.info(
                     "Update task relations complete, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
             result.put(Constants.DATA_LIST, processDefinition);
         } else {
             log.error(
                     "Update task relations error, projectCode:{}, processDefinitionCode:{}, processDefinitionVersion:{}.",
                     processDefinition.getProjectCode(), processDefinition.getCode(), processDefinition.getVersion());
-            putMsg(result, Status.UPDATE_PROCESS_DEFINITION_ERROR);
-            throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
+            putMsg(result, ProcessStatus.UPDATE_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(ProcessStatus.UPDATE_PROCESS_DEFINITION_ERROR);
         }
     }
 
@@ -627,18 +631,18 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         if (StringUtils.isEmpty(preTaskCodes)) {
             log.warn("Parameter preTaskCodes is empty.");
-            putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "preTaskCodes");
             return result;
         }
         List<ProcessTaskRelation> upstreamList = processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
         if (CollectionUtils.isEmpty(upstreamList)) {
             log.error("Upstream tasks based on the task do not exist, theTaskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.DATA_IS_NULL, "taskCode");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "taskCode");
             return result;
         }
 
@@ -646,14 +650,14 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                 .map(Long::parseLong).collect(Collectors.toList());
         if (preTaskCodeList.contains(0L)) {
             log.warn("Parameter preTaskCodes contain 0.");
-            putMsg(result, Status.DATA_IS_NULL, "preTaskCodes");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "preTaskCodes");
             return result;
         }
         List<Long> currentUpstreamList =
                 upstreamList.stream().map(ProcessTaskRelation::getPreTaskCode).collect(Collectors.toList());
         if (currentUpstreamList.contains(0L)) {
             log.error("Upstream taskCodes based on the task contain, theTaskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.DATA_IS_NOT_VALID, "currentUpstreamList");
+            putMsg(result, BaseStatus.DATA_IS_NOT_VALID, "currentUpstreamList");
             return result;
         }
         List<Long> tmpCurrent = Lists.newArrayList(currentUpstreamList);
@@ -662,7 +666,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (!preTaskCodeList.isEmpty()) {
             String invalidPreTaskCodes = StringUtils.join(preTaskCodeList, Constants.COMMA);
             log.error("Some upstream taskCodes are invalid, preTaskCodeList:{}.", invalidPreTaskCodes);
-            putMsg(result, Status.DATA_IS_NOT_VALID, invalidPreTaskCodes);
+            putMsg(result, BaseStatus.DATA_IS_NOT_VALID, invalidPreTaskCodes);
             return result;
         }
         ProcessDefinition processDefinition =
@@ -670,7 +674,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (processDefinition == null) {
             log.error("Process definition does not exist, processDefinitionCode:{}.",
                     upstreamList.get(0).getProcessDefinitionCode());
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST,
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST,
                     String.valueOf(upstreamList.get(0).getProcessDefinitionCode()));
             return result;
         }
@@ -714,26 +718,26 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         if (StringUtils.isEmpty(postTaskCodes)) {
             log.warn("Parameter postTaskCodes is empty.");
-            putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "postTaskCodes");
             return result;
         }
         List<ProcessTaskRelation> downstreamList =
                 processTaskRelationMapper.queryDownstreamByCode(projectCode, taskCode);
         if (CollectionUtils.isEmpty(downstreamList)) {
             log.error("Downstream tasks based on the task do not exist, theTaskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.DATA_IS_NULL, "taskCode");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "taskCode");
             return result;
         }
         List<Long> postTaskCodeList = Lists.newArrayList(postTaskCodes.split(Constants.COMMA)).stream()
                 .map(Long::parseLong).collect(Collectors.toList());
         if (postTaskCodeList.contains(0L)) {
             log.warn("Parameter postTaskCodes contains 0.");
-            putMsg(result, Status.DATA_IS_NULL, "postTaskCodes");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "postTaskCodes");
             return result;
         }
         ProcessDefinition processDefinition =
@@ -741,7 +745,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (processDefinition == null) {
             log.error("Process definition does not exist, processDefinitionCode:{}.",
                     downstreamList.get(0).getProcessDefinitionCode());
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST,
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST,
                     String.valueOf(downstreamList.get(0).getProcessDefinitionCode()));
             return result;
         }
@@ -769,7 +773,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         List<ProcessTaskRelation> processTaskRelationList =
@@ -789,7 +793,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             taskDefinitionLogList = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
         }
         result.put(Constants.DATA_LIST, taskDefinitionLogList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -806,7 +810,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         List<ProcessTaskRelation> processTaskRelationList =
@@ -826,7 +830,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             taskDefinitionLogList = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
         }
         result.put(Constants.DATA_LIST, taskDefinitionLogList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -847,14 +851,14 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
             log.error("Process definition does not exist, projectCode：{}， processDefinitionCode:{}.", projectCode,
                     processDefinitionCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
         List<ProcessTaskRelation> processTaskRelations =
@@ -863,7 +867,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         if (CollectionUtils.isEmpty(processTaskRelationList)) {
             log.error("Process task relations are empty, projectCode:{}, processDefinitionCode:{}.", projectCode,
                     processDefinitionCode);
-            putMsg(result, Status.DATA_IS_NULL, "processTaskRelationList");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "processTaskRelationList");
             return result;
         }
         Map<Long, List<ProcessTaskRelation>> taskRelationMap = new HashMap<>();
@@ -877,7 +881,7 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
             });
         }
         if (!taskRelationMap.containsKey(postTaskCode)) {
-            putMsg(result, Status.DATA_IS_NULL, "postTaskCode");
+            putMsg(result, BaseStatus.DATA_IS_NULL, "postTaskCode");
             return result;
         }
         if (taskRelationMap.get(postTaskCode).size() > 1) {
@@ -888,8 +892,8 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
                         log.error(
                                 "Delete task relation edge error, processTaskRelationId:{}, preTaskCode:{}, postTaskCode:{}",
                                 processTaskRelation.getId(), preTaskCode, postTaskCode);
-                        putMsg(result, Status.DELETE_EDGE_ERROR);
-                        throw new ServiceException(Status.DELETE_EDGE_ERROR);
+                        putMsg(result, BaseStatus.DELETE_EDGE_ERROR);
+                        throw new ServiceException(BaseStatus.DELETE_EDGE_ERROR);
                     } else
                         log.info(
                                 "Delete task relation edge complete, processTaskRelationId:{}, preTaskCode:{}, postTaskCode:{}",

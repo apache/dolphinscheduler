@@ -20,7 +20,12 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.SessionService;
@@ -164,23 +169,23 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // check all user params
         String msg = this.checkUserParams(userName, userPassword, email, phone);
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED, msg);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED, msg);
             return result;
         }
 
         if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
 
         if (!StringUtils.isEmpty(msg)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
             return result;
         }
 
         if (!checkTenantExists(tenantId)) {
             log.warn("Tenant does not exist, tenantId:{}.", tenantId);
-            putMsg(result, Status.TENANT_NOT_EXIST);
+            putMsg(result, TenantStatus.TENANT_NOT_EXIST);
             return result;
         }
 
@@ -191,7 +196,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -340,13 +345,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Result<Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Result<Object> result = new Result<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         if (!isAdmin(loginUser)) {
             log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
                     loginUser.getUserName());
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -358,7 +363,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         pageInfo.setTotal((int) scheduleList.getTotal());
         pageInfo.setTotalList(scheduleList.getRecords());
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -376,43 +381,43 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            int state,
                            String timeZone) {
         if (resourcePermissionCheckService.functionDisabled()) {
-            throw new ServiceException(Status.FUNCTION_DISABLED);
+            throw new ServiceException(BaseStatus.FUNCTION_DISABLED);
         }
         if (!canOperator(loginUser, userId)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
-            throw new ServiceException(Status.USER_NOT_EXIST, userId);
+            throw new ServiceException(UserStatus.USER_NOT_EXIST, userId);
         }
 
         // non-admin should not modify tenantId and queue
         if (!isAdmin(loginUser)) {
             if (tenantId != null && user.getTenantId() != tenantId) {
-                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+                throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
             }
             if (StringUtils.isNotEmpty(queue) && !StringUtils.equals(queue, user.getQueue())) {
-                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+                throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
             }
         }
 
         if (StringUtils.isNotEmpty(userName)) {
 
             if (!CheckUtils.checkUserName(userName)) {
-                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+                throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
             }
 
             // todo: use the db unique index
             User tempUser = userMapper.queryByUserNameAccurately(userName);
             if (tempUser != null && !userId.equals(tempUser.getId())) {
-                throw new ServiceException(Status.USER_NAME_EXIST);
+                throw new ServiceException(UserStatus.USER_NAME_EXIST);
             }
             user.setUserName(userName);
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
             if (!CheckUtils.checkPasswordLength(userPassword)) {
-                throw new ServiceException(Status.USER_PASSWORD_LENGTH_ERROR);
+                throw new ServiceException(UserStatus.USER_PASSWORD_LENGTH_ERROR);
             }
             user.setUserPassword(EncryptionUtils.getMd5(userPassword));
             sessionService.expireSession(user.getId());
@@ -420,22 +425,22 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(email)) {
             if (!CheckUtils.checkEmail(email)) {
-                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, email);
+                throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, email);
             }
             user.setEmail(email);
         }
 
         if (StringUtils.isNotEmpty(phone) && !CheckUtils.checkPhone(phone)) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, phone);
         }
 
         if (state == 0 && user.getState() != state && Objects.equals(loginUser.getId(), user.getId())) {
-            throw new ServiceException(Status.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
+            throw new ServiceException(BaseStatus.NOT_ALLOW_TO_DISABLE_OWN_ACCOUNT);
         }
 
         if (StringUtils.isNotEmpty(timeZone)) {
             if (!CheckUtils.checkTimeZone(timeZone)) {
-                throw new ServiceException(Status.TIME_ZONE_ILLEGAL, timeZone);
+                throw new ServiceException(BaseStatus.TIME_ZONE_ILLEGAL, timeZone);
             }
             user.setTimeZone(timeZone);
         }
@@ -447,7 +452,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setTenantId(tenantId);
         // updateProcessInstance user
         if (userMapper.updateById(user) <= 0) {
-            throw new ServiceException(Status.UPDATE_USER_ERROR);
+            throw new ServiceException(UserStatus.UPDATE_USER_ERROR);
         }
         return user;
     }
@@ -465,28 +470,28 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> deleteUserById(User loginUser, int id) throws IOException {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // only admin can operate
         if (!isAdmin(loginUser)) {
             log.warn("User does not have permission for this feature, userId:{}, userName:{}.", loginUser.getId(),
                     loginUser.getUserName());
-            putMsg(result, Status.USER_NO_OPERATION_PERM, id);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM, id);
             return result;
         }
         // check exist
         User tempUser = userMapper.selectById(id);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", id);
-            putMsg(result, Status.USER_NOT_EXIST, id);
+            putMsg(result, UserStatus.USER_NOT_EXIST, id);
             return result;
         }
         // check if is a project owner
         List<Project> projects = projectMapper.queryProjectCreatedByUser(id);
         if (CollectionUtils.isNotEmpty(projects)) {
             String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
-            putMsg(result, Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
+            putMsg(result, ProjectStatus.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
             log.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
                     projectNames);
             return result;
@@ -500,11 +505,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (userMapper.deleteById(id) > 0) {
             metricsCleanUpService.cleanUpApiResponseTimeMetricsByUserId(id);
             log.info("User is deleted and id is :{}.", id);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
             return result;
         } else {
             log.error("User delete error, userId:{}.", id);
-            putMsg(result, Status.DELETE_USER_BY_ID_ERROR);
+            putMsg(result, UserStatus.DELETE_USER_BY_ID_ERROR);
             return result;
         }
     }
@@ -523,18 +528,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // 1. only admin can operate
-        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (this.check(result, !this.isAdmin(loginUser), UserStatus.USER_NO_OPERATION_PERM)) {
             return result;
         }
 
         // 2. check if user is existed
         User user = this.userMapper.selectById(userId);
         if (user == null) {
-            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            this.putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
@@ -542,14 +547,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             // 3. check if project is existed
             Project project = this.projectMapper.queryDetailById(Integer.parseInt(projectId));
             if (project == null) {
-                this.putMsg(result, Status.PROJECT_NOT_FOUND, Integer.parseInt(projectId));
+                this.putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, Integer.parseInt(projectId));
             } else {
                 // 4. delete the relationship between project and user
                 this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
             }
         });
 
-        this.putMsg(result, Status.SUCCESS);
+        this.putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -568,17 +573,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
-        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+        if (check(result, StringUtils.isEmpty(projectIds), BaseStatus.SUCCESS)) {
             return result;
         }
         Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
@@ -595,7 +600,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setUpdateTime(now);
             projectUserMapper.insert(projectUser);
         });
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -615,18 +620,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
-        if (check(result, StringUtils.isEmpty(projectIds), Status.SUCCESS)) {
+        if (check(result, StringUtils.isEmpty(projectIds), BaseStatus.SUCCESS)) {
             log.warn("Parameter projectIds is empty.");
             return result;
         }
@@ -644,7 +649,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setUpdateTime(now);
             projectUserMapper.insert(projectUser);
         });
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -663,7 +668,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
 
@@ -671,7 +676,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User tempUser = this.userMapper.selectById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
-            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            this.putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
@@ -679,7 +684,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
             log.error("Project does not exist, projectCode:{}.", projectCode);
-            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            this.putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 
@@ -687,7 +692,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (!this.canOperator(loginUser, project.getUserId())) {
             log.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.",
                     loginUser.getId(), loginUser.getUserName(), projectCode);
-            this.putMsg(result, Status.USER_NO_OPERATION_PERM);
+            this.putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -704,7 +709,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             this.projectUserMapper.insert(projectUser);
         }
         log.info("User is granted permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
-        this.putMsg(result, Status.SUCCESS);
+        this.putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -722,11 +727,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // 1. only admin can operate
-        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (this.check(result, !this.isAdmin(loginUser), UserStatus.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can revoke the project permission.");
             return result;
         }
@@ -735,7 +740,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = this.userMapper.selectById(userId);
         if (user == null) {
             log.error("User does not exist, userId:{}.", userId);
-            this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            this.putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
@@ -743,14 +748,14 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
             log.error("Project does not exist, projectCode:{}.", projectCode);
-            this.putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+            this.putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
 
         // 4. delete th relationship between project and user
         this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
         log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
-        this.putMsg(result, Status.SUCCESS);
+        this.putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -768,13 +773,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
             log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
@@ -816,7 +821,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                     log.error("Resource id:{} is used by process definition {}", resId,
                             resourceProcessMap.get(resId));
                 }
-                putMsg(result, Status.RESOURCE_IS_USED);
+                putMsg(result, ResourceStatus.RESOURCE_IS_USED);
                 return result;
             }
 
@@ -824,7 +829,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         resourceUserMapper.deleteResourceUser(userId, 0);
 
-        if (check(result, StringUtils.isEmpty(resourceIds), Status.SUCCESS)) {
+        if (check(result, StringUtils.isEmpty(resourceIds), BaseStatus.SUCCESS)) {
             log.warn("Parameter resourceIds is empty.");
             return result;
         }
@@ -833,7 +838,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             Resource resource = resourceMapper.selectById(resourceIdValue);
             if (resource == null) {
                 log.error("Resource does not exist, resourceId:{}.", resourceIdValue);
-                putMsg(result, Status.RESOURCE_NOT_EXIST);
+                putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
                 return result;
             }
 
@@ -856,7 +861,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         log.info("User is granted permission for resources, userId:{}, resourceIds:{}.", user.getId(),
                 needAuthorizeResIds);
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -875,19 +880,19 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
             log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
         udfUserMapper.deleteByUserId(userId);
 
-        if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
+        if (check(result, StringUtils.isEmpty(udfIds), BaseStatus.SUCCESS)) {
             log.warn("Parameter udfIds is empty.");
             return result;
         }
@@ -907,7 +912,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         log.info("User is granted permission for UDF, userName:{}.", user.getUserName());
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -926,11 +931,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // only admin can operate
-        if (this.check(result, !this.isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (this.check(result, !this.isAdmin(loginUser), UserStatus.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can grant namespaces.");
             return result;
         }
@@ -939,7 +944,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
@@ -960,7 +965,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         log.info("User is granted permission for namespace, userId:{}.", tempUser.getId());
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -980,18 +985,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         result.put(Constants.STATUS, false);
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         User user = userMapper.selectById(userId);
         if (user == null) {
-            putMsg(result, Status.USER_NOT_EXIST, userId);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userId);
             return result;
         }
 
         datasourceUserMapper.deleteByUserId(userId);
 
-        if (check(result, StringUtils.isEmpty(datasourceIds), Status.SUCCESS)) {
+        if (check(result, StringUtils.isEmpty(datasourceIds), BaseStatus.SUCCESS)) {
             return result;
         }
 
@@ -1009,7 +1014,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             datasourceUserMapper.insert(datasourceUser);
         }
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -1026,7 +1031,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         User user = null;
@@ -1063,7 +1068,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         result.put(Constants.DATA_LIST, user);
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -1077,18 +1082,18 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> queryAllGeneralUsers(User loginUser) {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), UserStatus.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can query all general users.");
             return result;
         }
 
         List<User> userList = userMapper.queryAllGeneralUser();
         result.put(Constants.DATA_LIST, userList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -1104,12 +1109,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         // only admin can operate
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, USER_MANAGER)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
         List<User> userList = userMapper.queryEnabledUsers();
         result.put(Constants.DATA_LIST, userList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -1126,9 +1131,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Result<Object> result = new Result<>();
         User user = userMapper.queryByUserNameAccurately(userName);
         if (user != null) {
-            putMsg(result, Status.USER_NAME_EXIST);
+            putMsg(result, UserStatus.USER_NAME_EXIST);
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
 
         return result;
@@ -1146,11 +1151,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), UserStatus.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can deauthorize user.");
             return result;
         }
@@ -1171,7 +1176,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             resultUsers = new ArrayList<>(userSet);
         }
         result.put(Constants.DATA_LIST, resultUsers);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -1187,17 +1192,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId) {
         Map<String, Object> result = new HashMap<>();
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         // only admin can operate
-        if (check(result, !isAdmin(loginUser), Status.USER_NO_OPERATION_PERM)) {
+        if (check(result, !isAdmin(loginUser), UserStatus.USER_NO_OPERATION_PERM)) {
             log.warn("Only admin can authorize user.");
             return result;
         }
         List<User> userList = userMapper.queryUserListByAlertGroupId(alertGroupId);
         result.put(Constants.DATA_LIST, userList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -1253,7 +1258,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                     if (!storageOperate.exists(
                             String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
                         log.error("Resource file: {} does not exist, copy error.", component.getFullName());
-                        throw new ServiceException(Status.RESOURCE_NOT_EXIST);
+                        throw new ServiceException(ResourceStatus.RESOURCE_NOT_EXIST);
                     }
 
                     if (!component.isDirctory()) {
@@ -1299,20 +1304,20 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         if (!StringUtils.isEmpty(msg)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, msg);
             return result;
         }
 
         if (!userPassword.equals(repeatPassword)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, "two passwords are not same");
             return result;
         }
         User user = createUser(userName, userPassword, email, -1, "", "", Flag.NO.ordinal());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.put(Constants.DATA_LIST, user);
         return result;
     }
@@ -1329,28 +1334,28 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.STATUS, false);
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
 
         if (!CheckUtils.checkUserName(userName)) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
             return result;
         }
 
         User user = userMapper.queryByUserNameAccurately(userName);
 
         if (user == null) {
-            putMsg(result, Status.USER_NOT_EXIST, userName);
+            putMsg(result, UserStatus.USER_NOT_EXIST, userName);
             return result;
         }
 
         if (user.getState() != Flag.NO.ordinal()) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
             return result;
         }
 
@@ -1360,7 +1365,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         userMapper.updateById(user);
 
         User responseUser = userMapper.queryByUserNameAccurately(userName);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.put(Constants.DATA_LIST, responseUser);
         return result;
     }
@@ -1377,11 +1382,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> result = new HashMap<>();
 
         if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
+            putMsg(result, BaseStatus.FUNCTION_DISABLED);
             return result;
         }
         if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
 
@@ -1393,7 +1398,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> failedRes = new HashMap<>();
         for (String userName : userNames) {
             Map<String, Object> tmpResult = activateUser(loginUser, userName);
-            if (tmpResult.get(Constants.STATUS) != Status.SUCCESS) {
+            if (tmpResult.get(Constants.STATUS) != BaseStatus.SUCCESS) {
                 totalFailed++;
                 Map<String, String> failedBody = new HashMap<>();
                 failedBody.put("userName", userName);
@@ -1413,7 +1418,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         Map<String, Object> res = new HashMap<>();
         res.put("success", successRes);
         res.put("failed", failedRes);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         result.put(Constants.DATA_LIST, res);
         return result;
     }

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -74,7 +74,7 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
                 end = DateUtils.stringToDate(endTime);
             }
         } catch (Exception e) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
         }
 
         Page<DqExecuteResult> page = new Page<>(pageNo, pageSize);

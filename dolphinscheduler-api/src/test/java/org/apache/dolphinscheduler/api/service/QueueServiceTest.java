@@ -23,7 +23,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.AssertionsHelper;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.QueueStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -135,13 +136,13 @@ public class QueueServiceTest {
         // queue is null
         Throwable exception = Assertions.assertThrows(ServiceException.class,
                 () -> queueService.createQueue(getLoginUser(), null, QUEUE_NAME));
-        String formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE);
+        String formatter = MessageFormat.format(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // queueName is null
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> queueService.createQueue(getLoginUser(), QUEUE_NAME, null));
-        formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE_NAME);
+        formatter = MessageFormat.format(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE_NAME);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // correct
@@ -161,7 +162,7 @@ public class QueueServiceTest {
         // not exist
         Throwable exception = Assertions.assertThrows(ServiceException.class,
                 () -> queueService.updateQueue(getLoginUser(), 0, QUEUE, QUEUE_NAME));
-        String formatter = MessageFormat.format(Status.QUEUE_NOT_EXIST.getMsg(), QUEUE);
+        String formatter = MessageFormat.format(QueueStatus.QUEUE_NOT_EXIST.getMsg(), QUEUE);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // no need update
@@ -169,18 +170,18 @@ public class QueueServiceTest {
                 baseServiceLogger)).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> queueService.updateQueue(getLoginUser(), 1, QUEUE_NAME, QUEUE_NAME));
-        Assertions.assertEquals(Status.NEED_NOT_UPDATE_QUEUE.getMsg(), exception.getMessage());
+        Assertions.assertEquals(QueueStatus.NEED_NOT_UPDATE_QUEUE.getMsg(), exception.getMessage());
 
         // queue exist
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> queueService.updateQueue(getLoginUser(), 1, EXISTS, QUEUE_NAME));
-        formatter = MessageFormat.format(Status.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
+        formatter = MessageFormat.format(QueueStatus.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // queueName exist
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, EXISTS));
-        formatter = MessageFormat.format(Status.QUEUE_NAME_EXIST.getMsg(), EXISTS);
+        formatter = MessageFormat.format(QueueStatus.QUEUE_NAME_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // success
@@ -201,24 +202,24 @@ public class QueueServiceTest {
         // queue null
         Throwable exception =
                 Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(null, QUEUE_NAME));
-        String formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE);
+        String formatter = MessageFormat.format(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // queueName null
         exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE_NAME, null));
-        formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE_NAME);
+        formatter = MessageFormat.format(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE_NAME);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queueName
         when(queueMapper.existQueue(EXISTS, null)).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(EXISTS, QUEUE_NAME));
-        formatter = MessageFormat.format(Status.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
+        formatter = MessageFormat.format(QueueStatus.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queue
         when(queueMapper.existQueue(null, EXISTS)).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE, EXISTS));
-        formatter = MessageFormat.format(Status.QUEUE_NAME_EXIST.getMsg(), EXISTS);
+        formatter = MessageFormat.format(QueueStatus.QUEUE_NAME_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // success

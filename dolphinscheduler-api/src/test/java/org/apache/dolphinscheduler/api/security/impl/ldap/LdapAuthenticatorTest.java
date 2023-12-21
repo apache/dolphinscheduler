@@ -21,7 +21,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -116,24 +117,24 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.DENY);
         when(ldapService.createIfUserNotExists()).thenReturn(false);
         Result<Map<String, String>> result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
-        Assertions.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
+        Assertions.assertEquals(UserStatus.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
 
         // test username pwd correct and user not exist, config user not exist action create, so login success
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.CREATE);
         when(ldapService.createIfUserNotExists()).thenReturn(true);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), (int) result.getCode());
         logger.info(result.toString());
 
         // test username pwd correct and user not exist, config action create but can't create session, so login failed
         when(sessionService.createSessionIfAbsent(Mockito.any(User.class))).thenReturn(null);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
-        Assertions.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
+        Assertions.assertEquals(UserStatus.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
         // test username pwd error, login failed
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(null);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
-        Assertions.assertEquals(Status.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
+        Assertions.assertEquals(UserStatus.USER_NAME_PASSWD_ERROR.getCode(), (int) result.getCode());
     }
 
     @Test

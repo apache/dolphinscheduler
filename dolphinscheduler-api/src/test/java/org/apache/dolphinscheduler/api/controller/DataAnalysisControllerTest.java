@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
@@ -82,7 +82,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 });
         assertThat(result.getCode())
                 .isNotNull()
-                .isEqualTo(Status.SUCCESS.getCode());
+                .isEqualTo(BaseStatus.SUCCESS.getCode());
         projectMapper.deleteById(projectId);
     }
 
@@ -105,7 +105,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 new TypeReference<Result<WorkflowInstanceCountVo>>() {
                 });
         assertThat(result.getCode())
-                .isEqualTo(Status.SUCCESS.getCode());
+                .isEqualTo(BaseStatus.SUCCESS.getCode());
 
         projectMapper.deleteById(projectId);
     }
@@ -123,7 +123,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isEqualTo(BaseStatus.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -135,7 +135,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isEqualTo(BaseStatus.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
@@ -147,7 +147,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        assertThat(result.getCode().intValue()).isEqualTo(BaseStatus.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

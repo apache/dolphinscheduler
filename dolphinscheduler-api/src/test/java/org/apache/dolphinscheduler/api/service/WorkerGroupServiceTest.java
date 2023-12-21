@@ -21,7 +21,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
 import static org.mockito.ArgumentMatchers.any;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
+import org.apache.dolphinscheduler.api.enums.v2.WorkerGroupStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
@@ -117,7 +120,7 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(false);
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(),
+        Assertions.assertEquals(UserStatus.USER_NO_OPERATION_PERM.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
 
@@ -130,7 +133,7 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, "", "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.NAME_NULL.getCode(),
+        Assertions.assertEquals(BaseStatus.NAME_NULL.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
 
@@ -148,7 +151,7 @@ public class WorkerGroupServiceTest {
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.NAME_EXIST.getCode(),
+        Assertions.assertEquals(BaseStatus.NAME_EXIST.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
 
@@ -167,7 +170,7 @@ public class WorkerGroupServiceTest {
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.WORKER_ADDRESS_INVALID.getCode(),
+        Assertions.assertEquals(WorkerGroupStatus.WORKER_ADDRESS_INVALID.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
 
@@ -188,7 +191,7 @@ public class WorkerGroupServiceTest {
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
-        Assertions.assertEquals(Status.SUCCESS.getCode(),
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(),
                 ((Status) result.get(Constants.STATUS)).getCode());
     }
 
@@ -208,7 +211,7 @@ public class WorkerGroupServiceTest {
         Mockito.when(registryClient.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(activeWorkerNodes);
 
         Result result = workerGroupService.queryAllGroupPaging(loginUser, 1, 1, null);
-        Assertions.assertEquals(result.getCode(), Status.SUCCESS.getCode());
+        Assertions.assertEquals(result.getCode(), BaseStatus.SUCCESS.getCode());
     }
 
     @Test
@@ -228,7 +231,7 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(null);
 
         Map<String, Object> notExistResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
-        Assertions.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(),
+        Assertions.assertEquals(WorkerGroupStatus.DELETE_WORKER_GROUP_NOT_EXIST.getCode(),
                 ((Status) notExistResult.get(Constants.STATUS)).getCode());
     }
 
@@ -250,7 +253,7 @@ public class WorkerGroupServiceTest {
                 .thenReturn(processInstances);
 
         Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
-        Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
+        Assertions.assertEquals(WorkerGroupStatus.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
                 ((Status) deleteFailed.get(Constants.STATUS)).getCode());
     }
 
@@ -276,7 +279,7 @@ public class WorkerGroupServiceTest {
         Mockito.when(scheduleMapper.selectList(Mockito.any())).thenReturn(null);
 
         Map<String, Object> successResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(),
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(),
                 ((Status) successResult.get(Constants.STATUS)).getCode());
     }
 

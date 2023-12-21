@@ -24,7 +24,13 @@ import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleCreateRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleFilterRequest;
 import org.apache.dolphinscheduler.api.dto.schedule.ScheduleUpdateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.EnvironmentStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ScheduleStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -159,7 +165,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (scheduleExists != null) {
             log.error("Schedule already exist, scheduleId:{},processDefineCode:{}", scheduleExists.getId(),
                     processDefineCode);
-            putMsg(result, Status.SCHEDULE_ALREADY_EXISTS, processDefineCode, scheduleExists.getId());
+            putMsg(result, ScheduleStatus.SCHEDULE_ALREADY_EXISTS, processDefineCode, scheduleExists.getId());
             return result;
         }
 
@@ -176,12 +182,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             log.warn("The start time must not be the same as the end or time can not be null.");
-            putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
+            putMsg(result, ScheduleStatus.SCHEDULE_START_TIME_END_TIME_SAME);
             return result;
         }
         if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
             log.warn("The start time must smaller than end time");
-            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
+            putMsg(result, BaseStatus.START_TIME_BIGGER_THAN_END_TIME_ERROR);
             return result;
         }
 
@@ -189,7 +195,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
             log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
             return result;
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
@@ -215,7 +221,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         // return scheduler object with ID
         result.put(Constants.DATA_LIST, scheduleMapper.selectById(scheduleObj.getId()));
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         log.info("Schedule create complete, projectCode:{}, processDefinitionCode:{}, scheduleId:{}.",
                 projectCode, processDefineCode, scheduleObj.getId());
         result.put("scheduleId", scheduleObj.getId());
@@ -225,7 +231,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     protected void projectPermCheckByProcess(User loginUser, long processDefinitionCode) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
+            throw new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, processDefinitionCode);
         }
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         // check project auth
@@ -235,16 +241,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private void scheduleParamCheck(String scheduleParamStr) {
         ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleParamStr, ScheduleParam.class);
         if (scheduleParam == null) {
-            throw new ServiceException(Status.PARSE_SCHEDULE_PARAM_ERROR, scheduleParamStr);
+            throw new ServiceException(ScheduleStatus.PARSE_SCHEDULE_PARAM_ERROR, scheduleParamStr);
         }
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
-            throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
+            throw new ServiceException(ScheduleStatus.SCHEDULE_START_TIME_END_TIME_SAME);
         }
         if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
-            throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
+            throw new ServiceException(BaseStatus.START_TIME_BIGGER_THAN_END_TIME_ERROR);
         }
         if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
-            throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
+            throw new ServiceException(ScheduleStatus.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
         }
     }
 
@@ -271,7 +277,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleExists =
                 scheduleMapper.queryByProcessDefinitionCode(scheduleCreateRequest.getProcessDefinitionCode());
         if (scheduleExists != null) {
-            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, scheduleCreateRequest.getProcessDefinitionCode(),
+            throw new ServiceException(ScheduleStatus.SCHEDULE_ALREADY_EXISTS,
+                    scheduleCreateRequest.getProcessDefinitionCode(),
                     scheduleExists.getId());
         }
 
@@ -280,7 +287,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule schedule = scheduleCreateRequest.convert2Schedule();
         Environment environment = environmentMapper.queryByEnvironmentCode(schedule.getEnvironmentCode());
         if (environment == null) {
-            throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, schedule.getEnvironmentCode());
+            throw new ServiceException(EnvironmentStatus.QUERY_ENVIRONMENT_BY_CODE_ERROR,
+                    schedule.getEnvironmentCode());
         }
 
         schedule.setUserId(loginUser.getId());
@@ -291,7 +299,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         this.scheduleParamCheck(scheduleCreateRequest.getScheduleParam());
         int create = scheduleMapper.insert(schedule);
         if (create <= 0) {
-            throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
+            throw new ServiceException(ScheduleStatus.CREATE_SCHEDULE_ERROR);
         }
         // updateProcessInstance receivers and cc by process definition id
         processDefinition.setWarningGroupId(schedule.getWarningGroupId());
@@ -343,7 +351,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         if (schedule == null) {
             log.error("Schedule does not exist, scheduleId:{}.", id);
-            putMsg(result, Status.SCHEDULE_NOT_EXISTS, id);
+            putMsg(result, ScheduleStatus.SCHEDULE_NOT_EXISTS, id);
             return result;
         }
 
@@ -351,7 +359,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             log.error("Process definition does not exist, processDefinitionCode:{}.",
                     schedule.getProcessDefinitionCode());
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(schedule.getProcessDefinitionCode()));
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST, String.valueOf(schedule.getProcessDefinitionCode()));
             return result;
         }
 
@@ -375,7 +383,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                       ScheduleUpdateRequest scheduleUpdateRequest) {
         Schedule schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) {
-            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
+            throw new ServiceException(ScheduleStatus.SCHEDULE_NOT_EXISTS, scheduleId);
         }
 
         Schedule scheduleUpdate;
@@ -385,7 +393,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException
                 | NoSuchMethodException e) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleUpdateRequest.toString());
+            throw new ServiceException(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleUpdateRequest.toString());
         }
         // check update params
         this.projectPermCheckByProcess(loginUser, scheduleUpdate.getProcessDefinitionCode());
@@ -393,13 +401,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (scheduleUpdate.getEnvironmentCode() != null) {
             Environment environment = environmentMapper.queryByEnvironmentCode(scheduleUpdate.getEnvironmentCode());
             if (environment == null) {
-                throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, scheduleUpdate.getEnvironmentCode());
+                throw new ServiceException(EnvironmentStatus.QUERY_ENVIRONMENT_BY_CODE_ERROR,
+                        scheduleUpdate.getEnvironmentCode());
             }
         }
 
         int update = scheduleMapper.updateById(scheduleUpdate);
         if (update <= 0) {
-            throw new ServiceException(Status.UPDATE_SCHEDULE_ERROR);
+            throw new ServiceException(ScheduleStatus.UPDATE_SCHEDULE_ERROR);
         }
         return scheduleUpdate;
     }
@@ -417,7 +426,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 Integer scheduleId) {
         Schedule schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) {
-            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
+            throw new ServiceException(ScheduleStatus.SCHEDULE_NOT_EXISTS, scheduleId);
         }
         this.projectPermCheckByProcess(loginUser, schedule.getProcessDefinitionCode());
         return schedule;
@@ -451,7 +460,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefineCode);
             if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
                 log.error("Process definition does not exist, processDefinitionCode:{}.", processDefineCode);
-                putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
+                putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefineCode));
                 return result;
             }
         }
@@ -471,7 +480,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         pageInfo.setTotal((int) schedulePage.getTotal());
         pageInfo.setTotalList(scheduleList);
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -534,7 +543,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         result.put(Constants.DATA_LIST, scheduleList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
 
         return result;
     }
@@ -566,21 +575,21 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void deleteSchedulesById(User loginUser, Integer scheduleId) {
         Schedule schedule = scheduleMapper.selectById(scheduleId);
         if (schedule == null) {
-            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
+            throw new ServiceException(ScheduleStatus.SCHEDULE_NOT_EXISTS, scheduleId);
         }
         // check schedule is already online
         if (schedule.getReleaseState() == ReleaseState.ONLINE) {
-            throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, scheduleId);
+            throw new ServiceException(ScheduleStatus.SCHEDULE_STATE_ONLINE, scheduleId);
         }
         // Determine if the login user is the owner of the schedule
         if (loginUser.getId() != schedule.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         this.projectPermCheckByProcess(loginUser, schedule.getProcessDefinitionCode());
         int delete = scheduleMapper.deleteById(scheduleId);
         if (delete <= 0) {
-            throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
+            throw new ServiceException(ScheduleStatus.DELETE_SCHEDULE_BY_ID_ERROR);
         }
     }
 
@@ -608,7 +617,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             cron = CronUtils.parse2Cron(scheduleParam.getCrontab());
         } catch (CronParseException e) {
             log.error("Parse cron to cron expression error, crontab:{}.", scheduleParam.getCrontab(), e);
-            putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
+            putMsg(result, ScheduleStatus.PARSE_TO_CRON_EXPRESSION_ERROR);
             return result;
         }
         List<ZonedDateTime> selfFireDateList =
@@ -616,7 +625,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         List<String> previewDateList =
                 selfFireDateList.stream().map(t -> DateUtils.dateToString(t, zoneId)).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, previewDateList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -650,7 +659,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
+        if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
             return result;
         }
         // check schedule exists
@@ -658,14 +667,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (schedule == null) {
             log.error("Schedule of process definition does not exist, processDefinitionCode:{}.",
                     processDefinitionCode);
-            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, processDefinitionCode);
+            putMsg(result, ScheduleStatus.SCHEDULE_CRON_NOT_EXISTS, processDefinitionCode);
             return result;
         }
 
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(processDefinitionCode);
         if (processDefinition == null || projectCode != processDefinition.getProjectCode()) {
             log.error("Process definition does not exist, processDefinitionCode:{}.", processDefinitionCode);
-            putMsg(result, Status.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
+            putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_EXIST, String.valueOf(processDefinitionCode));
             return result;
         }
 
@@ -699,7 +708,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
         if (!ReleaseState.ONLINE.equals(processDefinition.getReleaseState())) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
+            throw new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getName());
         }
 
         schedule.setReleaseState(ReleaseState.ONLINE);
@@ -745,7 +754,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 String tenantCode,
                                 long environmentCode) {
         if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE,
-                Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
+                ScheduleStatus.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
             log.warn("Schedule can not be updated due to schedule is {}, scheduleId:{}.",
                     ReleaseState.ONLINE.getDescp(), schedule.getId());
             return;
@@ -761,17 +770,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleExpression, ScheduleParam.class);
             if (scheduleParam == null) {
                 log.warn("Parameter scheduleExpression is invalid, so parse cron error.");
-                putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
+                putMsg(result, ScheduleStatus.PARSE_TO_CRON_EXPRESSION_ERROR);
                 return;
             }
             if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
                 log.warn("The start time must not be the same as the end or time can not be null.");
-                putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
+                putMsg(result, ScheduleStatus.SCHEDULE_START_TIME_END_TIME_SAME);
                 return;
             }
             if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
                 log.warn("The start time must smaller than end time");
-                putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
+                putMsg(result, BaseStatus.START_TIME_BIGGER_THAN_END_TIME_ERROR);
                 return;
             }
 
@@ -779,7 +788,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             schedule.setEndTime(scheduleParam.getEndTime());
             if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
                 log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
-                putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
+                putMsg(result, ScheduleStatus.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
                 return;
             }
             schedule.setCrontab(scheduleParam.getCrontab());
@@ -808,7 +817,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         log.info("Schedule update complete, projectCode:{}, processDefinitionCode:{}, scheduleId:{}.",
                 processDefinition.getProjectCode(), processDefinition.getCode(), schedule.getId());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
     }
 
     /**
@@ -820,7 +829,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                throw new ServiceException(Status.TENANT_NOT_EXIST, tenantCode);
+                throw new ServiceException(TenantStatus.TENANT_NOT_EXIST, tenantCode);
             }
         }
     }

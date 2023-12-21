@@ -17,15 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ALERT_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALERT_GROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERTGROUP_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_GROUP_ERROR;
-
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.GroupStatus;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -85,7 +78,6 @@ public class AlertGroupController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_ALERT_GROUP_ERROR)
     public Result<AlertGroup> createAlertGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "groupName") String groupName,
                                                @RequestParam(value = "description", required = false) String description,
@@ -103,7 +95,6 @@ public class AlertGroupController extends BaseController {
     @Operation(summary = "listAlertgroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
     public Result<List<AlertGroup>> list(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(loginUser);
@@ -119,7 +110,6 @@ public class AlertGroupController extends BaseController {
     @Operation(summary = "listNormalAlertgroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
     @GetMapping(value = "/normal-list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
     public Result<List<AlertGroup>> normalAlertGroupList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         List<AlertGroup> alertGroups = alertGroupService.queryNormalAlertGroups(loginUser);
@@ -143,7 +133,6 @@ public class AlertGroupController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
     public Result<PageInfo<AlertGroup>> listPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @RequestParam(value = "searchVal", required = false) String searchVal,
                                                    @RequestParam("pageNo") Integer pageNo,
@@ -168,7 +157,6 @@ public class AlertGroupController extends BaseController {
     })
     @PostMapping(value = "/query")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALERT_GROUP_ERROR)
     public Result<AlertGroup> queryAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestParam("id") Integer id) {
 
@@ -194,7 +182,6 @@ public class AlertGroupController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_ALERT_GROUP_ERROR)
     public Result<AlertGroup> updateAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @PathVariable(value = "id") int id,
                                                    @RequestParam(value = "groupName") String groupName,
@@ -218,7 +205,6 @@ public class AlertGroupController extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_ALERT_GROUP_ERROR)
     public Result<Boolean> deleteAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @PathVariable(value = "id") int id) {
         alertGroupService.deleteAlertGroupById(loginUser, id);
@@ -245,11 +231,11 @@ public class AlertGroupController extends BaseController {
         Result result = new Result();
         if (exist) {
             log.error("group {} has exist, can't create again.", groupName);
-            result.setCode(Status.ALERT_GROUP_EXIST.getCode());
-            result.setMsg(Status.ALERT_GROUP_EXIST.getMsg());
+            result.setCode(GroupStatus.ALERT_GROUP_EXIST.getCode());
+            result.setMsg(GroupStatus.ALERT_GROUP_EXIST.getMsg());
         } else {
-            result.setCode(Status.SUCCESS.getCode());
-            result.setMsg(Status.SUCCESS.getMsg());
+            result.setCode(BaseStatus.SUCCESS.getCode());
+            result.setMsg(BaseStatus.SUCCESS.getMsg());
         }
         return result;
     }

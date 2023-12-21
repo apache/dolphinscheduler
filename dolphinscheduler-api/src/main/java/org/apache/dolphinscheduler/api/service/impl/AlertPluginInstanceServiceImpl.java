@@ -22,7 +22,10 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.AlertStatus;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -109,7 +112,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                                       String pluginInstanceParams) {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALART_INSTANCE_CREATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
@@ -121,7 +124,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         alertPluginInstance.setWarningType(warningType);
 
         if (alertPluginInstanceMapper.existInstanceName(alertPluginInstance.getInstanceName()) == Boolean.TRUE) {
-            throw new ServiceException(Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
+            throw new ServiceException(PluginStatus.PLUGIN_INSTANCE_ALREADY_EXISTS);
         }
 
         int i = alertPluginInstanceMapper.insert(alertPluginInstance);
@@ -143,7 +146,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             }
             return alertPluginInstance;
         }
-        throw new ServiceException(Status.SAVE_ERROR);
+        throw new ServiceException(BaseStatus.SAVE_ERROR);
     }
 
     /**
@@ -159,7 +162,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                                           WarningType warningType, String pluginInstanceParams) {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_UPDATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         String paramsMapJson = parsePluginParamsMap(pluginInstanceParams);
@@ -173,7 +176,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                     alertPluginInstance.getInstanceName());
             return alertPluginInstance;
         }
-        throw new ServiceException(Status.SAVE_ERROR);
+        throw new ServiceException(BaseStatus.SAVE_ERROR);
     }
 
     /**
@@ -187,7 +190,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     @Transactional
     public void deleteById(User loginUser, int alertPluginInstanceId) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_PLUGIN_DELETE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         AlertPluginInstance alertPluginInstance = alertPluginInstanceMapper.selectById(alertPluginInstanceId);
@@ -207,7 +210,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             // check if there is an associated alert group
             boolean hasAssociatedAlertGroup = checkHasAssociatedAlertGroup(String.valueOf(alertPluginInstanceId));
             if (hasAssociatedAlertGroup) {
-                throw new ServiceException(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
+                throw new ServiceException(PluginStatus.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED);
             }
         }
 
@@ -225,7 +228,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     public AlertPluginInstance getById(User loginUser, int id) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         return alertPluginInstanceMapper.selectById(id);
     }
@@ -339,7 +342,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     public void testSend(int pluginDefineId, String pluginInstanceParams) {
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
-            throw new ServiceException(Status.ALERT_SERVER_NOT_EXIST);
+            throw new ServiceException(AlertStatus.ALERT_SERVER_NOT_EXIST);
         }
 
         Host alertServerAddress = alertServerAddressOptional.get();
@@ -356,11 +359,11 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             log.info("Send alert to: {} successfully, response: {}", alertServerAddress, alertSendResponse);
         } catch (Exception e) {
             log.error("Send alert: {} to: {} failed", alertTestSendRequest, alertServerAddress, e);
-            throw new ServiceException(Status.ALERT_TEST_SENDING_FAILED, e.getMessage());
+            throw new ServiceException(AlertStatus.ALERT_TEST_SENDING_FAILED, e.getMessage());
         }
 
         if (alertSendResponse.isSuccess()) {
-            throw new ServiceException(Status.ALERT_TEST_SENDING_FAILED,
+            throw new ServiceException(AlertStatus.ALERT_TEST_SENDING_FAILED,
                     alertSendResponse.getResResults().get(0).getMessage());
         }
     }

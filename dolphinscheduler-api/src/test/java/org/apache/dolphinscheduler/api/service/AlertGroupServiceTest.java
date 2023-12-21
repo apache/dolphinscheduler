@@ -27,7 +27,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.GroupStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -124,7 +125,7 @@ public class AlertGroupServiceTest {
         user.setId(0);
         // no operate
         user.setUserType(UserType.GENERAL_USER);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> alertGroupService.createAlertGroup(user, groupName, groupName, null));
 
         user.setUserType(UserType.ADMIN_USER);
@@ -149,7 +150,7 @@ public class AlertGroupServiceTest {
                 ALERT_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, null, user.getId(),
                 baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.ALERT_GROUP_EXIST,
+        assertThrowsServiceException(GroupStatus.ALERT_GROUP_EXIST,
                 () -> alertGroupService.createAlertGroup(user, groupName, groupName, null));
     }
 
@@ -160,7 +161,7 @@ public class AlertGroupServiceTest {
         user.setId(0);
         // no operate
         user.setUserType(UserType.GENERAL_USER);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> alertGroupService.updateAlertGroupById(user, 1, groupName, groupName, null));
         user.setUserType(UserType.ADMIN_USER);
         // not exist
@@ -169,7 +170,7 @@ public class AlertGroupServiceTest {
                 ALERT_GROUP_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{1}, 0,
                 baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.ALERT_GROUP_NOT_EXIST,
+        assertThrowsServiceException(GroupStatus.ALERT_GROUP_NOT_EXIST,
                 () -> alertGroupService.updateAlertGroupById(user, 1, groupName, groupName, null));
         // success
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{3},
@@ -190,7 +191,7 @@ public class AlertGroupServiceTest {
         when(alertGroupMapper.selectById(3)).thenReturn(getEntity());
         when(alertGroupMapper.updateById(Mockito.any()))
                 .thenThrow(new DuplicateKeyException("group name exist"));
-        assertThrowsServiceException(Status.ALERT_GROUP_EXIST,
+        assertThrowsServiceException(GroupStatus.ALERT_GROUP_EXIST,
                 () -> alertGroupService.updateAlertGroupById(user, 3, groupName, groupName, null));
     }
 
@@ -202,7 +203,7 @@ public class AlertGroupServiceTest {
         AlertGroup globalAlertGroup = new AlertGroup();
         globalAlertGroup.setId(2);
         globalAlertGroup.setGroupName("global alert group");
-        assertThrowsServiceException(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP,
+        assertThrowsServiceException(GroupStatus.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP,
                 () -> alertGroupService.updateAlertGroupById(user, 2, groupName, groupName, null));
     }
 
@@ -214,7 +215,7 @@ public class AlertGroupServiceTest {
         user.setUserType(UserType.GENERAL_USER);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(),
                 ALERT_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> alertGroupService.deleteAlertGroupById(user, 1));
 
         // not exist
@@ -224,18 +225,18 @@ public class AlertGroupServiceTest {
                 user.getId(), ALERT_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP,
                 new Object[]{3}, 0, baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.ALERT_GROUP_NOT_EXIST,
+        assertThrowsServiceException(GroupStatus.ALERT_GROUP_NOT_EXIST,
                 () -> alertGroupService.deleteAlertGroupById(user, 3));
 
         // not allowed1
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{1}, 0,
                 baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP,
+        assertThrowsServiceException(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP,
                 () -> alertGroupService.deleteAlertGroupById(user, 1));
         // not allowed2
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP,
                 new Object[]{2}, 0, baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP,
+        assertThrowsServiceException(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP,
                 () -> alertGroupService.deleteAlertGroupById(user, 2));
         // success
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{4}, 0,

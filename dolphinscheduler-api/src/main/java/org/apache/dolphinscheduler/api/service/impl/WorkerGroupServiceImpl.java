@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKER_GROUP_DELETE;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
+import org.apache.dolphinscheduler.api.enums.v2.WorkerGroupStatus;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -114,12 +116,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                                                String otherParamsJson) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
         if (StringUtils.isEmpty(name)) {
             log.warn("Parameter name can ot be null.");
-            putMsg(result, Status.NAME_NULL);
+            putMsg(result, BaseStatus.NAME_NULL);
             return result;
         }
         Date now = new Date();
@@ -144,19 +146,19 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
         if (checkWorkerGroupNameExists(workerGroup)) {
             log.warn("Worker group with the same name already exists, name:{}.", workerGroup.getName());
-            putMsg(result, Status.NAME_EXIST, workerGroup.getName());
+            putMsg(result, BaseStatus.NAME_EXIST, workerGroup.getName());
             return result;
         }
         String invalidAddr = checkWorkerGroupAddrList(workerGroup);
         if (invalidAddr != null) {
             log.warn("Worker group address is invalid, invalidAddr:{}.", invalidAddr);
-            putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
+            putMsg(result, WorkerGroupStatus.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
 
         handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
         log.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -208,7 +210,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             List<String> taskNames = taskDefinitions.stream().limit(3).map(taskDefinition -> taskDefinition.getName())
                     .collect(Collectors.toList());
 
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS, taskDefinitions.size(),
+            putMsg(result, WorkerGroupStatus.WORKER_GROUP_DEPENDENT_TASK_EXISTS, taskDefinitions.size(),
                     JSONUtils.toJsonString(taskNames));
             return true;
         }
@@ -222,7 +224,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     .map(schedule -> processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode()).getName())
                     .collect(Collectors.toList());
 
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
+            putMsg(result, WorkerGroupStatus.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
                     JSONUtils.toJsonString(processNames));
             return true;
         }
@@ -233,7 +235,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                         .lambda().eq(EnvironmentWorkerGroupRelation::getWorkerGroup, workerGroup.getName()));
 
         if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelations)) {
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS, environmentWorkerGroupRelations.size());
+            putMsg(result, WorkerGroupStatus.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS,
+                    environmentWorkerGroupRelations.size());
             return true;
         }
 
@@ -313,7 +316,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         pageInfo.setTotalList(resultDataList);
 
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -338,7 +341,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
         result.put(Constants.DATA_LIST, availableWorkerGroupList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -383,13 +386,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
         Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            putMsg(result, UserStatus.USER_NO_OPERATION_PERM);
             return result;
         }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);
         if (workerGroup == null) {
             log.error("Worker group does not exist, workerGroupId:{}.", id);
-            putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
+            putMsg(result, WorkerGroupStatus.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
         List<ProcessInstance> processInstances = processInstanceMapper
@@ -401,7 +404,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             log.warn(
                     "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
+            putMsg(result, WorkerGroupStatus.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
 
@@ -412,7 +415,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         workerGroupMapper.deleteById(id);
 
         log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -426,7 +429,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         Map<String, Object> result = new HashMap<>();
         Set<String> serverNodeList = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
         result.put(Constants.DATA_LIST, serverNodeList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 

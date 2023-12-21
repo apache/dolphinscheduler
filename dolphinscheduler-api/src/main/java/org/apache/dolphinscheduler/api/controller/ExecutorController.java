@@ -17,15 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
-
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -129,7 +123,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(START_PROCESS_INSTANCE_ERROR)
     public Result startProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
@@ -226,7 +219,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(START_PROCESS_INSTANCE_ERROR)
     public Result batchStartProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
@@ -281,7 +273,7 @@ public class ExecutorController extends BaseController {
                     testFlag,
                     complementDependentMode, null, allLevelDependent, executionOrder);
 
-            if (!Status.SUCCESS.equals(result.get(Constants.STATUS))) {
+            if (!BaseStatus.SUCCESS.equals(result.get(Constants.STATUS))) {
                 log.error("Process definition start failed, projectCode:{}, processDefinitionCode:{}.", projectCode,
                         processDefinitionCode);
                 startFailedProcessDefinitionCodeList.add(String.valueOf(processDefinitionCode));
@@ -292,7 +284,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR,
+            putMsg(result, ProcessStatus.BATCH_START_PROCESS_INSTANCE_ERROR,
                     String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
@@ -315,7 +307,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
@@ -341,7 +332,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
@@ -356,7 +346,7 @@ public class ExecutorController extends BaseController {
                 try {
                     Map<String, Object> singleResult =
                             execService.execute(loginUser, projectCode, processInstanceId, executeType);
-                    if (!Status.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
+                    if (!BaseStatus.SUCCESS.equals(singleResult.get(Constants.STATUS))) {
                         log.error("Start to execute process instance error, projectCode:{}, processInstanceId:{}.",
                                 projectCode, processInstanceId);
                         executeFailedIdList.add((String) singleResult.get(Constants.MSG));
@@ -365,14 +355,15 @@ public class ExecutorController extends BaseController {
                                 projectCode, processInstanceId);
                 } catch (Exception e) {
                     executeFailedIdList
-                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(ProcessStatus.PROCESS_INSTANCE_ERROR.getMsg(),
+                                    strProcessInstanceId));
                 }
             }
         }
         if (!executeFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
+            putMsg(result, ProcessStatus.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR, String.join("\n", executeFailedIdList));
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return returnDataList(result);
     }
@@ -389,7 +380,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "/start-check")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(CHECK_PROCESS_DEFINITION_ERROR)
     public Result startCheckProcessDefinition(@RequestParam(value = "processDefinitionCode") long processDefinitionCode) {
         Map<String, Object> result = execService.startCheckByProcessDefinedCode(processDefinitionCode);
         return returnDataList(result);
@@ -404,7 +394,6 @@ public class ExecutorController extends BaseController {
     })
     @GetMapping(value = "/query-executing-workflow")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_EXECUTING_WORKFLOW_ERROR)
     public Result queryExecutingWorkflow(@RequestParam("id") Integer processInstanceId) {
         WorkflowExecuteDto workflowExecuteDto =
                 execService.queryExecutingWorkflowByProcessInstanceId(processInstanceId);
@@ -437,7 +426,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(START_PROCESS_INSTANCE_ERROR)
     public Result<Boolean> startStreamTaskInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                    @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
@@ -479,7 +467,6 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "/execute-task")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
     public Result executeTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                               @RequestParam("processInstanceId") Integer processInstanceId,

@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.security.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.security.AuthenticationType;
 import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.api.security.SecurityConfig;
@@ -72,12 +73,12 @@ public abstract class AbstractAuthenticator implements Authenticator {
         if (user == null) {
             if (Objects.equals(securityConfig.getType(), AuthenticationType.CASDOOR_SSO.name())) {
                 log.error("State or code entered incorrectly.");
-                result.setCode(Status.STATE_CODE_ERROR.getCode());
-                result.setMsg(Status.STATE_CODE_ERROR.getMsg());
+                result.setCode(BaseStatus.STATE_CODE_ERROR.getCode());
+                result.setMsg(BaseStatus.STATE_CODE_ERROR.getMsg());
             } else {
                 log.error("Username or password entered incorrectly.");
-                result.setCode(Status.USER_NAME_PASSWD_ERROR.getCode());
-                result.setMsg(Status.USER_NAME_PASSWD_ERROR.getMsg());
+                result.setCode(UserStatus.USER_NAME_PASSWD_ERROR.getCode());
+                result.setMsg(UserStatus.USER_NAME_PASSWD_ERROR.getMsg());
             }
             return result;
         }
@@ -85,16 +86,16 @@ public abstract class AbstractAuthenticator implements Authenticator {
         // check user state
         if (user.getState() == Flag.NO.ordinal()) {
             log.error("The current user is deactivated, userName:{}.", user.getUserName());
-            result.setCode(Status.USER_DISABLED.getCode());
-            result.setMsg(Status.USER_DISABLED.getMsg());
+            result.setCode(UserStatus.USER_DISABLED.getCode());
+            result.setMsg(UserStatus.USER_DISABLED.getMsg());
             return result;
         }
 
         // create session
         Session session = sessionService.createSessionIfAbsent(user);
         if (session == null) {
-            result.setCode(Status.LOGIN_SESSION_FAILED.getCode());
-            result.setMsg(Status.LOGIN_SESSION_FAILED.getMsg());
+            result.setCode(UserStatus.LOGIN_SESSION_FAILED.getCode());
+            result.setMsg(UserStatus.LOGIN_SESSION_FAILED.getMsg());
             return result;
         }
 
@@ -105,8 +106,8 @@ public abstract class AbstractAuthenticator implements Authenticator {
         data.put(Constants.SECURITY_CONFIG_TYPE, securityConfig.getType());
 
         result.setData(data);
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.LOGIN_SUCCESS.getMsg());
+        result.setCode(BaseStatus.SUCCESS.getCode());
+        result.setMsg(UserStatus.LOGIN_SUCCESS.getMsg());
         return result;
     }
 

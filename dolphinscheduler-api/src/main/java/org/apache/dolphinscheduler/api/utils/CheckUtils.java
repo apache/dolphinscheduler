@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.utils;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER_PASSWORD_MAX_LENGTH;
 import static org.apache.dolphinscheduler.common.constants.Constants.USER_PASSWORD_MIN_LENGTH;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -82,11 +82,11 @@ public class CheckUtils {
     public static Map<String, Object> checkDesc(String desc) {
         Map<String, Object> result = new HashMap<>();
         if (!StringUtils.isEmpty(desc) && desc.length() > 200) {
-            result.put(Constants.STATUS, Status.REQUEST_PARAMS_NOT_VALID_ERROR);
+            result.put(Constants.STATUS, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR);
             result.put(Constants.MSG,
-                    MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
+                    MessageFormat.format(BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), "desc length"));
         } else {
-            result.put(Constants.STATUS, Status.SUCCESS);
+            result.put(Constants.STATUS, BaseStatus.SUCCESS);
         }
         return result;
     }

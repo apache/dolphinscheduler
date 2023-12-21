@@ -17,15 +17,10 @@
 
 package org.apache.dolphinscheduler.api.controller.v2;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR;
-
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationDeleteRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -73,7 +68,6 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     @Operation(summary = "create", description = "CREATE_PROCESS_TASK_RELATION_NOTES")
     @PostMapping(consumes = {"application/json"})
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROCESS_TASK_RELATION_ERROR)
     public Result<ProcessTaskRelation> createTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                           @RequestBody TaskRelationCreateRequest TaskRelationCreateRequest) {
         ProcessTaskRelation processTaskRelation =
@@ -94,7 +88,6 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     })
     @DeleteMapping(value = "/{code-pair}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_PROCESS_RELATION_ERROR)
     public Result deleteTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable("code-pair") String codePair) {
         TaskRelationDeleteRequest taskRelationDeleteRequest = new TaskRelationDeleteRequest(codePair);
@@ -117,7 +110,6 @@ public class ProcessTaskRelationV2Controller extends BaseController {
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_UPSTREAM_TASK_PROCESS_RELATION_ERROR)
     public Result<List<ProcessTaskRelation>> updateUpstreamTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                           @PathVariable("code") Long code,
                                                                           @RequestBody TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest) {

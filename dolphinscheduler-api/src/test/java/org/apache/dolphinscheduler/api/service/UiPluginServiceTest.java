@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.PluginStatus;
 import org.apache.dolphinscheduler.api.service.impl.UiPluginServiceImpl;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
@@ -58,30 +59,30 @@ public class UiPluginServiceTest {
     @Test
     public void testQueryPlugins1() {
         Map<String, Object> result = uiPluginService.queryUiPluginsByType(PluginType.REGISTER);
-        Assertions.assertEquals(Status.PLUGIN_NOT_A_UI_COMPONENT, result.get("status"));
+        Assertions.assertEquals(PluginStatus.PLUGIN_NOT_A_UI_COMPONENT, result.get("status"));
     }
 
     @Test
     public void testQueryPlugins2() {
         Map<String, Object> result = uiPluginService.queryUiPluginsByType(PluginType.ALERT);
         Mockito.when(pluginDefineMapper.queryByPluginType(PluginType.ALERT.getDesc())).thenReturn(null);
-        Assertions.assertEquals(Status.QUERY_PLUGINS_RESULT_IS_NULL, result.get("status"));
+        Assertions.assertEquals(PluginStatus.QUERY_PLUGINS_RESULT_IS_NULL, result.get("status"));
 
         Mockito.when(pluginDefineMapper.queryByPluginType(PluginType.ALERT.getDesc()))
                 .thenReturn(Collections.singletonList(pluginDefine));
         result = uiPluginService.queryUiPluginsByType(PluginType.ALERT);
-        Assertions.assertEquals(Status.SUCCESS, result.get("status"));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get("status"));
     }
 
     @Test
     public void testQueryPluginDetailById() {
         Mockito.when(pluginDefineMapper.queryDetailById(1)).thenReturn(null);
         Map<String, Object> result = uiPluginService.queryUiPluginDetailById(1);
-        Assertions.assertEquals(Status.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL, result.get("status"));
+        Assertions.assertEquals(PluginStatus.QUERY_PLUGIN_DETAIL_RESULT_IS_NULL, result.get("status"));
 
         Mockito.when(pluginDefineMapper.queryDetailById(1)).thenReturn(pluginDefine);
         result = uiPluginService.queryUiPluginDetailById(1);
-        Assertions.assertEquals(Status.SUCCESS, result.get("status"));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get("status"));
     }
 
 }

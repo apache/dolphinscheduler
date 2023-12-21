@@ -17,12 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_WORKER_GROUP_FAIL;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_ADDRESS_LIST_FAIL;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
-import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
-
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -79,7 +73,6 @@ public class WorkerGroupController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(SAVE_ERROR)
     public Result saveWorkerGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
@@ -108,7 +101,6 @@ public class WorkerGroupController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKER_GROUP_FAIL)
     public Result queryAllWorkerGroupsPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @RequestParam("pageNo") Integer pageNo,
                                              @RequestParam("pageSize") Integer pageSize,
@@ -127,7 +119,6 @@ public class WorkerGroupController extends BaseController {
     @Operation(summary = "queryAllWorkerGroups", description = "QUERY_WORKER_GROUP_LIST_NOTES")
     @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKER_GROUP_FAIL)
     public Result queryAllWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = workerGroupService.queryAllGroup(loginUser);
         return returnDataList(result);
@@ -146,7 +137,6 @@ public class WorkerGroupController extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_WORKER_GROUP_FAIL)
     public Result deleteWorkerGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable("id") Integer id) {
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
@@ -162,7 +152,6 @@ public class WorkerGroupController extends BaseController {
     @Operation(summary = "queryWorkerAddressList", description = "QUERY_WORKER_ADDRESS_LIST_NOTES")
     @GetMapping(value = "/worker-address-list")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKER_ADDRESS_LIST_FAIL)
     public Result queryWorkerAddressList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         Map<String, Object> result = workerGroupService.getWorkerAddressList();
         return returnDataList(result);

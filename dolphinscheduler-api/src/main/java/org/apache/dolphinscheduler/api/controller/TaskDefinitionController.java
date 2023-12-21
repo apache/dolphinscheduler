@@ -17,19 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_DEFINE_BY_CODE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_VERSIONS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_TASK_DEFINITION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
-
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -87,7 +75,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_TASK_DEFINITION_ERROR)
     public Result createTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson) {
@@ -115,7 +102,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @PostMapping("/save-single")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_TASK_DEFINITION_ERROR)
     public Result createTaskBindsWorkFlow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
@@ -143,7 +129,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_TASK_DEFINITION_ERROR)
     public Result updateTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @PathVariable(value = "code") long code,
@@ -172,7 +157,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @PutMapping(value = "/{code}/with-upstream")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_TASK_DEFINITION_ERROR)
     public Result updateTaskWithUpstream(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @PathVariable(value = "code") long code,
@@ -202,7 +186,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_DEFINITION_VERSIONS_ERROR)
     public Result queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable(value = "code") long code,
@@ -228,7 +211,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(SWITCH_TASK_DEFINITION_VERSION_ERROR)
     public Result switchTaskDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable(value = "code") long code,
@@ -253,7 +235,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_DEFINITION_VERSION_ERROR)
     public Result deleteTaskDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable(value = "code") long code,
@@ -277,12 +258,11 @@ public class TaskDefinitionController extends BaseController {
     })
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_DEFINE_BY_CODE_ERROR)
     public Result deleteTaskDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @PathVariable(value = "code") long code) {
         taskDefinitionService.deleteTaskDefinitionByCode(loginUser, code);
-        return new Result(Status.SUCCESS);
+        return new Result(BaseStatus.SUCCESS);
     }
 
     /**
@@ -299,7 +279,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DETAIL_OF_TASK_DEFINITION_ERROR)
     public Result queryTaskDefinitionDetail(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @PathVariable(value = "code") long code) {
@@ -332,7 +311,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_DEFINITION_LIST_PAGING_ERROR)
     public Result queryTaskDefinitionListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                 @RequestParam(value = "searchTaskName", required = false) String searchTaskName,
@@ -359,7 +337,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @GetMapping(value = "/gen-task-codes")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     public Result genTaskCodeList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("genNum") Integer genNum) {
         Map<String, Object> result = taskDefinitionService.genTaskCodeList(genNum);
@@ -383,7 +360,6 @@ public class TaskDefinitionController extends BaseController {
     })
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(RELEASE_TASK_DEFINITION_ERROR)
     public Result releaseTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "code", required = true) long code,

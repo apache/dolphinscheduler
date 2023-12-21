@@ -17,13 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_TASK_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DATA_IS_NOT_VALID;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_EDGE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_PROCESS_RELATION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_PROCESS_RELATION_ERROR;
-
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ProcessTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -80,7 +74,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROCESS_TASK_RELATION_ERROR)
     public Result createProcessTaskRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
@@ -88,9 +81,9 @@ public class ProcessTaskRelationController extends BaseController {
                                             @RequestParam(name = "postTaskCode", required = true) long postTaskCode) {
         Map<String, Object> result = new HashMap<>();
         if (postTaskCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "postTaskCode");
+            putMsg(result, BaseStatus.DATA_IS_NOT_VALID, "postTaskCode");
         } else if (processDefinitionCode == 0L) {
-            putMsg(result, DATA_IS_NOT_VALID, "processDefinitionCode");
+            putMsg(result, BaseStatus.DATA_IS_NOT_VALID, "processDefinitionCode");
         } else {
             result = processTaskRelationService.createProcessTaskRelation(loginUser, projectCode, processDefinitionCode,
                     preTaskCode, postTaskCode);
@@ -115,7 +108,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @DeleteMapping(value = "/{taskCode}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_PROCESS_RELATION_ERROR)
     public Result deleteTaskProcessRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(name = "processDefinitionCode", required = true) long processDefinitionCode,
@@ -141,7 +133,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @DeleteMapping(value = "/{taskCode}/upstream")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_PROCESS_RELATION_ERROR)
     public Result deleteUpstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @RequestParam(name = "preTaskCodes", required = true) String preTaskCodes,
@@ -167,7 +158,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @DeleteMapping(value = "/{taskCode}/downstream")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_PROCESS_RELATION_ERROR)
     public Result deleteDownstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @RequestParam(name = "postTaskCodes", required = true) String postTaskCodes,
@@ -191,7 +181,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @GetMapping(value = "/{taskCode}/upstream")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
     public Result queryUpstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable("taskCode") long taskCode) {
@@ -213,7 +202,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @GetMapping(value = "/{taskCode}/downstream")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_PROCESS_RELATION_ERROR)
     public Result queryDownstreamRelation(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @PathVariable("taskCode") long taskCode) {
@@ -239,7 +227,6 @@ public class ProcessTaskRelationController extends BaseController {
     })
     @DeleteMapping(value = "/{processDefinitionCode}/{preTaskCode}/{postTaskCode}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_EDGE_ERROR)
     public Result deleteEdge(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                              @PathVariable long processDefinitionCode,

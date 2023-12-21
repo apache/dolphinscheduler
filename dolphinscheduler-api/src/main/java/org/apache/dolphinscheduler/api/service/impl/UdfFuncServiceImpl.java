@@ -18,7 +18,10 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ResourceStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UDFStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -95,19 +98,19 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_CREATE);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         if (checkDescriptionLength(desc)) {
             log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            putMsg(result, BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
 
         // verify udf func name exist
         if (checkUdfFuncNameExists(funcName)) {
             log.warn("Udf function with the same name already exists.");
-            putMsg(result, Status.UDF_FUNCTION_EXISTS);
+            putMsg(result, UDFStatus.UDF_FUNCTION_EXISTS);
             return result;
         }
 
@@ -120,7 +123,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         if (!existResource) {
             log.error("resource full name {} is not exist", fullName);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
 
@@ -147,7 +150,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         udfFuncMapper.insert(udf);
         log.info("UDF function create complete, udfFuncName:{}.", udf.getFuncName());
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -173,17 +176,17 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.UDF,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         UdfFunc udfFunc = udfFuncMapper.selectById(id);
         if (udfFunc == null) {
             log.error("Resource does not exist, udf func id:{}.", id);
-            putMsg(result, Status.RESOURCE_NOT_EXIST);
+            putMsg(result, ResourceStatus.RESOURCE_NOT_EXIST);
             return result;
         }
         result.setData(udfFunc);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -215,12 +218,12 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{udfFuncId},
                 AuthorizationType.UDF, ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         if (checkDescriptionLength(desc)) {
             log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            putMsg(result, BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         // verify udfFunc is exist
@@ -228,8 +231,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         if (udf == null) {
             log.error("UDF function does not exist, udfFuncId:{}.", udfFuncId);
-            result.setCode(Status.UDF_FUNCTION_NOT_EXIST.getCode());
-            result.setMsg(Status.UDF_FUNCTION_NOT_EXIST.getMsg());
+            result.setCode(UDFStatus.UDF_FUNCTION_NOT_EXIST.getCode());
+            result.setMsg(UDFStatus.UDF_FUNCTION_NOT_EXIST.getMsg());
             return result;
         }
 
@@ -237,8 +240,8 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         if (!funcName.equals(udf.getFuncName())) {
             if (checkUdfFuncNameExists(funcName)) {
                 log.warn("Udf function exists, can not create again, udfFuncName:{}.", funcName);
-                result.setCode(Status.UDF_FUNCTION_EXISTS.getCode());
-                result.setMsg(Status.UDF_FUNCTION_EXISTS.getMsg());
+                result.setCode(UDFStatus.UDF_FUNCTION_EXISTS.getCode());
+                result.setMsg(UDFStatus.UDF_FUNCTION_EXISTS.getMsg());
                 return result;
             }
         }
@@ -248,15 +251,15 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             doesResExist = storageOperate.exists(fullName);
         } catch (Exception e) {
             log.error("udf resource :{} checking error", fullName, e);
-            result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
-            result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
+            result.setCode(ResourceStatus.RESOURCE_NOT_EXIST.getCode());
+            result.setMsg(ResourceStatus.RESOURCE_NOT_EXIST.getMsg());
             return result;
         }
 
         if (!doesResExist) {
             log.error("resource full name {} is not exist", fullName);
-            result.setCode(Status.RESOURCE_NOT_EXIST.getCode());
-            result.setMsg(Status.RESOURCE_NOT_EXIST.getMsg());
+            result.setCode(ResourceStatus.RESOURCE_NOT_EXIST.getCode());
+            result.setMsg(ResourceStatus.RESOURCE_NOT_EXIST.getMsg());
             return result;
         }
 
@@ -277,7 +280,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         udfFuncMapper.updateById(udf);
         log.info("UDF function update complete, udfFuncId:{}, udfFuncName:{}.", udfFuncId, funcName);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -296,7 +299,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -304,7 +307,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         pageInfo.setTotal((int) udfFuncList.getTotal());
         pageInfo.setTotalList(udfFuncList.getRecords());
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -341,20 +344,20 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         Set<Integer> udfFuncIds = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.UDF,
                 loginUser.getId(), log);
         if (udfFuncIds.isEmpty()) {
             result.setData(Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
             return result;
         }
         List<UdfFunc> udfFuncList = udfFuncMapper.getUdfFuncByType(new ArrayList<>(udfFuncIds), type);
 
         result.setData(udfFuncList);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -372,13 +375,13 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.UDF,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_DELETE);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         udfFuncMapper.deleteById(id);
         udfUserMapper.deleteByUdfFuncId(id);
         log.info("UDF function delete complete, udfFuncId:{}.", id);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -394,15 +397,15 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.UDF,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_VIEW);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
         if (checkUdfFuncNameExists(name)) {
             log.warn("Udf function with the same already exists.");
-            putMsg(result, Status.UDF_FUNCTION_EXISTS);
+            putMsg(result, UDFStatus.UDF_FUNCTION_EXISTS);
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return result;
     }

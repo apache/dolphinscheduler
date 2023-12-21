@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskGroupServiceImpl;
@@ -144,7 +146,7 @@ public class TaskGroupServiceTest {
                 loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START, serviceLogger))
                 .thenReturn(false);
         Map<String, Object> objectMap = taskGroupService.forceStartTask(loginUser, 1);
-        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, objectMap.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.NO_CURRENT_OPERATING_PERMISSION, objectMap.get(Constants.STATUS));
     }
 
     @Test
@@ -154,7 +156,7 @@ public class TaskGroupServiceTest {
                 loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY, serviceLogger))
                 .thenReturn(false);
         Map<String, Object> objectMap = taskGroupService.modifyPriority(loginUser, 1, 1);
-        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, objectMap.get(Constants.STATUS));
+        Assertions.assertEquals(UserStatus.NO_CURRENT_OPERATING_PERMISSION, objectMap.get(Constants.STATUS));
     }
 
     @Test
@@ -216,7 +218,7 @@ public class TaskGroupServiceTest {
         Mockito.when(projectMapper.queryByCode(taskGroup.getProjectCode())).thenReturn(getProject());
         Map<String, Object> result = taskGroupService.updateTaskGroup(loginUser, 1, "newName", "desc", 100);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         taskGroup.setStatus(0);
     }
@@ -234,16 +236,16 @@ public class TaskGroupServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TASK_GROUP, null,
                 0, serviceLogger)).thenReturn(true);
         Map<String, Object> result = taskGroupService.closeTaskGroup(loginUser, 1);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
 
         taskGroup.setStatus(0);
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         result = taskGroupService.closeTaskGroup(loginUser, 1);
-        Assertions.assertEquals(Status.TASK_GROUP_STATUS_CLOSED, result.get(Constants.STATUS));
+        Assertions.assertEquals(TaskStatus.TASK_GROUP_STATUS_CLOSED, result.get(Constants.STATUS));
 
         taskGroup.setStatus(1);
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         result = taskGroupService.startTaskGroup(loginUser, 1);
-        Assertions.assertEquals(Status.TASK_GROUP_STATUS_OPENED, result.get(Constants.STATUS));
+        Assertions.assertEquals(TaskStatus.TASK_GROUP_STATUS_OPENED, result.get(Constants.STATUS));
     }
 }

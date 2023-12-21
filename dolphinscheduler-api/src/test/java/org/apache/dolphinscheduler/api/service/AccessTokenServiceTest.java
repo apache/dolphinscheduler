@@ -28,7 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AccessTokenServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -137,11 +138,11 @@ public class AccessTokenServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 baseServiceLogger)).thenReturn(true);
         // not exist
-        assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
+        assertThrowsServiceException(BaseStatus.ACCESS_TOKEN_NOT_EXIST,
                 () -> accessTokenService.deleteAccessTokenById(userLogin, 0));
         // no operate
         userLogin.setId(2);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+        assertThrowsServiceException(UserStatus.USER_NO_OPERATION_PERM,
                 () -> accessTokenService.deleteAccessTokenById(userLogin, 1));
         // success
         userLogin.setId(1);
@@ -174,7 +175,7 @@ public class AccessTokenServiceTest {
         // ACCESS_TOKEN_NOT_EXIST
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
+        assertThrowsServiceException(BaseStatus.ACCESS_TOKEN_NOT_EXIST,
                 () -> accessTokenService.updateToken(getLoginUser(), 2, Integer.MAX_VALUE, getDate(), "token"));
     }
 

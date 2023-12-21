@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -90,11 +91,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
         if (taskInstance == null) {
             log.error("Task instance does not exist, taskInstanceId:{}.", taskInstId);
-            return Result.error(Status.TASK_INSTANCE_NOT_FOUND);
+            return Result.error(TaskStatus.TASK_INSTANCE_NOT_FOUND);
         }
         if (StringUtils.isBlank(taskInstance.getHost())) {
             log.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
-            return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
+            return Result.error(TaskStatus.TASK_INSTANCE_HOST_IS_NULL);
         }
         projectService.checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
         Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
@@ -140,12 +141,12 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         // check whether the task instance can be found
         TaskInstance task = taskInstanceDao.queryById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND);
+            throw new ServiceException(TaskStatus.TASK_INSTANCE_NOT_FOUND);
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
+            throw new ServiceException(TaskStatus.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
         return queryLog(task, skipLineNum, limit);
     }
@@ -213,7 +214,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             }
             return sb.toString();
         } catch (Throwable ex) {
-            throw new ServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR, ex);
+            throw new ServiceException(TaskStatus.QUERY_TASK_INSTANCE_LOG_ERROR, ex);
         }
     }
 
@@ -244,7 +245,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             return Bytes.concat(head, logBytes);
         } catch (Exception ex) {
             log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
-            throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
+            throw new ServiceException(TaskStatus.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
         }
 
     }

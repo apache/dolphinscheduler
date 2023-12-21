@@ -18,7 +18,10 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
@@ -96,23 +99,23 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            putMsg(result, BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         if (name == null) {
             log.warn("Parameter name can ot be null.");
-            putMsg(result, Status.NAME_NULL);
+            putMsg(result, BaseStatus.NAME_NULL);
             return result;
         }
         if (groupSize <= 0) {
             log.warn("Parameter task group size is must bigger than 1.");
-            putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
+            putMsg(result, TaskStatus.TASK_GROUP_SIZE_ERROR);
             return result;
         }
         TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
         if (taskGroup1 != null) {
             log.warn("Task group with the same name already exists, taskGroupName:{}.", taskGroup1.getName());
-            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
+            putMsg(result, TaskStatus.TASK_GROUP_NAME_EXSIT);
             return result;
         }
         Date now = new Date();
@@ -129,10 +132,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
         if (taskGroupMapper.insert(taskGroup) > 0) {
             log.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Create task group error, taskGroupName:{}.", taskGroup.getName());
-            putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
+            putMsg(result, TaskStatus.CREATE_TASK_GROUP_ERROR);
             return result;
         }
 
@@ -157,17 +160,17 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         }
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
+            putMsg(result, BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
         if (name == null) {
             log.warn("Parameter name can ot be null.");
-            putMsg(result, Status.NAME_NULL);
+            putMsg(result, BaseStatus.NAME_NULL);
             return result;
         }
         if (groupSize <= 0) {
             log.warn("Parameter task group size is must bigger than 1.");
-            putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
+            putMsg(result, TaskStatus.TASK_GROUP_SIZE_ERROR);
             return result;
         }
         Long exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda()
@@ -177,12 +180,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
         if (exists > 0) {
             log.error("Task group with the same name already exists.");
-            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
+            putMsg(result, TaskStatus.TASK_GROUP_NAME_EXSIT);
             return result;
         }
         if (taskGroup.getStatus() != Flag.YES.getCode()) {
             log.warn("Task group has been closed, taskGroupId:{}.", id);
-            putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
+            putMsg(result, TaskStatus.TASK_GROUP_STATUS_ERROR);
             return result;
         }
         taskGroup.setGroupSize(groupSize);
@@ -194,10 +197,10 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         int i = taskGroupMapper.updateById(taskGroup);
         if (i > 0) {
             log.info("Update task group complete, taskGroupId:{}.", id);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Update task group error, taskGroupId:{}.", id);
-            putMsg(result, Status.UPDATE_TASK_GROUP_ERROR);
+            putMsg(result, TaskStatus.UPDATE_TASK_GROUP_ERROR);
         }
         return result;
     }
@@ -272,7 +275,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         pageInfo.setTotalList(list);
 
         result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -288,7 +291,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Map<String, Object> result = new HashMap<>();
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         result.put(Constants.DATA_LIST, taskGroup);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -327,13 +330,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
                 ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.NO.getCode()) {
             log.info("Task group has been closed, taskGroupId:{}.", id);
-            putMsg(result, Status.TASK_GROUP_STATUS_CLOSED);
+            putMsg(result, TaskStatus.TASK_GROUP_STATUS_CLOSED);
             return result;
         }
         taskGroup.setStatus(Flag.NO.getCode());
@@ -342,7 +345,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             log.info("Task group close complete, taskGroupId:{}.", id);
         else
             log.error("Task group close error, taskGroupId:{}.", id);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -360,13 +363,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
                 ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.YES.getCode()) {
             log.info("Task group has been started, taskGroupId:{}.", id);
-            putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
+            putMsg(result, TaskStatus.TASK_GROUP_STATUS_OPENED);
             return result;
         }
         taskGroup.setStatus(Flag.YES.getCode());
@@ -376,7 +379,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             log.info("Task group start complete, taskGroupId:{}.", id);
         else
             log.error("Task group start error, taskGroupId:{}.", id);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -393,7 +396,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
                 ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         return executorService.forceStartTaskInstance(loginUser, queueId);
@@ -406,12 +409,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
                 ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY);
         if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            putMsg(result, UserStatus.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
         taskGroupQueueService.modifyPriority(queueId, priority);
         log.info("Modify task group queue priority complete, queueId:{}, priority:{}.", queueId, priority);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -433,7 +436,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
             log.warn("Project does not exist");
-            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+            putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, "");
         }
 
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
@@ -448,13 +451,13 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (projectUser == null) {
             log.warn("User {} does not have operation permission for project {}", loginUser.getUserName(),
                     project.getCode());
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+            putMsg(result, UserStatus.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
             return false;
         }
         if (writePermission && projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
             log.warn("User {} does not have write permission for project {}", loginUser.getUserName(),
                     project.getCode());
-            putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+            putMsg(result, UserStatus.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
             return false;
         }
 

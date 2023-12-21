@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.impl.ProjectPreferenceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -68,7 +68,7 @@ public class ProjectPreferenceServiceTest {
         Mockito.when(projectPreferenceMapper.insert(Mockito.any())).thenReturn(1);
 
         Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
     }
 
     @Test
@@ -82,12 +82,12 @@ public class ProjectPreferenceServiceTest {
 
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
         Result result = projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
 
         // SUCCESS
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(getProjectPreference());
         result = projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class ProjectPreferenceServiceTest {
 
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(getProjectPreference());
         Result result = projectPreferenceService.enableProjectPreference(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), result.getCode());
 
     }
 

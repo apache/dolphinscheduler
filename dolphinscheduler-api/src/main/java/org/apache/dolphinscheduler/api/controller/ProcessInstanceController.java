@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -102,7 +100,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     public Result queryProcessInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
@@ -137,7 +134,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR)
     public Result queryTaskListByProcessId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable("id") Integer id) throws IOException {
@@ -172,7 +168,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.UPDATE_PROCESS_INSTANCE_ERROR)
     public Result updateProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
@@ -202,7 +197,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result queryProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable("id") Integer id) {
@@ -228,7 +222,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                           @RequestParam("size") Integer size,
@@ -254,7 +247,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
     public Result<Void> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                   @PathVariable("id") Integer id) {
@@ -276,7 +268,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/query-sub-by-parent")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
     public Result querySubProcessInstanceByTaskId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                   @RequestParam("taskId") Integer taskId) {
@@ -299,7 +290,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/query-parent-by-sub")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR)
     public Result queryParentInstanceBySubId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @RequestParam("subId") Integer subId) {
@@ -320,12 +310,11 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/query-dynamic-sub-workflows")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
     public Result<List<DynamicSubWorkflowDto>> queryDynamicSubWorkflowInstances(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                                 @RequestParam("taskId") Integer taskId) {
         List<DynamicSubWorkflowDto> dynamicSubWorkflowDtos =
                 processInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
-        return new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
+        return new Result(BaseStatus.SUCCESS.getCode(), BaseStatus.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
     }
 
     /**
@@ -341,7 +330,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/{id}/view-variables")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
     public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                 @PathVariable("id") Integer id) {
@@ -363,7 +351,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping(value = "/{id}/view-gantt")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR)
     public Result viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("id") Integer id) throws Exception {
@@ -387,7 +374,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
     public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @PathVariable long projectCode,
                                                   @RequestParam("processInstanceIds") String processInstanceIds) {
@@ -404,14 +390,16 @@ public class ProcessInstanceController extends BaseController {
                 } catch (Exception e) {
                     log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
                     deleteFailedIdList
-                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
+                            .add(MessageFormat.format(ProcessStatus.PROCESS_INSTANCE_ERROR.getMsg(),
+                                    strProcessInstanceId));
                 }
             }
         }
         if (!deleteFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join("\n", deleteFailedIdList));
+            putMsg(result, ProcessStatus.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR,
+                    String.join("\n", deleteFailedIdList));
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return returnDataList(result);
     }
@@ -423,7 +411,6 @@ public class ProcessInstanceController extends BaseController {
     })
     @GetMapping("/trigger")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
     public Result queryProcessInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @PathVariable long projectCode,
                                                      @RequestParam(value = "triggerCode") Long triggerCode) {

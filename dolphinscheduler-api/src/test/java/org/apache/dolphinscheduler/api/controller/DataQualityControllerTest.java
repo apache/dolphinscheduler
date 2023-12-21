@@ -20,7 +20,8 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.AssertionsHelper;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -131,7 +132,7 @@ public class DataQualityControllerTest {
 
         Result<PageInfo<DqRule>> response =
                 dataQualityController.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
@@ -140,7 +141,7 @@ public class DataQualityControllerTest {
         when(dqRuleService.queryAllRuleList()).thenReturn(getRuleList());
 
         Result<List<DqRule>> listResult = dataQualityController.queryRuleList();
-        Assertions.assertEquals(Status.SUCCESS.getCode(), listResult.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), listResult.getCode().intValue());
     }
 
     @Test
@@ -159,6 +160,6 @@ public class DataQualityControllerTest {
 
         Result<PageInfo<DqExecuteResult>> pageInfoResult =
                 dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType, 0, start, end, 1, 10);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), pageInfoResult.getCode().intValue());
+        Assertions.assertEquals(BaseStatus.SUCCESS.getCode(), pageInfoResult.getCode().intValue());
     }
 }

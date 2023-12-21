@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.api.python;
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
@@ -275,7 +277,7 @@ public class PythonGateway {
                     description, globalParams,
                     null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
+            if (result.get(Constants.STATUS) != BaseStatus.SUCCESS) {
                 log.error(result.get(Constants.MSG).toString());
                 throw new ServiceException(result.get(Constants.MSG).toString());
             }
@@ -310,9 +312,9 @@ public class PythonGateway {
         Status verifyStatus = (Status) verifyProcessDefinitionExists.get(Constants.STATUS);
 
         ProcessDefinition processDefinition = null;
-        if (verifyStatus == Status.PROCESS_DEFINITION_NAME_EXIST) {
+        if (verifyStatus == ProcessStatus.PROCESS_DEFINITION_NAME_EXIST) {
             processDefinition = processDefinitionMapper.queryByDefineName(projectCode, workflowName);
-        } else if (verifyStatus != Status.SUCCESS) {
+        } else if (verifyStatus != BaseStatus.SUCCESS) {
             String msg =
                     "Verify workflow exists status is invalid, neither SUCCESS or WORKFLOW_NAME_EXIST.";
             log.error(msg);

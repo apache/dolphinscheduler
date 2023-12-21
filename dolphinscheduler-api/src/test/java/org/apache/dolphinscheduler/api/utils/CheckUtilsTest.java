@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.common.constants.Constants;
 
 import java.util.Map;
@@ -55,7 +56,7 @@ public class CheckUtilsTest {
     public void testCheckDesc() {
         Map<String, Object> objectMap = CheckUtils.checkDesc("I am desc");
         Status status = (Status) objectMap.get(Constants.STATUS);
-        Assertions.assertEquals(status.getCode(), Status.SUCCESS.getCode());
+        Assertions.assertEquals(status.getCode(), BaseStatus.SUCCESS.getCode());
     }
 
     @Test

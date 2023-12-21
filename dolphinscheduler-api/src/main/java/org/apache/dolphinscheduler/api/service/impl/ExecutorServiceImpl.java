@@ -34,7 +34,12 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SCHEDULE_TI
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ScheduleStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
+import org.apache.dolphinscheduler.api.enums.v2.TenantStatus;
+import org.apache.dolphinscheduler.api.enums.v2.WorkFlowStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.ExecuteClient;
 import org.apache.dolphinscheduler.api.executor.ExecuteContext;
@@ -233,14 +238,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             log.warn("Parameter timeout is invalid, timeout:{}.", timeout);
-            putMsg(result, Status.TASK_TIMEOUT_PARAMS_ERROR);
+            putMsg(result, TaskStatus.TASK_TIMEOUT_PARAMS_ERROR);
             return result;
         }
 
         if (Objects.nonNull(expectedParallelismNumber) && expectedParallelismNumber <= 0) {
             log.warn("Parameter expectedParallelismNumber is invalid, expectedParallelismNumber:{}.",
                     expectedParallelismNumber);
-            putMsg(result, Status.TASK_PARALLELISM_PARAMS_ERROR);
+            putMsg(result, TaskStatus.TASK_PARALLELISM_PARAMS_ERROR);
             return result;
         }
 
@@ -280,11 +285,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             log.info("Create command complete, processDefinitionCode:{}, commandCount:{}.",
                     processDefinition.getCode(), create);
             result.put(Constants.DATA_LIST, triggerCode);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Start process instance failed because create command error, processDefinitionCode:{}.",
                     processDefinition.getCode());
-            putMsg(result, Status.START_PROCESS_INSTANCE_ERROR);
+            putMsg(result, ProcessStatus.START_PROCESS_INSTANCE_ERROR);
         }
         return result;
     }
@@ -295,7 +300,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // no master
         if (masterServers.isEmpty()) {
-            throw new ServiceException(Status.MASTER_NOT_EXISTS);
+            throw new ServiceException(BaseStatus.MASTER_NOT_EXISTS);
         }
     }
 
@@ -311,7 +316,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             String[] stringDates = cronMap.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST).split(COMMA);
             if (stringDates.length > SCHEDULE_TIME_MAX_LENGTH) {
                 log.warn("Parameter cornTime is bigger than {}.", SCHEDULE_TIME_MAX_LENGTH);
-                throw new ServiceException(Status.SCHEDULE_TIME_NUMBER_EXCEED);
+                throw new ServiceException(ScheduleStatus.SCHEDULE_TIME_NUMBER_EXCEED);
             }
         }
     }
@@ -327,16 +332,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                             long processDefineCode, Integer version) {
         // check process definition exists
         if (projectCode != processDefinition.getProjectCode()) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, processDefinition.getCode());
+            throw new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, processDefinition.getCode());
         }
         // check process definition online
         if (processDefinition.getReleaseState() != ReleaseState.ONLINE) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getCode(),
+            throw new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_RELEASE, processDefinition.getCode(),
                     processDefinition.getVersion());
         }
         // check sub process definition online
         if (!checkSubProcessDefinitionValid(processDefinition)) {
-            throw new ServiceException(Status.SUB_PROCESS_DEFINE_NOT_RELEASE);
+            throw new ServiceException(ProcessStatus.SUB_PROCESS_DEFINE_NOT_RELEASE);
         }
     }
 
@@ -386,7 +391,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (!Constants.DEFAULT.equals(tenantCode)) {
             Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
             if (tenant == null) {
-                throw new ServiceException(Status.TENANT_NOT_EXIST, tenantCode);
+                throw new ServiceException(TenantStatus.TENANT_NOT_EXIST, tenantCode);
             }
         }
     }
@@ -414,7 +419,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkMasterExists();
 
         ProcessInstance workflowInstance = processInstanceDao.queryOptionalById(processInstanceId)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+                .orElseThrow(() -> new ServiceException(ProcessStatus.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
         checkState(workflowInstance.getProjectCode() == projectCode,
                 "The workflow instance's project code doesn't equals to the given project");
@@ -428,7 +433,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 executeType));
 
         Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.STATUS, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -467,12 +472,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
 
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
-                .orElseThrow(() -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
+                .orElseThrow(() -> new ServiceException(ProcessStatus.PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
 
         if (!processInstance.getState().isFinished()) {
             log.error("Can not execute task for process instance which is not finished, processInstanceId:{}.",
                     processInstanceId);
-            putMsg(response, Status.WORKFLOW_INSTANCE_IS_NOT_FINISHED);
+            putMsg(response, WorkFlowStatus.WORKFLOW_INSTANCE_IS_NOT_FINISHED);
             return response;
         }
 
@@ -490,12 +495,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             startNodeListLong = Long.parseLong(startNodeList);
         } catch (NumberFormatException e) {
             log.error("startNodeList is not a number");
-            putMsg(response, Status.REQUEST_PARAMS_NOT_VALID_ERROR, startNodeList);
+            putMsg(response, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, startNodeList);
             return response;
         }
 
         if (taskDefinitionLogMapper.queryMaxVersionForDefinition(startNodeListLong) == null) {
-            putMsg(response, Status.EXECUTE_NOT_DEFINE_TASK);
+            putMsg(response, TaskStatus.EXECUTE_NOT_DEFINE_TASK);
             return response;
         }
 
@@ -521,7 +526,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             log.warn(
                     "Process instance is executing the command, processDefinitionCode:{}, processDefinitionVersion:{}, processInstanceId:{}.",
                     processDefinition.getCode(), processDefinition.getVersion(), processInstanceId);
-            putMsg(response, Status.PROCESS_INSTANCE_EXECUTING_COMMAND,
+            putMsg(response, ProcessStatus.PROCESS_INSTANCE_EXECUTING_COMMAND,
                     String.valueOf(processDefinition.getCode()));
             return response;
         }
@@ -533,14 +538,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             log.info("Create {} command complete, processDefinitionCode:{}, processDefinitionVersion:{}.",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
                     processDefinition.getVersion());
-            putMsg(response, Status.SUCCESS);
+            putMsg(response, BaseStatus.SUCCESS);
         } else {
             log.error(
                     "Execute process instance failed because create {} command error, processDefinitionCode:{}, processDefinitionVersion:{}， processInstanceId:{}.",
                     command.getCommandType().getDescp(), command.getProcessDefinitionCode(),
                     processDefinition.getVersion(),
                     processInstanceId);
-            putMsg(response, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
+            putMsg(response, ProcessStatus.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
 
         return response;
@@ -555,7 +560,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (processInstance == null) {
             log.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.",
                     taskGroupQueue.getProjectCode(), taskGroupQueue.getProcessId());
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId());
+            putMsg(result, ProcessStatus.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId());
             return result;
         }
 
@@ -571,7 +576,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     .collect(Collectors.toList());
             for (String startNode : startNodeList.split(Constants.COMMA)) {
                 if (!existsNodes.contains(Long.valueOf(startNode))) {
-                    throw new ServiceException(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS, startNode);
+                    throw new ServiceException(ProcessStatus.START_NODE_NOT_EXIST_IN_LAST_PROCESS, startNode);
                 }
             }
         }
@@ -618,10 +623,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 break;
         }
         if (!checkResult) {
-            putMsg(result, Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
+            putMsg(result, ProcessStatus.PROCESS_INSTANCE_STATE_OPERATION_ERROR, processInstance.getName(),
                     executionStatus.toString(), executeType.toString());
         } else {
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         }
         return result;
     }
@@ -655,10 +660,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     SingletonJdkDynamicRpcClientProxyFactory
                             .getProxyClient(processInstance.getHost(), ITaskInstanceExecutionEventListener.class);
             iTaskInstanceExecutionEventListener.onWorkflowInstanceInstanceStateChange(workflowStateEventChangeRequest);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Process instance state update error, processInstanceName:{}.", processInstance.getName());
-            putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
+            putMsg(result, ProcessStatus.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
         return result;
     }
@@ -673,7 +678,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> result = new HashMap<>();
         if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
             log.warn("Task group queue already starts, taskGroupQueueId:{}.", taskGroupQueue.getId());
-            putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
+            putMsg(result, TaskStatus.TASK_GROUP_QUEUE_ALREADY_START);
             return result;
         }
 
@@ -684,7 +689,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
         iLogicTaskInstanceOperator.forceStartTaskInstance(
                 new TaskInstanceForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()));
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -702,7 +707,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         if (processDefinition == null) {
             log.error("Process definition is not be found, processDefinitionCode:{}.", processDefinitionCode);
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "processDefinitionCode");
+            putMsg(result, BaseStatus.REQUEST_PARAMS_NOT_VALID_ERROR, "processDefinitionCode");
             return result;
         }
 
@@ -718,13 +723,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         log.warn("Subprocess definition {} of process definition {} is not {}.",
                                 processDefinitionTmp.getName(),
                                 processDefinition.getName(), ReleaseState.ONLINE.getDescp());
-                        putMsg(result, Status.PROCESS_DEFINE_NOT_RELEASE, processDefinitionTmp.getName());
+                        putMsg(result, ProcessStatus.PROCESS_DEFINE_NOT_RELEASE, processDefinitionTmp.getName());
                         return result;
                     }
                 }
             }
         }
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -923,7 +928,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         if (CollectionUtils.isEmpty(listDate)) {
-            throw new ServiceException(Status.TASK_COMPLEMENT_DATA_DATE_ERROR);
+            throw new ServiceException(TaskStatus.TASK_COMPLEMENT_DATA_DATE_ERROR);
         }
 
         if (executionOrder.equals(ExecutionOrder.DESC_ORDER)) {
@@ -1192,6 +1197,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         log.error(
                 "Start to execute stream task instance error, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}, response: {}.",
                 projectCode, taskDefinitionCode, taskDefinitionVersion, streamingTaskTriggerResponse);
-        throw new ServiceException(Status.START_TASK_INSTANCE_ERROR);
+        throw new ServiceException(TaskStatus.START_TASK_INSTANCE_ERROR);
     }
 }

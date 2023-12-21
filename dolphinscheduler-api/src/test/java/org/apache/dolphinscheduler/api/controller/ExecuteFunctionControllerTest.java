@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -87,7 +87,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
                     JsonObject.class);
 
     final ImmutableMap<String, Object> executeServiceResult =
-            ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
+            ImmutableMap.of(Constants.STATUS, BaseStatus.SUCCESS, Constants.DATA_LIST, "Test Data");
 
     @MockBean(name = "executorServiceImpl")
     private ExecutorService executorService;
@@ -273,7 +273,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("processInstanceId", Integer.toString(processInstanceId));
         paramsMap.add("executeType", String.valueOf(executeType));
         final Map<String, Object> executeServiceResult = new HashMap<>();
-        executeServiceResult.put(Constants.STATUS, Status.SUCCESS);
+        executeServiceResult.put(Constants.STATUS, BaseStatus.SUCCESS);
         executeServiceResult.put(Constants.DATA_LIST, "Test Data");
 
         final JsonObject expectResponseContent = gson

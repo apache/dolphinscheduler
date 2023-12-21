@@ -17,14 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.FORCE_TASK_SUCCESS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.REMOVE_TASK_INSTANCE_CACHE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -97,7 +90,6 @@ public class TaskInstanceController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
     public Result queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                       @RequestParam(value = "processInstanceId", required = false, defaultValue = "0") Integer processInstanceId,
@@ -149,7 +141,6 @@ public class TaskInstanceController extends BaseController {
     })
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(FORCE_TASK_SUCCESS_ERROR)
     public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {
@@ -170,7 +161,6 @@ public class TaskInstanceController extends BaseController {
     })
     @PostMapping(value = "/{id}/savepoint")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_SAVEPOINT_ERROR)
     public Result<Object> taskSavePoint(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "id") Integer id) {
@@ -191,7 +181,6 @@ public class TaskInstanceController extends BaseController {
     })
     @PostMapping(value = "/{id}/stop")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_STOP_ERROR)
     public Result<Object> stopTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {
@@ -212,7 +201,6 @@ public class TaskInstanceController extends BaseController {
     })
     @DeleteMapping(value = "/{id}/remove-cache")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(REMOVE_TASK_INSTANCE_CACHE_ERROR)
     public TaskInstanceRemoveCacheResponse removeTaskInstanceCache(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                    @PathVariable(value = "id") Integer id) {

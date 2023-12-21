@@ -22,7 +22,9 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
+import org.apache.dolphinscheduler.api.enums.v2.TaskStatus;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -202,7 +204,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         pageInfo.setTotal((int) taskInstanceIPage.getTotal());
         pageInfo.setTotalList(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
         result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -223,7 +225,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Map<String, Object> checkResult =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
+        if (status != BaseStatus.SUCCESS) {
             putMsg(result, status);
             return result;
         }
@@ -233,7 +235,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (task == null) {
             log.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            putMsg(result, TaskStatus.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
 
@@ -241,7 +243,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition can not be found, projectCode:{}, taskDefinitionCode:{}.", projectCode,
                     task.getTaskCode());
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
+            putMsg(result, TaskStatus.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
             return result;
         }
 
@@ -249,7 +251,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (!task.getState().isFailure() && !task.getState().isKill()) {
             log.warn("{} type task instance can not perform force success, projectCode:{}, taskInstanceId:{}.",
                     task.getState().getDesc(), projectCode, taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
+            putMsg(result, TaskStatus.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
             return result;
         }
 
@@ -260,11 +262,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             processService.forceProcessInstanceSuccessByTaskInstanceId(taskInstanceId);
             log.info("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}", projectCode,
                     taskInstanceId);
-            putMsg(result, Status.SUCCESS);
+            putMsg(result, BaseStatus.SUCCESS);
         } else {
             log.error("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}",
                     projectCode, taskInstanceId);
-            putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
+            putMsg(result, TaskStatus.FORCE_TASK_SUCCESS_ERROR);
         }
         return result;
     }
@@ -278,7 +280,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Map<String, Object> checkResult =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
+        if (status != BaseStatus.SUCCESS) {
             putMsg(result, status);
             return result;
         }
@@ -287,7 +289,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskInstance == null) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            putMsg(result, TaskStatus.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
         IStreamingTaskInstanceOperator streamingTaskInstanceOperator =
@@ -296,7 +298,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         TaskInstanceTriggerSavepointResponse taskInstanceTriggerSavepointResponse =
                 streamingTaskInstanceOperator.triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
         log.info("StreamingTaskInstance trigger savepoint response: {}", taskInstanceTriggerSavepointResponse);
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -309,7 +311,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Map<String, Object> checkResult =
                 projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
         Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
+        if (status != BaseStatus.SUCCESS) {
             putMsg(result, status);
             return result;
         }
@@ -318,7 +320,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskInstance == null) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
             return result;
         }
 
@@ -329,7 +330,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 iTaskInstanceOperator.killTask(new TaskInstanceKillRequest(taskInstanceId));
         log.info("TaskInstance kill response: {}", taskInstanceKillResponse);
 
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return result;
     }
 
@@ -358,7 +359,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (taskInstance == null) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
+            putMsg(result, TaskStatus.TASK_INSTANCE_NOT_FOUND);
             return new TaskInstanceRemoveCacheResponse(result);
         }
         String tagCacheKey = taskInstance.getCacheKey();
@@ -367,7 +368,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         if (StringUtils.isNotEmpty(cacheKey)) {
             taskInstanceDao.clearCacheByCacheKey(cacheKey);
         }
-        putMsg(result, Status.SUCCESS);
+        putMsg(result, BaseStatus.SUCCESS);
         return new TaskInstanceRemoveCacheResponse(result, cacheKey);
     }
 

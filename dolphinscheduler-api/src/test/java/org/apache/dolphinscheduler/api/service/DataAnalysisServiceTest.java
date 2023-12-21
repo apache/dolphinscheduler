@@ -28,7 +28,8 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
@@ -148,9 +149,9 @@ public class DataAnalysisServiceTest {
         String endDate = "2020-02-11 16:03:18";
 
         // checkProject false
-        doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, 1)).when(projectService)
+        doThrow(new ServiceException(ProjectStatus.PROJECT_NOT_FOUND, 1)).when(projectService)
                 .checkProjectAndAuthThrowException(any(), anyLong(), any());
-        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+        assertThrowsServiceException(ProjectStatus.PROJECT_NOT_FOUND,
                 () -> dataAnalysisServiceImpl.getTaskInstanceStateCountByProject(user, 1L, startDate, endDate));
     }
 
@@ -212,9 +213,9 @@ public class DataAnalysisServiceTest {
         String endDate = "2020-02-11 16:03:18";
 
         // checkProject false
-        doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, 1)).when(projectService)
+        doThrow(new ServiceException(ProjectStatus.PROJECT_NOT_FOUND, 1)).when(projectService)
                 .checkProjectAndAuthThrowException(any(), anyLong(), any());
-        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+        assertThrowsServiceException(ProjectStatus.PROJECT_NOT_FOUND,
                 () -> dataAnalysisServiceImpl.getWorkflowInstanceStateCountByProject(user, 1L, startDate, endDate));
 
         doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());

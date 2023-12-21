@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.ProjectStatus;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -72,10 +73,10 @@ public class BaseServiceTest {
     public void testPutMsg() {
 
         Map<String, Object> result = new HashMap<>();
-        baseService.putMsg(result, Status.SUCCESS);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        baseService.putMsg(result, BaseStatus.SUCCESS);
+        Assertions.assertEquals(BaseStatus.SUCCESS, result.get(Constants.STATUS));
         // has params
-        baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
+        baseService.putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, "test");
 
     }
 
@@ -83,10 +84,10 @@ public class BaseServiceTest {
     public void testPutMsgTwo() {
 
         Result result = new Result();
-        baseService.putMsg(result, Status.SUCCESS);
-        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        baseService.putMsg(result, BaseStatus.SUCCESS);
+        Assertions.assertEquals(BaseStatus.SUCCESS.getMsg(), result.getMsg());
         // has params
-        baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
+        baseService.putMsg(result, ProjectStatus.PROJECT_NOT_FOUND, "test");
     }
 
     @Test

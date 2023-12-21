@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.EnvironmentStatus;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -183,7 +183,7 @@ public class EnvironmentControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         logger.info(result.toString());
-        Assertions.assertTrue(result.isStatus(Status.ENVIRONMENT_NAME_EXISTS));
+        Assertions.assertTrue(result.isStatus(EnvironmentStatus.ENVIRONMENT_NAME_EXISTS));
         logger.info("verify environment return result:{}", mvcResult.getResponse().getContentAsString());
 
     }

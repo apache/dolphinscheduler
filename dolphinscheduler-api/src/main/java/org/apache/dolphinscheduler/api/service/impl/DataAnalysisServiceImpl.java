@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.ProcessStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -278,7 +278,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode) {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
         if (processDefinition == null) {
-            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
+            throw new ServiceException(ProcessStatus.PROCESS_DEFINE_NOT_EXIST, workflowCode);
         }
         projectService.checkHasProjectWritePermissionThrowException(loginUser, processDefinition.getProjectCode());
 

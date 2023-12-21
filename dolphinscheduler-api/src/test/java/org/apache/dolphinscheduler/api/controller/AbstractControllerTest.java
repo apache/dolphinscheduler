@@ -19,7 +19,8 @@ package org.apache.dolphinscheduler.api.controller;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest.RegistryServer;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.Status;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -95,7 +96,7 @@ public abstract class AbstractControllerTest {
 
     public Map<String, Object> success() {
         Map<String, Object> serviceResult = new HashMap<>();
-        putMsg(serviceResult, Status.SUCCESS);
+        putMsg(serviceResult, BaseStatus.SUCCESS);
         return serviceResult;
     }
 

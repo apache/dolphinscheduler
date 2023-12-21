@@ -22,7 +22,9 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
+import org.apache.dolphinscheduler.api.enums.v2.GroupStatus;
+import org.apache.dolphinscheduler.api.enums.v2.UserStatus;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -103,12 +105,12 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
 
         // only admin can operate
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_VIEW)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         // check if exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
-            throw new ServiceException(Status.ALERT_GROUP_NOT_EXIST, id);
+            throw new ServiceException(GroupStatus.ALERT_GROUP_NOT_EXIST, id);
         }
         return alertGroup;
     }
@@ -156,11 +158,11 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         Map<String, Object> result = new HashMap<>();
         // only admin can operate
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
             log.warn("Parameter description is too long.");
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+            throw new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
         }
         AlertGroup alertGroup = new AlertGroup();
         Date now = new Date();
@@ -180,10 +182,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
                 return alertGroup;
             }
             log.error("Create alert group error, groupName:{}", alertGroup.getGroupName());
-            throw new ServiceException(Status.CREATE_ALERT_GROUP_ERROR);
+            throw new ServiceException(GroupStatus.CREATE_ALERT_GROUP_ERROR);
         } catch (DuplicateKeyException ex) {
             log.error("Create alert group error, groupName:{}", alertGroup.getGroupName(), ex);
-            throw new ServiceException(Status.ALERT_GROUP_EXIST);
+            throw new ServiceException(GroupStatus.ALERT_GROUP_EXIST);
         }
     }
 
@@ -203,19 +205,19 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         // don't allow to update global alert group
         // todo: remove hardcode
         if (id == 2) {
-            throw new ServiceException(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP);
+            throw new ServiceException(GroupStatus.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP);
         }
 
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
+            throw new ServiceException(BaseStatus.DESCRIPTION_TOO_LONG_ERROR);
         }
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
 
         if (alertGroup == null) {
-            throw new ServiceException(Status.ALERT_GROUP_NOT_EXIST);
+            throw new ServiceException(GroupStatus.ALERT_GROUP_NOT_EXIST);
         }
 
         Date now = new Date();
@@ -233,7 +235,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return alertGroup;
         } catch (DuplicateKeyException ex) {
             log.error("Update alert group error, groupName:{}", alertGroup.getGroupName(), ex);
-            throw new ServiceException(Status.ALERT_GROUP_EXIST);
+            throw new ServiceException(GroupStatus.ALERT_GROUP_EXIST);
         }
     }
 
@@ -249,19 +251,19 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
 
         // only admin can operate
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_DELETE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            throw new ServiceException(UserStatus.USER_NO_OPERATION_PERM);
         }
 
         // Not allow to delete the default alarm group ,because the module of service need to use it.
         if (id == 1 || id == 2) {
             log.warn("Not allow to delete the default alarm group.");
-            throw new ServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
+            throw new ServiceException(GroupStatus.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
         }
 
         // check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
-            throw new ServiceException(Status.ALERT_GROUP_NOT_EXIST);
+            throw new ServiceException(GroupStatus.ALERT_GROUP_NOT_EXIST);
         }
 
         alertGroupMapper.deleteById(id);

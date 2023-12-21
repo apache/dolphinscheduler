@@ -17,13 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.ADD_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_TYPE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_TASK_TYPE_ERROR;
-
 import org.apache.dolphinscheduler.api.dto.FavTaskDto;
-import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.enums.v2.BaseStatus;
 import org.apache.dolphinscheduler.api.service.FavTaskService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -67,10 +62,9 @@ public class FavTaskController extends BaseController {
     @Operation(summary = "listTaskType", description = "QUERY_TASK_TYPE_LIST")
     @GetMapping(value = "/taskTypes")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_TASK_TYPE_ERROR)
     public Result listTaskType(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<FavTaskDto> favTaskList = favTaskService.getFavTaskList(loginUser);
-        return success(Status.SUCCESS.getMsg(), favTaskList);
+        return success(BaseStatus.SUCCESS.getMsg(), favTaskList);
     }
 
     /**
@@ -82,7 +76,6 @@ public class FavTaskController extends BaseController {
     @Operation(summary = "deleteTaskType", description = "DELETE_TASK_TYPE")
     @DeleteMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_TASK_TYPE_ERROR)
     public Result deleteFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("taskType") String taskType) {
         boolean b = favTaskService.deleteFavTask(loginUser, taskType);
@@ -98,7 +91,6 @@ public class FavTaskController extends BaseController {
     @Operation(summary = "addTaskType", description = "ADD_TASK_TYPE")
     @PostMapping(value = "/{taskType}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(ADD_TASK_TYPE_ERROR)
     public Result addFavTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @PathVariable("taskType") String taskType) {
         int i = favTaskService.addFavTask(loginUser, taskType);
