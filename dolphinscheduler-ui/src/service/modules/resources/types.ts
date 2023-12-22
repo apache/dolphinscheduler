@@ -124,7 +124,7 @@ interface ResourceFileV2 {
   idValue: string
   name: string
   type: string
-  directory: boolean
+  dirctory: boolean
   description: string
   currentDir: string
   fullName: string

@@ -34,7 +34,6 @@ export function useResources(
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
-  const allResourceFullName = ref([] as string[])
 
   const getResources = async () => {
     if (taskStore.resources.length) {
@@ -45,39 +44,58 @@ export function useResources(
     resourcesLoading.value = true
     const res = await queryResourceList({ type: 'FILE', fullName: '' })
     utils.removeUselessChildren(res)
-    allResourceFullName.value = getFullNameList(res)
     resourcesOptions.value = res || []
     resourcesLoading.value = false
     taskStore.updateResource(res)
   }
 
-  /**
-   * get fullName list
-   * @param nodes resource list
-   * @returns fullName list
-   */
-  const getFullNameList = (nodes: ResourceFileV2[]) => {
-    if (!nodes) {
-      return []
-    }
-    let result: string[] = []
-    for (const { fullName, children } of nodes) {
-      if (fullName) {
-        result.push(fullName)
+  const validateResourceExist = (
+    fullName: string,
+    parentDir: string,
+    resources: ResourceFileV2[]
+  ): boolean => {
+    if (resources.length >= 0) {
+      for (const res of resources) {
+        if (res.dirctory) {
+          const isPrefix = new RegExp(`^${res.fullName}`).test(fullName)
+          if (!isPrefix) {
+            continue
+          }
+          if (!res.children) {
+            res.children = []
+          }
+          return validateResourceExist(fullName, res.name, res.children)
+        }
+        if (res.fullName === fullName) {
+          return true
+        }
       }
-      if (children) {
-        result = result.concat(getFullNameList(children))
-      }
     }
-    return result
+    addResourceNode(fullName, parentDir, resources)
+    return false
   }
 
-  /**
-   * validate resource exist
-   * @param name resource name
-   */
-  const validateResourceExist = (name: string): boolean => {
-    return allResourceFullName.value.includes(name)
+  const addResourceNode = (
+    fullName: string,
+    parentDir: string,
+    resources: ResourceFileV2[]
+  ) => {
+    const resourceNode = {
+      fullName: fullName,
+      name: getResourceDirAfter(fullName, parentDir),
+      disable: true
+    }
+    resources.push(resourceNode)
+  }
+
+  const getResourceDirAfter = (fullName: string, parentDir: string) => {
+    parentDir = '/resources/' + parentDir
+    const delimiterIndex = fullName.indexOf(parentDir)
+    if (delimiterIndex !== -1) {
+      return fullName.substring(delimiterIndex + parentDir.length)
+    } else {
+      return fullName
+    }
   }
 
   onMounted(() => {
@@ -111,22 +129,24 @@ export function useResources(
         if (value) {
           const errorNames: string[] = []
           value.forEach((item) => {
-            if (!validateResourceExist(item)) {
+            if (
+              !validateResourceExist(
+                item,
+                '',
+                resourcesOptions.value as ResourceFileV2[]
+              )
+            ) {
               errorNames.push(item)
             }
           })
           if (errorNames.length > 0) {
-            errorNames.forEach((item) => {
-              // delete select node
-              value.splice(value.indexOf(item), 1)
-              resourcesOptions.value.push({
-                fullName: item,
-                name: item,
-                disable: true
-              })
+            let errorName = ': '
+            errorNames.forEach((name) => {
+              value.splice(value.indexOf(name), 1)
+              errorName += getResourceDirAfter(name, '') + ';'
             })
             return new Error(
-              t('project.node.useless_resources_tips') + errorNames.join(' ; ')
+              t('project.node.useless_resources_tips') + errorName
             )
           }
         }
