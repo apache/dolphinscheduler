@@ -58,7 +58,7 @@ export function useResources(
 
   const validateResourceExist = (
     fullName: string,
-    parentDir: string,
+    parentDir: string[],
     resources: ResourceOption[]
   ): boolean => {
     if (resources.length >= 0) {
@@ -71,9 +71,10 @@ export function useResources(
           if (!res.children) {
             res.children = []
           }
+          parentDir.push(res.name)
           return validateResourceExist(
             fullName,
-            res.name,
+            parentDir,
             res.children as ResourceOption[]
           )
         }
@@ -88,7 +89,7 @@ export function useResources(
 
   const addResourceNode = (
     fullName: string,
-    parentDir: string,
+    parentDir: string[],
     resources: ResourceOption[]
   ) => {
     const resourceNode = {
@@ -99,11 +100,11 @@ export function useResources(
     resources.push(resourceNode)
   }
 
-  const getResourceDirAfter = (fullName: string, parentDir: string) => {
-    parentDir = '/resources/' + parentDir
-    const delimiterIndex = fullName.indexOf(parentDir)
+  const getResourceDirAfter = (fullName: string, parentDir: string[]) => {
+    const dirctory = '/resources/' + parentDir.join('')
+    const delimiterIndex = fullName.indexOf(dirctory)
     if (delimiterIndex !== -1) {
-      return fullName.substring(delimiterIndex + parentDir.length)
+      return fullName.substring(delimiterIndex + dirctory.length)
     } else {
       return fullName
     }
@@ -143,7 +144,7 @@ export function useResources(
             if (
               !validateResourceExist(
                 item,
-                '',
+                [],
                 resourcesOptions.value as ResourceOption[]
               )
             ) {
@@ -154,7 +155,7 @@ export function useResources(
             let errorName = ': '
             errorNames.forEach((name) => {
               value.splice(value.indexOf(name), 1)
-              errorName += getResourceDirAfter(name, '') + ';'
+              errorName += getResourceDirAfter(name, []) + ';'
             })
             return new Error(
               t('project.node.useless_resources_tips') + errorName
