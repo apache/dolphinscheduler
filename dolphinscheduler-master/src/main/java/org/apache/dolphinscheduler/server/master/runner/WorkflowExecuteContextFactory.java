@@ -78,7 +78,7 @@ public class WorkflowExecuteContextFactory {
             log.info("Master handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
             throw new RuntimeException("Slot check failed the current state: " + slotCheckState);
         }
-        ProcessInstance processInstance = processService.handleCommand(masterConfig.getMasterAddress(), command);
+        ProcessInstance processInstance = processService.handleCommand(masterConfig.getId(), command);
         ProcessInstanceMetrics
                 .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return Optional.ofNullable(processInstance);

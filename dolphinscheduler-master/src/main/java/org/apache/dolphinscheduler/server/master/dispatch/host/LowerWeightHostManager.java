@@ -130,11 +130,12 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    public Optional<HostWeight> getHostWeight(String addr, String workerGroup, WorkerHeartBeat heartBeat) {
+    public Optional<HostWeight> getHostWeight(String node, String workerGroup, WorkerHeartBeat heartBeat) {
         if (heartBeat == null) {
-            log.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
+            log.warn("worker {} in work group {} have not received the heartbeat", node, workerGroup);
             return Optional.empty();
         }
+        String addr = heartBeat.getHost() + ":" + heartBeat.getPort();
         if (ServerStatus.ABNORMAL == heartBeat.getServerStatus()) {
             log.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
                     addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());

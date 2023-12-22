@@ -50,7 +50,7 @@ public class TaskInstanceDispatchOperationFunction
         try {
             // set cache, it will be used when kill task
             TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
-            taskExecutionContext.setHost(workerConfig.getWorkerAddress());
+            taskExecutionContext.setHost(workerConfig.getId());
             taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
 
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),

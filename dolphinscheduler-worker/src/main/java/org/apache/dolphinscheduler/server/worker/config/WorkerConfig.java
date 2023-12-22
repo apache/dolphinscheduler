@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
+import java.util.UUID;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -57,6 +58,7 @@ public class WorkerConfig implements Validator {
      */
     private String workerAddress;
     private String workerRegistryPath;
+    private String id;
 
     private TaskExecuteThreadsFullPolicy taskExecuteThreadsFullPolicy = TaskExecuteThreadsFullPolicy.REJECT;
 
@@ -80,8 +82,8 @@ public class WorkerConfig implements Validator {
         if (StringUtils.isEmpty(workerConfig.getWorkerAddress())) {
             workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
         }
-
-        workerConfig.setWorkerRegistryPath(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerConfig.getWorkerAddress());
+        workerConfig.setId(workerAddress + "_" + UUID.randomUUID().toString().replaceAll("-", ""));
+        workerConfig.setWorkerRegistryPath(REGISTRY_DOLPHINSCHEDULER_WORKERS + "/" + workerConfig.getId());
         printConfig();
     }
 
@@ -98,5 +100,6 @@ public class WorkerConfig implements Validator {
         log.info("Worker config: workerAddress -> {}", workerAddress);
         log.info("Worker config: workerRegistryPath: {}", workerRegistryPath);
         log.info("Worker config: taskExecuteThreadsFullPolicy: {}", taskExecuteThreadsFullPolicy);
+        log.info("Worker config: id: {}", id);
     }
 }
