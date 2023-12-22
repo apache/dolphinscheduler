@@ -21,7 +21,6 @@ import { queryResourceList } from '@/service/modules/resources'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import utils from '@/utils'
 import type { IJsonItem, IResource } from '../types'
-import { ResourceFileV2 } from '@/service/modules/resources/types'
 
 export function useResources(
   span: number | Ref<number> = 24,
@@ -30,7 +29,15 @@ export function useResources(
 ): IJsonItem {
   const { t } = useI18n()
 
-  const resourcesOptions = ref([] as IResource[])
+  interface ResourceOption {
+    name: string
+    fullName: string
+    dirctory?: boolean
+    disable: boolean
+    children?: ResourceOption[]
+  }
+
+  const resourcesOptions = ref<ResourceOption[] | IResource[]>([])
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
@@ -52,7 +59,7 @@ export function useResources(
   const validateResourceExist = (
     fullName: string,
     parentDir: string,
-    resources: ResourceFileV2[]
+    resources: ResourceOption[]
   ): boolean => {
     if (resources.length >= 0) {
       for (const res of resources) {
@@ -64,7 +71,11 @@ export function useResources(
           if (!res.children) {
             res.children = []
           }
-          return validateResourceExist(fullName, res.name, res.children)
+          return validateResourceExist(
+            fullName,
+            res.name,
+            res.children as ResourceOption[]
+          )
         }
         if (res.fullName === fullName) {
           return true
@@ -78,7 +89,7 @@ export function useResources(
   const addResourceNode = (
     fullName: string,
     parentDir: string,
-    resources: ResourceFileV2[]
+    resources: ResourceOption[]
   ) => {
     const resourceNode = {
       fullName: fullName,
@@ -133,7 +144,7 @@ export function useResources(
               !validateResourceExist(
                 item,
                 '',
-                resourcesOptions.value as ResourceFileV2[]
+                resourcesOptions.value as ResourceOption[]
               )
             ) {
               errorNames.push(item)
@@ -155,8 +166,8 @@ export function useResources(
           if (!value || value.length == 0) {
             return new Error(t('project.node.resources_tips'))
           }
-
-          if (limit > 0 && value.length > limit) {
+          const limit_ = isRef(limit) ? limit.value : limit
+          if (limit_ > 0 && value.length > limit_) {
             return new Error(t('project.node.resources_limit_tips') + limit)
           }
         }

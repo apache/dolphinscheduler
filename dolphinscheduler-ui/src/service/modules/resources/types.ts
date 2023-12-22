@@ -119,18 +119,6 @@ interface ResourceViewRes {
   content: string
 }
 
-interface ResourceFileV2 {
-  id: number
-  idValue: string
-  name: string
-  type: string
-  dirctory: boolean
-  description: string
-  currentDir: string
-  fullName: string
-  children: ResourceFileV2[]
-}
-
 export {
   FileReq,
   ResourceTypeReq,
@@ -151,6 +139,5 @@ export {
   UdfFuncReq,
   ResourceListRes,
   ResourceViewRes,
-  ResourceFile,
-  ResourceFileV2
+  ResourceFile
 }
