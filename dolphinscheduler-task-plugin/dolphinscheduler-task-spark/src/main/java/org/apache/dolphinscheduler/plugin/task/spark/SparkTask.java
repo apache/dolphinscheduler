@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -179,7 +180,8 @@ public class SparkTask extends AbstractYarnTask {
 
         ResourceInfo mainJar = sparkParameters.getMainJar();
         if (programType != ProgramType.SQL) {
-            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            args.add(resourceContext.getResourceItem(mainJar.getResourceName()).getResourceAbsolutePathInLocal());
         }
 
         String mainArgs = sparkParameters.getMainArgs();
@@ -200,8 +202,10 @@ public class SparkTask extends AbstractYarnTask {
 
                 try {
                     resourceFileName = resourceInfos.get(0).getResourceName();
+                    ResourceContext resourceContext = taskExecutionContext.getResourceContext();
                     sqlContent = FileUtils.readFileToString(
-                            new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                            new File(
+                                    resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                             StandardCharsets.UTF_8);
                 } catch (IOException e) {
                     log.error("read sql content from file {} error ", resourceFileName, e);

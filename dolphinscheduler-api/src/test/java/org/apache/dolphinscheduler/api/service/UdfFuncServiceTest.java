@@ -28,10 +28,8 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -77,9 +75,6 @@ public class UdfFuncServiceTest {
 
     @InjectMocks
     private UdfFuncServiceImpl udfFuncService;
-
-    @Mock
-    private ResourceMapper resourceMapper;
 
     @Mock
     private UdfFuncMapper udfFuncMapper;
@@ -289,17 +284,6 @@ public class UdfFuncServiceTest {
         loginUser.setUserType(UserType.ADMIN_USER);
         loginUser.setId(1);
         return loginUser;
-    }
-
-    /**
-     * get resourceId
-     */
-    private Resource getResource() {
-
-        Resource resource = new Resource();
-        resource.setId(1);
-        resource.setAlias("test");
-        return resource;
     }
 
     private List<UdfFunc> getList() {

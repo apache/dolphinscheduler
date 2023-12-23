@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
@@ -36,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.sql.utils.SqlSplitUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -518,11 +518,10 @@ public class SqlTask extends AbstractTask {
      */
     private List<String> buildJarSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> {
-            String defaultFS = value.getDefaultFS();
-            String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
-            String uploadPath = CommonUtils.getHdfsUdfDir(value.getTenantCode());
             String resourceFullName = value.getResourceName();
-            return String.format("add jar %s", resourceFullName);
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            return String.format("add jar %s",
+                    resourceContext.getResourceItem(resourceFullName).getResourceAbsolutePathInLocal());
         }).collect(Collectors.toList());
     }
 

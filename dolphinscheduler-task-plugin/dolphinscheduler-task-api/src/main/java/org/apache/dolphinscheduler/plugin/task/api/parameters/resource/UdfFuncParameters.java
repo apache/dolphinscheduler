@@ -90,10 +90,6 @@ public class UdfFuncParameters extends AbstractResourceParameters {
      */
     private UdfType type;
 
-    private String tenantCode;
-
-    private String defaultFS;
-
     /**
      * create time
      */

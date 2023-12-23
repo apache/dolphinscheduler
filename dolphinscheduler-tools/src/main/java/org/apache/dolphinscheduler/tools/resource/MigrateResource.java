@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.tools.resource;
 
+import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,7 @@ public class MigrateResource {
         private MigrateResourceService migrateResourceService;
 
         @Override
-        public void run(String... args) {
+        public void run(String... args) throws SQLException {
             String targetTenantCode = args[0];
             logger.info("Moving all unmanaged resources to tenant: {}", targetTenantCode);
             migrateResourceService.migrateResourceOnce(targetTenantCode);

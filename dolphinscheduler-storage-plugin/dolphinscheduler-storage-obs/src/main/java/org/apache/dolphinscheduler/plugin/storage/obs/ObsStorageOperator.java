@@ -154,12 +154,6 @@ public class ObsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fullName) {
-        String resDir = getResDir(tenantCode);
-        return fullName.replaceFirst(resDir, "");
-    }
-
-    @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
@@ -188,8 +182,7 @@ public class ObsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath,
-                         boolean overwrite) throws IOException {
+    public void download(String srcFilePath, String dstFilePath, boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());

@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
@@ -315,29 +314,6 @@ public class UsersController extends BaseController {
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "projectCode") long projectCode) {
         Map<String, Object> result = this.usersService.revokeProject(loginUser, userId, projectCode);
-        return returnDataList(result);
-    }
-
-    /**
-     * grant resource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param resourceIds resource id array
-     * @return grant result code
-     */
-    @Operation(summary = "grantResource", description = "GRANT_RESOURCE_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "resourceIds", description = "RESOURCE_IDS", required = true, schema = @Schema(implementation = String.class))
-    })
-    @PostMapping(value = "/grant-file")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(GRANT_RESOURCE_ERROR)
-    public Result grantResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam(value = "userId") int userId,
-                                @RequestParam(value = "resourceIds") String resourceIds) {
-        Map<String, Object> result = usersService.grantResources(loginUser, userId, resourceIds);
         return returnDataList(result);
     }
 

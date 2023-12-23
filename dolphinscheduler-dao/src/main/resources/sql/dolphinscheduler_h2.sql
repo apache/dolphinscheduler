@@ -784,6 +784,7 @@ CREATE TABLE t_ds_relation_project_user
 -- ----------------------------
 -- Table structure for t_ds_relation_resources_user
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_relation_resources_user CASCADE;
 CREATE TABLE t_ds_relation_resources_user
 (
@@ -818,6 +819,7 @@ CREATE TABLE t_ds_relation_udfs_user
 -- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_resources CASCADE;
 CREATE TABLE t_ds_resources
 (

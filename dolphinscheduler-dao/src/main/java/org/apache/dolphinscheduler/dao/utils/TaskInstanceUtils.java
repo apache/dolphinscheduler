@@ -71,7 +71,6 @@ public class TaskInstanceUtils {
         target.setExecutorId(source.getExecutorId());
         target.setVarPool(source.getVarPool());
         target.setExecutorName(source.getExecutorName());
-        target.setResources(source.getResources());
         target.setDelayTime(source.getDelayTime());
         target.setDryRun(source.getDryRun());
         target.setTaskGroupId(source.getTaskGroupId());

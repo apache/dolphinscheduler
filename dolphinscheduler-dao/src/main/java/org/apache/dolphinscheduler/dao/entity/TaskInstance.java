@@ -258,9 +258,6 @@ public class TaskInstance implements Serializable {
 
     private String executorName;
 
-    @TableField(exist = false)
-    private Map<String, String> resources;
-
     /**
      * delay execution time.
      */

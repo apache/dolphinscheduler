@@ -783,6 +783,7 @@ CREATE TABLE `t_ds_relation_project_user` (
 -- ----------------------------
 -- Table structure for t_ds_relation_resources_user
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS `t_ds_relation_resources_user`;
 CREATE TABLE `t_ds_relation_resources_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -815,6 +816,7 @@ CREATE TABLE `t_ds_relation_udfs_user` (
 -- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS `t_ds_resources`;
 CREATE TABLE `t_ds_resources` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',

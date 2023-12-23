@@ -282,19 +282,12 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fullName) {
-        String resDir = getResDir(tenantCode);
-        return fullName.replaceFirst(resDir, "");
-    }
-
-    @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         return getHdfsFileName(resourceType, tenantCode, fileName);
     }
 
     @Override
-    public void download(String tenantCode, String srcHdfsFilePath, String dstFile,
-                         boolean overwrite) throws IOException {
+    public void download(String srcHdfsFilePath, String dstFile, boolean overwrite) throws IOException {
         copyHdfsToLocal(srcHdfsFilePath, dstFile, false, overwrite);
     }
 

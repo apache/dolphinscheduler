@@ -25,12 +25,14 @@ public class ResourceInfo {
     /**
      * res the name of the resource that was uploaded
      */
+    @Deprecated
     private Integer id;
 
     /**
-     * full name of the resource that was uploaded
+     * ResourceAbsolutePathInStorage
      */
     private String resourceName;
 
+    @Deprecated
     private String res;
 }
