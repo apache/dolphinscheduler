@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -38,9 +38,7 @@ public class FlinkArgsUtilsTest {
         flinkParameters.setDeployMode(flinkDeployMode);
         flinkParameters.setParallelism(4);
         ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(1);
         resourceInfo.setResourceName("/opt/job.jar");
-        resourceInfo.setRes("/opt/job.jar");
         flinkParameters.setMainJar(resourceInfo);
         flinkParameters.setMainClass("org.example.Main");
         flinkParameters.setSlot(4);
@@ -54,9 +52,14 @@ public class FlinkArgsUtilsTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskAppId("app-id");
         taskExecutionContext.setExecutePath("/tmp/execution");
-        HashMap<String, String> map = new HashMap<>();
-        map.put("/opt/job.jar", "/opt/job.jar");
-        taskExecutionContext.setResources(map);
+
+        ResourceContext.ResourceItem resourceItem = new ResourceContext.ResourceItem();
+        resourceItem.setResourceAbsolutePathInLocal("/opt/job.jar");
+        resourceItem.setResourceAbsolutePathInStorage("/opt/job.jar");
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem);
+        taskExecutionContext.setResourceContext(resourceContext);
         return taskExecutionContext;
     }
 
