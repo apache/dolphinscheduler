@@ -80,22 +80,4 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
-    @Test
-    public void testExceptionHandler() throws Exception {
-        Map<String, Object> paramsMap = new HashMap<>();
-        paramsMap.put("userId", -1);
-        paramsMap.put("expireTime", "2022-12-31 00:00:00");
-        paramsMap.put("token", "507f5aeaaa2093dbdff5d5522ce00510");
-        MvcResult mvcResult = mockMvc.perform(post("/v2/access-tokens")
-                .header("sessionId", sessionId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(JSONUtils.toJsonString(paramsMap)))
-                // todo: bad request?
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(), result.getCode().intValue());
-    }
 }

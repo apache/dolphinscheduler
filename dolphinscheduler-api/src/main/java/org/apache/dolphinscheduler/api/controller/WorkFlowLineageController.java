@@ -18,11 +18,9 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_LINEAGE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.TASK_WITH_DEPENDENT_ERROR;
 import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -69,7 +67,6 @@ public class WorkFlowLineageController extends BaseController {
     @Operation(summary = "queryLineageByWorkFlowName", description = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
     public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                     @RequestParam(value = "workFlowName", required = false) String workFlowName) {
@@ -82,7 +79,6 @@ public class WorkFlowLineageController extends BaseController {
     @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
     @GetMapping(value = "/{workFlowCode}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
@@ -121,7 +117,6 @@ public class WorkFlowLineageController extends BaseController {
     })
     @PostMapping(value = "/tasks/verify-delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(TASK_WITH_DEPENDENT_ERROR)
     public Result verifyTaskCanDelete(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                       @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
