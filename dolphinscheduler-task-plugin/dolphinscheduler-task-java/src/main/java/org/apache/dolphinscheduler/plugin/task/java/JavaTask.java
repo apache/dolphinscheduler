@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
@@ -52,8 +53,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public class JavaTask extends AbstractTask {
 
     /**
@@ -79,9 +83,7 @@ public class JavaTask extends AbstractTask {
     public JavaTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskRequest = taskRequest;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
     }
 
     /**
@@ -131,7 +133,7 @@ public class JavaTask extends AbstractTask {
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
+            setTaskOutputParams(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             log.error("java task interrupted ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
@@ -175,7 +177,9 @@ public class JavaTask extends AbstractTask {
      * @return String
      **/
     protected String buildJarCommand() {
-        String mainJarName = taskRequest.getResources().get(javaParameters.getMainJar().getResourceName());
+        ResourceContext resourceContext = taskRequest.getResourceContext();
+        String mainJarName = resourceContext.getResourceItem(javaParameters.getMainJar().getResourceName())
+                .getResourceAbsolutePathInLocal();
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(" ")
@@ -278,14 +282,17 @@ public class JavaTask extends AbstractTask {
         } else {
             builder.append("--class-path");
         }
-        builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
+        builder.append(" ")
+                .append(JavaConstants.CLASSPATH_CURRENT_DIR)
                 .append(JavaConstants.PATH_SEPARATOR)
                 .append(taskRequest.getExecutePath());
-        Map<String, String> resourceMap = taskRequest.getResources();
+        ResourceContext resourceContext = taskRequest.getResourceContext();
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
-            builder.append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
-                    .append(resourceMap.get(info.getResourceName()));
+            builder
+                    .append(taskRequest.getExecutePath())
+                    .append(FOLDER_SEPARATOR)
+                    .append(resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal());
         }
         return builder.toString();
     }

@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,12 +103,12 @@ public class TaskInstanceKillOperationFunction
     }
 
     protected void cancelApplication(int taskInstanceId) {
-        WorkerTaskExecuteRunnable workerTaskExecuteRunnable = workerManager.getTaskExecuteThread(taskInstanceId);
-        if (workerTaskExecuteRunnable == null) {
+        WorkerTaskExecutor workerTaskExecutor = workerManager.getTaskExecuteThread(taskInstanceId);
+        if (workerTaskExecutor == null) {
             log.warn("taskExecuteThread not found, taskInstanceId:{}", taskInstanceId);
             return;
         }
-        AbstractTask task = workerTaskExecuteRunnable.getTask();
+        AbstractTask task = workerTaskExecutor.getTask();
         if (task == null) {
             log.warn("task not found, taskInstanceId:{}", taskInstanceId);
             return;

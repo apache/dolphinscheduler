@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
@@ -109,7 +110,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     @Test
     public void testAuthenticate() {
         when(ldapService.ldapLogin(ldapUid, ldapUserPwd)).thenReturn(ldapEmail);
-        when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(mockSession.getId());
+        when(sessionService.createSessionIfAbsent(Mockito.any(User.class))).thenReturn(mockSession);
 
         // test username pwd correct and user not exist, config user not exist action deny, so login denied
         when(ldapService.getLdapUserNotExistAction()).thenReturn(LdapUserNotExistActionType.DENY);
@@ -125,7 +126,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
         logger.info(result.toString());
 
         // test username pwd correct and user not exist, config action create but can't create session, so login failed
-        when(sessionService.createSession(Mockito.any(User.class), Mockito.eq(ip))).thenReturn(null);
+        when(sessionService.createSessionIfAbsent(Mockito.any(User.class))).thenReturn(null);
         result = ldapAuthenticator.authenticate(ldapUid, ldapUserPwd, ip);
         Assertions.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
@@ -139,12 +140,12 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
     public void testGetAuthUser() {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         when(usersService.queryUser(mockUser.getId())).thenReturn(mockUser);
-        when(sessionService.getSession(request)).thenReturn(mockSession);
+        when(sessionService.getSession(any())).thenReturn(mockSession);
 
         User user = ldapAuthenticator.getAuthUser(request);
         Assertions.assertNotNull(user);
 
-        when(sessionService.getSession(request)).thenReturn(null);
+        when(sessionService.getSession(any())).thenReturn(null);
         user = ldapAuthenticator.getAuthUser(request);
         Assertions.assertNull(user);
     }

@@ -456,7 +456,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
                 .thenReturn(processTaskRelationList);
         Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(getProcessDefinition());
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 1L)).thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(1L)).thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
@@ -494,7 +494,7 @@ public class ProcessTaskRelationServiceTest {
         processTaskRelation.setPostTaskCode(taskCode);
         processTaskRelation.setPostTaskVersion(1);
         processTaskRelationList.add(processTaskRelation);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(processDefinitionCode))
                 .thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
@@ -527,7 +527,7 @@ public class ProcessTaskRelationServiceTest {
         List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
         processTaskRelationList.add(processTaskRelation);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 1L)).thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(1L)).thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,

@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
@@ -56,17 +55,12 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -202,45 +196,6 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
-        }
-    }
-
-    @Component
-    public static class FilePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
-
-        private final ResourceMapper resourceMapper;
-
-        private final ResourceUserMapper resourceUserMapper;
-
-        public FilePermissionCheck(ResourceMapper resourceMapper, ResourceUserMapper resourceUserMapper) {
-            this.resourceMapper = resourceMapper;
-            this.resourceUserMapper = resourceUserMapper;
-        }
-
-        @Override
-        public List<AuthorizationType> authorizationTypes() {
-            return Arrays.asList(AuthorizationType.RESOURCE_FILE_ID, AuthorizationType.UDF_FILE);
-        }
-
-        @Override
-        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<Resource> relationResources;
-            if (userId == 0) {
-                relationResources = new ArrayList<>();
-            } else {
-                // query resource relation
-                List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, 0);
-                relationResources = CollectionUtils.isEmpty(resIds) ? new ArrayList<>()
-                        : resourceMapper.queryResourceListById(resIds);
-            }
-            List<Resource> ownResourceList = resourceMapper.queryResourceListAuthored(userId, -1);
-            relationResources.addAll(ownResourceList);
-            return relationResources.stream().map(Resource::getId).collect(toSet());
-        }
-
-        @Override
-        public boolean permissionCheck(int userId, String permissionKey, Logger logger) {
-            return true;
         }
     }
 
