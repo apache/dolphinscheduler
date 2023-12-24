@@ -58,7 +58,6 @@ public class DataxParametersTest {
         DataxParameters dataxParameters = new DataxParameters();
         List<ResourceInfo> resourceInfoList = new ArrayList<>();
         ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(2);
         resourceInfo.setResourceName("/hdfs.keytab");
         resourceInfoList.add(resourceInfo);
 
@@ -90,7 +89,7 @@ public class DataxParametersTest {
                 + "jobSpeedRecord=1, "
                 + "xms=0, "
                 + "xmx=-100, "
-                + "resourceList=[{\"id\":2,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"
+                + "resourceList=[{\"id\":null,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"
                 + "}";
 
         Assertions.assertEquals(expected, dataxParameters.toString());

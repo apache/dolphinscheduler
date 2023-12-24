@@ -54,7 +54,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ConnectorType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
@@ -72,13 +71,11 @@ import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextC
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -113,7 +110,6 @@ public class TaskExecutionContextFactory {
 
     public TaskExecutionContext createTaskExecutionContext(TaskInstance taskInstance) throws TaskExecutionContextCreateException {
         ProcessInstance workflowInstance = taskInstance.getProcessInstance();
-        taskInstance.setResources(getResourceFullNames(taskInstance));
 
         ResourceParametersHelper resources =
                 Optional.ofNullable(taskPluginManager.getTaskChannel(taskInstance.getTaskType()))
@@ -157,22 +153,6 @@ public class TaskExecutionContextFactory {
     public void setK8sTaskRelatedInfo(TaskExecutionContext taskExecutionContext, TaskInstance taskInstance) {
         K8sTaskExecutionContext k8sTaskExecutionContext = setK8sTaskRelation(taskInstance);
         taskExecutionContext.setK8sTaskExecutionContext(k8sTaskExecutionContext);
-    }
-
-    private Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
-        Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
-                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
-        if (baseParam != null) {
-            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
-                // TODO: Modify this part to accomodate(migrate) oldversionresources in the future.
-                projectResourceFiles.forEach(file -> resourcesMap.put(file.getResourceName(),
-                        processService.queryTenantCodeByResName(file.getResourceName(), ResourceType.FILE)));
-            }
-        }
-
-        return resourcesMap;
     }
 
     private void setTaskResourceInfo(ResourceParametersHelper resourceParametersHelper) {
@@ -219,9 +199,6 @@ public class TaskExecutionContextFactory {
         udfFuncList.forEach(udfFunc -> {
             UdfFuncParameters udfFuncParameters =
                     JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
-            udfFuncParameters.setDefaultFS(PropertyUtils.getString(Constants.FS_DEFAULT_FS));
-            String tenantCode = processService.queryTenantCodeByResName(udfFunc.getResourceName(), ResourceType.UDF);
-            udfFuncParameters.setTenantCode(tenantCode);
             map.put(udfFunc.getId(), udfFuncParameters);
         });
     }
