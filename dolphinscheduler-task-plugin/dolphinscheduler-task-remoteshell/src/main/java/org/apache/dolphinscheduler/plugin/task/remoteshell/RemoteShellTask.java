@@ -97,7 +97,7 @@ public class RemoteShellTask extends AbstractTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
-        // todo: add task close method to release resource
+        // add task close method to release resource
         try (RemoteExecutor executor = remoteExecutor) {
             // construct process
             String localFile = buildCommand();
