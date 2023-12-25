@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.MINUTE_2_SECOND_TIME_UNIT;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
@@ -38,6 +37,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import lombok.Data;
 
@@ -407,7 +407,7 @@ public class TaskInstance implements Serializable {
         Date now = new Date();
         long failedTimeInterval = DateUtils.differSec(now, getEndTime());
         // task retry does not over time, return false
-        return getRetryInterval() * MINUTE_2_SECOND_TIME_UNIT < failedTimeInterval;
+        return TimeUnit.MINUTES.toSeconds(getRetryInterval()) < failedTimeInterval;
     }
 
 }
