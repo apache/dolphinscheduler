@@ -15,16 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.hana;
+package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
-import org.apache.dolphinscheduler.plugin.datasource.api.client.CommonDataSourceClient;
-import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+/**
+ * target common parameter
+ */
+public class TargetCommonParameter {
 
-public class HanaDataSourceClient extends CommonDataSourceClient {
+    /**
+     * target datasource
+     */
+    protected int targetDatasource;
 
-    public HanaDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
-        super(baseConnectionParam, dbType);
+    public int getTargetDatasource() {
+        return targetDatasource;
+    }
+
+    public void setTargetDatasource(int targetDatasource) {
+        this.targetDatasource = targetDatasource;
     }
 
 }

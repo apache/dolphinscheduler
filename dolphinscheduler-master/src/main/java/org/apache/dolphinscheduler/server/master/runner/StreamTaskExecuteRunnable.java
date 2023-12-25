@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
@@ -43,7 +42,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -60,9 +58,7 @@ import org.apache.dolphinscheduler.server.master.runner.dispatcher.WorkerTaskDis
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -70,10 +66,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -319,8 +312,6 @@ public class StreamTaskExecuteRunnable implements Runnable {
             return null;
         }
 
-        taskInstance.setResources(getResourceFullNames(taskInstance));
-
         TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
         ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
 
@@ -348,42 +339,6 @@ public class StreamTaskExecuteRunnable implements Runnable {
         taskExecutionContextFactory.setDataQualityTaskExecutionContext(taskExecutionContext, taskInstance, tenantCode);
         taskExecutionContextFactory.setK8sTaskRelatedInfo(taskExecutionContext, taskInstance);
         return taskExecutionContext;
-    }
-
-    /**
-     * get resource map key is full name and value is tenantCode
-     */
-    protected Map<String, String> getResourceFullNames(TaskInstance taskInstance) {
-        Map<String, String> resourcesMap = new HashMap<>();
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
-                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
-        if (baseParam != null) {
-            List<ResourceInfo> projectResourceFiles = baseParam.getResourceFilesList();
-            if (CollectionUtils.isNotEmpty(projectResourceFiles)) {
-
-                // filter the resources that the resource id equals 0
-                Set<ResourceInfo> oldVersionResources =
-                        projectResourceFiles.stream().filter(t -> t.getId() == null).collect(Collectors.toSet());
-                if (CollectionUtils.isNotEmpty(oldVersionResources)) {
-                    oldVersionResources.forEach(t -> resourcesMap.put(t.getRes(),
-                            processService.queryTenantCodeByResName(t.getRes(), ResourceType.FILE)));
-                }
-
-                // get the resource id in order to get the resource names in batch
-                Stream<Integer> resourceIdStream = projectResourceFiles.stream().map(ResourceInfo::getId);
-                Set<Integer> resourceIdsSet = resourceIdStream.collect(Collectors.toSet());
-
-                if (CollectionUtils.isNotEmpty(resourceIdsSet)) {
-                    Integer[] resourceIds = resourceIdsSet.toArray(new Integer[resourceIdsSet.size()]);
-
-                    List<Resource> resources = processService.listResourceByIds(resourceIds);
-                    resources.forEach(t -> resourcesMap.put(t.getFullName(),
-                            processService.queryTenantCodeByResName(t.getFullName(), ResourceType.FILE)));
-                }
-            }
-        }
-
-        return resourcesMap;
     }
 
     protected boolean handleTaskEvent(TaskEvent taskEvent) throws StateEventHandleException, StateEventHandleError {

@@ -14,48 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Date;
+package org.apache.dolphinscheduler.plugin.datasource.hana;
 
-import lombok.Data;
+import org.apache.dolphinscheduler.plugin.datasource.api.client.BaseAdHocDataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+public class HanaAdHocDataSourceClient extends BaseAdHocDataSourceClient {
 
-@Data
-@TableName("t_ds_relation_resources_user")
-public class ResourcesUser {
-
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    /**
-     * user id
-     */
-    private int userId;
-
-    /**
-     * resource id
-     */
-    private int resourcesId;
-
-    /**
-     * permission
-     */
-    private int perm;
-
-    /**
-     * create time
-     */
-    private Date createTime;
-
-    /**
-     * update time
-     */
-    private Date updateTime;
+    public HanaAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
+        super(baseConnectionParam, dbType);
+    }
 }
