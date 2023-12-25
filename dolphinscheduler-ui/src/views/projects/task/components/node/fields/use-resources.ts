@@ -61,7 +61,7 @@ export function useResources(
     parentDir: string[],
     resources: ResourceOption[]
   ): boolean => {
-    if (resources.length >= 0) {
+    if (resources.length > 0) {
       for (const res of resources) {
         if (res.dirctory) {
           const isPrefix = new RegExp(`^${res.fullName}`).test(fullName)
