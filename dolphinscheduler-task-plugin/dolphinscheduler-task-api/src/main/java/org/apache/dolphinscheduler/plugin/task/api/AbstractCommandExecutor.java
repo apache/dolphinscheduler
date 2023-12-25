@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -131,11 +130,7 @@ public abstract class AbstractCommandExecutor {
         // Set sudo (This is only work in Linux)
         iShellInterceptorBuilder.sudoMode(OSUtils.isSudoEnable());
         // Set tenant (This is only work in Linux)
-        if (TenantConstants.DEFAULT_TENANT_CODE.equals(taskRequest.getTenantCode())) {
-            iShellInterceptorBuilder.runUser(TenantConstants.BOOTSTRAPT_SYSTEM_USER);
-        } else {
-            iShellInterceptorBuilder.runUser(taskRequest.getTenantCode());
-        }
+        iShellInterceptorBuilder.runUser(taskRequest.getTenantCode());
         // Set CPU Quota (This is only work in Linux)
         if (taskRequest.getCpuQuota() != null) {
             iShellInterceptorBuilder.cpuQuota(taskRequest.getCpuQuota());

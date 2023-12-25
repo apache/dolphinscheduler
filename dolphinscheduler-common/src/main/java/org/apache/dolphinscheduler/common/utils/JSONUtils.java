@@ -21,6 +21,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
@@ -67,7 +68,7 @@ import com.google.common.base.Strings;
  * json utils
  */
 @Slf4j
-public class JSONUtils {
+public final class JSONUtils {
 
     static {
         log.info("init timezone: {}", TimeZone.getDefault());
@@ -78,6 +79,7 @@ public class JSONUtils {
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .configure(FAIL_ON_EMPTY_BEANS, false)
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))

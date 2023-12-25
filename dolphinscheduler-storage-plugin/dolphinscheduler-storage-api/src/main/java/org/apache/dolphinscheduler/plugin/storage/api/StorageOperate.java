@@ -69,10 +69,11 @@ public interface StorageOperate {
 
     /**
      * get the path of the resource file excluding the base path (fileName)
-     * @param fullName
-     * @return
      */
-    String getResourceFileName(String tenantCode, String fullName);
+    default String getResourceFileName(String tenantCode, String fullName) {
+        String resDir = getResDir(tenantCode);
+        return fullName.replaceFirst(resDir, "");
+    }
 
     /**
      * get the path of the file
@@ -137,14 +138,13 @@ public interface StorageOperate {
 
     /**
      * download the srcPath to local
-     * @param tenantCode
+     *
      * @param srcFilePath the full path of the srcPath
      * @param dstFile
      * @param overwrite
      * @throws IOException
      */
-    void download(String tenantCode, String srcFilePath, String dstFile,
-                  boolean overwrite) throws IOException;
+    void download(String srcFilePath, String dstFile, boolean overwrite) throws IOException;
 
     /**
      * vim the context of filePath
