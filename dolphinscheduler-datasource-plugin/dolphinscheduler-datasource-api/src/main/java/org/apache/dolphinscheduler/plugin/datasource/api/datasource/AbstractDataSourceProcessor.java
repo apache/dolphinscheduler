@@ -92,12 +92,15 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         if (MapUtils.isEmpty(other)) {
             return;
         }
+
         if (!Sets.intersection(other.keySet(), POSSIBLE_MALICIOUS_KEYS).isEmpty()) {
             throw new IllegalArgumentException("Other params include possible malicious keys.");
         }
-        boolean paramsCheck = other.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
-        if (!paramsCheck) {
-            throw new IllegalArgumentException("datasource other params illegal");
+
+        for (Map.Entry<String, String> entry : other.entrySet()) {
+            if (!PARAMS_PATTER.matcher(entry.getKey()).matches()) {
+                throw new IllegalArgumentException("datasource other params: " + entry.getKey() + " illegal");
+            }
         }
     }
 
