@@ -217,7 +217,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         taskExecutionContext.setTenantCode(tenant);
         log.info("TenantCode: {} check successfully", taskExecutionContext.getTenantCode());
 
-        TaskExecutionContextUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
+        TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
         log.info("WorkflowInstanceExecDir: {} check successfully", taskExecutionContext.getExecutePath());
 
         TaskChannel taskChannel =
