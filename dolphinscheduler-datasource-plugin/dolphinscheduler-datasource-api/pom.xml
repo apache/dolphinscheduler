@@ -40,7 +40,6 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
