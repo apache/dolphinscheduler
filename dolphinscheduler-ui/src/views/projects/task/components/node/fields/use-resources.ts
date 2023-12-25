@@ -32,7 +32,7 @@ export function useResources(
   interface ResourceOption {
     name: string
     fullName: string
-    dirctory?: boolean
+    dirctory: boolean
     disable: boolean
     children?: ResourceOption[]
   }
@@ -61,23 +61,28 @@ export function useResources(
     parentDir: string[],
     resources: ResourceOption[]
   ): boolean => {
+    const isDirectory = (res: ResourceOption): boolean => {
+      return res.dirctory && new RegExp(`^${res.fullName}`).test(fullName)
+    }
+
+    const processDirectory = (res: ResourceOption): boolean => {
+      if (!res.children) {
+        res.children = []
+      }
+      parentDir.push(res.name)
+      return validateResourceExist(
+        fullName,
+        parentDir,
+        res.children as ResourceOption[]
+      )
+    }
+
     if (resources.length > 0) {
       for (const res of resources) {
-        if (res.dirctory) {
-          const isPrefix = new RegExp(`^${res.fullName}`).test(fullName)
-          if (!isPrefix) {
-            continue
-          }
-          if (!res.children) {
-            res.children = []
-          }
-          parentDir.push(res.name)
-          return validateResourceExist(
-            fullName,
-            parentDir,
-            res.children as ResourceOption[]
-          )
+        if (isDirectory(res)) {
+          return processDirectory(res)
         }
+
         if (res.fullName === fullName) {
           return true
         }
@@ -95,6 +100,7 @@ export function useResources(
     const resourceNode = {
       fullName: fullName,
       name: getResourceDirAfter(fullName, parentDir),
+      dirctory: false,
       disable: true
     }
     resources.push(resourceNode)
