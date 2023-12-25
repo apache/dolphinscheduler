@@ -50,8 +50,8 @@ export default {
           },
           {
             key: 'docs1',
-            text: '3.1.8',
-            link: '/en-us/docs/3.1.8/user_doc/about/introduction.html',
+            text: '3.1.9',
+            link: '/en-us/docs/3.1.9/user_doc/about/introduction.html',
           },
           {
             key: 'docs2',
@@ -178,8 +178,8 @@ export default {
           },
           {
             key: 'docs1',
-            text: '3.1.8',
-            link: '/zh-cn/docs/3.1.8/user_doc/about/introduction.html',
+            text: '3.1.9',
+            link: '/zh-cn/docs/3.1.9/user_doc/about/introduction.html',
           },
           {
             key: 'docs2',
