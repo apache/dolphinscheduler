@@ -21,36 +21,37 @@ import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TaskExecutionCheckerUtils {
+public class TaskExecutionContextUtils {
 
-    public static void checkTenantExist(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
+    public static String getOrCreateTenant(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
         try {
             String tenantCode = taskExecutionContext.getTenantCode();
             if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode)) {
-                log.warn("Current tenant is default tenant, will use {} to execute the task",
+                log.info("Current tenant is default tenant, will use {} to execute the task",
                         TenantConstants.BOOTSTRAPT_SYSTEM_USER);
-                return;
+                return TenantConstants.BOOTSTRAPT_SYSTEM_USER;
             }
             boolean osUserExistFlag;
             // if Using distributed is true and Currently supported systems are linux,Should not let it
@@ -70,6 +71,7 @@ public class TaskExecutionCheckerUtils {
                 throw new TaskException(
                         String.format("TenantCode: %s doesn't exist", tenantCode));
             }
+            return tenantCode;
         } catch (TaskException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -97,51 +99,55 @@ public class TaskExecutionCheckerUtils {
         }
     }
 
-    public static void downloadResourcesIfNeeded(StorageOperate storageOperate,
-                                                 TaskExecutionContext taskExecutionContext) {
-        String execLocalPath = taskExecutionContext.getExecutePath();
-        String tenant = taskExecutionContext.getTenantCode();
-        String actualTenant =
-                TenantConstants.DEFAULT_TENANT_CODE.equals(tenant) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER : tenant;
+    public static ResourceContext downloadResourcesIfNeeded(String tenant,
+                                                            TaskChannel taskChannel,
+                                                            StorageOperate storageOperate,
+                                                            TaskExecutionContext taskExecutionContext) {
+        AbstractParameters abstractParameters = taskChannel.parseParameters(
+                ParametersNode.builder()
+                        .taskType(taskExecutionContext.getTaskType())
+                        .taskParams(taskExecutionContext.getTaskParams())
+                        .build());
 
-        Map<String, String> projectRes = taskExecutionContext.getResources();
-        if (MapUtils.isEmpty(projectRes)) {
-            return;
+        List<ResourceInfo> resourceFilesList = abstractParameters.getResourceFilesList();
+        if (CollectionUtils.isEmpty(resourceFilesList)) {
+            log.debug("There is no resource file need to download");
+            return new ResourceContext();
         }
-        List<Pair<String, String>> downloadFiles = new ArrayList<>();
-        projectRes.keySet().forEach(fullName -> {
-            String fileName = storageOperate.getResourceFileName(actualTenant, fullName);
-            projectRes.put(fullName, fileName);
-            File resFile = new File(execLocalPath, fileName);
-            boolean notExist = !resFile.exists();
-            if (notExist) {
-                downloadFiles.add(Pair.of(fullName, fileName));
-            } else {
-                log.warn("Resource file : {} already exists will not download again ", resFile.getName());
-            }
-        });
 
-        if (CollectionUtils.isNotEmpty(downloadFiles)) {
-            for (Pair<String, String> fileDownload : downloadFiles) {
+        ResourceContext resourceContext = new ResourceContext();
+        String taskWorkingDirectory = taskExecutionContext.getExecutePath();
+
+        for (ResourceInfo resourceInfo : resourceFilesList) {
+            String resourceAbsolutePathInStorage = resourceInfo.getResourceName();
+            String resourceRelativePath = storageOperate.getResourceFileName(tenant, resourceAbsolutePathInStorage);
+            String resourceAbsolutePathInLocal = Paths.get(taskWorkingDirectory, resourceRelativePath).toString();
+            File file = new File(resourceAbsolutePathInLocal);
+            if (!file.exists()) {
                 try {
-                    String fullName = fileDownload.getLeft();
-                    String fileName = fileDownload.getRight();
-
                     long resourceDownloadStartTime = System.currentTimeMillis();
-
-                    Path localFileAbsolutePath = Paths.get(execLocalPath, fileName);
-                    storageOperate.download(actualTenant, fullName, localFileAbsolutePath.toString(), true);
-                    log.info("Download resource file {} under: {} successfully", fileName, localFileAbsolutePath);
+                    storageOperate.download(resourceAbsolutePathInStorage, resourceAbsolutePathInLocal, true);
+                    log.debug("Download resource file {} under: {} successfully", resourceAbsolutePathInStorage,
+                            resourceAbsolutePathInLocal);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
-                    WorkerServerMetrics.recordWorkerResourceDownloadSize(Files.size(localFileAbsolutePath));
+                    WorkerServerMetrics
+                            .recordWorkerResourceDownloadSize(Files.size(Paths.get(resourceAbsolutePathInLocal)));
                     WorkerServerMetrics.incWorkerResourceDownloadSuccessCount();
-                } catch (Exception e) {
+                } catch (Exception ex) {
                     WorkerServerMetrics.incWorkerResourceDownloadFailureCount();
-                    throw new TaskException(String.format("Download resource file: %s error", fileDownload), e);
+                    throw new TaskException(
+                            String.format("Download resource file: %s error", resourceAbsolutePathInStorage), ex);
                 }
             }
+            ResourceContext.ResourceItem resourceItem = ResourceContext.ResourceItem.builder()
+                    .resourceAbsolutePathInStorage(resourceAbsolutePathInStorage)
+                    .resourceRelativePath(resourceRelativePath)
+                    .resourceAbsolutePathInLocal(resourceAbsolutePathInLocal)
+                    .build();
+            resourceContext.addResourceItem(resourceItem);
         }
+        return resourceContext;
     }
 
 }
