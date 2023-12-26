@@ -432,7 +432,7 @@ export default {
     resources: 'Resources',
     resources_tips: 'Please select resources',
     resources_limit_tips: 'Please select again, resource limit:',
-    non_resources_tips: 'Please delete all non-existent resources',
+    no_resources_tips: 'Please delete all non-existent resources',
     useless_resources_tips: 'Unauthorized or deleted resources',
     custom_parameters: 'Custom Parameters',
     copy_success: 'Copy success',
