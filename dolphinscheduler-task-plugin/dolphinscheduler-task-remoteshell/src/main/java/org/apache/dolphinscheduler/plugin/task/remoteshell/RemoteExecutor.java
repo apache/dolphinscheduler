@@ -39,10 +39,11 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class RemoteExecutor {
+public class RemoteExecutor implements AutoCloseable {
 
     static final String REMOTE_SHELL_HOME = "/tmp/dolphinscheduler-remote-shell-%s/";
     static final String STATUS_TAG_MESSAGE = "DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-";
@@ -50,9 +51,9 @@ public class RemoteExecutor {
 
     protected Map<String, String> taskOutputParams = new HashMap<>();
 
-    SshClient sshClient;
-    ClientSession session;
-    SSHConnectionParam sshConnectionParam;
+    private SshClient sshClient;
+    private ClientSession session;
+    private SSHConnectionParam sshConnectionParam;
 
     public RemoteExecutor(SSHConnectionParam sshConnectionParam) {
 
@@ -203,6 +204,18 @@ public class RemoteExecutor {
 
     private String getRemoteShellHome() {
         return String.format(REMOTE_SHELL_HOME, sshConnectionParam.getUser());
+    }
+
+    @SneakyThrows
+    @Override
+    public void close() {
+        if (session != null && session.isOpen()) {
+            session.close();
+        }
+        if (sshClient != null && sshClient.isStarted()) {
+            sshClient.close();
+        }
+
     }
 
     static class COMMAND {
