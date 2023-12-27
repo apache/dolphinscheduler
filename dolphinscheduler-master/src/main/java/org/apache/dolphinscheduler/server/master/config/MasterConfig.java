@@ -64,9 +64,9 @@ public class MasterConfig implements Validator {
     private int execThreads = 10;
 
     // todo: change to sync thread pool/ async thread pool ?
-    private int masterTaskExecuteThreadPoolSize = Runtime.getRuntime().availableProcessors();
+    private int masterSyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
 
-    private int masterAsyncTaskStateCheckThreadPoolSize = Runtime.getRuntime().availableProcessors();
+    private int masterAsyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
     /**
      * The task dispatch thread pool size.
      */

@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +38,9 @@ public class ThreadUtils {
      * @param threadsNum threadsNum
      * @return ExecutorService
      */
-    public static ExecutorService newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
+    public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
         ThreadFactory threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat(threadName).build();
-        return Executors.newFixedThreadPool(threadsNum, threadFactory);
+        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, threadFactory);
     }
 
     public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadName) {
