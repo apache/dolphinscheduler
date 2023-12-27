@@ -39,7 +39,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -108,7 +107,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
         sendTaskResult();
 
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
         log.info("Remove the current task execute context from worker cache");
         clearTaskExecPathIfNeeded();
 
@@ -118,7 +117,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         if (cancelTask()) {
             log.info("Cancel the task successfully");
         }
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
@@ -128,7 +127,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     }
 
-    public boolean cancelTask() {
+    protected boolean cancelTask() {
         // cancel the task
         if (task == null) {
             return true;
@@ -157,7 +156,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
             if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext,
                         ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
                 log.info(

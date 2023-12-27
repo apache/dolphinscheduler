@@ -64,9 +64,9 @@ public class MasterConfig implements Validator {
     private int execThreads = 10;
 
     // todo: change to sync thread pool/ async thread pool ?
-    private int masterTaskExecuteThreadPoolSize = Runtime.getRuntime().availableProcessors();
+    private int masterSyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
 
-    private int masterAsyncTaskStateCheckThreadPoolSize = Runtime.getRuntime().availableProcessors();
+    private int masterAsyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
     /**
      * The task dispatch thread pool size.
      */
@@ -163,23 +163,27 @@ public class MasterConfig implements Validator {
     }
 
     private void printConfig() {
-        log.info("Master config: listenPort -> {} ", listenPort);
-        log.info("Master config: fetchCommandNum -> {} ", fetchCommandNum);
-        log.info("Master config: preExecThreads -> {} ", preExecThreads);
-        log.info("Master config: execThreads -> {} ", execThreads);
-        log.info("Master config: dispatchTaskNumber -> {} ", dispatchTaskNumber);
-        log.info("Master config: hostSelector -> {} ", hostSelector);
-        log.info("Master config: heartbeatInterval -> {} ", heartbeatInterval);
-        log.info("Master config: taskCommitRetryTimes -> {} ", taskCommitRetryTimes);
-        log.info("Master config: taskCommitInterval -> {} ", taskCommitInterval);
-        log.info("Master config: stateWheelInterval -> {} ", stateWheelInterval);
-        log.info("Master config: maxCpuLoadAvg -> {} ", maxCpuLoadAvg);
-        log.info("Master config: reservedMemory -> {} ", reservedMemory);
-        log.info("Master config: failoverInterval -> {} ", failoverInterval);
-        log.info("Master config: killApplicationWhenTaskFailover -> {} ", killApplicationWhenTaskFailover);
-        log.info("Master config: registryDisconnectStrategy -> {} ", registryDisconnectStrategy);
-        log.info("Master config: masterAddress -> {} ", masterAddress);
-        log.info("Master config: masterRegistryPath -> {} ", masterRegistryPath);
-        log.info("Master config: workerGroupRefreshInterval -> {} ", workerGroupRefreshInterval);
+        String config =
+                "\n****************************Master Configuration**************************************" +
+                        "\n  listen-port -> " + listenPort +
+                        "\n  fetch-command-num -> " + fetchCommandNum +
+                        "\n  pre-exec-threads -> " + preExecThreads +
+                        "\n  exec-threads -> " + execThreads +
+                        "\n  dispatch-task-number -> " + dispatchTaskNumber +
+                        "\n  host-selector -> " + hostSelector +
+                        "\n  heartbeat-interval -> " + heartbeatInterval +
+                        "\n  task-commit-retry-times -> " + taskCommitRetryTimes +
+                        "\n  task-commit-interval -> " + taskCommitInterval +
+                        "\n  state-wheel-interval -> " + stateWheelInterval +
+                        "\n  max-cpu-load-avg -> " + maxCpuLoadAvg +
+                        "\n  reserved-memory -> " + reservedMemory +
+                        "\n  failover-interval -> " + failoverInterval +
+                        "\n  kill-application-when-task-failover -> " + killApplicationWhenTaskFailover +
+                        "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +
+                        "\n  master-address -> " + masterAddress +
+                        "\n  master-registry-path: " + masterRegistryPath +
+                        "\n  worker-group-refresh-interval: " + workerGroupRefreshInterval +
+                        "\n****************************Master Configuration**************************************";
+        log.info(config);
     }
 }
