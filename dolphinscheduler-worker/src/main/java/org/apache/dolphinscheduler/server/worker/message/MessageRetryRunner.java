@@ -69,7 +69,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
         log.info("Message retry runner staring");
         messageSenders.forEach(messageSender -> {
             messageSenderMap.put(messageSender.getMessageType(), messageSender);
-            log.info("Injected message sender: {}", messageSender.getClass().getName());
+            log.info("Injected message sender: {}", messageSender.getClass().getSimpleName());
         });
         super.start();
         log.info("Message retry runner started");
