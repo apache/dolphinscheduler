@@ -46,7 +46,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
-import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.testcontainers.utility.DockerImageName;
@@ -67,14 +67,14 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private final int DOCKER_PORT = 12345;
 
     private RemoteWebDriver driver;
-    private DockerComposeContainer<?> compose;
+    private ComposeContainer compose;
     private BrowserWebDriverContainer<?> browser;
     private HostAndPort address;
     private String rootPath;
 
     private Path record;
 
-    private final String serviceName = "dolphinscheduler_1";
+    private final String serviceName = "dolphinscheduler";
 
     @Override
     @SuppressWarnings("UnstableApiUsage")
@@ -194,7 +194,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         }
     }
 
-    private DockerComposeContainer<?> createDockerCompose(ExtensionContext context) {
+    private ComposeContainer createDockerCompose(ExtensionContext context) {
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
@@ -203,13 +203,17 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                                        .map(URL::getPath)
                                        .map(File::new)
                                        .collect(Collectors.toList());
-        compose = new DockerComposeContainer<>(files)
-            .withPull(true)
-            .withTailChildContainers(true)
-            .withLocalCompose(true)
-            .withExposedService(serviceName, DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
-            .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
-            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
+									   
+       ComposeContainer compose = new ComposeContainer(files)
+                .withPull(true)
+                .withTailChildContainers(true)
+                .withLocalCompose(true)
+                .withExposedService(
+                        serviceName,
+                        DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
+                .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+                .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
+	   
 
         return compose;
     }
