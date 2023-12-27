@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.worker.runner;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
@@ -42,15 +41,7 @@ public class TaskCallbackImpl implements TaskCallBack {
 
     @Override
     public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
-        TaskExecutionContext taskExecutionContext =
-                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        if (taskExecutionContext == null) {
-            log.error("task execution context is empty, taskInstanceId: {}, applicationInfo:{}", taskInstanceId,
-                    applicationInfo);
-            return;
-        }
-
-        log.info("send remote application info {}", applicationInfo);
+        // todo: use listener
         taskExecutionContext.setAppIds(applicationInfo.getAppIds());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
                 ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
@@ -58,13 +49,6 @@ public class TaskCallbackImpl implements TaskCallBack {
 
     @Override
     public void updateTaskInstanceInfo(int taskInstanceId) {
-        TaskExecutionContext taskExecutionContext =
-                TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-        if (taskExecutionContext == null) {
-            log.error("task execution context is empty, taskInstanceId: {}", taskInstanceId);
-            return;
-        }
-
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
                 ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.RUNNING_INFO);
     }

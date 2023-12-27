@@ -30,7 +30,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 import org.apache.dolphinscheduler.server.worker.task.WorkerHeartBeatTask;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -55,7 +55,7 @@ public class WorkerRegistryClient implements AutoCloseable {
     private WorkerConfig workerConfig;
 
     @Autowired
-    private WorkerManagerThread workerManagerThread;
+    private WorkerTaskExecutorThreadPool workerManagerThread;
 
     @Autowired
     private RegistryClient registryClient;
@@ -71,7 +71,7 @@ public class WorkerRegistryClient implements AutoCloseable {
         this.workerHeartBeatTask = new WorkerHeartBeatTask(
                 workerConfig,
                 registryClient,
-                () -> workerManagerThread.getWaitSubmitQueueSize());
+                () -> workerManagerThread.getWaitingTaskExecutorSize());
     }
 
     public void start() {

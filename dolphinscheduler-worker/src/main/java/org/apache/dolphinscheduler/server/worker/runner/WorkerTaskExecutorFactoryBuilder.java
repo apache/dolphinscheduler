@@ -24,20 +24,31 @@ import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
-import javax.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-
-@UtilityClass
+@Component
 public class WorkerTaskExecutorFactoryBuilder {
 
-    public static WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(@NonNull TaskExecutionContext taskExecutionContext,
-                                                                                                          @NonNull WorkerConfig workerConfig,
-                                                                                                          @NonNull WorkerMessageSender workerMessageSender,
-                                                                                                          @NonNull TaskPluginManager taskPluginManager,
-                                                                                                          @Nullable StorageOperate storageOperate,
-                                                                                                          @NonNull WorkerRegistryClient workerRegistryClient) {
+    @Autowired
+    private WorkerConfig workerConfig;
+
+    @Autowired
+    private WorkerMessageSender workerMessageSender;
+
+    @Autowired
+    private TaskPluginManager taskPluginManager;
+
+    @Autowired
+    private WorkerTaskExecutorThreadPool workerManager;
+
+    @Autowired(required = false)
+    private StorageOperate storageOperate;
+
+    @Autowired
+    private WorkerRegistryClient workerRegistryClient;
+
+    public WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(TaskExecutionContext taskExecutionContext) {
         return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,

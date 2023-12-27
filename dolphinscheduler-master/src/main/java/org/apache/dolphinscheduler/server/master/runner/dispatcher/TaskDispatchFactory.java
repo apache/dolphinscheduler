@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,10 @@ public class TaskDispatchFactory {
 
     public TaskDispatcher getTaskDispatcher(String taskType) {
         return TaskUtils.isMasterTask(taskType) ? masterTaskDispatcher : workerTaskDispatcher;
+    }
+
+    public TaskDispatcher getTaskDispatcher(TaskInstance taskInstance) {
+        return getTaskDispatcher(taskInstance.getTaskType());
     }
 
 }

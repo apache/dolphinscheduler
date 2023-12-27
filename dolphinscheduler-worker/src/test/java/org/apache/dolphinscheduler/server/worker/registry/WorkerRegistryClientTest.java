@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 
 import java.time.Duration;
 import java.util.Set;
@@ -67,7 +67,7 @@ public class WorkerRegistryClientTest {
     private ScheduledExecutorService heartBeatExecutor;
 
     @Mock
-    private WorkerManagerThread workerManagerThread;
+    private WorkerTaskExecutorThreadPool workerManagerThread;
 
     @Mock
     private WorkerConnectStrategy workerConnectStrategy;

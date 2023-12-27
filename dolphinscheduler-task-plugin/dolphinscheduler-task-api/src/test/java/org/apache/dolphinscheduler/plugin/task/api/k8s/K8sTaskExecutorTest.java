@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
@@ -90,7 +88,7 @@ public class K8sTaskExecutorTest {
         TaskResponse taskResponse = new TaskResponse();
         k8sTaskExecutor.setJob(job);
         k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse);
-        Assertions.assertEquals(0, Integer.compare(EXIT_CODE_KILL, taskResponse.getExitStatusCode()));
+        Assertions.assertEquals(0, taskResponse.getExitStatusCode());
     }
     @Test
     public void testWaitTimeoutNormal() {

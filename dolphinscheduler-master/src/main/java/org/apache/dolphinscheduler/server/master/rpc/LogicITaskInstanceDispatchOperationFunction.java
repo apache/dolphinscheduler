@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchR
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.runner.GlobalMasterTaskExecuteRunnableQueue;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorFactoryBuilder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorThreadPoolManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +41,7 @@ public class LogicITaskInstanceDispatchOperationFunction
     private MasterTaskExecutorFactoryBuilder masterTaskExecutorFactoryBuilder;
 
     @Autowired
-    private GlobalMasterTaskExecuteRunnableQueue globalMasterTaskExecuteRunnableQueue;
+    private MasterTaskExecutorThreadPoolManager masterTaskExecutorThreadPool;
 
     @Override
     public LogicTaskDispatchResponse operate(LogicTaskDispatchRequest taskDispatchRequest) {
@@ -62,16 +62,12 @@ public class LogicITaskInstanceDispatchOperationFunction
             MasterTaskExecutor masterTaskExecutor = masterTaskExecutorFactoryBuilder
                     .createMasterTaskExecutorFactory(taskExecutionContext.getTaskType())
                     .createMasterTaskExecutor(taskExecutionContext);
-            if (globalMasterTaskExecuteRunnableQueue
-                    .submitMasterTaskExecuteRunnable(masterTaskExecutor)) {
-                log.info("Submit LogicTask: {} to MasterDelayTaskExecuteRunnableDelayQueue success", taskInstanceName);
+            if (masterTaskExecutorThreadPool.submitMasterTaskExecutor(masterTaskExecutor)) {
+                log.info("Submit LogicTask: {} to MasterTaskExecutorThreadPool success", taskInstanceName);
                 return LogicTaskDispatchResponse.success(taskInstanceId);
             } else {
-                log.error(
-                        "Submit LogicTask: {} to MasterDelayTaskExecuteRunnableDelayQueue failed, current task waiting queue size: {} is full",
-                        taskInstanceName, globalMasterTaskExecuteRunnableQueue.size());
-                return LogicTaskDispatchResponse.failed(taskInstanceId,
-                        "MasterDelayTaskExecuteRunnableDelayQueue is full");
+                log.error("Submit LogicTask: {} to MasterTaskExecutorThreadPool failed", taskInstanceName);
+                return LogicTaskDispatchResponse.failed(taskInstanceId, "MasterTaskExecutorThreadPool is full");
             }
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();

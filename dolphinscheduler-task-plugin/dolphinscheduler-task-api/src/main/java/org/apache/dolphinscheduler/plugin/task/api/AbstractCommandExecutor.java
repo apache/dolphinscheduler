@@ -105,13 +105,7 @@ public abstract class AbstractCommandExecutor {
                             TaskCallBack taskCallBack) throws Exception {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
-        if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-            log.warn(
-                    "Cannot find the taskInstance: {} from TaskExecutionContextCacheManager, the task might already been killed",
-                    taskInstanceId);
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            return result;
-        }
+        // todo: we need to use state like JDK Thread to make sure the killed task should not be executed
         iShellInterceptorBuilder = iShellInterceptorBuilder
                 .shellDirectory(taskRequest.getExecutePath())
                 .shellName(taskRequest.getTaskAppId());
@@ -155,13 +149,7 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskRequest.setProcessId(processId);
-        boolean updateTaskExecutionContextStatus =
-                TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
-        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            cancelApplication();
-            return result;
-        }
+
         // print process id
         log.info("process start, process id is: {}", processId);
 
