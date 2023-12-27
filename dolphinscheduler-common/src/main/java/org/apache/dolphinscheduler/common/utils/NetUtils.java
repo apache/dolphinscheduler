@@ -41,9 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.Sets;
 
-/**
- * NetUtils
- */
 @Slf4j
 public class NetUtils {
 
@@ -213,15 +210,17 @@ public class NetUtils {
                 .collect(Collectors.toList());
 
         // Use the specified network interface if set
-        if (StringUtils.isNotBlank(specifyNetworkInterfaceName())) {
-            String specifyNetworkInterfaceName = specifyNetworkInterfaceName();
+        String specifiedNetworkInterfaceName = specifyNetworkInterfaceName();
+        if (StringUtils.isNotBlank(specifiedNetworkInterfaceName)) {
             validNetworkInterfaces = validNetworkInterfaces.stream()
-                    .filter(networkInterface -> specifyNetworkInterfaceName.equals(networkInterface.getDisplayName()))
+                    .filter(networkInterface -> specifiedNetworkInterfaceName.equals(networkInterface.getDisplayName()))
                     .collect(Collectors.toList());
             if (CollectionUtils.isEmpty(validNetworkInterfaces)) {
                 throw new IllegalArgumentException(
-                        "The specified network interface: " + specifyNetworkInterfaceName + " is not found");
+                        "The specified network interface: " + specifiedNetworkInterfaceName + " is not found");
             }
+            log.info("Use the specified network interface: {} -> {}", specifiedNetworkInterfaceName,
+                    validNetworkInterfaces);
         }
 
         Set<String> restrictNetworkInterfaceName = restrictNetworkInterfaceName();
@@ -307,9 +306,10 @@ public class NetUtils {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface networkInterface = interfaces.nextElement();
-            log.info("Found NetworkInterface: {}", networkInterface);
+            log.debug("Found NetworkInterface: {}", networkInterface);
             validNetworkInterfaces.add(networkInterface);
         }
+        log.info("Get all NetworkInterfaces: {}", validNetworkInterfaces);
         return validNetworkInterfaces;
     }
 

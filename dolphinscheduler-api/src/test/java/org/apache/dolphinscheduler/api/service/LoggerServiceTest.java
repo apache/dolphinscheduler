@@ -91,7 +91,7 @@ public class LoggerServiceTest {
 
     @BeforeEach
     public void setUp() {
-        nettyRemotingServer = new NettyRemotingServer(new NettyServerConfig(8080));
+        nettyRemotingServer = new NettyRemotingServer(NettyServerConfig.builder().listenPort(8080).build());
         nettyRemotingServer.start();
         SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery =
                 new SpringServerMethodInvokerDiscovery(nettyRemotingServer);

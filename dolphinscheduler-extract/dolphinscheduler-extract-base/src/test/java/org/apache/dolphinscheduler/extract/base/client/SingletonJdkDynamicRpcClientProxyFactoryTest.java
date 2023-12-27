@@ -34,7 +34,8 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
     @BeforeEach
     public void setUp() {
-        nettyRemotingServer = new NettyRemotingServer(new NettyServerConfig(12345));
+        nettyRemotingServer =
+                new NettyRemotingServer(NettyServerConfig.builder().serverName("ApiServer").listenPort(12345).build());
         nettyRemotingServer.start();
 
         new SpringServerMethodInvokerDiscovery(nettyRemotingServer)
