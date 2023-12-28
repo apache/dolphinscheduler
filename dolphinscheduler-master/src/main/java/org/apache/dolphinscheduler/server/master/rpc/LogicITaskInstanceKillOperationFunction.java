@@ -21,10 +21,10 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillReque
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.GlobalMasterTaskExecuteRunnableQueue;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorHolder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorThreadPoolManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +38,7 @@ public class LogicITaskInstanceKillOperationFunction
             ITaskInstanceOperationFunction<LogicTaskKillRequest, LogicTaskKillResponse> {
 
     @Autowired
-    private GlobalMasterTaskExecuteRunnableQueue globalMasterTaskExecuteRunnableQueue;
+    private MasterTaskExecutorThreadPoolManager masterTaskExecutorThreadPool;
 
     @Override
     public LogicTaskKillResponse operate(LogicTaskKillRequest taskKillRequest) {
@@ -54,8 +54,8 @@ public class LogicITaskInstanceKillOperationFunction
             }
             try {
                 masterTaskExecutor.cancelTask();
-                globalMasterTaskExecuteRunnableQueue
-                        .removeMasterTaskExecuteRunnable(masterTaskExecutor);
+                // todo: if we remove success then we don't need to cancel?
+                masterTaskExecutorThreadPool.removeMasterTaskExecutor(masterTaskExecutor);
                 return LogicTaskKillResponse.success();
             } catch (MasterTaskExecuteException e) {
                 log.error("Cancel MasterTaskExecuteRunnable failed ", e);

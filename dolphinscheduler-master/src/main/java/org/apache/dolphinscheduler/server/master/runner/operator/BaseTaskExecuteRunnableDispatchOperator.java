@@ -52,6 +52,6 @@ public abstract class BaseTaskExecuteRunnableDispatchOperator implements TaskExe
                     taskInstance.getName(),
                     taskInstance.getDelayTime(), remainTime);
         }
-        globalTaskDispatchWaitingQueue.submitNeedToDispatchTaskExecuteRunnable(taskExecuteRunnable);
+        globalTaskDispatchWaitingQueue.submitTaskExecuteRunnable(taskExecuteRunnable);
     }
 }

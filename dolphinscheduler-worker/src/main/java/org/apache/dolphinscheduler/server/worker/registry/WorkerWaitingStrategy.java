@@ -24,8 +24,8 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceWaitingQueue;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 
 import java.time.Duration;
 
@@ -50,10 +50,7 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private WorkerManagerThread workerManagerThread;
-
-    @Autowired
-    private GlobalTaskInstanceWaitingQueue globalTaskInstanceWaitingQueue;
+    private WorkerTaskExecutorThreadPool workerManagerThread;
 
     @Override
     public void disconnect() {
@@ -114,7 +111,7 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
 
     private void clearWorkerResource() {
         workerManagerThread.clearTask();
-        globalTaskInstanceWaitingQueue.clearTask();
+        WorkerTaskExecutorHolder.clear();
         log.warn("Worker server clear the tasks due to lost connection from registry");
         messageRetryRunner.clearMessage();
         log.warn("Worker server clear the retry message due to lost connection from registry");
