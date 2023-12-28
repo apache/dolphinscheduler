@@ -31,4 +31,12 @@ class SqlSplitUtilsTest {
                 Lists.newArrayList("select * from table1", "select * from table2", "select * from table3"),
                 SqlSplitUtils.splitSql(sql));
     }
+
+    @Test
+    void splitSqlTrailingSemicolons() {
+        String sql = "select * from table1;";
+        Assertions.assertEquals(
+                Lists.newArrayList("select * from table1"),
+                SqlSplitUtils.splitSql(sql));
+    }
 }

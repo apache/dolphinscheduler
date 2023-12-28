@@ -21,10 +21,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.base.CharMatcher;
+
 public class SqlSplitUtils {
 
     private static final String UNIX_SQL_SEPARATOR = ";\n";
     private static final String WINDOWS_SQL_SEPARATOR = ";\r\n";
+
+    /**
+     * remove trailing ; from a sql sentence
+     */
+    public static String removeTrailingSemicolons(String sql) {
+        return CharMatcher.is(';').trimTrailingFrom(sql);
+    }
 
     /**
      * split sql to submit sql.
@@ -41,10 +50,9 @@ public class SqlSplitUtils {
     public static List<String> splitSql(String sql) {
 
         return Arrays.stream(sql.replaceAll(WINDOWS_SQL_SEPARATOR, UNIX_SQL_SEPARATOR).split(UNIX_SQL_SEPARATOR))
-                .filter(subSql -> {
-                    String trim = subSql.trim();
-                    return !trim.isEmpty() && !trim.startsWith("--");
-                }).collect(Collectors.toList());
+                .map(subSql -> removeTrailingSemicolons(subSql.trim()))
+                .filter(subSql -> !subSql.isEmpty() && !subSql.startsWith("--"))
+                .collect(Collectors.toList());
     }
 
 }
