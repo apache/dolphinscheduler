@@ -97,6 +97,6 @@ public enum DbType {
      * @return
      */
     public boolean isSupportMultipleStatement() {
-        return isHive() || this == DbType.SPARK;
+        return this == DbType.SPARK;
     }
 }
