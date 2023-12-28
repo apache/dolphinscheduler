@@ -36,46 +36,78 @@ import lombok.extern.slf4j.Slf4j;
 @NotThreadSafe
 public class TaskOutputParameterParser {
 
-    private final Map<String, String> taskOutputParams = new HashMap<>();
+    // Used to avoid '${setValue(' which loss the end of ')}'
+    private final int maxOneParameterRows;
+
+    // Used to avoid '${setValue(' which length is too long, this may case OOM
+    private final int maxOneParameterLength;
+
+    private final Map<String, String> taskOutputParams;
 
     private List<String> currentTaskOutputParam;
 
-    public void appendParseLog(String log) {
-        if (log == null) {
+    private long currentTaskOutputParamLength;
+
+    public TaskOutputParameterParser() {
+        // the default max rows of one parameter is 1024, this should be enough
+        this(1024, Integer.MAX_VALUE);
+    }
+
+    public TaskOutputParameterParser(int maxOneParameterRows, int maxOneParameterLength) {
+        this.maxOneParameterRows = maxOneParameterRows;
+        this.maxOneParameterLength = maxOneParameterLength;
+        this.taskOutputParams = new HashMap<>();
+        this.currentTaskOutputParam = null;
+        this.currentTaskOutputParamLength = 0;
+    }
+
+    public void appendParseLog(String logLine) {
+        if (logLine == null) {
             return;
         }
 
         if (currentTaskOutputParam != null) {
+            if (currentTaskOutputParam.size() > maxOneParameterRows
+                    || currentTaskOutputParamLength > maxOneParameterLength) {
+                log.warn(
+                        "The output param expression '{}' is too long, the max rows is {}, max length is {}, will skip this param",
+                        String.join("\n", currentTaskOutputParam), maxOneParameterLength, maxOneParameterRows);
+                currentTaskOutputParam = null;
+                currentTaskOutputParamLength = 0;
+                return;
+            }
             // continue to parse the rest of line
-            int i = log.indexOf(")}");
+            int i = logLine.indexOf(")}");
             if (i == -1) {
                 // the end of var pool not found
-                currentTaskOutputParam.add(log);
+                currentTaskOutputParam.add(logLine);
+                currentTaskOutputParamLength += logLine.length();
             } else {
                 // the end of var pool found
-                currentTaskOutputParam.add(log.substring(0, i + 2));
+                currentTaskOutputParam.add(logLine.substring(0, i + 2));
                 Pair<String, String> keyValue = parseOutputParam(String.join("\n", currentTaskOutputParam));
                 if (keyValue.getKey() != null && keyValue.getValue() != null) {
                     taskOutputParams.put(keyValue.getKey(), keyValue.getValue());
                 }
                 currentTaskOutputParam = null;
+                currentTaskOutputParamLength = 0;
                 // continue to parse the rest of line
-                if (i + 2 != log.length()) {
-                    appendParseLog(log.substring(i + 2));
+                if (i + 2 != logLine.length()) {
+                    appendParseLog(logLine.substring(i + 2));
                 }
             }
             return;
         }
 
-        int indexOfVarPoolBegin = log.indexOf("${setValue(");
+        int indexOfVarPoolBegin = logLine.indexOf("${setValue(");
         if (indexOfVarPoolBegin == -1) {
-            indexOfVarPoolBegin = log.indexOf("#{setValue(");
+            indexOfVarPoolBegin = logLine.indexOf("#{setValue(");
         }
         if (indexOfVarPoolBegin == -1) {
             return;
         }
         currentTaskOutputParam = new ArrayList<>();
-        appendParseLog(log.substring(indexOfVarPoolBegin));
+        appendParseLog(logLine.substring(indexOfVarPoolBegin));
     }
 
     public Map<String, String> getTaskOutputParams() {

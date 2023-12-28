@@ -21,7 +21,6 @@ import static java.util.Collections.singletonList;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JOB_TTL_SECONDS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL;
@@ -39,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
@@ -284,18 +282,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         try {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-                result.setExitStatusCode(EXIT_CODE_KILL);
-                return result;
-            }
             if (StringUtils.isEmpty(k8sParameterStr)) {
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String connectionParams = k8sTaskExecutionContext.getConnectionParams();
-            String kubeConfig = JSONUtils.getNodeString(connectionParams, "kubeConfig");
-            String configYaml = kubeConfig;
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
@@ -373,10 +364,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
-                log.info("[K8sJobExecutor-{}] killed", job.getMetadata().getName());
-                taskResponse.setExitStatusCode(EXIT_CODE_KILL);
-            } else if (jobStatus == EXIT_CODE_SUCCESS) {
+            if (jobStatus == EXIT_CODE_SUCCESS) {
                 log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {
