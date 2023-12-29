@@ -127,6 +127,7 @@ export default {
     end: '结束',
     none_send: '都不发',
     success_send: '成功发',
+    none_send: '都不发',
     failure_send: '失败发',
     all_send: '成功或失败都发',
     warning_group_tip: '请选择告警组',
