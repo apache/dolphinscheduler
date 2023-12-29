@@ -311,6 +311,7 @@ export default defineComponent({
               options={this.workerGroups}
               onUpdateValue={this.updateWorkerGroup}
               v-model:value={this.startForm.workerGroup}
+              filterable
             />
           </NFormItem>
           <NFormItem
@@ -320,6 +321,7 @@ export default defineComponent({
             <NSelect
               options={this.tenantList}
               v-model:value={this.startForm.tenantCode}
+              filterable
             />
           </NFormItem>
 
@@ -333,6 +335,7 @@ export default defineComponent({
               )}
               v-model:value={this.startForm.environmentCode}
               clearable
+              filterable
             />
           </NFormItem>
           {this.startForm.warningType !== 'NONE' && (
@@ -345,6 +348,7 @@ export default defineComponent({
                 placeholder={t('project.workflow.please_choose')}
                 v-model:value={this.startForm.warningGroupId}
                 clearable
+                filterable
               />
             </NFormItem>
           )}

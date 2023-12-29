@@ -458,6 +458,7 @@ export default defineComponent({
               options={this.workerGroups}
               onUpdateValue={this.updateWorkerGroup}
               v-model:value={this.timingForm.workerGroup}
+              filterable
             />
           </NFormItem>
           <NFormItem
@@ -467,6 +468,7 @@ export default defineComponent({
             <NSelect
               options={this.tenantList}
               v-model:value={this.timingForm.tenantCode}
+              filterable
             />
           </NFormItem>
           <NFormItem
@@ -477,6 +479,7 @@ export default defineComponent({
               options={this.environmentOptions}
               v-model:value={this.timingForm.environmentCode}
               clearable
+              filterable
             />
           </NFormItem>
           {this.timingForm.warningType !== 'NONE' && (
@@ -489,6 +492,7 @@ export default defineComponent({
                 placeholder={t('project.workflow.please_choose')}
                 v-model:value={this.timingForm.warningGroupId}
                 clearable
+                filterable
               />
             </NFormItem>
           )}
