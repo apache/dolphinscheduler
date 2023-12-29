@@ -293,6 +293,21 @@ export default defineComponent({
               v-model:value={this.startForm.warningType}
             />
           </NFormItem>
+          {this.startForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+              required
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.startForm.warningGroupId}
+                clearable
+                filterable
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.workflow_priority')}
             path='processInstancePriority'
@@ -338,20 +353,6 @@ export default defineComponent({
               filterable
             />
           </NFormItem>
-          {this.startForm.warningType !== 'NONE' && (
-            <NFormItem
-              label={t('project.workflow.alarm_group')}
-              path='warningGroupId'
-            >
-              <NSelect
-                options={this.alertGroups}
-                placeholder={t('project.workflow.please_choose')}
-                v-model:value={this.startForm.warningGroupId}
-                clearable
-                filterable
-              />
-            </NFormItem>
-          )}
           <NFormItem
             label={t('project.workflow.complement_data')}
             path='complement_data'
