@@ -71,7 +71,7 @@ export const useForm = () => {
       testFlag: 0,
       version: null,
       allLevelDependent: 'false',
-      executionOrder: 'DESC_ORDER',
+      executionOrder: 'DESC_ORDER'
     },
     saving: false,
     rules: {
@@ -89,6 +89,17 @@ export const useForm = () => {
           const dates = value.split(',')
           if (dates.length > 100) {
             return new Error(t('project.workflow.schedule_date_limit'))
+          }
+        }
+      },
+      warningGroupId: {
+        trigger: ['blur'],
+        validator() {
+          if (
+            startState.startForm.warningType !== 'NONE' &&
+            !startState.startForm.warningGroupId
+          ) {
+            return new Error(t('project.workflow.warning_group_tip'))
           }
         }
       }
@@ -112,7 +123,20 @@ export const useForm = () => {
       tenantCode: 'default',
       environmentCode: null as null | string
     },
-    saving: false
+    saving: false,
+    rules: {
+      warningGroupId: {
+        trigger: ['blur'],
+        validator() {
+          if (
+            timingState.timingForm.warningType !== 'NONE' &&
+            !timingState.timingForm.warningGroupId
+          ) {
+            return new Error(t('project.workflow.warning_group_tip'))
+          }
+        }
+      }
+    }
   })
 
   const copyState = reactive({

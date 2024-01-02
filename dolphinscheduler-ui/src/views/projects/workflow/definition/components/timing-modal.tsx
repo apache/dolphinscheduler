@@ -332,7 +332,7 @@ export default defineComponent({
         onConfirm={this.handleTiming}
         confirmLoading={this.saving}
       >
-        <NForm ref='timingFormRef'>
+        <NForm ref='timingFormRef' rules={this.rules}>
           <NFormItem
             label={t('project.workflow.start_and_stop_time')}
             path='startEndTime'
@@ -440,6 +440,21 @@ export default defineComponent({
               v-model:value={this.timingForm.warningType}
             />
           </NFormItem>
+          {this.timingForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+              required
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.timingForm.warningGroupId}
+                clearable
+                filterable
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.workflow_priority')}
             path='processInstancePriority'
@@ -482,20 +497,6 @@ export default defineComponent({
               filterable
             />
           </NFormItem>
-          {this.timingForm.warningType !== 'NONE' && (
-            <NFormItem
-              label={t('project.workflow.alarm_group')}
-              path='warningGroupId'
-            >
-              <NSelect
-                options={this.alertGroups}
-                placeholder={t('project.workflow.please_choose')}
-                v-model:value={this.timingForm.warningGroupId}
-                clearable
-                filterable
-              />
-            </NFormItem>
-          )}
         </NForm>
       </Modal>
     )

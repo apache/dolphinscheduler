@@ -129,6 +129,7 @@ export default {
     success_send: 'Success',
     failure_send: 'Failure',
     all_send: 'All',
+    warning_group_tip: 'Please select alarm group',
     whether_complement_data: 'Whether it is a complement process?',
     schedule_date: 'Schedule date',
     select_date: 'Select Date',
