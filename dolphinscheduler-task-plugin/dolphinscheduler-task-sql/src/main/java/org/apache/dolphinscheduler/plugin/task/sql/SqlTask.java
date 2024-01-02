@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
@@ -37,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.sql.utils.SqlSplitUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -52,7 +52,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,9 +133,8 @@ public class SqlTask extends AbstractTask {
             // get datasource
             baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dbType,
                     sqlTaskExecutionContext.getConnectionParams());
-            List<String> subSqls =
-                    dbType.isSupportMultipleStatement() ? Collections.singletonList(sqlParameters.getSql())
-                            : SqlSplitUtils.splitSql(sqlParameters.getSql());
+            List<String> subSqls = DataSourceProcessorProvider.getDataSourceProcessor(dbType)
+                    .splitAndRemoveComment(sqlParameters.getSql());
 
             // ready to execute SQL and parameter entity Map
             List<SqlBinds> mainStatementSqlBinds = subSqls

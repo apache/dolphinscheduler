@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.k8s.param;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -38,7 +39,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 @Slf4j
-public class K8sDataSourceProcessor implements DataSourceProcessor {
+public class K8sDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {

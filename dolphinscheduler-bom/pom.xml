@@ -34,7 +34,7 @@
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
-        <druid.version>1.2.4</druid.version>
+        <druid.version>1.2.20</druid.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
         <jetcd.test.version>0.7.1</jetcd.test.version>
