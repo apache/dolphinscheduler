@@ -43,6 +43,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'input',
+      class: 'input-url-name',
       field: 'url',
       name: t('project.node.http_url'),
       props: {
