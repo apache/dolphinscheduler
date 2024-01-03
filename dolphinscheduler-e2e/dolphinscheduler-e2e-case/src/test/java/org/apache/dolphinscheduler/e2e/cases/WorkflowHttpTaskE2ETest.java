@@ -28,8 +28,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinition
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
