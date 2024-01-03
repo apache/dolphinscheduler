@@ -33,7 +33,8 @@ import org.springframework.stereotype.Service;
 public class WorkerRpcServer extends SpringServerMethodInvokerDiscovery implements Closeable {
 
     public WorkerRpcServer(WorkerConfig workerConfig) {
-        super(NettyRemotingServerFactory.buildNettyRemotingServer(new NettyServerConfig(workerConfig.getListenPort())));
+        super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
+                .serverName("WorkerRpcServer").listenPort(workerConfig.getListenPort()).build()));
     }
 
     public void start() {

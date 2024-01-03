@@ -15,20 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.sql.utils;
+package org.apache.dolphinscheduler.server.master.runner.execute;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+public interface IMasterTaskExecutorThreadPool<T extends MasterTaskExecutor> {
 
-import com.google.common.collect.Lists;
+    boolean submitMasterTaskExecutor(T masterTaskExecutor);
 
-class SqlSplitUtilsTest {
-
-    @Test
-    void splitSql() {
-        String sql = "select * from table1;\nselect * from table2;\nselect * from table3;\r\n";
-        Assertions.assertEquals(
-                Lists.newArrayList("select * from table1", "select * from table2", "select * from table3"),
-                SqlSplitUtils.splitSql(sql));
-    }
+    boolean removeMasterTaskExecutor(T masterTaskExecutor);
 }

@@ -58,7 +58,7 @@ public class AbstractDataSourceProcessorTest {
         doThrow(new IllegalArgumentException()).when(mockDataSourceProcessor).checkOther(other);
     }
 
-    @org.junit.Test
+    @Test
     public void transformOtherParamToMap() {
         AbstractDataSourceProcessor abstractDataSourceProcessor = new AbstractDataSourceProcessor() {
 

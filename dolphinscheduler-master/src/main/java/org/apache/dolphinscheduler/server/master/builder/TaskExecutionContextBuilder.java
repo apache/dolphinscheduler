@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.builder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.dolphinscheduler.common.constants.Constants.MINUTE_2_SECOND_TIME_UNIT;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -34,6 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -84,7 +84,7 @@ public class TaskExecutionContextBuilder {
             if (taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.FAILED
                     || taskDefinition.getTimeoutNotifyStrategy() == TaskTimeoutStrategy.WARNFAILED) {
                 taskExecutionContext.setTaskTimeout(
-                        Math.min(taskDefinition.getTimeout() * MINUTE_2_SECOND_TIME_UNIT, Integer.MAX_VALUE));
+                        (int) Math.min(TimeUnit.MINUTES.toSeconds(taskDefinition.getTimeout()), Integer.MAX_VALUE));
             }
         }
         taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
