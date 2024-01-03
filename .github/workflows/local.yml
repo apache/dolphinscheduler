@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - dev
+      - e2e_improve
 
 name: LOCAL
 
