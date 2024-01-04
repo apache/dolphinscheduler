@@ -332,7 +332,7 @@ export default defineComponent({
         onConfirm={this.handleTiming}
         confirmLoading={this.saving}
       >
-        <NForm ref='timingFormRef'>
+        <NForm ref='timingFormRef' rules={this.rules}>
           <NFormItem
             label={t('project.workflow.start_and_stop_time')}
             path='startEndTime'
@@ -440,6 +440,21 @@ export default defineComponent({
               v-model:value={this.timingForm.warningType}
             />
           </NFormItem>
+          {this.timingForm.warningType !== 'NONE' && (
+            <NFormItem
+              label={t('project.workflow.alarm_group')}
+              path='warningGroupId'
+              required
+            >
+              <NSelect
+                options={this.alertGroups}
+                placeholder={t('project.workflow.please_choose')}
+                v-model:value={this.timingForm.warningGroupId}
+                clearable
+                filterable
+              />
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.workflow_priority')}
             path='processInstancePriority'
@@ -458,6 +473,7 @@ export default defineComponent({
               options={this.workerGroups}
               onUpdateValue={this.updateWorkerGroup}
               v-model:value={this.timingForm.workerGroup}
+              filterable
             />
           </NFormItem>
           <NFormItem
@@ -467,6 +483,7 @@ export default defineComponent({
             <NSelect
               options={this.tenantList}
               v-model:value={this.timingForm.tenantCode}
+              filterable
             />
           </NFormItem>
           <NFormItem
@@ -477,21 +494,9 @@ export default defineComponent({
               options={this.environmentOptions}
               v-model:value={this.timingForm.environmentCode}
               clearable
+              filterable
             />
           </NFormItem>
-          {this.timingForm.warningType !== 'NONE' && (
-            <NFormItem
-              label={t('project.workflow.alarm_group')}
-              path='warningGroupId'
-            >
-              <NSelect
-                options={this.alertGroups}
-                placeholder={t('project.workflow.please_choose')}
-                v-model:value={this.timingForm.warningGroupId}
-                clearable
-              />
-            </NFormItem>
-          )}
         </NForm>
       </Modal>
     )
