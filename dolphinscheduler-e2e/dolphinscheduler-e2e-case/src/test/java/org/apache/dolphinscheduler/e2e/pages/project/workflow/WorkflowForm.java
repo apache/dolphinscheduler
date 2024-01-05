@@ -19,16 +19,13 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.*;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -85,6 +82,8 @@ public final class WorkflowForm {
                 return (T) new SwitchTaskForm(this);
             case HTTP:
                 return (T) new HttpTaskForm(this);
+            case JAVA:
+                return (T) new JavaTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -121,5 +120,6 @@ public final class WorkflowForm {
         SUB_PROCESS,
         SWITCH,
         HTTP,
+        JAVA,
     }
 }

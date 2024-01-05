@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - dev
+      - e2e-java
 
 name: E2E
 
@@ -108,6 +108,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowE2ETest
           - name: WorkflowHttp
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowHttpTaskE2ETest
+          - name: WorkflowJava
+            class: org.apache.dolphinscheduler.e2e.cases.WorkflowJavaTaskE2ETest
 #          - name: WorkflowForSwitch
 #            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
           - name: FileManage
