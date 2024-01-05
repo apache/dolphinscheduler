@@ -1,0 +1,22 @@
+
+[{
+  "httpRequest": {
+    "path": "/test",
+    "method": "GET"
+  },
+  "httpResponse": {
+    "body": [
+      {
+        "name": "lzl",
+        "age": 18
+      },
+      {
+        "name": "pizz2",
+        "age": 19
+      }
+    ],
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}]
