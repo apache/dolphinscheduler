@@ -45,7 +45,7 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DolphinScheduler(composeFiles = "docker/base/docker-compose.yaml")
+@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class WorkflowJavaTaskE2ETest {
     private static final String project = "test-workflow-1";
 
