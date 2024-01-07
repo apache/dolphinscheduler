@@ -101,7 +101,7 @@ public class TenantController extends BaseController {
      * @param pageSize page size
      * @return tenant list page
      */
-    @Operation(summary = "queryTenantlistPaging", description = "QUERY_TENANT_LIST_PAGING_NOTES")
+    @Operation(summary = "queryTenantListPaging", description = "QUERY_TENANT_LIST_PAGING_NOTES")
     @Parameters({
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
@@ -110,7 +110,7 @@ public class TenantController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
-    public Result<PageInfo<Tenant>> queryTenantlistPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<Tenant>> queryTenantListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                                           @RequestParam("pageNo") Integer pageNo,
                                                           @RequestParam("pageSize") Integer pageSize) {
@@ -126,11 +126,11 @@ public class TenantController extends BaseController {
      * @param loginUser login user
      * @return tenant list
      */
-    @Operation(summary = "queryTenantlist", description = "QUERY_TENANT_LIST_NOTES")
+    @Operation(summary = "queryTenantList", description = "QUERY_TENANT_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
-    public Result<List<Tenant>> queryTenantlist(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result<List<Tenant>> queryTenantList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<Tenant> tenants = tenantService.queryTenantList(loginUser);
         return Result.success(tenants);
     }
