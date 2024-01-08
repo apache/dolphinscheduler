@@ -61,11 +61,16 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String tenant = System.getProperty("user.name");
 
-    private static final String javaContent = "public class HelloWorld {\n" +
-            "    public static void main(String[] args) {\n" +
-            "        System.out.println(\"HelloWorld\");\n" +
+    private static final String javaContent = "import java.io.IOException;\n" +
+            "public class JavaTaskTest {\n" +
+            "    public static void main(String[] args) throws IOException {\n" +
+            "        StringBuilder builder = new StringBuilder(\"Hello: \");\n" +
+            "        for (String arg : args) {\n" +
+            "            builder.append(arg).append(\" \");\n" +
+            "        }\n" +
+            "        System.out.println(builder);\n" +
             "    }\n" +
-            "}";
+            "}\n";
 
     private static RemoteWebDriver browser;
 
