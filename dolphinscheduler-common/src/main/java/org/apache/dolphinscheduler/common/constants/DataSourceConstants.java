@@ -66,8 +66,8 @@ public class DataSourceConstants {
     public static final String KYUUBI_VALIDATION_QUERY = "select 1";
     public static final String VERTICA_VALIDATION_QUERY = "select 1";
 
-    public static final String HANA_VALIDATION_QUERY = "select 1";
     public static final String XUGU_VALIDATION_QUERY = "select 1";
+    public static final String HANA_VALIDATION_QUERY = "select 1 from DUMMY";
 
     /**
      * jdbc url
@@ -105,7 +105,7 @@ public class DataSourceConstants {
      * dataSource sensitive param
      */
     public static final String DATASOURCE_PASSWORD_REGEX =
-            "(?<=((?i)password((\":\")|(=')))).*?(?=((\")|(')))";
+            "(?<=((?i)password((\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
 
     /**
      * datasource encryption salt

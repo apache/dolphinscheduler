@@ -52,8 +52,11 @@ public enum DbType {
     VERTICA(21, "vertica"),
     HANA(22, "hana"),
     DORIS(23, "doris"),
-    XUGU(24, "xugu");
+    XUGU(27, "xugu");
+    ZEPPELIN(24, "zeppelin"),
+    SAGEMAKER(25, "sagemaker"),
 
+    K8S(26, "k8s");
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
     @EnumValue

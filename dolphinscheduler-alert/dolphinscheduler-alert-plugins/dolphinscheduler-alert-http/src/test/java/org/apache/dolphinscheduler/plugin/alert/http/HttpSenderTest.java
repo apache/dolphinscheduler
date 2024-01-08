@@ -23,7 +23,6 @@ import static org.mockito.Mockito.spy;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +32,7 @@ import org.junit.jupiter.api.Test;
 public class HttpSenderTest {
 
     @Test
-    public void sendTest() throws IOException {
+    public void sendTest() throws Exception {
         Map<String, String> paramsMap = new HashMap<>();
         String url = "https://www.dolphinscheduler-not-exists-web.com:12345";
         String contentField = "content";
@@ -42,6 +41,7 @@ public class HttpSenderTest {
         paramsMap.put(HttpAlertConstants.NAME_HEADER_PARAMS, "{\"Content-Type\":\"application/json\"}");
         paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, "{\"number\":\"123456\"}");
         paramsMap.put(HttpAlertConstants.NAME_CONTENT_FIELD, contentField);
+        paramsMap.put(HttpAlertConstants.NAME_TIMEOUT, String.valueOf(HttpAlertConstants.DEFAULT_TIMEOUT));
 
         HttpSender httpSender = spy(new HttpSender(paramsMap));
         doReturn("success").when(httpSender).getResponseString(any());

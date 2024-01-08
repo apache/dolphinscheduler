@@ -22,11 +22,11 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -39,31 +39,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 /**
  * abstract command executor
  */
+@Slf4j
 public abstract class AbstractCommandExecutor {
 
-    /**
-     * rules for extracting Var Pool
-     */
-    protected static final Pattern SETVALUE_REGEX = Pattern.compile(TaskConstants.SETVALUE_REGEX);
-
-    protected StringBuilder varPool = new StringBuilder();
+    protected volatile Map<String, String> taskOutputParams = new HashMap<>();
     /**
      * process
      */
@@ -73,11 +67,6 @@ public abstract class AbstractCommandExecutor {
      * log handler
      */
     protected Consumer<LinkedBlockingQueue<String>> logHandler;
-
-    /**
-     * logger
-     */
-    protected Logger logger;
 
     /**
      * log list
@@ -98,11 +87,9 @@ public abstract class AbstractCommandExecutor {
     protected Future<?> podLogOutputFuture;
 
     public AbstractCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                   TaskExecutionContext taskRequest,
-                                   Logger logger) {
+                                   TaskExecutionContext taskRequest) {
         this.logHandler = logHandler;
         this.taskRequest = taskRequest;
-        this.logger = logger;
         this.logBuffer = new LinkedBlockingQueue<>();
         this.logBuffer.add(EMPTY_STRING);
 
@@ -118,13 +105,7 @@ public abstract class AbstractCommandExecutor {
                             TaskCallBack taskCallBack) throws Exception {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
-        if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-            logger.warn(
-                    "Cannot find the taskInstance: {} from TaskExecutionContextCacheManager, the task might already been killed",
-                    taskInstanceId);
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            return result;
-        }
+        // todo: we need to use state like JDK Thread to make sure the killed task should not be executed
         iShellInterceptorBuilder = iShellInterceptorBuilder
                 .shellDirectory(taskRequest.getExecutePath())
                 .shellName(taskRequest.getTaskAppId());
@@ -143,11 +124,7 @@ public abstract class AbstractCommandExecutor {
         // Set sudo (This is only work in Linux)
         iShellInterceptorBuilder.sudoMode(OSUtils.isSudoEnable());
         // Set tenant (This is only work in Linux)
-        if (TenantConstants.DEFAULT_TENANT_CODE.equals(taskRequest.getTenantCode())) {
-            iShellInterceptorBuilder.runUser(TenantConstants.BOOTSTRAPT_SYSTEM_USER);
-        } else {
-            iShellInterceptorBuilder.runUser(taskRequest.getTenantCode());
-        }
+        iShellInterceptorBuilder.runUser(taskRequest.getTenantCode());
         // Set CPU Quota (This is only work in Linux)
         if (taskRequest.getCpuQuota() != null) {
             iShellInterceptorBuilder.cpuQuota(taskRequest.getCpuQuota());
@@ -172,15 +149,9 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskRequest.setProcessId(processId);
-        boolean updateTaskExecutionContextStatus =
-                TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
-        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            cancelApplication();
-            return result;
-        }
+
         // print process id
-        logger.info("process start, process id is: {}", processId);
+        log.info("process start, process id is: {}", processId);
 
         // if timeout occurs, exit directly
         long remainTime = getRemainTime();
@@ -201,7 +172,7 @@ public abstract class AbstractCommandExecutor {
                 // Wait the task log process finished.
                 taskOutputFuture.get();
             } catch (ExecutionException e) {
-                logger.error("Handle task log error", e);
+                log.error("Handle task log error", e);
             }
         }
 
@@ -212,7 +183,7 @@ public abstract class AbstractCommandExecutor {
                 // delete pod after successful execution and log collection
                 ProcessUtils.cancelApplication(taskRequest);
             } catch (ExecutionException e) {
-                logger.error("Handle pod log error", e);
+                log.error("Handle pod log error", e);
             }
         }
 
@@ -223,21 +194,21 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(this.process.exitValue());
 
         } else {
-            logger.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
+            log.error("process has failure, the task timeout configuration value is:{}, ready to kill ...",
                     taskRequest.getTaskTimeout());
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             cancelApplication();
         }
         int exitCode = this.process.exitValue();
         String exitLogMessage = EXIT_CODE_KILL == exitCode ? "process has killed." : "process has exited.";
-        logger.info("{} execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
+        log.info("{} execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
                 exitLogMessage, taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
         return result;
 
     }
 
-    public String getVarPool() {
-        return varPool.toString();
+    public Map<String, String> getTaskOutputParams() {
+        return taskOutputParams;
     }
 
     public void cancelApplication() throws InterruptedException {
@@ -246,16 +217,12 @@ public abstract class AbstractCommandExecutor {
         }
 
         // soft kill
-        logger.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
+        log.info("Begin to kill process process, pid is : {}", taskRequest.getProcessId());
         process.destroy();
         if (!process.waitFor(5, TimeUnit.SECONDS)) {
             process.destroyForcibly();
         }
-        logger.info("Success kill task: {}, pid: {}", taskRequest.getTaskAppId(), taskRequest.getProcessId());
-    }
-
-    private void printCommand(List<String> commands) {
-        logger.info("task run command: {}", String.join(" ", commands));
+        log.info("Success kill task: {}, pid: {}", taskRequest.getTaskAppId(), taskRequest.getProcessId());
     }
 
     private void collectPodLogIfNeeded() {
@@ -299,24 +266,22 @@ public abstract class AbstractCommandExecutor {
         ExecutorService getOutputLogService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("ResolveOutputLog-thread-" + taskRequest.getTaskName());
         getOutputLogService.submit(() -> {
+            TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 while ((line = inReader.readLine()) != null) {
-                    if (line.startsWith("${setValue(") || line.startsWith("#{setValue(")) {
-                        varPool.append(findVarPool(line));
-                        varPool.append("$VarPool$");
-                    } else {
-                        logBuffer.add(line);
-                    }
+                    logBuffer.add(line);
+                    taskOutputParameterParser.appendParseLog(line);
                 }
                 processLogOutputIsSuccess = true;
             } catch (Exception e) {
-                logger.error("Parse var pool error", e);
+                log.error("Parse var pool error", e);
                 processLogOutputIsSuccess = true;
             } finally {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
             }
+            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         });
 
         getOutputLogService.shutdown();
@@ -336,26 +301,12 @@ public abstract class AbstractCommandExecutor {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Output task log error", e);
+                log.error("Output task log error", e);
             } finally {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
             }
         });
         parseProcessOutputExecutorService.shutdown();
-    }
-
-    /**
-     * find var pool
-     *
-     * @param line
-     * @return
-     */
-    private String findVarPool(String line) {
-        Matcher matcher = SETVALUE_REGEX.matcher(line);
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-        return null;
     }
 
     /**
@@ -389,7 +340,7 @@ public abstract class AbstractCommandExecutor {
 
             processId = f.getInt(process);
         } catch (Exception e) {
-            logger.error("Get task pid failed", e);
+            log.error("Get task pid failed", e);
         }
 
         return processId;

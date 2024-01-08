@@ -15,6 +15,7 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
 * [SubProcess](../task/sub-process.md)
+* [Kubernetes](../task/kubernetes.md)
 
 When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a SubProcess node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the subprocess.
 
@@ -91,6 +92,8 @@ For example
 
 ![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
 
+Attention: When the variable value contains the `\n` identifier, such as ` value = "hello \n world" `, value needs to be carried out in a special way. You need to use `print('${setValue(key=%s)}' % repr(value))`, otherwise the argument cannot be passed to the subsequent flow.
+
 #### Pass parameter from SubProcess task to downstream
 
 In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
@@ -116,3 +119,13 @@ Save the workflow and run it. The result of the downstream task is as follows:
 ![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
 
 Although the two parameters var1 and var2 are output in the A task, only the `OUT` parameter var1 is defined in the workflow definition, and the downstream task successfully outputs var1. It proves that the var1 parameter is passed in the workflow with reference to the expected value.
+
+#### Pass parameter from Kubernetes task to downstream
+
+Different programming languages may use different logging frameworks in Kubernetes tasks. To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)}` or `#{(key=value)}`. Users can output log data in the format in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter. DolphinScheduler will capture the `${(key=value)}` or `#{(key=value)}` in the output logs to capture the parameters and pass them downstream.
+
+For example
+
+![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
+
+Another special consideration, not always can DolphinScheduler collect pod logs, if the user redirects the log output stream, DolphinScheduler can not collect logs for use and can not use the output parameter, either.

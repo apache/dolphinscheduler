@@ -16,6 +16,8 @@
 #
 
 spring:
+  profiles:
+    active: h2
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -73,6 +75,19 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+
+mybatis-plus:
+  mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
+  type-aliases-package: org.apache.dolphinscheduler.dao.entity
+  configuration:
+    cache-enabled: false
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
 
 registry:
   type: zookeeper
@@ -192,15 +207,18 @@ worker:
   heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
-  tenant-auto-create: true
-  #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
-  tenant-distributed-user: false
   # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
   max-cpu-load-avg: 1
   # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.1, only the available memory is higher than 10%, worker server can receive task.
   reserved-memory: 0.1
   task-execute-threads-full-policy: REJECT
+  tenant-config:
+    # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+    auto-create-tenant-enabled: true
+    # Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
+    distributed-tenant: false
+    # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
+    default-tenant-enabled: true
 
 alert:
   port: 50052
@@ -208,6 +226,7 @@ alert:
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
   heartbeat-interval: 60s
+  query_alert_threshold: 100
 
 api:
   audit-enable: false
@@ -309,4 +328,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
-    password: root
+    password: root@123

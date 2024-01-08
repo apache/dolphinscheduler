@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.shell.ShellExecutor;
 
 import oshi.SystemInfo;
@@ -35,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -96,16 +96,22 @@ public class OSUtils {
     }
 
     /**
-     * get available physical memory size
+     * get available physical or pod memory size
      * <p>
      * Keep 2 decimal
      *
-     * @return available Physical Memory Size, unit: G
+     * @return Available physical or pod memory size, unit: G
      */
     public static double availablePhysicalMemorySize() {
-        GlobalMemory memory = hal.getMemory();
-        double availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
+        double availablePhysicalMemorySize;
 
+        if (KubernetesUtils.isKubernetesMode()) {
+            long freeMemory = Runtime.getRuntime().freeMemory();
+            availablePhysicalMemorySize = freeMemory / 1024.0 / 1024 / 1024;
+        } else {
+            GlobalMemory memory = hal.getMemory();
+            availablePhysicalMemorySize = memory.getAvailable() / 1024.0 / 1024 / 1024;
+        }
         DecimalFormat df = new DecimalFormat(TWO_DECIMAL);
         df.setRoundingMode(RoundingMode.HALF_UP);
         return Double.parseDouble(df.format(availablePhysicalMemorySize));
@@ -123,7 +129,13 @@ public class OSUtils {
         long now = System.currentTimeMillis();
         if (now - prevTickTime > 950) {
             // Enough time has elapsed.
-            cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
+            if (KubernetesUtils.isKubernetesMode()) {
+                OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+                cpuUsage = operatingSystemMXBean.getSystemLoadAverage();
+            } else {
+                cpuUsage = processor.getSystemCpuLoadBetweenTicks(prevTicks);
+            }
+
             prevTickTime = System.currentTimeMillis();
             prevTicks = processor.getSystemCpuLoadTicks();
         }
@@ -387,8 +399,6 @@ public class OSUtils {
         if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
             return command;
         }
-        tenantCode = TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) ? TenantConstants.BOOTSTRAPT_SYSTEM_USER
-                : tenantCode;
         return String.format("sudo -u %s %s", tenantCode, command);
     }
 

@@ -22,16 +22,14 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueueLooper;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -45,22 +43,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.REGEX, pattern = {
-                "org.apache.dolphinscheduler.service.process.*",
-                "org.apache.dolphinscheduler.service.queue.*",
-        })
-})
+@ComponentScan(basePackages = "org.apache.dolphinscheduler")
 @Slf4j
 public class WorkerServer implements IStoppable {
-
-    @Autowired
-    private WorkerManagerThread workerManagerThread;
 
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
@@ -73,12 +62,6 @@ public class WorkerServer implements IStoppable {
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
-
-    @Autowired
-    private WorkerConfig workerConfig;
-
-    @Autowired
-    private GlobalTaskInstanceDispatchQueueLooper globalTaskInstanceDispatchQueueLooper;
 
     /**
      * worker server startup, not use web service
@@ -98,10 +81,7 @@ public class WorkerServer implements IStoppable {
         this.workerRegistryClient.setRegistryStoppable(this);
         this.workerRegistryClient.start();
 
-        this.workerManagerThread.start();
-
         this.messageRetryRunner.start();
-        this.globalTaskInstanceDispatchQueueLooper.start();
 
         /*
          * registry hooks, which are called before the process exits
@@ -124,7 +104,13 @@ public class WorkerServer implements IStoppable {
                 WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
                 WorkerRegistryClient closedRegistryClient = workerRegistryClient) {
             log.info("Worker server is stopping, current cause : {}", cause);
-            // kill running tasks
+            // todo: we need to remove this method
+            // since for some task, we need to take-over the remote task after the worker restart
+            // and if the worker crash, the `killAllRunningTasks` will not be execute, this will cause there exist two
+            // kind of situation:
+            // 1. If the worker is stop by kill, the tasks will be kill.
+            // 2. If the worker is stop by kill -9, the tasks will not be kill.
+            // So we don't need to kill the tasks.
             this.killAllRunningTasks();
         } catch (Exception e) {
             log.error("Worker server stop failed, current cause: {}", cause, e);
@@ -139,25 +125,25 @@ public class WorkerServer implements IStoppable {
     }
 
     public void killAllRunningTasks() {
-        Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
-        if (CollectionUtils.isEmpty(taskRequests)) {
+        Collection<WorkerTaskExecutor> workerTaskExecutors = WorkerTaskExecutorHolder.getAllTaskExecutor();
+        if (CollectionUtils.isEmpty(workerTaskExecutors)) {
             return;
         }
-        log.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
+        log.info("Worker begin to kill all cache task, task size: {}", workerTaskExecutors.size());
         int killNumber = 0;
-        for (TaskExecutionContext taskRequest : taskRequests) {
+        for (WorkerTaskExecutor workerTaskExecutor : workerTaskExecutors) {
             // kill task when it's not finished yet
             try {
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
-                        taskRequest.getTaskInstanceId());
-                if (ProcessUtils.kill(taskRequest)) {
+                TaskExecutionContext taskExecutionContext = workerTaskExecutor.getTaskExecutionContext();
+                LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
+                if (ProcessUtils.kill(taskExecutionContext)) {
                     killNumber++;
                 }
             } finally {
                 LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
-        log.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
+        log.info("Worker after kill all cache task, task size: {}, killed number: {}", workerTaskExecutors.size(),
                 killNumber);
     }
 }

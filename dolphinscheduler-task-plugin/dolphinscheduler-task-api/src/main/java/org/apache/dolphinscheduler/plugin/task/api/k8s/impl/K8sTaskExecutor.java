@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s.impl;
 
+import static java.util.Collections.singletonList;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JOB_TTL_SECONDS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL;
@@ -38,11 +38,11 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
@@ -62,11 +62,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.AffinityBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.NodeSelectorTerm;
 import io.fabric8.kubernetes.api.model.Quantity;
 import io.fabric8.kubernetes.api.model.ResourceRequirements;
@@ -81,20 +81,22 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 /**
  * K8sTaskExecutor used to submit k8s task to K8S
  */
+@Slf4j
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private Job job;
     protected boolean podLogOutputIsFinished = false;
     protected Future<?> podLogOutputFuture;
 
-    public K8sTaskExecutor(Logger logger, TaskExecutionContext taskRequest) {
-        super(logger, taskRequest);
+    public K8sTaskExecutor(TaskExecutionContext taskRequest) {
+        super(taskRequest);
     }
 
-    public Job buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
+    public void buildK8sJob(K8sTaskMainParameters k8STaskMainParameters) {
         String taskInstanceId = String.valueOf(taskRequest.getTaskInstanceId());
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String image = k8STaskMainParameters.getImage();
+        String pullSecret = k8STaskMainParameters.getPullSecret();
         String namespaceName = k8STaskMainParameters.getNamespaceName();
         String imagePullPolicy = k8STaskMainParameters.getImagePullPolicy();
         Map<String, String> otherParams = k8STaskMainParameters.getParamsMap();
@@ -110,11 +112,17 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         Map<String, Quantity> limitRes = new HashMap<>();
         limitRes.put(MEMORY, new Quantity(String.format("%s%s", limitPodMem, MI)));
         limitRes.put(CPU, new Quantity(String.valueOf(limitPodCpu)));
+
         Map<String, String> labelMap = k8STaskMainParameters.getLabelMap();
-        labelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
-        labelMap.put(NAME_LABEL, k8sJobName);
+        Map<String, String> jobLabelMap = new HashMap<>();
+        jobLabelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
+        jobLabelMap.put(NAME_LABEL, k8sJobName);
+        jobLabelMap.putAll(labelMap);
+
         Map<String, String> podLabelMap = new HashMap<>();
         podLabelMap.put(UNIQUE_LABEL_NAME, taskRequest.getTaskAppId());
+        podLabelMap.putAll(labelMap);
+
         EnvVar taskInstanceIdVar = new EnvVar(TASK_INSTANCE_ID, taskInstanceId, null);
         List<EnvVar> envVars = new ArrayList<>();
         envVars.add(taskInstanceIdVar);
@@ -155,11 +163,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                         .endRequiredDuringSchedulingIgnoredDuringExecution()
                         .endNodeAffinity().build();
 
-        JobBuilder jobBuilder = new JobBuilder()
+        job = new JobBuilder()
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
                 .withName(k8sJobName)
-                .withLabels(labelMap)
+                .withLabels(jobLabelMap)
                 .withNamespace(namespaceName)
                 .endMetadata()
                 .withNewSpec()
@@ -178,14 +186,16 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withResources(new ResourceRequirements(limitRes, reqRes))
                 .withEnv(envVars)
                 .endContainer()
+                .withImagePullSecrets(
+                        StringUtils.isEmpty(pullSecret) ? null : singletonList(new LocalObjectReference(pullSecret)))
                 .withRestartPolicy(RESTART_POLICY)
                 .withAffinity(affinity)
                 .endSpec()
                 .endTemplate()
                 .withBackoffLimit(retryNum)
-                .endSpec();
+                .endSpec()
+                .build();
 
-        return jobBuilder.build();
     }
 
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
@@ -249,6 +259,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String taskName = taskRequest.getTaskName().toLowerCase(Locale.ROOT);
         String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
+            TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), containerName)) {
@@ -257,6 +268,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
                         log.info("[K8S-pod-log] {}", line);
+                        taskOutputParameterParser.appendParseLog(line);
                     }
                 }
             } catch (Exception e) {
@@ -265,6 +277,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
                 podLogOutputIsFinished = true;
             }
+            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         });
 
         collectPodLogExecutorService.shutdown();
@@ -275,12 +288,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         try {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-                result.setExitStatusCode(EXIT_CODE_KILL);
-                return result;
-            }
             if (StringUtils.isEmpty(k8sParameterStr)) {
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
@@ -322,7 +330,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 JSONUtils.parseObject(k8sParameterStr, K8sTaskMainParameters.class);
         try {
             log.info("[K8sJobExecutor-{}-{}] start to submit job", taskName, taskInstanceId);
-            job = buildK8sJob(k8STaskMainParameters);
+            buildK8sJob(k8STaskMainParameters);
             stopJobOnK8s(k8sParameterStr);
             String namespaceName = k8STaskMainParameters.getNamespaceName();
             k8sUtils.createJob(namespaceName, job);
@@ -362,10 +370,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
-                log.info("[K8sJobExecutor-{}] killed", job.getMetadata().getName());
-                taskResponse.setExitStatusCode(EXIT_CODE_KILL);
-            } else if (jobStatus == EXIT_CODE_SUCCESS) {
+            if (jobStatus == EXIT_CODE_SUCCESS) {
                 log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {

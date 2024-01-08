@@ -17,10 +17,18 @@
 
 package org.apache.dolphinscheduler.extract.base.config;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class NettyServerConfig {
+
+    private String serverName;
 
     /**
      * init the server connectable queue
@@ -55,9 +63,6 @@ public class NettyServerConfig {
     /**
      * listen port
      */
-    private int listenPort = 12346;
+    private int listenPort;
 
-    public NettyServerConfig(int listenPort) {
-        this.listenPort = listenPort;
-    }
 }

@@ -53,8 +53,9 @@ BEGIN
 ALTER TABLE t_ds_process_definition ADD COLUMN `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
 END IF;
 END;
- d//
- delimiter ;
+d//
+
+delimiter ;
 CALL t_ds_process_definition_add_column;
 DROP PROCEDURE t_ds_process_definition_add_column;
 
@@ -72,8 +73,9 @@ BEGIN
 ALTER TABLE t_ds_process_definition_log ADD COLUMN `execution_type` tinyint(4) DEFAULT '0' COMMENT 'execution_type 0:parallel,1:serial wait,2:serial discard,3:serial priority';
 END IF;
 END;
- d//
- delimiter ;
+d//
+
+delimiter ;
 CALL t_ds_process_definition_log_add_column;
 DROP PROCEDURE t_ds_process_definition_log_add_column;
 
@@ -91,8 +93,9 @@ BEGIN
 ALTER TABLE t_ds_process_instance ADD COLUMN `next_process_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId';
 END IF;
 END;
- d//
- delimiter ;
+d//
+
+delimiter ;
 CALL t_ds_process_instance_add_column;
 DROP PROCEDURE t_ds_process_instance_add_column;
 
@@ -445,10 +448,15 @@ BEGIN
            AND TABLE_SCHEMA=(SELECT DATABASE())
            AND COLUMN_NAME ='task_name')
    THEN
-       ALTER TABLE `t_ds_fav_task` MODIFY COLUMN `id` bigint NOT NULL AUTO_INCREMENT;
        ALTER TABLE `t_ds_fav_task` DROP COLUMN `task_name`;
-       ALTER TABLE `t_ds_fav_task` ADD COLUMN `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name';
    END IF;
+   IF NOT EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_fav_task'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='task_type')
+   THEN
+        ALTER TABLE `t_ds_fav_task` ADD `task_type` varchar(64) NOT NULL COMMENT 'favorite task type name';
+    END IF;
 END;
 d//
 delimiter ;
