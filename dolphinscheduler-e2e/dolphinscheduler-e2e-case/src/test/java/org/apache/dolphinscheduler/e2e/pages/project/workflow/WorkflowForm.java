@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 
@@ -82,6 +83,8 @@ public final class WorkflowForm {
                 return (T) new SubWorkflowTaskForm(this);
             case SWITCH:
                 return (T) new SwitchTaskForm(this);
+            case HTTP:
+                return (T) new HttpTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -117,5 +120,6 @@ public final class WorkflowForm {
         SHELL,
         SUB_PROCESS,
         SWITCH,
+        HTTP,
     }
 }

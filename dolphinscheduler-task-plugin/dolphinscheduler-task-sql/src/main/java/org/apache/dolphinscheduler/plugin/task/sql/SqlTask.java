@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
@@ -36,8 +36,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.sql.utils.SqlSplitUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -52,7 +52,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,9 +133,8 @@ public class SqlTask extends AbstractTask {
             // get datasource
             baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dbType,
                     sqlTaskExecutionContext.getConnectionParams());
-            List<String> subSqls =
-                    dbType.isSupportMultipleStatement() ? Collections.singletonList(sqlParameters.getSql())
-                            : SqlSplitUtils.splitSql(sqlParameters.getSql());
+            List<String> subSqls = DataSourceProcessorProvider.getDataSourceProcessor(dbType)
+                    .splitAndRemoveComment(sqlParameters.getSql());
 
             // ready to execute SQL and parameter entity Map
             List<SqlBinds> mainStatementSqlBinds = subSqls
@@ -248,25 +246,17 @@ public class SqlTask extends AbstractTask {
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
 
-            int rowCount = 0;
-            int limit = sqlParameters.getLimit() == 0 ? QUERY_LIMIT : sqlParameters.getLimit();
-
             while (resultSet.next()) {
-                if (rowCount == limit) {
-                    log.info("sql result limit : {} exceeding results are filtered", limit);
-                    break;
-                }
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
                     mapOfColValues.set(md.getColumnLabel(i), JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
                 resultJSONArray.add(mapOfColValues);
-                rowCount++;
             }
 
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
                     : TaskConstants.DEFAULT_DISPLAY_ROWS;
-            displayRows = Math.min(displayRows, rowCount);
+            displayRows = Math.min(displayRows, resultJSONArray.size());
             log.info("display sql result {} rows as follows:", displayRows);
             for (int i = 0; i < displayRows; i++) {
                 String row = JSONUtils.toJsonString(resultJSONArray.get(i));
@@ -383,6 +373,7 @@ public class SqlTask extends AbstractTask {
      */
     private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) {
         // is the timeout set
+        // todo: we need control the timeout at master side.
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
         try {
@@ -390,6 +381,7 @@ public class SqlTask extends AbstractTask {
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
+            stmt.setMaxRows(sqlParameters.getLimit() <= 0 ? QUERY_LIMIT : sqlParameters.getLimit());
             Map<Integer, Property> params = sqlBinds.getParamsMap();
             if (params != null) {
                 for (Map.Entry<Integer, Property> entry : params.entrySet()) {
@@ -524,11 +516,10 @@ public class SqlTask extends AbstractTask {
      */
     private List<String> buildJarSql(List<UdfFuncParameters> udfFuncParameters) {
         return udfFuncParameters.stream().map(value -> {
-            String defaultFS = value.getDefaultFS();
-            String prefixPath = defaultFS.startsWith("file://") ? "file://" : defaultFS;
-            String uploadPath = CommonUtils.getHdfsUdfDir(value.getTenantCode());
             String resourceFullName = value.getResourceName();
-            return String.format("add jar %s", resourceFullName);
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            return String.format("add jar %s",
+                    resourceContext.getResourceItem(resourceFullName).getResourceAbsolutePathInLocal());
         }).collect(Collectors.toList());
     }
 
