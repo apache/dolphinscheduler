@@ -591,6 +591,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     });
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
+            pd.setSchedule(schedule);
         }
 
         PageInfo<ProcessDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
