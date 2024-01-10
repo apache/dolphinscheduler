@@ -85,14 +85,14 @@
         <include refid="baseSqlV2">
             <property name="alias" value="p"/>
         </include> ,
-        u.user_name as user_name ,
+        u.user_name as user_name,
         count(distinct def.id) AS def_count,
         count(distinct inst.id) as inst_running_count
         from t_ds_project p
         left join t_ds_user u on u.id=p.user_id
         left join t_ds_process_definition def
         on def.project_code = p.code
-        left join (	select
+        left join (select
         COUNT(distinct inst.id)  as inst_running_count, def.project_code code
         from
         t_ds_process_definition_log def
