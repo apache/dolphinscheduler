@@ -32,8 +32,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESTART_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_INSTANCE_ID;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.UNIQUE_LABEL_NAME;
 
-import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
-import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
@@ -79,6 +77,8 @@ import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 
 /**
  * K8sTaskExecutor used to submit k8s task to K8S
@@ -201,7 +201,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     }
     public void registerBatchJobFormer(Job job, String taskInstanceId, TaskResponse taskResponse) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
-        ResourceEventHandler resourceEventHandler =  new ResourceEventHandler<Job>() {
+        ResourceEventHandler resourceEventHandler = new ResourceEventHandler<Job>() {
+
             @Override
             public void onAdd(Job job) {
                 log.info("[K8sJobExecutor-{}] job got added", job.getMetadata().getName());
@@ -212,12 +213,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                     log.info("[K8sJobExecutor-{}] job got updated", job.getMetadata().getName());
                     int jobStatus = getK8sJobStatus(job);
-                    log.info("job {} status {}", job.getMetadata().getName(), jobStatus);
                     if (jobStatus == TaskConstants.RUNNING_CODE) {
                         return;
                     }
-                        setTaskStatus(jobStatus, taskInstanceId, taskResponse);
-                        countDownLatch.countDown();
+                    setTaskStatus(jobStatus, taskInstanceId, taskResponse);
+                    countDownLatch.countDown();
                 } finally {
                     LogUtils.removeTaskInstanceLogFullPathMDC();
                 }
