@@ -14,48 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Date;
+package org.apache.dolphinscheduler.server.master.runner.execute;
 
-import lombok.Data;
+public interface IMasterTaskExecutorThreadPool<T extends MasterTaskExecutor> {
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+    boolean submitMasterTaskExecutor(T masterTaskExecutor);
 
-@Data
-@TableName("t_ds_relation_resources_user")
-public class ResourcesUser {
-
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    /**
-     * user id
-     */
-    private int userId;
-
-    /**
-     * resource id
-     */
-    private int resourcesId;
-
-    /**
-     * permission
-     */
-    private int perm;
-
-    /**
-     * create time
-     */
-    private Date createTime;
-
-    /**
-     * update time
-     */
-    private Date updateTime;
+    boolean removeMasterTaskExecutor(T masterTaskExecutor);
 }

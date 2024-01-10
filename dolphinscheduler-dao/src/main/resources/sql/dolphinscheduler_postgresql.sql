@@ -695,7 +695,7 @@ create index relation_project_user_id_index on t_ds_relation_project_user (user_
 --
 -- Table structure for table t_ds_relation_resources_user
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_relation_resources_user;
 CREATE TABLE t_ds_relation_resources_user (
   id int NOT NULL ,
@@ -726,7 +726,7 @@ CREATE TABLE t_ds_relation_udfs_user (
 --
 -- Table structure for table t_ds_resources
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_resources;
 CREATE TABLE t_ds_resources (
   id int NOT NULL  ,

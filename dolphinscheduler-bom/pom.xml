@@ -34,7 +34,7 @@
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
-        <druid.version>1.2.4</druid.version>
+        <druid.version>1.2.20</druid.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
         <jetcd.test.version>0.7.1</jetcd.test.version>
@@ -119,7 +119,7 @@
         <esdk-obs.version>3.23.3</esdk-obs.version>
         <system-lambda.version>1.2.1</system-lambda.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
-        <testcontainer.version>1.17.6</testcontainer.version>
+        <testcontainer.version>1.19.3</testcontainer.version>
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>

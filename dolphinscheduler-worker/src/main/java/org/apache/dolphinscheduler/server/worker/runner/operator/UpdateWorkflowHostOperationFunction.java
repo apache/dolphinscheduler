@@ -20,9 +20,10 @@ package org.apache.dolphinscheduler.server.worker.runner.operator;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,21 +48,29 @@ public class UpdateWorkflowHostOperationFunction
             LogUtils.setTaskInstanceIdMDC(taskInstanceId);
             log.info("Received UpdateWorkflowHostRequest: {}", updateWorkflowHostRequest);
 
-            TaskExecutionContext taskExecutionContext =
-                    TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId);
-            if (taskExecutionContext == null) {
-                log.error("Cannot find the taskExecutionContext for taskInstance : {}", taskInstanceId);
-                return UpdateWorkflowHostResponse.failed("Cannot find the taskExecutionContext");
+            boolean updateWorkerTaskExecutor = updateHostInWorkflowTaskExecutor(taskInstanceId, workflowHost);
+            boolean updateMessage = updateHostInMessage(taskInstanceId, workflowHost);
+            if (updateWorkerTaskExecutor || updateMessage) {
+                return UpdateWorkflowHostResponse.success();
             }
-
-            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
-            taskExecutionContext.setWorkflowInstanceHost(workflowHost);
-            messageRetryRunner.updateMessageHost(taskInstanceId, workflowHost);
-            log.info("Success update workflow host: {} for taskInstance: {}", workflowHost, taskInstanceId);
-            return UpdateWorkflowHostResponse.success();
+            return UpdateWorkflowHostResponse.failed("The taskInstance is not in the worker");
         } finally {
             LogUtils.removeTaskInstanceIdMDC();
             LogUtils.removeTaskInstanceLogFullPathMDC();
         }
+    }
+
+    private boolean updateHostInWorkflowTaskExecutor(int taskInstanceId, String workflowHost) {
+        WorkerTaskExecutor workerTaskExecutor = WorkerTaskExecutorHolder.get(taskInstanceId);
+        if (workerTaskExecutor == null) {
+            return false;
+        }
+        TaskExecutionContext taskExecutionContext = workerTaskExecutor.getTaskExecutionContext();
+        taskExecutionContext.setWorkflowInstanceHost(workflowHost);
+        return true;
+    }
+
+    private boolean updateHostInMessage(int taskInstanceId, String workflowHost) {
+        return messageRetryRunner.updateMessageHost(taskInstanceId, workflowHost);
     }
 }

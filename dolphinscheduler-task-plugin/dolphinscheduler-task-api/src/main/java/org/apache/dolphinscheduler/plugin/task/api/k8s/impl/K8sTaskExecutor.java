@@ -21,7 +21,6 @@ import static java.util.Collections.singletonList;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JOB_TTL_SECONDS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL;
@@ -41,7 +40,6 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
@@ -116,11 +114,17 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         Map<String, Quantity> limitRes = new HashMap<>();
         limitRes.put(MEMORY, new Quantity(String.format("%s%s", limitPodMem, MI)));
         limitRes.put(CPU, new Quantity(String.valueOf(limitPodCpu)));
+
         Map<String, String> labelMap = k8STaskMainParameters.getLabelMap();
-        labelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
-        labelMap.put(NAME_LABEL, k8sJobName);
+        Map<String, String> jobLabelMap = new HashMap<>();
+        jobLabelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
+        jobLabelMap.put(NAME_LABEL, k8sJobName);
+        jobLabelMap.putAll(labelMap);
+
         Map<String, String> podLabelMap = new HashMap<>();
         podLabelMap.put(UNIQUE_LABEL_NAME, taskRequest.getTaskAppId());
+        podLabelMap.putAll(labelMap);
+
         EnvVar taskInstanceIdVar = new EnvVar(TASK_INSTANCE_ID, taskInstanceId, null);
         List<EnvVar> envVars = new ArrayList<>();
         envVars.add(taskInstanceIdVar);
@@ -165,7 +169,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
                 .withName(k8sJobName)
-                .withLabels(labelMap)
+                .withLabels(jobLabelMap)
                 .withNamespace(namespaceName)
                 .endMetadata()
                 .withNewSpec()
@@ -334,12 +338,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         try {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-                result.setExitStatusCode(EXIT_CODE_KILL);
-                return result;
-            }
             if (StringUtils.isEmpty(k8sParameterStr)) {
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
@@ -420,10 +419,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
-                log.info("[K8sJobExecutor-{}] killed", job.getMetadata().getName());
-                taskResponse.setExitStatusCode(EXIT_CODE_KILL);
-            } else if (jobStatus == EXIT_CODE_SUCCESS) {
+            if (jobStatus == EXIT_CODE_SUCCESS) {
                 log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {
