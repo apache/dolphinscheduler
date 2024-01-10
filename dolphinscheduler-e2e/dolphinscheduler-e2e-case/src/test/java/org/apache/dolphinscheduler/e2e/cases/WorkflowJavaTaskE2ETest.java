@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinition
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -61,10 +63,18 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String tenant = System.getProperty("user.name");
 
-    private static final String javaContent = "public class Test {" +
+    private static final String environmentName = "JAVA_HOME";
+
+    private static final String environmentConfig = "export JAVA_HOME=${JAVA_HOME:-/opt/java/openjdk}";
+
+    private static final String environmentDesc = "JAVA_HOME_DESC";
+
+    private static final String environmentWorkerGroup = "default";
+
+    private static final String javaContent = "public class Test {\n" +
             "    public static void main(String[] args) {" +
-            "        System.out.println(\"hello world\");" +
-            "    }" +
+            "        System.out.println(\"hello world\");\n" +
+            "    }\n" +
             "}";
 
     private static RemoteWebDriver browser;
@@ -76,6 +86,9 @@ public class WorkflowJavaTaskE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class)
                 .create(tenant)
+                .goToNav(SecurityPage.class)
+                .goToTab(EnvironmentPage.class)
+                .create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup)
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
@@ -108,6 +121,8 @@ public class WorkflowJavaTaskE2ETest {
                 .delete(tenant);
     }
 
+
+
     @Test
     @Order(1)
     void testCreateWorkflow() {
@@ -119,11 +134,11 @@ public class WorkflowJavaTaskE2ETest {
         workflowDefinitionPage
                 .createWorkflow()
                 .<JavaTaskForm> addTask(WorkflowForm.TaskType.JAVA)
-                .script(javaContent)
+                .script(javaContent.replaceAll("\\r\\n", "\n"))
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
+                .selectEnv(environmentName)
                 .submit()
-
                 .submit()
                 .name(workflow)
                 .addGlobalParam("global_param", "hello world")
