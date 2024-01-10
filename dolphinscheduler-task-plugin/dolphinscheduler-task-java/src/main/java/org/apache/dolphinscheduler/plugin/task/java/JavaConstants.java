@@ -26,7 +26,7 @@ public class JavaConstants {
     /**
      * The constants used to get the Java installation directory
      **/
-    public static final String JAVA_HOME_VAR = "$JAVA_HOME";
+    public static final String JAVA_HOME_VAR = "/opt/java/openjdk";
 
     /**
      * this constant represents the use of the java command to run a task
