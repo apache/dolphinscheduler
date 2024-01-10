@@ -207,6 +207,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             public void onAdd(Job job) {
                 log.info("[K8sJobExecutor-{}] job got added", job.getMetadata().getName());
             }
+
             @Override
             public void onUpdate(Job job, Job t1) {
                 try {
@@ -223,12 +224,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 }
 
             }
+
             @Override
             public void onDelete(Job job, boolean b) {
                 log.info("[K8sJobExecutor-{}] job got deleted", job.getMetadata().getName());
 
             }
         };
+
         try (SharedIndexInformer sharedIndexInformer = k8sUtils.createBatchJobInformer(job, resourceEventHandler)) {
             boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                     || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
@@ -247,6 +250,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         }
     }
+    
     @Deprecated
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
