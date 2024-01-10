@@ -71,11 +71,11 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String environmentWorkerGroup = "default";
 
-    private static final String javaContent = "public class Test {\n" +
+    private static final String javaContent = "public class Test {" +
             "    public static void main(String[] args) {" +
-            "        System.out.println(\"hello world\");\n" +
-            "    }\n" +
-            "}\n";
+            "        System.out.println(\"hello world\");" +
+            "    }" +
+            "}";
 
     private static RemoteWebDriver browser;
 
@@ -134,7 +134,7 @@ public class WorkflowJavaTaskE2ETest {
         workflowDefinitionPage
                 .createWorkflow()
                 .<JavaTaskForm> addTask(WorkflowForm.TaskType.JAVA)
-                .script(javaContent.replaceAll("\\r\\n", "\n"))
+                .script(javaContent)
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
                 .selectEnv(environmentName)
