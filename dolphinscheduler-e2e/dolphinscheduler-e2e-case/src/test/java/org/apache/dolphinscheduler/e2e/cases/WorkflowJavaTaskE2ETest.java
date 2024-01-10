@@ -75,7 +75,7 @@ public class WorkflowJavaTaskE2ETest {
             "    public static void main(String[] args) {" +
             "        System.out.println(\"hello world\");\n" +
             "    }\n" +
-            "}";
+            "}\n";
 
     private static RemoteWebDriver browser;
 
