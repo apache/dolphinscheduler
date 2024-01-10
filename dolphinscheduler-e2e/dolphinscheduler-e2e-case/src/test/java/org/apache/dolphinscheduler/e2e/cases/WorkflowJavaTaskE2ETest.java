@@ -61,10 +61,10 @@ public class WorkflowJavaTaskE2ETest {
 
     private static final String tenant = System.getProperty("user.name");
 
-    private static final String javaContent = "public class Test {\n" +
-            "    public static void main(String[] args) {\n" +
-            "        System.out.println(\"hello world\");\n" +
-            "    }\n" +
+    private static final String javaContent = "public class Test {" +
+            "    public static void main(String[] args) {" +
+            "        System.out.println(\"hello world\");" +
+            "    }" +
             "}";
 
     private static RemoteWebDriver browser;
