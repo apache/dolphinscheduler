@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
@@ -47,9 +48,11 @@ public class TaskExecutionContextUtils {
 
     public static String getOrCreateTenant(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
         try {
+            TenantConfig tenantConfig = workerConfig.getTenantConfig();
+
             String tenantCode = taskExecutionContext.getTenantCode();
-            if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode)) {
-                log.info("Current tenant is default tenant, will use {} to execute the task",
+            if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) && tenantConfig.isDefaultTenantEnabled()) {
+                log.info("Current tenant is default tenant, will use bootstrap user: {} to execute the task",
                         TenantConstants.BOOTSTRAPT_SYSTEM_USER);
                 return TenantConstants.BOOTSTRAPT_SYSTEM_USER;
             }
@@ -57,10 +60,10 @@ public class TaskExecutionContextUtils {
             // if Using distributed is true and Currently supported systems are linux,Should not let it
             // automatically
             // create tenants,so TenantAutoCreate has no effect
-            if (workerConfig.isTenantDistributedUser() && SystemUtils.IS_OS_LINUX) {
+            if (tenantConfig.isDistributedTenantEnabled() && SystemUtils.IS_OS_LINUX) {
                 // use the id command to judge in linux
                 osUserExistFlag = OSUtils.existTenantCodeInLinux(tenantCode);
-            } else if (OSUtils.isSudoEnable() && workerConfig.isTenantAutoCreate()) {
+            } else if (OSUtils.isSudoEnable() && tenantConfig.isAutoCreateTenantEnabled()) {
                 // if not exists this user, then create
                 OSUtils.createUserIfAbsent(tenantCode);
                 osUserExistFlag = OSUtils.getUserList().contains(tenantCode);

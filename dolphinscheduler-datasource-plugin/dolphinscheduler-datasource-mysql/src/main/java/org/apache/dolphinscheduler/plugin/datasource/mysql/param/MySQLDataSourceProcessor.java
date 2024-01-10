@@ -33,10 +33,9 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,9 +53,6 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     private static final String ALLOW_LOCAL_IN_FILE_NAME = "allowLocalInfile";
 
     private static final String ALLOW_URL_IN_LOCAL_IN_FILE_NAME = "allowUrlInLocalInfile";
-
-    private static final String APPEND_PARAMS =
-            "allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -119,11 +115,7 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
-        String jdbcUrl = mysqlConnectionParam.getJdbcUrl();
-        if (MapUtils.isNotEmpty(mysqlConnectionParam.getOther())) {
-            return String.format("%s?%s&%s", jdbcUrl, transformOther(mysqlConnectionParam.getOther()), APPEND_PARAMS);
-        }
-        return String.format("%s?%s", jdbcUrl, APPEND_PARAMS);
+        return mysqlConnectionParam.getJdbcUrl();
     }
 
     @Override
@@ -140,7 +132,32 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
             log.warn("sensitive param : {} in password field is filtered", AUTO_DESERIALIZE);
             password = password.replace(AUTO_DESERIALIZE, "");
         }
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), user, password);
+
+        Properties connectionProperties = getConnectionProperties(mysqlConnectionParam, user, password);
+
+        return DriverManager.getConnection(getJdbcUrl(connectionParam), connectionProperties);
+    }
+
+    private Properties getConnectionProperties(MySQLConnectionParam mysqlConnectionParam, String user,
+                                               String password) {
+        Properties connectionProperties = new Properties();
+        connectionProperties.put("user", user);
+        connectionProperties.put("password", password);
+        Map<String, String> paramMap = mysqlConnectionParam.getOther();
+        if (MapUtils.isNotEmpty(paramMap)) {
+            paramMap.forEach((k, v) -> {
+                if (!checkKeyIsLegitimate(k)) {
+                    log.info("Key `{}` is not legitimate for security reason", k);
+                    return;
+                }
+                connectionProperties.put(k, v);
+            });
+        }
+        connectionProperties.put(AUTO_DESERIALIZE, "false");
+        connectionProperties.put(ALLOW_LOAD_LOCAL_IN_FILE_NAME, "false");
+        connectionProperties.put(ALLOW_LOCAL_IN_FILE_NAME, "false");
+        connectionProperties.put(ALLOW_URL_IN_LOCAL_IN_FILE_NAME, "false");
+        return connectionProperties;
     }
 
     @Override
@@ -156,25 +173,6 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public List<String> splitAndRemoveComment(String sql) {
         return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.mysql);
-    }
-
-    private String transformOther(Map<String, String> paramMap) {
-        if (MapUtils.isEmpty(paramMap)) {
-            return null;
-        }
-        Map<String, String> otherMap = new HashMap<>();
-        paramMap.forEach((k, v) -> {
-            if (!checkKeyIsLegitimate(k)) {
-                return;
-            }
-            otherMap.put(k, v);
-        });
-        if (MapUtils.isEmpty(otherMap)) {
-            return null;
-        }
-        List<String> otherList = new ArrayList<>();
-        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
-        return String.join("&", otherList);
     }
 
     private static boolean checkKeyIsLegitimate(String key) {
