@@ -80,7 +80,7 @@ public class MySQLDataSourceProcessorTest {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         Assertions.assertEquals(
-                "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+                "jdbc:mysql://localhost:3306/default",
                 mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 

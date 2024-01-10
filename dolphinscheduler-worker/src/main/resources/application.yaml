@@ -47,10 +47,6 @@ worker:
   heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
-  tenant-auto-create: true
-  #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
-  tenant-distributed-user: false
   # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
   max-cpu-load-avg: 1
   # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, only the available memory is higher than 30%, worker server can receive task.
@@ -61,6 +57,13 @@ worker:
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   task-execute-threads-full-policy: REJECT
+  tenant-config:
+    # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+    auto-create-tenant-enabled: true
+    # Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, auto-create-tenant-enabled has no effect and will not automatically create tenants.
+    distributed-tenant-enabled: false
+    # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`.
+    default-tenant-enabled: false
 
 server:
   port: 1235
