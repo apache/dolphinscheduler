@@ -159,24 +159,6 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.workflow.timing'),
-            trigger: () => (
-              <NButton
-                size='small'
-                type='info'
-                tag='div'
-                circle
-                onClick={this.handleTimingWorkflow}
-              >
-                <NIcon>
-                  <ClockCircleOutlined />
-                </NIcon>
-              </NButton>
-            )
-          }}
-        </NTooltip>
-        <NTooltip trigger={'hover'}>
-          {{
             default: () =>
               releaseState === 'ONLINE'
                 ? t('project.workflow.down_line')
@@ -207,6 +189,24 @@ export default defineComponent({
                   )
                 }}
               </NPopconfirm>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
+            default: () => t('project.workflow.timing'),
+            trigger: () => (
+              <NButton
+                size='small'
+                type='info'
+                tag='div'
+                circle
+                onClick={this.handleTimingWorkflow}
+              >
+                <NIcon>
+                  <ClockCircleOutlined />
+                </NIcon>
+              </NButton>
             )
           }}
         </NTooltip>
