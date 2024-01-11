@@ -82,6 +82,8 @@ export default {
     timezone: 'Timezone',
     up_line: 'Online',
     down_line: 'Offline',
+    time_up_line: 'Scheduler Online',
+    time_down_line: 'Scheduler Offline',
     copy_workflow: 'Copy Workflow',
     copy_workflow_name: 'Copy workflow name',
     visit_workflow_instances: 'Visit workflow instances',
@@ -233,6 +235,8 @@ export default {
     want_to_set_timing: 'Would you like to set the workflow timing?',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',
+    time_to_online: 'Confirm to make the Scheduler online?',
+    time_to_offline: 'Confirm to make the Scheduler offline?',
   },
   task: {
     on_line: 'Online',

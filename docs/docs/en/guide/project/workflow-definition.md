@@ -70,10 +70,12 @@ Click `Project Management -> Workflow -> Workflow Definition` to enter the workf
 ### Actions Supported by a Single Workflow
 
 - **Edit:** Only "Offline" workflow definitions can be edited. Workflow DAG editing is the same as [Create Workflow Definition](#create-workflow-definition)
+- **Run:** Only workflow in the online state can run. See [Run Workflow](#run-the-workflow) for the operation steps.
 - **Online:** When the workflow status is "Offline", used to make workflow online. Only the workflow in the "Online" state can run, but cannot edit.
 - **Offline:** When the workflow status is "Online", used to make workflow offline. Only the workflow in the "Offline" state can be edited, but cannot run.
-- **Run:** Only workflow in the online state can run. See [Run Workflow](#run-the-workflow) for the operation steps.
-- **Timing:** Timing can only set to online workflows, and the system automatically schedules to run the workflow on time. The status after creating a timing setting is "offline", and the timing must set online on the timing management page to make effect. See [Workflow Timing](#workflow-schedule) for timing operation steps.
+- **Timing:** Timing can only set to online workflows, and the system automatically schedules to run the workflow on time. The status after creating a timing setting is "offline", You need to click the <img src="../../../../img/scheduler_online.png" width="20"/>button on the right to go online to take effect. See [Workflow Timing](#workflow-schedule) for timing operation steps.
+- **Timing Online：** Scheduled online, schedule can only be clicked after the schedule is created and the workflow status is "online".
+- **Timing Offline：** Scheduled offline.
 - **Timing Management:** The timing management page can edit, online or offline and delete timing.
 - **Delete:** Delete the workflow definition. In the same project, only the workflow definition created by yourself can be deleted, and the workflow definition of other users cannot be deleted. If you need to delete it, please contact the user who created it or the administrator.
 - **Download:** Download workflow definition to local.
@@ -179,9 +181,12 @@ Description of workflow operating parameters:
 
 - Click the "Create" button to create the timing. Now the timing status is "**Offline**" and the timing needs to be **Online** to make effect.
 
-- Schedule online: Click the `Timing Management` button <img src="../../../../img/timeManagement.png" width="35"/>, enter the timing management page, click the `online` button, the timing status will change to `online`, as shown in the below figure, the workflow makes effect regularly.
+- Schedule online: Click the `Timing online` button <img src="../../../../img/scheduler_online.png" width="30"/>, click the `online` button, the timing status will change to `online`, as shown in the below figure, the workflow makes effect regularly.
 
   ![workflow-time03](../../../../img/new_ui/dev/project/workflow-time03.png)
+
+- View the Schedule Timing：After the scheduled time goes online, you can check the current timing situation through the "Timing" button<img src="../../../../img/timing.png" width="35"/>. But it cannot be modified, as shown in the below figure.
+  ![workflow-time04](../../../../img/new_ui/dev/project/workflow-time04.png)
 
 ## Import Workflow
 

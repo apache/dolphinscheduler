@@ -65,6 +65,10 @@ const props = {
   type: {
     type: String as PropType<String>,
     default: 'create'
+  },
+  state: {
+    type: String as PropType<String>,
+    default: 'OFFLINE'
   }
 }
 
@@ -331,8 +335,13 @@ export default defineComponent({
         onCancel={this.hideModal}
         onConfirm={this.handleTiming}
         confirmLoading={this.saving}
+        confirmDisabled={this.$props.state === 'ONLINE'}
       >
-        <NForm ref='timingFormRef' rules={this.rules}>
+        <NForm
+          ref='timingFormRef'
+          rules={this.rules}
+          disabled={this.$props.state === 'ONLINE'}
+        >
           <NFormItem
             label={t('project.workflow.start_and_stop_time')}
             path='startEndTime'

@@ -38,6 +38,7 @@ export interface IDefinitionData {
   projectName: any
   releaseState: string
   scheduleReleaseState: any
+  schedule: any
   tenantCode: any
   tenantId: number
   timeout: number

@@ -143,6 +143,9 @@ public class ProcessDefinition {
     @TableField(exist = false)
     private ReleaseState scheduleReleaseState;
 
+    @TableField(exist = false)
+    private Schedule schedule;
+
     /**
      * process warning time out. unit: minute
      */

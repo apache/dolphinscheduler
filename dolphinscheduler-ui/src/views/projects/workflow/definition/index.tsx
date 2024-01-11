@@ -60,8 +60,7 @@ export default defineComponent({
       getTableData,
       batchDeleteWorkflow,
       batchExportWorkflow,
-      batchCopyWorkflow,
-      gotoTimingManage
+      batchCopyWorkflow
     } = useTable()
 
     const requestData = () => {
@@ -82,7 +81,7 @@ export default defineComponent({
     }
 
     const confirmToSetWorkflowTiming = () => {
-      gotoTimingManage(variables.row)
+      variables.timingShowRef = true
     }
 
     const handleSearch = () => {
@@ -295,6 +294,8 @@ export default defineComponent({
         <TimingModal
           v-model:row={this.row}
           v-model:show={this.timingShowRef}
+          v-model:type={this.timingType}
+          v-model:state={this.timingState}
           onUpdateList={this.handleUpdateList}
         />
         <VersionModal
