@@ -199,7 +199,7 @@ public class ServerNodeManager implements InitializingBean {
             workerNodeInfoWriteLock.lock();
             try {
                 workerNodeInfo.remove(workerAddress);
-                log.info("remove work {} from workerNodeInfo when work server down", workerAddress);
+                log.info("remove worker node {} from workerNodeInfo when worker server down", workerAddress);
             } finally {
                 workerNodeInfoWriteLock.unlock();
             }
