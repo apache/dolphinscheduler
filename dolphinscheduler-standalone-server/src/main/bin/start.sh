@@ -19,7 +19,6 @@
 BIN_DIR=$(dirname $0)
 DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
-
 export DATABASE=${DATABASE:-h2}
 source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
 
