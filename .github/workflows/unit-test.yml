@@ -24,7 +24,7 @@ on:
       - '**/*.md'
       - 'dolphinscheduler-ui'
     branches:
-      - dev
+      - fix_javatask
 
 env:
   LOG_DIR: /tmp/dolphinscheduler
