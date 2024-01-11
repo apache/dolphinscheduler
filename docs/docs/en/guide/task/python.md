@@ -47,3 +47,21 @@ After running this example, we would see "param_val" print in the log.
 print("${param_key}")
 ```
 
+### Multi-Line Shell Task Example
+
+```python
+import subprocess
+
+
+# Define multi-line shell command with string formatting and parameters
+shell_command = '''
+echo "Executing multi-line shell command"
+echo "Parameter: {}"
+ls -l
+'''.format('${param_key}')  
+
+# Execute the multi-line shell command using subprocess
+subprocess.run(shell_command, shell=True)
+
+
+
