@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - e2e-java
+      - dev
 
 name: E2E
 

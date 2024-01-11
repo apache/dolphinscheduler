@@ -24,7 +24,7 @@ on:
       - '**/*.md'
       - 'dolphinscheduler-ui'
     branches:
-      - e2e-java
+      - dev
 
 env:
   LOG_DIR: /tmp/dolphinscheduler
