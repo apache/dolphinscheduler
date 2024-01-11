@@ -45,8 +45,6 @@ public class WorkerConfig implements Validator {
     private int execThreads = 10;
     private Duration heartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
-    private boolean tenantAutoCreate = true;
-    private boolean tenantDistributedUser = false;
     private int maxCpuLoadAvg = -1;
     private double reservedMemory = 0.1;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
@@ -58,6 +56,8 @@ public class WorkerConfig implements Validator {
     private String workerRegistryPath;
 
     private TaskExecuteThreadsFullPolicy taskExecuteThreadsFullPolicy = TaskExecuteThreadsFullPolicy.REJECT;
+
+    private TenantConfig tenantConfig = new TenantConfig();
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -92,8 +92,7 @@ public class WorkerConfig implements Validator {
                         "\n  exec-threads -> " + execThreads +
                         "\n  heartbeat-interval -> " + heartbeatInterval +
                         "\n  host-weight -> " + hostWeight +
-                        "\n  tenant-auto-create -> " + tenantAutoCreate +
-                        "\n  tenant-distributed-user -> " + tenantDistributedUser +
+                        "\n  tenantConfig -> " + tenantConfig +
                         "\n  max-cpu-load-avg -> " + maxCpuLoadAvg +
                         "\n  reserved-memory -> " + reservedMemory +
                         "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +
