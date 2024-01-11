@@ -89,6 +89,7 @@
         <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
         <docker.hub>apache</docker.hub>
+        <docker.java.version>8</docker.java.version>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
         <docker.build.skip>true</docker.build.skip>
@@ -475,6 +476,8 @@
                                     <argument>build</argument>
                                     <argument>--load</argument>
                                     <argument>--no-cache</argument>
+                                    <argument>--build-arg</argument>
+                                    <argument>JAVA_VERSION=${docker.java.version}</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>
                                     <argument>-t</argument>
@@ -503,6 +506,8 @@
                                     <argument>--platform</argument>
                                     <argument>linux/amd64,linux/arm64</argument>
                                     <argument>--no-cache</argument>
+                                    <argument>--build-arg</argument>
+                                    <argument>JAVA_VERSION=${docker.java.version}</argument>
                                     <argument>--push</argument>
                                     <argument>-t</argument>
                                     <argument>${docker.hub}/${docker.repo}:${docker.tag}</argument>

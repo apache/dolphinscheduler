@@ -47,11 +47,19 @@ jobs:
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v2
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'adopt'
       - name: Build Image
         run: |
           ./mvnw -B clean package \
@@ -61,7 +69,9 @@ jobs:
           -Dmaven.checkstyle.skip \
           -Dmaven.deploy.skip \
           -Ddocker.push.skip=true \
-          -Pdocker,release -Ddocker.tag=ci \
+          -Pdocker,release \
+          -Ddocker.java.version=${{ matrix.java }} \
+          -Ddocker.tag=ci \
           -pl org.apache.dolphinscheduler:dolphinscheduler-alert-server \
           -pl dolphinscheduler-tools \
           -pl dolphinscheduler-api \
