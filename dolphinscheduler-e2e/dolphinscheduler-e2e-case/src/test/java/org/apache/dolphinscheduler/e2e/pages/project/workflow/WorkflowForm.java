@@ -19,7 +19,11 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.*;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
