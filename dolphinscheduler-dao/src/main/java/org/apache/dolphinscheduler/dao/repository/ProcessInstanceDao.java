@@ -32,6 +32,13 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
     void upsertProcessInstance(ProcessInstance processInstance);
 
     /**
+     * performs an "upsert" operation (update or insert) on a ProcessInstance object within a new transaction
+     *
+     * @param processInstance processInstance
+     */
+    void performTransactionalUpsert(ProcessInstance processInstance);
+
+    /**
      * find last scheduler process instance in the date interval
      *
      * @param definitionCode definitionCode

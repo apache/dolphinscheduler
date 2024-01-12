@@ -325,7 +325,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     protected void saveSerialProcess(ProcessInstance processInstance, ProcessDefinition processDefinition) {
         processInstance.setStateWithDesc(WorkflowExecutionStatus.SERIAL_WAIT, "wait by serial_wait strategy");
-        processInstanceDao.upsertProcessInstance(processInstance);
+        processInstanceDao.performTransactionalUpsert(processInstance);
         // serial wait
         // when we get the running instance(or waiting instance) only get the priority instance(by id)
         if (processDefinition.getExecutionType().typeIsSerialWait()) {
@@ -338,7 +338,7 @@ public class ProcessServiceImpl implements ProcessService {
             if (CollectionUtils.isEmpty(runningProcessInstances)) {
                 processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
                         "submit from serial_wait strategy");
-                processInstanceDao.upsertProcessInstance(processInstance);
+                processInstanceDao.performTransactionalUpsert(processInstance);
             }
         } else if (processDefinition.getExecutionType().typeIsSerialDiscard()) {
             List<ProcessInstance> runningProcessInstances =
@@ -349,12 +349,12 @@ public class ProcessServiceImpl implements ProcessService {
                             processInstance.getId());
             if (CollectionUtils.isNotEmpty(runningProcessInstances)) {
                 processInstance.setStateWithDesc(WorkflowExecutionStatus.STOP, "stop by serial_discard strategy");
-                processInstanceDao.upsertProcessInstance(processInstance);
+                processInstanceDao.performTransactionalUpsert(processInstance);
                 return;
             }
             processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
                     "submit from serial_discard strategy");
-            processInstanceDao.upsertProcessInstance(processInstance);
+            processInstanceDao.performTransactionalUpsert(processInstance);
         } else if (processDefinition.getExecutionType().typeIsSerialPriority()) {
             List<ProcessInstance> runningProcessInstances =
                     this.processInstanceMapper.queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(
@@ -384,7 +384,7 @@ public class ProcessServiceImpl implements ProcessService {
             }
             processInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION,
                     "submit by serial_priority strategy");
-            processInstanceDao.upsertProcessInstance(processInstance);
+            processInstanceDao.performTransactionalUpsert(processInstance);
         }
     }
 
