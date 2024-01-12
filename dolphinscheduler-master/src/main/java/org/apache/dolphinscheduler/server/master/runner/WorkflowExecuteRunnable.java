@@ -1842,7 +1842,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 workflowInstance.setEndTime(new Date());
             }
             try {
-                processInstanceDao.updateById(workflowInstance);
+                processInstanceDao.performTransactionalUpsert(workflowInstance);
             } catch (Exception ex) {
                 // recover the status
                 workflowInstance.setStateWithDesc(originStates, "recover state by DB error");
