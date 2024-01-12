@@ -66,6 +66,12 @@ public abstract class TaskNodeForm {
     private WebElement selectPreTasks;
 
     @FindBys({
+            @FindBy(className = "env-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectEnv;
+
+    @FindBys({
             @FindBy(className = "btn-custom-parameters"),
             @FindBy(tagName = "button"),
     })
@@ -108,6 +114,25 @@ public abstract class TaskNodeForm {
             inputParamKey().get(len).sendKeys(key);
             inputParamValue().get(len).sendKeys(value);
         }
+
+        return this;
+    }
+
+    public TaskNodeForm selectEnv(String envName){
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectEnv);
+
+        final By optionsLocator = By.className("n-base-selection-input__content");
+
+        new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+
+        webElements.stream()
+                .filter(it -> it.getText().contains(envName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such envName: " + envName))
+                .click();
 
         return this;
     }

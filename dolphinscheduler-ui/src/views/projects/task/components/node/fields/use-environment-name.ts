@@ -93,6 +93,7 @@ export function useEnvironmentName(
   return {
     type: 'select',
     field: 'environmentCode',
+    class: 'env-select',
     span: 12,
     name: t('project.node.environment_name'),
     props: {
