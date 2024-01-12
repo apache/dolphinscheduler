@@ -27,6 +27,7 @@ public class DinkyTaskConstants {
     }
 
     private static final String API_ROUTE = "/openapi/";
+    public static final String GET_VERSION = API_ROUTE + "version";
     public static final String SUBMIT_TASK = API_ROUTE + "submitTask";
     public static final String ONLINE_TASK = API_ROUTE + "onLineTask";
     public static final String SAVEPOINT_TASK = API_ROUTE + "savepointTask";
@@ -34,11 +35,19 @@ public class DinkyTaskConstants {
     public static final int API_ERROR = 1;
     public static final String API_VERSION_ERROR_TIPS =
             "Please check that the dinky version is greater than or equal to 0.6.5";
+    public static final String API_RESULT_CODE = "code";
+    public static final String API_RESULT_SUCCESS = "success";
+    public static final String API_RESULT_MSG = "msg";
+    public static final String API_RESULT_ERROR = "error";
+    public static final String API_RESULT_DATA = "data";
     public static final String API_RESULT_DATAS = "datas";
+    public static final String API_RESULT_JOB_INSTANCE_ID = "jobInstanceId";
 
     public static final String SAVEPOINT_CANCEL = "cancel";
 
     public static final String PARAM_TASK_ID = "id";
+    public static final String PARAM_TASK_IS_ONLINE = "isOnline";
+    public static final String PARAM_TASK_VARIABLES = "variables";
     public static final String PARAM_JSON_TASK_ID = "taskId";
     public static final String PARAM_SAVEPOINT_TYPE = "type";
     public static final String PARAM_JOB_INSTANCE_ID = "id";
