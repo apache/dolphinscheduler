@@ -196,11 +196,14 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | master.env.MASTER_EXEC_THREADS | string | `"100"` | Master execute thread number to limit process instances |
 | master.env.MASTER_FAILOVER_INTERVAL | string | `"10m"` | Master failover interval, the unit is minute |
 | master.env.MASTER_HEARTBEAT_ERROR_THRESHOLD | string | `"5"` | Master heartbeat error threshold |
-| master.env.MASTER_HEARTBEAT_INTERVAL | string | `"10s"` | Master heartbeat interval, the unit is second |
 | master.env.MASTER_HOST_SELECTOR | string | `"LowerWeight"` | Master host selector to select a suitable worker, optional values include Random, RoundRobin, LowerWeight |
 | master.env.MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER | string | `"true"` | Master kill application when handle failover |
-| master.env.MASTER_MAX_CPU_LOAD_AVG | string | `"1"` | Master max cpuload avg, only higher than the system cpu load average, master server can schedule |
-| master.env.MASTER_RESERVED_MEMORY | string | `"0.3"` | Master reserved memory, only lower than system available memory, master server can schedule, the unit is G |
+| master.env.MASTER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Master max heartbeat interval |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open master overload protection |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_STATE_WHEEL_INTERVAL | string | `"5s"` | master state wheel interval, the unit is second |
 | master.env.MASTER_TASK_COMMIT_INTERVAL | string | `"1s"` | master commit task interval, the unit is second |
 | master.env.MASTER_TASK_COMMIT_RETRYTIMES | string | `"5"` | Master commit task retry times |
@@ -293,12 +296,17 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | worker.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
 | worker.enabled | bool | `true` | Enable or disable the Worker component |
+| worker.env.DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
 | worker.env.WORKER_EXEC_THREADS | string | `"100"` | Worker execute thread number to limit task instances |
-| worker.env.WORKER_HEARTBEAT_INTERVAL | string | `"10s"` | Worker heartbeat interval, the unit is second |
-| worker.env.WORKER_HEART_ERROR_THRESHOLD | string | `"5"` | Worker heartbeat error threshold |
 | worker.env.WORKER_HOST_WEIGHT | string | `"100"` | Worker host weight to dispatch tasks |
-| worker.env.WORKER_MAX_CPU_LOAD_AVG | string | `"1"` | Worker max cpu load avg, only higher than the system cpu load average, worker server can be dispatched tasks |
-| worker.env.WORKER_RESERVED_MEMORY | string | `"0.3"` | Worker reserved memory, only lower than system available memory, worker server can be dispatched tasks, the unit is G |
+| worker.env.WORKER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Worker heartbeat interval |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open worker overload protection |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks. |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks. |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max jvm memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks. |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks. |
+| worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
+| worker.env.WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT | bool | `false` | Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants. |
 | worker.keda.advanced | object | `{}` | Specify HPA related options |
 | worker.keda.cooldownPeriod | int | `30` | How many seconds KEDA will wait before scaling to zero. Note that HPA has a separate cooldown period for scale-downs |
 | worker.keda.enabled | bool | `false` | Enable or disable the Keda component |
