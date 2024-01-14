@@ -57,6 +57,10 @@ public class DinkyTaskConstants {
     public static final String STATUS_FAILED = "FAILED";
     public static final String STATUS_UNKNOWN = "UNKNOWN";
 
+    public static final String SUBMIT_FAILED_MSG = "Submit dinkyTask failed:";
+    public static final String TRACK_FAILED_MSG = "Track dinkyTask failed:";
+    public static final String APPIDS_FORMAT = "%s-%s";
+
     public static final long SLEEP_MILLIS = 3000;
 
 }

@@ -116,7 +116,7 @@ public class DinkyTask extends AbstractRemoteTask {
             String taskId = this.dinkyParameters.getTaskId();
             boolean isOnline = this.dinkyParameters.isOnline();
             JsonNode result;
-            String API_RESULT_DATAS = DinkyTaskConstants.API_RESULT_DATAS;
+            String apiResultDatasKey = DinkyTaskConstants.API_RESULT_DATAS;
             if (isOnline) {
                 // Online dinky-0.6.5 task, and only one job is allowed to execute
                 result = onlineTaskV0(address, taskId);
@@ -125,19 +125,19 @@ public class DinkyTask extends AbstractRemoteTask {
                 result = submitTaskV0(address, taskId);
             }
             if (checkResultV0(result)) {
-                status = result.get(API_RESULT_DATAS).get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean();
-                if (result.get(API_RESULT_DATAS).has(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID)
-                        && !(result.get(API_RESULT_DATAS)
+                status = result.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean();
+                if (result.get(apiResultDatasKey).has(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID)
+                        && !(result.get(apiResultDatasKey)
                                 .get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID) instanceof NullNode)) {
                     jobInstanceId =
-                            result.get(API_RESULT_DATAS).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();
+                            result.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();
                 }
             }
         } catch (Exception ex) {
             Thread.currentThread().interrupt();
-            log.error("Submit dinkyTask failed", ex);
+            log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw new TaskException("Submit dinkyTask failed", ex);
+            throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
         }
     }
 
@@ -159,15 +159,16 @@ public class DinkyTask extends AbstractRemoteTask {
                             result.get(API_RESULT_DATA).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();
                 }
             } else {
-                log.error("Submit dinkyTask failed: {}", result.get(DinkyTaskConstants.API_RESULT_MSG));
+                log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG + "{}", result.get(DinkyTaskConstants.API_RESULT_MSG));
                 setExitStatusCode(EXIT_CODE_FAILURE);
-                throw new TaskException("Submit dinkyTask failed: " + result.get(DinkyTaskConstants.API_RESULT_MSG));
+                throw new TaskException(
+                        DinkyTaskConstants.SUBMIT_FAILED_MSG + result.get(DinkyTaskConstants.API_RESULT_MSG));
             }
         } catch (Exception ex) {
             Thread.currentThread().interrupt();
-            log.error("Submit dinkyTask failed", ex);
+            log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw new TaskException("Submit dinkyTask failed", ex);
+            throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
         }
     }
 
@@ -177,12 +178,12 @@ public class DinkyTask extends AbstractRemoteTask {
             String taskId = this.dinkyParameters.getTaskId();
             if (status && jobInstanceId == null) {
                 // Use address-taskId as app id
-                setAppIds(String.format("%s-%s", address, taskId));
+                setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
                 setExitStatusCode(mapStatusToExitCode(true));
                 log.info("Dinky common sql task finished.");
                 return;
             }
-            String API_RESULT_DATAS = DinkyTaskConstants.API_RESULT_DATAS;
+            String apiResultDatasKey = DinkyTaskConstants.API_RESULT_DATAS;
             boolean finishFlag = false;
             while (!finishFlag) {
                 JsonNode jobInstanceInfoResult = getJobInstanceInfo(address, jobInstanceId);
@@ -190,22 +191,23 @@ public class DinkyTask extends AbstractRemoteTask {
                     break;
                 }
                 String jobInstanceStatus =
-                        jobInstanceInfoResult.get(API_RESULT_DATAS).get("status").asText();
+                        jobInstanceInfoResult.get(apiResultDatasKey).get("status").asText();
                 switch (jobInstanceStatus) {
                     case DinkyTaskConstants.STATUS_FINISHED:
                         final int exitStatusCode = mapStatusToExitCode(status);
                         // Use address-taskId as app id
-                        setAppIds(String.format("%s-%s", address, taskId));
+                        setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
                         setExitStatusCode(exitStatusCode);
                         log.info("dinky task finished with results: {}",
-                                jobInstanceInfoResult.get(API_RESULT_DATAS));
+                                jobInstanceInfoResult.get(apiResultDatasKey));
                         finishFlag = true;
                         break;
                     case DinkyTaskConstants.STATUS_FAILED:
                     case DinkyTaskConstants.STATUS_CANCELED:
                     case DinkyTaskConstants.STATUS_UNKNOWN:
-                        errorHandle(jobInstanceInfoResult.get(API_RESULT_DATAS).get(DinkyTaskConstants.API_RESULT_ERROR)
-                                .asText());
+                        errorHandle(
+                                jobInstanceInfoResult.get(apiResultDatasKey).get(DinkyTaskConstants.API_RESULT_ERROR)
+                                        .asText());
                         finishFlag = true;
                         break;
                     default:
@@ -214,9 +216,9 @@ public class DinkyTask extends AbstractRemoteTask {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            log.error("Track dinkyTask failed", ex);
+            log.error(DinkyTaskConstants.TRACK_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw new TaskException("Track dinkyTask failed", ex);
+            throw new TaskException(DinkyTaskConstants.TRACK_FAILED_MSG, ex);
         }
     }
 
@@ -227,7 +229,7 @@ public class DinkyTask extends AbstractRemoteTask {
             String taskId = this.dinkyParameters.getTaskId();
             if (status && jobInstanceId == null) {
                 // Use address-taskId as app id
-                setAppIds(String.format("%s-%s", address, taskId));
+                setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
                 setExitStatusCode(mapStatusToExitCode(true));
                 log.info("Dinky common sql task finished.");
                 return;
@@ -245,7 +247,7 @@ public class DinkyTask extends AbstractRemoteTask {
                     case DinkyTaskConstants.STATUS_FINISHED:
                         final int exitStatusCode = mapStatusToExitCode(status);
                         // Use address-taskId as app id
-                        setAppIds(String.format("%s-%s", address, taskId));
+                        setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
                         setExitStatusCode(exitStatusCode);
                         log.info("dinky task finished with results: {}",
                                 jobInstanceInfoResult.get(API_RESULT_DATA));
@@ -264,9 +266,9 @@ public class DinkyTask extends AbstractRemoteTask {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            log.error("Track dinkyTask failed", ex);
+            log.error(DinkyTaskConstants.TRACK_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
-            throw new TaskException("Track dinkyTask failed", ex);
+            throw new TaskException(DinkyTaskConstants.TRACK_FAILED_MSG, ex);
         }
     }
     /**
@@ -284,25 +286,27 @@ public class DinkyTask extends AbstractRemoteTask {
     }
 
     private boolean checkResultV0(JsonNode result) {
+        boolean isCorrect = true;
         if (result instanceof MissingNode || result instanceof NullNode) {
             errorHandle(DinkyTaskConstants.API_VERSION_ERROR_TIPS);
-            return false;
+            isCorrect = false;
         } else if (result.get(DinkyTaskConstants.API_RESULT_CODE).asInt() == DinkyTaskConstants.API_ERROR) {
             errorHandle(result.get(DinkyTaskConstants.API_RESULT_MSG));
-            return false;
+            isCorrect = false;
         }
-        return true;
+        return isCorrect;
     }
 
     private boolean checkResultV1(JsonNode result) {
+        boolean isCorrect = true;
         if (result instanceof MissingNode || result instanceof NullNode) {
             errorHandle(DinkyTaskConstants.API_VERSION_ERROR_TIPS);
-            return false;
+            isCorrect = false;
         } else if (!result.get(DinkyTaskConstants.API_RESULT_SUCCESS).asBoolean()) {
             errorHandle(result.get(DinkyTaskConstants.API_RESULT_MSG));
-            return false;
+            isCorrect = false;
         }
-        return true;
+        return isCorrect;
     }
 
     private void errorHandle(Object msg) {
@@ -350,9 +354,8 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private String getDinkyVersion(String address) {
         JsonNode versionJsonNode = parse(doGet(address + DinkyTaskConstants.GET_VERSION, new HashMap<>()));
-        if (versionJsonNode instanceof MissingNode || versionJsonNode == null) {
-            return "0";
-        } else if (versionJsonNode.get(DinkyTaskConstants.API_RESULT_CODE).asInt() == DinkyTaskConstants.API_ERROR) {
+        if (versionJsonNode instanceof MissingNode || versionJsonNode == null
+                || versionJsonNode.get(DinkyTaskConstants.API_RESULT_CODE).asInt() == DinkyTaskConstants.API_ERROR) {
             return "0";
         }
         return versionJsonNode.get(DinkyTaskConstants.API_RESULT_DATA).asText();
