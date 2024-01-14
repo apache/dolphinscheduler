@@ -78,7 +78,7 @@ public class MasterConfig implements Validator {
     /**
      * Master heart beat task execute interval.
      */
-    private Duration heartbeatInterval = Duration.ofSeconds(10);
+    private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     /**
      * task submit max retry times.
      */
@@ -91,8 +91,7 @@ public class MasterConfig implements Validator {
      * state wheel check interval, if this value is bigger, may increase the delay of task/processInstance.
      */
     private Duration stateWheelInterval = Duration.ofMillis(5);
-    private double maxCpuLoadAvg = 1;
-    private double reservedMemory = 0.1;
+    private MasterServerLoadProtection serverLoadProtection = new MasterServerLoadProtection();
     private Duration failoverInterval = Duration.ofMinutes(10);
     private boolean killApplicationWhenTaskFailover = true;
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
@@ -128,8 +127,8 @@ public class MasterConfig implements Validator {
         if (masterConfig.getDispatchTaskNumber() <= 0) {
             errors.rejectValue("dispatch-task-number", null, "should be a positive value");
         }
-        if (masterConfig.getHeartbeatInterval().toMillis() < 0) {
-            errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
+        if (masterConfig.getMaxHeartbeatInterval().toMillis() < 0) {
+            errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
         }
         if (masterConfig.getTaskCommitRetryTimes() <= 0) {
             errors.rejectValue("task-commit-retry-times", null, "should be a positive value");
@@ -142,12 +141,6 @@ public class MasterConfig implements Validator {
         }
         if (masterConfig.getFailoverInterval().toMillis() <= 0) {
             errors.rejectValue("failover-interval", null, "should be a valid duration");
-        }
-        if (masterConfig.getMaxCpuLoadAvg() <= 0) {
-            masterConfig.setMaxCpuLoadAvg(100);
-        }
-        if (masterConfig.getReservedMemory() <= 0) {
-            masterConfig.setReservedMemory(100);
         }
 
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
@@ -171,12 +164,11 @@ public class MasterConfig implements Validator {
                         "\n  exec-threads -> " + execThreads +
                         "\n  dispatch-task-number -> " + dispatchTaskNumber +
                         "\n  host-selector -> " + hostSelector +
-                        "\n  heartbeat-interval -> " + heartbeatInterval +
+                        "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  task-commit-retry-times -> " + taskCommitRetryTimes +
                         "\n  task-commit-interval -> " + taskCommitInterval +
                         "\n  state-wheel-interval -> " + stateWheelInterval +
-                        "\n  max-cpu-load-avg -> " + maxCpuLoadAvg +
-                        "\n  reserved-memory -> " + reservedMemory +
+                        "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  failover-interval -> " + failoverInterval +
                         "\n  kill-application-when-task-failover -> " + killApplicationWhenTaskFailover +
                         "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +

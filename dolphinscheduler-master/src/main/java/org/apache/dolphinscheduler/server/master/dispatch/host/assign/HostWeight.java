@@ -20,69 +20,44 @@ package org.apache.dolphinscheduler.server.master.dispatch.host.assign;
 import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
-/**
- * host weight
- */
+import lombok.Data;
+
+@Data
 public class HostWeight {
 
-    private final int CPU_FACTOR = 10;
+    private final int THREAD_USAGE_FACTOR = 10;
 
-    private final int MEMORY_FACTOR = 20;
+    private final int CPU_USAGE_FACTOR = 20;
 
-    private final int LOAD_AVERAGE_FACTOR = 70;
+    private final int MEMORY_USAGE_FACTOR = 20;
 
-    private final HostWorker hostWorker;
+    private final int DISK_USAGE_FACTOR = 50;
+
+    private final Host host;
 
     private final double weight;
 
+    // if the weight is small, then is will be chosen first
     private double currentWeight;
 
-    private final int waitingTaskCount;
-
-    public HostWeight(HostWorker hostWorker, double cpu, double memory, double loadAverage, int waitingTaskCount,
+    public HostWeight(HostWorker hostWorker,
+                      double cpuUsage,
+                      double memoryUsage,
+                      double diskUsage,
+                      double threadPoolUsage,
                       long startTime) {
-        this.hostWorker = hostWorker;
-        this.weight = calculateWeight(cpu, memory, loadAverage, startTime);
+        this.host = hostWorker;
+        this.weight = calculateWeight(cpuUsage, memoryUsage, diskUsage, threadPoolUsage, startTime);
         this.currentWeight = this.weight;
-        this.waitingTaskCount = waitingTaskCount;
     }
 
-    public double getWeight() {
-        return weight;
-    }
-
-    public double getCurrentWeight() {
-        return currentWeight;
-    }
-
-    public void setCurrentWeight(double currentWeight) {
-        this.currentWeight = currentWeight;
-    }
-
-    public HostWorker getHostWorker() {
-        return hostWorker;
-    }
-
-    public Host getHost() {
-        return (Host) hostWorker;
-    }
-
-    public int getWaitingTaskCount() {
-        return waitingTaskCount;
-    }
-
-    @Override
-    public String toString() {
-        return "HostWeight{"
-                + "hostWorker=" + hostWorker
-                + ", weight=" + weight
-                + ", currentWeight=" + currentWeight
-                + ", waitingTaskCount=" + waitingTaskCount
-                + '}';
-    }
-
-    private double calculateWeight(double cpu, double memory, double loadAverage, long startTime) {
-        double calculatedWeight = cpu * CPU_FACTOR + memory * MEMORY_FACTOR + loadAverage * LOAD_AVERAGE_FACTOR;
+    private double calculateWeight(double cpuUsage,
+                                   double memoryUsage,
+                                   double diskUsage,
+                                   double threadPoolUsage,
+                                   long startTime) {
+        double calculatedWeight = 100 - (cpuUsage * CPU_USAGE_FACTOR + memoryUsage * MEMORY_USAGE_FACTOR
+                + diskUsage * DISK_USAGE_FACTOR + threadPoolUsage * THREAD_USAGE_FACTOR);
         long uptime = System.currentTimeMillis() - startTime;
         if (uptime > 0 && uptime < Constants.WARM_UP_TIME) {
             // If the warm-up is not over, add the weight

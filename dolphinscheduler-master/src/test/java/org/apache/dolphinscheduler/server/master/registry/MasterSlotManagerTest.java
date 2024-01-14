@@ -46,7 +46,7 @@ public class MasterSlotManagerTest {
         // on normal Master side
         Mockito.when(masterConfig.getMasterAddress()).thenReturn("127.0.0.1:7777");
 
-        sendHeartBeat(ServerStatus.ABNORMAL, ServerStatus.NORMAL);
+        sendHeartBeat(ServerStatus.BUSY, ServerStatus.NORMAL);
         Assertions.assertEquals(1, masterSlotManager.getMasterSize());
         Assertions.assertEquals(0, masterSlotManager.getSlot());
 
@@ -60,7 +60,7 @@ public class MasterSlotManagerTest {
         // on abnormal Master side
         Mockito.when(masterConfig.getMasterAddress()).thenReturn("127.0.0.1:6666");
 
-        sendHeartBeat(ServerStatus.ABNORMAL, ServerStatus.NORMAL);
+        sendHeartBeat(ServerStatus.BUSY, ServerStatus.NORMAL);
         Assertions.assertEquals(0, masterSlotManager.getMasterSize());
         Assertions.assertEquals(0, masterSlotManager.getSlot());
 

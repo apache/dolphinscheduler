@@ -30,8 +30,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,8 +48,7 @@ public class MasterSlotManager {
     private volatile int currentSlot = 0;
     private volatile int totalSlot = 0;
 
-    @PostConstruct
-    public void init() {
+    public void start() {
         serverNodeManager.addMasterInfoChangeListener(new MasterSlotManager.SlotChangeListener());
     }
 
@@ -72,7 +69,7 @@ public class MasterSlotManager {
         @Override
         public void notify(Map<String, MasterHeartBeat> masterNodeInfo) {
             List<Server> serverList = masterNodeInfo.values().stream()
-                    .filter(heartBeat -> !heartBeat.getServerStatus().equals(ServerStatus.ABNORMAL))
+                    .filter(heartBeat -> !heartBeat.getServerStatus().equals(ServerStatus.BUSY))
                     .map(this::convertHeartBeatToServer).collect(Collectors.toList());
             syncMasterNodes(serverList);
         }

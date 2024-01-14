@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
-
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
+package org.apache.dolphinscheduler.meter.metrics;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,26 +26,29 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkerHeartBeat implements HeartBeat {
+public class SystemMetrics {
 
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double jvmMemoryUsage;
-    private double memoryUsage;
-    private double diskUsage;
-    private ServerStatus serverStatus;
-    private int processId;
+    // CPU
+    private double systemCpuUsagePercentage;
+    private double processCpuUsagePercentage;
+    private double totalCpuUsedPercentage;
 
-    private String host;
-    private int port;
+    // JVM-Memory
+    // todo: get pod memory usage
+    private double jvmMemoryUsed;
+    private double jvmMemoryMax;
+    private double jvmMemoryUsedPercentage;
 
-    private int workerHostWeight; // worker host weight
-    private int threadPoolUsage; // worker waiting task count
+    // System-Memory
+    // todo: get pod cpu usage
+    private double systemMemoryUsed;
+    private double systemMemoryMax;
+    private double systemMemoryUsedPercentage;
 
-    @Override
-    public ServerStatus getServerStatus() {
-        return serverStatus;
-    }
+    // Disk
+    // todo: get pod disk usage
+    private double diskUsed;
+    private double diskTotal;
+    private double diskUsedPercentage;
 
 }

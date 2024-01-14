@@ -21,9 +21,13 @@ import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
+import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
@@ -73,6 +77,12 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterRpcServer masterRPCServer;
 
+    @Autowired
+    private MetricsProvider metricsProvider;
+
+    @Autowired
+    private MasterSlotManager masterSlotManager;
+
     public static void main(String[] args) {
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         SpringApplication.run(MasterServer.class);
@@ -89,6 +99,8 @@ public class MasterServer implements IStoppable {
         // install task plugin
         this.taskPluginManager.loadPlugin();
 
+        this.masterSlotManager.start();
+
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
@@ -99,6 +111,19 @@ public class MasterServer implements IStoppable {
         this.failoverExecuteThread.start();
 
         this.schedulerApi.start();
+
+        MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getTotalCpuUsedPercentage();
+        });
+        MasterServerMetrics.registerMasterMemoryAvailableGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return (systemMetrics.getSystemMemoryMax() - systemMetrics.getSystemMemoryUsed()) / 1024.0 / 1024 / 1024;
+        });
+        MasterServerMetrics.registerMasterMemoryUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getJvmMemoryUsedPercentage();
+        });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!ServerLifeCycleManager.isStopped()) {

@@ -21,11 +21,13 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
@@ -78,6 +80,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     @Autowired
     private MasterTaskExecutorBootstrap masterTaskExecutorBootstrap;
 
+    @Autowired
+    private MetricsProvider metricsProvider;
+
     protected MasterSchedulerBootstrap() {
         super("MasterCommandLoopThread");
     }
@@ -102,11 +107,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         log.info("MasterSchedulerBootstrap stopped...");
     }
 
-    /**
-     * run of MasterSchedulerService
-     */
     @Override
     public void run() {
+        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
@@ -115,9 +118,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
-                boolean isOverload =
-                        OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
-                if (isOverload) {
+                SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+                if (serverLoadProtection.isOverload(systemMetrics)) {
                     log.warn("The current server is overload, cannot consumes commands.");
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);

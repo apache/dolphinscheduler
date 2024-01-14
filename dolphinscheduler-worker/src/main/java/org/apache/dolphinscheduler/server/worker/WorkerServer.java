@@ -21,11 +21,14 @@ import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
 import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
@@ -63,6 +66,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    @Autowired
+    private MetricsProvider metricsProvider;
+
     /**
      * worker server startup, not use web service
      *
@@ -82,6 +88,19 @@ public class WorkerServer implements IStoppable {
         this.workerRegistryClient.start();
 
         this.messageRetryRunner.start();
+
+        WorkerServerMetrics.registerWorkerCpuUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getTotalCpuUsedPercentage();
+        });
+        WorkerServerMetrics.registerWorkerMemoryAvailableGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return (systemMetrics.getSystemMemoryMax() - systemMetrics.getSystemMemoryUsed()) / 1024.0 / 1024 / 1024;
+        });
+        WorkerServerMetrics.registerWorkerMemoryUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getJvmMemoryUsedPercentage();
+        });
 
         /*
          * registry hooks, which are called before the process exits

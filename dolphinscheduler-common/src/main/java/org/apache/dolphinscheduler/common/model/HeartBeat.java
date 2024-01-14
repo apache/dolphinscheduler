@@ -17,9 +17,13 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
+
 public interface HeartBeat {
 
     String getHost();
+
+    ServerStatus getServerStatus();
 
     int getPort();
 

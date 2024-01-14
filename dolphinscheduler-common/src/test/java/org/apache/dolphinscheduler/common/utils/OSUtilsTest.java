@@ -14,47 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.os;
 
-import org.apache.dolphinscheduler.common.utils.OSUtils;
+package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.commons.lang3.SystemUtils;
 
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-/**
- * OSUtilsTest
- */
+@Slf4j
 public class OSUtilsTest {
-
-    private static Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
-
-    @Test
-    public void diskAvailable() {
-        double diskAvailable = OSUtils.diskAvailable();
-        logger.info("diskAvailable : {}", diskAvailable);
-        Assertions.assertTrue(diskAvailable >= 0.0);
-    }
-
-    @Test
-    public void cpuUsage() {
-        double cpuUsage = OSUtils.cpuUsagePercentage();
-        logger.info("cpuUsage : {}", cpuUsage);
-        Assertions.assertTrue(cpuUsage >= 0.0);
-    }
-
-    @Test
-    public void availablePhysicalMemorySize() {
-        double physicalMemorySize = OSUtils.availablePhysicalMemorySize();
-        logger.info("physicalMemorySize : {}", physicalMemorySize);
-        Assertions.assertTrue(physicalMemorySize >= 0.0);
-
-    }
 
     @Test
     public void existTenantCodeInLinux() {
@@ -77,9 +50,31 @@ public class OSUtilsTest {
             Assertions.assertFalse(userList.contains("xxxtt"));
         } else {
             Assertions.assertFalse(false, "system must be linux");
-
         }
-
     }
 
+    @Test
+    void getTotalSystemMemory() throws InterruptedException {
+        double totalSystemMemory = OSUtils.getTotalSystemMemory();
+        Assertions.assertTrue(totalSystemMemory > 0);
+        // Assert that the memory is not changed
+        Thread.sleep(1000L);
+        Assertions.assertEquals(totalSystemMemory, OSUtils.getTotalSystemMemory());
+    }
+
+    @Test
+    void getSystemMemoryAvailable() {
+        long systemAvailableMemoryUsed = OSUtils.getSystemAvailableMemoryUsed();
+        Assertions.assertTrue(systemAvailableMemoryUsed > 0);
+    }
+
+    @Test
+    void getSystemMemoryUsedPercentage() {
+        long totalSystemMemory = OSUtils.getTotalSystemMemory();
+        long systemMemoryAvailable = OSUtils.getSystemAvailableMemoryUsed();
+        double systemAvailableMemoryUsedPercentage =
+                (double) (totalSystemMemory - systemMemoryAvailable) / totalSystemMemory;
+
+        Assertions.assertTrue(systemAvailableMemoryUsedPercentage > 0);
+    }
 }

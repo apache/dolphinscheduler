@@ -44,13 +44,20 @@ worker:
   # worker execute thread number to limit task instances in parallel
   exec-threads: 100
   # worker heartbeat interval
-  heartbeat-interval: 10s
+  max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
-  max-cpu-load-avg: 1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, only the available memory is higher than 30%, worker server can receive task.
-  reserved-memory: 0.3
+  server-load-protection:
+    # If set true, will open worker overload protection
+    enabled: true
+    # Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks.
+    max-cpu-usage-percentage-thresholds: 0.7
+    # Worker max jvm memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks.
+    max-jvm-memory-usage-percentage-thresholds: 0.7
+    # Worker max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+    max-system-memory-usage-percentage-thresholds: 0.7
+    # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+    max-disk-usage-percentage-thresholds: 0.7
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
     strategy: waiting

@@ -21,11 +21,13 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -55,7 +57,7 @@ public class WorkerRegistryClient implements AutoCloseable {
     private WorkerConfig workerConfig;
 
     @Autowired
-    private WorkerTaskExecutorThreadPool workerManagerThread;
+    private WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool;
 
     @Autowired
     private RegistryClient registryClient;
@@ -64,14 +66,18 @@ public class WorkerRegistryClient implements AutoCloseable {
     @Lazy
     private WorkerConnectStrategy workerConnectStrategy;
 
+    @Autowired
+    private MetricsProvider metricsProvider;
+
     private WorkerHeartBeatTask workerHeartBeatTask;
 
     @PostConstruct
     public void initWorkRegistry() {
         this.workerHeartBeatTask = new WorkerHeartBeatTask(
                 workerConfig,
+                metricsProvider,
                 registryClient,
-                () -> workerManagerThread.getWaitingTaskExecutorSize());
+                workerTaskExecutorThreadPool);
     }
 
     public void start() {
@@ -84,11 +90,13 @@ public class WorkerRegistryClient implements AutoCloseable {
         }
     }
 
-    /**
-     * registry
-     */
-    private void registry() {
+    private void registry() throws InterruptedException {
         WorkerHeartBeat workerHeartBeat = workerHeartBeatTask.getHeartBeat();
+        while (ServerStatus.BUSY.equals(workerHeartBeat.getServerStatus())) {
+            log.warn("Worker node is BUSY: {}", workerHeartBeat);
+            workerHeartBeat = workerHeartBeatTask.getHeartBeat();
+            Thread.sleep(SLEEP_TIME_MILLIS);
+        }
         String workerZKPath = workerConfig.getWorkerRegistryPath();
         // remove before persist
         registryClient.remove(workerZKPath);

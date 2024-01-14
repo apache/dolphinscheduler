@@ -19,6 +19,9 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
@@ -34,6 +37,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 
@@ -42,12 +46,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -106,7 +112,7 @@ public class ProcessInstanceAPITest {
             // create test project
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-            Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+            assertTrue(queryAllProjectListResponse.getBody().getSuccess());
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData()).get(0)).get("code");
 
             // upload test workflow definition json
@@ -115,17 +121,17 @@ public class ProcessInstanceAPITest {
             CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
                 .importProcessDefinition(loginUser, projectCode, file);
             String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
-            Assertions.assertTrue(data.contains("\"success\":true"));
+            assertTrue(data.contains("\"success\":true"));
 
             // get workflow definition code
             HttpResponse queryAllProcessDefinitionByProjectCodeResponse = processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
-            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
+            assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
+            assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
             processDefinitionCode = (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse.getBody().getData()).get(0)).get("processDefinition")).get("code");
 
             // release test workflow
             HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode, ReleaseState.ONLINE);
-            Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
+            assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
 
             // trigger workflow instance
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -133,15 +139,21 @@ public class ProcessInstanceAPITest {
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
             HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
-            Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
-            // make sure process instance has completed and successfully persisted into db
-            Thread.sleep(5000);
+            assertTrue(startProcessInstanceResponse.getBody().getSuccess());
 
-            // query workflow instance by trigger code
-            triggerCode = (long) startProcessInstanceResponse.getBody().getData();
-            HttpResponse queryProcessInstancesByTriggerCodeResponse = processInstancePage.queryProcessInstancesByTriggerCode(loginUser, projectCode, triggerCode);
-            Assertions.assertTrue(queryProcessInstancesByTriggerCodeResponse.getBody().getSuccess());
-            processInstanceId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryProcessInstancesByTriggerCodeResponse.getBody().getData()).get(0)).get("id");
+            // make sure process instance has completed and successfully persisted into db
+            Awaitility.await()
+                .atMost(30, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    // query workflow instance by trigger code
+                    triggerCode = (long) startProcessInstanceResponse.getBody().getData();
+                    HttpResponse queryProcessInstancesByTriggerCodeResponse = processInstancePage.queryProcessInstancesByTriggerCode(loginUser, projectCode, triggerCode);
+                    assertTrue(queryProcessInstancesByTriggerCodeResponse.getBody().getSuccess());
+                    List<LinkedHashMap<String, Object>> body = (List<LinkedHashMap<String, Object>>) queryProcessInstancesByTriggerCodeResponse.getBody().getData();
+                    assertTrue(CollectionUtils.isNotEmpty(body));
+                    assertEquals("SUCCESS", body.get(0).get("state"));
+                    processInstanceId = (int) body.get(0).get("id");
+                });
         }  catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
@@ -152,34 +164,34 @@ public class ProcessInstanceAPITest {
     @Order(2)
     public void testQueryProcessInstanceList() {
         HttpResponse queryProcessInstanceListResponse = processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
-        Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
+        assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
+        assertTrue(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(3)
     public void testQueryTaskListByProcessId() {
         HttpResponse queryTaskListByProcessIdResponse = processInstancePage.queryTaskListByProcessId(loginUser, projectCode, processInstanceId);
-        Assertions.assertTrue(queryTaskListByProcessIdResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryTaskListByProcessIdResponse.getBody().getData().toString().contains("test_import"));
+        assertTrue(queryTaskListByProcessIdResponse.getBody().getSuccess());
+        assertTrue(queryTaskListByProcessIdResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(4)
     public void testQueryProcessInstanceById() {
         HttpResponse queryProcessInstanceByIdResponse = processInstancePage.queryProcessInstanceById(loginUser, projectCode, processInstanceId);
-        Assertions.assertTrue(queryProcessInstanceByIdResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryProcessInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
+        assertTrue(queryProcessInstanceByIdResponse.getBody().getSuccess());
+        assertTrue(queryProcessInstanceByIdResponse.getBody().getData().toString().contains("test_import"));
     }
 
     @Test
     @Order(5)
     public void testDeleteProcessInstanceById() {
         HttpResponse deleteProcessInstanceByIdResponse = processInstancePage.deleteProcessInstanceById(loginUser, projectCode, processInstanceId);
-        Assertions.assertTrue(deleteProcessInstanceByIdResponse.getBody().getSuccess());
+        assertTrue(deleteProcessInstanceByIdResponse.getBody().getSuccess());
 
         HttpResponse queryProcessInstanceListResponse = processInstancePage.queryProcessInstanceList(loginUser, projectCode, 1, 10);
-        Assertions.assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
+        assertTrue(queryProcessInstanceListResponse.getBody().getSuccess());
         Assertions.assertFalse(queryProcessInstanceListResponse.getBody().getData().toString().contains("test_import"));
     }
 

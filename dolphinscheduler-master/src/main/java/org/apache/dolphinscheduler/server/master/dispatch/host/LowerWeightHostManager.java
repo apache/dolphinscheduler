@@ -130,28 +130,22 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
     }
 
-    public Optional<HostWeight> getHostWeight(String addr, String workerGroup, WorkerHeartBeat heartBeat) {
+    public Optional<HostWeight> getHostWeight(String workerAddress, String workerGroup, WorkerHeartBeat heartBeat) {
         if (heartBeat == null) {
-            log.warn("worker {} in work group {} have not received the heartbeat", addr, workerGroup);
-            return Optional.empty();
-        }
-        if (ServerStatus.ABNORMAL == heartBeat.getServerStatus()) {
-            log.warn("worker {} current cpu load average {} is too high or available memory {}G is too low",
-                    addr, heartBeat.getLoadAverage(), heartBeat.getAvailablePhysicalMemorySize());
+            log.warn("Worker {} in WorkerGroup {} have not received the heartbeat", workerAddress, workerGroup);
             return Optional.empty();
         }
         if (ServerStatus.BUSY == heartBeat.getServerStatus()) {
-            log.warn("worker {} is busy, current waiting task count {} is large than worker thread count {}",
-                    addr, heartBeat.getWorkerWaitingTaskCount(), heartBeat.getWorkerExecThreadCount());
+            log.warn("Worker {} in workerGroup {} is Busy, heartbeat is {}", workerAddress, workerGroup, heartBeat);
             return Optional.empty();
         }
         return Optional.of(
                 new HostWeight(
-                        HostWorker.of(addr, heartBeat.getWorkerHostWeight(), workerGroup),
+                        HostWorker.of(workerAddress, heartBeat.getWorkerHostWeight(), workerGroup),
                         heartBeat.getCpuUsage(),
                         heartBeat.getMemoryUsage(),
-                        heartBeat.getLoadAverage(),
-                        heartBeat.getWorkerWaitingTaskCount(),
+                        heartBeat.getDiskUsage(),
+                        heartBeat.getThreadPoolUsage(),
                         heartBeat.getStartupTime()));
     }
 
