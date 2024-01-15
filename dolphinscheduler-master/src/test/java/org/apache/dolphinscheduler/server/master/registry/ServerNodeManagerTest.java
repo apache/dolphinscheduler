@@ -5,6 +5,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -26,6 +27,9 @@ public class ServerNodeManagerTest {
 
     @Mock
     AlertDao alertDao;
+
+    @Mock
+    ListenerEventAlertManager listenerEventAlertManager;
 
     @InjectMocks
     ServerNodeManager serverNodeManager;
