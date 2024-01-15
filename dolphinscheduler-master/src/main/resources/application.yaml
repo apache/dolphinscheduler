@@ -113,16 +113,23 @@ master:
   # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
   host-selector: lower_weight
   # master heartbeat interval
-  heartbeat-interval: 10s
+  max-heartbeat-interval: 10s
   # master commit task retry times
   task-commit-retry-times: 5
   # master commit task interval
   task-commit-interval: 1s
   state-wheel-interval: 5s
-  # master max cpuload avg percentage, only higher than the system cpu load average, master server can schedule. default value 1: will use 100% cpu
-  max-cpu-load-avg: 1
-  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, only the available memory is higher than 30%, master server can schedule.
-  reserved-memory: 0.3
+  server-load-protection:
+    # If set true, will open master overload protection
+    enabled: true
+    # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
+    max-cpu-usage-percentage-thresholds: 0.7
+    # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
+    max-jvm-memory-usage-percentage-thresholds: 0.7
+    # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+    max-system-memory-usage-percentage-thresholds: 0.7
+    # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
+    max-disk-usage-percentage-thresholds: 0.7
   # failover interval, the unit is minute
   failover-interval: 10m
   # kill yarn / k8s application when failover taskInstance, default true
