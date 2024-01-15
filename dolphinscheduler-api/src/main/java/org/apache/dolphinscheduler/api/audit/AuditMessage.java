@@ -17,70 +17,32 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.common.enums.AuditResourceType;
+import lombok.Data;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Date;
 
+@Data
 public class AuditMessage {
 
     private User user;
 
     private Date auditDate;
 
-    private AuditResourceType resourceType;
+    private AuditObjectType objectType;
 
-    private AuditOperationType operation;
+    private AuditOperationType operationType;
 
     private Integer resourceId;
 
-    public AuditMessage(User user, Date auditDate, AuditResourceType resourceType, AuditOperationType operation,
+    public AuditMessage(User user, Date auditDate, AuditObjectType objectType, AuditOperationType operationType,
                         Integer resourceId) {
         this.user = user;
         this.auditDate = auditDate;
-        this.resourceType = resourceType;
-        this.operation = operation;
-        this.resourceId = resourceId;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Date getAuditDate() {
-        return auditDate;
-    }
-
-    public void setAuditDate(Date auditDate) {
-        this.auditDate = auditDate;
-    }
-
-    public AuditResourceType getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(AuditResourceType resourceType) {
-        this.resourceType = resourceType;
-    }
-
-    public AuditOperationType getOperation() {
-        return operation;
-    }
-
-    public void setOperation(AuditOperationType operation) {
-        this.operation = operation;
-    }
-
-    public Integer getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(Integer resourceId) {
+        this.objectType = objectType;
+        this.operationType = operationType;
         this.resourceId = resourceId;
     }
 
@@ -89,8 +51,8 @@ public class AuditMessage {
         return "AuditMessage{"
                 + "user=" + user
                 + ", Date=" + auditDate
-                + ", resourceType" + resourceType
-                + ", operation=" + operation
+                + ", objectType" + objectType
+                + ", operationType=" + operationType
                 + ", resourceId='" + resourceId + '\'';
     }
 }

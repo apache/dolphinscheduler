@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.audit.AuditMessage;
-import org.apache.dolphinscheduler.api.audit.AuditPublishService;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.common.enums.AuditResourceType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
@@ -44,20 +42,20 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     @Autowired
     private AuditLogMapper auditLogMapper;
 
-    @Autowired
-    private AuditPublishService publishService;
-
-    /**
-     * add new audit log
-     *
-     * @param user                  login user
-     * @param resourceType          resource type
-     * @param resourceId            resource id
-     * @param operation             operation type
-     */
     @Override
-    public void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation) {
-        publishService.publish(new AuditMessage(user, new Date(), resourceType, operation, resourceId));
+    public void addAudit(AuditLog auditLog) {
+        auditLogMapper.insert(auditLog);
+    }
+
+    @Override
+    public void addQuartzLog(int processId) {
+        AuditLog auditLog = new AuditLog();
+        auditLog.setObjectId(processId);
+        auditLog.setObjectType(AuditObjectType.WORKFLOW.getCode());
+        auditLog.setOperationType(AuditOperationType.SCHEDULE_RUN.getCode());
+        auditLog.setTime(new Date());
+        auditLog.setUserId(-1);
+        auditLogMapper.insert(auditLog);
     }
 
     /**
@@ -75,7 +73,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      */
     @Override
     public PageInfo<AuditDto> queryLogListPaging(User loginUser,
-                                                 AuditResourceType resourceType,
+                                                 AuditObjectType resourceType,
                                                  AuditOperationType operationType,
                                                  String startDate,
                                                  String endDate,
@@ -115,11 +113,11 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      */
     private AuditDto transformAuditLog(AuditLog auditLog) {
         AuditDto auditDto = new AuditDto();
-        String resourceType = AuditResourceType.of(auditLog.getResourceType()).getMsg();
+        String resourceType = AuditObjectType.of(auditLog.getObjectType()).getName();
         auditDto.setResource(resourceType);
-        auditDto.setOperation(AuditOperationType.of(auditLog.getOperation()).getMsg());
+        auditDto.setOperation(AuditOperationType.of(auditLog.getOperationType()).getName());
         auditDto.setUserName(auditLog.getUserName());
-        auditDto.setResourceName(auditLogMapper.queryResourceNameByType(resourceType, auditLog.getResourceId()));
+        auditDto.setResourceName(auditLogMapper.queryResourceNameByType(resourceType, auditLog.getObjectId()));
         auditDto.setTime(auditLog.getTime());
         return auditDto;
     }

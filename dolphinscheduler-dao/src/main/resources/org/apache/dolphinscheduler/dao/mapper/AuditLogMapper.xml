@@ -19,10 +19,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AuditLogMapper">
     <sql id="baseSql">
-        id, user_id, resource_type, operation, resource_id, time
+        id, user_id, object_type, operation_type, object_id, time, detail
     </sql>
     <sql id="baseSqlV2">
-        ${alias}.id, ${alias}.user_id, ${alias}.resource_type, ${alias}.operation, ${alias}.resource_id, ${alias}.time
+        ${alias}.id, ${alias}.user_id, ${alias}.object_type, ${alias}.operation_type, ${alias}.object_id, ${alias}.time, ${alias}.detail
     </sql>
 
     <select id="queryAuditLog" resultType="org.apache.dolphinscheduler.dao.entity.AuditLog">
@@ -32,20 +32,20 @@
         </include>
         ,
         u.user_name as user_name
-        from t_ds_audit_log log
+        from t_ds_audit_log_1 log
         join t_ds_user u on log.user_id = u.id
         where 1 = 1
         <if test="startDate != null">
             and log.time > #{startDate} and log.time <![CDATA[ <=]]> #{endDate}
         </if>
-        <if test="resourceType != null and resourceType.length > 0">
-            and log.resource_type in
-            <foreach collection="resourceType" index="index" item="i" open="(" separator="," close=")">
+        <if test="objectType != null and objectType.length > 0">
+            and log.object_type in
+            <foreach collection="objectType" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         <if test="operationType != null and operationType.length > 0">
-            and log.operation in
+            and log.operation_type in
             <foreach collection="operationType" index="index" item="j" open="(" separator="," close=")">
                 #{j}
             </foreach>
@@ -57,11 +57,11 @@
     </select>
 
     <select id="queryResourceNameByType" resultType="String">
-        <if test="resourceType != null and resourceType == 'USER'">
-            select user_name from t_ds_user where id = #{resourceId}
+        <if test="objectType != null and objectType == 'USER'">
+            select user_name from t_ds_user where id = #{objectId}
         </if>
-        <if test="resourceType != null and resourceType == 'PROJECT'">
-            select name from t_ds_project where id = #{resourceId}
+        <if test="objectType != null and objectType == 'Project'">
+            select name from t_ds_project where id = #{objectId}
         </if>
     </select>
 </mapper>

@@ -32,7 +32,7 @@ server:
 
 spring:
   profiles:
-    active: postgresql
+    active: mysql
   banner:
     charset: UTF-8
   jackson:
@@ -121,21 +121,10 @@ management:
       application: ${spring.application.name}
 
 registry:
-  type: zookeeper
-  zookeeper:
-    namespace: dolphinscheduler
-    connect-string: localhost:2181
-    retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
-      max-retries: 5
-    session-timeout: 60s
-    connection-timeout: 15s
-    block-until-connected: 15s
-    digest: ~
+  type: jdbc
 
 api:
-  audit-enable: false
+  audit-enable: true
   # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
   # global max request number per second
   # default tenant-level max request number
@@ -247,9 +236,9 @@ spring:
       on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
+    url: jdbc:mysql://tidb.intm.aiadgen-int-1.int.infra.webex.com:4000/ds3?useUnicode=true&characterEncoding=UTF-8&enabledTLSProtocols=TLSv1.2
+    username: udp
+    password: K$6Uu8U$JlcJWXeT
   quartz:
     properties:
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate

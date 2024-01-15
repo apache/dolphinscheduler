@@ -32,12 +32,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface AuditLogMapper extends BaseMapper<AuditLog> {
 
     IPage<AuditLog> queryAuditLog(IPage<AuditLog> page,
-                                  @Param("resourceType") int[] resourceArray,
+                                  @Param("objectType") int[] objectType,
                                   @Param("operationType") int[] operationType,
                                   @Param("userName") String userName,
                                   @Param("startDate") Date startDate,
                                   @Param("endDate") Date endDate);
 
-    String queryResourceNameByType(@Param("resourceType") String resourceType,
-                                   @Param("resourceId") Integer resourceId);
+    String queryResourceNameByType(@Param("objectType") String objectType,
+                                   @Param("objectId") Integer objectId);
 }

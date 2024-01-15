@@ -89,8 +89,8 @@ public class AuditServiceTest {
     private AuditLog getAuditLog() {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserName("testName");
-        auditLog.setOperation(0);
-        auditLog.setResourceType(0);
+        auditLog.setOperationType(0);
+        auditLog.setObjectType(0);
         return auditLog;
     }
 }

@@ -15,22 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.common.enums.Audit;
+
+import lombok.Getter;
 
 import java.util.HashMap;
 
 /**
  * Audit Operation type
  */
+
 public enum AuditOperationType {
 
     CREATE(0, "CREATE"),
     READ(1, "READ"),
     UPDATE(2, "UPDATE"),
-    DELETE(3, "DELETE");
+    ONLINE(3, "ONLINE"),
+    START(4, "ONLINE"),
+    SCHEDULE_RUN(6, "SCHEDULE_RUN"),
+    RUN(6, "RUN"),
+    STOP(7, "STOP"),
+    DELETE(8, "DELETE");
 
+    @Getter
     private final int code;
-    private final String enMsg;
+    @Getter
+    private final String name;
+
+    AuditOperationType(int code, String name) {
+        this.code = code;
+        this.name = name;
+    }
 
     private static HashMap<Integer, AuditOperationType> AUDIT_OPERATION_MAP = new HashMap<>();
 
@@ -40,23 +55,10 @@ public enum AuditOperationType {
         }
     }
 
-    AuditOperationType(int code, String enMsg) {
-        this.code = code;
-        this.enMsg = enMsg;
-    }
-
     public static AuditOperationType of(int status) {
         if (AUDIT_OPERATION_MAP.containsKey(status)) {
             return AUDIT_OPERATION_MAP.get(status);
         }
         throw new IllegalArgumentException("invalid audit operation type code " + status);
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getMsg() {
-        return enMsg;
     }
 }

@@ -1911,6 +1911,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (Boolean.TRUE.equals(syncDefine)) {
             if (processDefinition.getId() == null) {
                 result = processDefineMapper.insert(processDefinitionLog);
+                processDefinition.setId(processDefinitionLog.getId());
             } else {
                 processDefinitionLog.setId(processDefinition.getId());
                 result = processDefineMapper.updateById(processDefinitionLog);

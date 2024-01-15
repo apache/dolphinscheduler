@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.common.enums.AuditResourceType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ public class AuditLogController extends BaseController {
     @Parameters({
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "resourceType", description = "RESOURCE_TYPE", schema = @Schema(implementation = AuditResourceType.class)),
+            @Parameter(name = "resourceType", description = "RESOURCE_TYPE", schema = @Schema(implementation = AuditObjectType.class)),
             @Parameter(name = "operationType", description = "OPERATION_TYPE", schema = @Schema(implementation = AuditOperationType.class)),
             @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
@@ -81,7 +81,7 @@ public class AuditLogController extends BaseController {
     public Result<PageInfo<AuditDto>> queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam("pageNo") Integer pageNo,
                                                               @RequestParam("pageSize") Integer pageSize,
-                                                              @RequestParam(value = "resourceType", required = false) AuditResourceType resourceType,
+                                                              @RequestParam(value = "resourceType", required = false) AuditObjectType resourceType,
                                                               @RequestParam(value = "operationType", required = false) AuditOperationType operationType,
                                                               @RequestParam(value = "startDate", required = false) String startDate,
                                                               @RequestParam(value = "endDate", required = false) String endDate,

@@ -23,8 +23,10 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
-@TableName("t_ds_audit_log")
+@Data
+@TableName("t_ds_audit_log_1")
 public class AuditLog {
 
     /**
@@ -39,19 +41,19 @@ public class AuditLog {
     private Integer userId;
 
     /**
-     * resource type
+     * object type
      */
-    private Integer resourceType;
+    private Integer objectType;
 
     /**
      * operation type
      */
-    private Integer operation;
+    private Integer operationType;
 
     /**
-     * resource id
+     * object id
      */
-    private Integer resourceId;
+    private Integer objectId;
 
     /**
      * user name
@@ -64,51 +66,5 @@ public class AuditLog {
      */
     private Date time;
 
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
-    }
-
-    public Integer getOperation() {
-        return operation;
-    }
-
-    public void setOperation(Integer operation) {
-        this.operation = operation;
-    }
-
-    public Integer getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(Integer resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
+    private String detail;
 }

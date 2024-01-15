@@ -19,8 +19,9 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.common.enums.AuditResourceType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
+import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 /**
@@ -28,15 +29,10 @@ import org.apache.dolphinscheduler.dao.entity.User;
  */
 public interface AuditService {
 
-    /**
-     * add new audit record
-     *
-     * @param user                  login user
-     * @param resourceType          resource type
-     * @param resourceId            resource id
-     * @param operation             operation type
-     */
-    void addAudit(User user, AuditResourceType resourceType, Integer resourceId, AuditOperationType operation);
+
+    void addAudit(AuditLog auditLog);
+
+    void addQuartzLog(int processId);
 
     /**
      * query audit log list
@@ -51,7 +47,7 @@ public interface AuditService {
      * @param pageSize          page size
      * @return                  audit log string
      */
-    PageInfo<AuditDto> queryLogListPaging(User loginUser, AuditResourceType resourceType,
+    PageInfo<AuditDto> queryLogListPaging(User loginUser, AuditObjectType resourceType,
                                           AuditOperationType operationType, String startTime,
                                           String endTime, String userName,
                                           Integer pageNo, Integer pageSize);
