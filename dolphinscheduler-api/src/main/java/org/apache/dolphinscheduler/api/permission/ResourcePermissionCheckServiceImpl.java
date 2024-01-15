@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
@@ -54,7 +53,6 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -250,32 +248,6 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public boolean permissionCheck(int userId, String permissionKey, Logger logger) {
             return true;
-        }
-    }
-
-    @Component
-    public static class K8sNamespaceResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
-
-        private final K8sNamespaceMapper k8sNamespaceMapper;
-
-        public K8sNamespaceResourcePermissionCheck(K8sNamespaceMapper k8sNamespaceMapper) {
-            this.k8sNamespaceMapper = k8sNamespaceMapper;
-        }
-
-        @Override
-        public List<AuthorizationType> authorizationTypes() {
-            return Collections.singletonList(AuthorizationType.K8S_NAMESPACE);
-        }
-
-        @Override
-        public boolean permissionCheck(int userId, String url, Logger logger) {
-            return false;
-        }
-
-        @Override
-        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
-            return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
     }
 
