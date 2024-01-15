@@ -37,7 +37,6 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -85,7 +84,7 @@ public class TaskExecutionContextUtils {
 
     public static void createTaskInstanceWorkingDirectory(TaskExecutionContext taskExecutionContext) throws TaskException {
         // local execute path
-        String taskInstanceWorkingDirectory = FileUtils.getProcessExecDir(
+        String taskInstanceWorkingDirectory = FileUtils.getTaskInstanceWorkingDirectory(
                 taskExecutionContext.getTenantCode(),
                 taskExecutionContext.getProjectCode(),
                 taskExecutionContext.getProcessDefineCode(),
@@ -93,13 +92,12 @@ public class TaskExecutionContextUtils {
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId());
         try {
-            Path path = Paths.get(taskInstanceWorkingDirectory);
-            if (Files.deleteIfExists(path)) {
+            if (new File(taskInstanceWorkingDirectory).exists()) {
+                FileUtils.deleteFile(taskInstanceWorkingDirectory);
                 log.warn("The TaskInstance WorkingDirectory: {} is exist, will recreate again",
                         taskInstanceWorkingDirectory);
             }
-            Files.createDirectories(path);
-            taskExecutionContext.setExecutePath(taskInstanceWorkingDirectory);
+            Files.createDirectories(Paths.get(taskInstanceWorkingDirectory));
 
             taskExecutionContext.setExecutePath(taskInstanceWorkingDirectory);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(taskInstanceWorkingDirectory));
