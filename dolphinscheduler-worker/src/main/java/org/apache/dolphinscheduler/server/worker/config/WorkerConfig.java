@@ -43,10 +43,9 @@ public class WorkerConfig implements Validator {
 
     private int listenPort = 1234;
     private int execThreads = 10;
-    private Duration heartbeatInterval = Duration.ofSeconds(10);
+    private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
-    private int maxCpuLoadAvg = -1;
-    private double reservedMemory = 0.1;
+    private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
 
     /**
@@ -70,11 +69,8 @@ public class WorkerConfig implements Validator {
         if (workerConfig.getExecThreads() <= 0) {
             errors.rejectValue("exec-threads", null, "should be a positive value");
         }
-        if (workerConfig.getHeartbeatInterval().getSeconds() <= 0) {
-            errors.rejectValue("heartbeat-interval", null, "shoule be a valid duration");
-        }
-        if (workerConfig.getMaxCpuLoadAvg() <= 0) {
-            workerConfig.setMaxCpuLoadAvg(Runtime.getRuntime().availableProcessors() * 2);
+        if (workerConfig.getMaxHeartbeatInterval().getSeconds() <= 0) {
+            errors.rejectValue("max-heartbeat-interval", null, "shoule be a valid duration");
         }
         if (StringUtils.isEmpty(workerConfig.getWorkerAddress())) {
             workerConfig.setWorkerAddress(NetUtils.getAddr(workerConfig.getListenPort()));
@@ -90,11 +86,10 @@ public class WorkerConfig implements Validator {
                 "\n****************************Worker Configuration**************************************" +
                         "\n  listen-port -> " + listenPort +
                         "\n  exec-threads -> " + execThreads +
-                        "\n  heartbeat-interval -> " + heartbeatInterval +
+                        "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  host-weight -> " + hostWeight +
                         "\n  tenantConfig -> " + tenantConfig +
-                        "\n  max-cpu-load-avg -> " + maxCpuLoadAvg +
-                        "\n  reserved-memory -> " + reservedMemory +
+                        "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  registry-disconnect-strategy -> " + registryDisconnectStrategy +
                         "\n  task-execute-threads-full-policy: " + taskExecuteThreadsFullPolicy +
                         "\n  address -> " + workerAddress +

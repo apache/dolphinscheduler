@@ -33,13 +33,17 @@ public class MasterHeartBeat implements HeartBeat {
     private long startupTime;
     private long reportTime;
     private double cpuUsage;
+    private double jvmMemoryUsage;
     private double memoryUsage;
-    private double availablePhysicalMemorySize;
-    private double reservedMemory;
-    private double diskAvailable;
-    private int processId;
+    private double diskUsage;
     private ServerStatus serverStatus;
+    private int processId;
 
     private String host;
     private int port;
+
+    @Override
+    public ServerStatus getServerStatus() {
+        return serverStatus;
+    }
 }
