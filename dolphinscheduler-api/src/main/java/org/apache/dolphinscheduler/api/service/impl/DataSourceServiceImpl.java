@@ -213,6 +213,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
+        baseDataSourceParamDTO.setPassword(getHiddenPassword());
 
         return baseDataSourceParamDTO;
     }
