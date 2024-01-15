@@ -47,7 +47,7 @@ public class DataSourceUtilsTest {
     @Test
     public void testCheckDatasourceParam() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
+        mysqlDatasourceParamDTO.setHost("0.0.0.0");
         mysqlDatasourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
@@ -57,7 +57,19 @@ public class DataSourceUtilsTest {
         DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
         Assertions.assertTrue(true);
     }
-
+    @Test
+    public void testCheckIpv6DatasourceParam() {
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
+        mysqlDatasourceParamDTO.setHost("0000:0000:0000::0000");
+        mysqlDatasourceParamDTO.setDatabase("default");
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        other.put("queryTimeout", "-1");
+        other.put("characterEncoding", "utf8");
+        mysqlDatasourceParamDTO.setOther(other);
+        DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
+        Assertions.assertTrue(true);
+    }
     @Test
     public void testBuildConnectionParams() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();

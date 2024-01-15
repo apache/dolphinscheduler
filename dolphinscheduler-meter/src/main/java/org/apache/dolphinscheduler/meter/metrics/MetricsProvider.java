@@ -15,11 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.meter.metrics;
 
-public enum ServerStatus {
+public interface MetricsProvider {
 
-    NORMAL,
-    BUSY
+    SystemMetrics getSystemMetrics();
 
 }
