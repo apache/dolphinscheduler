@@ -280,7 +280,7 @@ public class JavaTask extends AbstractTask {
         if (javaParameters.isModulePath()) {
             builder.append("--module-path");
         } else {
-            builder.append("--class-path");
+            builder.append("-classpath");
         }
         builder.append(" ")
                 .append(JavaConstants.CLASSPATH_CURRENT_DIR)
