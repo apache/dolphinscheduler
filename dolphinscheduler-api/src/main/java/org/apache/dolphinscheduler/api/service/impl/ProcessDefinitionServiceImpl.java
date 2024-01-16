@@ -111,7 +111,10 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
@@ -1188,8 +1191,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             putMsg(result, Status.DATA_IS_NULL, "fileContent");
             return result;
         }
+
+        //keep new code in global map, for down-stream flow may import before up-stream job
+        Map<Long, Long> codeGlobalMap = new HashMap<>();
         for (DagDataSchedule dagDataSchedule : dagDataScheduleList) {
-            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule)) {
+            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule, codeGlobalMap)) {
                 return result;
             }
         }
@@ -1409,7 +1415,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     protected boolean checkAndImport(User loginUser,
                                      long projectCode,
                                      Map<String, Object> result,
-                                     DagDataSchedule dagDataSchedule) {
+                                     DagDataSchedule dagDataSchedule,
+                                     Map<Long, Long> codeGlobalMap) {
         if (!checkImportanceParams(dagDataSchedule, result)) {
             return false;
         }
@@ -1432,7 +1439,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
-            processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+            processDefinition.setCode(getOrGenerateNewCode(codeGlobalMap, processDefinition.getCode()));
         } catch (CodeGenerateException e) {
             log.error(
                     "Save process definition error because generate process definition code error, projectCode:{}.",
@@ -1441,7 +1448,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return false;
         }
         List<TaskDefinition> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
-        Map<Long, Long> taskCodeMap = new HashMap<>();
         Date now = new Date();
         List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
         for (TaskDefinition taskDefinition : taskDefinitionList) {
@@ -1455,15 +1461,47 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
             try {
-                long code = CodeGenerateUtils.getInstance().genCode();
-                taskCodeMap.put(taskDefinitionLog.getCode(), code);
-                taskDefinitionLog.setCode(code);
+                taskDefinitionLog.setCode(getOrGenerateNewCode(codeGlobalMap, taskDefinitionLog.getCode()));
             } catch (CodeGenerateException e) {
                 log.error("Generate task definition code error, projectCode:{}, processDefinitionCode:{}",
                         projectCode, processDefinition.getCode(), e);
                 putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, "Error generating task definition code");
                 return false;
             }
+
+            if (StringUtils.isNotEmpty(taskDefinition.getTaskParams()) && JSONUtils.checkJsonValid(taskDefinition.getTaskParams())) {
+                ObjectNode taskParamsJsonNodes = JSONUtils.parseObject(taskDefinition.getTaskParams());
+                if (taskParamsJsonNodes != null) {
+                    JsonNode dependJsonNode = taskParamsJsonNodes.get(Constants.DEPENDENCE);
+                    if (dependJsonNode != null) {
+                        DependentParameters dependentParameters
+                                = JSONUtils.parseObject(dependJsonNode.toString(), DependentParameters.class);
+                        if (dependentParameters != null && dependentParameters.getDependTaskList() != null) {
+                            for (DependentTaskModel dependentTaskModel : dependentParameters.getDependTaskList()) {
+                                if (dependentTaskModel.getDependItemList() == null) {
+                                    continue;
+                                }
+                                for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
+                                    dependentItem.setProjectCode(projectCode);
+
+                                    // definitionCode depTaskCode
+                                    try {
+                                        dependentItem.setDefinitionCode(getOrGenerateNewCode(codeGlobalMap, dependentItem.getDefinitionCode()));
+                                        dependentItem.setDepTaskCode(getOrGenerateNewCode(codeGlobalMap, dependentItem.getDepTaskCode()));
+                                    } catch (CodeGenerateException e) {
+                                        putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
+                                        return false;
+                                    }
+                                }
+                            }
+
+                            taskParamsJsonNodes.set(Constants.DEPENDENCE, JSONUtils.toJsonNode(dependentParameters));
+                            taskDefinitionLog.setTaskParams(taskParamsJsonNodes.toString());
+                        }
+                    }
+                }
+            }
+
             taskDefinitionLogList.add(taskDefinitionLog);
         }
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
@@ -1479,11 +1517,11 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessTaskRelationLog> taskRelationLogList = new ArrayList<>();
         for (ProcessTaskRelation processTaskRelation : taskRelationList) {
             ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog(processTaskRelation);
-            if (taskCodeMap.containsKey(processTaskRelationLog.getPreTaskCode())) {
-                processTaskRelationLog.setPreTaskCode(taskCodeMap.get(processTaskRelationLog.getPreTaskCode()));
+            if (codeGlobalMap.containsKey(processTaskRelationLog.getPreTaskCode())) {
+                processTaskRelationLog.setPreTaskCode(codeGlobalMap.get(processTaskRelationLog.getPreTaskCode()));
             }
-            if (taskCodeMap.containsKey(processTaskRelationLog.getPostTaskCode())) {
-                processTaskRelationLog.setPostTaskCode(taskCodeMap.get(processTaskRelationLog.getPostTaskCode()));
+            if (codeGlobalMap.containsKey(processTaskRelationLog.getPostTaskCode())) {
+                processTaskRelationLog.setPostTaskCode(codeGlobalMap.get(processTaskRelationLog.getPostTaskCode()));
             }
             processTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
             processTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
@@ -1496,7 +1534,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             for (int i = 0; i < arrayNode.size(); i++) {
                 ObjectNode newObjectNode = newArrayNode.addObject();
                 JsonNode jsonNode = arrayNode.get(i);
-                Long taskCode = taskCodeMap.get(jsonNode.get("taskCode").asLong());
+                Long taskCode = codeGlobalMap.get(jsonNode.get("taskCode").asLong());
                 if (Objects.nonNull(taskCode)) {
                     newObjectNode.put("taskCode", taskCode);
                     newObjectNode.set("x", jsonNode.get("x"));
@@ -1539,6 +1577,17 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         log.info("Import process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
                 processDefinition.getCode());
         return true;
+    }
+
+    private long getOrGenerateNewCode(Map<Long, Long> codeGlobalMap, long oldCode) throws CodeGenerateException {
+        if (codeGlobalMap.containsKey(oldCode)) {
+            return codeGlobalMap.get(oldCode);
+        }
+
+        // generate a new code
+        long code = CodeGenerateUtils.getInstance().genCode();
+        codeGlobalMap.put(oldCode, code);
+        return code;
     }
 
     /**
