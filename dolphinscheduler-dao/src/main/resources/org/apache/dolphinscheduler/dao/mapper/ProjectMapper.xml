@@ -87,7 +87,7 @@
         </include> ,
         u.user_name as user_name,
         count(distinct def.id) AS def_count,
-        count(distinct inst.id) as inst_running_count
+        t.inst_running_count as inst_running_count
         from t_ds_project p
         left join t_ds_user u on u.id=p.user_id
         left join t_ds_process_definition def
