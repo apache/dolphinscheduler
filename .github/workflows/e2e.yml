@@ -65,9 +65,7 @@ jobs:
       - name: Run Spotless Check
         run: |
             ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
-              -DfailIfNoTests=false \
-              -Dmaven.test.skip=true \
-              -Dspotless.skip=false
+             spotless:check
       - name: Build Image
         run: |
           ./mvnw -B clean install \
