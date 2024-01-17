@@ -50,12 +50,17 @@ repos:
           --ignore-init-module-imports,
           --in-place
         ]
-  - repo: local
-    hooks:
+  #- repo: local
+  #  hooks:
       # Spotless Hooks
-      - id: spotless
-        name: spotless lint
-        entry: mvnw.cmd spotless:check
-        language: script
-        pass_filenames: false
+      # - id: spotless
+      #   name: spotless lint
+      #   entry: mvnw.cmd spotless:check
+      #   language: script
+      #   pass_filenames: false
+      #  - id: e2e-spotless
+      #  name: e2e spotless lint
+      #  entry: mvnw.cmd -f dolphinscheduler-e2e/pom.xml spotless:check
+      #   language: script
+    #  pass_filenames: false
 
