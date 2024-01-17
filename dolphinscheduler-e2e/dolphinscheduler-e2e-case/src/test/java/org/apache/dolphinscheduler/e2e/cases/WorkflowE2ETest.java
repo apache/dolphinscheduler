@@ -70,7 +70,7 @@ class WorkflowE2ETest {
     @BeforeAll
     public static void setup() {
         UserPage userPage = new LoginPage(browser)
-                .login("admin", "dolphinscheduler123")
+                .login(user, password)
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class)
                 .create(tenant)
