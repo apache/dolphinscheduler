@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -29,7 +28,6 @@ import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import java.time.Duration;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -38,9 +36,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkerGroupE2ETest {
+
     private static final String workerGroupName = "test_worker_group";
     private static final String editWorkerGroupName = "edit_worker_group";
 
@@ -49,9 +49,9 @@ class WorkerGroupE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(SecurityPage.class)
-            .goToTab(WorkerGroupPage.class);
+                .login("admin", "dolphinscheduler123")
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
     }
 
     @Test
@@ -60,7 +60,7 @@ class WorkerGroupE2ETest {
         final WorkerGroupPage page = new WorkerGroupPage(browser);
 
         new WebDriverWait(page.driver(), Duration.ofSeconds(20))
-            .until(ExpectedConditions.urlContains("/security/worker-group-manage"));
+                .until(ExpectedConditions.urlContains("/security/worker-group-manage"));
 
         page.create(workerGroupName);
 
@@ -68,9 +68,9 @@ class WorkerGroupE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.workerGroupList())
-                .as("workerGroup list should contain newly-created workerGroup")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(workerGroupName));
+                    .as("workerGroup list should contain newly-created workerGroup")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(workerGroupName));
         });
     }
 
@@ -81,10 +81,8 @@ class WorkerGroupE2ETest {
 
         page.create(workerGroupName);
 
-        Awaitility.await().untilAsserted(() ->
-            assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("already exists")
-        );
+        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists"));
 
         page.createWorkerForm().buttonCancel().click();
     }
@@ -98,12 +96,11 @@ class WorkerGroupE2ETest {
         Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.workerGroupList())
-                .as("workerGroup list should contain newly-modified workerGroup")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(editWorkerGroupName));
+                    .as("workerGroup list should contain newly-modified workerGroup")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(editWorkerGroupName));
         });
     }
-
 
     @Test
     @Order(40)
@@ -116,10 +113,8 @@ class WorkerGroupE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                page.workerGroupList()
-            ).noneMatch(
-                it -> it.getText().contains(workerGroupName) || it.getText().contains(editWorkerGroupName)
-            );
+                    page.workerGroupList()).noneMatch(
+                            it -> it.getText().contains(workerGroupName) || it.getText().contains(editWorkerGroupName));
         });
     }
 }
