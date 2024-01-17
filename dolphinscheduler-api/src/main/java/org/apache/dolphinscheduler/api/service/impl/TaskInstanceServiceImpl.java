@@ -379,9 +379,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return;
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
-            ILogService iLogService =
-                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
-            iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+            if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
+                ILogService iLogService =
+                        SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(),
+                                ILogService.class);
+                iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+            }
         }
 
         dqExecuteResultDao.deleteByWorkflowInstanceId(workflowInstanceId);
