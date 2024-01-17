@@ -19,6 +19,8 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -31,6 +33,9 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+
+import java.time.Duration;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -40,13 +45,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
 @DolphinScheduler(composeFiles = "docker/workflow-http/docker-compose.yaml")
 public class WorkflowHttpTaskE2ETest {
-
 
     private static final String project = "test-workflow-1";
 
@@ -76,13 +76,13 @@ public class WorkflowHttpTaskE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(
+                        new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project)
-        ;
+                .create(project);
     }
 
     @AfterAll
@@ -115,7 +115,7 @@ public class WorkflowHttpTaskE2ETest {
 
         workflowDefinitionPage
                 .createWorkflow()
-                .<HttpTaskForm> addTask(WorkflowForm.TaskType.HTTP)
+                .<HttpTaskForm>addTask(WorkflowForm.TaskType.HTTP)
                 .url(mockServerUrl)
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
@@ -124,17 +124,14 @@ public class WorkflowHttpTaskE2ETest {
                 .submit()
                 .name(workflow)
                 .addGlobalParam("global_param", "hello world")
-                .submit()
-        ;
+                .submit();
 
         Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(
-                        it -> it.getText().contains(workflow)
-                ));
+                        it -> it.getText().contains(workflow)));
         workflowDefinitionPage.publish(workflow);
     }
-
 
     @Test
     @Order(30)

@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import java.time.Duration;
 import java.util.List;
 
+import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -32,13 +34,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-
-import lombok.Getter;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class EnvironmentPage extends NavBarPage implements SecurityPage.Tab {
+
     @FindBy(className = "btn-create-environment")
     private WebElement buttonCreateEnvironment;
 
@@ -46,8 +47,8 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
     private List<WebElement> environmentList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -67,8 +68,9 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         createEnvironmentForm().inputEnvironmentDesc().sendKeys(desc);
 
         editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+        new WebDriverWait(driver, Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                        "n-base-select-option__content")));
         editEnvironmentForm().selectWorkerGroupList()
                 .stream()
                 .filter(it -> it.getText().contains(workerGroup))
@@ -84,13 +86,13 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
     public EnvironmentPage update(String oldName, String name, String config, String desc, String workerGroup) {
         environmentList()
                 .stream()
-                .filter(it -> it.findElement(By.className("environment-name")).getAttribute("innerHTML").contains(oldName))
+                .filter(it -> it.findElement(By.className("environment-name")).getAttribute("innerHTML")
+                        .contains(oldName))
                 .flatMap(it -> it.findElements(By.className("edit")).stream())
                 .filter(WebElement::isDisplayed)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No edit button in environment list"))
                 .click();
-
 
         editEnvironmentForm().inputEnvironmentName().sendKeys(Keys.CONTROL + "a");
         editEnvironmentForm().inputEnvironmentName().sendKeys(Keys.BACK_SPACE);
@@ -106,8 +108,9 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
         if (editEnvironmentForm().selectedWorkerGroup().getAttribute("innerHTML").equals(workerGroup)) {
             editEnvironmentForm().btnSelectWorkerGroupDropdown().click();
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                    "n-base-select-option__content")));
+            new WebDriverWait(driver, Duration.ofSeconds(20))
+                    .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                            "n-base-select-option__content")));
             editEnvironmentForm().selectWorkerGroupList()
                     .stream()
                     .filter(it -> it.getText().contains(workerGroup))
@@ -139,25 +142,26 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
 
     @Getter
     public class EnvironmentForm {
+
         EnvironmentForm() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-            @FindBy(className = "input-environment-name"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-environment-name"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputEnvironmentName;
 
         @FindBys({
-            @FindBy(className = "input-environment-config"),
-            @FindBy(tagName = "textarea"),
+                @FindBy(className = "input-environment-config"),
+                @FindBy(tagName = "textarea"),
         })
         private WebElement inputEnvironmentConfig;
 
         @FindBys({
-            @FindBy(className = "input-environment-desc"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-environment-desc"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputEnvironmentDesc;
 
@@ -171,8 +175,8 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
         private List<WebElement> selectWorkerGroupList;
 
         @FindBys({
-            @FindBy(className = "n-base-selection-tags"),
-            @FindBy(className = "n-tag__content"),
+                @FindBy(className = "n-base-selection-tags"),
+                @FindBy(className = "n-tag__content"),
         })
         private WebElement selectedWorkerGroup;
 

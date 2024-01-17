@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage.Tab;
 import java.time.Duration;
 import java.util.List;
 
+import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -35,12 +37,11 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import lombok.Getter;
-
 import com.google.common.base.Strings;
 
 @Getter
 public final class TokenPage extends NavBarPage implements Tab {
+
     @FindBy(className = "btn-create-token")
     private WebElement buttonCreateToken;
 
@@ -48,8 +49,8 @@ public final class TokenPage extends NavBarPage implements Tab {
     private List<WebElement> tokenList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -69,10 +70,12 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create(String userName) {
         buttonCreateToken().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
         createTokenForm().selectUserNameDropdown().click();
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                        "n-base-select-option__content")));
         createTokenForm().selectUserNameList()
                 .stream()
                 .filter(it -> it.getText().contains(userName))
@@ -81,7 +84,8 @@ public final class TokenPage extends NavBarPage implements Tab {
                         userName)))
                 .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
         createTokenForm().buttonGenerateToken().click();
 
         createTokenForm().buttonSubmit().click();
@@ -91,16 +95,18 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public TokenPage update(String userName) {
         tokenList().stream()
-            .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
-            .flatMap(it -> it.findElements(By.className("edit")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No edit button in token list"))
-            .click();
+                .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
+                .flatMap(it -> it.findElements(By.className("edit")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No edit button in token list"))
+                .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
         editTokenForm().buttonGenerateToken().click();
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
+        new WebDriverWait(driver, Duration.ofSeconds(30))
+                .until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
 
         editTokenForm().buttonSubmit().click();
 
@@ -109,23 +115,23 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public String getToken(String userName) {
         return tokenList().stream()
-                          .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
-                          .flatMap(it -> it.findElements(By.className("token")).stream())
-                          .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
-                          .map(it -> it.getAttribute("innerHTML"))
-                          .findFirst()
-                          .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
+                .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
+                .flatMap(it -> it.findElements(By.className("token")).stream())
+                .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
+                .map(it -> it.getAttribute("innerHTML"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
     }
 
     public TokenPage delete(String userName) {
         tokenList()
-            .stream()
-            .filter(it -> it.getText().contains(userName))
-            .flatMap(it -> it.findElements(By.className("delete")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No delete button in token list"))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(userName))
+                .flatMap(it -> it.findElements(By.className("delete")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No delete button in token list"))
+                .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -134,13 +140,14 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     @Getter
     public class TokenForm {
+
         TokenForm() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-            @FindBy(className = "input-username"),
-            @FindBy(className = "n-base-selection"),
+                @FindBy(className = "input-username"),
+                @FindBy(className = "n-base-selection"),
         })
         private WebElement selectUserNameDropdown;
 
