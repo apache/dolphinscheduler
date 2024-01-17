@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -227,10 +228,8 @@ public class TaskExecutionContext implements Serializable {
      * k8s TaskExecutionContext
      */
     private K8sTaskExecutionContext k8sTaskExecutionContext;
-    /**
-     * resources full name and tenant code
-     */
-    private Map<String, String> resources;
+
+    private ResourceContext resourceContext;
 
     /**
      * taskInstance varPool

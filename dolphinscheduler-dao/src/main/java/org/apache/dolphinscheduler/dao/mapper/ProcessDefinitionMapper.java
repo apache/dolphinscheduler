@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -28,17 +28,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * process definition mapper interface
  */
-@CacheConfig(cacheNames = "processDefinition", keyGenerator = "cacheKeyGenerator")
 public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
 
     /**
@@ -47,13 +42,11 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return process definition
      */
-    @Cacheable(sync = true)
     ProcessDefinition queryByCode(@Param("code") long code);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.code")
     int updateById(@Param("et") ProcessDefinition processDefinition);
 
     /**
@@ -62,7 +55,6 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param code code
      * @return delete result
      */
-    @CacheEvict
     int deleteByCode(@Param("code") long code);
 
     /**
@@ -158,7 +150,7 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param projectCodes projectCodes
      * @return definition group by user
      */
-    List<DefinitionGroupByUser> countDefinitionByProjectCodes(@Param("projectCodes") Long[] projectCodes);
+    List<WorkflowDefinitionCountDto> countDefinitionByProjectCodes(@Param("projectCodes") Collection<Long> projectCodes);
 
     /**
      * Statistics process definition group by project codes list
@@ -170,9 +162,9 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @param releaseState releaseState
      * @return definition group by user
      */
-    List<DefinitionGroupByUser> countDefinitionByProjectCodesV2(@Param("projectCodes") Long[] projectCodes,
-                                                                @Param("userId") Integer userId,
-                                                                @Param("releaseState") Integer releaseState);
+    List<WorkflowDefinitionCountDto> countDefinitionByProjectCodesV2(@Param("projectCodes") List<Long> projectCodes,
+                                                                     @Param("userId") Integer userId,
+                                                                     @Param("releaseState") Integer releaseState);
 
     /**
      * list all resource ids

@@ -186,4 +186,12 @@ public class BaseServiceImpl implements BaseService {
     public boolean checkDescriptionLength(String description) {
         return description != null && description.codePointCount(0, description.length()) > 255;
     }
+
+    protected Date transformDate(String dateStr) {
+        Date date = DateUtils.stringToDate(dateStr);
+        if (date == null) {
+            throw new IllegalArgumentException("dateStr: [" + dateStr + "] is invalid");
+        }
+        return date;
+    }
 }

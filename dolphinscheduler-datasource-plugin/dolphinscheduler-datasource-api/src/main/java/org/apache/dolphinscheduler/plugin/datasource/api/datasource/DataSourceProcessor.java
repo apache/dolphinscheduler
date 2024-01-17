@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public interface DataSourceProcessor {
 
@@ -113,4 +114,6 @@ public interface DataSourceProcessor {
      * get datasource processor
      */
     DataSourceProcessor create();
+
+    List<String> splitAndRemoveComment(String sql);
 }

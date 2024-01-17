@@ -21,39 +21,25 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.io.Serializable;
 
-/**
- *  master/worker task transport
- */
+/** master/worker task transport */
 public class SqoopTaskExecutionContext implements Serializable {
 
-    /**
-     * dataSourceId
-     */
+    /** dataSourceId */
     private int dataSourceId;
 
-    /**
-     * sourcetype
-     */
+    /** sourcetype */
     private DbType sourcetype;
 
-    /**
-     * sourceConnectionParams
-     */
+    /** sourceConnectionParams */
     private String sourceConnectionParams;
 
-    /**
-     * dataTargetId
-     */
+    /** dataTargetId */
     private int dataTargetId;
 
-    /**
-     * targetType
-     */
+    /** targetType */
     private DbType targetType;
 
-    /**
-     * targetConnectionParams
-     */
+    /** targetConnectionParams */
     private String targetConnectionParams;
 
     public int getDataSourceId() {
@@ -107,12 +93,20 @@ public class SqoopTaskExecutionContext implements Serializable {
     @Override
     public String toString() {
         return "SqoopTaskExecutionContext{"
-                + "dataSourceId=" + dataSourceId
-                + ", sourcetype=" + sourcetype
-                + ", sourceConnectionParams='" + sourceConnectionParams + '\''
-                + ", dataTargetId=" + dataTargetId
-                + ", targetType=" + targetType
-                + ", targetConnectionParams='" + targetConnectionParams + '\''
+                + "dataSourceId="
+                + dataSourceId
+                + ", sourcetype="
+                + sourcetype
+                + ", sourceConnectionParams='"
+                + sourceConnectionParams
+                + '\''
+                + ", dataTargetId="
+                + dataTargetId
+                + ", targetType="
+                + targetType
+                + ", targetConnectionParams='"
+                + targetConnectionParams
+                + '\''
                 + '}';
     }
 }

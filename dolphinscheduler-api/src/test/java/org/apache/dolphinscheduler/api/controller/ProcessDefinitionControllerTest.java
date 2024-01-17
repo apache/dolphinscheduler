@@ -166,12 +166,12 @@ public class ProcessDefinitionControllerTest {
 
         Mockito.when(processDefinitionService.updateProcessDefinition(user, projectCode, name, code, description,
                 globalParams,
-                locations, timeout, relationJson, taskDefinitionJson, "",
+                locations, timeout, relationJson, taskDefinitionJson,
                 ProcessExecutionTypeEnum.PARALLEL)).thenReturn(result);
 
         Result response = processDefinitionController.updateProcessDefinition(user, projectCode, name, code,
                 description, globalParams,
-                locations, timeout, relationJson, taskDefinitionJson, "", ProcessExecutionTypeEnum.PARALLEL,
+                locations, timeout, relationJson, taskDefinitionJson, ProcessExecutionTypeEnum.PARALLEL,
                 ReleaseState.OFFLINE);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
@@ -179,13 +179,13 @@ public class ProcessDefinitionControllerTest {
     @Test
     public void testReleaseProcessDefinition() {
         long projectCode = 1L;
-        int id = 1;
+        long id = 1L;
         Map<String, Object> result = new HashMap<>();
         putMsg(result, Status.SUCCESS);
 
-        Mockito.when(processDefinitionService.releaseProcessDefinition(user, projectCode, id, ReleaseState.OFFLINE))
-                .thenReturn(result);
-        Result response =
+        Mockito.doNothing().when(processDefinitionService)
+                .offlineWorkflowDefinition(user, projectCode, id);
+        Result<Boolean> response =
                 processDefinitionController.releaseProcessDefinition(user, projectCode, id, ReleaseState.OFFLINE);
         Assertions.assertTrue(response != null && response.isSuccess());
     }

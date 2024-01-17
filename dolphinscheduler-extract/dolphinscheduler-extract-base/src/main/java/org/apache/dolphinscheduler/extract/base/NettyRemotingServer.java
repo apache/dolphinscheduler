@@ -73,9 +73,11 @@ public class NettyRemotingServer {
     public NettyRemotingServer(final NettyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
         ThreadFactory bossThreadFactory =
-                new ThreadFactoryBuilder().setDaemon(true).setNameFormat("NettyServerBossThread_%s").build();
+                new ThreadFactoryBuilder().setDaemon(true).setNameFormat(serverConfig.getServerName() + "BossThread_%s")
+                        .build();
         ThreadFactory workerThreadFactory =
-                new ThreadFactoryBuilder().setDaemon(true).setNameFormat("NettyServerWorkerThread_%s").build();
+                new ThreadFactoryBuilder().setDaemon(true)
+                        .setNameFormat(serverConfig.getServerName() + "WorkerThread_%s").build();
         if (Epoll.isAvailable()) {
             this.bossGroup = new EpollEventLoopGroup(1, bossThreadFactory);
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);
@@ -108,16 +110,23 @@ public class NettyRemotingServer {
             try {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
-                log.error("NettyRemotingServer bind fail {}, exit", e.getMessage(), e);
-                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
+                log.error("{} bind fail {}, exit", serverConfig.getServerName(), e.getMessage(), e);
+                throw new RemoteException(
+                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()));
             }
+
             if (future.isSuccess()) {
-                log.info("NettyRemotingServer bind success at port : {}", serverConfig.getListenPort());
-            } else if (future.cause() != null) {
-                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()),
+                log.info("{} bind success at port: {}", serverConfig.getServerName(), serverConfig.getListenPort());
+                return;
+            }
+
+            if (future.cause() != null) {
+                throw new RemoteException(
+                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()),
                         future.cause());
             } else {
-                throw new RemoteException(String.format(NETTY_BIND_FAILURE_MSG, serverConfig.getListenPort()));
+                throw new RemoteException(
+                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()));
             }
         }
     }
