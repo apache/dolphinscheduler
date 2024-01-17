@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - dev
+      - fix_e2e_code_stytle
 
 name: E2E
 
@@ -148,6 +148,7 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
             -DfailIfNoTests=false \
+            -Dspotless.skip=false  \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v2
         if: always()
