@@ -62,6 +62,12 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
+      - name: Run Spotless Check
+          run: |
+            ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
+              -DfailIfNoTests=false \
+              -Dmaven.test.skip=true \
+              -Dspotless.skip=false
       - name: Build Image
         run: |
           ./mvnw -B clean install \
@@ -110,8 +116,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowHttpTaskE2ETest
           - name: WorkflowJava
             class: org.apache.dolphinscheduler.e2e.cases.WorkflowJavaTaskE2ETest
-#          - name: WorkflowForSwitch
-#            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
+          #          - name: WorkflowForSwitch
+          #            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
           - name: FileManage
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
           - name: UdfManage
