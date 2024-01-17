@@ -63,7 +63,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
       - name: Run Spotless Check
-          run: |
+        run: |
             ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
               -DfailIfNoTests=false \
               -Dmaven.test.skip=true \
