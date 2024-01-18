@@ -168,7 +168,7 @@ public class ProcessUtils {
                 taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(
+                            .setExecutePath(FileUtils.getTaskInstanceWorkingDirectory(
                                     taskExecutionContext.getTenantCode(),
                                     taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
