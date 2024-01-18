@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.service.queue;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.service.exceptions.TaskPriorityQueueException;
 
@@ -35,7 +34,7 @@ import com.google.common.base.Preconditions;
  * Task instances priority queue implementation
  * All the task instances are in the same process instance.
  */
-public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInstance> {
+public class StandByTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInstance> {
 
     /**
      * queue size
@@ -45,7 +44,8 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     /**
      * queue
      */
-    private final PriorityQueue<TaskInstance> queue = new PriorityQueue<>(QUEUE_MAX_SIZE, new TaskInfoComparator());
+    private final PriorityQueue<TaskInstance> queue =
+            new PriorityQueue<>(QUEUE_MAX_SIZE, new TaskInstancePriorityComparator());
     private final Set<String> taskInstanceIdentifySet = Collections.synchronizedSet(new HashSet<>());
 
     /**
@@ -163,24 +163,25 @@ public class PeerTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInst
     }
 
     /**
-     * TaskInfoComparator
+     * This comparator is used to sort task instances in the standby queue.
+     * If the TaskInstance is in the same taskGroup, then we will sort the TaskInstance by {@link TaskInstance#getTaskGroupPriority()} in the taskGroup.
+     * Otherwise, we will sort the TaskInstance by {@link TaskInstance#getTaskInstancePriority()} in the workflow.
      */
-    private static class TaskInfoComparator implements Comparator<TaskInstance> {
+    private static class TaskInstancePriorityComparator implements Comparator<TaskInstance> {
 
-        /**
-         * compare o1 o2
-         *
-         * @param o1 o1
-         * @param o2 o2
-         * @return compare result
-         */
         @Override
         public int compare(TaskInstance o1, TaskInstance o2) {
-            if (o1.getTaskInstancePriority().equals(o2.getTaskInstancePriority())) {
-                // larger number, higher priority
-                return Constants.OPPOSITE_VALUE * Integer.compare(o1.getTaskGroupPriority(), o2.getTaskGroupPriority());
+            int taskPriorityInTaskGroup = -1 * Integer.compare(o1.getTaskGroupPriority(), o2.getTaskGroupPriority());
+            int taskInstancePriorityInWorkflow =
+                    Long.compare(o1.getTaskInstancePriority().getCode(), o2.getTaskInstancePriority().getCode());
+
+            if (o1.getTaskGroupId() == o2.getTaskGroupId()) {
+                // If at the same taskGroup
+                if (taskPriorityInTaskGroup != 0) {
+                    return taskPriorityInTaskGroup;
+                }
             }
-            return o1.getTaskInstancePriority().compareTo(o2.getTaskInstancePriority());
+            return taskInstancePriorityInWorkflow;
         }
     }
 }
