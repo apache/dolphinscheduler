@@ -55,12 +55,12 @@ repos:
       # Spotless Hooks
        - id: spotless
          name: spotless lint
-         entry: ./mvnw spotless:check
+         entry: mvnw.cmd spotless:check
          language: script
          pass_filenames: false
        - id: e2e-spotless
          name: e2e spotless lint
-         entry: ./mvnw -f dolphinscheduler-e2e/pom.xml spotless:check
+         entry: mvnw.cmd -f dolphinscheduler-e2e/pom.xml spotless:check
          language: script
          pass_filenames: false
 
