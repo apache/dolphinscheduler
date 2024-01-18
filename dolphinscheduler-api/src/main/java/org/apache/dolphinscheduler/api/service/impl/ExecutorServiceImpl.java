@@ -107,6 +107,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -678,6 +679,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         taskGroupQueue.setForceStart(Flag.YES.getCode());
+        taskGroupQueue.setUpdateTime(new Date());
         processService.updateTaskGroupQueue(taskGroupQueue);
         log.info("Sending force start command to master: {}.", processInstance.getHost());
         ILogicTaskInstanceOperator iLogicTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
