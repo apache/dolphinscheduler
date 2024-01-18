@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 
+import org.apache.dolphinscheduler.dao.model.ProjectInstanceRunningDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
@@ -157,4 +158,11 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return workflow count
      */
     int queryAllWorkflowCounts(@Param("projectsCodes") List<Long> projectsCodes);
+
+    /**
+     * query project running process instance number
+     * @param projectsCodes
+     * @return projectInstanceRunningDTOList
+     */
+    List<ProjectInstanceRunningDTO> queryRunningProcessInstanceNumber(@Param("projectsCodes") List<Long> projectsCodes);
 }

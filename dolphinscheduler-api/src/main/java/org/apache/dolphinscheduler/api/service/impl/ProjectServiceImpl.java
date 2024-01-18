@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -60,6 +61,7 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.dolphinscheduler.dao.model.ProjectInstanceRunningDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -388,6 +390,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 projectMapper.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
+
+        setRunningProcessInstanceNumber(projectList);
+
         if (loginUser.getUserType() != UserType.ADMIN_USER) {
             for (Project project : projectList) {
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
@@ -429,6 +434,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 projectMapper.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
+
+        setRunningProcessInstanceNumber(projectList);
 
         for (Project project : projectList) {
             if (userProjectIds.contains(project.getId())) {
@@ -854,5 +861,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .stream()
                 .map(Project::getCode)
                 .collect(Collectors.toList());
+    }
+
+    private void setRunningProcessInstanceNumber(List<Project> projectList) {
+        List<Long> projectsCodes = projectList.stream().map(Project::getCode).collect(Collectors.toList());
+        List<ProjectInstanceRunningDTO> projectInstanceRunningDTOList = projectMapper.queryRunningProcessInstanceNumber(projectsCodes);
+        Map<Long, Integer> longProjectInstanceRunningDTOMap = projectInstanceRunningDTOList.stream().collect(Collectors.toMap(ProjectInstanceRunningDTO::getProjectCode, ProjectInstanceRunningDTO::getInstRunningCount));
+        projectList.forEach(project -> project.setInstRunningCount(MapUtils.getInteger(longProjectInstanceRunningDTOMap, project.getCode(), 0)));
     }
 }
