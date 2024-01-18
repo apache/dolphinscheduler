@@ -18,10 +18,12 @@
 package org.apache.dolphinscheduler.api.metrics;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
+import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Timer;
 
@@ -119,5 +121,11 @@ public class ApiServerMetrics {
                 Metrics.globalRegistry.timer(
                         "ds.api.response.time",
                         "user.id", String.valueOf(userId)));
+    }
+
+    public static void registerUncachedException(final Supplier<Number> supplier) {
+        Gauge.builder("ds.api.uncached.exception", supplier)
+                .description("number of uncached exception")
+                .register(Metrics.globalRegistry);
     }
 }

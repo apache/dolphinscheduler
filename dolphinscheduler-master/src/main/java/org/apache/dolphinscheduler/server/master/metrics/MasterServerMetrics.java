@@ -61,6 +61,12 @@ public class MasterServerMetrics {
                 .register(Metrics.globalRegistry);
     }
 
+    public static void registerUncachedException(final Supplier<Number> supplier) {
+        Gauge.builder("ds.master.uncached.exception", supplier)
+                .description("number of uncached exception")
+                .register(Metrics.globalRegistry);
+    }
+
     public void incMasterOverload() {
         masterOverloadCounter.increment();
     }
