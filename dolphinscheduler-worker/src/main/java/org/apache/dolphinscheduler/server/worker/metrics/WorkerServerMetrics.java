@@ -127,4 +127,10 @@ public class WorkerServerMetrics {
                 .register(Metrics.globalRegistry);
     }
 
+    public static void registerUncachedException(final Supplier<Number> supplier) {
+        Gauge.builder("ds.worker.uncached.exception", supplier)
+                .description("number of uncached exception")
+                .register(Metrics.globalRegistry);
+    }
+
 }
