@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.api.vo.ScheduleVo;
+import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -462,12 +462,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 scheduleMapper.queryByProjectAndProcessDefineCodePaging(page, projectCode, processDefineCode,
                         searchVal);
 
-        List<ScheduleVo> scheduleList = new ArrayList<>();
+        List<ScheduleVO> scheduleList = new ArrayList<>();
         for (Schedule schedule : schedulePage.getRecords()) {
-            scheduleList.add(new ScheduleVo(schedule));
+            scheduleList.add(new ScheduleVO(schedule));
         }
 
-        PageInfo<ScheduleVo> pageInfo = new PageInfo<>(pageNo, pageSize);
+        PageInfo<ScheduleVO> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) schedulePage.getTotal());
         pageInfo.setTotalList(scheduleList);
         result.setData(pageInfo);
@@ -528,9 +528,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(project.getName());
-        List<ScheduleVo> scheduleList = new ArrayList<>();
+        List<ScheduleVO> scheduleList = new ArrayList<>();
         for (Schedule schedule : schedules) {
-            scheduleList.add(new ScheduleVo(schedule));
+            scheduleList.add(new ScheduleVO(schedule));
         }
 
         result.put(Constants.DATA_LIST, scheduleList);

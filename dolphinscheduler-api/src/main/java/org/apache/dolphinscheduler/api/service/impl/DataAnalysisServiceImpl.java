@@ -27,9 +27,9 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -105,7 +105,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Override
-    public TaskInstanceCountVo getTaskInstanceStateCountByProject(User loginUser,
+    public TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,
                                                                   Long projectCode,
                                                                   String startDate,
                                                                   String endDate) {
@@ -114,26 +114,26 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
                 taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
-        return TaskInstanceCountVo.of(taskInstanceStatusCounts);
+        return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
     @Override
-    public TaskInstanceCountVo getAllTaskInstanceStateCount(User loginUser,
+    public TaskInstanceCountVO getAllTaskInstanceStateCount(User loginUser,
                                                             String startDate,
                                                             String endDate) {
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
         if (CollectionUtils.isEmpty(projectCodes)) {
-            return TaskInstanceCountVo.empty();
+            return TaskInstanceCountVO.empty();
         }
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
                 taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
-        return TaskInstanceCountVo.of(taskInstanceStatusCounts);
+        return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
     @Override
-    public WorkflowInstanceCountVo getWorkflowInstanceStateCountByProject(User loginUser,
+    public WorkflowInstanceCountVO getWorkflowInstanceStateCountByProject(User loginUser,
                                                                           Long projectCode,
                                                                           String startDate,
                                                                           String endDate) {
@@ -142,40 +142,40 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = endDate == null ? null : transformDate(endDate);
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = processInstanceMapper
                 .countWorkflowInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
-        return WorkflowInstanceCountVo.of(workflowInstanceStatusCountDtos);
+        return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
 
     @Override
-    public WorkflowInstanceCountVo getAllWorkflowInstanceStateCount(User loginUser,
+    public WorkflowInstanceCountVO getAllWorkflowInstanceStateCount(User loginUser,
                                                                     String startDate,
                                                                     String endDate) {
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
         if (CollectionUtils.isEmpty(projectCodes)) {
-            return WorkflowInstanceCountVo.empty();
+            return WorkflowInstanceCountVO.empty();
         }
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
 
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos =
                 processInstanceMapper.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
-        return WorkflowInstanceCountVo.of(workflowInstanceStatusCountDtos);
+        return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
 
     @Override
-    public WorkflowDefinitionCountVo getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
+    public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
                 processDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
-        return WorkflowDefinitionCountVo.of(workflowDefinitionCounts);
+        return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
     }
 
     @Override
-    public WorkflowDefinitionCountVo getAllWorkflowDefinitionCount(User loginUser) {
+    public WorkflowDefinitionCountVO getAllWorkflowDefinitionCount(User loginUser) {
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
         if (CollectionUtils.isEmpty(projectCodes)) {
-            return WorkflowDefinitionCountVo.empty();
+            return WorkflowDefinitionCountVO.empty();
         }
-        return WorkflowDefinitionCountVo.of(processDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
+        return WorkflowDefinitionCountVO.of(processDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
     }
 
     @Override
