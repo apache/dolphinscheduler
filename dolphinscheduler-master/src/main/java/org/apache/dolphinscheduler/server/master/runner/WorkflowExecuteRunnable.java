@@ -490,6 +490,16 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         } else {
             ProcessInstance processInstance =
                     processService.findProcessInstanceById(nextTaskInstance.getProcessInstanceId());
+            if (processInstance == null) {
+                log.error("WorkflowInstance is null cannot wakeup, processInstanceId:{}",
+                        nextTaskInstance.getProcessInstanceId());
+                return;
+            }
+            if (processInstance.getHost() == null || Constants.NULL.equals(processInstance.getHost())) {
+                log.warn("The next WorkflowInstance: {} host is null no need to wakeup, maybe it is in failover",
+                        processInstance);
+                return;
+            }
             ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
             taskInstanceOperator.wakeupTaskInstance(
@@ -1842,7 +1852,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 workflowInstance.setEndTime(new Date());
             }
             try {
-                processInstanceDao.updateById(workflowInstance);
+                processInstanceDao.performTransactionalUpsert(workflowInstance);
             } catch (Exception ex) {
                 // recover the status
                 workflowInstance.setStateWithDesc(originStates, "recover state by DB error");
