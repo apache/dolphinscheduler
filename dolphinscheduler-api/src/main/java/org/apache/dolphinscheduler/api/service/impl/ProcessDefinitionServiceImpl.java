@@ -1192,7 +1192,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
-        //keep new code in global map, for down-stream flow may import before up-stream job
+        // keep new code in global map, for down-stream flow may import before up-stream job
         Map<Long, Long> codeGlobalMap = new HashMap<>();
         for (DagDataSchedule dagDataSchedule : dagDataScheduleList) {
             if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule, codeGlobalMap)) {
@@ -1469,13 +1469,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 return false;
             }
 
-            if (StringUtils.isNotEmpty(taskDefinition.getTaskParams()) && JSONUtils.checkJsonValid(taskDefinition.getTaskParams())) {
+            if (StringUtils.isNotEmpty(taskDefinition.getTaskParams())
+                    && JSONUtils.checkJsonValid(taskDefinition.getTaskParams())) {
                 ObjectNode taskParamsJsonNodes = JSONUtils.parseObject(taskDefinition.getTaskParams());
                 if (taskParamsJsonNodes != null) {
                     JsonNode dependJsonNode = taskParamsJsonNodes.get(Constants.DEPENDENCE);
                     if (dependJsonNode != null) {
-                        DependentParameters dependentParameters
-                                = JSONUtils.parseObject(dependJsonNode.toString(), DependentParameters.class);
+                        DependentParameters dependentParameters =
+                                JSONUtils.parseObject(dependJsonNode.toString(), DependentParameters.class);
                         if (dependentParameters != null && dependentParameters.getDependTaskList() != null) {
                             for (DependentTaskModel dependentTaskModel : dependentParameters.getDependTaskList()) {
                                 if (dependentTaskModel.getDependItemList() == null) {
@@ -1486,8 +1487,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
                                     // definitionCode depTaskCode
                                     try {
-                                        dependentItem.setDefinitionCode(getOrGenerateNewCode(codeGlobalMap, dependentItem.getDefinitionCode()));
-                                        dependentItem.setDepTaskCode(getOrGenerateNewCode(codeGlobalMap, dependentItem.getDepTaskCode()));
+                                        dependentItem.setDefinitionCode(
+                                                getOrGenerateNewCode(codeGlobalMap, dependentItem.getDefinitionCode()));
+                                        dependentItem.setDepTaskCode(
+                                                getOrGenerateNewCode(codeGlobalMap, dependentItem.getDepTaskCode()));
                                     } catch (CodeGenerateException e) {
                                         putMsg(result, Status.CREATE_PROCESS_DEFINITION_ERROR);
                                         return false;
