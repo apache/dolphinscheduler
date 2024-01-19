@@ -78,7 +78,7 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                             "Cannot find the taskInstance from TaskExecutionContextCacheManager, the task may already been killed, will stop the async master task");
                     continue;
                 }
-                masterAsyncTaskExecutorThreadPool.getThreadPool().submit(() -> {
+                masterAsyncTaskExecutorThreadPool.getThreadPool().execute(() -> {
                     final AsyncTaskExecuteFunction asyncTaskExecuteFunction =
                             asyncTaskExecutionContext.getAsyncTaskExecuteFunction();
                     final AsyncTaskCallbackFunction asyncTaskCallbackFunction =
