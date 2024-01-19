@@ -62,7 +62,7 @@ DolphinScheduler 的主要特性如下：
 
 - 加入 [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack)
 - 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息 <!-- markdown-link-check-disable-line -->
-- 订阅 DolphinScheduler 邮件列表, 用户订阅 users@dolphinscheduler.apache.org 开发者请订阅 dev@dolphinscheduler.apache.org
+- 订阅 DolphinScheduler 邮件列表, 用户订阅 [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) 开发者请订阅 [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org)
 
 # Landscapes
 
