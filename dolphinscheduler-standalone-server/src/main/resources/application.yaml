@@ -182,16 +182,22 @@ master:
   # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
   host-selector: lower_weight
   # master heartbeat interval
-  heartbeat-interval: 10s
+  max-heartbeat-interval: 10s
   # master commit task retry times
   task-commit-retry-times: 5
   # master commit task interval
   task-commit-interval: 1s
   state-wheel-interval: 5s
-  # master max cpuload avg percentage, only higher than the system cpu load average, master server can schedule. default value 1: will use 100% cpu
-  max-cpu-load-avg: 1
-  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.1, only the available memory is higher than 10%, master server can schedule.
-  reserved-memory: 0.1
+  server-load-protection:
+    enabled: true
+    # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
+    max-cpu-usage-percentage-thresholds: 0.9
+    # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
+    max-jvm-memory-usage-percentage-thresholds: 0.9
+    # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+    max-system-memory-usage-percentage-thresholds: 0.9
+    # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
+    max-disk-usage-percentage-thresholds: 0.9
   # failover interval
   failover-interval: 10m
   # kill yarn/k8s application when failover taskInstance, default true
@@ -204,13 +210,19 @@ worker:
   # worker execute thread number to limit task instances in parallel
   exec-threads: 10
   # worker heartbeat interval
-  heartbeat-interval: 10s
+  max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value 1: will use 100% cpu.
-  max-cpu-load-avg: 1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.1, only the available memory is higher than 10%, worker server can receive task.
-  reserved-memory: 0.1
+  server-load-protection:
+    enabled: true
+    # Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks.
+    max-cpu-usage-percentage-thresholds: 0.9
+    # Worker max JVM memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks.
+    max-jvm-memory-usage-percentage-thresholds: 0.9
+    # Worker max System memory usage , when the worker's system memory usage is smaller then this value, worker server can be dispatched tasks.
+    max-system-memory-usage-percentage-thresholds: 0.9
+    # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+    max-disk-usage-percentage-thresholds: 0.9
   task-execute-threads-full-policy: REJECT
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
@@ -225,7 +237,7 @@ alert:
   # Mark each alert of alert server if late after x milliseconds as failed.
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
-  heartbeat-interval: 60s
+  max-heartbeat-interval: 60s
   query_alert_threshold: 100
 
 api:
