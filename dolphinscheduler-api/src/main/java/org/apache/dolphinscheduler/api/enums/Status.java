@@ -131,7 +131,7 @@ public enum Status {
     VERIFY_USERNAME_ERROR(10100, "verify username error", "用户名验证错误"),
     UNAUTHORIZED_USER_ERROR(10101, "unauthorized user error", "查询未授权用户错误"),
     AUTHORIZED_USER_ERROR(10102, "authorized user error", "查询授权用户错误"),
-    QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error", "查询任务实例日志错误"),
+    QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error: {0}", "查询任务实例日志错误: {0}"),
     DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR(10104, "download task instance log file error", "下载任务日志文件错误"),
     CREATE_PROCESS_DEFINITION_ERROR(10105, "create process definition error", "创建工作流错误"),
     VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR(10106, "verify process definition name unique error", "工作流定义名称验证错误"),
