@@ -265,7 +265,7 @@ public abstract class AbstractCommandExecutor {
         // todo: remove this this thread pool.
         ExecutorService getOutputLogService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("ResolveOutputLog-thread-" + taskRequest.getTaskName());
-        getOutputLogService.submit(() -> {
+        getOutputLogService.execute(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
