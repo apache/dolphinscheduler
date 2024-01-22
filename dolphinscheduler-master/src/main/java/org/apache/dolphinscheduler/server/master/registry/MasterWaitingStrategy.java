@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 
 import java.time.Duration;
@@ -50,8 +49,6 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     private MasterConfig masterConfig;
     @Autowired
     private RegistryClient registryClient;
-    @Autowired
-    private MasterRpcServer masterRPCServer;
     @Autowired
     private WorkflowEventQueue workflowEventQueue;
     @Autowired
@@ -97,7 +94,6 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
         } else {
             try {
                 ServerLifeCycleManager.recoverFromWaiting();
-                reStartMasterResource();
                 log.info("Recover from waiting success, the current server status is {}",
                         ServerLifeCycleManager.getServerStatus());
             } catch (Exception e) {
@@ -117,9 +113,6 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
     }
 
     private void clearMasterResource() {
-        // close the worker resource, if close failed should stop the worker server
-        masterRPCServer.close();
-        log.warn("Master closed RPC server due to lost registry connection");
         workflowEventQueue.clearWorkflowEventQueue();
         log.warn("Master clear workflow event queue due to lost registry connection");
         processInstanceExecCacheManager.clearCache();
@@ -129,9 +122,4 @@ public class MasterWaitingStrategy implements MasterConnectStrategy {
 
     }
 
-    private void reStartMasterResource() {
-        // reopen the resource, if reopen failed should stop the worker server
-        masterRPCServer.start();
-        log.warn("Master restarted RPC server due to reconnect to registry");
-    }
 }

@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.DataAnalysisServiceImpl;
-import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -201,7 +201,7 @@ public class DataAnalysisServiceTest {
         user.setUserType(UserType.GENERAL_USER);
         when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any()))
                 .thenReturn(Collections.emptyList());
-        TaskInstanceCountVo taskInstanceStateCountByProject =
+        TaskInstanceCountVO taskInstanceStateCountByProject =
                 dataAnalysisServiceImpl.getTaskInstanceStateCountByProject(user, 1L, null, null);
         assertThat(taskInstanceStateCountByProject).isNotNull();
     }

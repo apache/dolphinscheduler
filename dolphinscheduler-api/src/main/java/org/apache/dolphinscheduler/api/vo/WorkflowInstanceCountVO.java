@@ -34,17 +34,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkflowInstanceCountVo {
+public class WorkflowInstanceCountVO {
 
     private int totalCount;
 
     private List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCounts;
 
-    public static WorkflowInstanceCountVo empty() {
+    public static WorkflowInstanceCountVO empty() {
         return of(Collections.emptyList());
     }
 
-    public static WorkflowInstanceCountVo of(List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos) {
+    public static WorkflowInstanceCountVO of(List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos) {
         workflowInstanceStatusCountDtos = new ArrayList<>(workflowInstanceStatusCountDtos);
 
         Map<WorkflowExecutionStatus, WorkflowInstanceStatusCountDto> workflowExecutionStatusWorkflowInstanceStatusCountMap =
@@ -56,7 +56,7 @@ public class WorkflowInstanceCountVo {
             }
         }
 
-        WorkflowInstanceCountVo workflowInstanceCountVo = new WorkflowInstanceCountVo();
+        WorkflowInstanceCountVO workflowInstanceCountVo = new WorkflowInstanceCountVO();
         workflowInstanceCountVo.setWorkflowInstanceStatusCounts(workflowInstanceStatusCountDtos);
         workflowInstanceCountVo.setTotalCount(
                 workflowInstanceStatusCountDtos.stream().mapToInt(WorkflowInstanceStatusCountDto::getCount).sum());

@@ -40,12 +40,13 @@ public class PostgresqlDatabaseContainerProvider implements DatabaseContainerPro
     @Override
     public GenericContainer<?> getContainer(DolphinSchedulerDatabaseContainer dataSourceContainer) {
         // todo: test with multiple pg version
-        GenericContainer<?> postgresqlContainer = new PostgreSQLContainer(DockerImageName.parse("postgres:11.1"))
-                .withUsername("root")
-                .withPassword("root")
-                .withDatabaseName("dolphinscheduler")
-                .withNetwork(NETWORK)
-                .withExposedPorts(5432);
+        GenericContainer<?> postgresqlContainer =
+                new PostgreSQLContainer(DockerImageName.parse(dataSourceContainer.imageName()))
+                        .withUsername("root")
+                        .withPassword("root")
+                        .withDatabaseName("dolphinscheduler")
+                        .withNetwork(NETWORK)
+                        .withExposedPorts(5432);
         postgresqlContainer.setPortBindings(Lists.newArrayList("5432:5432"));
 
         return postgresqlContainer;
