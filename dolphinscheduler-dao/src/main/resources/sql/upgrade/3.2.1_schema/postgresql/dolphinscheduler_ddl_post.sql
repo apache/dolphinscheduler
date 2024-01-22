@@ -14,3 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+alter table t_ds_process_definition alter column `version` set default 1;
+alter table t_ds_process_definition alter column `version` int(11) NOT NULL;
+alter table t_ds_process_definition_log alter column `version` set default 1;
+alter table t_ds_process_definition_log alter column `version` int(11) NOT NULL;
+alter table t_ds_task_definition alter column `version` set default 1;
+alter table t_ds_task_definition alter column `version` int(11) NOT NULL;
+alter table t_ds_task_definition_log alter column `version` set default 1;
+alter table t_ds_task_definition_log alter column `version` int(11) NOT NULL;
+alter table t_ds_process_instance alter column `process_definition_version` set default 1;
+alter table t_ds_process_instance alter column `process_definition_version` int(11) NOT NULL;
+alter table t_ds_task_instance alter column `task_definition_version` set default 1;
+alter table t_ds_task_instance alter column `task_definition_version` int(11) NOT NULL;
