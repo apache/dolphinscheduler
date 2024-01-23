@@ -31,22 +31,22 @@ import org.springframework.beans.BeanUtils;
  * @author fanwanlong
  */
 @Data
-public class TaskDefinitionVo extends TaskDefinition {
+public class TaskDefinitionVO extends TaskDefinition {
 
     /**
      * process task related list
      */
     private List<ProcessTaskRelation> processTaskRelationList;
 
-    public TaskDefinitionVo() {
+    public TaskDefinitionVO() {
     }
 
-    public TaskDefinitionVo(List<ProcessTaskRelation> processTaskRelationList) {
+    public TaskDefinitionVO(List<ProcessTaskRelation> processTaskRelationList) {
         this.processTaskRelationList = processTaskRelationList;
     }
 
-    public static TaskDefinitionVo fromTaskDefinition(TaskDefinition taskDefinition) {
-        TaskDefinitionVo taskDefinitionVo = new TaskDefinitionVo();
+    public static TaskDefinitionVO fromTaskDefinition(TaskDefinition taskDefinition) {
+        TaskDefinitionVO taskDefinitionVo = new TaskDefinitionVO();
         BeanUtils.copyProperties(taskDefinition, taskDefinitionVo);
         if (TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()) {
             taskDefinitionVo.setTimeoutNotifyStrategy(null);

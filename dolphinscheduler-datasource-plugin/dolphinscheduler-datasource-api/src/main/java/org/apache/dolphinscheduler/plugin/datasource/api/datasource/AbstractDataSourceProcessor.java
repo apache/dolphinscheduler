@@ -69,7 +69,8 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      * @param host datasource host
      */
     protected void checkHost(String host) {
-        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+        if (com.google.common.net.InetAddresses.isInetAddress(host)) {
+        } else if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
             throw new IllegalArgumentException("datasource host illegal");
         }
     }
