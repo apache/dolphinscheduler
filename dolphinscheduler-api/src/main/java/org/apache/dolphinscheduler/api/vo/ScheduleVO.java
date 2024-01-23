@@ -30,7 +30,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class ScheduleVo {
+public class ScheduleVO {
 
     private int id;
 
@@ -140,7 +140,7 @@ public class ScheduleVo {
      */
     private String environmentName;
 
-    public ScheduleVo(Schedule schedule) {
+    public ScheduleVO(Schedule schedule) {
         this.setId(schedule.getId());
         this.setCrontab(schedule.getCrontab());
         this.setProjectName(schedule.getProjectName());
