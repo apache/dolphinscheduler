@@ -865,8 +865,10 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     private void setRunningProcessInstanceNumber(List<Project> projectList) {
         List<Long> projectsCodes = projectList.stream().map(Project::getCode).collect(Collectors.toList());
-        List<ProjectInstanceRunningDTO> projectInstanceRunningDTOList = projectMapper.queryRunningProcessInstanceNumber(projectsCodes);
-        Map<Long, Integer> longProjectInstanceRunningDTOMap = projectInstanceRunningDTOList.stream().collect(Collectors.toMap(ProjectInstanceRunningDTO::getProjectCode, ProjectInstanceRunningDTO::getInstRunningCount));
-        projectList.forEach(project -> project.setInstRunningCount(MapUtils.getInteger(longProjectInstanceRunningDTOMap, project.getCode(), 0)));
+        if (projectsCodes.size() > 0) {
+            List<ProjectInstanceRunningDTO> projectInstanceRunningDTOList = projectMapper.queryRunningProcessInstanceNumber(projectsCodes);
+            Map<Long, Integer> longProjectInstanceRunningDTOMap = projectInstanceRunningDTOList.stream().collect(Collectors.toMap(ProjectInstanceRunningDTO::getProjectCode, ProjectInstanceRunningDTO::getInstRunningCount));
+            projectList.forEach(project -> project.setInstRunningCount(MapUtils.getInteger(longProjectInstanceRunningDTOMap, project.getCode(), 0)));
+        }
     }
 }
