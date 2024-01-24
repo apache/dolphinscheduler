@@ -163,7 +163,7 @@ public class K8sNamespaceController extends BaseController {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return the namespaces which user have not permission to see
+     * @return the namespaces which user have no permission to see
      */
     @Operation(summary = "queryUnauthorizedNamespace", description = "QUERY_UNAUTHORIZED_NAMESPACE_NOTES")
     @Parameters({
