@@ -17,22 +17,21 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
-/**
- * All thread used in DolphinScheduler should extend with this class to avoid the server hang issue.
- */
-public abstract class BaseDaemonThread extends Thread {
+import java.util.concurrent.ThreadPoolExecutor;
 
-    protected BaseDaemonThread(Runnable runnable) {
-        super(runnable);
-        this.setDaemon(true);
-        this.setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+class ThreadUtilsTest {
+
+    @Test
+    void newDaemonFixedThreadExecutor() throws InterruptedException {
+        ThreadPoolExecutor threadPoolExecutor = ThreadUtils.newDaemonFixedThreadExecutor("DemonThread", 1);
+        threadPoolExecutor.execute(() -> {
+            throw new IllegalArgumentException("I am an exception");
+        });
+        Thread.sleep(1_000);
+        Assertions.assertEquals(1, DefaultUncaughtExceptionHandler.getUncaughtExceptionCount());
+
     }
-
-    protected BaseDaemonThread(String threadName) {
-        super();
-        this.setName(threadName);
-        this.setDaemon(true);
-        this.setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
-    }
-
 }

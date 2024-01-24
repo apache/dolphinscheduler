@@ -34,17 +34,17 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskInstanceCountVo {
+public class TaskInstanceCountVO {
 
     private int totalCount;
 
     private List<TaskInstanceStatusCountDto> taskInstanceStatusCounts;
 
-    public static TaskInstanceCountVo empty() {
+    public static TaskInstanceCountVO empty() {
         return of(Collections.emptyList());
     }
 
-    public static TaskInstanceCountVo of(List<TaskInstanceStatusCountDto> taskInstanceStatusCounts) {
+    public static TaskInstanceCountVO of(List<TaskInstanceStatusCountDto> taskInstanceStatusCounts) {
         taskInstanceStatusCounts = new ArrayList<>(taskInstanceStatusCounts);
 
         Map<TaskExecutionStatus, TaskInstanceStatusCountDto> taskInstanceStatusCountMap =
@@ -57,7 +57,7 @@ public class TaskInstanceCountVo {
             }
         }
 
-        TaskInstanceCountVo taskInstanceCountVo = new TaskInstanceCountVo();
+        TaskInstanceCountVO taskInstanceCountVo = new TaskInstanceCountVO();
         taskInstanceCountVo.setTaskInstanceStatusCounts(taskInstanceStatusCounts);
         taskInstanceCountVo
                 .setTotalCount(taskInstanceStatusCounts.stream().mapToInt(TaskInstanceStatusCountDto::getCount).sum());

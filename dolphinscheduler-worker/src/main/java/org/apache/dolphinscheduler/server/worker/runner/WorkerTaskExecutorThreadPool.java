@@ -49,7 +49,7 @@ public class WorkerTaskExecutorThreadPool {
         synchronized (WorkerTaskExecutorThreadPool.class) {
             if (TaskExecuteThreadsFullPolicy.CONTINUE.equals(workerConfig.getTaskExecuteThreadsFullPolicy())) {
                 WorkerTaskExecutorHolder.put(workerTaskExecutor);
-                threadPoolExecutor.submit(workerTaskExecutor);
+                threadPoolExecutor.execute(workerTaskExecutor);
                 return true;
             }
             if (isOverload()) {
@@ -58,7 +58,7 @@ public class WorkerTaskExecutorThreadPool {
                 return false;
             }
             WorkerTaskExecutorHolder.put(workerTaskExecutor);
-            threadPoolExecutor.submit(workerTaskExecutor);
+            threadPoolExecutor.execute(workerTaskExecutor);
             return true;
         }
     }

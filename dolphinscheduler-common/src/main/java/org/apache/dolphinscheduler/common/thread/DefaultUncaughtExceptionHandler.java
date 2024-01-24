@@ -17,22 +17,31 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
-/**
- * All thread used in DolphinScheduler should extend with this class to avoid the server hang issue.
- */
-public abstract class BaseDaemonThread extends Thread {
+import java.util.concurrent.atomic.LongAdder;
 
-    protected BaseDaemonThread(Runnable runnable) {
-        super(runnable);
-        this.setDaemon(true);
-        this.setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class DefaultUncaughtExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+    private static final DefaultUncaughtExceptionHandler INSTANCE = new DefaultUncaughtExceptionHandler();
+
+    private static final LongAdder uncaughtExceptionCount = new LongAdder();
+
+    private DefaultUncaughtExceptionHandler() {
     }
 
-    protected BaseDaemonThread(String threadName) {
-        super();
-        this.setName(threadName);
-        this.setDaemon(true);
-        this.setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
+    public static DefaultUncaughtExceptionHandler getInstance() {
+        return INSTANCE;
     }
 
+    public static long getUncaughtExceptionCount() {
+        return uncaughtExceptionCount.longValue();
+    }
+
+    @Override
+    public void uncaughtException(Thread t, Throwable e) {
+        uncaughtExceptionCount.add(1);
+        log.error("Caught an exception in {}.", t, e);
+    }
 }

@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.api;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
@@ -51,6 +53,8 @@ public class ApiApplicationServer {
     private PluginDao pluginDao;
 
     public static void main(String[] args) {
+        ApiServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         SpringApplication.run(ApiApplicationServer.class);
     }
 
