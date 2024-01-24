@@ -14,9 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
-alter table t_ds_process_definition alter column `version` int(11) NOT NULL default 1;
-alter table t_ds_process_definition_log alter column `version` int(11) NOT NULL default 1;
-alter table t_ds_task_definition alter column `version` int(11) NOT NULL default 1;
-alter table t_ds_task_definition_log alter column `version` int(11) NOT NULL default 1;
-alter table t_ds_process_instance alter column `process_definition_version` int(11) NOT NULL default 1;
-alter table t_ds_task_instance alter column `task_definition_version` int(11) NOT NULL default 1;
+ALTER TABLE "t_ds_process_definition" ALTER COLUMN "version" SET DEFAULT 1;
+ALTER TABLE "t_ds_process_definition_log" ALTER COLUMN "version" SET DEFAULT 1;
+ALTER TABLE "t_ds_task_definition" ALTER COLUMN "version" SET DEFAULT 1;
+ALTER TABLE "t_ds_task_definition_log" ALTER COLUMN "version" SET DEFAULT 1;
+ALTER TABLE "t_ds_process_instance" ALTER COLUMN "process_definition_version" SET NOT NULL, ALTER COLUMN "process_definition_version" SET DEFAULT 1;
+ALTER TABLE "t_ds_task_instance" ALTER COLUMN "task_definition_version" SET NOT NULL, ALTER COLUMN "task_definition_version" SET DEFAULT 1;
