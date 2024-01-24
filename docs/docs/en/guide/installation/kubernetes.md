@@ -4,6 +4,8 @@ Kubernetes deployment is DolphinScheduler deployment in a Kubernetes cluster, wh
 
 If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
 
+> **Tip**: You can also try [DolphinScheduler K8S Operator](https://github.com/apache/dolphinscheduler-operator)，which is current on alpha1 stage
+
 ## Prerequisites
 
 - [Helm](https://helm.sh/) version 3.1.0+
