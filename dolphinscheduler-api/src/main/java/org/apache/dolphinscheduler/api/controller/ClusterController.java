@@ -81,7 +81,7 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_CLUSTER_ERROR)
-    public Result<Long> createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<Long> createCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("name") String name,
                                       @RequestParam("config") String config,
                                       @RequestParam(value = "description", required = false) String description) {

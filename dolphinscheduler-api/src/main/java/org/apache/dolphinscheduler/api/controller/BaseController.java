@@ -151,7 +151,7 @@ public class BaseController {
 
     /**
      * return the data use Map format, for example, passing the value of key, value, passing a value
-     * eg. "/user/add"  then return user name: zhangsan
+     * e.g. "/user/add"  then return username: zhangsan
      *
      * @param msg message
      * @param object success object data

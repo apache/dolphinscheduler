@@ -56,10 +56,10 @@ public class CloudController extends BaseController {
     private CloudService cloudService;
 
     /**
-     * get datafactory list
+     * get data factory list
      *
      * @param loginUser login user
-     * @return datafactory name list
+     * @return data factory name list
      */
     @Operation(summary = "listDataFactory", description = "LIST_DATA_FACTORY")
     @GetMapping(value = "/azure/datafactory/factories")

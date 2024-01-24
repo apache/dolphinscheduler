@@ -161,7 +161,7 @@ public class LoginController extends BaseController {
         return Result.success();
     }
 
-    @Operation(summary = "signOut", description = "SIGNOUT_NOTES")
+    @Operation(summary = "signOut", description = "SIGN_OUT_NOTES")
     @PostMapping(value = "/signOut")
     @ApiException(SIGN_OUT_ERROR)
     public Result signOut(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,

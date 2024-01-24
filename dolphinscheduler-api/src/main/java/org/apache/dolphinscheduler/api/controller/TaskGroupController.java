@@ -83,11 +83,11 @@ public class TaskGroupController extends BaseController {
     @ApiException(CREATE_TASK_GROUP_ERROR)
     public Result createTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("name") String name,
-                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectcode,
+                                  @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectCode,
                                   @RequestParam("description") String description,
                                   @RequestParam("groupSize") Integer groupSize) {
         Map<String, Object> result =
-                taskGroupService.createTaskGroup(loginUser, projectcode, name, description, groupSize);
+                taskGroupService.createTaskGroup(loginUser, projectCode, name, description, groupSize);
         return returnDataList(result);
     }
 

@@ -111,7 +111,7 @@ public class WorkFlowLineageController extends BaseController {
      * @param projectCode project codes which taskCode belong
      * @param processDefinitionCode project code which taskCode belong
      * @param taskCode task definition code
-     * @return Result of task can be delete or not
+     * @return Result of task can be deleted or not
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
     @Parameters({

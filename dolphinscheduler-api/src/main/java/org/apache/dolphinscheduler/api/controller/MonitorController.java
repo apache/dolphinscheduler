@@ -89,7 +89,7 @@ public class MonitorController extends BaseController {
      * query database state
      *
      * @param loginUser login user
-     * @return data base state
+     * @return database state
      */
     @Operation(summary = "queryDatabaseState", description = "QUERY_DATABASE_STATE_NOTES")
     @GetMapping(value = "/databases")
