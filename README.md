@@ -66,7 +66,7 @@ Welcome to join the Apache DolphinScheduler community by:
 
 - Join the [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack) to keep in touch with the community
 - Follow the [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) and get the latest news <!-- markdown-link-check-disable-line -->
-- Subscribe DolphinScheduler mail list, users@dolphinscheduler.apache.org for user and dev@dolphinscheduler.apache.org for developer
+- Subscribe DolphinScheduler mail list, [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) for user and [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org) for developer
 
 # Landscapes
 

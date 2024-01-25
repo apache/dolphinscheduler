@@ -41,7 +41,7 @@ public class MasterAsyncTaskExecutorThreadPool implements IMasterTaskExecutorThr
     public boolean submitMasterTaskExecutor(AsyncMasterTaskExecutor asyncMasterTaskExecutor) {
         synchronized (MasterAsyncTaskExecutorThreadPool.class) {
             // todo: check if the thread pool is overload
-            threadPoolExecutor.submit(asyncMasterTaskExecutor);
+            threadPoolExecutor.execute(asyncMasterTaskExecutor);
             return true;
         }
     }
