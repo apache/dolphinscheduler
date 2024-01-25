@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -36,12 +37,15 @@ public class AlertRegistryClient implements AutoCloseable {
     @Autowired
     private AlertConfig alertConfig;
 
+    @Autowired
+    private MetricsProvider metricsProvider;
+
     private AlertHeartbeatTask alertHeartbeatTask;
 
     public void start() {
         log.info("AlertRegistryClient starting...");
         registryClient.getLock(RegistryNodeType.ALERT_LOCK.getRegistryPath());
-        alertHeartbeatTask = new AlertHeartbeatTask(alertConfig, registryClient);
+        alertHeartbeatTask = new AlertHeartbeatTask(alertConfig, metricsProvider, registryClient);
         alertHeartbeatTask.start();
         // start heartbeat task
         log.info("AlertRegistryClient started...");

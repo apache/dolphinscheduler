@@ -98,11 +98,17 @@ public class HttpAlertChannelTest {
                 .addValidate(Validate.newBuilder().setRequired(true).build())
                 .build();
 
+        InputParam timeout = InputParam.newBuilder("timeout", "timeout")
+                .setValue(120)
+                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .build();
+
         paramsList.add(urlParam);
         paramsList.add(headerParams);
         paramsList.add(bodyParams);
         paramsList.add(content);
         paramsList.add(requestType);
+        paramsList.add(timeout);
 
         return JSONUtils.toJsonString(paramsList);
     }

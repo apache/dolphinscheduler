@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.common.thread;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -31,24 +31,20 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class ThreadUtils {
 
-    /**
-     * Wrapper over newDaemonFixedThreadExecutor.
-     *
-     * @param threadName threadName
-     * @param threadsNum threadsNum
-     * @return ExecutorService
-     */
-    public static ExecutorService newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat(threadName).build();
-        return Executors.newFixedThreadPool(threadsNum, threadFactory);
+    public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
+        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, newDaemonThreadFactory(threadName));
     }
 
     public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadName) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat(threadName)
+        return Executors.newSingleThreadScheduledExecutor(newDaemonThreadFactory(threadName));
+    }
+
+    public static ThreadFactory newDaemonThreadFactory(String threadName) {
+        return new ThreadFactoryBuilder()
                 .setDaemon(true)
+                .setNameFormat(threadName)
+                .setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance())
                 .build();
-        return Executors.newSingleThreadScheduledExecutor(threadFactory);
     }
 
     /**
