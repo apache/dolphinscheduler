@@ -21,11 +21,13 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
@@ -33,7 +35,7 @@ import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
+import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -73,10 +75,13 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private WorkflowEventLooper workflowEventLooper;
 
     @Autowired
-    private ServerNodeManager serverNodeManager;
+    private MasterSlotManager masterSlotManager;
 
     @Autowired
     private MasterTaskExecutorBootstrap masterTaskExecutorBootstrap;
+
+    @Autowired
+    private MetricsProvider metricsProvider;
 
     protected MasterSchedulerBootstrap() {
         super("MasterCommandLoopThread");
@@ -102,11 +107,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
         log.info("MasterSchedulerBootstrap stopped...");
     }
 
-    /**
-     * run of MasterSchedulerService
-     */
     @Override
     public void run() {
+        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         while (!ServerLifeCycleManager.isStopped()) {
             try {
                 if (!ServerLifeCycleManager.isRunning()) {
@@ -115,9 +118,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                 }
                 // todo: if the workflow event queue is much, we need to handle the back pressure
-                boolean isOverload =
-                        OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory());
-                if (isOverload) {
+                SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+                if (serverLoadProtection.isOverload(systemMetrics)) {
                     log.warn("The current server is overload, cannot consumes commands.");
                     MasterServerMetrics.incMasterOverload();
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -171,8 +173,8 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private List<Command> findCommands() throws MasterException {
         try {
             long scheduleStartTime = System.currentTimeMillis();
-            int thisMasterSlot = serverNodeManager.getSlot();
-            int masterCount = serverNodeManager.getMasterSize();
+            int thisMasterSlot = masterSlotManager.getSlot();
+            int masterCount = masterSlotManager.getMasterSize();
             if (masterCount <= 0) {
                 log.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
                 return Collections.emptyList();

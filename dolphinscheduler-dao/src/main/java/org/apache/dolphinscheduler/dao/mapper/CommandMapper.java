@@ -36,13 +36,13 @@ public interface CommandMapper extends BaseMapper<Command> {
      * count command state
      * @param startTime startTime
      * @param endTime endTime
-     * @param projectCodeArray projectCodeArray
+     * @param projectCodes projectCodes
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
                                          @Param("startTime") Date startTime,
                                          @Param("endTime") Date endTime,
-                                         @Param("projectCodeArray") Long[] projectCodeArray);
+                                         @Param("projectCodes") List<Long> projectCodes);
 
     /**
      * query command page

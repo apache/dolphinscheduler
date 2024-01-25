@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseResponse;
-import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 
 import org.apache.commons.lang3.StringUtils;
 

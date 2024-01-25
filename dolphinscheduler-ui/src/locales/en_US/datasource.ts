@@ -70,6 +70,10 @@ export default {
   user_password_tips: 'Please enter your password',
   aws_region: 'Aws Region',
   aws_region_tips: 'Please enter AwsRegion',
+  aws_access_key: 'AwsAccessKey',
+  aws_access_key_tips: 'Please enter AwsAccessKey',
+  aws_secret_access_key: 'AwsSecretAccessKey',
+  aws_secret_access_key_tips: 'Please enter AwsSecretAccessKey',
   validation: 'Validation',
   mode_tips: 'Please select a mode',
   jdbc_format_tips: 'jdbc connection parameters is not a correct JSON format',
@@ -87,5 +91,11 @@ export default {
   SecretAccessKey: 'SecretAccessKey',
   SecretAccessKey_tips: 'Please input SecretAccessKey',
   dbUser: 'DbUser',
-  dbUser_tips: 'Please input DbUser'
+  dbUser_tips: 'Please input DbUser',
+  zeppelin_rest_endpoint: 'zeppelinRestEndpoint',
+  zeppelin_rest_endpoint_tips: 'Please input zeppelin restEndpoint',
+  kubeConfig: 'kubeConfig',
+  kubeConfig_tips: 'Please input KubeConfig',
+  namespace: 'namespace',
+  namespace_tips: 'Please input namespace'
 }

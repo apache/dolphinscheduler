@@ -18,7 +18,7 @@
 ################################
 ## DolphinScheduler Worker KEDA Scaler
 #################################
-{{- if and .Values.worker.keda.enabled }}
+{{- if and .Values.worker.keda.enabled .Values.worker.enabled }}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:

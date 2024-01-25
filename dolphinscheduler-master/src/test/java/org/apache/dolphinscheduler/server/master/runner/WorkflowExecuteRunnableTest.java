@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -102,6 +102,8 @@ public class WorkflowExecuteRunnableTest {
 
     private WorkflowExecuteContextFactory workflowExecuteContextFactory;
 
+    private ListenerEventAlertManager listenerEventAlertManager;
+
     @BeforeEach
     public void init() throws Exception {
         applicationContext = Mockito.mock(ApplicationContext.class);
@@ -117,6 +119,7 @@ public class WorkflowExecuteRunnableTest {
         taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
         defaultTaskExecuteRunnableFactory = Mockito.mock(DefaultTaskExecuteRunnableFactory.class);
         workflowExecuteContextFactory = Mockito.mock(WorkflowExecuteContextFactory.class);
+        listenerEventAlertManager = Mockito.mock(ListenerEventAlertManager.class);
 
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
@@ -146,7 +149,8 @@ public class WorkflowExecuteRunnableTest {
                         stateWheelExecuteThread,
                         curingGlobalParamsService,
                         taskInstanceDao,
-                        defaultTaskExecuteRunnableFactory));
+                        defaultTaskExecuteRunnableFactory,
+                        listenerEventAlertManager));
     }
 
     @Test

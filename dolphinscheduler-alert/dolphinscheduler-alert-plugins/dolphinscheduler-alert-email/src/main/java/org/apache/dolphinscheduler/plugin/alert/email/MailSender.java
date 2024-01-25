@@ -405,7 +405,9 @@ public final class MailSender {
      */
     private void handleException(AlertResult alertResult, Exception e) {
         log.error("Send email to {} failed", receivers, e);
-        alertResult.setMessage("Send email to {" + String.join(",", receivers) + "} failed，" + e.toString());
+        alertResult.setMessage(
+                String.format("Send email to: %s, failed: %s",
+                        String.join(",", receivers), e.getMessage()));
     }
 
 }

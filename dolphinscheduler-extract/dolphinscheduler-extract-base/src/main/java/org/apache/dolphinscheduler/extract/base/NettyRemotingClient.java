@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.base;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingException;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingTimeoutException;
@@ -30,7 +31,6 @@ import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
 import org.apache.dolphinscheduler.extract.base.utils.CallerThreadExecutePolicy;
 import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
-import org.apache.dolphinscheduler.extract.base.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
 import java.net.InetSocketAddress;
@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -80,12 +81,11 @@ public class NettyRemotingClient implements AutoCloseable {
 
     public NettyRemotingClient(final NettyClientConfig clientConfig) {
         this.clientConfig = clientConfig;
+        ThreadFactory nettyClientThreadFactory = ThreadUtils.newDaemonThreadFactory("NettyClientThread-");
         if (Epoll.isAvailable()) {
-            this.workerGroup =
-                    new EpollEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
+            this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), nettyClientThreadFactory);
         } else {
-            this.workerGroup =
-                    new NioEventLoopGroup(clientConfig.getWorkerThreads(), new NamedThreadFactory("NettyClient"));
+            this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), nettyClientThreadFactory);
         }
         this.callbackExecutor = new ThreadPoolExecutor(
                 Constants.CPUS,
@@ -93,12 +93,12 @@ public class NettyRemotingClient implements AutoCloseable {
                 1,
                 TimeUnit.MINUTES,
                 new LinkedBlockingQueue<>(1000),
-                new NamedThreadFactory("CallbackExecutor"),
+                ThreadUtils.newDaemonThreadFactory("NettyClientCallbackThread-"),
                 new CallerThreadExecutePolicy());
         this.clientHandler = new NettyClientHandler(this, callbackExecutor);
 
-        this.responseFutureExecutor =
-                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ResponseFutureExecutor"));
+        this.responseFutureExecutor = Executors.newSingleThreadScheduledExecutor(
+                ThreadUtils.newDaemonThreadFactory("NettyClientResponseFutureThread-"));
 
         this.start();
     }

@@ -17,17 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -40,18 +38,17 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleExecuteSqlMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleInputEntryMapper;
 import org.apache.dolphinscheduler.dao.mapper.DqRuleMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ValueType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.dolphinscheduler.spi.params.base.FormType;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -109,22 +106,20 @@ public class DqRuleServiceTest {
                 + "\"statistics_execute_sql\",\"name\":\"统计值计算SQL\",\"type\":\"input\",\"title\":"
                 + "\"统计值计算SQL\",\"validate\":[{\"required\":true,\"type\":\"string\",\"trigger\":\"blur\"}]}]";
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
-        Map<String, Object> result = dqRuleService.getRuleFormCreateJsonById(1);
-        Assertions.assertEquals(json, result.get(Constants.DATA_LIST));
+        String ruleFormCreateJsonById = dqRuleService.getRuleFormCreateJsonById(1);
+        Assertions.assertEquals(json, ruleFormCreateJsonById);
     }
 
     @Test
     public void testQueryAllRuleList() {
         when(dqRuleMapper.selectList(new QueryWrapper<>())).thenReturn(getRuleList());
-        Map<String, Object> result = dqRuleService.queryAllRuleList();
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertDoesNotThrow(() -> dqRuleService.queryAllRuleList());
     }
 
     @Test
     public void testGetDatasourceOptionsById() {
         when(dataSourceMapper.listAllDataSourceByType(DbType.MYSQL.getCode())).thenReturn(dataSourceList());
-        Map<String, Object> result = dqRuleService.queryAllRuleList();
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertDoesNotThrow(() -> dqRuleService.queryAllRuleList());
     }
 
     @Test
@@ -146,15 +141,14 @@ public class DqRuleServiceTest {
         page.setTotal(1);
         page.setRecords(getRuleList());
 
-        when(dqRuleMapper.queryRuleListPaging(
-                any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end))).thenReturn(page);
+        when(dqRuleMapper.queryRuleListPaging(any(IPage.class), eq(""), eq(ruleType), eq(start), eq(end)))
+                .thenReturn(page);
 
         when(dqRuleInputEntryMapper.getRuleInputEntryList(1)).thenReturn(getRuleInputEntryList());
         when(dqRuleExecuteSqlMapper.getExecuteSqlList(1)).thenReturn(getRuleExecuteSqlList());
 
-        Result result = dqRuleService.queryRuleListPaging(
-                loginUser, searchVal, 0, "2020-01-01 00:00:00", "2020-01-02 00:00:00", 1, 10);
-        Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), result.getCode());
+        assertDoesNotThrow(() -> dqRuleService.queryRuleListPaging(loginUser, searchVal, 0, "2020-01-01 00:00:00",
+                "2020-01-02 00:00:00", 1, 10));
     }
 
     private List<DataSource> dataSourceList() {
@@ -198,13 +192,13 @@ public class DqRuleServiceTest {
         srcConnectorType.setType(FormType.SELECT.getFormType());
         srcConnectorType.setCanEdit(true);
         srcConnectorType.setIsShow(true);
-        srcConnectorType.setValue("JDBC");
+        srcConnectorType.setData("JDBC");
         srcConnectorType.setPlaceholder("Please select the source connector type");
         srcConnectorType.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         srcConnectorType
                 .setOptions("[{\"label\":\"HIVE\",\"value\":\"HIVE\"},{\"label\":\"JDBC\",\"value\":\"JDBC\"}]");
         srcConnectorType.setInputType(InputType.DEFAULT.getCode());
-        srcConnectorType.setValueType(ValueType.NUMBER.getCode());
+        srcConnectorType.setDataType(DataType.NUMBER.getCode());
         srcConnectorType.setIsEmit(true);
         srcConnectorType.setIsValidate(true);
 
@@ -217,7 +211,7 @@ public class DqRuleServiceTest {
         statisticsName.setPlaceholder("Please enter statistics name, the alias in statistics execute sql");
         statisticsName.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
         statisticsName.setInputType(InputType.DEFAULT.getCode());
-        statisticsName.setValueType(ValueType.STRING.getCode());
+        statisticsName.setDataType(DataType.STRING.getCode());
         statisticsName.setIsEmit(false);
         statisticsName.setIsValidate(true);
 
@@ -229,7 +223,7 @@ public class DqRuleServiceTest {
         statisticsExecuteSql.setIsShow(true);
         statisticsExecuteSql.setPlaceholder("Please enter the statistics execute sql");
         statisticsExecuteSql.setOptionSourceType(OptionSourceType.DEFAULT.getCode());
-        statisticsExecuteSql.setValueType(ValueType.LIKE_SQL.getCode());
+        statisticsExecuteSql.setDataType(DataType.LIKE_SQL.getCode());
         statisticsExecuteSql.setIsEmit(false);
         statisticsExecuteSql.setIsValidate(true);
 

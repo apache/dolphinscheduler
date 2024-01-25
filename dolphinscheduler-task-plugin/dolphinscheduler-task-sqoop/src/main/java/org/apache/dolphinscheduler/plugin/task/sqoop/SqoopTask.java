@@ -29,19 +29,16 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * sqoop task extends the shell task
  */
+@Slf4j
 public class SqoopTask extends AbstractYarnTask {
 
-    /**
-     * sqoop task params
-     */
     private SqoopParameters sqoopParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;

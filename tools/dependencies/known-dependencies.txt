@@ -30,9 +30,7 @@ bcutil-jdk15on-1.69.jar
 bonecp-0.8.0.RELEASE.jar
 bucket4j-core-6.2.0.jar
 caffeine-2.9.3.jar
-checker-qual-3.12.0.jar
 checker-qual-3.19.0.jar
-checker-qual-3.5.0.jar
 classgraph-4.8.147.jar
 classmate-1.5.1.jar
 clickhouse-jdbc-0.4.6.jar
@@ -74,7 +72,7 @@ datanucleus-rdbms-4.1.19.jar
 datasync-2.17.282.jar
 derby-10.14.2.0.jar
 dnsjava-2.1.7.jar
-druid-1.2.4.jar
+druid-1.2.20.jar
 eventstream-1.0.1.jar
 error_prone_annotations-2.5.1.jar
 failureaccess-1.0.1.jar
@@ -381,7 +379,6 @@ azure-core-http-netty-1.13.0.jar
 azure-identity-1.7.1.jar
 content-type-2.2.jar
 jackson-dataformat-xml-2.13.3.jar
-jna-platform-5.6.0.jar
 lang-tag-1.6.jar
 msal4j-1.13.3.jar
 msal4j-persistence-extension-1.1.0.jar
@@ -489,3 +486,17 @@ azure-storage-blob-12.21.0.jar
 azure-storage-internal-avro-12.6.0.jar
 vertica-jdbc-12.0.4-0.jar
 esdk-obs-java-bundle-3.23.3.jar
+dyvmsapi20170525-2.1.4.jar
+alibabacloud-gateway-spi-0.0.1.jar
+credentials-java-0.2.2.jar
+endpoint-util-0.0.7.jar
+openapiutil-0.1.14.jar
+tea-1.1.14.jar
+tea-openapi-0.2.2.jar
+tea-rpc-0.0.11.jar
+tea-rpc-util-0.1.3.jar
+tea-util-0.2.13.jar
+dom4j-2.1.3.jar
+jaxb-core-2.3.0.jar
+jaxb-impl-2.3.0.jar
+

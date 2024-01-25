@@ -25,14 +25,14 @@ import {
   PlayCircleOutlined,
   ClockCircleOutlined,
   CopyOutlined,
-  FieldTimeOutlined,
   ExportOutlined,
   ApartmentOutlined,
-  UploadOutlined
+  UploadOutlined,
+  ArrowUpOutlined,
+  ArrowDownOutlined
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
-
 const props = {
   row: {
     type: Object as PropType<IDefinitionData>
@@ -50,9 +50,9 @@ export default defineComponent({
     'versionWorkflow',
     'deleteWorkflow',
     'releaseWorkflow',
+    'releaseScheduler',
     'copyWorkflow',
     'exportWorkflow',
-    'gotoTimingManage',
     'gotoWorkflowTree'
   ],
   setup(props, ctx) {
@@ -88,14 +88,13 @@ export default defineComponent({
       ctx.emit('exportWorkflow')
     }
 
-    const handleGotoTimingManage = () => {
-      ctx.emit('gotoTimingManage')
-    }
-
     const handleGotoWorkflowTree = () => {
       ctx.emit('gotoWorkflowTree')
     }
 
+    const handleReleaseScheduler = () => {
+      ctx.emit('releaseScheduler')
+    }
     return {
       handleEditWorkflow,
       handleStartWorkflow,
@@ -105,8 +104,8 @@ export default defineComponent({
       handleReleaseWorkflow,
       handleCopyWorkflow,
       handleExportWorkflow,
-      handleGotoTimingManage,
       handleGotoWorkflowTree,
+      handleReleaseScheduler,
       ...toRefs(props)
     }
   },
@@ -114,7 +113,7 @@ export default defineComponent({
     const { t } = useI18n()
     const releaseState = this.row?.releaseState
     const scheduleReleaseState = this.row?.scheduleReleaseState
-
+    const schedule = this.row?.schedule
     return (
       <NSpace>
         <NTooltip trigger={'hover'}>
@@ -160,6 +159,41 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
+            default: () =>
+              releaseState === 'ONLINE'
+                ? t('project.workflow.down_line')
+                : t('project.workflow.up_line'),
+            trigger: () => (
+              <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
+                {{
+                  default: () =>
+                    releaseState === 'ONLINE'
+                      ? t('project.workflow.confirm_to_offline')
+                      : t('project.workflow.confirm_to_online'),
+                  trigger: () => (
+                    <NButton
+                      size='small'
+                      type={releaseState === 'ONLINE' ? 'warning' : 'error'}
+                      tag='div'
+                      circle
+                      class='btn-publish'
+                    >
+                      <NIcon>
+                        {releaseState === 'ONLINE' ? (
+                          <DownloadOutlined />
+                        ) : (
+                          <UploadOutlined />
+                        )}
+                      </NIcon>
+                    </NButton>
+                  )
+                }}
+              </NPopconfirm>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
             default: () => t('project.workflow.timing'),
             trigger: () => (
               <NButton
@@ -168,7 +202,6 @@ export default defineComponent({
                 tag='div'
                 circle
                 onClick={this.handleTimingWorkflow}
-                disabled={releaseState !== 'ONLINE' || !!scheduleReleaseState}
               >
                 <NIcon>
                   <ClockCircleOutlined />
@@ -180,35 +213,38 @@ export default defineComponent({
         <NTooltip trigger={'hover'}>
           {{
             default: () =>
-              releaseState === 'ONLINE'
-                ? t('project.workflow.down_line')
-                : t('project.workflow.up_line'),
+              scheduleReleaseState === 'ONLINE'
+                ? t('project.workflow.time_down_line')
+                : t('project.workflow.time_up_line'),
             trigger: () => (
-              <NButton
-                size='small'
-                type={releaseState === 'ONLINE' ? 'warning' : 'error'}
-                tag='div'
-                circle
-                class='btn-publish'
-              >
-                <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
-                  {{
-                    default: () =>
-                      releaseState === 'ONLINE'
-                        ? t('project.workflow.confirm_to_offline')
-                        : t('project.workflow.confirm_to_online'),
-                    trigger: () => (
+              <NPopconfirm onPositiveClick={this.handleReleaseScheduler}>
+                {{
+                  default: () =>
+                    scheduleReleaseState === 'ONLINE'
+                      ? t('project.workflow.time_to_offline')
+                      : t('project.workflow.time_to_online'),
+                  trigger: () => (
+                    <NButton
+                      size='small'
+                      type={
+                        scheduleReleaseState === 'ONLINE' ? 'warning' : 'error'
+                      }
+                      tag='div'
+                      circle
+                      class='btn-publish'
+                      disabled={!schedule || releaseState !== 'ONLINE'}
+                    >
                       <NIcon>
-                        {releaseState === 'ONLINE' ? (
-                          <DownloadOutlined />
+                        {scheduleReleaseState === 'ONLINE' ? (
+                          <ArrowDownOutlined />
                         ) : (
-                          <UploadOutlined />
+                          <ArrowUpOutlined />
                         )}
                       </NIcon>
-                    )
-                  }}
-                </NPopconfirm>
-              </NButton>
+                    </NButton>
+                  )
+                }}
+              </NPopconfirm>
             )
           }}
         </NTooltip>
@@ -232,54 +268,30 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
-            default: () => t('project.workflow.cron_manage'),
-            trigger: () => (
-              <NButton
-                size='small'
-                type='info'
-                tag='div'
-                circle
-                disabled={releaseState === 'OFFLINE'}
-                onClick={this.handleGotoTimingManage}
-              >
-                <NIcon>
-                  <FieldTimeOutlined />
-                </NIcon>
-              </NButton>
-            )
-          }}
-        </NTooltip>
-        <NTooltip trigger={'hover'}>
-          {{
             default: () => t('project.workflow.delete'),
             trigger: () => (
-              <NButton
-                size='small'
-                type='error'
-                tag='div'
-                circle
+              <NPopconfirm
                 disabled={releaseState === 'ONLINE'}
-                class='btn-delete'
+                onPositiveClick={this.handleDeleteWorkflow}
               >
-                <NPopconfirm
-                  disabled={releaseState === 'ONLINE'}
-                  onPositiveClick={this.handleDeleteWorkflow}
-                >
-                  {{
-                    default: () => t('project.workflow.delete_confirm'),
-                    icon: () => (
-                      <NIcon>
-                        <InfoCircleFilled />
-                      </NIcon>
-                    ),
-                    trigger: () => (
+                {{
+                  default: () => t('project.workflow.delete_confirm'),
+                  trigger: () => (
+                    <NButton
+                      size='small'
+                      type='error'
+                      tag='div'
+                      circle
+                      disabled={releaseState === 'ONLINE'}
+                      class='btn-delete'
+                    >
                       <NIcon>
                         <DeleteOutlined />
                       </NIcon>
-                    )
-                  }}
-                </NPopconfirm>
-              </NButton>
+                    </NButton>
+                  )
+                }}
+              </NPopconfirm>
             )
           }}
         </NTooltip>

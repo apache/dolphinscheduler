@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.JAR;
 import static org.apache.dolphinscheduler.common.constants.Constants.PERIOD;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
-import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.resources.filter.ResourceFilter;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.ResourceTreeVisitor;
 import org.apache.dolphinscheduler.api.dto.resources.visitor.Visitor;
@@ -45,14 +44,9 @@ import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
@@ -91,8 +85,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 
 /**
@@ -103,9 +95,6 @@ import com.google.common.io.Files;
 public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesService {
 
     @Autowired
-    private ResourceMapper resourcesMapper;
-
-    @Autowired
     private UdfFuncMapper udfFunctionMapper;
 
     @Autowired
@@ -113,15 +102,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
     @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private ResourceUserMapper resourceUserMapper;
-
-    @Autowired
-    private ProcessDefinitionLogMapper processDefinitionLogMapper;
-
-    @Autowired
-    private ProcessTaskRelationMapper processTaskRelationMapper;
 
     @Autowired(required = false)
     private StorageOperate storageOperate;
@@ -265,36 +245,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 RegexUtils.escapeNRT(name), RegexUtils.escapeNRT(file.getOriginalFilename()));
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * update the folder's size of the resource
-     *
-     * @param resource the current resource
-     * @param size size
-     */
-    private void updateParentResourceSize(Resource resource, long size) {
-        if (resource.getSize() > 0) {
-            String[] splits = resource.getFullName().split("/");
-            for (int i = 1; i < splits.length; i++) {
-                String parentFullName = Joiner.on("/").join(Arrays.copyOfRange(splits, 0, i));
-                if (StringUtils.isNotBlank(parentFullName)) {
-                    List<Resource> resources =
-                            resourcesMapper.queryResource(parentFullName, resource.getType().ordinal());
-                    if (CollectionUtils.isNotEmpty(resources)) {
-                        Resource parentResource = resources.get(0);
-                        if (parentResource.getSize() + size >= 0) {
-                            parentResource.setSize(parentResource.getSize() + size);
-                        } else {
-                            parentResource.setSize(0L);
-                        }
-                        resourcesMapper.updateById(parentResource);
-                        log.info("Resource size update complete, resourceFullName:{}, newSize:{}.",
-                                parentResource.getFullName(), parentResource.getSize());
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -612,10 +562,12 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
             try {
                 if (StringUtils.isBlank(fullName)) {
-                    resourcesList = storageOperate.listFilesStatus(defaultPath, defaultPath, tenantCode, type);
-                } else {
-                    resourcesList = storageOperate.listFilesStatus(fullName, defaultPath, tenantCode, type);
+                    fullName = defaultPath;
                 }
+                resourcesList = recursive ? storageOperate.listFilesStatusRecursively(fullName, defaultPath,
+                        tenantCode, type)
+                        : storageOperate.listFilesStatus(fullName, defaultPath,
+                                tenantCode, type);
             } catch (Exception e) {
                 log.error(e.getMessage() + " Resource path: {}", fullName, e);
                 throw new ServiceException(String.format(e.getMessage() +
@@ -645,14 +597,10 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             }
 
             if (!storageOperate.mkdir(tenantCode, fullName)) {
-                log.error("create resource directory {} failed", fullName);
-                putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
-                // throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
+                throw new ServiceException(String.format("Create resource directory: %s failed.", fullName));
             }
             putMsg(result, Status.SUCCESS);
         } catch (Exception e) {
-            log.error("create resource directory {} failed", fullName);
-            putMsg(result, Status.STORE_OPERATE_CREATE_ERROR);
             throw new ServiceException(String.format("create resource directory: %s failed.", fullName));
         }
     }
@@ -813,25 +761,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         result.setData(visitor.visit("").getChildren());
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * transform resource object into StorageEntity object
-     *
-     * @param resource  a resource object
-     * @return a storageEntity object
-     */
-    private StorageEntity createStorageEntityBasedOnResource(Resource resource) {
-        StorageEntity entity = new StorageEntity();
-        entity.setFullName(resource.getFullName());
-        entity.setPfullName(resource.getPid() == -1 ? ""
-                : resourcesMapper.selectById(resource.getPid()).getFullName());
-        entity.setDirectory(resource.isDirectory());
-        entity.setAlias(resource.getAlias());
-        entity.setId(resource.getId());
-        entity.setType(resource.getType());
-
-        return entity;
     }
 
     /**
@@ -1216,40 +1145,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return storageOperate.getFileStatus(fullName, defaultPath, user.getTenantCode(), ResourceType.FILE);
     }
 
-    private void permissionPostHandle(ResourceType resourceType, User loginUser, Integer resourceId) {
-        AuthorizationType authorizationType =
-                resourceType.equals(ResourceType.FILE) ? AuthorizationType.RESOURCE_FILE_ID
-                        : AuthorizationType.UDF_FILE;
-        permissionPostHandle(authorizationType, loginUser.getId(), Collections.singletonList(resourceId), log);
-    }
-
-    private Result<Object> verifyResource(User loginUser, ResourceType type, String fullName, int pid) {
-        Result<Object> result = verifyResourceName(fullName, type, loginUser);
-        if (!result.getCode().equals(Status.SUCCESS.getCode())) {
-            return result;
-        }
-        return verifyPid(loginUser, pid);
-    }
-
-    private Result<Object> verifyPid(User loginUser, int pid) {
-        Result<Object> result = new Result<>();
-        putMsg(result, Status.SUCCESS);
-        if (pid != -1) {
-            Resource parentResource = resourcesMapper.selectById(pid);
-            if (parentResource == null) {
-                log.error("Parent resource does not exist, parentResourceId:{}.", pid);
-                putMsg(result, Status.PARENT_RESOURCE_NOT_EXIST);
-                return result;
-            }
-            if (!canOperator(loginUser, parentResource.getUserId())) {
-                log.warn("User does not have operation privilege, loginUserName:{}.", loginUser.getUserName());
-                putMsg(result, Status.USER_NO_OPERATION_PERM);
-                return result;
-            }
-        }
-        return result;
-    }
-
     /**
      * updateProcessInstance resource
      *
@@ -1390,7 +1285,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         log.info("Resource path is {}, download local filename is {}", alias, localFileName);
 
         try {
-            storageOperate.download(tenantCode, fullName, localFileName, true);
+            storageOperate.download(fullName, localFileName, true);
             ApiServerMetrics.recordApiResourceDownloadSize(java.nio.file.Files.size(Paths.get(localFileName)));
             return org.apache.dolphinscheduler.api.utils.FileUtils.file2Resource(localFileName);
         } catch (IOException e) {
@@ -1398,46 +1293,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     fullName, localFileName, e.getMessage());
             throw new ServiceException("Download the resource file failed ,it may be related to your storage");
         }
-    }
-
-    /**
-     * list all file
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return unauthorized result code
-     */
-    @Override
-    public Map<String, Object> authorizeResourceTree(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-
-        List<Resource> resourceList;
-        if (isAdmin(loginUser)) {
-            // admin gets all resources except userId
-            resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        } else {
-            // non-admins users get their own resources
-            resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), -1);
-        }
-        List<ResourceComponent> list;
-        if (CollectionUtils.isNotEmpty(resourceList)) {
-            // Transform into StorageEntity for compatibility
-            List<StorageEntity> transformedResourceList = resourceList.stream()
-                    .map(this::createStorageEntityBasedOnResource)
-                    .collect(Collectors.toList());
-            Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
-            list = visitor.visit("").getChildren();
-        } else {
-            list = new ArrayList<>(0);
-        }
-
-        result.put(Constants.DATA_LIST, list);
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     @Override
@@ -1502,44 +1357,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     /**
-     * unauthorized file
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return unauthorized result code
-     */
-    @Override
-    public Map<String, Object> unauthorizedFile(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-
-        List<Resource> resourceList;
-        if (isAdmin(loginUser)) {
-            // admin gets all resources except userId
-            resourceList = resourcesMapper.queryResourceExceptUserId(userId);
-        } else {
-            // non-admins users get their own resources
-            resourceList = resourcesMapper.queryResourceListAuthored(loginUser.getId(), -1);
-        }
-        List<Resource> list;
-        if (resourceList != null && !resourceList.isEmpty()) {
-            Set<Resource> resourceSet = new HashSet<>(resourceList);
-            List<Resource> authedResourceList = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-            getAuthorizedResourceList(resourceSet, authedResourceList);
-            list = new ArrayList<>(resourceSet);
-        } else {
-            list = new ArrayList<>(0);
-        }
-        // Transform into StorageEntity for compatibility
-        List<StorageEntity> transformedResourceList = list.stream()
-                .map(this::createStorageEntityBasedOnResource)
-                .collect(Collectors.toList());
-        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
-        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
      * unauthorized udf function
      *
      * @param loginUser login user
@@ -1598,37 +1415,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     /**
-     * authorized file
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return authorized result
-     */
-    @Override
-    public Map<String, Object> authorizedFile(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-
-        List<Resource> authedResources = queryResourceList(userId, Constants.AUTHORIZE_WRITABLE_PERM);
-        // Transform into StorageEntity for compatibility
-        List<StorageEntity> transformedResourceList = authedResources.stream()
-                .map(this::createStorageEntityBasedOnResource)
-                .collect(Collectors.toList());
-        Visitor visitor = new ResourceTreeVisitor(transformedResourceList);
-        String visit = JSONUtils.toJsonString(visitor.visit(""), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-        log.info(visit);
-        String jsonTreeStr =
-                JSONUtils.toJsonString(visitor.visit("").getChildren(), SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-        log.info(jsonTreeStr);
-        result.put(Constants.DATA_LIST, visitor.visit("").getChildren());
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
      * get resource base dir
      *
      * @param loginUser login user
@@ -1679,69 +1465,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             authedResourceSet = new HashSet<>(authedResourceList);
             resourceSet.removeAll(authedResourceSet);
         }
-    }
-
-    /**
-     * list all children id
-     *
-     * @param resource    resource
-     * @param containSelf whether add self to children list
-     * @return all children id
-     */
-    List<Integer> listAllChildren(Resource resource, boolean containSelf) {
-        List<Integer> childList = new ArrayList<>();
-        if (resource.getId() != null && containSelf) {
-            childList.add(resource.getId());
-        }
-
-        if (resource.isDirectory()) {
-            listAllChildren(resource.getId(), childList);
-        }
-        return childList;
-    }
-
-    /**
-     * list all children id
-     *
-     * @param resourceId resource id
-     * @param childList  child list
-     */
-    void listAllChildren(int resourceId, List<Integer> childList) {
-        List<Integer> children = resourcesMapper.listChildren(resourceId);
-        for (int childId : children) {
-            childList.add(childId);
-            listAllChildren(childId, childList);
-        }
-    }
-
-    /**
-     * query authored resource list (own and authorized)
-     *
-     * @param loginUser login user
-     * @param type      ResourceType
-     * @return all authored resource list
-     */
-    private List<Resource> queryAuthoredResourceList(User loginUser, ResourceType type) {
-        Set<Integer> resourceIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(checkResourceType(type), loginUser.getId(), log);
-        if (resourceIds.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<Resource> resources = resourcesMapper.selectBatchIds(resourceIds);
-        resources = resources.stream().filter(rs -> rs.getType() == type).collect(Collectors.toList());
-        return resources;
-    }
-
-    /**
-     * query resource list by userId and perm
-     *
-     * @param userId userId
-     * @param perm   perm
-     * @return resource list
-     */
-    private List<Resource> queryResourceList(Integer userId, int perm) {
-        List<Integer> resIds = resourceUserMapper.queryResourcesIdListByUserIdAndPerm(userId, perm);
-        return CollectionUtils.isEmpty(resIds) ? new ArrayList<>() : resourcesMapper.queryResourceListById(resIds);
     }
 
     private AuthorizationType checkResourceType(ResourceType type) {

@@ -14,12 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {
-  useCustomParams,
-  useNamespace,
-  useCustomLabels,
-  useNodeSelectors
-} from '.'
+import { useCustomParams, useCustomLabels, useNodeSelectors } from '.'
 import type { IJsonItem } from '../types'
 import { useI18n } from 'vue-i18n'
 
@@ -27,7 +22,6 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
   return [
-    useNamespace(),
     {
       type: 'input-number',
       field: 'minCpuCores',
@@ -81,6 +75,14 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
+      field: 'pullSecret',
+      name: t('project.node.pull_secret'),
+      props: {
+        placeholder: t('project.node.pull_secret_tips')
+      }
+    },
+    {
+      type: 'input',
       field: 'command',
       name: t('project.node.command'),
       props: {
@@ -105,7 +107,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       field: 'nodeSelectors',
       name: 'node_selectors'
     }),
-    ...useCustomParams({ model, field: 'localParams', isSimple: true })
+    ...useCustomParams({ model, field: 'localParams', isSimple: false })
   ]
 }
 

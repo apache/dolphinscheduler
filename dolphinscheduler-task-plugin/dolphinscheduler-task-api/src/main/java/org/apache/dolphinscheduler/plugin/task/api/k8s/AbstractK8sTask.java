@@ -24,6 +24,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
+import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class AbstractK8sTask extends AbstractRemoteTask {
 
     /**
@@ -37,7 +42,7 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
      */
     protected AbstractK8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.abstractK8sTaskExecutor = new K8sTaskExecutor(log, taskRequest);
+        this.abstractK8sTaskExecutor = new K8sTaskExecutor(taskRequest);
     }
 
     // todo split handle to submit and track
@@ -47,6 +52,7 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
             TaskResponse response = abstractK8sTaskExecutor.run(buildCommand());
             setExitStatusCode(response.getExitStatusCode());
             setAppIds(response.getAppIds());
+            dealOutParam(abstractK8sTaskExecutor.getTaskOutputParams());
         } catch (Exception e) {
             log.error("k8s task submit failed with error");
             exitStatusCode = -1;
@@ -85,4 +91,5 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
      */
     protected abstract String buildCommand();
 
+    protected abstract void dealOutParam(Map<String, String> taskOutputParams);
 }
