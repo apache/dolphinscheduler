@@ -37,6 +37,13 @@ public class RetryUtilsTest {
             Assertions.fail();
         });
 
+        long startTime = System.currentTimeMillis();
+        Assertions.assertThrows(RuntimeException.class, () -> RetryUtils.retryFunction((Supplier<Boolean>) () -> {
+            throw new RuntimeException("Test failed function");
+        }, new RetryUtils.RetryPolicy(3, 1000L)));
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        Assertions.assertTrue(elapsedTime >= 3000L && elapsedTime < 4000L);
     }
 
 }
