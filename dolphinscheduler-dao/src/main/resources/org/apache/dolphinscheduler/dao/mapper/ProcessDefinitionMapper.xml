@@ -79,7 +79,7 @@
                 name like concat('%', #{searchVal}, '%') OR description like concat('%', #{searchVal}, '%')
                 )
         </if>
-        order by update_time desc
+        order by update_time desc, id asc
     </select>
     <select id="filterProcessDefinition"
             parameterType="org.apache.dolphinscheduler.dao.entity.ProcessDefinition"
