@@ -45,6 +45,12 @@ public class AlertServerMetrics {
                 .register(Metrics.globalRegistry);
     }
 
+    public static void registerUncachedException(final Supplier<Number> supplier) {
+        Gauge.builder("ds.alert.uncached.exception", supplier)
+                .description("number of uncached exception")
+                .register(Metrics.globalRegistry);
+    }
+
     public void incAlertSuccessCount() {
         alertSuccessCounter.increment();
     }
