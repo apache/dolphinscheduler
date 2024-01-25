@@ -6,21 +6,20 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 public class ServerNodeManagerTest {
-
 
     @Mock
     RegistryClient registryClient;
@@ -51,8 +50,8 @@ public class ServerNodeManagerTest {
         updateWorkerNodes.invoke(serverNodeManager);
 
         Map<String, WorkerHeartBeat> workerNodeInfo = serverNodeManager.getWorkerNodeInfo();
-        Assert.assertTrue(workerNodeInfo.containsKey("worker-node-1"));
-        Assert.assertTrue(workerNodeInfo.containsKey("worker-node-2"));
+        Assertions.assertTrue(workerNodeInfo.containsKey("worker-node-1"));
+        Assertions.assertTrue(workerNodeInfo.containsKey("worker-node-2"));
 
         // receive remove event when worker-node-1 server stop
         ServerNodeManager.WorkerDataListener workerDataListener = serverNodeManager.new WorkerDataListener();
@@ -61,20 +60,17 @@ public class ServerNodeManagerTest {
 
         // check worker-node-1 not exist in cache
         workerNodeInfo = serverNodeManager.getWorkerNodeInfo();
-        Assert.assertFalse(workerNodeInfo.containsKey("worker-node-1"));
-        Assert.assertTrue(workerNodeInfo.containsKey("worker-node-2"));
+        Assertions.assertFalse(workerNodeInfo.containsKey("worker-node-1"));
+        Assertions.assertTrue(workerNodeInfo.containsKey("worker-node-2"));
 
         // worker-node-1 restart, getServerMaps(RegistryNodeType.WORKER) method return two worker
         updateWorkerNodes.invoke(serverNodeManager);
 
-        //check cache
+        // check cache
         workerNodeInfo = serverNodeManager.getWorkerNodeInfo();
-        Assert.assertTrue(workerNodeInfo.containsKey("worker-node-1"));
-        Assert.assertTrue(workerNodeInfo.containsKey("worker-node-2"));
+        Assertions.assertTrue(workerNodeInfo.containsKey("worker-node-1"));
+        Assertions.assertTrue(workerNodeInfo.containsKey("worker-node-2"));
 
     }
-
-
-
 
 }
