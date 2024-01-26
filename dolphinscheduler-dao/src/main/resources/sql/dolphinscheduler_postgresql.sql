@@ -522,7 +522,7 @@ CREATE TABLE t_ds_process_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int DEFAULT NULL ,
+  process_definition_version int NOT NULL DEFAULT 1 ,
   project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
