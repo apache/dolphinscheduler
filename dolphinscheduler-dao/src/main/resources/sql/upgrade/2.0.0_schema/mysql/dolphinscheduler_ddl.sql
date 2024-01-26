@@ -415,7 +415,7 @@ alter table t_ds_process_instance drop dependence_schedule_times;
 
 -- t_ds_task_instance   note: Data migration is not supported
 alter table t_ds_task_instance change process_definition_id task_code bigint(20) NOT NULL COMMENT 'task definition code';
-alter table t_ds_task_instance add task_definition_version int(11) DEFAULT '0' COMMENT 'task definition version' AFTER task_code;
+alter table t_ds_task_instance add task_definition_version int(11) DEFAULT '1' COMMENT 'task definition version' AFTER task_code;
 alter table t_ds_task_instance add task_params text COMMENT 'job custom parameters' AFTER app_link;
 alter table t_ds_task_instance add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
 alter table t_ds_task_instance add environment_config text COMMENT 'this config contains many environment variables config' AFTER environment_code;
