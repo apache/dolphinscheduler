@@ -63,7 +63,8 @@ import com.google.common.collect.Lists;
 @Slf4j
 public class AlertDao {
 
-    private static final int QUERY_ALERT_THRESHOLD = 100;
+    @Value("${alert.query_alert_threshold:100}")
+    private Integer QUERY_ALERT_THRESHOLD;
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;

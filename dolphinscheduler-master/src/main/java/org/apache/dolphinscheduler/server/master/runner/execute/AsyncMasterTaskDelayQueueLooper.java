@@ -18,12 +18,9 @@
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,11 +36,8 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
     private AsyncMasterTaskDelayQueue asyncMasterTaskDelayQueue;
 
     @Autowired
-    private MasterConfig masterConfig;
-
+    private MasterAsyncTaskExecutorThreadPool masterAsyncTaskExecutorThreadPool;
     private static final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
-
-    private ExecutorService asyncTaskStateCheckThreadPool;
 
     public AsyncMasterTaskDelayQueueLooper() {
         super("AsyncMasterTaskDelayQueueLooper");
@@ -63,8 +57,6 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
 
     @Override
     public void run() {
-        asyncTaskStateCheckThreadPool = ThreadUtils.newDaemonFixedThreadExecutor("AsyncTaskStateCheckThreadPool",
-                masterConfig.getMasterAsyncTaskStateCheckThreadPoolSize());
         while (RUNNING_FLAG.get()) {
             AsyncTaskExecutionContext asyncTaskExecutionContext;
             try {
@@ -75,11 +67,10 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                 break;
             }
             final TaskExecutionContext taskExecutionContext = asyncTaskExecutionContext.getTaskExecutionContext();
-            try (
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext = LogUtils.setWorkflowAndTaskInstanceIDMDC(
-                            taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTaskInstanceId());
-                    LogUtils.MDCAutoClosableContext mdcAutoClosableContext1 =
-                            LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath())) {
+            try {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskExecutionContext.getProcessInstanceId(),
+                        taskExecutionContext.getTaskInstanceId());
+                LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
 
                 if (MasterTaskExecutionContextHolder
                         .getTaskExecutionContext(taskExecutionContext.getTaskInstanceId()) == null) {
@@ -87,7 +78,7 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                             "Cannot find the taskInstance from TaskExecutionContextCacheManager, the task may already been killed, will stop the async master task");
                     continue;
                 }
-                asyncTaskStateCheckThreadPool.submit(() -> {
+                masterAsyncTaskExecutorThreadPool.getThreadPool().execute(() -> {
                     final AsyncTaskExecuteFunction asyncTaskExecuteFunction =
                             asyncTaskExecutionContext.getAsyncTaskExecuteFunction();
                     final AsyncTaskCallbackFunction asyncTaskCallbackFunction =
@@ -118,6 +109,9 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
                         LogUtils.removeTaskInstanceIdMDC();
                     }
                 });
+            } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
         log.info("AsyncMasterTaskDelayQueueLooper closed...");
@@ -129,8 +123,5 @@ public class AsyncMasterTaskDelayQueueLooper extends BaseDaemonThread implements
             log.warn("The AsyncMasterTaskDelayQueueLooper is not started, will not close");
             return;
         }
-        log.info("AsyncMasterTaskDelayQueueLooper closing...");
-        asyncTaskStateCheckThreadPool.shutdown();
-        log.info("AsyncMasterTaskDelayQueueLooper closed...");
     }
 }

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -273,6 +274,8 @@ public class FlinkArgsUtils {
             args.add(others);
         }
 
+        // determine yarn queue
+        determinedYarnQueue(args, flinkParameters, deployMode, flinkVersion);
         ProgramType programType = flinkParameters.getProgramType();
         String mainClass = flinkParameters.getMainClass();
         if (programType != null && programType != ProgramType.PYTHON && StringUtils.isNotEmpty(mainClass)) {
@@ -286,7 +289,8 @@ public class FlinkArgsUtils {
             if (ProgramType.PYTHON == programType) {
                 args.add(FlinkConstants.FLINK_PYTHON);
             }
-            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            args.add(resourceContext.getResourceItem(mainJar.getResourceName()).getResourceAbsolutePathInLocal());
         }
 
         String mainArgs = flinkParameters.getMainArgs();
@@ -295,8 +299,6 @@ public class FlinkArgsUtils {
             args.add(ParameterUtils.convertParameterPlaceholders(mainArgs, ParameterUtils.convert(paramsMap)));
         }
 
-        // determine yarn queue
-        determinedYarnQueue(args, flinkParameters, deployMode, flinkVersion);
         return args;
     }
 
@@ -310,8 +312,10 @@ public class FlinkArgsUtils {
                 } else {
                     doAddQueue(args, flinkParameters, FlinkConstants.FLINK_YARN_QUEUE_FOR_MODE);
                 }
+                break;
             case APPLICATION:
                 doAddQueue(args, flinkParameters, FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS);
+                break;
         }
     }
 
@@ -323,9 +327,11 @@ public class FlinkArgsUtils {
                 switch (option) {
                     case FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS:
                         args.add(String.format(FlinkConstants.FLINK_YARN_QUEUE_FOR_TARGETS + "=%s", yarnQueue));
+                        break;
                     case FlinkConstants.FLINK_YARN_QUEUE_FOR_MODE:
                         args.add(FlinkConstants.FLINK_YARN_QUEUE_FOR_MODE);
                         args.add(yarnQueue);
+                        break;
                 }
             }
         }

@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -51,20 +52,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.Config;
 
+@Slf4j
 public class SparkTask extends AbstractYarnTask {
 
-    /**
-     * spark parameters
-     */
     private SparkParameters sparkParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     public SparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -88,13 +86,8 @@ public class SparkTask extends AbstractYarnTask {
         log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
     }
 
-    /**
-     * create command
-     *
-     * @return command
-     */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         /**
          * (1) spark-submit [options] <app jar | python file> [app arguments]
          * (2) spark-sql [options] -f <filename>
@@ -116,14 +109,12 @@ public class SparkTask extends AbstractYarnTask {
         args.addAll(populateSparkOptions());
 
         // replace placeholder
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        String command =
-                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
-
-        log.info("spark task command: {}", command);
-
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     /**
@@ -189,7 +180,8 @@ public class SparkTask extends AbstractYarnTask {
 
         ResourceInfo mainJar = sparkParameters.getMainJar();
         if (programType != ProgramType.SQL) {
-            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            args.add(resourceContext.getResourceItem(mainJar.getResourceName()).getResourceAbsolutePathInLocal());
         }
 
         String mainArgs = sparkParameters.getMainArgs();
@@ -210,8 +202,10 @@ public class SparkTask extends AbstractYarnTask {
 
                 try {
                     resourceFileName = resourceInfos.get(0).getResourceName();
+                    ResourceContext resourceContext = taskExecutionContext.getResourceContext();
                     sqlContent = FileUtils.readFileToString(
-                            new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                            new File(
+                                    resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                             StandardCharsets.UTF_8);
                 } catch (IOException e) {
                     log.error("read sql content from file {} error ", resourceFileName, e);

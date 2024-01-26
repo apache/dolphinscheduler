@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
@@ -39,7 +40,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -84,7 +84,7 @@ public class JavaTaskTest {
         String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
         JavaTask javaTask = runJarType();
         Assertions.assertEquals(javaTask.buildJarCommand(), homeBinPath
-                + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+                + "java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -106,7 +106,7 @@ public class JavaTaskTest {
                 Files.delete(path);
             }
             Assertions.assertEquals(homeBinPath
-                    + "javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
+                    + "javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
                     javaTask.buildJavaCompileCommand(sourceCode));
         } finally {
             Path path = Paths.get(fileName);
@@ -125,7 +125,7 @@ public class JavaTaskTest {
     @Test
     public void buildJavaCommand() throws Exception {
         String wantJavaCommand =
-                "${JAVA_HOME}/bin/javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m";
+                "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m";
         JavaTask javaTask = runJavaType();
         String sourceCode = javaTask.buildJavaSourceContent();
         String publicClassName = javaTask.getPublicClassName(sourceCode);
@@ -212,9 +212,7 @@ public class JavaTaskTest {
         javaParameters.setJvmArgs("-xms:50m");
         javaParameters.setMainArgs("-host 127.0.0.1 -port 8080");
         ResourceInfo resourceJar = new ResourceInfo();
-        resourceJar.setId(2);
         resourceJar.setResourceName("/opt/share/jar/resource2.jar");
-        resourceJar.setRes("I'm resource2.jar");
         ArrayList<ResourceInfo> resourceInfoArrayList = new ArrayList<>();
         resourceInfoArrayList.add(resourceJar);
         javaParameters.setResourceList(resourceInfoArrayList);
@@ -236,9 +234,7 @@ public class JavaTaskTest {
         property.setType(VARCHAR);
         javaParameters.setLocalParams(localParams);
         ResourceInfo mainJar = new ResourceInfo();
-        mainJar.setId(1);
         mainJar.setResourceName("/opt/share/jar/main.jar");
-        mainJar.setRes("I'm main.jar");
         javaParameters.setMainJar(mainJar);
         return javaParameters;
     }
@@ -253,11 +249,23 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAVA)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
-        HashMap<String, String> map = new HashMap<>();
-        map.put("/opt/share/jar/resource2.jar", "opt/share/jar/resource2.jar");
-        map.put("/opt/share/jar/main.jar", "opt/share/jar/main.jar");
-        map.put("/JavaTaskTest.java", "JavaTaskTest.java");
-        taskExecutionContext.setResources(map);
+        ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
+        resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
+        resourceItem1.setResourceAbsolutePathInLocal("opt/share/jar/resource2.jar");
+
+        ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
+        resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
+        resourceItem2.setResourceAbsolutePathInLocal("opt/share/jar/main.jar");
+
+        ResourceContext.ResourceItem resourceItem3 = new ResourceContext.ResourceItem();
+        resourceItem2.setResourceAbsolutePathInStorage("/JavaTaskTest.java");
+        resourceItem2.setResourceAbsolutePathInLocal("JavaTaskTest.java");
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem1);
+        resourceContext.addResourceItem(resourceItem2);
+        resourceContext.addResourceItem(resourceItem3);
+        taskExecutionContext.setResourceContext(resourceContext);
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;
@@ -268,15 +276,24 @@ public class JavaTaskTest {
      *
      *  @return JavaTask
      **/
-    public JavaTask runJarType() {
+    private JavaTask runJarType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskParams(JSONUtils.toJsonString(createJavaParametersObject(RUN_TYPE_JAR)));
         taskExecutionContext.setExecutePath("/tmp/dolphinscheduler/test/executepath");
         taskExecutionContext.setTaskAppId("runJavaType");
-        HashMap<String, String> map = new HashMap<>();
-        map.put("/opt/share/jar/resource2.jar", "opt/share/jar/resource2.jar");
-        map.put("/opt/share/jar/main.jar", "opt/share/jar/main.jar");
-        taskExecutionContext.setResources(map);
+        ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
+        resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
+        resourceItem1.setResourceAbsolutePathInLocal("opt/share/jar/resource2.jar");
+
+        ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
+        resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
+        resourceItem2.setResourceAbsolutePathInLocal("opt/share/jar/main.jar");
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem1);
+        resourceContext.addResourceItem(resourceItem2);
+        taskExecutionContext.setResourceContext(resourceContext);
+
         JavaTask javaTask = new JavaTask(taskExecutionContext);
         javaTask.init();
         return javaTask;

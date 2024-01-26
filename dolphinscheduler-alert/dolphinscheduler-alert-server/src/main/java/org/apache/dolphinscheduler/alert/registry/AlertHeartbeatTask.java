@@ -18,10 +18,14 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -36,14 +40,18 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
     private final AlertConfig alertConfig;
     private final Integer processId;
     private final RegistryClient registryClient;
+
+    private final MetricsProvider metricsProvider;
     private final String heartBeatPath;
     private final long startupTime;
 
     public AlertHeartbeatTask(AlertConfig alertConfig,
+                              MetricsProvider metricsProvider,
                               RegistryClient registryClient) {
-        super("AlertHeartbeatTask", alertConfig.getHeartbeatInterval().toMillis());
+        super("AlertHeartbeatTask", alertConfig.getMaxHeartbeatInterval().toMillis());
         this.startupTime = System.currentTimeMillis();
         this.alertConfig = alertConfig;
+        this.metricsProvider = metricsProvider;
         this.registryClient = registryClient;
         this.heartBeatPath =
                 RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.getAlertServerAddress();
@@ -52,14 +60,17 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
 
     @Override
     public AlertServerHeartBeat getHeartBeat() {
+        SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
         return AlertServerHeartBeat.builder()
                 .processId(processId)
                 .startupTime(startupTime)
                 .reportTime(System.currentTimeMillis())
-                .cpuUsage(OSUtils.cpuUsagePercentage())
-                .memoryUsage(OSUtils.memoryUsagePercentage())
-                .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
-                .alertServerAddress(alertConfig.getAlertServerAddress())
+                .cpuUsage(systemMetrics.getTotalCpuUsedPercentage())
+                .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
+                .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .serverStatus(ServerStatus.NORMAL)
+                .host(NetUtils.getHost())
+                .port(alertConfig.getPort())
                 .build();
     }
 

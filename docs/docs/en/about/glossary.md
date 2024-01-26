@@ -61,7 +61,7 @@ process fails and ends
 
 - dolphinscheduler-dao provides operations such as database access.
 
-- dolphinscheduler-remote client and server based on netty
+- dolphinscheduler-extract dolphinscheduler extract module, providing master/worker/alert sdk.
 
 - dolphinscheduler-service service module, including Quartz, Zookeeper, log client access service, easy to call server
   module and api module

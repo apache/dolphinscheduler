@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.mr.MapReduceTaskConstants.
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +53,8 @@ public class MapReduceArgsUtils {
         ResourceInfo mainJar = param.getMainJar();
         if (mainJar != null) {
             args.add(JAR);
-            args.add(taskExecutionContext.getResources().get(mainJar.getResourceName()));
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            args.add(resourceContext.getResourceItem(mainJar.getResourceName()).getResourceAbsolutePathInLocal());
         }
 
         ProgramType programType = param.getProgramType();

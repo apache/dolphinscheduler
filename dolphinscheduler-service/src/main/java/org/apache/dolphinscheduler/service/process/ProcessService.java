@@ -39,7 +39,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -50,17 +49,19 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
 
     @Transactional
+    @Nullable
     ProcessInstance handleCommand(String host,
                                   Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
@@ -83,7 +84,7 @@ public interface ProcessService {
 
     void removeTaskLogFile(Integer processInstanceId);
 
-    void recurseFindSubProcess(long parentCode, List<Long> ids);
+    List<Long> findAllSubWorkflowDefinitionCode(long workflowDefinitionCode);
 
     String getTenantForProcess(String tenantCode, int userId);
 
@@ -132,8 +133,6 @@ public interface ProcessService {
 
     List<UdfFunc> queryUdfFunListByIds(Integer[] ids);
 
-    String queryTenantCodeByResName(String resName, ResourceType resourceType);
-
     List<Schedule> selectAllByProcessDefineCode(long[] codes);
 
     String queryUserQueueByProcessInstance(ProcessInstance processInstance);
@@ -145,10 +144,6 @@ public interface ProcessService {
     <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType);
 
     User getUserById(int userId);
-
-    Resource getResourceById(int resourceId);
-
-    List<Resource> listResourceByIds(Integer[] resIds);
 
     String formatTaskAppId(TaskInstance taskInstance);
 

@@ -50,5 +50,6 @@ header:
     - tools/dependencies/known-dependencies.txt
     - '**/banner.txt'
     - '.terraform.lock.hcl'
+    - deploy/kubernetes/dolphinscheduler/README.md.gotmpl
 
   comment: on-failure

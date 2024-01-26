@@ -38,7 +38,7 @@ public class OkHttpUtils {
     private static final OkHttpClient CLIENT = new OkHttpClient.Builder()
             .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
             .writeTimeout(5, TimeUnit.MINUTES) // write timeout
-            .readTimeout(5, TimeUnit.MINUTES) // read timeout
+            .readTimeout(5, TimeUnit.MINUTES)
             .build();
 
     public static @NonNull String get(@NonNull String url,
@@ -59,6 +59,7 @@ public class OkHttpUtils {
                                        @Nullable Map<String, Object> requestBodyMap) throws IOException {
         String finalUrl = addUrlParams(requestParamsMap, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
+        addHeader(httpHeaders, requestBuilder);
         if (requestBodyMap != null) {
             requestBuilder = requestBuilder.post(RequestBody.create(MediaType.parse("application/json"),
                     JSONUtils.toJsonString(requestBodyMap)));

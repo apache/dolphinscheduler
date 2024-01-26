@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.api.controller.v2;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_ACCESS_TOKEN_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.controller.BaseController;
 import org.apache.dolphinscheduler.api.dto.CreateTokenRequest;
-import org.apache.dolphinscheduler.api.dto.CreateTokenResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +65,12 @@ public class AccessTokenV2Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Parameter(name = "createTokenRequest", description = "createTokenRequest", required = true, schema = @Schema(implementation = CreateTokenRequest.class))
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public CreateTokenResponse createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<AccessToken> createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestBody CreateTokenRequest createTokenRequest) {
-        Result result = accessTokenService.createToken(loginUser,
+        AccessToken accessToken = accessTokenService.createToken(loginUser,
                 createTokenRequest.getUserId(),
                 createTokenRequest.getExpireTime(),
                 createTokenRequest.getToken());
-        return new CreateTokenResponse(result);
+        return Result.success(accessToken);
     }
 }

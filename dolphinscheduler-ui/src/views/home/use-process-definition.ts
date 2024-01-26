@@ -23,7 +23,7 @@ import type { DefinitionChartData } from './types'
 export function useProcessDefinition() {
   const getProcessDefinition = () => {
     const { state } = useAsyncState(
-      countDefinitionByUser({ projectCode: 0 }).then(
+      countDefinitionByUser({}).then(
         (res: ProcessDefinitionRes): DefinitionChartData => {
           const xAxisData = res.userList.map((item) => item.userName)
           const seriesData = res.userList.map((item) => item.count)

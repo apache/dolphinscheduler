@@ -90,12 +90,16 @@ public class RegistryClient {
                     server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
                     server.setId(masterHeartBeat.getProcessId());
+                    server.setHost(masterHeartBeat.getHost());
+                    server.setPort(masterHeartBeat.getPort());
                     break;
                 case WORKER:
                     WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
                     server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
                     server.setId(workerHeartBeat.getProcessId());
+                    server.setHost(workerHeartBeat.getHost());
+                    server.setPort(workerHeartBeat.getPort());
                     break;
                 case ALERT_SERVER:
                     AlertServerHeartBeat alertServerHeartBeat =
@@ -103,16 +107,16 @@ public class RegistryClient {
                     server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
                     server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
                     server.setId(alertServerHeartBeat.getProcessId());
+                    server.setHost(alertServerHeartBeat.getHost());
+                    server.setPort(alertServerHeartBeat.getPort());
+                    break;
+                default:
+                    log.warn("unknown registry node type: {}", registryNodeType);
             }
 
             server.setResInfo(heartBeatJson);
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
             server.setZkDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
-            // set host and port
-            String[] hostAndPort = serverPath.split(Constants.COLON);
-            // fetch the last one
-            server.setHost(hostAndPort[0]);
-            server.setPort(Integer.parseInt(hostAndPort[1]));
             serverList.add(server);
         }
         return serverList;
@@ -206,11 +210,11 @@ public class RegistryClient {
     }
 
     public boolean isMasterPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath());
+        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath());
+        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public Collection<String> getChildrenKeys(final String key) {
@@ -234,5 +238,4 @@ public class RegistryClient {
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {
         return getChildrenKeys(nodeType.getRegistryPath());
     }
-
 }

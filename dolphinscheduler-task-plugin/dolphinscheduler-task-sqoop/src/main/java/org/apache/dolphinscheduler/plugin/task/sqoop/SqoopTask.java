@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.SqoopJobGenerator;
@@ -30,19 +29,16 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * sqoop task extends the shell task
  */
+@Slf4j
 public class SqoopTask extends AbstractYarnTask {
 
-    /**
-     * sqoop task params
-     */
     private SqoopParameters sqoopParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
@@ -72,17 +68,16 @@ public class SqoopTask extends AbstractYarnTask {
     }
 
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
+        return generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+    }
 
-        String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
-        log.info("sqoop script: {}", resultScripts);
-        return resultScripts;
-
+    @Override
+    protected Map<String, String> getProperties() {
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     @Override

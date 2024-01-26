@@ -16,9 +16,9 @@
  */
 
 export default {
-  task_state_statistics: '任务状态统计',
-  process_state_statistics: '流程状态统计',
-  process_definition_statistics: '流程定义统计',
+  task_state_statistics: '任务实例状态统计',
+  process_state_statistics: '工作流实例状态统计',
+  process_definition_statistics: '工作流定义统计',
   number: '数量',
   state: '状态',
   submitted_success: '提交成功',
@@ -38,5 +38,6 @@ export default {
   serial_wait: '串行等待',
   dispatch: '派发',
   ready_block: '准备阻断',
-  block: '阻断'
+  block: '阻断',
+  wait_to_run: '等待执行'
 }

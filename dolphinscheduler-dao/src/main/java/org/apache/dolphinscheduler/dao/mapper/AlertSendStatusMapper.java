@@ -27,7 +27,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface AlertSendStatusMapper extends BaseMapper<AlertSendStatus> {
 
-    int batchInsert(List<AlertSendStatus> alertSendStatuses);
+    int batchInsert(@Param("alertSendStatuses") List<AlertSendStatus> alertSendStatuses);
 
     void deleteByAlertIds(@Param("alertIds") List<Integer> alertIds);
 }

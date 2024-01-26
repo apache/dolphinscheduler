@@ -20,12 +20,16 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRpcClient;
+import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
@@ -72,12 +76,18 @@ public class MasterServer implements IStoppable {
     private FailoverExecuteThread failoverExecuteThread;
 
     @Autowired
-    private MasterRPCServer masterRPCServer;
+    private MasterRpcServer masterRPCServer;
 
     @Autowired
-    private MasterRpcClient masterRpcClient;
+    private MetricsProvider metricsProvider;
+
+    @Autowired
+    private MasterSlotManager masterSlotManager;
 
     public static void main(String[] args) {
+        MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         SpringApplication.run(MasterServer.class);
     }
@@ -89,10 +99,11 @@ public class MasterServer implements IStoppable {
     public void run() throws SchedulerException {
         // init rpc server
         this.masterRPCServer.start();
-        this.masterRpcClient.start();
 
         // install task plugin
         this.taskPluginManager.loadPlugin();
+
+        this.masterSlotManager.start();
 
         // self tolerant
         this.masterRegistryClient.start();
@@ -104,6 +115,19 @@ public class MasterServer implements IStoppable {
         this.failoverExecuteThread.start();
 
         this.schedulerApi.start();
+
+        MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getTotalCpuUsedPercentage();
+        });
+        MasterServerMetrics.registerMasterMemoryAvailableGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return (systemMetrics.getSystemMemoryMax() - systemMetrics.getSystemMemoryUsed()) / 1024.0 / 1024 / 1024;
+        });
+        MasterServerMetrics.registerMasterMemoryUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getJvmMemoryUsedPercentage();
+        });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!ServerLifeCycleManager.isStopped()) {
@@ -129,8 +153,7 @@ public class MasterServer implements IStoppable {
         try (
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
-                MasterRPCServer closedRpcServer = masterRPCServer;
-                MasterRpcClient closedRpcClient = masterRpcClient;
+                MasterRpcServer closedRpcServer = masterRPCServer;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
