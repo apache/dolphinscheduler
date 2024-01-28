@@ -828,5 +828,37 @@
                 <docker.push.skip>false</docker.push.skip>
             </properties>
         </profile>
+        <profile>
+            <id>helm-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>helm-doc</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>--rm</argument>
+                                        <argument>--volume</argument>
+                                        <argument>${project.basedir}/deploy/kubernetes:/helm-docs</argument>
+                                        <argument>jnorwood/helm-docs:v1.11.3</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>

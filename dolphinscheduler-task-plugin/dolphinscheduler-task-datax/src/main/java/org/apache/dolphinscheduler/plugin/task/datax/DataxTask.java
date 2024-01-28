@@ -56,6 +56,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.expr.SQLPropertyExpr;
@@ -68,6 +70,7 @@ import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class DataxTask extends AbstractTask {
 
     /**
@@ -125,8 +128,7 @@ public class DataxTask extends AbstractTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
 
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext, log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     /**

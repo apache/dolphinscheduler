@@ -44,16 +44,14 @@ import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.IMasterLogService;
+import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.worker.IStreamingTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
-import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceKillResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -381,17 +379,11 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return;
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
-            // delete log
-            if (StringUtils.isNotEmpty(taskInstance.getLogPath())) {
-                if (TaskUtils.isLogicTask(taskInstance.getTaskType())) {
-                    IMasterLogService masterLogService = SingletonJdkDynamicRpcClientProxyFactory
-                            .getProxyClient(taskInstance.getHost(), IMasterLogService.class);
-                    masterLogService.removeLogicTaskInstanceLog(taskInstance.getLogPath());
-                } else {
-                    IWorkerLogService workerLogService = SingletonJdkDynamicRpcClientProxyFactory
-                            .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
-                    workerLogService.removeTaskInstanceLog(taskInstance.getLogPath());
-                }
+            if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
+                ILogService iLogService =
+                        SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(),
+                                ILogService.class);
+                iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
             }
         }
 

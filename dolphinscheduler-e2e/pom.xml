@@ -119,7 +119,7 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
-                <version>1.18.3</version>
+                <version>1.19.3</version>
                 <scope>import</scope>
                 <type>pom</type>
             </dependency>

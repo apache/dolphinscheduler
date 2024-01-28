@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.Resource;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.junit.jupiter.api.Assertions;
@@ -163,7 +163,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("pageNo", "1");
         paramsMap.add("pageSize", "30");
 
-        PageInfo<Resource> pageInfo = new PageInfo<>(1, 10);
+        PageInfo<Schedule> pageInfo = new PageInfo<>(1, 10);
         Result mockResult = Result.success(pageInfo);
 
         Mockito.when(schedulerService.querySchedule(isA(User.class), isA(Long.class), isA(Long.class),

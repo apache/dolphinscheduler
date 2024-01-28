@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -122,4 +123,18 @@ public class DorisDataSourceProcessorTest {
                     dorisDatasourceProcessor.getDatasourceUniqueId(dorisConnectionParam, DbType.DORIS));
         }
     }
+
+    @Test
+    public void splitAndRemoveComment() {
+        String sql =
+                "set enable_unique_key_partial_update = true;\r\n\r\n" +
+                        "insert into demo.table\r\n(age,name)\r\nselect 1, 'tom';\r\n\r\n" +
+                        "set enable_unique_key_partial_update = false;\r\n\r\n\r\n";
+        List<String> sqls = dorisDatasourceProcessor.splitAndRemoveComment(sql);
+        Assertions.assertEquals(3, sqls.size());
+        Assertions.assertEquals("set enable_unique_key_partial_update = true", sqls.get(0));
+        Assertions.assertEquals("insert into demo.table\r\n(age,name)\r\nselect 1, 'tom'", sqls.get(1));
+        Assertions.assertEquals("set enable_unique_key_partial_update = false", sqls.get(2));
+    }
+
 }

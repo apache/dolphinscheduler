@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hana.provider;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.apache.dolphinscheduler.plugin.datasource.api.provider.JDBCDataSourceProvider;
 import org.apache.dolphinscheduler.plugin.datasource.hana.param.HanaConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,25 +28,27 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.zaxxer.hikari.HikariDataSource;
+
 @ExtendWith(MockitoExtension.class)
-public class JDBCDataSourceProviderTest {
+class JDBCDataSourceProviderTest {
 
     @Test
-    public void testCreateJdbcDataSource() {
+    void testCreateJdbcDataSource() {
         try (
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
             HikariDataSource dataSource = Mockito.mock(HikariDataSource.class);
             mockedJDBCDataSourceProvider
-                    .when(() -> JDBCDataSourceProvider.createJdbcDataSource(Mockito.any(), Mockito.any()))
+                    .when(() -> JDBCDataSourceProvider.createOneSessionJdbcDataSource(Mockito.any(), Mockito.any()))
                     .thenReturn(dataSource);
             Assertions.assertNotNull(
-                    JDBCDataSourceProvider.createJdbcDataSource(new HanaConnectionParam(), DbType.HANA));
+                    JDBCDataSourceProvider.createOneSessionJdbcDataSource(new HanaConnectionParam(), DbType.HANA));
         }
     }
 
     @Test
-    public void testCreateOneSessionJdbcDataSource() {
+    void testCreateOneSessionJdbcDataSource() {
         try (
                 MockedStatic<JDBCDataSourceProvider> mockedJDBCDataSourceProvider =
                         Mockito.mockStatic(JDBCDataSourceProvider.class)) {
