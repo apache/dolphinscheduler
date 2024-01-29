@@ -4,6 +4,8 @@ Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务
 
 如果你是新手，想要体验 DolphinScheduler 的功能，推荐使用[Standalone](standalone.md)方式体检。如果你想体验更完整的功能，或者更大的任务量，推荐使用[伪集群部署](pseudo-cluster.md)。如果你是在生产中使用，推荐使用[集群部署](cluster.md)或者[kubernetes](kubernetes.md)
 
+> **提示**: 您也可以尝试使用[DolphinScheduler K8S Operator](https://github.com/apache/dolphinscheduler-operator)，目前处于 alpha1 阶段
+
 ## 先决条件
 
 - [Helm](https://helm.sh/) 3.1.0+

@@ -34,15 +34,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AuditLogMapperTest extends BaseDaoTest {
 
     @Autowired
-    AuditLogMapper logMapper;
+    private AuditLogMapper logMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
 
-    /**
-     * insert
-     * @return
-     */
     private void insertOne(AuditResourceType resourceType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);
@@ -84,7 +80,8 @@ public class AuditLogMapperTest extends BaseDaoTest {
         String resourceNameByUser = logMapper.queryResourceNameByType(AuditResourceType.USER_MODULE.getMsg(), 1);
         Assertions.assertEquals("admin", resourceNameByUser);
         Project project = insertProject();
-        String resourceNameByProject = logMapper.queryResourceNameByType(AuditResourceType.PROJECT_MODULE.getMsg(), 1);
+        String resourceNameByProject =
+                logMapper.queryResourceNameByType(AuditResourceType.PROJECT_MODULE.getMsg(), project.getId());
         Assertions.assertEquals(project.getName(), resourceNameByProject);
         int delete = projectMapper.deleteById(project.getId());
         Assertions.assertEquals(delete, 1);
