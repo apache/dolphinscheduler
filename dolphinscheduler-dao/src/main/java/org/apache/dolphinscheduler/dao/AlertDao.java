@@ -49,26 +49,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 @Component
+@Slf4j
 public class AlertDao {
 
-    /**
-     * logger of AlertDao
-     */
-    private static final Logger logger = LoggerFactory.getLogger(AlertDao.class);
-
-    private static final int QUERY_ALERT_THRESHOLD = 100;
+    @Value("${alert.query_alert_threshold:100}")
+    private Integer QUERY_ALERT_THRESHOLD;
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
@@ -93,14 +89,14 @@ public class AlertDao {
      */
     public int addAlert(Alert alert) {
         if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
-            logger.warn("the value of alertGroupId is null or 0 ");
+            log.warn("the value of alertGroupId is null or 0 ");
             return 0;
         }
 
         String sign = generateSign(alert);
         alert.setSign(sign);
         int count = alertMapper.insert(alert);
-        logger.info("add alert to db , alert: {}", alert);
+        log.info("add alert to db , alert: {}", alert);
         return count;
     }
 
@@ -282,7 +278,7 @@ public class AlertDao {
     }
 
     public List<Alert> listAlerts(int processInstanceId) {
-        LambdaQueryWrapper<Alert> wrapper = new QueryWrapper<>(new Alert()).lambda()
+        LambdaQueryWrapper<Alert> wrapper = new LambdaQueryWrapper<Alert>()
                 .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
     }
@@ -332,5 +328,21 @@ public class AlertDao {
 
     public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
         this.crashAlarmSuppression = crashAlarmSuppression;
+    }
+
+    public void deleteByWorkflowInstanceId(Integer processInstanceId) {
+        if (processInstanceId == null) {
+            return;
+        }
+        List<Alert> alertList = alertMapper.selectByWorkflowInstanceId(processInstanceId);
+        if (CollectionUtils.isEmpty(alertList)) {
+            return;
+        }
+        alertMapper.deleteByWorkflowInstanceId(processInstanceId);
+        List<Integer> alertIds = alertList
+                .stream()
+                .map(Alert::getId)
+                .collect(Collectors.toList());
+        alertSendStatusMapper.deleteByAlertIds(alertIds);
     }
 }

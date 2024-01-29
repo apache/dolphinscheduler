@@ -28,14 +28,15 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -53,7 +54,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         ClickHouseDataSourceParamDTO clickHouseDatasourceParamDTO = new ClickHouseDataSourceParamDTO();
         clickHouseDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         clickHouseDatasourceParamDTO.setUserName(connectionParams.getUser());
-        clickHouseDatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
+        clickHouseDatasourceParamDTO.setOther(connectionParams.getOther());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
@@ -78,8 +79,7 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         clickhouseConnectionParam.setPassword(PasswordUtils.encodePassword(clickHouseParam.getPassword()));
         clickhouseConnectionParam.setDriverClassName(getDatasourceDriver());
         clickhouseConnectionParam.setValidationQuery(getValidationQuery());
-        clickhouseConnectionParam.setOther(transformOther(clickHouseParam.getOther()));
-        clickhouseConnectionParam.setProps(clickHouseParam.getOther());
+        clickhouseConnectionParam.setOther(clickHouseParam.getOther());
         return clickhouseConnectionParam;
     }
 
@@ -102,8 +102,8 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         ClickHouseConnectionParam clickhouseConnectionParam = (ClickHouseConnectionParam) connectionParam;
         String jdbcUrl = clickhouseConnectionParam.getJdbcUrl();
-        if (!StringUtils.isEmpty(clickhouseConnectionParam.getOther())) {
-            jdbcUrl = String.format("%s?%s", jdbcUrl, clickhouseConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(clickhouseConnectionParam.getOther())) {
+            jdbcUrl = String.format("%s?%s", jdbcUrl, transformOther(clickhouseConnectionParam.getOther()));
         }
         return jdbcUrl;
     }
@@ -127,24 +127,18 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
         return new ClickHouseDataSourceProcessor();
     }
 
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.clickhouse);
+    }
+
     private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s%s", key, value, "&")));
-        return stringBuilder.toString();
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join("&", otherList);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        String[] configs = other.split("&");
-        for (String config : configs) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

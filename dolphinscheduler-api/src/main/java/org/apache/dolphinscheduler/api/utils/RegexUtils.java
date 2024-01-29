@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  */
 public class RegexUtils {
 
-    private static final String LINUX_USERNAME_PATTERN = "^[a-zA-Z0-9_].{0,30}";
+    private static final Pattern LINUX_USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_].{0,30}");
 
     private RegexUtils() {
     }
@@ -37,8 +37,7 @@ public class RegexUtils {
      * @return boolean
      */
     public static boolean isValidLinuxUserName(String str) {
-        Pattern pattern = Pattern.compile(LINUX_USERNAME_PATTERN);
-        return pattern.matcher(str).matches();
+        return LINUX_USERNAME_PATTERN.matcher(str).matches();
     }
 
     public static String escapeNRT(String str) {

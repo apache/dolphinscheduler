@@ -17,19 +17,21 @@
 
 package org.apache.dolphinscheduler.api;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,9 +43,8 @@ import org.springframework.context.event.EventListener;
 @ServletComponentScan
 @SpringBootApplication
 @ComponentScan("org.apache.dolphinscheduler")
+@Slf4j
 public class ApiApplicationServer {
-
-    private final Logger logger = LoggerFactory.getLogger(ApiApplicationServer.class);
 
     @Autowired
     private TaskPluginManager taskPluginManager;
@@ -52,12 +53,14 @@ public class ApiApplicationServer {
     private PluginDao pluginDao;
 
     public static void main(String[] args) {
+        ApiServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         SpringApplication.run(ApiApplicationServer.class);
     }
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
-        logger.info("Received spring application context ready event will load taskPlugin and write to DB");
+        log.info("Received spring application context ready event will load taskPlugin and write to DB");
         // install task plugin
         taskPluginManager.loadPlugin();
         for (Map.Entry<String, TaskChannelFactory> entry : taskPluginManager.getTaskChannelFactoryMap().entrySet()) {

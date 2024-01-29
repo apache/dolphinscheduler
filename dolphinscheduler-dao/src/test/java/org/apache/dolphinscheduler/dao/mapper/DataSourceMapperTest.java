@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static java.util.stream.Collectors.toList;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
@@ -126,7 +125,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         Map<Integer, DataSource> datasourceMap = createDataSourceMap(userId, "test");
 
         List<DataSource> actualDataSources = dataSourceMapper.queryDataSourceByType(
-                0, DbType.MYSQL.ordinal(), Constants.TEST_FLAG_NO);
+                0, DbType.MYSQL.ordinal());
 
         Assertions.assertTrue(actualDataSources.size() >= 2);
 
@@ -272,6 +271,38 @@ public class DataSourceMapperTest extends BaseDaoTest {
                 .containsAll(Arrays.asList(dataSourceIds)));
     }
 
+    @Test
+    public void testSelectPagingByIds() {
+        User user1 = createGeneralUser("user1");
+        User user2 = createGeneralUser("user2");
+        DataSource dataSource1ForUser1 = createDataSource(user1.getId(), "dataSource1ForUser1");
+        DataSource dataSource2ForUser2 = createDataSource(user2.getId(), "dataSource2ForUser2");
+        DataSource dataSource3ForUser1 = createDataSource(user1.getId(), dataSource1ForUser1.getName() + "test");
+
+        // select without conditions
+        Page page = new Page(0, 4);
+        List<DataSource> actualDataSources = dataSourceMapper.selectPagingByIds(page, null, null).getRecords();
+        Assertions.assertEquals(3, actualDataSources.size());
+        Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
+                .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId(),
+                        dataSource3ForUser1.getId())));
+
+        // select with name
+        actualDataSources = dataSourceMapper.selectPagingByIds(page, null, dataSource1ForUser1.getName()).getRecords();
+        Assertions.assertEquals(2, actualDataSources.size());
+        Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
+                .containsAll(Arrays.asList(dataSource1ForUser1.getId(), dataSource3ForUser1.getId())));
+
+        // select with dataSourceIds and name
+        actualDataSources = dataSourceMapper
+                .selectPagingByIds(page, Arrays.asList(dataSource1ForUser1.getId(), dataSource2ForUser2.getId()),
+                        dataSource1ForUser1.getName())
+                .getRecords();
+        Assertions.assertEquals(1, actualDataSources.size());
+        Assertions.assertTrue(actualDataSources.stream().map(t -> t.getId()).collect(toList())
+                .containsAll(Arrays.asList(dataSource1ForUser1.getId())));
+    }
+
     /**
      * create datasource relation
      * @param userId
@@ -348,7 +379,6 @@ public class DataSourceMapperTest extends BaseDaoTest {
         dataSource.setType(DbType.MYSQL);
         dataSource.setNote("mysql test");
         dataSource.setConnectionParams("hello mysql");
-        dataSource.setTestFlag(Constants.TEST_FLAG_NO);
         dataSource.setUpdateTime(DateUtils.getCurrentDate());
         dataSource.setCreateTime(DateUtils.getCurrentDate());
 

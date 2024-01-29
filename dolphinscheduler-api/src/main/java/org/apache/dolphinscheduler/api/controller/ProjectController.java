@@ -27,7 +27,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROJECT_DETAILS
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROJECT_ERROR;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -35,8 +34,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -62,9 +61,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "PROJECT_TAG")
 @RestController
 @RequestMapping("projects")
+@Slf4j
 public class ProjectController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
 
     @Autowired
     private ProjectService projectService;
@@ -85,7 +83,6 @@ public class ProjectController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
@@ -105,19 +102,16 @@ public class ProjectController extends BaseController {
     @Parameters({
             @Parameter(name = "code", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "123456")),
             @Parameter(name = "projectName", description = "PROJECT_NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "PROJECT_DESC", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "description", description = "PROJECT_DESC", schema = @Schema(implementation = String.class))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result updateProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code,
                                 @RequestParam("projectName") String projectName,
-                                @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "userName") String userName) {
-        return projectService.update(loginUser, code, projectName, description, userName);
+                                @RequestParam(value = "description", required = false) String description) {
+        return projectService.update(loginUser, code, projectName, description);
     }
 
     /**
@@ -134,7 +128,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_PROJECT_DETAILS_BY_CODE_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable("code") long code) {
         return projectService.queryByCode(loginUser, code);
@@ -158,20 +151,14 @@ public class ProjectController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "searchVal", required = false) String searchVal,
                                          @RequestParam("pageSize") Integer pageSize,
                                          @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            logger.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
-        return result;
+        return projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
     }
 
     /**
@@ -194,21 +181,16 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/project-with-authorized-level-list-paging")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectWithAuthorizedLevelListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                             @RequestParam("userId") Integer userId,
                                                             @RequestParam(value = "searchVal", required = false) String searchVal,
                                                             @RequestParam("pageSize") Integer pageSize,
                                                             @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
+        return projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
                 searchVal);
-        return result;
     }
 
     /**
@@ -225,7 +207,6 @@ public class ProjectController extends BaseController {
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result deleteProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code) {
         return projectService.deleteProject(loginUser, code);
@@ -236,7 +217,7 @@ public class ProjectController extends BaseController {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return the projects which user have not permission to see
+     * @return the projects which user have no permission to see
      */
     @Operation(summary = "queryUnauthorizedProject", description = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @Parameters({
@@ -245,7 +226,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/unauth-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_PROJECT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryUnauthorizedProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("userId") Integer userId) {
         return projectService.queryUnauthorizedProject(loginUser, userId);
@@ -265,7 +245,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/authed-project")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAuthorizedProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("userId") Integer userId) {
         return projectService.queryAuthorizedProject(loginUser, userId);
@@ -285,7 +264,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/project-with-authorized-level")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_PROJECT)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectWithAuthorizedLevel(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @RequestParam("userId") Integer userId) {
         return projectService.queryProjectWithAuthorizedLevel(loginUser, userId);
@@ -305,7 +283,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/authed-user")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_USER)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAuthorizedUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("projectCode") Long projectCode) {
         return projectService.queryAuthorizedUser(loginUser, projectCode);
@@ -321,7 +298,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/created-and-authed")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_AND_USER_CREATED_PROJECT_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryProjectCreatedAndAuthorizedByUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
     }
@@ -336,7 +312,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProjectList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return projectService.queryAllProjectList(loginUser);
     }
@@ -351,7 +326,6 @@ public class ProjectController extends BaseController {
     @GetMapping(value = "/list-dependent")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
     public Result queryAllProjectListForDependent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         return projectService.queryAllProjectListForDependent();
     }

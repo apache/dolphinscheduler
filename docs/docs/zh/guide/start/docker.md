@@ -1,13 +1,14 @@
 # Docker 快速使用教程
 
-本教程使用三种不同的方式通过 Docker 完成 DolphinScheduler 的部署，如果你想要快速体验，推荐使用 standalone-server 镜像，
-如果你想要体验比较完成的服务，推荐使用 docker-compose 启动服务。如果你已经有自己的数据库或者 Zookeeper 服务
-你想要沿用这些基础服务，你可以参考沿用已有的 PostgreSQL 和 ZooKeeper 服务完成部署。
+本教程使用三种不同的方式通过 Docker 完成 DolphinScheduler 的部署
+
+- 如果你想要快速体验，推荐使用 standalone-server 镜像，
+- 如果你想要体验比较完成的服务，推荐使用 docker-compose 启动服务.
+- 如果你已经有自己的数据库或者 Zookeeper 服务你想要沿用这些基础服务，你可以参考沿用已有的 PostgreSQL 和 ZooKeeper 服务完成部署。
 
 ## 前置条件
 
-- [Docker](https://docs.docker.com/engine/install/) 1.13.1+
-- [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
+需要安装 [Docker](https://docs.docker.com/engine/install/) 1.13.1 以上版本，以及 [Docker Compose](https://docs.docker.com/compose/) 1.28.0 以上版本。
 
 ## 启动服务
 
@@ -32,22 +33,15 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 服务重启的时候保留元数据（如需要挂载到本地路径需要做指定）。他更健壮，能保证用户体验更加完整的 DolphinScheduler 服务。这种方式需要先安装
 [docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux，Windows。
 
-安装完成 docker-compose 后我们需要修改部分配置以便能更好体验 DolphinScheduler 服务，我们需要配置不少于 4GB 的空闲内存：
-
-- Mac：点击 `Docker Desktop -> Preferences -> Resources -> Memory` 调整内存大小
-- Windows Docker Desktop：
-  - Hyper-V 模式：点击 `Docker Desktop -> Settings -> Resources -> Memory` 调整内存大小
-  - WSL 2 模式 模式：参考 [WSL 2 utility VM](https://docs.microsoft.com/zh-cn/windows/wsl/wsl-config#configure-global-options-with-wslconfig) 调整内存大小
-
-配置完成后我们需要获取 `docker-compose.yaml` 文件，通过[下载页面](/zh-cn/download/download.html)下载对应版本源码包可能是最快的方法，
-源码包对应的值为 "Total Source Code"。当下载完源码后就可以运行命令进行部署了。
+确保 docker-compose 顺利安装后，需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)
+下载对应版本源码包可能是最快的方法，当下载完源码后就可以运行命令进行部署了。
 
 ```shell
 $ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Mac Linux 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
-#  Windows 用户, `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
+# Windows 用户, `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
 
 # 如果需要初始化或者升级数据库结构，需要指定profile为schema
 $ docker-compose --profile schema up -d
@@ -56,8 +50,10 @@ $ docker-compose --profile schema up -d
 $ docker-compose --profile all up -d
 ```
 
-> 提醒：通过 docker-compose 启动服务时，除了会启动 DolphinScheduler 对应的服务外，还会启动必要依赖服务，如数据库 PostgreSQL(用户
-> `root`, 密码 `root`, 数据库 `dolphinscheduler`) 和 服务发现 ZooKeeper。
+> 提醒：安装完成 docker-compose 后需要修改部分配置以便能更好体验 DolphinScheduler 服务，我们推荐配置不少于 4GB 的空闲内存，详见
+> [How to assign more memory to docker container](https://stackoverflow.com/a/44533437/7152658).
+>
+> 通过 docker-compose 启动服务时，除了会启动 DolphinScheduler 对应的服务外，还会启动必要依赖服务，如数据库 PostgreSQL 和 服务发现 ZooKeeper
 
 ### 沿用已有的 PostgreSQL 和 ZooKeeper 服务
 
@@ -72,6 +68,7 @@ $ docker run -d --name dolphinscheduler-tools \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     --net host \
     apache/dolphinscheduler-tools:"${DOLPHINSCHEDULER_VERSION}" tools/bin/upgrade-schema.sh
 # 启动 DolphinScheduler 对应的服务
@@ -80,6 +77,7 @@ $ docker run -d --name dolphinscheduler-master \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
@@ -88,6 +86,7 @@ $ docker run -d --name dolphinscheduler-worker \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
@@ -96,6 +95,7 @@ $ docker run -d --name dolphinscheduler-api \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
@@ -104,13 +104,14 @@ $ docker run -d --name dolphinscheduler-alert-server \
     -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
+    -e SPRING_JACKSON_TIME_ZONE="UTC" \
     -e REGISTRY_ZOOKEEPER_CONNECT_STRING="localhost:2181" \
     --net host \
     -d apache/dolphinscheduler-alert-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
 > 注意：如果你本地还没有对应的数据库和 ZooKeeper 服务，但是想要尝试这个启动方式，可以先安装并启动
-> [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) 以及 [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.4.6+)
+> [PostgreSQL](https://www.postgresql.org/download/)(8.2.15+) 以及 [ZooKeeper](https://zookeeper.apache.org/releases.html)(3.8.0)
 
 ## 登录系统
 
@@ -126,4 +127,4 @@ $ docker run -d --name dolphinscheduler-alert-server \
 ## 环境变量
 
 可以通过环境变量来修改 Docker 运行的配置，我们在沿用已有的 PostgreSQL 和 ZooKeeper 服务中就通过环境变量修改了 Docker 的数据库配置和
-注册中心配置，关于全部的配置环境可以查看对应组件的 application.yaml 文件了解 <!-- markdown-link-check-disable-line -->
+注册中心配置，关于全部的配置环境可以查看对应组件的 application.yaml 文件了解。

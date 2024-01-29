@@ -21,16 +21,15 @@ import org.apache.dolphinscheduler.api.dto.FavTaskDto;
 import org.apache.dolphinscheduler.common.config.YamlPropertySourceFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
@@ -42,9 +41,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "task")
 @Getter
 @Setter
+@Slf4j
 public class TaskTypeConfiguration {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskTypeConfiguration.class);
 
     private List<String> universal;
     private List<String> cloud;
@@ -74,12 +72,12 @@ public class TaskTypeConfiguration {
     }
 
     public void printDefaultTypes() {
-        logger.info("support default universal task types: {}", universal);
-        logger.info("support default cloud task types: {}", cloud);
-        logger.info("support default logic task types: {}", logic);
-        logger.info("support default dataIntegration task types: {}", dataIntegration);
-        logger.info("support default dataQuality task types: {}", dataQuality);
-        logger.info("support default machineLearning task types: {}", machineLearning);
-        logger.info("support default other task types: {}", other);
+        log.info("support default universal task types: {}", universal);
+        log.info("support default cloud task types: {}", cloud);
+        log.info("support default logic task types: {}", logic);
+        log.info("support default dataIntegration task types: {}", dataIntegration);
+        log.info("support default dataQuality task types: {}", dataQuality);
+        log.info("support default machineLearning task types: {}", machineLearning);
+        log.info("support default other task types: {}", other);
     }
 }

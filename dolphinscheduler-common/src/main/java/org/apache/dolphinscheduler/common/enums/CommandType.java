@@ -40,6 +40,8 @@ public enum CommandType {
      * 8 pause a process
      * 9 stop a process
      * 10 recover waiting thread
+     * 11 recover serial wait
+     * 12 start a task node in a process instance
      */
     START_PROCESS(0, "start a new process"),
     START_CURRENT_TASK_PROCESS(1, "start a new process from current nodes"),
@@ -53,6 +55,8 @@ public enum CommandType {
     STOP(9, "stop a process"),
     RECOVER_WAITING_THREAD(10, "recover waiting thread"),
     RECOVER_SERIAL_WAIT(11, "recover serial wait"),
+    EXECUTE_TASK(12, "start a task node in a process instance"),
+    DYNAMIC_GENERATION(13, "dynamic generation"),
     ;
 
     CommandType(int code, String descp) {

@@ -29,6 +29,7 @@
 
     <modules>
         <module>dolphinscheduler-scheduler-api</module>
+        <module>dolphinscheduler-scheduler-all</module>
         <module>dolphinscheduler-scheduler-quartz</module>
     </modules>
 

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -30,6 +31,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 /**
  * to master/worker task transport
  */
@@ -37,6 +40,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskExecutionContext implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -65,6 +69,8 @@ public class TaskExecutionContext implements Serializable {
      * task type
      */
     private String taskType;
+
+    private String workflowInstanceHost;
 
     /**
      * host
@@ -142,11 +148,6 @@ public class TaskExecutionContext implements Serializable {
     private String tenantCode;
 
     /**
-     * task queue
-     */
-    private String queue;
-
-    /**
      * process define id
      */
     private int processDefineId;
@@ -167,17 +168,13 @@ public class TaskExecutionContext implements Serializable {
     private String taskParams;
 
     /**
-     * envFile
-     */
-    private String envFile;
-
-    /**
      * environmentConfig
      */
     private String environmentConfig;
 
     /**
      * definedParams
+     * // todo: we need to rename definedParams, prepareParamsMap, paramsMap, this is confusing
      */
     private Map<String, String> definedParams;
 
@@ -216,12 +213,6 @@ public class TaskExecutionContext implements Serializable {
      */
     private TaskExecutionStatus currentExecutionStatus;
 
-    /**
-     * Task Logger name should be like:
-     * TaskAppId=TASK-{firstSubmitTime}-{processDefineCode}_{processDefineVersion}-{processInstanceId}-{taskInstanceId}
-     */
-    private String taskLogName;
-
     private ResourceParametersHelper resourceParametersHelper;
 
     /**
@@ -237,10 +228,8 @@ public class TaskExecutionContext implements Serializable {
      * k8s TaskExecutionContext
      */
     private K8sTaskExecutionContext k8sTaskExecutionContext;
-    /**
-     * resources full name and tenant code
-     */
-    private Map<String, String> resources;
+
+    private ResourceContext resourceContext;
 
     /**
      * taskInstance varPool
@@ -270,4 +259,15 @@ public class TaskExecutionContext implements Serializable {
      * test flag
      */
     private int testFlag;
+
+    private boolean logBufferEnable;
+
+    /**
+     * dispatch fail times
+     */
+    private int dispatchFailTimes;
+
+    public void increaseDispatchFailTimes() {
+        this.dispatchFailTimes++;
+    }
 }

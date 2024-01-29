@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
+import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -46,8 +47,7 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
-                .setPlaceholder(
-                        "please enter your custom parameters, which will be passed to you when calling your script")
+                .setPlaceholder(AlertInputTips.CUSTOMIZED_PARAMS.getMsg())
                 .build();
         // need check file type and file exist
         InputParam scriptPathParam =
@@ -55,8 +55,7 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
-                        .setPlaceholder("please upload the file to the disk directory of the alert server,"
-                                + " and ensure that the path is absolute and has the corresponding access rights")
+                        .setPlaceholder(AlertInputTips.SCRIPT_PATH.getMsg())
                         .build();
 
         RadioParam scriptTypeParams = RadioParam

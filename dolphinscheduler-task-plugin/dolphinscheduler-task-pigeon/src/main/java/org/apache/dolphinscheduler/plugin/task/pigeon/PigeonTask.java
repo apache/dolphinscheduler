@@ -46,12 +46,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 /**
  * TIS DataX Task
  **/
+@Slf4j
 public class PigeonTask extends AbstractRemoteTask {
 
     public static final String KEY_POOL_VAR_PIGEON_HOST = "p_host";
@@ -73,12 +76,12 @@ public class PigeonTask extends AbstractRemoteTask {
     }
 
     @Override
-    public void init() {
+    public void init() throws TaskException {
         super.init();
-        logger.info("PIGEON task params {}", taskExecutionContext.getTaskParams());
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), PigeonParameters.class);
-        if (!parameters.checkParameters()) {
-            throw new RuntimeException("datax task params is not valid");
+        log.info("Initialize PIGEON task params {}", JSONUtils.toPrettyJsonString(parameters));
+        if (parameters == null || !parameters.checkParameters()) {
+            throw new TaskException("datax task params is not valid");
         }
     }
 
@@ -86,7 +89,7 @@ public class PigeonTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         // Trigger PIGEON DataX pipeline
-        logger.info("start execute PIGEON task");
+        log.info("start execute PIGEON task");
         long startTime = System.currentTimeMillis();
         String targetJobName = this.parameters.getTargetJobName();
         String host = getHost();
@@ -146,18 +149,18 @@ public class PigeonTask extends AbstractRemoteTask {
                     try {
                         webSocket.close();
                     } catch (Throwable e) {
-                        logger.warn(e.getMessage(), e);
+                        log.warn(e.getMessage(), e);
                     }
                 }
             }
 
             long costTime = System.currentTimeMillis() - startTime;
-            logger.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
+            log.info("PIGEON task: {},taskId:{} costTime : {} milliseconds, statusCode : {}",
                     targetJobName, taskId, costTime, (execState == ExecResult.SUCCESS) ? "'success'" : "'failure'");
             setExitStatusCode((execState == ExecResult.SUCCESS) ? TaskConstants.EXIT_CODE_SUCCESS
                     : TaskConstants.EXIT_CODE_FAILURE);
         } catch (Exception e) {
-            logger.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);
+            log.error("execute PIGEON dataX faild,PIGEON task name:" + targetJobName, e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             if (e instanceof InterruptedException) {
                 Thread.currentThread().interrupt();
@@ -182,9 +185,9 @@ public class PigeonTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        logger.info("start to cancelApplication");
+        log.info("start to cancelApplication");
         Objects.requireNonNull(triggerResult, "triggerResult can not be null");
-        logger.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
+        log.info("start to cancelApplication taskId:{}", triggerResult.getTaskId());
         final String triggerUrl = getTriggerUrl();
 
         StringEntity entity =
@@ -229,28 +232,28 @@ public class PigeonTask extends AbstractRemoteTask {
 
     private WebSocketClient receiveRealtimeLog(final String tisHost, String dataXName, int taskId) throws Exception {
         final String applyURI = config.getJobLogsFetchUrl(tisHost, dataXName, taskId);
-        logger.info("apply ws connection,uri:{}", applyURI);
+        log.info("apply ws connection,uri:{}", applyURI);
         WebSocketClient webSocketClient = new WebSocketClient(new URI(applyURI)) {
 
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                logger.info("start to receive remote execute log");
+                log.info("start to receive remote execute log");
             }
 
             @Override
             public void onMessage(String message) {
                 ExecLog execLog = JSONUtils.parseObject(message, ExecLog.class);
-                logger.info(execLog.getMsg());
+                log.info(execLog.getMsg());
             }
 
             @Override
             public void onClose(int code, String reason, boolean remote) {
-                logger.info("stop to receive remote log,reason:{},taskId:{}", reason, taskId);
+                log.info("stop to receive remote log,reason:{},taskId:{}", reason, taskId);
             }
 
             @Override
             public void onError(Exception t) {
-                logger.error(t.getMessage(), t);
+                log.error(t.getMessage(), t);
             }
         };
         webSocketClient.connect();

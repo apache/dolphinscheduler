@@ -22,7 +22,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 - Please fill in `data-quality.jar.name` according to the actual package name.
 - If you package `data-quality` separately, remember to modify the package name to be consistent with `data-quality.jar.name`.
 - If the old version is upgraded and used, you need to execute the `sql` update script to initialize the database before running.
-- If you want to use `MySQL` data, you need to comment out the `scope` of `MySQL` in `pom.xml`.
+- `dolphinscheduler-data-quality-dev-SNAPSHOT.jar` was built with no dependencies. If a `JDBC` driver is required, you can set the `-jars` parameter in the `node settings` `Option Parameters`, e.g. `--jars /lib/jars/mysql-connector-java-8.0.16.jar`.
 - Currently only `MySQL`, `PostgreSQL` and `HIVE` data sources have been tested, other data sources have not been tested yet.
 - `Spark` needs to be configured to read `Hive` metadata, `Spark` does not use `jdbc` to read `Hive`.
 
@@ -34,7 +34,7 @@ data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
 | CheckFormula  | <ul><li>Expected-Actual</li><li>Actual-Expected</li><li>(Actual/Expected)x100%</li><li>(Expected-Actual)/Expected x100%</li></ul>                                                |
 | Operator      | =, >, >=, <, <=, !=                                                                                                                                                              |
 | ExpectedValue | <ul><li>FixValue</li><li>DailyAvg</li><li>WeeklyAvg</li><li>MonthlyAvg</li><li>Last7DayAvg</li><li>Last30DayAvg</li><li>SrcTableTotalRows</li><li>TargetTableTotalRows</li></ul> |
-| Example       | <ul><li>CheckFormula：Expected-Actual</li><li>Operator：></li><li>Threshold：0</li><li>ExpectedValue：FixValue=9</li></ul>                                                           |
+| Example       | <ul><li>CheckFormula：Actual-Expected</li><li>Operator：></li><li>Threshold：0</li><li>ExpectedValue：FixValue=9</li></ul>                                                           |
 
 In the example, assuming that the actual value is 10, the operator is >, and the expected value is 9, then the result 10 -9 > 0 is true, which means that the row data in the empty column has exceeded the threshold, and the task is judged to fail.
 

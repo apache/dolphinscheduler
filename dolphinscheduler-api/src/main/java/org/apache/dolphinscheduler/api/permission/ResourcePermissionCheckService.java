@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.api.permission;
 
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -59,11 +58,4 @@ public interface ResourcePermissionCheckService<T> {
      */
     boolean functionDisabled();
 
-    /**
-     * associated with the current user after the resource is created
-     * @param authorizationType
-     * @param ids
-     * @param logger
-     */
-    void postHandle(Object authorizationType, Integer userId, List<Integer> ids, Logger logger);
 }

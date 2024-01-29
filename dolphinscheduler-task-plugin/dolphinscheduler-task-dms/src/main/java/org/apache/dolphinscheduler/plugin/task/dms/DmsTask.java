@@ -27,8 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,19 +35,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.services.databasemigrationservice.model.InvalidResourceStateException;
 import com.amazonaws.services.databasemigrationservice.model.ReplicationTask;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
+@Slf4j
 public class DmsTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
-            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+            JsonMapper.builder()
+                    .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
                     .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
                     .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
                     .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-                    .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+                    .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+                    .build();
     /**
      * taskExecutionContext
      */
@@ -68,8 +73,8 @@ public class DmsTask extends AbstractRemoteTask {
 
     @Override
     public void init() throws TaskException {
-        logger.info("Dms task params {}", taskExecutionContext.getTaskParams());
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DmsParameters.class);
+        log.info("Initialize Dms task params {}", JSONUtils.toPrettyJsonString(parameters));
         initDmsHook();
     }
 
@@ -102,7 +107,7 @@ public class DmsTask extends AbstractRemoteTask {
         dmsHook.setReplicationTaskArn(appId.getReplicationTaskArn());
         // if CdcStopPosition is not set, the task will not continue to check the running status
         if (isStopTaskWhenCdc()) {
-            logger.info(
+            log.info(
                     "This is a cdc task and cdcStopPosition is not set, the task will not continue to check the running status");
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
             return;
@@ -165,7 +170,7 @@ public class DmsTask extends AbstractRemoteTask {
         try {
             isStartSuccessfully = dmsHook.startReplicationTask();
         } catch (InvalidResourceStateException e) {
-            logger.error("Failed to start a task, error message: {}", e.getErrorMessage());
+            log.error("Failed to start a task, error message: {}", e.getErrorMessage());
 
             // Only restart task when the error contains "Test connection", means instance can not connect to source or
             // target
@@ -173,7 +178,7 @@ public class DmsTask extends AbstractRemoteTask {
                 return TaskConstants.EXIT_CODE_FAILURE;
             }
 
-            logger.info("restart replication task");
+            log.info("restart replication task");
             // if only restart task, run dmsHook.describeReplicationTasks to get replication task arn
             if (parameters.getIsRestartTask()) {
                 dmsHook.describeReplicationTasks();
@@ -232,16 +237,15 @@ public class DmsTask extends AbstractRemoteTask {
     public void convertJsonParameters() throws TaskException {
         // create a new parameter object using the json data if the json data is not empty
         if (parameters.getIsJsonFormat() && parameters.getJsonData() != null) {
-            // combining local and global parameters
             String jsonData = ParameterUtils.convertParameterPlaceholders(parameters.getJsonData(),
-                    ParamUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+                    ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));
 
             boolean isRestartTask = parameters.getIsRestartTask();
             try {
                 parameters = objectMapper.readValue(jsonData, DmsParameters.class);
                 parameters.setIsRestartTask(isRestartTask);
             } catch (Exception e) {
-                logger.error("Failed to convert json data to DmsParameters object.", e);
+                log.error("Failed to convert json data to DmsParameters object.", e);
                 throw new TaskException(e.getMessage());
             }
         }

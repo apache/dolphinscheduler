@@ -22,5 +22,23 @@ metadata:
     app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-common
     {{- include "dolphinscheduler.common.labels" . | nindent 4 }}
 data:
+  {{- if and .Values.api.taskTypeFilter.enabled }}
+  task-type-config.yaml: |-
+    {{- if .Values.api.taskTypeFilter.task }}
+    task:
+      {{- range $key, $value := .Values.api.taskTypeFilter.task }}
+      {{ $key }}:
+        {{- toYaml $value | nindent 8 }}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   common_properties: |-
-{{ tpl (.Files.Get "resources/config/common.properties") . | indent 4 }}
+  {{- if index .Values.conf "common" }}
+  {{- range $key, $value := index .Values.conf "common" }}
+    {{- if and $.Values.minio.enabled }}
+    {{- if eq $key "resource.storage.type" }}{{ $value = "S3" }}{{- end }}
+    {{- if eq $key "resource.aws.s3.endpoint" }}{{ $value = print "http://" (include "dolphinscheduler.minio.fullname" $) ":9000" }}{{- end }}
+    {{- end }}
+    {{ $key }}={{ $value }}
+  {{- end }}
+  {{- end }}

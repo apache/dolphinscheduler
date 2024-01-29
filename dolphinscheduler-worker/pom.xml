@@ -44,16 +44,9 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-service</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-meter</artifactId>
@@ -66,6 +59,26 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-storage-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-alert</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-master</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-worker</artifactId>
         </dependency>
 
         <dependency>
@@ -98,7 +111,7 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-kubernetes-fabric8-config</artifactId>
+            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
         </dependency>
 
         <dependency>

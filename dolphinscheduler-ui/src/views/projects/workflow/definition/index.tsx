@@ -20,11 +20,11 @@ import {
   NButton,
   NDataTable,
   NIcon,
-  NInput,
   NPagination,
   NSpace,
   NTooltip,
-  NPopconfirm
+  NPopconfirm,
+  NModal
 } from 'naive-ui'
 import {
   defineComponent,
@@ -44,6 +44,7 @@ import TimingModal from './components/timing-modal'
 import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
+import Search from '@/components/input-search'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -77,6 +78,10 @@ export default defineComponent({
     const handleCopyUpdateList = () => {
       variables.checkedRowKeys = []
       requestData()
+    }
+
+    const confirmToSetWorkflowTiming = () => {
+      variables.timingShowRef = true
     }
 
     const handleSearch = () => {
@@ -136,6 +141,7 @@ export default defineComponent({
       batchExportWorkflow,
       batchCopyWorkflow,
       handleCopyUpdateList,
+      confirmToSetWorkflowTiming,
       ...toRefs(variables),
       uiSettingStore,
       trim
@@ -158,15 +164,15 @@ export default defineComponent({
               >
                 {t('project.workflow.create_workflow')}
               </NButton>
-              {
-                this.uiSettingStore.getDynamicTask && <NButton
+              {this.uiSettingStore.getDynamicTask && (
+                <NButton
                   type='warning'
                   size='small'
                   onClick={this.createDefinitionDynamic}
                 >
                   {t('project.workflow.create_workflow_dynamic')}
                 </NButton>
-              }
+              )}
               <NButton
                 strong
                 secondary
@@ -177,12 +183,10 @@ export default defineComponent({
               </NButton>
             </NSpace>
             <NSpace>
-              <NInput
-                allowInput={this.trim}
-                size='small'
+              <Search
                 placeholder={t('resource.function.enter_keyword_tips')}
-                v-model={[this.searchVal, 'value']}
-                clearable
+                v-model:value={this.searchVal}
+                onSearch={this.handleSearch}
                 onClear={this.onClearSearch}
               />
               <NButton type='primary' size='small' onClick={this.handleSearch}>
@@ -209,7 +213,7 @@ export default defineComponent({
               <NSpace>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.delete'),
+                    default: () => t('project.workflow.batch_delete'),
                     trigger: () => (
                       <NPopconfirm onPositiveClick={this.batchDeleteWorkflow}>
                         {{
@@ -222,7 +226,7 @@ export default defineComponent({
                               disabled={this.checkedRowKeys.length <= 0}
                               class='btn-delete-all'
                             >
-                              {t('project.workflow.delete')}
+                              {t('project.workflow.batch_delete')}
                             </NButton>
                           )
                         }}
@@ -232,7 +236,7 @@ export default defineComponent({
                 </NTooltip>
                 <NTooltip>
                   {{
-                    default: () => t('project.workflow.export'),
+                    default: () => t('project.workflow.batch_export'),
                     trigger: () => (
                       <NButton
                         tag='div'
@@ -242,7 +246,7 @@ export default defineComponent({
                         onClick={this.batchExportWorkflow}
                         class='btn-delete-all'
                       >
-                        {t('project.workflow.export')}
+                        {t('project.workflow.batch_export')}
                       </NButton>
                     )
                   }}
@@ -290,6 +294,8 @@ export default defineComponent({
         <TimingModal
           v-model:row={this.row}
           v-model:show={this.timingShowRef}
+          v-model:type={this.timingType}
+          v-model:state={this.timingState}
           onUpdateList={this.handleUpdateList}
         />
         <VersionModal
@@ -301,6 +307,16 @@ export default defineComponent({
           v-model:codes={this.checkedRowKeys}
           v-model:show={this.copyShowRef}
           onUpdateList={this.handleCopyUpdateList}
+        />
+        <NModal
+          v-model:show={this.setTimingDialogShowRef}
+          preset={'dialog'}
+          title={t('project.workflow.success')}
+          content={t('project.workflow.want_to_set_timing')}
+          positiveText={t('project.workflow.confirm')}
+          negativeText={t('project.workflow.cancel')}
+          maskClosable={false}
+          onPositiveClick={this.confirmToSetWorkflowTiming}
         />
       </NSpace>
     )

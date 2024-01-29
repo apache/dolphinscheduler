@@ -29,14 +29,15 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -53,8 +54,8 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
 
         Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
-        db2DatasourceParamDTO.setOther(parseOther(connectionParams.getOther()));
-        db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
+        db2DatasourceParamDTO.setOther(connectionParams.getOther());
+        db2DatasourceParamDTO.setUserName(connectionParams.getUser());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
@@ -78,8 +79,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         db2ConnectionParam.setPassword(PasswordUtils.encodePassword(db2Param.getPassword()));
         db2ConnectionParam.setDriverClassName(getDatasourceDriver());
         db2ConnectionParam.setValidationQuery(getValidationQuery());
-        db2ConnectionParam.setOther(transformOther(db2Param.getOther()));
-        db2ConnectionParam.setProps(db2Param.getOther());
+        db2ConnectionParam.setOther(db2Param.getOther());
 
         return db2ConnectionParam;
     }
@@ -97,8 +97,9 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(db2ConnectionParam.getOther())) {
-            return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(), db2ConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(db2ConnectionParam.getOther())) {
+            return String.format("%s:%s", db2ConnectionParam.getJdbcUrl(),
+                    transformOther(db2ConnectionParam.getOther()));
         }
         return db2ConnectionParam.getJdbcUrl();
     }
@@ -126,24 +127,18 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         return DataSourceConstants.DB2_VALIDATION_QUERY;
     }
 
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.db2);
+    }
+
     private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isEmpty(otherMap)) {
             return null;
         }
-        StringBuilder stringBuilder = new StringBuilder();
-        otherMap.forEach((key, value) -> stringBuilder.append(String.format("%s=%s%s", key, value, ";")));
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-        return stringBuilder.toString();
+        List<String> otherList = new ArrayList<>();
+        otherMap.forEach((key, value) -> otherList.add(String.format("%s=%s", key, value)));
+        return String.join(";", otherList);
     }
 
-    private Map<String, String> parseOther(String other) {
-        if (other == null) {
-            return null;
-        }
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        for (String config : other.split("&")) {
-            otherMap.put(config.split("=")[0], config.split("=")[1]);
-        }
-        return otherMap;
-    }
 }

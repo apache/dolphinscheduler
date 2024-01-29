@@ -125,7 +125,7 @@ Execute `pm2 start npm -- run dev` to start the project in the project `dolphins
 - The corresponding html file is in `src/view/${corresponding page filename => home}/index.html`
 ```
 
-Public module and utill `src/js/module`
+Public module and util `src/js/module`
 
 `components` => internal project common components
 

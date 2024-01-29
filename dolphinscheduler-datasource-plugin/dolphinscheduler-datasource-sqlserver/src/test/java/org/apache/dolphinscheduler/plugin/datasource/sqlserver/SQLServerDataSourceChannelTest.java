@@ -32,9 +32,11 @@ public class SQLServerDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         SQLServerDataSourceChannel sourceChannel = Mockito.mock(SQLServerDataSourceChannel.class);
-        SQLServerDataSourceClient dataSourceClient = Mockito.mock(SQLServerDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
+        SQLServerPooledDataSourceClient dataSourceClient = Mockito.mock(SQLServerPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
         Assertions
-                .assertNotNull(sourceChannel.createDataSourceClient(new SQLServerConnectionParam(), DbType.SQLSERVER));
+                .assertNotNull(
+                        sourceChannel.createPooledDataSourceClient(new SQLServerConnectionParam(), DbType.SQLSERVER));
     }
 }

@@ -41,6 +41,12 @@ interface ExecuteReq {
   processInstanceId: number
 }
 
+interface ExecuteTaskReq {
+  processInstanceId: number
+  startNodeList: number
+  taskDependType: string
+}
+
 interface ProjectCodeReq {
   projectCode: number
 }
@@ -65,10 +71,12 @@ interface ProcessInstanceReq extends ProcessDefinitionCodeReq {
   taskDependType?: 'TASK_ONLY' | 'TASK_PRE' | 'TASK_POST'
   timeout?: number
   workerGroup?: string
+  version?: number
 }
 
 export {
   ExecuteReq,
+  ExecuteTaskReq,
   ProjectCodeReq,
   ProcessDefinitionCodeReq,
   ProcessInstanceReq

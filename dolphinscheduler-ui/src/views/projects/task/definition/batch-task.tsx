@@ -39,7 +39,6 @@ import { useTask } from './use-task'
 import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import Card from '@/components/card'
 import VersionModal from './components/version-modal'
-import MoveModal from './components/move-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import type { INodeData } from './types'
 
@@ -60,7 +59,6 @@ const BatchTaskDefinition = defineComponent({
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
         taskType: variables.taskType
       })
     }
@@ -80,11 +78,6 @@ const BatchTaskDefinition = defineComponent({
       onSearch()
     }
 
-    const onClearSearchWorkflowName = () => {
-      variables.searchWorkflowName = null
-      onSearch()
-    }
-
     const onClearSearchTaskType = () => {
       variables.taskType = null
       onSearch()
@@ -92,7 +85,6 @@ const BatchTaskDefinition = defineComponent({
 
     const onRefresh = () => {
       variables.showVersionModalRef = false
-      variables.showMoveModalRef = false
       requestData()
     }
     const onCreate = () => {
@@ -126,7 +118,6 @@ const BatchTaskDefinition = defineComponent({
       ...toRefs(task),
       onSearch,
       onClearSearchTaskName,
-      onClearSearchWorkflowName,
       onClearSearchTaskType,
       requestData,
       onUpdatePageSize,
@@ -164,14 +155,6 @@ const BatchTaskDefinition = defineComponent({
                 v-model={[this.searchTaskName, 'value']}
                 placeholder={t('project.task.task_name')}
                 onClear={this.onClearSearchTaskName}
-              />
-              <NInput
-                allowInput={this.trim}
-                size='small'
-                clearable
-                v-model={[this.searchWorkflowName, 'value']}
-                placeholder={t('project.task.workflow_name')}
-                onClear={this.onClearSearchWorkflowName}
               />
               <NSelect
                 v-model={[this.taskType, 'value']}
@@ -218,12 +201,6 @@ const BatchTaskDefinition = defineComponent({
           show={this.showVersionModalRef}
           row={this.row}
           onConfirm={() => (this.showVersionModalRef = false)}
-          onRefresh={onRefresh}
-        />
-        <MoveModal
-          show={this.showMoveModalRef}
-          row={this.row}
-          onCancel={() => (this.showMoveModalRef = false)}
           onRefresh={onRefresh}
         />
         <TaskModal

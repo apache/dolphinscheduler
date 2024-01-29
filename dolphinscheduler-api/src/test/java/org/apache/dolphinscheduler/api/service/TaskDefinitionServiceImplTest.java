@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 
 import org.apache.dolphinscheduler.api.dto.task.TaskCreateRequest;
@@ -32,6 +33,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -39,21 +41,30 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
+import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +77,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @ExtendWith(MockitoExtension.class)
 public class TaskDefinitionServiceImplTest {
@@ -85,8 +99,17 @@ public class TaskDefinitionServiceImplTest {
     @Mock
     private ProjectServiceImpl projectService;
 
+    @InjectMocks
+    private ProcessServiceImpl processServiceImpl;
+
     @Mock
     private ProcessService processService;
+
+    @Mock
+    private ProcessDefinitionLogMapper processDefineLogMapper;
+
+    @Mock
+    private ProcessTaskRelationLogMapper processTaskRelationLogMapper;
 
     @Mock
     private ProcessTaskRelationMapper processTaskRelationMapper;
@@ -103,11 +126,18 @@ public class TaskDefinitionServiceImplTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
 
+    @Mock
+    private ProcessTaskRelationLogDao processTaskRelationLogDao;
+
+    @Mock
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
     private static final String TASK_PARAMETER =
             "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";;
     private static final long PROJECT_CODE = 1L;
     private static final long PROCESS_DEFINITION_CODE = 2L;
     private static final long TASK_CODE = 3L;
+    private static final String UPSTREAM_CODE = "3,5";
     private static final int VERSION = 1;
     private static final int RESOURCE_RATE = -1;
     protected User user;
@@ -129,9 +159,9 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
 
         Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, PROJECT_CODE);
-        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION_CREATE))
-                .thenReturn(result);
+        Mockito.when(projectService.hasProjectAndWritePerm(user, project, result))
+                .thenReturn(true);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
 
         String createTaskDefinitionJson =
                 "[{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
@@ -148,14 +178,7 @@ public class TaskDefinitionServiceImplTest {
 
     @Test
     public void updateTaskDefinition() {
-        String taskDefinitionJson =
-                "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
-                        + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\",\\\"direct\\\":\\\"IN\\\","
-                        + "\\\"type\\\":\\\"VARCHAR\\\",\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":"
-                        + "\\\"echo ${datetime}\\\",\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
-                        + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\",\"flag\":0,\"taskPriority\":0,"
-                        + "\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":0,\"timeoutFlag\":0,"
-                        + "\"timeoutNotifyStrategy\":0,\"timeout\":0,\"delayTime\":0,\"resourceIds\":\"\"}";
+        String taskDefinitionJson = getTaskDefinitionJson();;
 
         Project project = getProject();
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
@@ -168,9 +191,14 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(new TaskDefinition());
         Mockito.when(taskDefinitionMapper.updateById(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
+        Mockito.when(processTaskRelationLogDao.insert(Mockito.any(ProcessTaskRelationLog.class))).thenReturn(1);
+        Mockito.when(processDefinitionMapper.queryByCode(2L)).thenReturn(new ProcessDefinition());
+        Mockito.when(processDefinitionMapper.updateById(Mockito.any(ProcessDefinition.class))).thenReturn(1);
+        Mockito.when(processDefinitionLogMapper.insert(Mockito.any(ProcessDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
-        Mockito.when(processTaskRelationMapper.queryByTaskCode(3)).thenReturn(getProcessTaskRelationList2());
+        Mockito.when(processTaskRelationMapper.queryProcessTaskRelationByTaskCodeAndTaskVersion(TASK_CODE, 0))
+                .thenReturn(getProcessTaskRelationList2());
         Mockito.when(processTaskRelationMapper
                 .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(1);
         result = taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson);
@@ -307,6 +335,33 @@ public class TaskDefinitionServiceImplTest {
     }
 
     @Test
+    public void testQueryTaskDefinitionListPaging() {
+        Project project = getProject();
+        Map<String, Object> checkResult = new HashMap<>();
+        checkResult.put(Constants.STATUS, Status.SUCCESS);
+        Integer pageNo = 1;
+        Integer pageSize = 10;
+        IPage<TaskMainInfo> taskMainInfoIPage = new Page<>();
+        TaskMainInfo taskMainInfo = new TaskMainInfo();
+        taskMainInfo.setTaskCode(TASK_CODE);
+        taskMainInfo.setUpstreamTaskCode(4L);
+        taskMainInfo.setUpstreamTaskName("4");
+        taskMainInfoIPage.setRecords(Collections.singletonList(taskMainInfo));
+        taskMainInfoIPage.setTotal(10L);
+        Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
+        Mockito.when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION))
+                .thenReturn(checkResult);
+        Mockito.when(taskDefinitionMapper.queryDefineListPaging(Mockito.any(Page.class), Mockito.anyLong(),
+                Mockito.isNull(), Mockito.anyString(), Mockito.isNull()))
+                .thenReturn(taskMainInfoIPage);
+        Mockito.when(taskDefinitionMapper.queryDefineListByCodeList(PROJECT_CODE, Collections.singletonList(3L)))
+                .thenReturn(Collections.singletonList(taskMainInfo));
+        Result result = taskDefinitionService.queryTaskDefinitionListPaging(user, PROJECT_CODE,
+                null, null, null, pageNo, pageSize);
+        Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+    }
+
+    @Test
     public void testReleaseTaskDefinition() {
         Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         Project project = getProject();
@@ -396,11 +451,15 @@ public class TaskDefinitionServiceImplTest {
         // success
         Mockito.when(taskDefinitionLogMapper.insert(isA(TaskDefinitionLog.class))).thenReturn(1);
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
-        Mockito.when(processTaskRelationService.updateUpstreamTaskDefinition(isA(User.class), isA(Long.class),
-                isA(TaskRelationUpdateUpstreamRequest.class))).thenReturn(getProcessTaskRelationList());
+        Mockito.when(
+                processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
+                        isA(Boolean.class),
+                        isA(TaskRelationUpdateUpstreamRequest.class)))
+                .thenReturn(getProcessTaskRelationList());
         Mockito.when(processDefinitionService.updateSingleProcessDefinition(isA(User.class), isA(Long.class),
                 isA(WorkflowUpdateRequest.class))).thenReturn(getProcessDefinition());
         Assertions.assertDoesNotThrow(() -> taskDefinitionService.createTaskDefinitionV2(user, taskCreateRequest));
+
     }
 
     @Test
@@ -467,10 +526,54 @@ public class TaskDefinitionServiceImplTest {
         // success
         Mockito.when(taskDefinitionLogMapper.insert(isA(TaskDefinitionLog.class))).thenReturn(1);
         // we do not test updateUpstreamTaskDefinition, because it should be tested in processTaskRelationService
-        Mockito.when(processTaskRelationService.updateUpstreamTaskDefinition(isA(User.class), isA(Long.class),
-                isA(TaskRelationUpdateUpstreamRequest.class))).thenReturn(getProcessTaskRelationList());
+        Mockito.when(
+                processTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(isA(User.class), isA(Long.class),
+                        isA(Boolean.class),
+                        isA(TaskRelationUpdateUpstreamRequest.class)))
+                .thenReturn(getProcessTaskRelationList());
         Assertions.assertDoesNotThrow(
                 () -> taskDefinitionService.updateTaskDefinitionV2(user, TASK_CODE, taskUpdateRequest));
+
+        TaskDefinition taskDefinition =
+                taskDefinitionService.updateTaskDefinitionV2(user, TASK_CODE, taskUpdateRequest);
+        Assertions.assertEquals(getTaskDefinition().getVersion() + 1, taskDefinition.getVersion());
+    }
+
+    @Test
+    public void testUpdateDag() {
+        User loginUser = getLoginUser();
+        ProcessDefinition processDefinition = getProcessDefinition();
+        processDefinition.setId(null);
+        List<ProcessTaskRelation> processTaskRelationList = getProcessTaskRelationList();
+        TaskDefinitionLog taskDefinitionLog = getTaskDefinitionLog();
+        ArrayList<TaskDefinitionLog> taskDefinitionLogs = new ArrayList<>();
+        taskDefinitionLogs.add(taskDefinitionLog);
+        Integer version = 1;
+        Mockito.when(processDefinitionMapper.queryByCode(isA(long.class))).thenReturn(processDefinition);
+
+        // saveProcessDefine
+        Mockito.when(processDefineLogMapper.queryMaxVersionForDefinition(isA(long.class))).thenReturn(version);
+        Mockito.when(processDefineLogMapper.insert(isA(ProcessDefinitionLog.class))).thenReturn(1);
+        Mockito.when(processDefinitionMapper.insert(isA(ProcessDefinitionLog.class))).thenReturn(1);
+        int insertVersion =
+                processServiceImpl.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+        Mockito.when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE))
+                .thenReturn(insertVersion);
+        Assertions.assertEquals(insertVersion, version + 1);
+
+        // saveTaskRelation
+        List<ProcessTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(eq(processDefinition.getCode())))
+                .thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
+        Mockito.when(processTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
+        int insertResult = processServiceImpl.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
+                processDefinition.getCode(), insertVersion, processTaskRelationLogList, taskDefinitionLogs,
+                Boolean.TRUE);
+        Assertions.assertEquals(Constants.EXIT_CODE_SUCCESS, insertResult);
+        Assertions.assertDoesNotThrow(
+                () -> taskDefinitionService.updateDag(loginUser, processDefinition.getCode(), processTaskRelationList,
+                        taskDefinitionLogs));
     }
 
     @Test
@@ -493,6 +596,63 @@ public class TaskDefinitionServiceImplTest {
         // success
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION);
         Assertions.assertDoesNotThrow(() -> taskDefinitionService.getTaskDefinition(user, TASK_CODE));
+    }
+
+    @Test
+    public void testUpdateTaskWithUpstream() {
+
+        String taskDefinitionJson = getTaskDefinitionJson();
+        TaskDefinition taskDefinition = getTaskDefinition();
+        taskDefinition.setFlag(Flag.NO);
+        TaskDefinition taskDefinitionSecond = getTaskDefinition();
+        taskDefinitionSecond.setCode(5);
+
+        user.setUserType(UserType.ADMIN_USER);
+        Mockito.when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
+        Mockito.when(projectService.hasProjectAndWritePerm(user, getProject(), new HashMap<>())).thenReturn(true);
+        Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
+        Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
+        Mockito.when(taskDefinitionMapper.updateById(Mockito.any())).thenReturn(1);
+        Mockito.when(taskDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
+
+        Mockito.when(taskDefinitionMapper.queryByCodeList(Mockito.anySet()))
+                .thenReturn(Arrays.asList(taskDefinition, taskDefinitionSecond));
+
+        Mockito.when(processTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
+                .thenReturn(getProcessTaskRelationListV2());
+        Mockito.when(processDefinitionMapper.queryByCode(PROCESS_DEFINITION_CODE)).thenReturn(getProcessDefinition());
+        Mockito.when(processTaskRelationMapper.batchInsert(Mockito.anyList())).thenReturn(1);
+        Mockito.when(processTaskRelationMapper.updateById(Mockito.any())).thenReturn(1);
+        Mockito.when(processTaskRelationLogDao.batchInsert(Mockito.anyList())).thenReturn(2);
+        // success
+        Map<String, Object> successMap = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
+                taskDefinitionJson, UPSTREAM_CODE);
+        Assertions.assertEquals(Status.SUCCESS, successMap.get(Constants.STATUS));
+        user.setUserType(UserType.GENERAL_USER);
+    }
+
+    private String getTaskDefinitionJson() {
+        return "{\"name\":\"detail_up\",\"description\":\"\",\"taskType\":\"SHELL\",\"taskParams\":"
+                + "\"{\\\"resourceList\\\":[],\\\"localParams\\\":[{\\\"prop\\\":\\\"datetime\\\","
+                + "\\\"direct\\\":\\\"IN\\\",\\\"type\\\":\\\"VARCHAR\\\","
+                + "\\\"value\\\":\\\"${system.datetime}\\\"}],\\\"rawScript\\\":\\\"echo ${datetime}\\\","
+                + "\\\"conditionResult\\\":\\\"{\\\\\\\"successNode\\\\\\\":[\\\\\\\"\\\\\\\"],"
+                + "\\\\\\\"failedNode\\\\\\\":[\\\\\\\"\\\\\\\"]}\\\",\\\"dependence\\\":{}}\","
+                + "\"flag\":0,\"taskPriority\":0,\"workerGroup\":\"default\",\"failRetryTimes\":0,"
+                + "\"failRetryInterval\":0,\"timeoutFlag\":0,\"timeoutNotifyStrategy\":0,\"timeout\":0,"
+                + "\"delayTime\":0,\"resourceIds\":\"\"}";
+    }
+
+    /**
+     * create admin user
+     */
+    private User getLoginUser() {
+        User loginUser = new User();
+        loginUser.setUserType(UserType.GENERAL_USER);
+        loginUser.setUserName("admin");
+        loginUser.setId(1);
+        return loginUser;
     }
 
     /**
@@ -530,6 +690,19 @@ public class TaskDefinitionServiceImplTest {
         return taskDefinition;
     }
 
+    private TaskDefinitionLog getTaskDefinitionLog() {
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setProjectCode(PROJECT_CODE);
+        taskDefinitionLog.setCode(TASK_CODE);
+        taskDefinitionLog.setVersion(VERSION);
+        taskDefinitionLog.setTaskType("SHELL");
+        taskDefinitionLog.setTaskParams(TASK_PARAMETER);
+        taskDefinitionLog.setFlag(Flag.YES);
+        taskDefinitionLog.setCpuQuota(RESOURCE_RATE);
+        taskDefinitionLog.setMemoryMax(RESOURCE_RATE);
+        return taskDefinitionLog;
+    }
+
     private List<ProcessTaskRelation> getProcessTaskRelationList() {
         List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
 
@@ -541,6 +714,40 @@ public class TaskDefinitionServiceImplTest {
 
         processTaskRelationList.add(processTaskRelation);
         return processTaskRelationList;
+    }
+
+    private List<ProcessTaskRelation> getProcessTaskRelationListV2() {
+        List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
+
+        ProcessTaskRelation processTaskRelation = new ProcessTaskRelation();
+        fillProcessTaskRelation(processTaskRelation);
+
+        processTaskRelationList.add(processTaskRelation);
+        processTaskRelation = new ProcessTaskRelation();
+        fillProcessTaskRelation(processTaskRelation);
+        processTaskRelation.setPreTaskCode(4L);
+        processTaskRelationList.add(processTaskRelation);
+        return processTaskRelationList;
+    }
+
+    private void fillProcessTaskRelation(ProcessTaskRelation processTaskRelation) {
+        processTaskRelation.setProjectCode(PROJECT_CODE);
+        processTaskRelation.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelation.setPreTaskCode(TASK_CODE);
+        processTaskRelation.setPostTaskCode(TASK_CODE + 1L);
+    }
+
+    private List<ProcessTaskRelationLog> getProcessTaskRelationLogList() {
+        List<ProcessTaskRelationLog> processTaskRelationLogList = new ArrayList<>();
+
+        ProcessTaskRelationLog processTaskRelationLog = new ProcessTaskRelationLog();
+        processTaskRelationLog.setProjectCode(PROJECT_CODE);
+        processTaskRelationLog.setProcessDefinitionCode(PROCESS_DEFINITION_CODE);
+        processTaskRelationLog.setPreTaskCode(TASK_CODE);
+        processTaskRelationLog.setPostTaskCode(TASK_CODE + 1L);
+
+        processTaskRelationLogList.add(processTaskRelationLog);
+        return processTaskRelationLogList;
     }
 
     private List<ProcessTaskRelation> getProcessTaskRelationList2() {

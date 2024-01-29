@@ -36,7 +36,7 @@ interface FileNameReq {
   fileName: string
 }
 
-interface TenantCodeReq{
+interface TenantCodeReq {
   tenantCode: string
 }
 
@@ -101,8 +101,8 @@ interface ResourceFile {
   directory: boolean
   fileName: string
   fullName: string
-  description: string
   size: number
+  createTime: string
   updateTime: string
 }
 

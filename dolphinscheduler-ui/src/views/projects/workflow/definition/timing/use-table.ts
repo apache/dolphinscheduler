@@ -18,7 +18,7 @@
 import { h, ref, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { NSpace, NTooltip, NButton, NPopconfirm } from 'naive-ui'
+import { NSpace, NTooltip, NButton, NPopconfirm, NTag } from 'naive-ui'
 import {
   deleteScheduleById,
   offline,
@@ -55,7 +55,10 @@ export function useTable() {
     searchVal: ref(),
     totalPage: ref(1),
     showRef: ref(false),
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    processDefinitionCode: router.currentRoute.value.params.definitionCode
+      ? ref(Number(router.currentRoute.value.params.definitionCode))
+      : ref()
   })
 
   const renderTime = (time: string, timeZone: string) => {
@@ -71,6 +74,104 @@ export function useTable() {
       h('span', { style: 'color: #1890ff; margin-left: 5px' }, `(${utc})`)
     ])
   }
+
+  const createTimingListTableColumns = (variables: any) => {
+    variables.columns = [
+      {
+        title: '#',
+        key: 'id',
+        ...COLUMN_WIDTH_CONFIG['index'],
+        render: (row: any, index: number) => index + 1
+      },
+      {
+        title: t('project.workflow.start_time'),
+        key: 'startTime',
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.startTime, row.timezoneId)
+      },
+      {
+        title: t('project.workflow.end_time'),
+        key: 'endTime',
+        ...COLUMN_WIDTH_CONFIG['timeZone'],
+        render: (row: any) => renderTime(row.endTime, row.timezoneId)
+      },
+      {
+        title: t('project.workflow.crontab'),
+        key: 'crontab',
+        width: 140
+      },
+      {
+        title: t('project.workflow.status'),
+        key: 'releaseState',
+        ...COLUMN_WIDTH_CONFIG['state'],
+        render: (row: any) => {
+          if (row.releaseState === 'ONLINE') {
+            return h(
+                NTag,
+                { type: 'success', size: 'small' },
+                {
+                  default: () => t('project.workflow.up_line')
+                }
+            )
+          } else {
+            return h(
+                NTag,
+                { type: 'warning', size: 'small' },
+                {
+                  default: () => t('project.workflow.down_line')
+                }
+            )
+          }
+        }
+      },
+      {
+        title: t('project.workflow.operation'),
+        key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        render: (row: any) => {
+          return h(NSpace, null, {
+            default: () => [
+              h(
+                  NTooltip,
+                  {},
+                  {
+                    trigger: () =>
+                        h(
+                            NButton,
+                            {
+                              circle: true,
+                              type:
+                                  row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                              size: 'small',
+                              onClick: () => {
+                                handleReleaseState(row)
+                              }
+                            },
+                            {
+                              icon: () =>
+                                  h(
+                                      row.releaseState === 'ONLINE'
+                                          ? ArrowDownOutlined
+                                          : ArrowUpOutlined
+                                  )
+                            }
+                        ),
+                    default: () =>
+                        row.releaseState === 'ONLINE'
+                            ? t('project.workflow.down_line')
+                            : t('project.workflow.up_line')
+                  }
+              ),
+            ]
+          })
+        }
+      }
+    ]
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
+  }
+
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -118,10 +219,40 @@ export function useTable() {
         title: t('project.workflow.status'),
         key: 'releaseState',
         ...COLUMN_WIDTH_CONFIG['state'],
-        render: (row: any) =>
-          row.releaseState === 'ONLINE'
-            ? t('project.workflow.up_line')
-            : t('project.workflow.down_line')
+        render: (row: any) => {
+          if (row.releaseState === 'ONLINE') {
+            return h(
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('project.workflow.up_line')
+              }
+            )
+          } else {
+            return h(
+              NTag,
+              { type: 'warning', size: 'small' },
+              {
+                default: () => t('project.workflow.down_line')
+              }
+            )
+          }
+        }
+      },
+      {
+        title: t('project.workflow.worker_group'),
+        key: 'workerGroup',
+        width: 140
+      },
+      {
+        title: t('project.workflow.tenant_code'),
+        key: 'tenantCode',
+        width: 140
+      },
+      {
+        title: t('project.workflow.environment_name'),
+        key: 'environmentName',
+        width: 160
       },
       {
         title: t('project.workflow.create_time'),
@@ -243,19 +374,16 @@ export function useTable() {
   const getTableData = (params: ISearchParam) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    const definitionCode = Number(
-      router.currentRoute.value.params.definitionCode
+
+    queryScheduleListPaging({ ...params }, variables.projectCode).then(
+      (res: any) => {
+        variables.totalPage = res.totalPage
+        variables.tableData = res.totalList.map((item: any) => {
+          return { ...item }
+        })
+        variables.loadingRef = false
+      }
     )
-    queryScheduleListPaging(
-      { ...params, processDefinitionCode: definitionCode },
-      variables.projectCode
-    ).then((res: any) => {
-      variables.totalPage = res.totalPage
-      variables.tableData = res.totalList.map((item: any) => {
-        return { ...item }
-      })
-      variables.loadingRef = false
-    })
   }
 
   const handleReleaseState = (row: any) => {
@@ -269,7 +397,9 @@ export function useTable() {
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal
+        searchVal: variables.searchVal,
+        projectCode: variables.projectCode,
+        processDefinitionCode: variables.processDefinitionCode
       })
     })
   }
@@ -284,7 +414,9 @@ export function useTable() {
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal
+        searchVal: variables.searchVal,
+        projectCode: variables.projectCode,
+        processDefinitionCode: variables.processDefinitionCode
       })
     })
   }
@@ -292,6 +424,7 @@ export function useTable() {
   return {
     variables,
     createColumns,
+    createTimingListTableColumns,
     getTableData
   }
 }

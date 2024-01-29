@@ -40,7 +40,7 @@ public class YarnClientAspectMoc {
 
     @AfterReturning(pointcut = "cflow(execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.submitApplication(ApplicationSubmissionContext))) "
             +
-            "&& !within(CfowAspect) && execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.createAppId())", returning = "submittedAppId")
+            "&& !within(YarnClientAspect) && execution(ApplicationId org.apache.dolphinscheduler.poc.YarnClientMoc.createAppId())", returning = "submittedAppId")
     public void createAppId(ApplicationId submittedAppId) {
         privateId = submittedAppId;
         logger.info("YarnClientAspectMoc[createAppId]: created submittedAppId {}", submittedAppId);

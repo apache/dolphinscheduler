@@ -63,8 +63,8 @@ import com.amazonaws.services.databasemigrationservice.model.TestConnectionReque
 @Data
 public class DmsHook {
 
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
+    protected final Logger log =
+            LoggerFactory.getLogger(DmsHook.class);
     private AWSDatabaseMigrationService client;
     private String replicationTaskIdentifier;
     private String sourceEndpointArn;
@@ -101,7 +101,7 @@ public class DmsHook {
     }
 
     public Boolean createReplicationTask() throws Exception {
-        logger.info("createReplicationTask ......");
+        log.info("createReplicationTask ......");
         CreateReplicationTaskRequest request = new CreateReplicationTaskRequest()
                 .withReplicationTaskIdentifier(replicationTaskIdentifier)
                 .withSourceEndpointArn(sourceEndpointArn)
@@ -123,13 +123,13 @@ public class DmsHook {
         CreateReplicationTaskResult result = client.createReplicationTask(request);
         replicationTaskIdentifier = result.getReplicationTask().getReplicationTaskIdentifier();
         replicationTaskArn = result.getReplicationTask().getReplicationTaskArn();
-        logger.info("replicationTaskIdentifier: {}, replicationTaskArn: {}", replicationTaskIdentifier,
+        log.info("replicationTaskIdentifier: {}, replicationTaskArn: {}", replicationTaskIdentifier,
                 replicationTaskArn);
         return awaitReplicationTaskStatus(STATUS.READY);
     }
 
     public Boolean startReplicationTask() {
-        logger.info("startReplicationTask ......");
+        log.info("startReplicationTask ......");
         StartReplicationTaskRequest request = new StartReplicationTaskRequest()
                 .withReplicationTaskArn(replicationTaskArn)
                 .withStartReplicationTaskType(startReplicationTaskType)
@@ -142,14 +142,14 @@ public class DmsHook {
     }
 
     public Boolean checkFinishedReplicationTask() {
-        logger.info("checkFinishedReplicationTask ......");
+        log.info("checkFinishedReplicationTask ......");
         awaitReplicationTaskStatus(STATUS.STOPPED);
         String stopReason = describeReplicationTasks().getStopReason();
         return stopReason.endsWith(STATUS.FINISH_END_TOKEN);
     }
 
     public void stopReplicationTask() {
-        logger.info("stopReplicationTask ......");
+        log.info("stopReplicationTask ......");
         if (replicationTaskArn == null) {
             return;
         }
@@ -160,7 +160,7 @@ public class DmsHook {
     }
 
     public Boolean deleteReplicationTask() {
-        logger.info("deleteReplicationTask ......");
+        log.info("deleteReplicationTask ......");
         DeleteReplicationTaskRequest request = new DeleteReplicationTaskRequest()
                 .withReplicationTaskArn(replicationTaskArn);
         client.deleteReplicationTask(request);
@@ -179,13 +179,13 @@ public class DmsHook {
     }
 
     public Boolean testConnection(String replicationInstanceArn, String endpointArn) {
-        logger.info("Test connect replication instance: {} and endpoint: {}", replicationInstanceArn, endpointArn);
+        log.info("Test connect replication instance: {} and endpoint: {}", replicationInstanceArn, endpointArn);
         TestConnectionRequest request = new TestConnectionRequest().withReplicationInstanceArn(replicationInstanceArn)
                 .withEndpointArn(endpointArn);
         try {
             client.testConnection(request);
         } catch (InvalidResourceStateException e) {
-            logger.info(e.getErrorMessage());
+            log.info(e.getErrorMessage());
         }
 
         return awaitConnectSuccess(replicationInstanceArn, endpointArn);
@@ -203,13 +203,13 @@ public class DmsHook {
             DescribeConnectionsResult response = client.describeConnections(request);
             String status = response.getConnections().get(0).getStatus();
             if (status.equals(STATUS.SUCCESSFUL)) {
-                logger.info("Connect successful");
+                log.info("Connect successful");
                 return true;
             } else if (!status.equals(STATUS.TESTING)) {
                 break;
             }
         }
-        logger.info("Connect error");
+        log.info("Connect error");
         return false;
     }
 
@@ -258,19 +258,19 @@ public class DmsHook {
                 }
                 if (!lastPercent.equals(percent)) {
                     String runningMessage = String.format("fullLoadProgressPercent: %s ", percent);
-                    logger.info(runningMessage);
+                    log.info(runningMessage);
                 }
                 lastPercent = percent;
             }
 
             if (exceptStatus.equals(status)) {
-                logger.info("success");
+                log.info("success");
                 return true;
             } else if (stopStatusSet.contains(status)) {
                 break;
             }
         }
-        logger.info("error");
+        log.info("error");
         return false;
     }
 

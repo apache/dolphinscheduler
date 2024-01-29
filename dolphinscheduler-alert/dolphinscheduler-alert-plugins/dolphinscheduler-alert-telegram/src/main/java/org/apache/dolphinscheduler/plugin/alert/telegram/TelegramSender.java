@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.telegram;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,14 +44,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@Slf4j
 public final class TelegramSender {
-
-    private static final Logger logger = LoggerFactory.getLogger(TelegramSender.class);
 
     private static final String BOT_TOKEN_REGEX = "{botToken}";
 
@@ -104,7 +103,7 @@ public final class TelegramSender {
             String resp = sendInvoke(alertData.getTitle(), alertData.getContent());
             result = parseRespToResult(resp);
         } catch (Exception e) {
-            logger.warn("send telegram alert msg exception : {}", e.getMessage());
+            log.warn("send telegram alert msg exception : {}", e.getMessage());
             result = new AlertResult();
             result.setStatus("false");
             result.setMessage(String.format("send telegram alert fail. %s", e.getMessage()));
@@ -159,7 +158,7 @@ public final class TelegramSender {
             } finally {
                 response.close();
             }
-            logger.info("Telegram send title :{},content : {}, resp: {}", title, content, resp);
+            log.info("Telegram send title :{},content : {}, resp: {}", title, content, resp);
             return resp;
         } finally {
             httpClient.close();
@@ -241,14 +240,15 @@ public final class TelegramSender {
     }
 
     private static CloseableHttpClient getDefaultClient() {
-        return HttpClients.createDefault();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
     }
 
     private static CloseableHttpClient getProxyClient(String proxy, int port, String user, String password) {
         HttpHost httpProxy = new HttpHost(proxy, port);
         CredentialsProvider provider = new BasicCredentialsProvider();
         provider.setCredentials(new AuthScope(httpProxy), new UsernamePasswordCredentials(user, password));
-        return HttpClients.custom().setDefaultCredentialsProvider(provider).build();
+        return HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy)
+                .setDefaultCredentialsProvider(provider).build();
     }
 
     private static RequestConfig getProxyConfig(String proxy, int port) {

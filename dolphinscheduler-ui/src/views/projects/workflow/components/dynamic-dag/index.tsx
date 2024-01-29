@@ -21,20 +21,26 @@ import { DagCanvas } from './dag-canvas'
 import { useDagStore } from '@/store/project/dynamic/dag'
 import { NodeShape, NodeHeight, NodeWidth } from './dag-setting'
 import { TaskForm } from './task'
+import { queryDynamicTaskResource } from '@/service/modules/dynamic-dag'
 import styles from './index.module.scss'
 
 const DynamicDag = defineComponent({
   name: 'DynamicDag',
   setup() {
-    const draggedTask = ref('')
+    const draggedTask = ref()
+    const formData = ref()
     const showModal = ref(false)
 
-    const handelDragstart = (task: string) => {
-      draggedTask.value = task
+    const handelDragstart = (task: any) => {
+      draggedTask.value = task.name
+
+      queryDynamicTaskResource(task.json).then((res: any) => {
+        formData.value = res
+      })
     }
 
     const handelDrop = (e: DragEvent) => {
-      if (!draggedTask) return
+      if (!draggedTask.value) return
 
       const shapes = useDagStore().getDagTasks
 
@@ -45,9 +51,9 @@ const DynamicDag = defineComponent({
         width: NodeWidth,
         height: NodeHeight,
         shape: NodeShape,
-        label: draggedTask.value + String(shapes.length + 1),
+        label: draggedTask.value.name + String(shapes.length + 1),
         zIndex: 1,
-        task: draggedTask.value
+        task: draggedTask.value.name
       })
 
       useDagStore().setDagTasks(shapes)
@@ -57,6 +63,7 @@ const DynamicDag = defineComponent({
 
     return {
       draggedTask,
+      formData,
       handelDragstart,
       handelDrop,
       showModal
@@ -66,17 +73,18 @@ const DynamicDag = defineComponent({
     return (
       <>
         <div class={styles['workflow-dag']}>
-          <DagSidebar onDragstart={this.handelDragstart}/>
-          <DagCanvas onDrop={this.handelDrop}/>
+          <DagSidebar onDragstart={this.handelDragstart} />
+          <DagCanvas onDrop={this.handelDrop} />
         </div>
-        {
-          this.draggedTask && <TaskForm
+        {this.draggedTask && this.formData && (
+          <TaskForm
             task={this.draggedTask}
+            formData={this.formData}
             showModal={this.showModal}
-            onCancelModal={() => this.showModal = false}
-            onConfirmModal={() => this.showModal = false}
+            onCancelModal={() => (this.showModal = false)}
+            onConfirmModal={() => (this.showModal = false)}
           />
-        }
+        )}
       </>
     )
   }

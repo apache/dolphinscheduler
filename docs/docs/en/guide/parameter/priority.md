@@ -2,13 +2,15 @@
 
 DolphinScheduler has three parameter types:
 
+* [Project-level Parameter](project-parameter.md): parameters defined at the project management page.
 * [Global Parameter](global.md): parameters defined at the workflow define page.
+* [Startup Parameter](startup-parameter.md): parameters defined at the workflow launch page.
 * [Parameter Context](context.md): parameters passed by upstream task nodes.
 * [Local Parameter](local.md): parameters belong to its node, which is the parameters defined by the user in [Custom Parameters].
 
 The user can define part of the parameters when creating workflow definitions.
 
-As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Local Parameter > Parameter Context > Global Parameter`.
+As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Startup Parameter > Local Parameter > Parameter Context > Global Parameter > Project-level Parameter`.
 
 In the case of upstream tasks can pass parameters to the downstream, there may be multiple tasks upstream that pass the same parameter name:
 
@@ -17,7 +19,7 @@ In the case of upstream tasks can pass parameters to the downstream, there may b
 
 ## Example
 
-Followings are examples showing task parameters priority problems:
+The following are examples showing task parameters priority problems:
 
 1: Use shell nodes to explain the first case.
 

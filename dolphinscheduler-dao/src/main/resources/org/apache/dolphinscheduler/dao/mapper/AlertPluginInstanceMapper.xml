@@ -20,7 +20,7 @@
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper">
 
     <sql id="baseSql">
-        id, plugin_define_id, plugin_instance_params, create_time, update_time, instance_name
+        id, plugin_define_id, plugin_instance_params, instance_type, warning_type, create_time, update_time, instance_name
     </sql>
 
 
@@ -30,6 +30,14 @@
         <include refid="baseSql"/>
         from t_ds_alert_plugin_instance
         where 1 = 1 order by update_time desc
+    </select>
+
+    <select id="queryAllGlobalAlertPluginInstanceList"
+            resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_alert_plugin_instance
+        where instance_type = 1 order by update_time desc
     </select>
 
     <select id="queryByIds" resultType="org.apache.dolphinscheduler.dao.entity.AlertPluginInstance">
@@ -53,6 +61,7 @@
         <if test="instanceName != null and instanceName != ''">
             and instance_name like concat('%', #{instanceName}, '%')
         </if>
+        order by update_time desc
     </select>
 
     <select id="existInstanceName" resultType="java.lang.Boolean">

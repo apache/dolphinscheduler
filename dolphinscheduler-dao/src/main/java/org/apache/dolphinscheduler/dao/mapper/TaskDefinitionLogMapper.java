@@ -24,10 +24,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
-
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,7 +33,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * task definition log mapper interface
  */
-@CacheConfig(cacheNames = "taskDefinition", keyGenerator = "cacheKeyGenerator")
 public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
 
     /**
@@ -46,13 +42,11 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version version
      * @return task definition log
      */
-    @Cacheable(sync = true)
     TaskDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
      * update
      */
-    @CacheEvict(key = "#p0.code + '_' + #p0.version")
     int updateById(@Param("et") TaskDefinitionLog taskDefinitionLog);
 
     /**
@@ -62,7 +56,6 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      * @param version task definition version
      * @return delete result
      */
-    @CacheEvict
     int deleteByCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**
@@ -73,6 +66,7 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
     Integer queryMaxVersionForDefinition(@Param("code") long code);
 
     /**
+     * todo: rename to query by code and version
      * @param taskDefinitions taskDefinition list
      * @return list
      */
@@ -96,4 +90,6 @@ public interface TaskDefinitionLogMapper extends BaseMapper<TaskDefinitionLog> {
      */
     IPage<TaskDefinitionLog> queryTaskDefinitionVersionsPaging(Page<TaskDefinitionLog> page, @Param("code") long code,
                                                                @Param("projectCode") long projectCode);
+
+    void deleteByTaskDefinitionCodes(@Param("taskDefinitionCodes") Set<Long> taskDefinitionCodes);
 }

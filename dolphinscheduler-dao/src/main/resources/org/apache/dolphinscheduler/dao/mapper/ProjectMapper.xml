@@ -84,15 +84,18 @@
         select
         <include refid="baseSqlV2">
             <property name="alias" value="p"/>
-        </include>
-        ,
+        </include> ,
         u.user_name as user_name,
-        (SELECT COUNT(*) FROM t_ds_process_definition AS def WHERE def.project_code = p.code) AS def_count,
-        (SELECT COUNT(*) FROM t_ds_process_definition_log def, t_ds_process_instance inst WHERE def.code =
-        inst.process_definition_code and def.version = inst.process_definition_version AND def.project_code = p.code
-        AND inst.state=1 ) as inst_running_count
+        count(distinct def.id) AS def_count,
+        count(distinct inst.id) as inst_running_count
         from t_ds_project p
         left join t_ds_user u on u.id=p.user_id
+        left join t_ds_process_definition def
+        on def.project_code = p.code
+        left join t_ds_process_instance inst
+        on inst.process_definition_code = def.code
+        and inst.process_definition_version = def.version
+        and inst.state = 1
         where 1=1
         <if test="projectsIds != null and projectsIds.size() > 0">
             and p.id  in
@@ -105,7 +108,8 @@
             OR p.description LIKE concat('%', #{searchName}, '%')
             )
         </if>
-        order by p.create_time desc
+        group by p.id,u.user_name
+        order by p.id desc
     </select>
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
@@ -179,10 +183,38 @@
             and  dp.id in (select project_id from t_ds_relation_project_user  where user_id=#{userId}
             union select id as project_id  from t_ds_project where user_id=#{userId})
         </if>
+        <if test="projectsIds != null and projectsIds.size() > 0">
+            and dp.id  in
+            <foreach item="id" index="index" collection="projectsIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryAllProjectForDependent" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select code, name
         from t_ds_project
+    </select>
+
+    <select id="queryProjectByTaskInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        from t_ds_task_instance ti
+        join t_ds_process_instance pi on ti.process_instance_id = pi.id
+        join t_ds_process_definition pd on pi.process_definition_code = pd.code
+        join t_ds_project p on p.code = pd.project_code
+        where ti.id = #{taskInstanceId}
+    </select>
+    <select id="queryAllWorkflowCounts" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_ds_process_definition
+        where 1=1
+        <if test="projectsCodes != null and projectsCodes.size() > 0">
+            and project_code  in
+            <foreach item="code" index="index" collection="projectsCodes" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </if>
     </select>
 </mapper>

@@ -24,7 +24,9 @@ export function useDependentTimeout(model: {
 }): IJsonItem[] {
   const { t } = useI18n()
   const timeCompleteSpan = computed(() => (model.timeoutShowFlag ? 24 : 0))
-  const timeCompleteEnableSpan = computed(() => (model.timeoutFlag ? 12 : 0))
+  const timeCompleteEnableSpan = computed(() =>
+    model.timeoutFlag && model.timeoutShowFlag ? 12 : 0
+  )
 
   const strategyOptions = [
     {
@@ -36,11 +38,11 @@ export function useDependentTimeout(model: {
       value: 'FAILED'
     }
   ]
+
   watch(
     () => model.timeoutFlag,
     (timeoutFlag) => {
-      model.timeoutNotifyStrategy = timeoutFlag ? ['WARN'] : []
-      model.timeout = timeoutFlag ? 30 : null
+      model.timeoutShowFlag = timeoutFlag
     }
   )
 
@@ -56,8 +58,14 @@ export function useDependentTimeout(model: {
       name: t('project.node.waiting_dependent_complete'),
       props: {
         'on-update:value': (value: boolean) => {
-          model.timeoutNotifyStrategy = value ? ['WARN'] : null
-          model.timeout = value ? 30 : null
+          if (value) {
+            if (!model.timeoutNotifyStrategy.length) {
+              model.timeoutNotifyStrategy = ['WARN']
+            }
+            if (!model.timeout) {
+              model.timeout = 30
+            }
+          }
         }
       },
       span: timeCompleteSpan

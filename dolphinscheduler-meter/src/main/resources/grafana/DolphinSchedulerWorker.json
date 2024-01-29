@@ -179,7 +179,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "process_start_time_seconds{}",
+          "expr": "process_start_time_seconds{application=\"worker-server\"}",
           "refId": "A"
         }
       ],
@@ -437,11 +437,11 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "ds_task_running{}",
+          "expr": "ds_worker_task{}",
           "refId": "A"
         }
       ],
-      "title": "Worker Running Task",
+      "title": "Worker Tasks Total",
       "type": "timeseries"
     },
     {

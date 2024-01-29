@@ -37,6 +37,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
     <dependencies>
         <!-- dolphinscheduler -->
         <dependency>
@@ -49,6 +50,12 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-dao</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-meter</artifactId>
@@ -75,7 +82,21 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+            <artifactId>dolphinscheduler-scheduler-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-storage-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-master</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-worker</artifactId>
         </dependency>
 
         <dependency>
@@ -163,7 +184,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Python -->
+        <!-- Python API's Gateway server -->
         <dependency>
             <groupId>net.sf.py4j</groupId>
             <artifactId>py4j</artifactId>
@@ -176,7 +197,7 @@
 
         <dependency>
             <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-kubernetes-fabric8-config</artifactId>
+            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
         </dependency>
 
         <dependency>
@@ -191,8 +212,25 @@
         </dependency>
 
         <dependency>
+            <groupId>org.casbin</groupId>
+            <artifactId>casdoor-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.azure.resourcemanager</groupId>
+            <artifactId>azure-resourcemanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.azure.resourcemanager</groupId>
+            <artifactId>azure-resourcemanager-datafactory</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-alert</artifactId>
         </dependency>
     </dependencies>
     <build>

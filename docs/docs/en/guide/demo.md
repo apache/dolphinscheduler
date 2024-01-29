@@ -8,7 +8,7 @@ To prevent data loss by some miss-operation, it is recommended to back up data b
 
 ### Download the Latest Version Installation Package
 
-Download the latest binary distribute package from [download](/en-us/download/download.html) and then put it in the different
+Download the latest binary distribute package from [download](https://dolphinscheduler.apache.org/en-us/download) and then put it in the different
 directory where current service running. And all below command is running in this directory.
 
 ## Start

@@ -17,20 +17,30 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.sql.Connection;
 import java.text.MessageFormat;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.alibaba.druid.sql.parser.SQLParserUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 
+@Slf4j
 public abstract class AbstractDataSourceProcessor implements DataSourceProcessor {
 
     private static final Pattern IPV4_PATTERN = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.\\,]+$");
@@ -39,13 +49,16 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
 
     private static final Pattern DATABASE_PATTER = Pattern.compile("^[a-zA-Z0-9\\_\\-\\.]+$");
 
-    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.]+$");
+    private static final Pattern PARAMS_PATTER = Pattern.compile("^[a-zA-Z0-9\\-\\_\\/\\@\\.\\:]+$");
 
     private static final Set<String> POSSIBLE_MALICIOUS_KEYS = Sets.newHashSet("allowLoadLocalInfile");
 
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO baseDataSourceParamDTO) {
-        checkHost(baseDataSourceParamDTO.getHost());
+        if (!baseDataSourceParamDTO.getType().equals(DbType.REDSHIFT)) {
+            // due to redshift use not regular hosts
+            checkHost(baseDataSourceParamDTO.getHost());
+        }
         checkDatabasePatter(baseDataSourceParamDTO.getDatabase());
         checkOther(baseDataSourceParamDTO.getOther());
     }
@@ -56,7 +69,8 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      * @param host datasource host
      */
     protected void checkHost(String host) {
-        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+        if (com.google.common.net.InetAddresses.isInetAddress(host)) {
+        } else if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
             throw new IllegalArgumentException("datasource host illegal");
         }
     }
@@ -81,13 +95,24 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         if (MapUtils.isEmpty(other)) {
             return;
         }
+
         if (!Sets.intersection(other.keySet(), POSSIBLE_MALICIOUS_KEYS).isEmpty()) {
             throw new IllegalArgumentException("Other params include possible malicious keys.");
         }
-        boolean paramsCheck = other.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
-        if (!paramsCheck) {
-            throw new IllegalArgumentException("datasource other params illegal");
+
+        for (Map.Entry<String, String> entry : other.entrySet()) {
+            if (!PARAMS_PATTER.matcher(entry.getKey()).matches()) {
+                throw new IllegalArgumentException("datasource other params: " + entry.getKey() + " illegal");
+            }
         }
+    }
+
+    protected Map<String, String> transformOtherParamToMap(String other) {
+        if (StringUtils.isBlank(other)) {
+            return Collections.emptyMap();
+        }
+        return JSONUtils.parseObject(other, new TypeReference<Map<String, String>>() {
+        });
     }
 
     @Override
@@ -95,5 +120,20 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getUser(),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()), baseConnectionParam.getJdbcUrl());
+    }
+
+    @Override
+    public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
+        try (Connection connection = getConnection(connectionParam)) {
+            return true;
+        } catch (Exception e) {
+            log.error("Check datasource connectivity for: {} error", getDbType().name(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.other);
     }
 }

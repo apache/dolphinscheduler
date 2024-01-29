@@ -26,22 +26,26 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-import org.apache.dolphinscheduler.service.registry.RegistryClient;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -55,21 +59,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.facebook.presto.jdbc.internal.guava.base.Strings;
 
 /**
  * worker group service impl
  */
 @Service
+@Slf4j
 public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceImpl.class);
 
     @Autowired
     private WorkerGroupMapper workerGroupMapper;
@@ -88,6 +92,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * create or update a worker group
@@ -108,41 +118,44 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             return result;
         }
         if (StringUtils.isEmpty(name)) {
-            logger.warn("Parameter name can ot be null.");
+            log.warn("Parameter name can ot be null.");
             putMsg(result, Status.NAME_NULL);
             return result;
         }
         Date now = new Date();
-        WorkerGroup workerGroup;
+        WorkerGroup workerGroup = null;
         if (id != 0) {
             workerGroup = workerGroupMapper.selectById(id);
-            // check exist
-            if (workerGroup == null) {
-                workerGroup = new WorkerGroup();
-                workerGroup.setCreateTime(now);
+            if (Objects.nonNull(workerGroup) && !workerGroup.getName().equals(name)) {
+                if (checkWorkerGroupDependencies(workerGroup, result)) {
+                    return result;
+                }
             }
-        } else {
+        }
+        if (workerGroup == null) {
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
         }
+
         workerGroup.setName(name);
         workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
         workerGroup.setDescription(description);
 
         if (checkWorkerGroupNameExists(workerGroup)) {
-            logger.warn("Worker group with the same name already exists, name:{}.", workerGroup.getName());
+            log.warn("Worker group with the same name already exists, name:{}.", workerGroup.getName());
             putMsg(result, Status.NAME_EXIST, workerGroup.getName());
             return result;
         }
         String invalidAddr = checkWorkerGroupAddrList(workerGroup);
         if (invalidAddr != null) {
-            logger.warn("Worker group address is invalid, invalidAddr:{}.", invalidAddr);
+            log.warn("Worker group address is invalid, invalidAddr:{}.", invalidAddr);
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
+
         handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
-        logger.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
+        log.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -153,8 +166,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
-            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(),
-                    Collections.singletonList(workerGroup.getId()), logger);
         }
     }
 
@@ -165,23 +176,68 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private boolean checkWorkerGroupNameExists(WorkerGroup workerGroup) {
+        // check database
         List<WorkerGroup> workerGroupList = workerGroupMapper.queryWorkerGroupByName(workerGroup.getName());
         if (CollectionUtils.isNotEmpty(workerGroupList)) {
-            // new group has same name
+            // create group, the same group name exists in the database
             if (workerGroup.getId() == null) {
                 return true;
             }
-            // check group id
-            for (WorkerGroup group : workerGroupList) {
-                if (Objects.equals(group.getId(), workerGroup.getId())) {
-                    return true;
-                }
+            // update group, the database exists with the same group name except itself
+            Optional<WorkerGroup> sameNameWorkGroupOptional = workerGroupList.stream()
+                    .filter(group -> !Objects.equals(group.getId(), workerGroup.getId())).findFirst();
+            if (sameNameWorkGroupOptional.isPresent()) {
+                return true;
             }
         }
-        // check zookeeper
-        String workerGroupPath =
-                Constants.REGISTRY_DOLPHINSCHEDULER_WORKERS + Constants.SINGLE_SLASH + workerGroup.getName();
-        return registryClient.exists(workerGroupPath);
+        return false;
+    }
+
+    /**
+     * check if the worker group has any dependent tasks,schedulers or environments.
+     *
+     * @param workerGroup worker group
+     * @return boolean
+     */
+    private boolean checkWorkerGroupDependencies(WorkerGroup workerGroup, Map<String, Object> result) {
+        // check if the worker group has any dependent tasks
+        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.selectList(
+                new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getWorkerGroup, workerGroup.getName()));
+
+        if (CollectionUtils.isNotEmpty(taskDefinitions)) {
+            List<String> taskNames = taskDefinitions.stream().limit(3).map(taskDefinition -> taskDefinition.getName())
+                    .collect(Collectors.toList());
+
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS, taskDefinitions.size(),
+                    JSONUtils.toJsonString(taskNames));
+            return true;
+        }
+
+        // check if the worker group has any dependent schedulers
+        List<Schedule> schedules = scheduleMapper
+                .selectList(new QueryWrapper<Schedule>().lambda().eq(Schedule::getWorkerGroup, workerGroup.getName()));
+
+        if (CollectionUtils.isNotEmpty(schedules)) {
+            List<String> processNames = schedules.stream().limit(3)
+                    .map(schedule -> processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode()).getName())
+                    .collect(Collectors.toList());
+
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
+                    JSONUtils.toJsonString(processNames));
+            return true;
+        }
+
+        // check if the worker group has any dependent environments
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
+                environmentWorkerGroupRelationMapper.selectList(new QueryWrapper<EnvironmentWorkerGroupRelation>()
+                        .lambda().eq(EnvironmentWorkerGroupRelation::getWorkerGroup, workerGroup.getName()));
+
+        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelations)) {
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS, environmentWorkerGroupRelations.size());
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -194,7 +250,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
             return null;
         }
-        Map<String, String> serverMaps = registryClient.getServerMaps(NodeType.WORKER);
+        Map<String, String> serverMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
         for (String addr : workerGroup.getAddrList().split(Constants.COMMA)) {
             if (!serverMaps.containsKey(addr)) {
                 return addr;
@@ -225,7 +281,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroups = getWorkerGroups(null);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
             workerGroups = getWorkerGroups(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<WorkerGroup> resultDataList = new ArrayList<>();
@@ -275,7 +331,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroups = getWorkerGroups(null);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), logger);
+                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
             workerGroups = getWorkerGroups(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
         }
         List<String> availableWorkerGroupList = workerGroups.stream()
@@ -299,11 +355,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         } else {
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
-        Optional<Boolean> containDefaultWorkerGroups = workerGroups.stream()
-                .map(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName())).findAny();
-        if (!containDefaultWorkerGroups.isPresent() || !containDefaultWorkerGroups.get()) {
+        boolean containDefaultWorkerGroups = workerGroups.stream()
+                .anyMatch(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName()));
+        if (!containDefaultWorkerGroups) {
             // there doesn't exist a default WorkerGroup, we will add all worker to the default worker group.
-            Set<String> activeWorkerNodes = registryClient.getServerNodeSet(NodeType.WORKER);
+            Set<String> activeWorkerNodes = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
             WorkerGroup defaultWorkerGroup = new WorkerGroup();
             defaultWorkerGroup.setName(Constants.DEFAULT_WORKER_GROUP);
             defaultWorkerGroup.setAddrList(String.join(Constants.COMMA, activeWorkerNodes));
@@ -332,7 +388,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
         WorkerGroup workerGroup = workerGroupMapper.selectById(id);
         if (workerGroup == null) {
-            logger.error("Worker group does not exist, workerGroupId:{}.", id);
+            log.error("Worker group does not exist, workerGroupId:{}.", id);
             putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
             return result;
         }
@@ -342,22 +398,20 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (CollectionUtils.isNotEmpty(processInstances)) {
             List<Integer> processInstanceIds =
                     processInstances.stream().map(ProcessInstance::getId).collect(Collectors.toList());
-            logger.warn(
+            log.warn(
                     "Delete worker group failed because there are {} processInstances are using it, processInstanceIds:{}.",
                     processInstances.size(), processInstanceIds);
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
-        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelationList =
-                environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName());
-        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelationList)) {
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size(),
-                    workerGroup.getName());
+
+        if (checkWorkerGroupDependencies(workerGroup, result)) {
             return result;
         }
+
         workerGroupMapper.deleteById(id);
-        processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
-        logger.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
+
+        log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -370,7 +424,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<String, Object> getWorkerAddressList() {
         Map<String, Object> result = new HashMap<>();
-        Set<String> serverNodeList = registryClient.getServerNodeSet(NodeType.WORKER);
+        Set<String> serverNodeList = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -393,7 +447,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         if (processInstance != null) {
             return processInstance.getWorkerGroup();
         }
-        logger.info("task : {} will use default worker group", taskInstance.getId());
+        log.info("task : {} will use default worker group", taskInstance.getId());
         return Constants.DEFAULT_WORKER_GROUP;
     }
 

@@ -89,17 +89,23 @@
                a.user_id,
                a.comparison_type,
                a.error_output_path,
-               b.name as process_definition_name,
-               e.name as process_instance_name,
-               c.name as task_name,
+               b.name  as process_definition_name,
+               e.name  as process_instance_name,
+               c.name  as task_name,
                cp.type as comparison_type_name,
                d.user_name
         FROM t_ds_dq_execute_result a
-        left join t_ds_process_definition b on a.process_definition_id = b.id
-        left join t_ds_task_instance c on a.task_instance_id = c.id
-        left join t_ds_process_instance e on a.process_instance_id = e.id
-        left join t_ds_user d on d.id = a.user_id
-        left join t_ds_dq_comparison_type cp on cp.id = a.comparison_type
-        where  task_instance_id = #{taskInstanceId}
+                 left join t_ds_process_definition b on a.process_definition_id = b.id
+                 left join t_ds_task_instance c on a.task_instance_id = c.id
+                 left join t_ds_process_instance e on a.process_instance_id = e.id
+                 left join t_ds_user d on d.id = a.user_id
+                 left join t_ds_dq_comparison_type cp on cp.id = a.comparison_type
+        where task_instance_id = #{taskInstanceId}
     </select>
+
+    <delete id="deleteByWorkflowInstanceId">
+        delete
+        from t_ds_dq_execute_result
+        where process_instance_id = #{workflowInstanceId}
+    </delete>
 </mapper>

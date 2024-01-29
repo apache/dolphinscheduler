@@ -15,7 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
+
 from github.resp_get import RespGet
 
 
@@ -25,6 +26,7 @@ class PullRequest:
     :param token: token to request GitHub API entrypoint.
     :param repo: GitHub repository identify, use `user/repo` or `org/repo`.
     """
+
     url_search = "https://api.github.com/search/issues"
     url_pr = "https://api.github.com/repos/{}/pulls/{}"
 
@@ -41,7 +43,9 @@ class PullRequest:
 
         :param number: pull requests number you want to get detail.
         """
-        return RespGet(url=self.url_pr.format(self.repo, number), headers=self.headers).get_single()
+        return RespGet(
+            url=self.url_pr.format(self.repo, number), headers=self.headers
+        ).get_single()
 
     def get_merged_detail_by_milestone(self, milestone: str) -> List[Dict]:
         """Get all merged requests pull request detail by specific milestone.
@@ -49,9 +53,13 @@ class PullRequest:
         :param milestone: query by specific milestone.
         """
         detail = []
-        numbers = {pr.get("number") for pr in self.search_merged_by_milestone(milestone)}
+        numbers = {
+            pr.get("number") for pr in self.search_merged_by_milestone(milestone)
+        }
         for number in numbers:
-            pr_dict = RespGet(url=self.url_pr.format(self.repo, number), headers=self.headers).get_single()
+            pr_dict = RespGet(
+                url=self.url_pr.format(self.repo, number), headers=self.headers
+            ).get_single()
             detail.append(pr_dict)
         return detail
 
@@ -61,4 +69,6 @@ class PullRequest:
         :param milestone: query by specific milestone.
         """
         params = {"q": f"repo:{self.repo} is:pr is:merged milestone:{milestone}"}
-        return RespGet(url=self.url_search, headers=self.headers, param=params).get_total()
+        return RespGet(
+            url=self.url_search, headers=self.headers, param=params
+        ).get_total()

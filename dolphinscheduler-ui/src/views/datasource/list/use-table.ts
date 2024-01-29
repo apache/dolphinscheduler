@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import {
   queryDataSourceListPaging,
   deleteDataSource
@@ -26,7 +26,7 @@ export function useTable() {
     page: 1,
     pageSize: 10,
     itemCount: 0,
-    searchVal: '',
+    searchVal: ref(''),
     list: [],
     loading: false
   })

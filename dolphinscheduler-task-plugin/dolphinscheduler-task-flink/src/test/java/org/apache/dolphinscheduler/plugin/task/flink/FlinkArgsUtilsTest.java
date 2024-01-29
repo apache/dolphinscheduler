@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.util.List;
 
@@ -37,9 +38,7 @@ public class FlinkArgsUtilsTest {
         flinkParameters.setDeployMode(flinkDeployMode);
         flinkParameters.setParallelism(4);
         ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(1);
-        resourceInfo.setResourceName("job");
-        resourceInfo.setRes("/opt/job.jar");
+        resourceInfo.setResourceName("/opt/job.jar");
         flinkParameters.setMainJar(resourceInfo);
         flinkParameters.setMainClass("org.example.Main");
         flinkParameters.setSlot(4);
@@ -53,6 +52,14 @@ public class FlinkArgsUtilsTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskAppId("app-id");
         taskExecutionContext.setExecutePath("/tmp/execution");
+
+        ResourceContext.ResourceItem resourceItem = new ResourceContext.ResourceItem();
+        resourceItem.setResourceAbsolutePathInLocal("/opt/job.jar");
+        resourceItem.setResourceAbsolutePathInStorage("/opt/job.jar");
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem);
+        taskExecutionContext.setResourceContext(resourceContext);
         return taskExecutionContext;
     }
 
@@ -67,7 +74,7 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testRunJarInClusterMode() throws Exception {
+    public void testRunJarInClusterMode() {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setFlinkVersion("1.11");
         List<String> commandLine1 =
@@ -95,7 +102,7 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testRunJarInLocalMode() throws Exception {
+    public void testRunJarInLocalMode() {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
@@ -105,7 +112,7 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testRunSql() throws Exception {
+    public void testRunSql() {
         FlinkParameters flinkParameters = buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER);
         flinkParameters.setProgramType(ProgramType.SQL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
@@ -115,18 +122,18 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    public void testInitOptionsInClusterMode() throws Exception {
+    public void testInitOptionsInLocalMode() {
         List<String> initOptions =
-                FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
+                FlinkArgsUtils.buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.LOCAL));
         Assertions.assertEquals(2, initOptions.size());
         Assertions.assertTrue(initOptions.contains("set execution.target=local"));
         Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
     }
 
     @Test
-    public void testInitOptionsInApplicationMode() throws Exception {
+    public void testInitOptionsInClusterMode() throws Exception {
         List<String> initOptions = FlinkArgsUtils
-                .buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.APPLICATION));
+                .buildInitOptionsForSql(buildTestFlinkParametersWithDeployMode(FlinkDeployMode.CLUSTER));
         Assertions.assertEquals(6, initOptions.size());
         Assertions.assertTrue(initOptions.contains("set execution.target=yarn-per-job"));
         Assertions.assertTrue(initOptions.contains("set taskmanager.numberOfTaskSlots=4"));

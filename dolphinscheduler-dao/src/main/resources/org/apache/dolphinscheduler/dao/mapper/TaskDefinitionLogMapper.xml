@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper">
     <sql id="baseSql">
-        id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
+        id, code, name, version, description, project_code, user_id, task_type, task_params, flag, is_cache, task_priority,
         worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,
         resource_ids, operator, operate_time, create_time, update_time, task_group_id, task_group_priority, cpu_quota, memory_max, task_execute_type
     </sql>
@@ -50,17 +50,18 @@
     </select>
     <insert id="batchInsert">
         insert into t_ds_task_definition_log (code, name, version, description, project_code, user_id,
-        task_type, task_params, flag, task_priority, worker_group, environment_code, fail_retry_times, fail_retry_interval,
+        task_type, task_params, flag, is_cache, task_priority, worker_group, environment_code, fail_retry_times, fail_retry_interval,
         timeout_flag, timeout_notify_strategy, timeout, delay_time, resource_ids, operator, operate_time, create_time,
         update_time, task_group_id, task_group_priority, cpu_quota, memory_max, task_execute_type)
         values
         <foreach collection="taskDefinitionLogs" item="taskDefinitionLog" separator=",">
             (#{taskDefinitionLog.code},#{taskDefinitionLog.name},#{taskDefinitionLog.version},#{taskDefinitionLog.description},
             #{taskDefinitionLog.projectCode},#{taskDefinitionLog.userId},#{taskDefinitionLog.taskType},#{taskDefinitionLog.taskParams},
-            #{taskDefinitionLog.flag},#{taskDefinitionLog.taskPriority},#{taskDefinitionLog.workerGroup},#{taskDefinitionLog.environmentCode},
+            #{taskDefinitionLog.flag},#{taskDefinitionLog.isCache},#{taskDefinitionLog.taskPriority},#{taskDefinitionLog.workerGroup},#{taskDefinitionLog.environmentCode},
             #{taskDefinitionLog.failRetryTimes},#{taskDefinitionLog.failRetryInterval},#{taskDefinitionLog.timeoutFlag},#{taskDefinitionLog.timeoutNotifyStrategy},
             #{taskDefinitionLog.timeout},#{taskDefinitionLog.delayTime},#{taskDefinitionLog.resourceIds},#{taskDefinitionLog.operator},#{taskDefinitionLog.operateTime},
-            #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime}, #{taskDefinitionLog.taskGroupId},#{taskDefinitionLog.taskGroupPriority},
+            #{taskDefinitionLog.createTime},#{taskDefinitionLog.updateTime},
+            #{taskDefinitionLog.taskGroupId},#{taskDefinitionLog.taskGroupPriority},
             #{taskDefinitionLog.cpuQuota},#{taskDefinitionLog.memoryMax},#{taskDefinitionLog.taskExecuteType})
         </foreach>
     </insert>
@@ -70,7 +71,8 @@
         where code = #{code}
           and version = #{version}
     </delete>
-    <select id="queryTaskDefinitionVersionsPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
+    <select id="queryTaskDefinitionVersionsPaging"
+            resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog">
         select
         <include refid="baseSql"/>
         from t_ds_task_definition_log
@@ -80,4 +82,12 @@
         </if>
         order by version desc
     </select>
+    <delete id="deleteByTaskDefinitionCodes">
+        delete
+        from t_ds_task_definition_log
+        where code in
+        <foreach collection="taskDefinitionCodes" item="taskDefinitionCode" separator="," open="(" close=")">
+            #{taskDefinitionCode}
+        </foreach>
+    </delete>
 </mapper>

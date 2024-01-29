@@ -26,17 +26,16 @@ import {
   CheckCircleFilled,
   Loading3QuartersOutlined,
   PauseCircleFilled,
-  ClockCircleOutlined,
   StopFilled,
   StopOutlined,
-  GlobalOutlined,
   IssuesCloseOutlined,
   SendOutlined,
-  HistoryOutlined
+  HistoryOutlined,
+  HourglassOutlined
 } from '@vicons/antd'
 import { format, parseISO } from 'date-fns'
 import _ from 'lodash'
-import { ITaskStateConfig } from './types'
+import { ITaskStateConfig, IWorkflowExecutionStateConfig } from './types'
 /**
  * Intelligent display kb m
  */
@@ -121,6 +120,14 @@ export const runningType = (t: any) => [
   {
     desc: `${t('project.workflow.recover_serial_wait')}`,
     code: 'RECOVER_SERIAL_WAIT'
+  },
+  {
+    desc: `${t('project.workflow.execute_task')}`,
+    code: 'EXECUTE_TASK'
+  },
+  {
+    desc: `${t('project.workflow.dynamic_generation')}`,
+    code: 'DYNAMIC_GENERATION'
   }
 ]
 
@@ -133,6 +140,20 @@ export const stateType = (t: any) => [
     label: `${t('project.workflow.all_status')}`
   },
   ...Object.entries(tasksState(t)).map(([key, item]) => ({
+    value: key,
+    label: item.desc
+  }))
+]
+
+/**
+ * State code table
+ */
+export const workflowExecutionStateType = (t: any) => [
+  {
+    value: '',
+    label: `${t('project.workflow.all_status')}`
+  },
+  ...Object.entries(workflowExecutionState(t)).map(([key, item]) => ({
     value: key,
     label: item.desc
   }))
@@ -175,6 +196,107 @@ export const streamStateType = (t: any) => [
  * @isSpin is loading (Need to execute the code block to write if judgment)
  */
 export const tasksState = (t: any): ITaskStateConfig => ({
+  SUBMITTED_SUCCESS: {
+    id: 0,
+    desc: `${t('project.workflow.submit_success')}`,
+    color: '#A9A9A9',
+    icon: IssuesCloseOutlined,
+    isSpin: false,
+    classNames: 'submitted_success'
+  },
+  RUNNING_EXECUTION: {
+    id: 1,
+    desc: `${t('project.workflow.executing')}`,
+    color: '#0097e0',
+    icon: SettingFilled,
+    isSpin: true,
+    classNames: 'running_execution'
+  },
+  PAUSE: {
+    id: 3,
+    desc: `${t('project.workflow.pause')}`,
+    color: '#057c72',
+    icon: PauseCircleOutlined,
+    isSpin: false,
+    classNames: 'pause'
+  },
+  STOP: {
+    id: 5,
+    desc: `${t('project.workflow.stop')}`,
+    color: '#e90101',
+    icon: StopOutlined,
+    isSpin: false,
+    classNames: 'stop'
+  },
+  FAILURE: {
+    id: 6,
+    desc: `${t('project.workflow.failed')}`,
+    color: '#000000',
+    icon: CloseCircleOutlined,
+    isSpin: false,
+    classNames: 'failed'
+  },
+  SUCCESS: {
+    id: 7,
+    desc: `${t('project.workflow.success')}`,
+    color: '#95DF96',
+    icon: CheckCircleOutlined,
+    isSpin: false,
+    classNames: 'success'
+  },
+  NEED_FAULT_TOLERANCE: {
+    id: 8,
+    desc: `${t('project.workflow.need_fault_tolerance')}`,
+    color: '#FF8C00',
+    icon: EditOutlined,
+    isSpin: false,
+    classNames: 'need_fault_tolerance'
+  },
+  KILL: {
+    id: 9,
+    desc: `${t('project.workflow.kill')}`,
+    color: '#a70202',
+    icon: MinusCircleOutlined,
+    isSpin: false,
+    classNames: 'kill'
+  },
+  DELAY_EXECUTION: {
+    id: 12,
+    desc: `${t('project.workflow.delay_execution')}`,
+    color: '#5102ce',
+    icon: PauseCircleFilled,
+    isSpin: false,
+    classNames: 'delay_execution'
+  },
+  FORCED_SUCCESS: {
+    id: 13,
+    desc: `${t('project.workflow.forced_success')}`,
+    color: '#5102ce',
+    icon: CheckCircleFilled,
+    isSpin: false,
+    classNames: 'forced_success'
+  },
+  DISPATCH: {
+    id: 17,
+    desc: `${t('project.workflow.dispatch')}`,
+    color: '#5101be',
+    icon: SendOutlined,
+    isSpin: false,
+    classNames: 'dispatch'
+  }
+})
+
+/**
+ * Workflow execution status
+ * @id id
+ * @desc tooltip
+ * @color color
+ * @icon icon
+ * @isSpin is loading (Need to execute the code block to write if judgment)
+ */
+export const workflowExecutionState = (
+  t: any
+): IWorkflowExecutionStateConfig => ({
   SUBMITTED_SUCCESS: {
     id: 0,
     desc: `${t('project.workflow.submit_success')}`,
@@ -239,38 +361,6 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     isSpin: false,
     classNames: 'success'
   },
-  NEED_FAULT_TOLERANCE: {
-    id: 8,
-    desc: `${t('project.workflow.need_fault_tolerance')}`,
-    color: '#FF8C00',
-    icon: EditOutlined,
-    isSpin: false,
-    classNames: 'need_fault_tolerance'
-  },
-  KILL: {
-    id: 9,
-    desc: `${t('project.workflow.kill')}`,
-    color: '#a70202',
-    icon: MinusCircleOutlined,
-    isSpin: false,
-    classNames: 'kill'
-  },
-  WAITING_THREAD: {
-    id: 10,
-    desc: `${t('project.workflow.waiting_for_thread')}`,
-    color: '#912eed',
-    icon: ClockCircleOutlined,
-    isSpin: false,
-    classNames: 'waiting_thread'
-  },
-  WAITING_DEPEND: {
-    id: 11,
-    desc: `${t('project.workflow.waiting_for_dependence')}`,
-    color: '#5101be',
-    icon: GlobalOutlined,
-    isSpin: false,
-    classNames: 'waiting_depend'
-  },
   DELAY_EXECUTION: {
     id: 12,
     desc: `${t('project.workflow.delay_execution')}`,
@@ -278,14 +368,6 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     icon: PauseCircleFilled,
     isSpin: false,
     classNames: 'delay_execution'
-  },
-  FORCED_SUCCESS: {
-    id: 13,
-    desc: `${t('project.workflow.forced_success')}`,
-    color: '#5102ce',
-    icon: CheckCircleFilled,
-    isSpin: false,
-    classNames: 'forced_success'
   },
   SERIAL_WAIT: {
     id: 14,
@@ -295,22 +377,30 @@ export const tasksState = (t: any): ITaskStateConfig => ({
     isSpin: true,
     classNames: 'serial_wait'
   },
-  DISPATCH: {
+  READY_BLOCK: {
     id: 15,
-    desc: `${t('project.workflow.dispatch')}`,
+    desc: `${t('project.workflow.ready_to_block')}`,
     color: '#5101be',
     icon: SendOutlined,
     isSpin: false,
-    classNames: 'dispatch'
+    classNames: 'pending'
   },
-  PENDING: {
-    id: 18,
-    desc: `${t('project.workflow.pending')}`,
+  BLOCK: {
+    id: 16,
+    desc: `${t('project.workflow.block')}`,
     color: '#5101be',
     icon: HistoryOutlined,
     isSpin: false,
     classNames: 'pending'
-  }
+  },
+  WAIT_TO_RUN: {
+    id: 18,
+    desc: `${t('project.overview.wait_to_run')}`,
+    color: '#5102ce',
+    icon: HourglassOutlined,
+    isSpin: false,
+    classNames: 'wait_to_run'
+  },
 })
 
 /**

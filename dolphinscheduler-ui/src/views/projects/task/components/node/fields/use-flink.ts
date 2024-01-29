@@ -16,7 +16,7 @@
  */
 import { computed, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCustomParams, useMainJar, useResources } from '.'
+import { useCustomParams, useMainJar, useResources, useYarnQueue } from '.'
 import type { IJsonItem } from '../types'
 
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
@@ -44,6 +44,22 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const appNameSpan = computed(() => (model.deployMode !== 'local' ? 24 : 0))
 
   const deployModeOptions = computed(() => {
+    if (model.programType === 'SQL') {
+      return [
+        {
+          label: 'per-job/cluster',
+          value: 'cluster'
+        },
+        {
+          label: 'local',
+          value: 'local'
+        },
+        {
+          label: 'standalone',
+          value: 'standalone'
+        }
+      ]
+    }
     if (model.flinkVersion === '<1.10') {
       return [
         {
@@ -86,7 +102,8 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   )
 
   watchEffect(() => {
-    model.flinkVersion = model.programType === 'SQL' ? '>=1.13' : '<1.10'
+    model.flinkVersion =
+      model.programType === 'SQL' ? '>=1.13' : model.flinkVersion
   })
 
   return [
@@ -149,6 +166,9 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       field: 'rawScript',
       span: scriptSpan,
       name: t('project.node.script'),
+      props: {
+        language: 'sql'
+      },
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
@@ -262,6 +282,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       value: model.parallelism
     },
+    useYarnQueue(),
     {
       type: 'input',
       field: 'mainArgs',

@@ -27,4 +27,15 @@
     </parent>
 
     <artifactId>dolphinscheduler-registry-api</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-extract-base</artifactId>
+        </dependency>
+    </dependencies>
 </project>

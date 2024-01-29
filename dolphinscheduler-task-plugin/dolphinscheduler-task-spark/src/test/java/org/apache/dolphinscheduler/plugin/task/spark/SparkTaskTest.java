@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.util.Collections;
 
@@ -42,38 +43,47 @@ public class SparkTaskTest {
 
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
-        Assertions.assertEquals(sparkTask.buildCommand(),
+        Assertions.assertEquals(
                 "${SPARK_HOME}/bin/spark-sql " +
                         "--master yarn " +
                         "--deploy-mode client " +
-                        "--driver-cores 1 " +
-                        "--driver-memory 512M " +
-                        "--num-executors 2 " +
-                        "--executor-cores 2 " +
-                        "--executor-memory 1G " +
+                        "--conf spark.driver.cores=1 " +
+                        "--conf spark.driver.memory=512M " +
+                        "--conf spark.executor.instances=2 " +
+                        "--conf spark.executor.cores=2 " +
+                        "--conf spark.executor.memory=1G " +
                         "--name sparksql " +
-                        "-f /tmp/5536_node.sql");
+                        "-f /tmp/5536_node.sql",
+                sparkTask.getScript());
     }
 
     @Test
     public void testBuildCommandWithSparkSubmit() {
         String parameters = buildSparkParametersWithSparkSubmit();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        ResourceContext.ResourceItem resourceItem = new ResourceContext.ResourceItem();
+        resourceItem.setResourceAbsolutePathInStorage("/lib/dolphinscheduler-task-spark.jar");
+        resourceItem.setResourceAbsolutePathInLocal("/lib/dolphinscheduler-task-spark.jar");
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem);
+
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
-        Assertions.assertEquals(sparkTask.buildCommand(),
+        Assertions.assertEquals(
                 "${SPARK_HOME}/bin/spark-submit " +
                         "--master yarn " +
                         "--deploy-mode client " +
                         "--class org.apache.dolphinscheduler.plugin.task.spark.SparkTaskTest " +
-                        "--driver-cores 1 " +
-                        "--driver-memory 512M " +
-                        "--num-executors 2 " +
-                        "--executor-cores 2 " +
-                        "--executor-memory 1G " +
+                        "--conf spark.driver.cores=1 " +
+                        "--conf spark.driver.memory=512M " +
+                        "--conf spark.executor.instances=2 " +
+                        "--conf spark.executor.cores=2 " +
+                        "--conf spark.executor.memory=1G " +
                         "--name spark " +
-                        "lib/dolphinscheduler-task-spark.jar");
+                        "/lib/dolphinscheduler-task-spark.jar",
+                sparkTask.getScript());
     }
 
     private String buildSparkParametersWithSparkSql() {
@@ -107,8 +117,6 @@ public class SparkTaskTest {
         sparkParameters.setExecutorMemory("1G");
         sparkParameters.setExecutorCores(2);
         ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(1);
-        resourceInfo.setRes("dolphinscheduler-task-spark.jar");
         resourceInfo.setResourceName("/lib/dolphinscheduler-task-spark.jar");
         sparkParameters.setMainJar(resourceInfo);
         return JSONUtils.toJsonString(sparkParameters);

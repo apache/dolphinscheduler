@@ -24,6 +24,7 @@ import lombok.Getter;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -34,13 +35,15 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
     @FindBy(className = "btn-create-directory")
     private WebElement buttonCreateDirectory;
 
-    @FindBy(className = "btn-upload-udf")
+    @FindBy(className = "btn-upload-resource")
     private WebElement buttonUploadUdf;
 
     @FindBy(className = "items")
@@ -54,7 +57,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final UploadFileBox uploadFileBox;
 
-    private final RenameDirectoryBox renameDirectoryBox;
+    private final RenameBox renameBox;
 
     private final CreateDirectoryBox createDirectoryBox;
 
@@ -63,22 +66,23 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
 
         uploadFileBox = new UploadFileBox();
 
-        renameDirectoryBox = new RenameDirectoryBox();
+        renameBox = new RenameBox();
 
         createDirectoryBox = new CreateDirectoryBox();
     }
 
-    public UdfManagePage createDirectory(String name, String description) {
+    public UdfManagePage createDirectory(String name) {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        createDirectoryBox().inputDescription().sendKeys(description);
         createDirectoryBox().buttonSubmit().click();
 
         return this;
     }
 
     public UdfManagePage uploadFile(String filePath) {
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonUploadUdf));
+
         buttonUploadUdf().click();
 
         driver.setFileDetector(new LocalFileDetector());
@@ -106,15 +110,15 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
         udfList()
             .stream()
             .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
+            .flatMap(it -> it.findElements(By.className("btn-rename")).stream())
             .filter(WebElement::isDisplayed)
             .findFirst()
             .orElseThrow(() -> new RuntimeException("No rename button in udf manage list"))
             .click();
 
-        renameDirectoryBox().inputName().clear();
-        renameDirectoryBox().inputName().sendKeys(AfterName);
-        renameDirectoryBox().buttonSubmit().click();
+        renameBox().inputName().clear();
+        renameBox().inputName().sendKeys(AfterName);
+        renameBox().buttonSubmit().click();
 
         return this;
     }
@@ -135,22 +139,16 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     @Getter
-    public class RenameDirectoryBox {
-        RenameDirectoryBox() {
+    public class RenameBox {
+        RenameBox() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-                @FindBy(className = "input-directory-name"),
-                @FindBy(tagName = "input"),
+            @FindBy(className = "input-name"),
+            @FindBy(tagName = "input"),
         })
         private WebElement inputName;
-
-        @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;
@@ -189,12 +187,6 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
                 @FindBy(tagName = "input"),
         })
         private WebElement inputDirectoryName;
-
-        @FindBys({
-                @FindBy(className = "input-description"),
-                @FindBy(tagName = "textarea"),
-        })
-        private WebElement inputDescription;
 
         @FindBy(className = "btn-submit")
         private WebElement buttonSubmit;

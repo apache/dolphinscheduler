@@ -20,13 +20,19 @@ package org.apache.dolphinscheduler.dao.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("t_ds_task_group")
 public class TaskGroup implements Serializable {
 
@@ -66,27 +72,8 @@ public class TaskGroup implements Serializable {
      */
     private Date updateTime;
     /**
-     * project Id
+     * project code
      */
     private long projectCode;
 
-    public TaskGroup(String name, long projectCode, String description, int groupSize, int userId, int status) {
-        this.name = name;
-        this.projectCode = projectCode;
-        this.description = description;
-        this.groupSize = groupSize;
-        this.userId = userId;
-        this.status = status;
-        init();
-
-    }
-
-    public TaskGroup() {
-        init();
-    }
-
-    public void init() {
-        this.status = 1;
-        this.useSize = 0;
-    }
 }

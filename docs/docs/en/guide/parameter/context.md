@@ -13,8 +13,15 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [Shell](../task/shell.md)
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
+* [Python](../task/python.md)
+* [SubProcess](../task/sub-process.md)
+* [Kubernetes](../task/kubernetes.md)
 
-When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. At present, we mainly focus on the SQL and shell nodes to pass parameters downstream.
+When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a SubProcess node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the subprocess.
+
+The value of upstream parameter can be updated in downstream node in the same way as [setting parameter](#create-a-shell-task-and-set-parameters).
+
+Upstream parameter will be override when defining parameter with the same name in downstream node.
 
 > Note: If there are no dependencies between nodes, local parameters cannot be passed upstream.
 
@@ -55,7 +62,7 @@ When the SHELL task is completed, we can use the output passed upstream as the q
 
 Click on the Save workflow icon and set the global parameters output and value.
 
-![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter04.png)
+![context-parameter04](../../../../img/new_ui/dev/parameter/context_parameter04.png)
 
 #### View results
 
@@ -73,6 +80,52 @@ The result of Node_mysql is as follows:
 
 ![context-log03](../../../../img/new_ui/dev/parameter/context_log03.png)
 
-Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
+Even though output is assigned a value of 1 in Node_A's script, the log still shows a value of 100. But according to the principle from [parameter priority](priority.md): `Startup Parameter > Local Parameter > Parameter Context > Global Parameter`, the output value in Node_B is 1. It proves that the output parameter is passed in the workflow with reference to the expected value, and the query operation is completed using this value in Node_mysql.
 
 But the output value 66 only shows in the Node_A, the reason is that the direction of value is selected as IN, and only when the direction is OUT will it be defined as a variable output.
+
+#### Pass parameter from Python task to downstream
+
+Use `print('${setValue(key=%s)}' % value)`, DolphinScheduler will capture the `${setValue(key=value}` in the output to capture the parameters and pass them downstream.
+
+For example
+
+![python_context_param](../../../../img/new_ui/dev/parameter/python_context_param.png)
+
+Attention: When the variable value contains the `\n` identifier, such as ` value = "hello \n world" `, value needs to be carried out in a special way. You need to use `print('${setValue(key=%s)}' % repr(value))`, otherwise the argument cannot be passed to the subsequent flow.
+
+#### Pass parameter from SubProcess task to downstream
+
+In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
+
+Create an A task in the workflow definition of the subprocess, add var1 and var2 parameters to the custom parameters, and write the following script:
+
+![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+
+Save the subprocess_example1 workflow and set the global parameters var1.
+
+![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+
+Create a sub_process task in a new workflow, and use the subprocess_example1 workflow as the sub-node.
+
+![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+
+Create a shell task as a downstream task of the sub_process task, and write the following script:
+
+![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+
+Save the workflow and run it. The result of the downstream task is as follows:
+
+![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+
+Although the two parameters var1 and var2 are output in the A task, only the `OUT` parameter var1 is defined in the workflow definition, and the downstream task successfully outputs var1. It proves that the var1 parameter is passed in the workflow with reference to the expected value.
+
+#### Pass parameter from Kubernetes task to downstream
+
+Different programming languages may use different logging frameworks in Kubernetes tasks. To be compatible with these frameworks, DolphinScheduler provides a universal logging data format `${(key=value)}` or `#{(key=value)}`. Users can output log data in the format in the terminal logs of their applications, where `key` is the corresponding parameter prop and `value` is the value of that parameter. DolphinScheduler will capture the `${(key=value)}` or `#{(key=value)}` in the output logs to capture the parameters and pass them downstream.
+
+For example
+
+![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
+
+Another special consideration, not always can DolphinScheduler collect pod logs, if the user redirects the log output stream, DolphinScheduler can not collect logs for use and can not use the output parameter, either.

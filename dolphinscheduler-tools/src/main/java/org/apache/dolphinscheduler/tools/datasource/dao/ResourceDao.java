@@ -17,21 +17,16 @@
 
 package org.apache.dolphinscheduler.tools.datasource.dao;
 
-import org.apache.dolphinscheduler.common.utils.ConnectionUtils;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -39,41 +34,9 @@ import com.google.common.base.Strings;
 /**
  * resource dao
  */
+@Deprecated
+@Slf4j
 public class ResourceDao {
-
-    public static final Logger logger = LoggerFactory.getLogger(ResourceDao.class);
-
-    /**
-     * list all resources
-     *
-     * @param conn connection
-     * @return map that key is full_name and value is id
-     */
-    Map<String, Integer> listAllResources(Connection conn) {
-        Map<String, Integer> resourceMap = new HashMap<>();
-
-        String sql = String.format("SELECT id,full_name FROM t_ds_resources");
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                Integer id = rs.getInt(1);
-                String fullName = rs.getString(2);
-                resourceMap.put(fullName, id);
-            }
-
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            ConnectionUtils.releaseResource(rs, pstmt, conn);
-        }
-
-        return resourceMap;
-    }
 
     /**
      * list all resources by the type
@@ -86,15 +49,13 @@ public class ResourceDao {
 
         String sql =
                 String.format("SELECT full_name, type, size, is_directory FROM t_ds_resources where type = %d", type);
-        ResultSet rs = null;
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
-            rs = pstmt.executeQuery();
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 String fullName = rs.getString("full_name");
-                Boolean isDirectory = rs.getBoolean("is_directory");
+                boolean isDirectory = rs.getBoolean("is_directory");
                 long fileSize = rs.getLong("size");
 
                 if (StringUtils.isNotBlank(fullName) && !isDirectory) {
@@ -109,18 +70,8 @@ public class ResourceDao {
                 }
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            if (Objects.nonNull(pstmt)) {
-                try {
-                    if (!pstmt.isClosed()) {
-                        pstmt.close();
-                    }
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
         }
         return resourceSizeMap;
     }
@@ -134,9 +85,7 @@ public class ResourceDao {
         Map<String, Long> resourceSizeMap = listAllResourcesByFileType(conn, type);
 
         String sql = "UPDATE t_ds_resources SET size=? where type=? and full_name=? and is_directory = true";
-        PreparedStatement pstmt = null;
-        try {
-            pstmt = conn.prepareStatement(sql);
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             for (Map.Entry<String, Long> entry : resourceSizeMap.entrySet()) {
                 pstmt.setLong(1, entry.getValue());
                 pstmt.setInt(2, type);
@@ -145,19 +94,8 @@ public class ResourceDao {
             }
             pstmt.executeBatch();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new RuntimeException("sql: " + sql, e);
-        } finally {
-            if (Objects.nonNull(pstmt)) {
-                try {
-                    if (!pstmt.isClosed()) {
-                        pstmt.close();
-                    }
-                } catch (SQLException e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-            ConnectionUtils.releaseResource(conn);
         }
     }
 

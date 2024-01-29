@@ -171,7 +171,7 @@ public class ResourcesControllerTest extends AbstractControllerTest {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
         Mockito.when(resourcesService
-                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString(),
+                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
@@ -388,28 +388,6 @@ public class ResourcesControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testAuthorizedFile() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(resourcesService.authorizedFile(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "2");
-
-        MvcResult mvcResult = mockMvc.perform(get("/resources/authed-file")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 

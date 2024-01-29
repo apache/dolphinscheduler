@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.remote.command.TaskExecuteAckCommand;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionFinishEventAck;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
@@ -33,10 +35,13 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class TaskResultEventHandler implements TaskEventHandler {
 
     @Autowired
@@ -96,12 +101,14 @@ public class TaskResultEventHandler implements TaskEventHandler {
             taskInstance.setEndTime(taskEvent.getEndTime());
             taskInstance.setVarPool(taskEvent.getVarPool());
             processService.changeOutParam(taskInstance);
-            taskInstanceDao.updateTaskInstance(taskInstance);
-            sendAckToWorker(taskEvent);
+            taskInstanceDao.updateById(taskInstance);
         } catch (Exception ex) {
             TaskInstanceUtils.copyTaskInstance(oldTaskInstance, taskInstance);
             throw new TaskEventHandleError("Handle task result event error, save taskInstance to db error", ex);
         }
+
+        sendAckToWorker(taskEvent);
+
         TaskStateEvent stateEvent = TaskStateEvent.builder()
                 .processInstanceId(taskEvent.getProcessInstanceId())
                 .taskInstanceId(taskEvent.getTaskInstanceId())
@@ -113,13 +120,16 @@ public class TaskResultEventHandler implements TaskEventHandler {
     }
 
     public void sendAckToWorker(TaskEvent taskEvent) {
-        // we didn't set the receiver address, since the ack doen's need to retry
-        TaskExecuteAckCommand taskExecuteAckMessage = new TaskExecuteAckCommand(true,
-                taskEvent.getTaskInstanceId(),
-                masterConfig.getMasterAddress(),
-                taskEvent.getWorkerAddress(),
-                System.currentTimeMillis());
-        taskEvent.getChannel().writeAndFlush(taskExecuteAckMessage.convert2Command());
+        try {
+            ITaskInstanceExecutionEventAckListener instanceExecutionEventAckListener =
+                    SingletonJdkDynamicRpcClientProxyFactory
+                            .getProxyClient(taskEvent.getWorkerAddress(), ITaskInstanceExecutionEventAckListener.class);
+            instanceExecutionEventAckListener.handleTaskInstanceExecutionFinishEventAck(
+                    TaskInstanceExecutionFinishEventAck.success(taskEvent.getTaskInstanceId()));
+        } catch (Exception e) {
+            // master ignore the exception, worker will retry to send this TaskEventType.RESULT event again.
+            log.warn("send ack to worker error, taskInstanceId: {}", taskEvent.getTaskInstanceId(), e);
+        }
     }
 
     @Override

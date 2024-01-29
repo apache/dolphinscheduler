@@ -21,11 +21,26 @@ DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
 
 source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
 
-JAVA_OPTS=${JAVA_OPTS:-"-server -Duser.timezone=${SPRING_JACKSON_TIME_ZONE} -Xms4g -Xmx4g -Xmn2g -XX:+PrintGCDetails -Xloggc:gc.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=dump.hprof"}
+JVM_ARGS_ENV_FILE=${BIN_DIR}/jvm_args_env.sh
+JVM_ARGS="-server"
+
+if [ -f $JVM_ARGS_ENV_FILE ]; then
+  while read line
+  do
+      if [[ "$line" == -* ]]; then
+            JVM_ARGS="${JVM_ARGS} $line"
+      fi
+  done < $JVM_ARGS_ENV_FILE
+fi
+
+JAVA_OPTS=${JAVA_OPTS:-"${JVM_ARGS}"}
 
 if [[ "$DOCKER" == "true" ]]; then
   JAVA_OPTS="${JAVA_OPTS} -XX:-UseContainerSupport"
 fi
+
+echo "JAVA_HOME=${JAVA_HOME}"
+echo "JAVA_OPTS=${JAVA_OPTS}"
 
 $JAVA_HOME/bin/java $JAVA_OPTS \
   -cp "$DOLPHINSCHEDULER_HOME/conf":"$DOLPHINSCHEDULER_HOME/libs/*" \

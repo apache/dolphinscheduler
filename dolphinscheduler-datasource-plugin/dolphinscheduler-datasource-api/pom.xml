@@ -30,7 +30,6 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -41,7 +40,6 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -142,5 +140,11 @@
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

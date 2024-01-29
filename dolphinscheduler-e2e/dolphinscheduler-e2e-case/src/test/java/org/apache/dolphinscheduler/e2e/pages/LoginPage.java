@@ -32,6 +32,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
+import java.time.Duration;
+
 @Getter
 public final class LoginPage extends NavBarPage {
     @FindBys({
@@ -58,7 +60,7 @@ public final class LoginPage extends NavBarPage {
 
     @SneakyThrows
     public NavBarPage login(String username, String password) {
-        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
+        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
 
         buttonSwitchLanguage().click();
 
@@ -66,7 +68,7 @@ public final class LoginPage extends NavBarPage {
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        new WebDriverWait(driver, 10)
+        new WebDriverWait(driver, Duration.ofSeconds(30))
             .until(ExpectedConditions.urlContains("/home"));
 
         return new NavBarPage(driver);

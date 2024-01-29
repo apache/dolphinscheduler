@@ -18,10 +18,10 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
@@ -72,7 +72,7 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @param projectCodes projectCodes
      * @return task definition list
      */
-    List<DefinitionGroupByUser> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
+    List<WorkflowDefinitionCountDto> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
 
     /**
      * list all resource ids and task_params containing resourceList
@@ -111,7 +111,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      *
      * @param page page
      * @param projectCode projectCode
-     * @param searchWorkflowName searchWorkflowName
      * @param searchTaskName searchTaskName
      * @param taskType taskType
      * @param taskExecuteType taskExecuteType
@@ -119,10 +118,18 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      */
     IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
                                               @Param("projectCode") long projectCode,
-                                              @Param("searchWorkflowName") String searchWorkflowName,
                                               @Param("searchTaskName") String searchTaskName,
                                               @Param("taskType") String taskType,
                                               @Param("taskExecuteType") TaskExecuteType taskExecuteType);
+
+    /**
+     * task main info
+     * @param projectCode project code
+     * @param codeList code list
+     * @return task main info
+     */
+    List<TaskMainInfo> queryDefineListByCodeList(@Param("projectCode") long projectCode,
+                                                 @Param("codeList") List<Long> codeList);
 
     /**
      * query task definition by code list
@@ -149,4 +156,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return deleted row count
      */
     int deleteByBatchCodes(@Param("taskCodeList") List<Long> taskCodeList);
+
+    void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

@@ -24,18 +24,19 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,54 +44,40 @@ import org.springframework.stereotype.Repository;
  * Task Instance DAO implementation
  */
 @Repository
-public class TaskInstanceDaoImpl implements TaskInstanceDao {
-
-    private final Logger logger = LoggerFactory.getLogger(TaskInstanceDaoImpl.class);
-
-    @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+@Slf4j
+public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMapper> implements TaskInstanceDao {
 
     @Autowired
     private ProcessInstanceMapper processInstanceMapper;
 
-    @Autowired
-    private ProcessInstanceMapDao processInstanceMapDao;
+    public TaskInstanceDaoImpl(@NonNull TaskInstanceMapper taskInstanceMapper) {
+        super(taskInstanceMapper);
+    }
 
     @Override
     public boolean upsertTaskInstance(TaskInstance taskInstance) {
         if (taskInstance.getId() != null) {
-            return updateTaskInstance(taskInstance);
+            return updateById(taskInstance);
         } else {
-            return insertTaskInstance(taskInstance);
+            return insert(taskInstance) > 0;
         }
     }
 
     @Override
-    public boolean insertTaskInstance(TaskInstance taskInstance) {
-        int count = taskInstanceMapper.insert(taskInstance);
-        return count > 0;
-    }
-
-    @Override
-    public boolean updateTaskInstance(TaskInstance taskInstance) {
-        int count = taskInstanceMapper.updateById(taskInstance);
-        return count > 0;
-    }
-
-    @Override
-    public TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
+    public boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance) {
         WorkflowExecutionStatus processInstanceState = processInstance.getState();
         if (processInstanceState.isFinished() || processInstanceState == WorkflowExecutionStatus.READY_STOP) {
-            logger.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
+            log.warn("processInstance: {} state was: {}, skip submit this task, taskCode: {}",
                     processInstance.getId(),
                     processInstanceState,
                     taskInstance.getTaskCode());
-            return null;
+            return false;
         }
         if (processInstanceState == WorkflowExecutionStatus.READY_PAUSE) {
             taskInstance.setState(TaskExecutionStatus.PAUSE);
         }
         taskInstance.setExecutorId(processInstance.getExecutorId());
+        taskInstance.setExecutorName(processInstance.getExecutorName());
         taskInstance.setState(getSubmitTaskState(taskInstance, processInstance));
         if (taskInstance.getSubmitTime() == null) {
             taskInstance.setSubmitTime(new Date());
@@ -98,11 +85,7 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
         if (taskInstance.getFirstSubmitTime() == null) {
             taskInstance.setFirstSubmitTime(taskInstance.getSubmitTime());
         }
-        boolean saveResult = upsertTaskInstance(taskInstance);
-        if (!saveResult) {
-            return null;
-        }
-        return taskInstance;
+        return upsertTaskInstance(taskInstance);
     }
 
     private TaskExecutionStatus getSubmitTaskState(TaskInstance taskInstance, ProcessInstance processInstance) {
@@ -131,7 +114,8 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
             return true;
         }
         List<TaskInstance> taskInstances =
-                this.findValidTaskListByProcessId(taskInstance.getProcessInstanceId(), taskInstance.getTestFlag());
+                this.queryValidTaskListByWorkflowInstanceId(taskInstance.getProcessInstanceId(),
+                        taskInstance.getTestFlag());
 
         for (TaskInstance task : taskInstances) {
             if (task.getState() == TaskExecutionStatus.FAILURE
@@ -143,28 +127,61 @@ public class TaskInstanceDaoImpl implements TaskInstanceDao {
     }
 
     @Override
-    public List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag) {
-        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES, testFlag);
+    public List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag) {
+        return mybatisMapper.findValidTaskListByProcessId(processInstanceId, Flag.YES, testFlag);
     }
 
     @Override
-    public List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId) {
+    public TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer processInstanceId, Long taskCode) {
+        return mybatisMapper.queryByInstanceIdAndCode(processInstanceId, taskCode);
+    }
+
+    @Override
+    public List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer processInstanceId) {
         ProcessInstance processInstance = processInstanceMapper.selectById(processInstanceId);
-        return taskInstanceMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
+        return mybatisMapper.findValidTaskListByProcessId(processInstanceId, Flag.NO,
                 processInstance.getTestFlag());
     }
 
     @Override
-    public TaskInstance findTaskInstanceById(Integer taskId) {
-        return taskInstanceMapper.selectById(taskId);
+    public TaskInstance queryByCacheKey(String cacheKey) {
+        if (StringUtils.isEmpty(cacheKey)) {
+            return null;
+        }
+        return mybatisMapper.queryByCacheKey(cacheKey);
     }
 
     @Override
-    public List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList) {
-        if (CollectionUtils.isEmpty(idList)) {
-            return new ArrayList<>();
+    public Boolean clearCacheByCacheKey(String cacheKey) {
+        try {
+            mybatisMapper.clearCacheByCacheKey(cacheKey);
+            return true;
+        } catch (Exception e) {
+            log.error("clear cache by cacheKey failed", e);
+            return false;
         }
-        return taskInstanceMapper.selectBatchIds(idList);
     }
 
+    @Override
+    public void deleteByWorkflowInstanceId(int workflowInstanceId) {
+        mybatisMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+
+    @Override
+    public List<TaskInstance> queryByWorkflowInstanceId(Integer workflowInstanceId) {
+        return mybatisMapper.findByWorkflowInstanceId(workflowInstanceId);
+    }
+
+    @Override
+    public List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
+                                                                                 Set<Long> taskCodes,
+                                                                                 int testFlag) {
+        return mybatisMapper.findLastTaskInstances(processInstanceId, taskCodes, testFlag);
+    }
+
+    @Override
+    public TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId, long depTaskCode,
+                                                                       int testFlag) {
+        return mybatisMapper.findLastTaskInstance(processInstanceId, depTaskCode, testFlag);
+    }
 }

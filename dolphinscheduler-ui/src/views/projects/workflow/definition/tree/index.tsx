@@ -17,21 +17,40 @@
 
 import Card from '@/components/card'
 import { ArrowLeftOutlined } from '@vicons/antd'
-import { NButton, NFormItem, NIcon, NSelect, NSpace, NImage } from 'naive-ui'
-import { defineComponent, onMounted, Ref, ref, watch } from 'vue'
+import {
+  NButton,
+  NFormItem,
+  NIcon,
+  NSelect,
+  NSpace,
+  NImage,
+  NTooltip
+} from 'naive-ui'
+import {
+  defineComponent,
+  onMounted,
+  Ref,
+  ref,
+  watch,
+  h,
+  toRefs,
+  reactive,
+  getCurrentInstance
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import styles from './index.module.scss'
-import UseTree from '@/views/projects/workflow/definition/tree/use-tree'
+import UseD3Tree from '@/views/projects/workflow/definition/tree/use-d3-tree'
+import Tree from '@/views/projects/workflow/definition/tree/use-d3-tree/tree'
 import { IChartDataItem } from '@/components/chart/modules/types'
 import { Router, useRouter } from 'vue-router'
 import { viewTree } from '@/service/modules/process-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
-import { find } from 'lodash'
-import { tasksState } from '@/common/common'
+import { tasksState, uuid } from '@/common/common'
 import type { ITaskTypeNodeOption } from './types'
+import { cloneDeep, map } from 'lodash'
 
 export default defineComponent({
-  name: 'WorkflowDefinitionTiming',
+  name: 'WorkflowDefinitionTree',
   setup() {
     const router: Router = useRouter()
     const { t, locale } = useI18n()
@@ -146,6 +165,18 @@ export default defineComponent({
       }
     ])
 
+    const showTooltip = ref(false)
+    const tooltipText = ref('')
+    const tooltipProps = reactive({
+      x: 0,
+      y: 0
+    })
+
+    const changeTooltip = (options: any) => {
+      tooltipProps.x = options.x
+      tooltipProps.y = options.y - 20
+    }
+
     const initTaskStateMap = () => {
       taskStateMap.value = Object.entries(tasksState(t)).map(([key, item]) => ({
         state: key,
@@ -154,72 +185,39 @@ export default defineComponent({
       }))
     }
 
-    const initChartData = (node: any, newNode: any) => {
-      newNode.children = []
-      node?.children.map((child: any) => {
-        const newChild = {}
-        initChartData(child, newChild)
-        newNode.children.push(newChild)
-      })
-
-      newNode.name = node.name
-      newNode.value = node.name === 'DAG' ? 'DAG' : node?.type
-      const taskTypeNodeOption = find(taskTypeNodeOptions.value, {
-        taskType: newNode.value
-      })
-      if (taskTypeNodeOption) {
-        newNode.itemStyle = { color: taskTypeNodeOption.color }
-        if (newNode.name !== 'DAG') {
-          let taskState = null
-          if (
-            node.instances &&
-            node.instances.length > 0 &&
-            node.instances[0].state
-          ) {
-            taskState = find(taskStateMap.value, {
-              state: node.instances[0].state
-            })
-          }
-          newNode.label = {
-            show: true,
-            formatter: [
-              `{name|${t('project.task.task_name')}:${newNode.name}}`,
-              `{type|${t('project.task.task_type')}:${
-                taskTypeNodeOption.taskType
-              }}`,
-              taskState
-                ? `{state|${t('project.workflow.task_state')}: ${
-                    taskState.value
-                  }}`
-                : ''
-            ].join('\n'),
-            rich: {
-              type: {
-                lineHeight: 20,
-                align: 'left'
-              },
-              name: {
-                lineHeight: 20,
-                align: 'left'
-              },
-              state: {
-                lineHeight: 20,
-                align: 'left',
-                color: taskState ? taskState.color : 'black'
-              }
-            }
-          }
-        }
-      }
-    }
+    const currentInstance = getCurrentInstance()
 
     const getWorkflowTreeData = async (limit: number) => {
       if (projectCode.value && definitionCode) {
+        Tree.reset()
+
         const res = await viewTree(projectCode.value, definitionCode.value, {
           limit: limit
         })
-        chartData.value = [{ name: 'DAG', value: 'DAG' }]
-        initChartData(res, chartData.value[0])
+
+        const treeData = cloneDeep(res)
+        if (!treeData?.children) return
+
+        const recursiveChildren = (children: any) => {
+          if (children.length) {
+            map(children, (v) => {
+              v.uuid = `${uuid('uuid_')}${uuid('') + uuid('')}`
+              if (v.children.length) {
+                recursiveChildren(v.children)
+              }
+            })
+          }
+        }
+
+        recursiveChildren(treeData.children)
+
+        Tree.init({
+          data: cloneDeep(treeData),
+          limit: limit,
+          selfTree: currentInstance,
+          taskTypeNodeOptions: taskTypeNodeOptions.value,
+          tasksStateObj: tasksState(t)
+        })
       }
     }
 
@@ -249,11 +247,15 @@ export default defineComponent({
       chartData,
       options,
       onSelectChange,
-      taskTypeNodeOptions
+      taskTypeNodeOptions,
+      showTooltip,
+      tooltipText,
+      changeTooltip,
+      ...toRefs(tooltipProps)
     }
   },
   render() {
-    const { chartData, options, onSelectChange, taskTypeNodeOptions } = this
+    const { options, onSelectChange, taskTypeNodeOptions } = this
     const { t } = useI18n()
     const router: Router = useRouter()
 
@@ -293,7 +295,24 @@ export default defineComponent({
                 </NButton>
               ))}
           </NSpace>
-          <UseTree chartData={chartData} />
+        </Card>
+        {h(
+          NTooltip,
+          {
+            show: this.showTooltip,
+            placement: 'top',
+            x: this.x,
+            y: this.y,
+            duration: 10,
+            'show-arrow': false
+          },
+          {
+            default: () => <div innerHTML={this.tooltipText}></div>,
+            trigger: () => ''
+          }
+        )}
+        <Card>
+          <UseD3Tree />
         </Card>
       </div>
     )

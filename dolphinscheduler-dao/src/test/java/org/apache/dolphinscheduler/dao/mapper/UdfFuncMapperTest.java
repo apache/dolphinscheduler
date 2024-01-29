@@ -93,16 +93,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
      * @return User
      */
     private User insertOneUser() {
-        User user = new User();
-        user.setUserName("user1");
-        user.setUserPassword("1");
-        user.setEmail("xx@123.com");
-        user.setUserType(UserType.GENERAL_USER);
-        user.setCreateTime(new Date());
-        user.setTenantId(1);
-        user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        return user;
+        return insertOneUser("user1");
     }
 
     /**
@@ -111,6 +102,15 @@ public class UdfFuncMapperTest extends BaseDaoTest {
      * @return User
      */
     private User insertOneUser(String userName) {
+        return createGeneralUser(userName);
+    }
+
+    /**
+     * create general user
+     *
+     * @return User
+     */
+    private User createGeneralUser(String userName) {
         User user = new User();
         user.setUserName(userName);
         user.setUserPassword("1");
@@ -138,24 +138,6 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         udfUser.setUpdateTime(new Date());
         udfUserMapper.insert(udfUser);
         return udfUser;
-    }
-
-    /**
-     * create general user
-     *
-     * @return User
-     */
-    private User createGeneralUser(String userName) {
-        User user = new User();
-        user.setUserName(userName);
-        user.setUserPassword("1");
-        user.setEmail("xx@123.com");
-        user.setUserType(UserType.GENERAL_USER);
-        user.setCreateTime(new Date());
-        user.setTenantId(1);
-        user.setUpdateTime(new Date());
-        userMapper.insert(user);
-        return user;
     }
 
     /**
@@ -199,7 +181,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         Integer[] idArray = new Integer[]{udfFunc.getId(), udfFunc1.getId()};
         // queryUdfByIdStr
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfByIdStr(idArray, "");
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
     }
 
     /**
@@ -216,7 +198,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
 
         IPage<UdfFunc> udfFuncIPage =
                 udfFuncMapper.queryUdfFuncPaging(page, Collections.singletonList(udfFunc.getId()), "");
-        Assertions.assertNotEquals(udfFuncIPage.getTotal(), 0);
+        Assertions.assertNotEquals(0, udfFuncIPage.getTotal());
 
     }
 
@@ -232,7 +214,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         // getUdfFuncByType
         List<UdfFunc> udfFuncList =
                 udfFuncMapper.getUdfFuncByType(Collections.singletonList(udfFunc.getId()), udfFunc.getType().ordinal());
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
 
     }
 
@@ -248,7 +230,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UdfFunc udfFunc1 = insertOne(user1);
         UdfFunc udfFunc2 = insertOne(user2);
         List<UdfFunc> udfFuncList = udfFuncMapper.queryUdfFuncExceptUserId(user1.getId());
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
 
     }
 
@@ -267,7 +249,7 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         UDFUser udfUser = insertOneUDFUser(user, udfFunc);
         // queryAuthedUdfFunc
         List<UdfFunc> udfFuncList = udfFuncMapper.queryAuthedUdfFunc(user.getId());
-        Assertions.assertNotEquals(udfFuncList.size(), 0);
+        Assertions.assertNotEquals(0, udfFuncList.size());
     }
 
     @Test

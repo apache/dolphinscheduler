@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -46,7 +47,7 @@ public class DataSourceUtilsTest {
     @Test
     public void testCheckDatasourceParam() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
-        mysqlDatasourceParamDTO.setHost("localhost");
+        mysqlDatasourceParamDTO.setHost("0.0.0.0");
         mysqlDatasourceParamDTO.setDatabase("default");
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
@@ -56,7 +57,19 @@ public class DataSourceUtilsTest {
         DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
         Assertions.assertTrue(true);
     }
-
+    @Test
+    public void testCheckIpv6DatasourceParam() {
+        MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
+        mysqlDatasourceParamDTO.setHost("0000:0000:0000::0000");
+        mysqlDatasourceParamDTO.setDatabase("default");
+        Map<String, String> other = new HashMap<>();
+        other.put("serverTimezone", "Asia/Shanghai");
+        other.put("queryTimeout", "-1");
+        other.put("characterEncoding", "utf8");
+        mysqlDatasourceParamDTO.setOther(other);
+        DataSourceUtils.checkDatasourceParam(mysqlDatasourceParamDTO);
+        Assertions.assertTrue(true);
+    }
     @Test
     public void testBuildConnectionParams() {
         MySQLDataSourceParamDTO mysqlDatasourceParamDTO = new MySQLDataSourceParamDTO();
@@ -91,22 +104,20 @@ public class DataSourceUtilsTest {
     }
 
     @Test
-    public void testGetConnection() throws ExecutionException {
+    public void testGetConnection() throws ExecutionException, SQLException {
         try (
                 MockedStatic<PropertyUtils> mockedStaticPropertyUtils = Mockito.mockStatic(PropertyUtils.class);
                 MockedStatic<DataSourceClientProvider> mockedStaticDataSourceClientProvider =
                         Mockito.mockStatic(DataSourceClientProvider.class)) {
             mockedStaticPropertyUtils.when(() -> PropertyUtils.getLong("kerberos.expire.time", 24L)).thenReturn(24L);
-            DataSourceClientProvider clientProvider = Mockito.mock(DataSourceClientProvider.class);
-            mockedStaticDataSourceClientProvider.when(DataSourceClientProvider::getInstance).thenReturn(clientProvider);
 
             Connection connection = Mockito.mock(Connection.class);
-            Mockito.when(clientProvider.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
+            Mockito.when(DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
 
             MySQLConnectionParam connectionParam = new MySQLConnectionParam();
             connectionParam.setUser("root");
             connectionParam.setPassword("123456");
-            connection = DataSourceClientProvider.getInstance().getConnection(DbType.MYSQL, connectionParam);
 
             Assertions.assertNotNull(connection);
         }
@@ -118,7 +129,7 @@ public class DataSourceUtilsTest {
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3308");
         String jdbcUrl = DataSourceUtils.getJdbcUrl(DbType.MYSQL, mysqlConnectionParam);
         Assertions.assertEquals(
-                "jdbc:mysql://localhost:3308?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+                "jdbc:mysql://localhost:3308",
                 jdbcUrl);
     }
 

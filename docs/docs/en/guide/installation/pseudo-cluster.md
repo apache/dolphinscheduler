@@ -8,13 +8,13 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 Pseudo-cluster deployment of DolphinScheduler requires external software support:
 
-* JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
-* Binary package: Download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/download.html)
-* Database: [PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) or [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+), you can choose one of the two, such as MySQL requires JDBC Driver 8.0.16
-* Registry Center: [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[download link][zookeeper]
-* Process tree analysis
-  * `pstree` for macOS
-  * `psmisc` for Fedora/Red/Hat/CentOS/Ubuntu/Debian
+- JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
+- Binary package: Download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download)
+- Database: [PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) or [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+), you can choose one of the two, such as MySQL requires JDBC Driver 8.0.16
+- Registry Center: [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[download link][zookeeper]
+- Process tree analysis
+  - `pstree` for macOS
+  - `psmisc` for Fedora/Red/Hat/CentOS/Ubuntu/Debian
 
 > **_Note:_** DolphinScheduler itself does not depend on Hadoop, Hive, Spark, but if you need to run tasks that depend on them, you need to have the corresponding environment support.
 
@@ -42,8 +42,8 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 
 > **_NOTICE:_**
 >
-> * Due to DolphinScheduler's multi-tenant task switch user using command `sudo -u {linux-user}`, the deployment user needs to have `sudo` privileges and be password-free. If novice learners don’t understand, you can ignore this point for now.
-> * If you find the line "Defaults requirett" in the `/etc/sudoers` file, please comment the content.
+> - Due to DolphinScheduler's multi-tenant task switch user using command `sudo -u {linux-user}`, the deployment user needs to have `sudo` privileges and be password-free. If novice learners don’t understand, you can ignore this point for now.
+> - If you find the line "Defaults requirett" in the `/etc/sudoers` file, please comment the content.
 
 ### Configure Machine SSH Password-Free Login
 
@@ -99,12 +99,12 @@ deployUser="dolphinscheduler"
 
 ### Modify `dolphinscheduler_env.sh`
 
-File  `./bin/env/dolphinscheduler_env.sh` describes the following configurations:
+File `./bin/env/dolphinscheduler_env.sh` describes the following configurations:
 
-* Database configuration of DolphinScheduler, see [Initialize the Database](#initialize-the-database) for detailed instructions.
-* Some tasks which need external dependencies or libraries such as `JAVA_HOME` and `SPARK_HOME`.
-* Registry center `zookeeper`.
-* Server related configuration, such as cache type, timezone, etc.
+- Database configuration of DolphinScheduler, see [Initialize the Database](#initialize-the-database) for detailed instructions.
+- Some tasks which need external dependencies or libraries such as `JAVA_HOME` and `SPARK_HOME`.
+- Registry center `zookeeper`.
+- Server related configuration, such as cache type, timezone, etc.
 
 You could ignore the task external dependencies if you do not use those tasks, but you have to change `JAVA_HOME`, registry center and database
 related configurations based on your environment.
@@ -133,12 +133,12 @@ export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-lo
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python/bin/python3}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/datax.py}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 ```
 
 ## Initialize the Database

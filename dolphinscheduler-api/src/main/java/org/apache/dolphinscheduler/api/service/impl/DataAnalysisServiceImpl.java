@@ -22,55 +22,63 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
+import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.TriFunction;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.google.common.collect.Lists;
 
 /**
  * data analysis service impl
  */
 @Service
+@Slf4j
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
-
-    private static final Logger logger = LoggerFactory.getLogger(DataAnalysisServiceImpl.class);
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -94,182 +102,96 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    private ProcessService processService;
+    private TaskDefinitionMapper taskDefinitionMapper;
 
-    /**
-     * statistical task instance status data
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param startDate   start date
-     * @param endDate     end date
-     * @return task state count data
-     */
     @Override
-    public Map<String, Object> countTaskStateByProject(User loginUser, long projectCode, String startDate,
-                                                       String endDate) {
-
-        return countStateByProject(
-                loginUser,
-                projectCode,
-                startDate,
-                endDate,
-                this::countTaskInstanceAllStatesByProjectCodes);
-    }
-
-    /**
-     * statistical process instance status data
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param startDate   start date
-     * @param endDate     end date
-     * @return process instance state count data
-     */
-    @Override
-    public Map<String, Object> countProcessInstanceStateByProject(User loginUser, long projectCode, String startDate,
+    public TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,
+                                                                  Long projectCode,
+                                                                  String startDate,
                                                                   String endDate) {
-        Map<String, Object> result = this.countStateByProject(
-                loginUser,
-                projectCode,
-                startDate,
-                endDate,
-                (start, end, projectCodes) -> this.processInstanceMapper.countInstanceStateByProjectCodes(start, end,
-                        projectCodes));
-
-        // process state count needs to remove state of forced success
-        if (result.containsKey(Constants.STATUS) && result.get(Constants.STATUS).equals(Status.SUCCESS)) {
-            ((TaskCountDto) result.get(Constants.DATA_LIST))
-                    .removeStateFromCountList(TaskExecutionStatus.FORCED_SUCCESS);
-        }
-        return result;
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        Date start = startDate == null ? null : transformDate(startDate);
+        Date end = endDate == null ? null : transformDate(endDate);
+        List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
+                taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
+        return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
-    /**
-     * Wrapper function of counting process instance state and task state
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param startDate   start date
-     * @param endDate     end date
-     */
-    private Map<String, Object> countStateByProject(User loginUser, long projectCode, String startDate, String endDate,
-                                                    TriFunction<Date, Date, Long[], List<ExecuteStatusCount>> instanceStateCounter) {
-        Map<String, Object> result = new HashMap<>();
-        if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
-        }
-
-        Date start = null;
-        Date end = null;
-        if (!StringUtils.isEmpty(startDate) && !StringUtils.isEmpty(endDate)) {
-            start = DateUtils.stringToDate(startDate);
-            end = DateUtils.stringToDate(endDate);
-            if (Objects.isNull(start) || Objects.isNull(end)) {
-                logger.warn("Parameter startDate or endDate is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
-        if (projectIds.getRight() != null) {
-            return projectIds.getRight();
-        }
-        Long[] projectCodeArray =
-                projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
-        List<ExecuteStatusCount> processInstanceStateCounts = new ArrayList<>();
-
-        if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
-            processInstanceStateCounts = instanceStateCounter.apply(start, end, projectCodeArray);
-        }
-
-        if (processInstanceStateCounts != null) {
-            TaskCountDto taskCountResult = new TaskCountDto(processInstanceStateCounts);
-            result.put(Constants.DATA_LIST, taskCountResult);
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
-    }
-
-    /**
-     * statistics the process definition quantities of a certain person
-     * <p>
-     * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @return definition count data
-     */
     @Override
-    public Map<String, Object> countDefinitionByUser(User loginUser, long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-        if (projectCode != 0) {
-            Project project = projectMapper.queryByCode(projectCode);
-            result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT_OVERVIEW);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                return result;
-            }
+    public TaskInstanceCountVO getAllTaskInstanceStateCount(User loginUser,
+                                                            String startDate,
+                                                            String endDate) {
+        List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
+        if (CollectionUtils.isEmpty(projectCodes)) {
+            return TaskInstanceCountVO.empty();
         }
-
-        List<DefinitionGroupByUser> defineGroupByUsers = new ArrayList<>();
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
-        if (projectIds.getRight() != null) {
-            List<DefinitionGroupByUser> emptyList = new ArrayList<>();
-            DefineUserDto dto = new DefineUserDto(emptyList);
-            result.put(Constants.DATA_LIST, dto);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        Long[] projectCodeArray =
-                projectCode == 0 ? getProjectCodesArrays(projectIds.getLeft()) : new Long[]{projectCode};
-        if (projectCodeArray.length != 0 || loginUser.getUserType() == UserType.ADMIN_USER) {
-            defineGroupByUsers = processDefinitionMapper.countDefinitionByProjectCodes(projectCodeArray);
-        }
-
-        DefineUserDto dto = new DefineUserDto(defineGroupByUsers);
-        result.put(Constants.DATA_LIST, dto);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        Date start = startDate == null ? null : transformDate(startDate);
+        Date end = endDate == null ? null : transformDate(endDate);
+        List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
+                taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
+        return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
-    /**
-     * statistical command status data
-     *
-     * @param loginUser login user
-     * @return command state count data
-     */
     @Override
-    public Map<String, Object> countCommandState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public WorkflowInstanceCountVO getWorkflowInstanceStateCountByProject(User loginUser,
+                                                                          Long projectCode,
+                                                                          String startDate,
+                                                                          String endDate) {
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        Date start = startDate == null ? null : transformDate(startDate);
+        Date end = endDate == null ? null : transformDate(endDate);
+        List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = processInstanceMapper
+                .countWorkflowInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
+        return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
+    }
 
-        /**
-         * find all the task lists in the project under the user
-         * statistics based on task status execution, failure, completion, wait, total
-         */
-        Date start = null;
-        Date end = null;
-        Pair<Set<Integer>, Map<String, Object>> projectIds = getProjectIds(loginUser, result);
-        if (projectIds.getRight() != null) {
-            List<CommandStateCount> noData = Arrays.stream(CommandType.values())
-                    .map(commandType -> new CommandStateCount(0, 0, commandType)).collect(Collectors.toList());
-            result.put(Constants.DATA_LIST, noData);
-            putMsg(result, Status.SUCCESS);
-            return result;
+    @Override
+    public WorkflowInstanceCountVO getAllWorkflowInstanceStateCount(User loginUser,
+                                                                    String startDate,
+                                                                    String endDate) {
+        List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
+        if (CollectionUtils.isEmpty(projectCodes)) {
+            return WorkflowInstanceCountVO.empty();
         }
-        Long[] projectCodeArray = getProjectCodesArrays(projectIds.getLeft());
+        Date start = startDate == null ? null : transformDate(startDate);
+        Date end = endDate == null ? null : transformDate(endDate);
+
+        List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos =
+                processInstanceMapper.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
+        return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
+    }
+
+    @Override
+    public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
+                processDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
+        return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
+    }
+
+    @Override
+    public WorkflowDefinitionCountVO getAllWorkflowDefinitionCount(User loginUser) {
+        List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
+        if (CollectionUtils.isEmpty(projectCodes)) {
+            return WorkflowDefinitionCountVO.empty();
+        }
+        return WorkflowDefinitionCountVO.of(processDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
+    }
+
+    @Override
+    public List<CommandStateCount> countCommandState(User loginUser) {
+
+        List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
+
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts =
-                commandMapper.countCommandState(start, end, projectCodeArray)
+                commandMapper.countCommandState(null, null, projectCodes)
                         .stream()
                         .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
         // count error command state
         Map<CommandType, Integer> errorCommandCounts =
-                errorCommandMapper.countCommandState(start, end, projectCodeArray)
+                errorCommandMapper.countCommandState(null, null, projectCodes)
                         .stream()
                         .collect(Collectors.toMap(CommandCount::getCommandType, CommandCount::getCount));
 
@@ -279,30 +201,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                         normalCountCommandCounts.getOrDefault(commandType, 0),
                         commandType))
                 .collect(Collectors.toList());
-
-        result.put(Constants.DATA_LIST, list);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    private Pair<Set<Integer>, Map<String, Object>> getProjectIds(User loginUser, Map<String, Object> result) {
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), logger);
-        if (projectIds.isEmpty()) {
-            List<ExecuteStatusCount> taskInstanceStateCounts = new ArrayList<>();
-            result.put(Constants.DATA_LIST, new TaskCountDto(taskInstanceStateCounts));
-            putMsg(result, Status.SUCCESS);
-            return Pair.of(null, result);
-        }
-        return Pair.of(projectIds, null);
-    }
-
-    private Long[] getProjectCodesArrays(Set<Integer> projectIds) {
-        List<Project> projects = projectMapper.selectBatchIds(projectIds);
-        List<Long> codeList = projects.stream().map(Project::getCode).collect(Collectors.toList());
-        Long[] projectCodeArray = new Long[codeList.size()];
-        codeList.toArray(projectCodeArray);
-        return projectCodeArray;
+        return list;
     }
 
     /**
@@ -311,46 +210,213 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
      * @return queue state count data
      */
     @Override
-    public Map<String, Object> countQueueState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Integer> countQueueState(User loginUser) {
 
         // TODO need to add detail data info
+        // todo: refactor this method, don't use Map
         Map<String, Integer> dataMap = new HashMap<>();
         dataMap.put("taskQueue", 0);
         dataMap.put("taskKill", 0);
-        result.put(Constants.DATA_LIST, dataMap);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return dataMap;
     }
 
+    /**
+     * query all workflow states count
+     *
+     * @param loginUser              login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return workflow states count
+     */
     @Override
-    public List<ExecuteStatusCount> countTaskInstanceAllStatesByProjectCodes(Date startTime, Date endTime,
-                                                                             Long[] projectCodes) {
-        Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(
-                this.taskInstanceMapper.countTaskInstanceStateByProjectCodes(startTime, endTime, projectCodes));
+    public TaskCountDto countWorkflowStates(User loginUser,
+                                            StatisticsStateRequest statisticsStateRequest) {
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (projectIds.isEmpty()) {
+            return new TaskCountDto(Collections.emptyList());
+        }
 
+        String projectName = statisticsStateRequest.getProjectName();
+        String workflowName = statisticsStateRequest.getWorkflowName();
+        Long projectCode = statisticsStateRequest.getProjectCode();
+        Long workflowCode = statisticsStateRequest.getWorkflowCode();
+        Integer model = Constants.QUERY_ALL_ON_SYSTEM;
+
+        if (!StringUtils.isBlank(projectName) || null != projectCode) {
+            model = Constants.QUERY_ALL_ON_PROJECT;
+        }
+        if (!StringUtils.isBlank(workflowName) || null != workflowCode) {
+            model = Constants.QUERY_ALL_ON_WORKFLOW;
+        }
+        try {
+            if (null == workflowCode || null == projectCode) {
+                projectCode = projectMapper.queryByName(projectName).getCode();
+                workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
+            }
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+        }
+
+        Date date = new Date();
+        Date startTime = statisticsStateRequest.getStartTime() == null ? DateUtils.addMonths(date, -1)
+                : statisticsStateRequest.getStartTime();
+        Date endTime = statisticsStateRequest.getEndTime() == null ? date : statisticsStateRequest.getEndTime();
+
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(
+                startTime, endTime, projectCode, workflowCode, model, projectIds);
+        return new TaskCountDto(executeStatusCounts);
+    }
+
+    /**
+     * query one workflow states count
+     *
+     * @param loginUser    login user
+     * @param workflowCode workflowCode
+     * @return workflow states count
+     */
+    @Override
+    public TaskCountDto countOneWorkflowStates(User loginUser, Long workflowCode) {
+        ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(workflowCode);
+        if (processDefinition == null) {
+            throw new ServiceException(Status.PROCESS_DEFINE_NOT_EXIST, workflowCode);
+        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, processDefinition.getProjectCode());
+
+        List<ExecuteStatusCount> executeStatusCounts = processInstanceMapper.countInstanceStateV2(null, null, null,
+                workflowCode, Constants.QUERY_ALL_ON_WORKFLOW, null);
+        return new TaskCountDto(executeStatusCounts);
+    }
+
+    /**
+     * query all task states count
+     *
+     * @param loginUser              login user
+     * @param statisticsStateRequest statisticsStateRequest
+     * @return tasks states count
+     */
+    @Override
+    public TaskCountDto countTaskStates(User loginUser, StatisticsStateRequest statisticsStateRequest) {
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (projectIds.isEmpty()) {
+            return new TaskCountDto(Collections.emptyList());
+        }
+        String projectName = statisticsStateRequest.getProjectName();
+        String workflowName = statisticsStateRequest.getWorkflowName();
+        String taskName = statisticsStateRequest.getTaskName();
+        Long projectCode = statisticsStateRequest.getProjectCode();
+        Long workflowCode = statisticsStateRequest.getWorkflowCode();
+        Long taskCode = statisticsStateRequest.getTaskCode();
+        Integer model = Constants.QUERY_ALL_ON_SYSTEM;
+
+        if (!StringUtils.isBlank(projectName) || null != projectCode) {
+            model = Constants.QUERY_ALL_ON_PROJECT;
+        }
+        if (!StringUtils.isBlank(workflowName) || null != workflowCode) {
+            model = Constants.QUERY_ALL_ON_WORKFLOW;
+        }
+        if (!StringUtils.isBlank(taskName) || null != taskCode) {
+            model = Constants.QUERY_ALL_ON_TASK;
+        }
+
+        try {
+            if (null == taskCode || null == workflowCode || null == projectCode) {
+                projectCode = projectMapper.queryByName(projectName).getCode();
+                workflowCode = processDefinitionMapper.queryByDefineName(projectCode, workflowName).getCode();
+                // todo The comment can be canceled after repairing the duplicate taskname of the existing workflow
+                // taskCode = relationMapper.queryTaskCodeByTaskName(workflowCode, taskName);
+            }
+        } catch (Exception e) {
+            log.warn(e.getMessage());
+        }
+
+        Date date = new Date();
+        Date startTime = statisticsStateRequest.getStartTime() == null ? DateUtils.addMonths(date, -1)
+                : statisticsStateRequest.getStartTime();
+        Date endTime = statisticsStateRequest.getEndTime() == null ? date : statisticsStateRequest.getEndTime();
+
+        Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(
+                taskInstanceMapper.countTaskInstanceStateByProjectIdsV2(startTime, endTime, projectIds));
+        List<TaskExecutionStatus> needRecountState = setOptional(startTimeStates);
+        if (needRecountState.size() == 0) {
+            return new TaskCountDto(startTimeStates.get());
+        }
+        List<ExecuteStatusCount> recounts = this.taskInstanceMapper
+                .countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2(startTime, endTime, projectCode,
+                        workflowCode, taskCode, model, projectIds,
+                        needRecountState);
+        startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
+        List<ExecuteStatusCount> executeStatusCounts = startTimeStates.orElse(null);
+        return new TaskCountDto(executeStatusCounts);
+    }
+
+    /**
+     * query one task states count
+     *
+     * @param loginUser login user
+     * @param taskCode  taskCode
+     * @return tasks states count
+     */
+    @Override
+    public TaskCountDto countOneTaskStates(User loginUser, Long taskCode) {
+        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        long projectCode = taskDefinition.getProjectCode();
+        Project project = projectMapper.queryByCode(projectCode);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+
+        Set<Integer> projectId = Collections.singleton(project.getId());
+        Optional<List<ExecuteStatusCount>> startTimeStates = Optional.ofNullable(
+                taskInstanceMapper.countTaskInstanceStateByProjectIdsV2(null, null, projectId));
+        List<TaskExecutionStatus> needRecountState = setOptional(startTimeStates);
+        if (needRecountState.size() == 0) {
+            return new TaskCountDto(startTimeStates.get());
+        }
+        List<ExecuteStatusCount> recounts = this.taskInstanceMapper
+                .countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2(null, null, projectCode, null, taskCode,
+                        Constants.QUERY_ALL_ON_TASK, projectId,
+                        needRecountState);
+        startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
+        List<ExecuteStatusCount> executeStatusCounts = startTimeStates.orElse(null);
+        return new TaskCountDto(executeStatusCounts);
+    }
+
+    /**
+     * statistics the process definition quantities of a certain person
+     * <p>
+     * We only need projects which users have permission to see to determine whether the definition belongs to the user or not.
+     *
+     * @param loginUser login user
+     * @return definition count data
+     */
+    @Override
+    public DefineUserDto countDefinitionByUserV2(User loginUser,
+                                                 Integer userId,
+                                                 Integer releaseState) {
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return new DefineUserDto(Collections.emptyList());
+        }
+        List<Long> projectCodes = projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
+
+        List<WorkflowDefinitionCountDto> workflowDefinitionCountDtos =
+                processDefinitionMapper.countDefinitionByProjectCodesV2(projectCodes, userId, releaseState);
+
+        return new DefineUserDto(workflowDefinitionCountDtos);
+    }
+
+    private List<TaskExecutionStatus> setOptional(Optional<List<ExecuteStatusCount>> startTimeStates) {
         List<TaskExecutionStatus> allState = Arrays.stream(TaskExecutionStatus.values()).collect(Collectors.toList());
-        List<TaskExecutionStatus> needRecountState;
         if (startTimeStates.isPresent() && startTimeStates.get().size() != 0) {
             List<TaskExecutionStatus> instanceState =
                     startTimeStates.get().stream().map(ExecuteStatusCount::getState).collect(Collectors.toList());
             // value 0 state need to recount by submit time
-            needRecountState =
-                    allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
-            if (needRecountState.size() == 0) {
-                return startTimeStates.get();
-            }
+            return allState.stream().filter(ele -> !instanceState.contains(ele)).collect(Collectors.toList());
         } else {
-            needRecountState = allState;
+            return allState;
         }
-
-        // use submit time to recount when 0
-        // if have any issues with this code, should change to specified states 0 8 9 17 not state count is 0
-        List<ExecuteStatusCount> recounts = this.taskInstanceMapper
-                .countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(startTime, endTime, projectCodes,
-                        needRecountState);
-        startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
-
-        return startTimeStates.orElse(null);
     }
 }

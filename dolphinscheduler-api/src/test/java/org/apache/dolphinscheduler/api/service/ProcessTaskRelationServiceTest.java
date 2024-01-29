@@ -41,7 +41,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -255,7 +255,6 @@ public class ProcessTaskRelationServiceTest {
         processDefinition.setId(1);
         processDefinition.setProjectCode(1L);
         processDefinition.setName("test_pdf");
-        processDefinition.setTenantId(1);
         processDefinition.setDescription("");
         processDefinition.setCode(1L);
         processDefinition.setVersion(1);
@@ -457,7 +456,7 @@ public class ProcessTaskRelationServiceTest {
         Mockito.when(processTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode))
                 .thenReturn(processTaskRelationList);
         Mockito.when(processDefinitionMapper.queryByCode(1L)).thenReturn(getProcessDefinition());
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 1L)).thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(1L)).thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,
@@ -495,7 +494,7 @@ public class ProcessTaskRelationServiceTest {
         processTaskRelation.setPostTaskCode(taskCode);
         processTaskRelation.setPostTaskVersion(1);
         processTaskRelationList.add(processTaskRelation);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, processDefinitionCode))
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(processDefinitionCode))
                 .thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
@@ -528,7 +527,7 @@ public class ProcessTaskRelationServiceTest {
         List<ProcessTaskRelation> processTaskRelationList = new ArrayList<>();
         processTaskRelationList.add(processTaskRelation);
         Mockito.when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(projectCode, 1L)).thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(1L)).thenReturn(processTaskRelationList);
         List<ProcessTaskRelationLog> relationLogs =
                 processTaskRelationList.stream().map(ProcessTaskRelationLog::new).collect(Collectors.toList());
         Mockito.when(processService.saveTaskRelation(user, 1L, 1L,

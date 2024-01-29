@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZoneId;
@@ -49,9 +49,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.NonNull;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.cronutils.model.Cron;
 import com.cronutils.model.definition.CronDefinitionBuilder;
@@ -62,13 +60,12 @@ import com.cronutils.parser.CronParser;
  * // todo: this utils is heavy, it rely on quartz and corn-utils.
  * cron utils
  */
+@Slf4j
 public class CronUtils {
 
     private CronUtils() {
         throw new IllegalStateException("CronUtils class");
     }
-
-    private static final Logger logger = LoggerFactory.getLogger(CronUtils.class);
 
     private static final CronParser QUARTZ_CRON_PARSER =
             new CronParser(CronDefinitionBuilder.instanceDefinitionFor(QUARTZ));
@@ -82,9 +79,27 @@ public class CronUtils {
     public static Cron parse2Cron(String cronExpression) throws CronParseException {
         try {
             return QUARTZ_CRON_PARSER.parse(cronExpression);
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             throw new CronParseException(String.format("Parse corn expression: [%s] error", cronExpression), ex);
         }
+    }
+
+    /**
+     * Indicates whether the specified cron expression can be parsed into a
+     * valid cron expression
+     *
+     * @param cronExpression the expression to evaluate
+     * @return a boolean indicating whether the given expression is a valid cron
+     *         expression
+     */
+    public static boolean isValidExpression(String cronExpression) {
+        try {
+            parse2Cron(cronExpression);
+        } catch (CronParseException e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -261,12 +276,12 @@ public class CronUtils {
                     calendar.add(Calendar.DATE, 1);
                     break;
                 default:
-                    logger.error("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum);
+                    log.error("Dependent process definition's  cycleEnum is {},not support!!", cycleEnum);
                     break;
             }
             maxExpirationTime = calendar.getTime();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         return DateUtils.compare(startTimeMax, maxExpirationTime) ? maxExpirationTime : startTimeMax;
     }

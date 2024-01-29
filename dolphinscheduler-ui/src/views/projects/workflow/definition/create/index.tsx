@@ -58,7 +58,7 @@ export default defineComponent({
         return {
           prop: p.key,
           value: p.value,
-          direct: 'IN',
+          direct: p.direct,
           type: 'VARCHAR'
         }
       })
@@ -69,7 +69,6 @@ export default defineComponent({
           taskRelationJson: JSON.stringify(connects),
           locations: JSON.stringify(locations),
           name: saveForm.name,
-          tenantCode: saveForm.tenantCode,
           executionType: saveForm.executionType,
           description: saveForm.description,
           globalParams: JSON.stringify(globalParams),
@@ -89,9 +88,11 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        {
-          route.query.dynamic === 'true' ? <DynamicDag /> : <Dag projectCode={projectCode} onSave={onSave} />
-        }
+        {route.query.dynamic === 'true' ? (
+          <DynamicDag />
+        ) : (
+          <Dag projectCode={projectCode} onSave={onSave} />
+        )}
       </div>
     )
   }

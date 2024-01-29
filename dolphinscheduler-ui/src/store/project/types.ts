@@ -23,6 +23,7 @@ type TaskExecuteType = 'STREAM' | 'BATCH'
 type TaskType =
   | 'SHELL'
   | 'SUB_PROCESS'
+  | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'
   | 'SPARK'
@@ -54,13 +55,19 @@ type TaskType =
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
+  | 'KUBEFLOW'
+  | 'LINKIS'
+  | 'DATA_FACTORY'
+  | 'REMOTESHELL'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
+
 type DependentResultType = {
-  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILURE'
+  [key: string]: 'SUCCESS' | 'FAILURE'
 }
+
 type BDependentResultType = {
-  [key: string]: 'SUCCESS' | 'WAITING_THREAD' | 'FAILED'
+  [key: string]: 'SUCCESS' | 'FAILED'
 }
 
 interface IResource {

@@ -31,7 +31,7 @@ public interface StateEvent {
 
     int getProcessInstanceId();
 
-    int getTaskInstanceId();
+    Integer getTaskInstanceId();
 
     @NonNull
     StateEventType getType();

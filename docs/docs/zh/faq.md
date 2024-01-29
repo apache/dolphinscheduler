@@ -24,26 +24,26 @@ A：DolphinScheduler 由 5 个服务组成，MasterServer、WorkerServer、ApiSe
 
 ## Q：系统支持哪些邮箱？
 
-A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在dolphinscheduler的ui中进行配置：
+A：支持绝大多数邮箱，qq、163、126、139、outlook、aliyun 等皆支持。支持 **TLS 和 SSL** 协议，可以在 dolphinscheduler 的 ui 中进行配置：
 [如何配置邮箱告警](../zh/guide/alert/email.md)。
 
 ---
 
 ## Q：常用的系统变量时间参数有哪些，如何使用？
 
-A：请参考[使用手册](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/parameter/built-in.html) 第8小节
+A：请参考[使用手册](https://dolphinscheduler.apache.org/zh-cn/docs/latest/user_doc/guide/parameter/built-in.html) 第 8 小节
 
 ---
 
 ## Q：pip install kazoo 这个安装报错。是必须安装的吗？
 
-A： 这个是 python 连接 Zookeeper 需要使用到的，用于删除Zookeeper中的master/worker临时节点信息。所以如果是第一次安装，就可以忽略错误。在1.3.0之后，kazoo不再需要了，我们用程序来代替kazoo所做的
+A： 这个是 python 连接 Zookeeper 需要使用到的，用于删除 Zookeeper 中的 master/worker 临时节点信息。所以如果是第一次安装，就可以忽略错误。在 1.3.0 之后，kazoo 不再需要了，我们用程序来代替 kazoo 所做的
 
 ---
 
 ## Q：怎么指定机器运行任务
 
-A：使用 **管理员** 创建 Worker 分组，在 **流程定义启动** 的时候可**指定Worker分组**或者在**任务节点上指定Worker分组**。如果不指定，则使用 Default，**Default默认是使用的集群里所有的Worker中随机选取一台来进行任务提交、执行**
+A：使用 **管理员** 创建 Worker 分组，在 **流程定义启动** 的时候可**指定 Worker 分组**或者在**任务节点上指定 Worker 分组**。如果不指定，则使用 Default，**Default 默认是使用的集群里所有的 Worker 中随机选取一台来进行任务提交、执行**
 
 ---
 
@@ -51,19 +51,19 @@ A：使用 **管理员** 创建 Worker 分组，在 **流程定义启动** 的�
 
 A：我们同时 **支持流程和任务的优先级**。优先级我们有 **HIGHEST、HIGH、MEDIUM、LOW 和 LOWEST** 五种级别。**可以设置不同流程实例之间的优先级，也可以设置同一个流程实例中不同任务实例的优先级**。详细内容请参考任务优先级设计 https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.html#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1
 
-----
+---
 
 ## Q：dolphinscheduler-grpc 报错
 
-A：在 1.2 及以前版本中，在根目录下执行：mvn -U clean package assembly:assembly -Dmaven.test.skip=true,然后刷新下整个项目就好，1.3版本中不再使用 GRPC 进行通信了
+A：在 1.2 及以前版本中，在根目录下执行：mvn -U clean package assembly:assembly -Dmaven.test.skip=true,然后刷新下整个项目就好，1.3 版本中不再使用 GRPC 进行通信了
 
-----
+---
 
 ## Q：DolphinScheduler 支持 windows 上运行么
 
 A： 理论上只有 **Worker 是需要在 Linux 上运行的**，其它的服务都是可以在 windows 上正常运行的。但是还是建议最好能在 linux 上部署使用
 
------
+---
 
 ## Q：UI 在 linux 编译 node-sass 提示：Error：EACCESS:permission denied，mkdir xxxx
 
@@ -73,54 +73,54 @@ A：单独安装 **npm install node-sass --unsafe-perm**，之后再 **npm insta
 
 ## Q：UI 不能正常登陆访问
 
-A：     1，如果是 node 启动的查看 dolphinscheduler-ui 下的 .env 文件里的 API_BASE 配置是否是 Api Server 服务地址
+A： 1，如果是 node 启动的查看 dolphinscheduler-ui 下的 .env 文件里的 API_BASE 配置是否是 Api Server 服务地址
 
-​       2，如果是 nginx 启动的并且是通过 **install-dolphinscheduler-ui.sh** 安装的，查看
+​ 2，如果是 nginx 启动的并且是通过 **install-dolphinscheduler-ui.sh** 安装的，查看
 
-​              **/etc/nginx/conf.d/dolphinscheduler.conf** 中的 proxy_pass 配置是否是 Api Server 服务地址
+​ **/etc/nginx/conf.d/dolphinscheduler.conf** 中的 proxy_pass 配置是否是 Api Server 服务地址
 
-​       3，如果以上配置都是正确的，那么请查看 Api Server 服务是否是正常的，
+​ 3，如果以上配置都是正确的，那么请查看 Api Server 服务是否是正常的，
 
-​			curl http://localhost:12345/dolphinscheduler/users/get-user-info 查看 Api Server 日志，
+​ curl http://localhost:12345/dolphinscheduler/users/get-user-info 查看 Api Server 日志，
 
-​			如果提示 cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null，则证明 Api Server 服务是正常的
+​ 如果提示 cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null，则证明 Api Server 服务是正常的
 
-​       4，如果以上都没有问题，需要查看一下 **application.properties** 中的 **server.context-path 和 server.port 配置**是否正确
+​ 4，如果以上都没有问题，需要查看一下 **application.properties** 中的 **server.context-path 和 server.port 配置**是否正确
 注意：1.3 版本直接使用 Jetty 进行前端代码的解析，无需再安装配置 nginx 了
 
 ---
 
 ## Q：流程定义手动启动或调度启动之后，没有流程实例生成
 
-A： 	  1，首先通过 **jps 查看MasterServer服务是否存在**，或者从服务监控直接查看 zk 中是否存在 master 服务
+A： 1，首先通过 **jps 查看 MasterServer 服务是否存在**，或者从服务监控直接查看 zk 中是否存在 master 服务
 
-​	   2，如果存在 master 服务，查看 **命令状态统计** 或者 **t_ds_error_command** 中是否增加的新记录，如果增加了，**请查看 message 字段定位启动异常原因**
+​ 2，如果存在 master 服务，查看 **命令状态统计** 或者 **t_ds_error_command** 中是否增加的新记录，如果增加了，**请查看 message 字段定位启动异常原因**
 
 ---
 
 ## Q：任务状态一直处于提交成功状态
 
-A：        1，首先通过 **jps 查看 WorkerServer 服务是否存在**，或者从服务监控直接查看 zk 中是否存在 worker 服务
+A： 1，首先通过 **jps 查看 WorkerServer 服务是否存在**，或者从服务监控直接查看 zk 中是否存在 worker 服务
 
-​          2，如果 **WorkerServer** 服务正常，需要 **查看 MasterServer 是否把 task 任务放到 zk 队列中** ，**需要查看 MasterServer 日志及 zk 队列中是否有任务阻塞**
+​ 2，如果 **WorkerServer** 服务正常，需要 **查看 MasterServer 是否把 task 任务放到 zk 队列中** ，**需要查看 MasterServer 日志及 zk 队列中是否有任务阻塞**
 
-​	   3，如果以上都没有问题，需要定位是否指定了 Worker 分组，但是 **Worker 分组的机器不是在线状态**
+​ 3，如果以上都没有问题，需要定位是否指定了 Worker 分组，但是 **Worker 分组的机器不是在线状态**
 
 ---
 
 ## Q：install.sh 中需要注意问题
 
-A：  	   1，如果替换变量中包含特殊字符，**请用 \ 转移符进行转移**
+A： 1，如果替换变量中包含特殊字符，**请用 \ 转移符进行转移**
 
-​	    2，installPath="/data1_1T/dolphinscheduler"，**这个目录不能和当前要一键安装的 install.sh 目录是一样的**
+​ 2，installPath="/data1_1T/dolphinscheduler"，**这个目录不能和当前要一键安装的 install.sh 目录是一样的**
 
-​	    3，deployUser="dolphinscheduler"，**部署用户必须具有 sudo 权限**，因为 worker 是通过 sudo -u 租户 sh xxx.command 进行执行的
+​ 3，deployUser="dolphinscheduler"，**部署用户必须具有 sudo 权限**，因为 worker 是通过 sudo -u 租户 sh xxx.command 进行执行的
 
-​	    4，monitorServerState="false"，服务监控脚本是否启动，默认是不启动服务监控脚本的。**如果启动服务监控脚本，则每 5 分钟定时来监控 master 和 worker 的服务是否 down 机，如果 down 机则会自动重启**
+​ 4，monitorServerState="false"，服务监控脚本是否启动，默认是不启动服务监控脚本的。**如果启动服务监控脚本，则每 5 分钟定时来监控 master 和 worker 的服务是否 down 机，如果 down 机则会自动重启**
 
-​	    5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 resource.hdfs.fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到conf根目录下
+​ 5，hdfsStartupSate="false"，是否开启 HDFS 资源上传功能。默认是不开启的，**如果不开启则资源中心是不能使用的**。如果开启，需要 conf/common/hadoop/hadoop.properties 中配置 resource.hdfs.fs.defaultFS 和 yarn 的相关配置，如果使用 namenode HA，需要将 core-site.xml 和 hdfs-site.xml 复制到 conf 根目录下
 
-​	注意：**1.0.x 版本是不会自动创建 hdfs 根目录的，需要自行创建，并且需要部署用户有hdfs的操作权限**
+​ 注意：**1.0.x 版本是不会自动创建 hdfs 根目录的，需要自行创建，并且需要部署用户有 hdfs 的操作权限**
 
 ---
 
@@ -157,11 +157,11 @@ A： 不能。因为在未启动 HDFS 创建的租户，不会在 HDFS 中注册
 
 ## Q：多 Master 和多 Worker 状态下，服务掉了，怎么容错
 
-A：  **注意：Master 监控 Master 及 Worker 服务。**
+A： **注意：Master 监控 Master 及 Worker 服务。**
 
-​	1，如果 Master 服务掉了，其它的 Master 会接管挂掉的 Master 的流程，继续监控 Worker task 状态
+​ 1，如果 Master 服务掉了，其它的 Master 会接管挂掉的 Master 的流程，继续监控 Worker task 状态
 
-​	2，如果 Worker 服务掉了，Master 会监控到 Worker 服务掉了，如果存在 Yarn 任务，Kill Yarn 任务之后走重试
+​ 2，如果 Worker 服务掉了，Master 会监控到 Worker 服务掉了，如果存在 Yarn 任务，Kill Yarn 任务之后走重试
 
 具体请看容错设计：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1.html#%E7%B3%BB%E7%BB%9F%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1
 
@@ -175,7 +175,7 @@ A ： 1.0.3 版本只实现了 Master 启动流程容错，不走 Worker 容错�
 
 ## Q：定时容易设置成每秒执行
 
-A ： 设置定时的时候需要注意，如果第一位（* * * * * ? *）设置成 \* ，则表示每秒执行。**我们将会在 1.1.0 版本中加入显示最近调度的时间列表** ，使用 http://cron.qqe2.com/  可以在线看近 5 次运行时间
+A ： 设置定时的时候需要注意，如果第一位（\* \* \* \* _ ? _）设置成 \* ，则表示每秒执行。**我们将会在 1.1.0 版本中加入显示最近调度的时间列表** ，使用 http://cron.qqe2.com/ 可以在线看近 5 次运行时间
 
 ## Q：定时有有效时间范围吗
 
@@ -183,32 +183,32 @@ A：有的，**如果定时的起止时间是同一个时间，那么此定时�
 
 ## Q：任务依赖有几种实现
 
-A：  1，**DAG** 之间的任务依赖关系，是从 **入度为零** 进行 DAG 切分的
+A： 1，**DAG** 之间的任务依赖关系，是从 **入度为零** 进行 DAG 切分的
 
-​	 2，有 **任务依赖节点** ，可以实现跨流程的任务或者流程依赖，具体请参考 依赖(DEPENDENT)节点：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.html#%E4%BB%BB%E5%8A%A1%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE
+​ 2，有 **任务依赖节点** ，可以实现跨流程的任务或者流程依赖，具体请参考 依赖(DEPENDENT)节点：https://analysys.github.io/easyscheduler_docs_cn/%E7%B3%BB%E7%BB%9F%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C.html#%E4%BB%BB%E5%8A%A1%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B%E5%92%8C%E5%8F%82%E6%95%B0%E8%AE%BE%E7%BD%AE
 
 ## Q：流程定义有几种启动方式
 
 A： 1，在 **流程定义列表**，点击 **启动** 按钮
 
-​		2，**流程定义列表添加定时器**，调度启动流程定义
+​ 2，**流程定义列表添加定时器**，调度启动流程定义
 
-​		3，流程定义 **查看或编辑** DAG 页面，任意 **任务节点右击** 启动流程定义
+​ 3，流程定义 **查看或编辑** DAG 页面，任意 **任务节点右击** 启动流程定义
 
-​		4，可以对流程定义 DAG 编辑，设置某些任务的运行标志位 **禁止运行**，则在启动流程定义的时候，将该节点的连线将从 DAG 中去掉
+​ 4，可以对流程定义 DAG 编辑，设置某些任务的运行标志位 **禁止运行**，则在启动流程定义的时候，将该节点的连线将从 DAG 中去掉
 
 ## Q：Python 任务设置 Python 版本
 
-A：  只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_HOME
+A： 只需要修改 `bin/env/dolphinscheduler_env.sh` 中的 PYTHON_LAUNCHER
 
 ```
-export PYTHON_HOME=/bin/python
+export PYTHON_LAUNCHER=/bin/python
 ```
 
-注意：这了 **PYTHON_HOME** ，是 python 命令的绝对路径，而不是单纯的 PYTHON_HOME，还需要注意的是 export PATH 的时候，需要直接
+注意：这了 **PYTHON_LAUNCHER** ，是 python 命令的绝对路径，而不是单纯的 PYTHON_LAUNCHER，还需要注意的是 export PATH 的时候，需要直接
 
 ```
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
 ```
 
 ## Q：Worker Task 通过 sudo -u 租户 sh xxx.command 会产生子进程，在 kill 的时候，是否会杀掉
@@ -269,14 +269,14 @@ A： 将 hive pom
 
 ## Q：如何增加一台工作服务器
 
-A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/laster/user_doc/installation/cluster.html) 1.3 小节，创建部署用户和 hosts 映射
+A： 1，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/installation/cluster) 1.3 小节，创建部署用户和 hosts 映射
 
-​	2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/laster/user_doc/installation/cluster.html) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
-​          1.4 小节的最后一步是在当前新增机器上执行的，即需要给部署目录部署用户的权限
+​ 2，参考官网[部署文档](https://dolphinscheduler.apache.org/zh-cn/docs/3.1.2/installation/cluster) 1.4 小节，配置 hosts 映射和 ssh 打通及修改目录权限.
+​ 1.4 小节的最后一步是在当前新增机器上执行的，即需要给部署目录部署用户的权限
 
-​	3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
+​ 3，复制正在运行的服务器上的部署目录到新机器的同样的部署目录下
 
-​	4，到 bin 下，启动 worker server
+​ 4，到 bin 下，启动 worker server
 
 ```
 ./dolphinscheduler-daemon.sh start worker-server
@@ -412,7 +412,7 @@ $cat /etc/hosts
 10.3.57.15
 ```
 
-hostname 命令返回服务器主机名，hostname -i 返回的是服务器主机名在 /etc/hosts 中所有匹配的ip地址。所以我把 /etc/hosts 中 127.0.0.1 中的主机名删掉，只保留内网 ip 的解析就可以了，没必要把 127.0.0.1 整条注释掉, 只要 hostname 命令返回值在 /etc/hosts 中对应的内网 ip 正确就可以，ds 程序取了第一个值，我理解上 ds 程序不应该用 hostname -i 取值这样有点问题，因为好多公司服务器的主机名都是运维配置的，感觉还是直接取配置文件的域名解析的返回 ip 更准确，或者 znode 中存域名信息而不是 /etc/hosts。
+hostname 命令返回服务器主机名，hostname -i 返回的是服务器主机名在 /etc/hosts 中所有匹配的 ip 地址。所以我把 /etc/hosts 中 127.0.0.1 中的主机名删掉，只保留内网 ip 的解析就可以了，没必要把 127.0.0.1 整条注释掉, 只要 hostname 命令返回值在 /etc/hosts 中对应的内网 ip 正确就可以，ds 程序取了第一个值，我理解上 ds 程序不应该用 hostname -i 取值这样有点问题，因为好多公司服务器的主机名都是运维配置的，感觉还是直接取配置文件的域名解析的返回 ip 更准确，或者 znode 中存域名信息而不是 /etc/hosts。
 
 ---
 
@@ -430,14 +430,14 @@ A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录
 sudo rm -rf node_modules
 ```
 
-​	2，通过 npm.taobao.org 下载 node-sass
+​ 2，通过 npm.taobao.org 下载 node-sass
 
 ```
 sudo npm uninstall node-sass
 sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 ```
 
-3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/zh/contribute/frontend-development.md)
 
 ```
 sudo npm rebuild node-sass
@@ -460,7 +460,7 @@ A：1，修改项目根目录 maven 配置文件，移除 scope 的 test 属性�
 </dependency>
 ```
 
-​	2，修改 application-dao.properties 和 quzrtz.properties 来使用 mysql 驱动
+​ 2，修改 application-dao.properties 和 quzrtz.properties 来使用 mysql 驱动
 默认驱动是 postgres 主要由于许可证原因。
 
 ---
@@ -469,7 +469,7 @@ A：1，修改项目根目录 maven 配置文件，移除 scope 的 test 属性�
 
 A：1，被执行的服务器在哪里配置，以及实际执行的服务器是哪台? 要指定在某个 worker 上去执行，可以在 worker 分组中配置，固定 IP，这样就可以把路径写死。如果配置的 worker 分组有多个 worker，实际执行的服务器由调度决定的，具有随机性。
 
-​	2，如果是服务器上某个路径的一个 shell 文件，怎么指向这个路径？服务器上某个路径下的 shell 文件，涉及到权限问题，不建议这么做。建议你可以使用资源中心的存储功能，然后在 shell 编辑器里面使用资源引用就可以，系统会帮助你把脚本下载到执行目录下。如果以 hdfs 作为资源中心，在执行的时候，调度器会把依赖的 jar 包，文件等资源拉到 worker 的执行目录上，我这边是 /tmp/escheduler/exec/process，该配置可以在 install.sh 中进行指定。
+​ 2，如果是服务器上某个路径的一个 shell 文件，怎么指向这个路径？服务器上某个路径下的 shell 文件，涉及到权限问题，不建议这么做。建议你可以使用资源中心的存储功能，然后在 shell 编辑器里面使用资源引用就可以，系统会帮助你把脚本下载到执行目录下。如果以 hdfs 作为资源中心，在执行的时候，调度器会把依赖的 jar 包，文件等资源拉到 worker 的执行目录上，我这边是 /tmp/escheduler/exec/process，该配置可以在 install.sh 中进行指定。
 
 3，以哪个用户来执行任务？执行任务的时候，调度器会采用 sudo -u 租户的方式去执行，租户是一个 linux 用户。
 
@@ -527,7 +527,7 @@ A： 1，用户修改了 api server 配置文件中的![apiServerContextPath](ht
  </p>
 A：1，编辑 ngnix 配置文件 vi /etc/nginx/nginx.conf，更改上传大小 client_max_body_size 1024m。
 
-​	2，更新 google chrome 版本到最新版本。
+​ 2，更新 google chrome 版本到最新版本。
 
 ---
 
@@ -545,7 +545,7 @@ proxy_send_timeout 300s;
 
 ## Q：工作流依赖
 
-A：1，目前是按照自然天来判断，上月末：判断时间是工作流 A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'。上月：是判断上个月从 1 号到月末每天都要有完成的A实例。上周： 上周 7 天都要有完成的 A 实例。前两天： 判断昨天和前天，两天都要有完成的 A 实例。
+A：1，目前是按照自然天来判断，上月末：判断时间是工作流 A start_time/scheduler_time between '2019-05-31 00:00:00' and '2019-05-31 23:59:59'。上月：是判断上个月从 1 号到月末每天都要有完成的 A 实例。上周： 上周 7 天都要有完成的 A 实例。前两天： 判断昨天和前天，两天都要有完成的 A 实例。
 
 ---
 
@@ -565,9 +565,9 @@ master 服务、worker 服务在 zookeeper 注册时，会以 ip:port 的形式�
 
 可以使用 dolphinscheduler 提供的三种策略，获取可用 ip：
 
-* default: 优先获取内网网卡获取 ip 地址，其次获取外网网卡获取 ip 地址，在前两项失效情况下，使用第一块可用网卡的地址
-* inner: 使用内网网卡获取 ip地址，如果获取失败抛出异常信息
-* outer: 使用外网网卡获取 ip地址，如果获取失败抛出异常信息
+- default: 优先获取内网网卡获取 ip 地址，其次获取外网网卡获取 ip 地址，在前两项失效情况下，使用第一块可用网卡的地址
+- inner: 使用内网网卡获取 ip 地址，如果获取失败抛出异常信息
+- outer: 使用外网网卡获取 ip 地址，如果获取失败抛出异常信息
 
 配置方式是在 `common.properties` 中修改相关配置：
 
@@ -602,9 +602,9 @@ sed -i 's/Defaults    requirett/#Defaults    requirett/g' /etc/sudoers
 
 ---
 
-## Q：Yarn多集群支持
+## Q：Yarn 多集群支持
 
-A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EMR）：
+A：将 Worker 节点分别部署至多个 Yarn 集群，步骤如下（例如 AWS EMR）：
 
 1. 将 Worker 节点部署至 EMR 集群的 Master 节点
 
@@ -616,7 +616,7 @@ A：将Worker节点分别部署至多个Yarn集群，步骤如下（例如AWS EM
 
 ## Q：Update process definition error: Duplicate key TaskDefinition
 
-A：在DS 2.0.4之前（2.0.0-alpha之后），可能存在版本切换的重复键问题，导致更新工作流失败；可参考如下SQL进行重复数据的删除，以MySQL为例：（注意：操作前请务必备份原数据，SQL来源于pr [#8408](https://github.com/apache/dolphinscheduler/pull/8408)）
+A：在 DS 2.0.4 之前（2.0.0-alpha 之后），可能存在版本切换的重复键问题，导致更新工作流失败；可参考如下 SQL 进行重复数据的删除，以 MySQL 为例：（注意：操作前请务必备份原数据，SQL 来源于 pr [#8408](https://github.com/apache/dolphinscheduler/pull/8408)）
 
 ```SQL
 DELETE FROM t_ds_process_task_relation_log WHERE id IN
@@ -702,9 +702,9 @@ DELETE FROM t_ds_task_definition_log WHERE id IN
 
 ---
 
-## Q：使用Postgresql数据库从2.0.1升级至2.0.5更新失败
+## Q：使用 Postgresql 数据库从 2.0.1 升级至 2.0.5 更新失败
 
-A：在数据库中执行以下SQL即可完成修复:
+A：在数据库中执行以下 SQL 即可完成修复:
 
 ```SQL
 update t_ds_version set version='2.0.1';
@@ -719,5 +719,21 @@ A：在 3.0.0-alpha 版本之后，Python gateway server 集成到 api server �
 并更改可选项 `python-gateway.enabled` 中的值设置为 `false`。
 
 ---
+
+## Q: 缓存执行时怎么判断任务已经存在缓存过的任务，即如何判断一个任务可以使用另外一个任务的运行结果？
+
+A: 对于标识为`缓存执行`的任务, 当任务启动时会生成一个缓存 key, 该 key 由以下字段组合哈希得到：
+
+- 任务定义：任务实例对应的任务定义的 id
+- 任务的版本：任务实例对应的任务定义的版本
+- 任务输入的参数：包括上游节点和全局参数传入的参数中，被任务定义的参数列表所引用和任务定义中使用`${}`引用的参数
+- 环境配置: 环境名称下具体的环境配置内容，具体为安全中心环境管理中的实际配置内容
+
+当缓存标识的任务运行时，会查找数据库中是否用相同缓存 key 的数据，
+
+- 若有则复制该任务实例并进行相应数据的更新
+- 若无，则任务照常运行，并在任务完成时将任务实例的数据存入缓存
+
+若不需要缓存时，可以在工作流实例中右键运行清除缓存，则会清除该版本下当前输入的参数的缓存数据。
 
 我们会持续收集更多的 FAQ。

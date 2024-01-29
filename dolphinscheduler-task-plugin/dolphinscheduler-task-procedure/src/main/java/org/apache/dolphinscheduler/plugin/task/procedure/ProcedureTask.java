@@ -21,8 +21,9 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
-import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -32,7 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -40,30 +41,23 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.collect.Maps;
 
-/**
- * procedure task
- */
+@Slf4j
 public class ProcedureTask extends AbstractTask {
 
-    /**
-     * procedure parameters
-     */
-    private ProcedureParameters procedureParameters;
+    private final ProcedureParameters procedureParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+    private final ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
     /**
      * constructor
@@ -75,14 +69,13 @@ public class ProcedureTask extends AbstractTask {
 
         this.taskExecutionContext = taskExecutionContext;
 
-        logger.info("procedure task params {}", taskExecutionContext.getTaskParams());
-
         this.procedureParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
+        log.info("Initialize procedure task params {}", JSONUtils.toPrettyJsonString(procedureParameters));
 
         // check parameters
-        if (!procedureParameters.checkParameters()) {
-            throw new RuntimeException("procedure task params is not valid");
+        if (procedureParameters == null || !procedureParameters.checkParameters()) {
+            throw new TaskException("procedure task params is not valid");
         }
 
         procedureTaskExecutionContext =
@@ -91,25 +84,17 @@ public class ProcedureTask extends AbstractTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
-        logger.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
+        log.info("procedure type : {}, datasource : {}, method : {} , localParams : {}",
                 procedureParameters.getType(),
                 procedureParameters.getDatasource(),
                 procedureParameters.getMethod(),
                 procedureParameters.getLocalParams());
 
-        Connection connection = null;
-        CallableStatement stmt = null;
-        try {
-            // load class
-            DbType dbType = DbType.valueOf(procedureParameters.getType());
-            // get datasource
-            ConnectionParam connectionParam =
-                    DataSourceUtils.buildConnectionParams(DbType.valueOf(procedureParameters.getType()),
-                            procedureTaskExecutionContext.getConnectionParams());
-
-            // get jdbc connection
-            connection = DataSourceClientProvider.getInstance().getConnection(dbType, connectionParam);
-
+        DbType dbType = DbType.valueOf(procedureParameters.getType());
+        DataSourceProcessor dataSourceProcessor = DataSourceProcessorProvider.getDataSourceProcessor(dbType);
+        ConnectionParam connectionParams =
+                dataSourceProcessor.createConnectionParams(procedureTaskExecutionContext.getConnectionParams());
+        try (Connection connection = DataSourceClientProvider.getAdHocConnection(dbType, connectionParams)) {
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
                     : taskExecutionContext.getPrepareParamsMap();
@@ -117,30 +102,26 @@ public class ProcedureTask extends AbstractTask {
                 // set out params before format sql
                 paramsMap.putAll(procedureParameters.getOutProperty());
             }
-
-            // format sql
             String proceduerSql = formatSql(sqlParamsMap, paramsMap);
             // call method
-            stmt = connection.prepareCall(proceduerSql);
+            try (CallableStatement stmt = connection.prepareCall(proceduerSql)) {
+                // set timeout
+                setTimeout(stmt);
 
-            // set timeout
-            setTimeout(stmt);
+                // outParameterMap
+                Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
 
-            // outParameterMap
-            Map<Integer, Property> outParameterMap = getOutParameterMap(stmt, sqlParamsMap, paramsMap);
+                stmt.executeUpdate();
 
-            stmt.executeUpdate();
+                // print the output parameters to the log
+                printOutParameter(stmt, outParameterMap);
 
-            // print the output parameters to the log
-            printOutParameter(stmt, outParameterMap);
-
-            setExitStatusCode(EXIT_CODE_SUCCESS);
+                setExitStatusCode(EXIT_CODE_SUCCESS);
+            }
         } catch (Exception e) {
             setExitStatusCode(EXIT_CODE_FAILURE);
-            logger.error("procedure task error", e);
+            log.error("procedure task error", e);
             throw new TaskException("Execute procedure task failed", e);
-        } finally {
-            close(stmt, connection);
         }
     }
 
@@ -150,7 +131,6 @@ public class ProcedureTask extends AbstractTask {
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
-        // combining local and global parameters
         setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
                 taskExecutionContext.getTaskInstanceId());
         return procedureParameters.getMethod().replaceAll(rgex, "?");
@@ -222,29 +202,6 @@ public class ProcedureTask extends AbstractTask {
     }
 
     /**
-     * close jdbc resource
-     *
-     * @param stmt       stmt
-     * @param connection connection
-     */
-    private void close(PreparedStatement stmt, Connection connection) {
-        if (stmt != null) {
-            try {
-                stmt.close();
-            } catch (SQLException e) {
-                logger.error("close prepared statement error : {}", e.getMessage(), e);
-            }
-        }
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                logger.error("close connection error : {}", e.getMessage(), e);
-            }
-        }
-    }
-
-    /**
      * get output parameter
      *
      * @param stmt     stmt
@@ -258,39 +215,39 @@ public class ProcedureTask extends AbstractTask {
         Object value = null;
         switch (dataType) {
             case VARCHAR:
-                logger.info("out prameter varchar key : {} , value : {}", prop, stmt.getString(index));
+                log.info("out prameter varchar key : {} , value : {}", prop, stmt.getString(index));
                 value = stmt.getString(index);
                 break;
             case INTEGER:
-                logger.info("out prameter integer key : {} , value : {}", prop, stmt.getInt(index));
+                log.info("out prameter integer key : {} , value : {}", prop, stmt.getInt(index));
                 value = stmt.getInt(index);
                 break;
             case LONG:
-                logger.info("out prameter long key : {} , value : {}", prop, stmt.getLong(index));
+                log.info("out prameter long key : {} , value : {}", prop, stmt.getLong(index));
                 value = stmt.getLong(index);
                 break;
             case FLOAT:
-                logger.info("out prameter float key : {} , value : {}", prop, stmt.getFloat(index));
+                log.info("out prameter float key : {} , value : {}", prop, stmt.getFloat(index));
                 value = stmt.getFloat(index);
                 break;
             case DOUBLE:
-                logger.info("out prameter double key : {} , value : {}", prop, stmt.getDouble(index));
+                log.info("out prameter double key : {} , value : {}", prop, stmt.getDouble(index));
                 value = stmt.getDouble(index);
                 break;
             case DATE:
-                logger.info("out prameter date key : {} , value : {}", prop, stmt.getDate(index));
+                log.info("out prameter date key : {} , value : {}", prop, stmt.getDate(index));
                 value = stmt.getDate(index);
                 break;
             case TIME:
-                logger.info("out prameter time key : {} , value : {}", prop, stmt.getTime(index));
+                log.info("out prameter time key : {} , value : {}", prop, stmt.getTime(index));
                 value = stmt.getTime(index);
                 break;
             case TIMESTAMP:
-                logger.info("out prameter timestamp key : {} , value : {}", prop, stmt.getTimestamp(index));
+                log.info("out prameter timestamp key : {} , value : {}", prop, stmt.getTimestamp(index));
                 value = stmt.getTimestamp(index);
                 break;
             case BOOLEAN:
-                logger.info("out prameter boolean key : {} , value : {}", prop, stmt.getBoolean(index));
+                log.info("out prameter boolean key : {} , value : {}", prop, stmt.getBoolean(index));
                 value = stmt.getBoolean(index);
                 break;
             default:

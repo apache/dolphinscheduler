@@ -23,10 +23,9 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -42,9 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
@@ -57,9 +57,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * alert group service impl
  */
 @Service
+@Slf4j
 public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroupService {
-
-    private Logger logger = LoggerFactory.getLogger(AlertGroupServiceImpl.class);
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
@@ -71,52 +70,47 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return alert group list
      */
     @Override
-    public Map<String, Object> queryAlertgroup(User loginUser) {
-        HashMap<String, Object> result = new HashMap<>();
-        List<AlertGroup> alertGroups;
+    public List<AlertGroup> queryAllAlertGroup(User loginUser) {
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            alertGroups = alertGroupMapper.queryAllGroupList();
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
-            if (ids.isEmpty()) {
-                result.put(Constants.DATA_LIST, Collections.emptyList());
-                putMsg(result, Status.SUCCESS);
-                return result;
-            }
-            alertGroups = alertGroupMapper.selectBatchIds(ids);
+            return alertGroupMapper.queryAllGroupList();
         }
-        result.put(Constants.DATA_LIST, alertGroups);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP,
+                loginUser.getId(), log);
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return alertGroupMapper.selectBatchIds(ids);
+    }
+
+    @Override
+    public List<AlertGroup> queryNormalAlertGroups(User loginUser) {
+        return queryAllAlertGroup(loginUser)
+                .stream()
+                // todo: remove the hardcode
+                .filter(alertGroup -> alertGroup.getId() != 2)
+                .collect(Collectors.toList());
     }
 
     /**
      * query alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return one alert group
      */
     @Override
-    public Map<String, Object> queryAlertGroupById(User loginUser, Integer id) {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
+    public AlertGroup queryAlertGroupById(User loginUser, Integer id) {
 
         // only admin can operate
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_VIEW)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         // check if exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
-            putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.ALERT_GROUP_NOT_EXIST, id);
         }
-        result.put("data", alertGroup);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return alertGroup;
     }
 
     /**
@@ -124,35 +118,27 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param pageNo    page number
+     * @param pageSize  page size
      * @return alert group list page
      */
     @Override
-    public Result listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
-
-        Result result = new Result();
-        IPage<AlertGroup> alertGroupPage;
-        PageInfo<AlertGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
+    public PageInfo<AlertGroup> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize) {
         Page<AlertGroup> page = new Page<>(pageNo, pageSize);
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            alertGroupPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, loginUser.getId(), logger);
-            if (ids.isEmpty()) {
-                result.setData(pageInfo);
-                putMsg(result, Status.SUCCESS);
-                return result;
-            }
-            alertGroupPage = alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
+            IPage<AlertGroup> alertGroupIPage = alertGroupMapper.queryAlertGroupPage(page, searchVal);
+            return PageInfo.of(alertGroupIPage);
         }
-        pageInfo.setTotal((int) alertGroupPage.getTotal());
-        pageInfo.setTotalList(alertGroupPage.getRecords());
-        result.setData(pageInfo);
 
-        putMsg(result, Status.SUCCESS);
-        return result;
+        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP,
+                loginUser.getId(), log);
+        if (ids.isEmpty()) {
+            return PageInfo.of(pageNo, pageSize);
+        }
+
+        IPage<AlertGroup> alertGroupIPage =
+                alertGroupMapper.queryAlertGroupPageByIds(page, new ArrayList<>(ids), searchVal);
+        return PageInfo.of(alertGroupIPage);
     }
 
     /**
@@ -166,18 +152,15 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      */
     @Override
     @Transactional
-    public Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc,
-                                                String alertInstanceIds) {
+    public AlertGroup createAlertGroup(User loginUser, String groupName, String desc, String alertInstanceIds) {
         Map<String, Object> result = new HashMap<>();
         // only admin can operate
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_GROUP, ALERT_GROUP_CREATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            log.warn("Parameter description is too long.");
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         AlertGroup alertGroup = new AlertGroup();
         Date now = new Date();
@@ -193,21 +176,15 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         try {
             int insert = alertGroupMapper.insert(alertGroup);
             if (insert > 0) {
-                result.put(Constants.DATA_LIST, alertGroup);
-                putMsg(result, Status.SUCCESS);
-                permissionPostHandle(AuthorizationType.ALERT_GROUP, loginUser.getId(),
-                        Collections.singletonList(alertGroup.getId()), logger);
-                logger.info("Create alert group complete, groupName:{}", alertGroup.getGroupName());
-            } else {
-                logger.error("Create alert group error, groupName:{}", alertGroup.getGroupName());
-                putMsg(result, Status.CREATE_ALERT_GROUP_ERROR);
+                log.info("Create alert group complete, groupName:{}", alertGroup.getGroupName());
+                return alertGroup;
             }
+            log.error("Create alert group error, groupName:{}", alertGroup.getGroupName());
+            throw new ServiceException(Status.CREATE_ALERT_GROUP_ERROR);
         } catch (DuplicateKeyException ex) {
-            logger.error("Create alert group error, groupName:{}", alertGroup.getGroupName(), ex);
-            putMsg(result, Status.ALERT_GROUP_EXIST);
+            log.error("Create alert group error, groupName:{}", alertGroup.getGroupName(), ex);
+            throw new ServiceException(Status.ALERT_GROUP_EXIST);
         }
-
-        return result;
     }
 
     /**
@@ -221,26 +198,24 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return update result code
      */
     @Override
-    public Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc,
-                                                String alertInstanceIds) {
-        Map<String, Object> result = new HashMap<>();
+    public AlertGroup updateAlertGroupById(User loginUser, int id, String groupName, String desc,
+                                           String alertInstanceIds) {
+        // don't allow to update global alert group
+        // todo: remove hardcode
+        if (id == 2) {
+            throw new ServiceException(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP);
+        }
 
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         if (checkDescriptionLength(desc)) {
-            logger.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
 
         if (alertGroup == null) {
-            logger.error("Alert group does not exist, id:{}.", id);
-            putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
-            return result;
-
+            throw new ServiceException(Status.ALERT_GROUP_NOT_EXIST);
         }
 
         Date now = new Date();
@@ -254,53 +229,43 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         alertGroup.setAlertInstanceIds(alertInstanceIds);
         try {
             alertGroupMapper.updateById(alertGroup);
-            logger.info("Update alert group complete, groupName:{}", alertGroup.getGroupName());
-            putMsg(result, Status.SUCCESS);
+            log.info("Update alert group complete, groupName:{}", alertGroup.getGroupName());
+            return alertGroup;
         } catch (DuplicateKeyException ex) {
-            logger.error("Update alert group error, groupName:{}", alertGroup.getGroupName(), ex);
-            putMsg(result, Status.ALERT_GROUP_EXIST);
+            log.error("Update alert group error, groupName:{}", alertGroup.getGroupName(), ex);
+            throw new ServiceException(Status.ALERT_GROUP_EXIST);
         }
-        return result;
     }
 
     /**
      * delete alert group by id
      *
      * @param loginUser login user
-     * @param id alert group id
+     * @param id        alert group id
      * @return delete result code
      */
     @Override
-    @Transactional
-    public Map<String, Object> delAlertgroupById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, false);
+    public void deleteAlertGroupById(User loginUser, int id) {
 
         // only admin can operate
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         // Not allow to delete the default alarm group ,because the module of service need to use it.
-        if (id == 1) {
-            logger.warn("Not allow to delete the default alarm group.");
-            putMsg(result, Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
-            return result;
+        if (id == 1 || id == 2) {
+            log.warn("Not allow to delete the default alarm group.");
+            throw new ServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
         }
 
         // check exist
         AlertGroup alertGroup = alertGroupMapper.selectById(id);
         if (alertGroup == null) {
-            logger.error("Alert group does not exist, id:{}.", id);
-            putMsg(result, Status.ALERT_GROUP_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.ALERT_GROUP_NOT_EXIST);
         }
 
         alertGroupMapper.deleteById(id);
-        logger.info("Delete alert group complete, groupId:{}", id);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        log.info("Delete alert group complete, groupId:{}", id);
     }
 
     /**

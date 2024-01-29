@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.generator;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.D;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EQUAL_SIGN;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SPACE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.FORMAT_S_S_S;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants;
@@ -29,15 +30,13 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * common script generator
  */
+@Slf4j
 public class CommonGenerator {
-
-    private static final Logger logger = LoggerFactory.getLogger(CommonGenerator.class);
 
     public String generate(SqoopParameters sqoopParameters) {
 
@@ -49,16 +48,21 @@ public class CommonGenerator {
                     .append(SPACE)
                     .append(sqoopParameters.getModelType());
 
+            // sqoop sqoop.export.records.per.statement
+            commonSb.append(SPACE).append(D).append(SPACE)
+                    .append(String.format(FORMAT_S_S_S, SqoopConstants.SQOOP_EXPORT_RECORDS_PER_STATEMENT,
+                            EQUAL_SIGN, 1));
+
             // sqoop map-reduce job name
             commonSb.append(SPACE).append(D).append(SPACE)
-                    .append(String.format("%s%s%s", SqoopConstants.SQOOP_MR_JOB_NAME,
+                    .append(String.format(FORMAT_S_S_S, SqoopConstants.SQOOP_MR_JOB_NAME,
                             EQUAL_SIGN, sqoopParameters.getJobName()));
 
             // hadoop custom param
             List<Property> hadoopCustomParams = sqoopParameters.getHadoopCustomParams();
             if (CollectionUtils.isNotEmpty(hadoopCustomParams)) {
                 for (Property hadoopCustomParam : hadoopCustomParams) {
-                    String hadoopCustomParamStr = String.format("%s%s%s", hadoopCustomParam.getProp(),
+                    String hadoopCustomParamStr = String.format(FORMAT_S_S_S, hadoopCustomParam.getProp(),
                             EQUAL_SIGN, hadoopCustomParam.getValue());
 
                     commonSb.append(SPACE).append(D)
@@ -85,7 +89,7 @@ public class CommonGenerator {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop task general param build failed: [%s]", e.getMessage()));
         }
 
         return commonSb.toString();

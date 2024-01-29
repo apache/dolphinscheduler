@@ -107,6 +107,9 @@ $bgLight: #ffffff;
     &.icon-sub_process {
       background-image: url('/images/task-icons/sub_process.png');
     }
+    &.icon-dynamic {
+      background-image: url('/images/task-icons/dynamic.png');
+    }
     &.icon-data_quality {
       background-image: url('/images/task-icons/data_quality.png');
     }
@@ -196,7 +199,19 @@ $bgLight: #ffffff;
       background-image: url('/images/task-icons/dms.png');
     }
     &.icon-datasync {
-      background-image: url('/images/task-icons/datasync_hover.png');
+      background-image: url('/images/task-icons/datasync.png');
+    }
+    &.icon-linkis {
+      background-image: url('/images/task-icons/linkis.png');
+    }
+    &.icon-kubeflow {
+      background-image: url('/images/task-icons/kubeflow.png');
+    }
+    &.icon-data_factory {
+      background-image: url('/images/task-icons/data_factory.png');
+    }
+    &.icon-remoteshell {
+      background-image: url('/images/task-icons/remoteshell.png');
     }
   }
 
@@ -207,6 +222,9 @@ $bgLight: #ffffff;
       }
       &.icon-sub_process {
         background-image: url('/images/task-icons/sub_process_hover.png');
+      }
+      &.icon-dynamic {
+        background-image: url('/images/task-icons/dynamic_hover.png');
       }
       &.icon-data_quality {
         background-image: url('/images/task-icons/data_quality_hover.png');
@@ -297,7 +315,19 @@ $bgLight: #ffffff;
         background-image: url('/images/task-icons/dms_hover.png');
       }
       &.icon-datasync {
-        background-image: url('/images/task-icons/datasync.png');
+        background-image: url('/images/task-icons/datasync_hover.png');
+      }
+      &.icon-linkis {
+        background-image: url('/images/task-icons/linkis_hover.png');
+      }
+      &.icon-kubeflow {
+        background-image: url('/images/task-icons/kubeflow_hover.png');
+      }
+      &.icon-data_factory {
+        background-image: url('/images/task-icons/data_factory_hover.png');
+      }
+      &.icon-remoteshell {
+        background-image: url('/images/task-icons/remoteshell_hover.png');
       }
     }
   }

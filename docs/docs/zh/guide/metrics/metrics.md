@@ -17,7 +17,7 @@ cd dolphinscheduler-meter/src/main/resources/grafana-demo
 docker compose up
 ```
 
-然后，您即可通过http://localhost/3001`链接访问`Grafana`面板。
+然后，您即可通过`http://localhost:3001`链接访问`Grafana`面板。
 
 ![image.png](../../../../img/metrics/metrics-master.png)
 ![image.png](../../../../img/metrics/metrics-worker.png)
@@ -74,7 +74,6 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 - ds.task.dispatch.failure.count: (counter) 分发失败的任务数量，重试也包含在内
 - ds.task.dispatch.error.count: (counter) 分发任务的错误数量
 - ds.task.execution.count.by.type: (counter) 任务执行数量，按标签`task_type`聚类
-- ds.task.running: (gauge) 正在运行的任务数量
 - ds.task.prepared: (gauge) 准备好且待提交的任务数量
 - ds.task.execution.count: (counter) 已执行的任务数量
 - ds.task.execution.duration: (histogram) 任务执行时长
@@ -83,7 +82,7 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 - ds.workflow.create.command.count: (counter) 工作量创建并插入的命令数量
 - ds.workflow.instance.running: (gauge) 正在运行的工作流实例数量
-- ds.workflow.instance.count: (counter) 工作流实例数量，由tag `state`按状态切分：
+- ds.workflow.instance.count: (counter) 工作流实例数量，由tag `process.definition.code` 和 `state` 切分。您可以通过 `process.definition.code` 这个tag筛选出和某个workflow相关的指标，这里的 `process.definition.code` 指的是您工作流定义的编号代码。工作流实例有如下七种状态：
   - submit：已提交的工作量实例数量
   - timeout：运行超时的工作流实例数量
   - finish：已完成的工作流实例数量，包含成功和失败
@@ -104,6 +103,12 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 ### Worker Server指标
 
 - ds.worker.overload.count: (counter) worker过载次数
+- ds.worker.task: (gauge) worker上任务总数，包含等待提交和正在执行的任务
+- ds.worker.execute.queue.size: (gauge) worker上等待提交的任务总数
+- ds.worker.active.execute.thread: (gauge) worker上正在执行的任务总数
+- ds.worker.memory.available: (gauge) worker机器可用物理内存 (GB)
+- ds.worker.cpu.usage: (gauge) worker机器cpu使用百分比
+- ds.worker.memory.usage: (gauge) worker机器内存使用百分比
 - ds.worker.full.submit.queue.count: (counter) worker提交队列全满次数
 - ds.worker.resource.download.count: (counter) worker下载资源文件的次数，可由`status`标签切分
 - ds.worker.resource.download.duration: (histogram) worker下载资源文件时花费的时间分布
@@ -111,7 +116,11 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
 
 ### Api Server指标
 
-- 目前我们尚未提供任何Api Server指标
+- ds.api.request.count: (counter) api请求次数
+- ds.api.response.count: (counter) api响应次数，可由标签`code`切分
+- ds.api.response.time: (timer) api响应时间分布，可由标签`user_id`切分
+- ds.api.resource.upload.size: (histogram) api上传资源文件大小的分布（bytes）
+- ds.api.resource.download.size: (histogram) api下载资源文件大小的分布（bytes）
 
 ### Alert Server指标
 

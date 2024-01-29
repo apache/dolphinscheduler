@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.AssertionsHelper;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.DqExecuteResultServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DqRuleServiceImpl;
@@ -26,6 +27,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
@@ -33,7 +35,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.dp.RuleType;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -74,16 +75,10 @@ public class DataQualityControllerTest {
     }
 
     @Test
-    public void testGetRuleFormCreateJsonById() throws Exception {
+    public void testGetRuleFormCreateJsonById() {
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, 1);
-
-        Mockito.when(dqRuleService.getRuleFormCreateJsonById(1)).thenReturn(result);
-
-        Result response = dataQualityController.getRuleFormCreateJsonById(1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Mockito.when(dqRuleService.getRuleFormCreateJsonById(1)).thenReturn("");
+        AssertionsHelper.assertDoesNotThrow(() -> dataQualityController.getRuleFormCreateJsonById(1));
     }
 
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
@@ -132,50 +127,38 @@ public class DataQualityControllerTest {
         pageInfo.setTotal(10);
         pageInfo.setTotalList(getRuleList());
 
-        Result result = new Result();
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        when(dqRuleService.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10)).thenReturn(pageInfo);
 
-        when(dqRuleService.queryRuleListPaging(
-                user, searchVal, ruleType, start, end, 1, 10)).thenReturn(result);
-
-        Result response = dataQualityController.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10);
+        Result<PageInfo<DqRule>> response =
+                dataQualityController.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }
 
     @Test
-    public void testQueryRuleList() throws Exception {
+    public void testQueryRuleList() {
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, getRuleList());
+        when(dqRuleService.queryAllRuleList()).thenReturn(getRuleList());
 
-        when(dqRuleService.queryAllRuleList()).thenReturn(result);
-
-        Result response = dataQualityController.queryRuleList();
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Result<List<DqRule>> listResult = dataQualityController.queryRuleList();
+        Assertions.assertEquals(Status.SUCCESS.getCode(), listResult.getCode().intValue());
     }
 
     @Test
-    public void testQueryResultListPaging() throws Exception {
+    public void testQueryResultListPaging() {
 
         String searchVal = "";
         int ruleType = 0;
         String start = "2020-01-01 00:00:00";
         String end = "2020-01-02 00:00:00";
 
-        PageInfo<DqRule> pageInfo = new PageInfo<>(1, 10);
+        PageInfo<DqExecuteResult> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotal(10);
 
-        Result result = new Result();
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
+        when(dqExecuteResultService.queryResultListPaging(user, searchVal, 0, ruleType, start, end, 1, 10))
+                .thenReturn(pageInfo);
 
-        when(dqExecuteResultService.queryResultListPaging(
-                user, searchVal, 0, ruleType, start, end, 1, 10)).thenReturn(result);
-
-        Result response =
+        Result<PageInfo<DqExecuteResult>> pageInfoResult =
                 dataQualityController.queryExecuteResultListPaging(user, searchVal, ruleType, 0, start, end, 1, 10);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), pageInfoResult.getCode().intValue());
     }
 }

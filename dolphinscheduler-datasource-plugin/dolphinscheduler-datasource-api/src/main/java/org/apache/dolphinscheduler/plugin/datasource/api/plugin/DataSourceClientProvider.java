@@ -20,71 +20,80 @@ package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.spi.datasource.AdHocDataSourceClient;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceClient;
+import org.apache.dolphinscheduler.spi.datasource.PooledDataSourceClient;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
+@Slf4j
 public class DataSourceClientProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataSourceClientProvider.class);
+    // We use the cache here to avoid creating a new datasource client every time,
+    // One DataSourceClient corresponds to one unique datasource.
+    private static final Cache<String, PooledDataSourceClient> POOLED_DATASOURCE_CLIENT_CACHE =
+            CacheBuilder.newBuilder()
+                    .expireAfterWrite(PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24L), TimeUnit.HOURS)
+                    .removalListener((RemovalListener<String, PooledDataSourceClient>) notification -> {
+                        try (PooledDataSourceClient closedClient = notification.getValue()) {
+                            log.info("Datasource: {} is removed from cache due to expire", notification.getKey());
+                        } catch (Exception e) {
+                            log.error("Close datasource client error", e);
+                        }
+                    })
+                    .maximumSize(100)
+                    .build();
+    private static final DataSourcePluginManager dataSourcePluginManager = new DataSourcePluginManager();
 
-    private static final long duration = PropertyUtils.getLong(TaskConstants.KERBEROS_EXPIRE_TIME, 24);
-    private static final Cache<String, DataSourceClient> uniqueId2dataSourceClientCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(duration, TimeUnit.HOURS)
-            .removalListener((RemovalListener<String, DataSourceClient>) notification -> {
-                try (DataSourceClient closedClient = notification.getValue()) {
-                    logger.info("Datasource: {} is removed from cache due to expire", notification.getKey());
-                }
-            })
-            .maximumSize(100)
-            .build();
-    private DataSourcePluginManager dataSourcePluginManager;
-
-    private DataSourceClientProvider() {
-        initDataSourcePlugin();
+    static {
+        dataSourcePluginManager.installPlugin();
     }
 
-    private static class DataSourceClientProviderHolder {
-
-        private static final DataSourceClientProvider INSTANCE = new DataSourceClientProvider();
-    }
-
-    public static DataSourceClientProvider getInstance() {
-        return DataSourceClientProviderHolder.INSTANCE;
-    }
-
-    public Connection getConnection(DbType dbType, ConnectionParam connectionParam) throws ExecutionException {
+    public static DataSourceClient getPooledDataSourceClient(DbType dbType,
+                                                             ConnectionParam connectionParam) throws ExecutionException {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
-        logger.info("Get connection from datasource {}", datasourceUniqueId);
-
-        DataSourceClient dataSourceClient = uniqueId2dataSourceClientCache.get(datasourceUniqueId, () -> {
+        return POOLED_DATASOURCE_CLIENT_CACHE.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
             DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
             if (null == dataSourceChannel) {
                 throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
             }
-            return dataSourceChannel.createDataSourceClient(baseConnectionParam, dbType);
+            return dataSourceChannel.createPooledDataSourceClient(baseConnectionParam, dbType);
         });
-        return dataSourceClient.getConnection();
     }
 
-    private void initDataSourcePlugin() {
-        dataSourcePluginManager = new DataSourcePluginManager();
-        dataSourcePluginManager.installPlugin();
+    public static Connection getPooledConnection(DbType dbType,
+                                                 ConnectionParam connectionParam) throws SQLException, ExecutionException {
+        return getPooledDataSourceClient(dbType, connectionParam).getConnection();
+    }
+
+    public static AdHocDataSourceClient getAdHocDataSourceClient(DbType dbType, ConnectionParam connectionParam) {
+        BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
+        Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
+        DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+        if (null == dataSourceChannel) {
+            throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+        }
+        return dataSourceChannel.createAdHocDataSourceClient(baseConnectionParam, dbType);
+    }
+
+    public static Connection getAdHocConnection(DbType dbType,
+                                                ConnectionParam connectionParam) throws SQLException, ExecutionException {
+        return getAdHocDataSourceClient(dbType, connectionParam).getConnection();
     }
 }

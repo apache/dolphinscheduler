@@ -92,6 +92,66 @@ export function useDatasource(
       id: 10,
       code: 'ATHENA',
       disabled: false
+    },
+    {
+      id: 12,
+      code: 'TRINO',
+      disabled: false
+    },
+    {
+      id: 13,
+      code: 'STARROCKS',
+      disabled: false
+    },
+    {
+      id: 14,
+      code: 'AZURESQL',
+      disabled: false
+    },
+    {
+      id: 15,
+      code: 'DAMENG',
+      disabled: false
+    },
+    {
+      id: 15,
+      code: 'SSH',
+      disabled: true
+    },
+    {
+      id: 16,
+      code: 'DATABEND',
+      disabled: false
+    },
+    {
+      id: 21,
+      code: 'VERTICA',
+      disabled: false
+    },
+    {
+      id: 22,
+      code: 'HANA',
+      disabled: false
+    },
+    {
+      id: 23,
+      code: 'ZEPPELIN',
+      disabled: false
+    },
+    {
+      id: 23,
+      code: 'DORIS',
+      disabled: false
+    },
+    {
+      id: 24,
+      code: 'SAGEMAKER',
+      disabled: false
+    },
+    {
+      id: 25,
+      code: 'KYUUBI',
+      disabled: false
     }
   ]
 

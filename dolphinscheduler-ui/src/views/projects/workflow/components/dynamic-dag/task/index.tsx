@@ -15,7 +15,13 @@
  * limitations under the License.
  */
 
-import { defineComponent, getCurrentInstance, PropType, toRefs, watch } from 'vue'
+import {
+  defineComponent,
+  getCurrentInstance,
+  PropType,
+  toRefs,
+  watch
+} from 'vue'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useTaskForm } from './use-task-form'
 import { useI18n } from 'vue-i18n'
@@ -30,6 +36,9 @@ const props = {
   },
   task: {
     type: String as PropType<string>
+  },
+  formData: {
+    type: Object as PropType<object>
   }
 }
 
@@ -39,7 +48,7 @@ const TaskForm = defineComponent({
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
-    const { variables } = useTaskForm()
+    const { variables, handleValidate } = useTaskForm(props.formData)
     const { t } = useI18n()
 
     const cancelModal = () => {
@@ -47,19 +56,24 @@ const TaskForm = defineComponent({
     }
 
     const confirmModal = () => {
+      handleValidate()
       ctx.emit('confirmModal')
     }
 
     const onUpdateValue = (v: any, f: any) => {
-      f.modelField.indexOf('.') >= 0 ?
-        (variables.model as any)[f.modelField.split('.')[0]][f.modelField.split('.')[1]] = v :
-        (variables.model as any)[f.modelField] = v
+      f.modelField.indexOf('.') >= 0
+        ? ((variables.model as any)[f.modelField.split('.')[0]][
+            f.modelField.split('.')[1]
+          ] = v)
+        : ((variables.model as any)[f.modelField] = v)
     }
 
     const setDefaultValue = (f: any) => {
-      return f.modelField.indexOf('.') >= 0 ?
-        (variables.model as any)[f.modelField.split('.')[0]][f.modelField.split('.')[1]] :
-        (variables.model as any)[f.modelField]
+      return f.modelField.indexOf('.') >= 0
+        ? (variables.model as any)[f.modelField.split('.')[0]][
+            f.modelField.split('.')[1]
+          ]
+        : (variables.model as any)[f.modelField]
     }
 
     watch(variables.model, () => {
@@ -80,54 +94,49 @@ const TaskForm = defineComponent({
     return (
       <Modal
         title={this.task}
-        show={(this.showModal && this.task) as boolean}
+        show={this.showModal}
         onCancel={this.cancelModal}
-        onConfirm={this.confirmModal}>
-        <NForm
-          model={this.model}
-          rules={this.rules}
-          ref={'taskForm'}>
-          {
-            (this.formStructure as Array<any>).map(f => {
-              return <NFormItem
-                label={this.t(f.label)}
-                path={f.field}
-              >
-                {
-                  f.type === 'input' && <NInput
+        onConfirm={this.confirmModal}
+      >
+        <NForm model={this.model} rules={this.rules} ref={'taskForm'}>
+          {(this.formStructure as Array<any>).map((f) => {
+            return (
+              <NFormItem label={this.t(f.label)} path={f.field}>
+                {f.type === 'input' && (
+                  <NInput
                     allowInput={this.trim}
                     placeholder={f.placeholder ? this.t(f.placeholder) : ''}
                     defaultValue={this.setDefaultValue(f)}
                     onUpdateValue={(v) => this.onUpdateValue(v, f)}
                     clearable={f.clearable}
                   />
-                }
-                {
-                  f.type === 'select' && <NSelect
+                )}
+                {f.type === 'select' && (
+                  <NSelect
                     placeholder={f.placeholder ? this.t(f.placeholder) : ''}
                     defaultValue={this.setDefaultValue(f)}
                     onUpdateValue={(v) => this.onUpdateValue(v, f)}
                     options={
-                      f.optionsLocale ?
-                        f.options.map((o: SelectOption) => {
-                          return {
-                            label: this.t(o.label as string),
-                            value: o.value
-                          }
-                        }) :
-                        f.options
+                      f.optionsLocale
+                        ? f.options.map((o: SelectOption) => {
+                            return {
+                              label: this.t(o.label as string),
+                              value: o.value
+                            }
+                          })
+                        : f.options
                     }
                   />
-                }
-                {
-                  f.type === 'studio' && <MonacoEditor
+                )}
+                {f.type === 'studio' && (
+                  <MonacoEditor
                     defaultValue={this.setDefaultValue(f)}
                     onUpdateValue={(v) => this.onUpdateValue(v, f)}
                   />
-                }
+                )}
               </NFormItem>
-            })
-          }
+            )
+          })}
         </NForm>
       </Modal>
     )

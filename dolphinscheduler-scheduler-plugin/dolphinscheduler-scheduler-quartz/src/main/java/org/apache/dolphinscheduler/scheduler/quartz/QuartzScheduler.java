@@ -32,20 +32,19 @@ import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.TriggerKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Strings;
 
+@Slf4j
 public class QuartzScheduler implements SchedulerApi {
-
-    private static final Logger logger = LoggerFactory.getLogger(QuartzScheduler.class);
 
     @Autowired
     private Scheduler scheduler;
@@ -77,6 +76,14 @@ public class QuartzScheduler implements SchedulerApi {
          */
         Date startDate = DateUtils.transformTimezoneDate(schedule.getStartTime(), timezoneId);
         Date endDate = DateUtils.transformTimezoneDate(schedule.getEndTime(), timezoneId);
+        /**
+         * If the start time is less than the current time, the start time is set to the current time.
+         * We do this change to avoid misfires all triggers when update the scheduler.
+         */
+        Date now = new Date();
+        if (startDate.before(now)) {
+            startDate = now;
+        }
 
         lock.writeLock().lock();
         try {
@@ -94,7 +101,7 @@ public class QuartzScheduler implements SchedulerApi {
 
                 scheduler.addJob(jobDetail, false, true);
 
-                logger.info("Add job, job name: {}, group name: {}", jobKey.getName(), jobKey.getGroup());
+                log.info("Add job, job name: {}, group name: {}", jobKey.getName(), jobKey.getGroup());
             }
 
             TriggerKey triggerKey = new TriggerKey(jobKey.getName(), jobKey.getGroup());
@@ -109,7 +116,7 @@ public class QuartzScheduler implements SchedulerApi {
                     .endAt(endDate)
                     .withSchedule(
                             cronSchedule(cronExpression)
-                                    .withMisfireHandlingInstructionFireAndProceed()
+                                    .withMisfireHandlingInstructionIgnoreMisfires()
                                     .inTimeZone(DateUtils.getTimezone(timezoneId)))
                     .forJob(jobDetail).build();
 
@@ -121,19 +128,19 @@ public class QuartzScheduler implements SchedulerApi {
                 if (!Strings.nullToEmpty(cronExpression).equalsIgnoreCase(Strings.nullToEmpty(oldCronExpression))) {
                     // reschedule job trigger
                     scheduler.rescheduleJob(triggerKey, cronTrigger);
-                    logger.info(
+                    log.info(
                             "reschedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
                             triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
                 }
             } else {
                 scheduler.scheduleJob(cronTrigger);
-                logger.info(
+                log.info(
                         "schedule job trigger, triggerName: {}, triggerGroupName: {}, cronExpression: {}, startDate: {}, endDate: {}",
                         triggerKey.getName(), triggerKey.getGroup(), cronExpression, startDate, endDate);
             }
 
         } catch (Exception e) {
-            logger.error("Failed to add scheduler task, projectId: {}, scheduler: {}", projectId, schedule, e);
+            log.error("Failed to add scheduler task, projectId: {}, scheduler: {}", projectId, schedule, e);
             throw new SchedulerException("Add schedule job failed", e);
         } finally {
             lock.writeLock().unlock();
@@ -145,11 +152,11 @@ public class QuartzScheduler implements SchedulerApi {
         JobKey jobKey = QuartzTaskUtils.getJobKey(scheduleId, projectId);
         try {
             if (scheduler.checkExists(jobKey)) {
-                logger.info("Try to delete scheduler task, projectId: {}, schedulerId: {}", projectId, scheduleId);
+                log.info("Try to delete scheduler task, projectId: {}, schedulerId: {}", projectId, scheduleId);
                 scheduler.deleteJob(jobKey);
             }
         } catch (Exception e) {
-            logger.error("Failed to delete scheduler task, projectId: {}, schedulerId: {}", projectId, scheduleId, e);
+            log.error("Failed to delete scheduler task, projectId: {}, schedulerId: {}", projectId, scheduleId, e);
             throw new SchedulerException("Failed to delete scheduler task");
         }
     }

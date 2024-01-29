@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.tools.demo;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -41,9 +41,8 @@ public class CreateProcessDemo {
 
     @Component
     @Profile("demo")
+    @Slf4j
     static class DemoRunner implements CommandLineRunner {
-
-        private static final Logger logger = LoggerFactory.getLogger(DemoRunner.class);
 
         private final ProcessDefinitionDemo processDefinitionDemo;
 
@@ -54,7 +53,7 @@ public class CreateProcessDemo {
         @Override
         public void run(String... args) throws Exception {
             processDefinitionDemo.createProcessDefinitionDemo();
-            logger.info("create process definition demo success");
+            log.info("create process definition demo success");
         }
     }
 }

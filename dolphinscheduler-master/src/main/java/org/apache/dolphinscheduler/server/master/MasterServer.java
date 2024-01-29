@@ -20,21 +20,26 @@ package org.apache.dolphinscheduler.server.master;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-import org.apache.dolphinscheduler.server.master.rpc.MasterRPCServer;
+import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
+import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
-import org.apache.dolphinscheduler.service.task.TaskPluginManager;
 
 import javax.annotation.PostConstruct;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.quartz.SchedulerException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -46,9 +51,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan("org.apache.dolphinscheduler")
 @EnableTransactionManagement
 @EnableCaching
+@Slf4j
 public class MasterServer implements IStoppable {
-
-    private static final Logger logger = LoggerFactory.getLogger(MasterServer.class);
 
     @Autowired
     private SpringApplicationContext springApplicationContext;
@@ -72,9 +76,18 @@ public class MasterServer implements IStoppable {
     private FailoverExecuteThread failoverExecuteThread;
 
     @Autowired
-    private MasterRPCServer masterRPCServer;
+    private MasterRpcServer masterRPCServer;
+
+    @Autowired
+    private MetricsProvider metricsProvider;
+
+    @Autowired
+    private MasterSlotManager masterSlotManager;
 
     public static void main(String[] args) {
+        MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         Thread.currentThread().setName(Constants.THREAD_NAME_MASTER_SERVER);
         SpringApplication.run(MasterServer.class);
     }
@@ -90,17 +103,31 @@ public class MasterServer implements IStoppable {
         // install task plugin
         this.taskPluginManager.loadPlugin();
 
+        this.masterSlotManager.start();
+
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.masterSchedulerBootstrap.init();
         this.masterSchedulerBootstrap.start();
 
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
 
         this.schedulerApi.start();
+
+        MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getTotalCpuUsedPercentage();
+        });
+        MasterServerMetrics.registerMasterMemoryAvailableGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return (systemMetrics.getSystemMemoryMax() - systemMetrics.getSystemMemoryUsed()) / 1024.0 / 1024 / 1024;
+        });
+        MasterServerMetrics.registerMasterMemoryUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getJvmMemoryUsedPercentage();
+        });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!ServerLifeCycleManager.isStopped()) {
@@ -118,7 +145,7 @@ public class MasterServer implements IStoppable {
         // set stop signal is true
         // execute only once
         if (!ServerLifeCycleManager.toStopped()) {
-            logger.warn("MasterServer is already stopped, current cause: {}", cause);
+            log.warn("MasterServer is already stopped, current cause: {}", cause);
             return;
         }
         // thread sleep 3 seconds for thread quietly stop
@@ -126,18 +153,18 @@ public class MasterServer implements IStoppable {
         try (
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
-                MasterRPCServer closedRpcServer = masterRPCServer;
+                MasterRpcServer closedRpcServer = masterRPCServer;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext) {
 
-            logger.info("Master server is stopping, current cause : {}", cause);
+            log.info("Master server is stopping, current cause : {}", cause);
         } catch (Exception e) {
-            logger.error("MasterServer stop failed, current cause: {}", cause, e);
+            log.error("MasterServer stop failed, current cause: {}", cause, e);
             return;
         }
-        logger.info("MasterServer stopped, current cause: {}", cause);
+        log.info("MasterServer stopped, current cause: {}", cause);
     }
 
     @Override

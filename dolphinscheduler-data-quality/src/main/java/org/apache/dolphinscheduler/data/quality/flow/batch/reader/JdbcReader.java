@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.batch.reader;
 
+import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DB_TABLE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DOTS;
 import static org.apache.dolphinscheduler.data.quality.Constants.DRIVER;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchReader;
 import org.apache.dolphinscheduler.data.quality.utils.ConfigUtils;
+import org.apache.dolphinscheduler.data.quality.utils.ParserUtils;
 
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Dataset;
@@ -77,9 +79,9 @@ public class JdbcReader implements BatchReader {
         DataFrameReader reader = sparkSession.read()
                 .format(JDBC)
                 .option(URL, config.getString(URL))
-                .option(DB_TABLE, config.getString(TABLE))
+                .option(DB_TABLE, config.getString(DATABASE) + "." + config.getString(TABLE))
                 .option(USER, config.getString(USER))
-                .option(PASSWORD, config.getString(PASSWORD))
+                .option(PASSWORD, ParserUtils.decode(config.getString(PASSWORD)))
                 .option(DRIVER, config.getString(DRIVER));
 
         Config jdbcConfig = ConfigUtils.extractSubConfig(config, JDBC + DOTS, false);

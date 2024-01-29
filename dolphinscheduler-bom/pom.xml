@@ -34,9 +34,7 @@
         <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
-        <druid.version>1.2.4</druid.version>
-        <zookeeper.version>3.8.0</zookeeper.version>
-        <curator.version>5.3.0</curator.version>
+        <druid.version>1.2.20</druid.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
         <jetcd.test.version>0.7.1</jetcd.test.version>
@@ -48,18 +46,21 @@
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-configuration.version>1.10</commons-configuration.version>
         <commons-email.version>1.5</commons-email.version>
-        <commons-collections4.version>4.1</commons-collections4.version>
+        <commons-collections4.version>4.3</commons-collections4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
         <jackson.version>2.13.4</jackson.version>
         <protostuff.version>1.7.2</protostuff.version>
-        <byte-buddy.version>1.9.16</byte-buddy.version>
+        <byte-buddy.version>1.12.11</byte-buddy.version>
         <logback.version>1.2.11</logback.version>
         <hadoop.version>3.2.4</hadoop.version>
         <cron-utils.version>9.1.6</cron-utils.version>
-        <h2.version>2.1.210</h2.version>
-        <mysql-connector.version>8.0.16</mysql-connector.version>
+        <h2.version>2.2.220</h2.version>
+        <mysql-connector.version>8.0.33</mysql-connector.version>
+        <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
+        <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
+        <ngdbc.version>2.4.51</ngdbc.version>
         <slf4j.version>1.7.36</slf4j.version>
         <poi.version>4.1.2</poi.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
@@ -68,11 +69,13 @@
         <guava.version>31.1-jre</guava.version>
         <postgresql.version>42.4.1</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
+        <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.11.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
-        <clickhouse-jdbc.version>0.1.52</clickhouse-jdbc.version>
+        <clickhouse-jdbc.version>0.4.6</clickhouse-jdbc.version>
+        <databend-jdbc.version>0.0.7</databend-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
-        <mssql-jdbc.version>6.1.0.jre8</mssql-jdbc.version>
+        <mssql-jdbc.version>11.2.1.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
         <servlet-api.version>2.5</servlet-api.version>
         <guava-retry.version>2.0.0</guava-retry.version>
@@ -86,20 +89,40 @@
         <aws-sdk.version>1.12.300</aws-sdk.version>
         <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
-        <okhttp.version>3.14.9</okhttp.version>
+        <okhttp.version>4.9.3</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
         <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
         <gson.version>2.9.1</gson.version>
         <dropwizard.metrics-version>4.2.11</dropwizard.metrics-version>
-        <snappy.version>1.1.8.4</snappy.version>
+        <snappy.version>1.1.10.1</snappy.version>
         <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
-        <snakeyaml.version>1.31</snakeyaml.version>
+        <snakeyaml.version>1.33</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
         <aspectj.version>1.9.7</aspectj.version>
         <zt-zip.version>1.15</zt-zip.version>
+        <trino-jdbc.version>402</trino-jdbc.version>
+        <azure-identity.version>1.7.1</azure-identity.version>
+        <redshift-jdbc42.version>2.1.0.9</redshift-jdbc42.version>
+        <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
+        <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
+        <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
+        <snowflake-jdbc.version>3.13.29</snowflake-jdbc.version>
+        <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
+        <sshd.version>2.8.0</sshd.version>
+        <fabric8.client.version>6.0.0</fabric8.client.version>
+        <casdoor.version>1.6.0</casdoor.version>
+        <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
+        <protobuf.version>3.17.2</protobuf.version>
+        <esdk-obs.version>3.23.3</esdk-obs.version>
+        <system-lambda.version>1.2.1</system-lambda.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
+        <testcontainer.version>1.19.3</testcontainer.version>
+        <checker-qual.version>3.19.0</checker-qual.version>
+        <zeppelin-client.version>0.10.1</zeppelin-client.version>
+        <aliyun-voice.version>2.1.4</aliyun-voice.version>
     </properties>
 
     <dependencyManagement>
@@ -381,10 +404,30 @@
             </dependency>
 
             <dependency>
+                <groupId>com.dameng</groupId>
+                <artifactId>DmJdbcDriver18</artifactId>
+                <version>${dameng-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.vertica.jdbc</groupId>
+                <artifactId>vertica-jdbc</artifactId>
+                <version>${vertica-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
                 <version>${h2.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.sap.cloud.db.jdbc</groupId>
+                <artifactId>ngdbc</artifactId>
+                <version>${ngdbc.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <!-- sl4j -->
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -523,7 +566,11 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.kyuubi</groupId>
+                <artifactId>kyuubi-hive-jdbc-shaded</artifactId>
+                <version>${kyuubi-jdbc.version}</version>
+            </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
@@ -551,9 +598,15 @@
             </dependency>
 
             <dependency>
-                <groupId>ru.yandex.clickhouse</groupId>
+                <groupId>com.clickhouse</groupId>
                 <artifactId>clickhouse-jdbc</artifactId>
                 <version>${clickhouse-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.databend</groupId>
+                <artifactId>databend-jdbc</artifactId>
+                <version>${databend-jdbc.version}</version>
             </dependency>
 
             <dependency>
@@ -660,6 +713,20 @@
             </dependency>
 
             <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-storage</artifactId>
+                <version>${google-cloud-storage.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-sdk-bom</artifactId>
+                <version>${azure-sdk-bom.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>joda-time</groupId>
                 <artifactId>joda-time</artifactId>
                 <version>${joda-time.version}</version>
@@ -692,6 +759,12 @@
             </dependency>
 
             <dependency>
+                <groupId>io.trino</groupId>
+                <artifactId>trino-jdbc</artifactId>
+                <version>${trino-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>com.google.code.gson</groupId>
                 <artifactId>gson</artifactId>
                 <version>${gson.version}</version>
@@ -712,6 +785,17 @@
                         <artifactId>jackson-module-scala_2.11</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-sftp</artifactId>
+                <version>${sshd.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.sshd</groupId>
+                <artifactId>sshd-scp</artifactId>
+                <version>${sshd.version}</version>
             </dependency>
 
             <dependency>
@@ -778,7 +862,135 @@
                 <artifactId>zt-zip</artifactId>
                 <version>${zt-zip.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-identity</artifactId>
+                <version>${azure-identity.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager</artifactId>
+                <version>${azure-resourcemanager.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure.resourcemanager</groupId>
+                <artifactId>azure-resourcemanager-datafactory</artifactId>
+                <version>${azure-resourcemanager-datafactory.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazon.redshift</groupId>
+                <artifactId>redshift-jdbc42</artifactId>
+                <version>${redshift-jdbc42.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-redshift</artifactId>
+                <version>${aws-java-sdk-redshift.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${fabric8.client.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.casbin</groupId>
+                <artifactId>casdoor-spring-boot-starter</artifactId>
+                <version>${casdoor.version}</version>
+            </dependency>
 
+            <dependency>
+                <groupId>net.snowflake</groupId>
+                <artifactId>snowflake-jdbc</artifactId>
+                <version>${snowflake-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.zeppelin</groupId>
+                <artifactId>zeppelin-client</artifactId>
+                <version>${zeppelin-client.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.huaweicloud</groupId>
+                <artifactId>esdk-obs-java-bundle</artifactId>
+                <version>${esdk-obs.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.stefanbirkner</groupId>
+                <artifactId>system-lambda</artifactId>
+                <version>${system-lambda.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- test dependencies on TestContainers -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mysql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.checkerframework</groupId>
+                <artifactId>checker-qual</artifactId>
+                <version>${checker-qual.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dyvmsapi20170525</artifactId>
+                <version>${aliyun-voice.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>zk-3.8</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <zookeeper.version>3.8.0</zookeeper.version>
+                <curator.version>5.3.0</curator.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>zk-3.4</id>
+            <activation>
+                <property>
+                    <name>zk-3.4</name>
+                </property>
+            </activation>
+            <properties>
+                <curator.version>4.3.0</curator.version>
+                <zookeeper.version>3.4.14</zookeeper.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>

@@ -57,13 +57,6 @@
                 <exclude>**/dolphinscheduler-ui/node/**</exclude>
                 <exclude>**/dolphinscheduler-ui/node_modules/**</exclude>
 
-                <!-- python ignore -->
-                <exclude>**/dolphinscheduler-python/pydolphinscheduler/.pytest_cache/**</exclude>
-                <exclude>**/dolphinscheduler-python/pydolphinscheduler/build/**</exclude>
-                <exclude>**/dolphinscheduler-python/pydolphinscheduler/dist/**</exclude>
-                <exclude>**/dolphinscheduler-python/pydolphinscheduler/dist/**</exclude>
-                <exclude>**/dolphinscheduler-python/pydolphinscheduler/htmlcov/**</exclude>
-
                 <!-- eclipse ignore -->
                 <exclude>**/.settings/**</exclude>
                 <exclude>**/.project</exclude>

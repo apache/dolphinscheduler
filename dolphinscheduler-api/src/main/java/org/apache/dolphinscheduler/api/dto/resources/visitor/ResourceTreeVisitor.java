@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.dto.resources.visitor;
 import org.apache.dolphinscheduler.api.dto.resources.Directory;
 import org.apache.dolphinscheduler.api.dto.resources.FileLeaf;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
-import org.apache.dolphinscheduler.service.storage.StorageEntity;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -128,7 +128,6 @@ public class ResourceTreeVisitor implements Visitor {
         tempResourceComponent.setId(resource.getId());
         tempResourceComponent.setPid(resource.getPfullName());
         tempResourceComponent.setIdValue(resource.getId(), resource.isDirectory());
-        tempResourceComponent.setDescription(resource.getDescription());
         tempResourceComponent.setType(resource.getType());
         return tempResourceComponent;
     }

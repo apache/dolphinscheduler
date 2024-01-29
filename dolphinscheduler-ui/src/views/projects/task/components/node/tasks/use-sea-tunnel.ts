@@ -46,7 +46,7 @@ export function useSeaTunnel({
     memoryMax: -1,
     delayTime: 0,
     timeout: 30,
-    engine: 'FLINK',
+    startupScript: 'seatunnel.sh',
     runMode: 'RUN',
     useCustom: true,
     deployMode: 'client',
@@ -56,24 +56,28 @@ export function useSeaTunnel({
     timeoutNotifyStrategy: ['WARN'],
     rawScript:
       'env {\n' +
-      '    execution.parallelism = 1\n' +
+      '  execution.parallelism = 2\n' +
+      '  job.mode = "BATCH"\n' +
+      '  checkpoint.interval = 10000\n' +
       '}\n' +
       '\n' +
       'source {\n' +
-      '    FakeSourceStream {\n' +
-      '        result_table_name = "fake"\n' +
-      '        field_name = "name,age"\n' +
+      '  FakeSource {\n' +
+      '    parallelism = 2\n' +
+      '    result_table_name = "fake"\n' +
+      '    row.num = 16\n' +
+      '    schema = {\n' +
+      '      fields {\n' +
+      '        name = "string"\n' +
+      '        age = "int"\n' +
+      '      }\n' +
       '    }\n' +
-      '}\n' +
-      '\n' +
-      'transform {\n' +
-      '    sql {\n' +
-      '        sql = "select name,age from fake"\n' +
-      '    }\n' +
+      '  }\n' +
       '}\n' +
       '\n' +
       'sink {\n' +
-      '    ConsoleSink {}\n' +
+      '  Console {\n' +
+      '  }\n' +
       '}'
   } as INodeData)
 
@@ -82,6 +86,7 @@ export function useSeaTunnel({
       Fields.useName(from),
       ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
+      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(),

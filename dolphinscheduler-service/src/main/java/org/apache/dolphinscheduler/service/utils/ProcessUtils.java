@@ -21,13 +21,10 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.service.log.LogClient;
-import org.apache.dolphinscheduler.service.storage.impl.HadoopUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -42,16 +39,15 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * mainly used to get the start command line of a process.
  */
+@Slf4j
 public class ProcessUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     /**
      * Initialization regularization, solve the problem of pre-compilation performance,
@@ -65,38 +61,10 @@ public class ProcessUtils {
     private static final Pattern WINDOWSATTERN = Pattern.compile("\\w+\\((\\d+)\\)");
 
     /**
-     * kill yarn application.
-     *
-     * @param appIds app id list
-     * @param logger logger
-     * @param tenantCode tenant code
-     * @param executePath execute path
-     */
-    public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
-        if (appIds == null || appIds.isEmpty()) {
-            return;
-        }
-
-        for (String appId : appIds) {
-            try {
-                TaskExecutionStatus applicationStatus = HadoopUtils.getInstance().getApplicationStatus(appId);
-
-                if (!applicationStatus.isFinished()) {
-                    String commandFile = String.format("%s/%s.kill", executePath, appId);
-                    String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
-                    execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
-                }
-            } catch (Exception e) {
-                logger.error("Get yarn application app id [{}}] status failed", appId, e);
-            }
-        }
-    }
-
-    /**
      * get kerberos init command
      */
     static String getKerberosInitCommand() {
-        logger.info("get kerberos init command");
+        log.info("get kerberos init command");
         StringBuilder kerberosCommandBuilder = new StringBuilder();
         boolean hadoopKerberosState =
                 PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
@@ -108,7 +76,7 @@ public class ProcessUtils {
                             PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
                             PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
                     .append("\n\n");
-            logger.info("kerberos init command: {}", kerberosCommandBuilder);
+            log.info("kerberos init command: {}", kerberosCommandBuilder);
         }
         return kerberosCommandBuilder.toString();
     }
@@ -144,10 +112,10 @@ public class ProcessUtils {
 
             String runCmd = String.format("%s %s", Constants.SH, commandFile);
             runCmd = OSUtils.getSudoCmd(tenantCode, runCmd);
-            logger.info("kill cmd:{}", runCmd);
+            log.info("kill cmd:{}", runCmd);
             OSUtils.exeCmd(runCmd);
         } catch (Exception e) {
-            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
+            log.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
         }
     }
 
@@ -192,20 +160,15 @@ public class ProcessUtils {
      * @param taskExecutionContext taskExecutionContext
      * @return yarn application ids
      */
-    public static @Nullable List<String> killYarnJob(@NonNull LogClient logClient,
-                                                     @NonNull TaskExecutionContext taskExecutionContext) {
-        if (taskExecutionContext.getLogPath() == null) {
-            return Collections.emptyList();
-        }
+    public static @Nullable List<String> killApplication(@NonNull List<String> appIds,
+                                                         @NonNull TaskExecutionContext taskExecutionContext) {
         try {
             Thread.sleep(Constants.SLEEP_TIME_MILLIS);
-            Host host = Host.of(taskExecutionContext.getHost());
-            List<String> appIds = logClient.getAppIds(host.getIp(), host.getPort(), taskExecutionContext.getLogPath(),
-                    taskExecutionContext.getAppInfoPath());
             if (CollectionUtils.isNotEmpty(appIds)) {
+                taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(
+                            .setExecutePath(FileUtils.getTaskInstanceWorkingDirectory(
                                     taskExecutionContext.getTenantCode(),
                                     taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
@@ -214,15 +177,14 @@ public class ProcessUtils {
                                     taskExecutionContext.getTaskInstanceId()));
                 }
                 FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
-                cancelApplication(appIds, logger, taskExecutionContext.getTenantCode(),
-                        taskExecutionContext.getExecutePath());
+                org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(taskExecutionContext);
                 return appIds;
             } else {
-                logger.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
+                log.info("The current appId is empty, don't need to kill the yarn job, taskInstanceId: {}",
                         taskExecutionContext.getTaskInstanceId());
             }
         } catch (Exception e) {
-            logger.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+            log.error("Kill yarn job failure, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         return Collections.emptyList();
     }

@@ -145,7 +145,7 @@
         AND a.task_type = #{taskType}
     </select>
 
-    <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="DependentProcessDefinition">
+    <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition">
         SELECT
         c.code AS process_definition_code
         ,c.name AS process_definition_name
@@ -161,6 +161,7 @@
             AND a.task_params LIKE concat('%', #{code}, '%')
         </if>
         AND a.task_type = 'DEPENDENT'
+        AND c.release_state = 1
     </select>
 
     <select id="queryTaskSubProcessDepOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">

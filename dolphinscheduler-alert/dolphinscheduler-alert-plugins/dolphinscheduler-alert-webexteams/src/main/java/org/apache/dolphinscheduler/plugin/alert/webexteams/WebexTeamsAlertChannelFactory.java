@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.webexteams;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
+import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -44,7 +45,7 @@ public final class WebexTeamsAlertChannelFactory implements AlertChannelFactory 
         InputParam botAccessToken = InputParam
                 .newBuilder(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_BOT_ACCESS_TOKEN,
                         WebexTeamsParamsConstants.WEBEX_TEAMS_BOT_ACCESS_TOKEN)
-                .setPlaceholder("Please enter the robot's access token you were given")
+                .setPlaceholder(AlertInputTips.BOT_TOKEN.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(true)
                         .build())
@@ -53,7 +54,7 @@ public final class WebexTeamsAlertChannelFactory implements AlertChannelFactory 
         InputParam roomId = InputParam
                 .newBuilder(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_ROOM_ID,
                         WebexTeamsParamsConstants.WEBEX_TEAMS_ROOM_ID)
-                .setPlaceholder("The room ID of the message")
+                .setPlaceholder(AlertInputTips.ROOM_ID.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
@@ -62,7 +63,7 @@ public final class WebexTeamsAlertChannelFactory implements AlertChannelFactory 
         InputParam toPersonId = InputParam
                 .newBuilder(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_TO_PERSON_ID,
                         WebexTeamsParamsConstants.WEBEX_TEAMS_TO_PERSON_ID)
-                .setPlaceholder("The person ID of the message recipient")
+                .setPlaceholder(AlertInputTips.RECIPIENT_USER_ID.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
@@ -71,7 +72,7 @@ public final class WebexTeamsAlertChannelFactory implements AlertChannelFactory 
         InputParam toPersonEmail = InputParam
                 .newBuilder(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_TO_PERSON_EMAIL,
                         WebexTeamsParamsConstants.WEBEX_TEAMS_TO_PERSON_EMAIL)
-                .setPlaceholder("The email address of the message recipient")
+                .setPlaceholder(AlertInputTips.RECIPIENT_EMAIL.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
@@ -80,7 +81,7 @@ public final class WebexTeamsAlertChannelFactory implements AlertChannelFactory 
         InputParam atSomeoneInRoom = InputParam
                 .newBuilder(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_AT_SOMEONE_IN_ROOM,
                         WebexTeamsParamsConstants.WEBEX_TEAMS_AT_SOMEONE_IN_ROOM)
-                .setPlaceholder("use ,(eng commas) to separate multiple emails")
+                .setPlaceholder(AlertInputTips.WEBEX_MENTION_USERS.getMsg())
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())

@@ -18,10 +18,11 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
@@ -39,7 +40,6 @@ public interface ResourcesService {
      *
      * @param loginUser login user
      * @param name alias
-     * @param description description
      * @param type type
      * @param pid parent id
      * @param currentDir current directory
@@ -47,7 +47,6 @@ public interface ResourcesService {
      */
     Result<Object> createDirectory(User loginUser,
                                    String name,
-                                   String description,
                                    ResourceType type,
                                    int pid,
                                    String currentDir);
@@ -57,7 +56,6 @@ public interface ResourcesService {
      *
      * @param loginUser login user
      * @param name alias
-     * @param desc description
      * @param type type
      * @param file file
      * @param currentDir current directory
@@ -65,7 +63,6 @@ public interface ResourcesService {
      */
     Result<Object> createResource(User loginUser,
                                   String name,
-                                  String desc,
                                   ResourceType type,
                                   MultipartFile file,
                                   String currentDir);
@@ -74,7 +71,6 @@ public interface ResourcesService {
      * update resource
      * @param loginUser     login user
      * @param name          name
-     * @param desc          description
      * @param type          resource type
      * @param file          resource file
      * @return  update result code
@@ -83,7 +79,6 @@ public interface ResourcesService {
                                   String fullName,
                                   String tenantCode,
                                   String name,
-                                  String desc,
                                   ResourceType type,
                                   MultipartFile file);
 
@@ -97,8 +92,9 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                   ResourceType type, String searchVal, Integer pageNo, Integer pageSize);
+    Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
+                                                            ResourceType type, String searchVal, Integer pageNo,
+                                                            Integer pageSize);
 
     /**
      * query resource list
@@ -161,37 +157,21 @@ public interface ResourcesService {
      * @param type resource type
      * @param fileName file name
      * @param fileSuffix file suffix
-     * @param desc description
      * @param content content
      * @return create result code
      */
     Result<Object> onlineCreateResource(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                        String desc, String content, String currentDirectory);
+                                        String content, String currentDirectory);
 
     /**
      * create or update resource.
-     * If the folder is not already created, it will be
-     *
-     * @param loginUser user who create or update resource
-     * @param fileFullName The full name of resource.Includes path and suffix.
-     * @param desc description of resource
-     * @param content content of resource
-     * @return create result code
-     */
-    Result<Object> onlineCreateOrUpdateResourceWithDir(User loginUser, String fileFullName, String desc,
-                                                       String content);
-
-    /**
-     * create or update resource.
-     * If the folder is not already created, it will be
+     * If the folder is not already created, it will be ignored and directly create the new file
      *
      * @param userName user who create or update resource
      * @param fullName The fullname of resource.Includes path and suffix.
-     * @param description description of resource
      * @param resourceContent content of resource
-     * @return id of resource
      */
-    Integer createOrUpdateResource(String userName, String fullName, String description, String resourceContent);
+    StorageEntity createOrUpdateResource(String userName, String fullName, String resourceContent) throws Exception;
 
     /**
      * updateProcessInstance resource
@@ -214,22 +194,13 @@ public interface ResourcesService {
     org.springframework.core.io.Resource downloadResource(User loginUser, String fullName) throws IOException;
 
     /**
-     * list all file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> authorizeResourceTree(User loginUser, Integer userId);
-
-    /**
      * Get resource by given resource type and full name.
      * Useful in Python API create task which need processDefinition information.
      *
      * @param userName user who query resource
      * @param fullName full name of the resource
      */
-    Resource queryResourcesFileInfo(String userName, String fullName);
+    StorageEntity queryFileStatus(String userName, String fullName) throws Exception;
 
     /**
      * delete DATA_TRANSFER data in resource center
@@ -238,15 +209,6 @@ public interface ResourcesService {
      * @param days number of days
      */
     DeleteDataTransferResponse deleteDataTransferData(User loginUser, Integer days);
-
-    /**
-     * unauthorized file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    Map<String, Object> unauthorizedFile(User loginUser, Integer userId);
 
     /**
      * unauthorized udf function
@@ -267,15 +229,6 @@ public interface ResourcesService {
     Map<String, Object> authorizedUDFFunction(User loginUser, Integer userId);
 
     /**
-     * authorized file
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result
-     */
-    Map<String, Object> authorizedFile(User loginUser, Integer userId);
-
-    /**
      * get resource by id
      * @param fullName resource full name
      * @param tenantCode owner's tenant code of resource
@@ -283,5 +236,14 @@ public interface ResourcesService {
      */
     Result<Object> queryResourceByFullName(User loginUser, String fullName, String tenantCode,
                                            ResourceType type) throws IOException;
+
+    /**
+     * get resource base dir
+     *
+     * @param loginUser login user
+     * @param type      resource type
+     * @return
+     */
+    Result<Object> queryResourceBaseDir(User loginUser, ResourceType type);
 
 }

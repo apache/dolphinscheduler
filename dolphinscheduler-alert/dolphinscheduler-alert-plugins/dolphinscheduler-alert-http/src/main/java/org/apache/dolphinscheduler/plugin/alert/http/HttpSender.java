@@ -18,35 +18,37 @@
 package org.apache.dolphinscheduler.plugin.alert.http;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public final class HttpSender {
 
-    private static final Logger logger = LoggerFactory.getLogger(HttpSender.class);
     private static final String URL_SPLICE_CHAR = "?";
     /**
      * request type post
@@ -61,6 +63,7 @@ public final class HttpSender {
     private final String bodyParams;
     private final String contentField;
     private final String requestType;
+    private final int timeout;
     private String url;
     private HttpRequestBase httpRequest;
 
@@ -71,6 +74,9 @@ public final class HttpSender {
         bodyParams = paramsMap.get(HttpAlertConstants.NAME_BODY_PARAMS);
         contentField = paramsMap.get(HttpAlertConstants.NAME_CONTENT_FIELD);
         requestType = paramsMap.get(HttpAlertConstants.NAME_REQUEST_TYPE);
+        timeout = StringUtils.isNotBlank(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+                ? Integer.parseInt(paramsMap.get(HttpAlertConstants.NAME_TIMEOUT))
+                : HttpAlertConstants.DEFAULT_TIMEOUT;
     }
 
     public AlertResult send(String msg) {
@@ -96,32 +102,42 @@ public final class HttpSender {
             alertResult.setStatus("true");
             alertResult.setMessage(resp);
         } catch (Exception e) {
-            logger.error("send http alert msg  exception : {}", e.getMessage());
+            log.error("send http alert msg  exception : {}", e.getMessage());
             alertResult.setStatus("false");
-            alertResult.setMessage("send http request  alert fail.");
+            alertResult.setMessage(
+                    String.format("Send http request alert failed: %s", e.getMessage()));
         }
 
         return alertResult;
     }
 
-    public String getResponseString(HttpRequestBase httpRequest) throws IOException {
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    public String getResponseString(HttpRequestBase httpRequest) throws Exception {
+
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setConnectTimeout(timeout * 1000)
+                .setConnectionRequestTimeout(timeout * 1000)
+                .setSocketTimeout(timeout * 1000)
+                .build();
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setDefaultRequestConfig(requestConfig)
+                .setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build();
+
         CloseableHttpResponse response = httpClient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
         return EntityUtils.toString(entity, DEFAULT_CHARSET);
     }
 
     private void createHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
-        if (REQUEST_TYPE_POST.equals(requestType)) {
+        if (REQUEST_TYPE_POST.equalsIgnoreCase(requestType)) {
             httpRequest = new HttpPost(url);
             setHeader();
             // POST request add param in request body
             setMsgInRequestBody(msg);
-        } else if (REQUEST_TYPE_GET.equals(requestType)) {
+        } else if (REQUEST_TYPE_GET.equalsIgnoreCase(requestType)) {
             // GET request add param in url
             setMsgInUrl(msg);
             URL unencodeUrl = new URL(url);
-            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getHost(), unencodeUrl.getPath(),
+            URI uri = new URI(unencodeUrl.getProtocol(), unencodeUrl.getAuthority(), unencodeUrl.getPath(),
                     unencodeUrl.getQuery(), null);
 
             httpRequest = new HttpGet(uri);
@@ -140,7 +156,11 @@ public final class HttpSender {
             if (!url.contains(URL_SPLICE_CHAR)) {
                 type = URL_SPLICE_CHAR;
             }
-            url = String.format("%s%s%s=%s", url, type, contentField, msg);
+            try {
+                url = String.format("%s%s%s=%s", url, type, contentField, URLEncoder.encode(msg, DEFAULT_CHARSET));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -164,13 +184,20 @@ public final class HttpSender {
      */
     private void setMsgInRequestBody(String msg) {
         try {
-            ObjectNode objectNode = JSONUtils.parseObject(bodyParams);
+            ObjectNode objectNode = JSONUtils.createObjectNode();
+            if (StringUtils.isNotBlank(bodyParams)) {
+                objectNode = JSONUtils.parseObject(bodyParams);
+            }
             // set msg content field
             objectNode.put(contentField, msg);
             StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
             ((HttpPost) httpRequest).setEntity(entity);
         } catch (Exception e) {
-            logger.error("send http alert msg  exception : {}", e.getMessage());
+            log.error("send http alert msg  exception : {}", e.getMessage());
         }
+    }
+
+    public String getRequestUrl() {
+        return httpRequest.getURI().toString();
     }
 }

@@ -30,15 +30,11 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -70,11 +66,12 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
 
-        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(""), eq(""), any(), any(),
+        when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(""), any(), eq(""), any(),
+                any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(result);
         Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
-                "", "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
+                "", 1L, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
                 TaskExecuteType.BATCH, pageNo, pageSize);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
     }
@@ -85,9 +82,8 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("taskInstanceId", "104");
 
-        Map<String, Object> mockResult = new HashMap<>(5);
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
-        mockResult.put(Constants.MSG, Status.SUCCESS.getMsg());
+        Result mockResult = new Result();
+        putMsg(mockResult, Status.SUCCESS);
         when(taskInstanceService.forceTaskSuccess(any(User.class), anyLong(), anyInt())).thenReturn(mockResult);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success", "cxc_1113")

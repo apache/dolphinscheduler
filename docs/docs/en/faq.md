@@ -43,7 +43,7 @@ A: This is the python connection Zookeeper needs to use, it is used to delete th
 
 ## Q: How to specify the machine running task
 
-A: version 1.2 and berfore, Use **the administrator** to create a Worker group, **specify the Worker group** when the **process definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
+A: version 1.2 and before, Use **the administrator** to create a Worker group, **specify the Worker group** when the **process definition starts**, or **specify the Worker group on the task node**. If not specified, use Default, **Default is to select one of all the workers in the cluster to use for task submission and execution.**
 version 1.3, you can set worker group for the worker
 
 ---
@@ -75,35 +75,35 @@ A: Install **npm install node-sass --unsafe-perm** separately, then **npm instal
 
 ## Q: UI cannot log in normally.
 
-A:   1, if it is node startup, check whether the .env API_BASE configuration under dolphinscheduler-ui is the Api Server service address.
+A: 1, if it is node startup, check whether the .env API_BASE configuration under dolphinscheduler-ui is the Api Server service address.
 
-​       2, If it is nginx booted and installed via **install-dolphinscheduler-ui.sh**, check if the proxy_pass      			configuration in **/etc/nginx/conf.d/dolphinscheduler.conf** is the Api Server service address
+​ 2, If it is nginx booted and installed via **install-dolphinscheduler-ui.sh**, check if the proxy_pass configuration in **/etc/nginx/conf.d/dolphinscheduler.conf** is the Api Server service address
 
-​       3, if the above configuration is correct, then please check if the Api Server service is normal,
+​ 3, if the above configuration is correct, then please check if the Api Server service is normal,
 
-​		   curl http://localhost:12345/dolphinscheduler/users/get-user-info, check the Api Server log,
+​ curl http://localhost:12345/dolphinscheduler/users/get-user-info, check the Api Server log,
 
-​          if  Prompt cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null,   		  which proves that the Api Server service is normal.
+​ if Prompt cn.dolphinscheduler.api.interceptor.LoginHandlerInterceptor:[76] - session info is null, which proves that the Api Server service is normal.
 
-​	4, if there is no problem above, you need to check if **server.context-path and server.port configuration** in **application.properties** is correct
+​ 4, if there is no problem above, you need to check if **server.context-path and server.port configuration** in **application.properties** is correct
 
 ---
 
 ## Q: After the process definition is manually started or scheduled, no process instance is generated.
 
-A:   1, first **check whether the MasterServer service exists through jps**, or directly check whether there is a master service in zk from the service monitoring.
+A: 1, first **check whether the MasterServer service exists through jps**, or directly check whether there is a master service in zk from the service monitoring.
 
-​       2,If there is a master service, check **the command status statistics** or whether new records are added in **t_ds_error_command**. If it is added, **please check the message field.**
+​ 2,If there is a master service, check **the command status statistics** or whether new records are added in **t_ds_error_command**. If it is added, **please check the message field.**
 
 ---
 
 ## Q : The task status is always in the successful submission status.
 
-A:   1, **first check whether the WorkerServer service exists through jps**, or directly check whether there is a worker service in zk from the service monitoring.
+A: 1, **first check whether the WorkerServer service exists through jps**, or directly check whether there is a worker service in zk from the service monitoring.
 
-​       2,If the **WorkerServer** service is normal, you need to **check whether the MasterServer puts the task task in the zk queue. You need to check whether the task is blocked in the MasterServer log and the zk queue.**
+​ 2,If the **WorkerServer** service is normal, you need to **check whether the MasterServer puts the task in the zk queue. You need to check whether the task is blocked in the MasterServer log and the zk queue.**
 
-​       3, if there is no problem above, you need to locate whether the Worker group is specified, but **the machine grouped by the worker is not online**.
+​ 3, if there is no problem above, you need to locate whether the Worker group is specified, but **the machine grouped by the worker is not online**.
 
 ---
 
@@ -119,17 +119,17 @@ Dockerfile address: https://github.com/qiaozhanwei/escheduler_dockerfile/tree/ma
 
 ## Q : Need to pay attention to the problem in install.sh
 
-A:   1, if the replacement variable contains special characters, **use the \ transfer character to transfer**
+A: 1, if the replacement variable contains special characters, **use the \ transfer character to transfer**
 
-​       2, installPath="/data1_1T/dolphinscheduler", **this directory can not be the same as the install.sh directory currently installed with one click.**
+​ 2, installPath="/data1_1T/dolphinscheduler", **this directory can not be the same as the install.sh directory currently installed with one click.**
 
-​       3, deployUser = "dolphinscheduler", **the deployment user must have sudo privileges**, because the worker is executed by sudo -u tenant sh xxx.command
+​ 3, deployUser = "dolphinscheduler", **the deployment user must have sudo privileges**, because the worker is executed by sudo -u tenant sh xxx.command
 
-​       4, monitorServerState = "false", whether the service monitoring script is started, the default is not to start the service monitoring script. **If the service monitoring script is started, the master and worker services are monitored every 5 minutes, and if the machine is down, it will automatically restart.**
+​ 4, monitorServerState = "false", whether the service monitoring script is started, the default is not to start the service monitoring script. **If the service monitoring script is started, the master and worker services are monitored every 5 minutes, and if the machine is down, it will automatically restart.**
 
-​       5, hdfsStartupSate="false", whether to enable HDFS resource upload function. The default is not enabled. **If it is not enabled, the resource center cannot be used.** If enabled, you need to configure the configuration of resource.hdfs.fs.defaultFS and yarn in conf/common/hadoop/hadoop.properties. If you use namenode HA, you need to copy core-site.xml and hdfs-site.xml to the conf root directory.
+​ 5, hdfsStartupSate="false", whether to enable HDFS resource upload function. The default is not enabled. **If it is not enabled, the resource center cannot be used.** If enabled, you need to configure the configuration of resource.hdfs.fs.defaultFS and yarn in conf/common/hadoop/hadoop.properties. If you use namenode HA, you need to copy core-site.xml and hdfs-site.xml to the conf root directory.
 
-​    Note: **The 1.0.x version does not automatically create the hdfs root directory, you need to create it yourself, and you need to deploy the user with hdfs operation permission.**
+​ Note: **The 1.0.x version does not automatically create the hdfs root directory, you need to create it yourself, and you need to deploy the user with hdfs operation permission.**
 
 ---
 
@@ -170,9 +170,9 @@ A: No. Because the tenant created by HDFS is not started, the tenant directory w
 
 A: **Note:** **Master monitors Master and Worker services.**
 
-​    1，If the Master service is lost, other Masters will take over the process of the hanged Master and continue to monitor the Worker task status.
+​ 1，If the Master service is lost, other Masters will take over the process of the hanged Master and continue to monitor the Worker task status.
 
-​    2，If the Worker service is lost, the Master will monitor that the Worker service is gone. If there is a Yarn task, the Kill Yarn task will be retried.
+​ 2，If the Worker service is lost, the Master will monitor that the Worker service is gone. If there is a Yarn task, the Kill Yarn task will be retried.
 
 Please see the fault-tolerant design in the architecture for details.
 
@@ -186,7 +186,7 @@ A: The 1.0.3 version only implements the fault tolerance of the Master startup p
 
 ## Q : Timing is easy to set to execute every second
 
-A : Note when setting the timing. If the first digit (* * * * * ? *) is set to *, it means execution every second. **We will add a list of recently scheduled times in version 1.1.0.** You can see the last 5 running times online at http://cron.qqe2.com/
+A : Note when setting the timing. If the first digit (\* \* \* \* _ ? _) is set to \*, it means execution every second. **We will add a list of recently scheduled times in version 1.1.0.** You can see the last 5 running times online at http://cron.qqe2.com/
 
 ---
 
@@ -198,47 +198,47 @@ A: Yes, **if the timing start and end time is the same time, then this timing wi
 
 ## Q : There are several implementations of task dependencies
 
-A:	1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
+A: 1, the task dependency between **DAG**, is **from the zero degree** of the DAG segmentation
 
-​		2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual.
+​ 2, there are **task dependent nodes**, you can achieve cross-process tasks or process dependencies, please refer to the (DEPENDENT) node design in the system-manual.
 
-​	Note: **Cross-project processes or task dependencies are not supported**
+​ Note: **Cross-project processes or task dependencies are not supported**
 
 ---
 
 ## Q: There are several ways to start the process definition.
 
-A:   1, in **the process definition list**, click the **Start** button.
+A: 1, in **the process definition list**, click the **Start** button.
 
-​       2, **the process definition list adds a timer**, scheduling start process definition.
+​ 2, **the process definition list adds a timer**, scheduling start process definition.
 
-​       3, process definition **view or edit** the DAG page, any **task node right click** Start process definition.
+​ 3, process definition **view or edit** the DAG page, any **task node right click** Start process definition.
 
-​       4, you can define DAG editing for the process, set the running flag of some tasks to **prohibit running**, when the process definition is started, the connection of the node will be removed from the DAG.
+​ 4, you can define DAG editing for the process, set the running flag of some tasks to **prohibit running**, when the process definition is started, the connection of the node will be removed from the DAG.
 
 ---
 
 ## Q : Python task setting Python version
 
-A:	1，**for the version after 1.0.3** only need to modify PYTHON_HOME in `bin/env/dolphinscheduler_env.sh`
+A: 1，**for the version after 1.0.3** only need to modify `$PYTHON_LAUNCHER` in `bin/env/dolphinscheduler_env.sh`
 
 ```
-export PYTHON_HOME=/bin/python
+export PYTHON_LAUNCHER=/bin/python/bin/python3
 ```
 
-Note: This is **PYTHON_HOME** , which is the absolute path of the python command, not the simple PYTHON_HOME. Also note that when exporting the PATH, you need to directly
+Note: This is **PYTHON_LAUNCHER** , which is the absolute path of the python command, not the simple PYTHON_LAUNCHER. Also note that when exporting the PATH, you need to directly
 
 ```
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$PATH
 ```
 
-​		2，For versions prior to 1.0.3, the Python task only supports the Python version of the system. It does not support specifying the Python version.
+​ 2，For versions prior to 1.0.3, the Python task only supports the Python version of the system. It does not support specifying the Python version.
 
 ---
 
 ## Q：Worker Task will generate a child process through sudo -u tenant sh xxx.command, will kill when kill
 
-A：  We will add the kill task in 1.0.4 and kill all the various child processes generated by the task.
+A： We will add the kill task in 1.0.4 and kill all the various child processes generated by the task.
 
 ---
 
@@ -298,13 +298,13 @@ change into
 
 ## Q : how to add a worker server
 
-A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
+A: 1, Create deployment user and hosts mapping, please refer 1.3 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/user_doc/installation/cluster)
 
-​		2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/laster/user_doc/installation/cluster.html)
+​ 2, Configure hosts mapping and ssh access and modify directory permissions. please refer 1.4 part of [cluster deployment](https://dolphinscheduler.apache.org/en-us/docs/3.1.2/user_doc/installation/cluster)
 
-​		3, Copy the deployment directory from worker server that has already deployed
+​ 3, Copy the deployment directory from worker server that has already deployed
 
-​		4, Go to bin dir, then start worker server
+​ 4, Go to bin dir, then start worker server
 
         ```
         ./dolphinscheduler-daemon.sh start worker-server
@@ -365,7 +365,7 @@ A: The license of mysql jdbc connector is not compatible with apache v2 license,
 
 ---
 
-## Q : Allways fail when a task instance submit multiple yarn application
+## Q : Always fail when a task instance submit multiple yarn application
 
 <p align="center">
    <img src="https://user-images.githubusercontent.com/16174111/81312485-476e9380-90b9-11ea-9aad-ed009db899b1.png" width="60%" />
@@ -411,7 +411,7 @@ A: This problem is solved in dev-1.3.0. This [pr](https://github.com/apache/dolp
    <img src="https://user-images.githubusercontent.com/51871547/80302626-b1478d00-87dd-11ea-97d4-08aa2244a6d0.jpg" width="60%" />
  </p>
 
-A: This [bug](https://github.com/apache/dolphinscheduler/issues/1477) describe the problem detail and it has been been solved in version 1.2.1.
+A: This [bug](https://github.com/apache/dolphinscheduler/issues/1477) describe the problem detail and it has been solved in version 1.2.1.
 
 For version under 1.2.1, some tips for this situation:
 
@@ -441,7 +441,7 @@ $cat /etc/hosts
 10.3.57.15
 ```
 
-Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
+Hostname cmd return server hostname, hostname -i return all matched ips configured in /etc/hosts. So after I delete the hostname matched with 127.0.0.1, and only remain internal ip resolution, instead of remove all the 127.0.0.1 resolution record. As long as hostname cmd return the correct internal ip configured in /etc/hosts can fix this bug. DolphinScheduler use the first record returned by hostname -i command. In my opinion, DS should not use hostname -i to get the ip , as in many companies the devops configured the server name, we suggest use ip configured in configuration file or znode instead of /etc/hosts.
 
 ---
 
@@ -459,14 +459,14 @@ A: 1, cd dolphinscheduler-ui and delete node_modules directory
 sudo rm -rf node_modules
 ```
 
-​	2, install node-sass through npm.taobao.org
+​ 2, install node-sass through npm.taobao.org
 
 ```
 sudo npm uninstall node-sass
 sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 ```
 
-3, if the 2nd step failure, please, [referer url](https://dolphinscheduler.apache.org/en-us/development/frontend-development.html)
+3, if the 2nd step failure, please, [referer url](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/frontend-development.md)
 
 ```
 sudo npm rebuild node-sass
@@ -489,8 +489,8 @@ A: 1, Edit project root dir maven config file, remove scope test property so tha
 </dependency>
 ```
 
-​	2, Edit application-dao.properties and quzrtz.properties config file to use mysql driver.
-Default is postgresSql driver because of license problem.
+​ 2, Edit application-dao.properties and quzrtz.properties config file to use mysql driver.
+Default is postgresql driver because of license problem.
 
 ---
 
@@ -498,7 +498,7 @@ Default is postgresSql driver because of license problem.
 
 A: 1, Where is the executed server? Specify one worker to run the task, you can create worker group in Security Center, then the task can be send to the particular worker. If a worker group have multiple servers, which server actually execute is determined by scheduling and has randomness.
 
-​	2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installtion dolphinscheduler.
+​ 2, If it is a shell file of a path on the server, how to point to the path? The server shell file, involving permissions issues, it is not recommended to do so. It is recommended that you use the storage function of the resource center, and then use the resource reference in the shell editor. The system will help you download the script to the execution directory. If the task dependent on resource center files, worker use "hdfs dfs -get" to get the resource files in HDFS, then run the task in /tmp/escheduler/exec/process, this path can be customized when installing dolphinscheduler.
 
 3, Which user execute the task? Task is run by the tenant through "sudo -u ${tenant}", tenant is a linux user.
 
@@ -527,7 +527,7 @@ A: 1, modify application_master.properties, for example: server.port=12345.
 
 ## Q : Scheduled tasks cannot be online
 
-A: 1, We can successly create scheduled task and add one record into t_scheduler_schedules table, but when I click online, front page no reaction and will lock table t_scheduler_schedules, and tested set field release_state value to 1 in table t_scheduler_schedules, and task display online state. For DS version above 1.2 table name is t_ds_schedules, other version table name is t_scheduler_schedules.
+A: 1, We can successfully create scheduled task and add one record into t_scheduler_schedules table, but when I click online, front page no reaction and will lock table t_scheduler_schedules, and tested set field release_state value to 1 in table t_scheduler_schedules, and task display online state. For DS version above 1.2 table name is t_ds_schedules, other version table name is t_scheduler_schedules.
 
 ---
 
@@ -559,7 +559,7 @@ A: 1, User changed the config api server config file and item
  </p>
 A: 1, Edit ngnix config file, edit upload max size client_max_body_size 1024m.
 
-​	2, the version of Google Chrome is old, and the latest version of the browser has been updated.
+​ 2, the version of Google Chrome is old, and the latest version of the browser has been updated.
 
 ---
 
@@ -581,7 +581,7 @@ A: 1, It is currently judged according to natural days, at the end of last month
 
 ---
 
-## Q : DS Backend Inteface Document
+## Q : DS Backend Interface Document
 
 A: 1, http://106.75.43.194:8888/dolphinscheduler/swagger-ui/index.html?language=en.
 
@@ -597,9 +597,9 @@ If the ip address is obtained incorrectly, please check the network information.
 
 You can use the three strategies provided by dolphinscheduler to get the available ip:
 
-* default: First using internal network card to obtain the IP address, and then using external network card. If all above fail, use the address of the first available network card
-* inner: Use the internal network card to obtain the ip address, if fails thrown an exception.
-* outer: Use the external network card to obtain the ip address, if fails thrown an exception.
+- default: First using internal network card to obtain the IP address, and then using external network card. If all above fail, use the address of the first available network card
+- inner: Use the internal network card to obtain the ip address, if fails thrown an exception.
+- outer: Use the external network card to obtain the ip address, if fails thrown an exception.
 
 Modify the configuration in `common.properties`:
 
@@ -751,5 +751,21 @@ start API server. If you want disabled when Python gateway service you could cha
 `api-server/conf/application.yaml` and change attribute `python-gateway.enabled : false`.
 
 ---
+
+## Q：How to determine whether a task has been cached when the cache is executed, that is, how to determine whether a task can use the running result of another task?
+
+A: For the task identified as `Cache Execution`, when the task starts, a cache key will be generated, and the key is composed of the following fields and hashed:
+
+- task definition: the id of the task definition corresponding to the task instance
+- task version: the version of the task definition corresponding to the task instance
+- task input parameters: including the parameters passed in by the upstream node and the global parameter, the parameters referenced by the parameter list of the task definition and the parameters used by the task definition using `${}`
+- environment configuration: the actual configuration content of the environment configuration under the environment name, that is, the actual configuration content in the `security` - `environment management`
+
+If the task with cache identification runs, it will find whether there is data with the same cache key in the database,
+
+- If there is, copy the task instance and update the corresponding data
+- If not, the task runs as usual, and the task instance data is stored in the cache when the task is completed
+
+If you do not need to cache, you can right-click the node to run `Clear cache` in the workflow instance to clear the cache, which will clear the cache data of the current input parameters under this version.
 
 We will collect more FAQ later

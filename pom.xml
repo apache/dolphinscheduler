@@ -43,19 +43,20 @@
         <module>dolphinscheduler-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
-        <module>dolphinscheduler-remote</module>
         <module>dolphinscheduler-service</module>
         <module>dolphinscheduler-microbench</module>
         <module>dolphinscheduler-data-quality</module>
         <module>dolphinscheduler-standalone-server</module>
         <module>dolphinscheduler-datasource-plugin</module>
-        <module>dolphinscheduler-python</module>
         <module>dolphinscheduler-meter</module>
         <module>dolphinscheduler-master</module>
         <module>dolphinscheduler-worker</module>
         <module>dolphinscheduler-tools</module>
         <module>dolphinscheduler-ui</module>
         <module>dolphinscheduler-scheduler-plugin</module>
+        <module>dolphinscheduler-storage-plugin</module>
+        <module>dolphinscheduler-extract</module>
+        <module>dolphinscheduler-dao-plugin</module>
     </modules>
 
     <properties>
@@ -72,6 +73,7 @@
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
+        <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
@@ -91,9 +93,12 @@
         <docker.tag>${project.version}</docker.tag>
         <docker.build.skip>true</docker.build.skip>
         <docker.push.skip>true</docker.push.skip>
-
-        <python.sign.skip>true</python.sign.skip>
         <skipDepCheck>true</skipDepCheck>
+        <build.ui.skip>false</build.ui.skip>
+        <spotless.skip>false</spotless.skip>
+
+        <skipUT>false</skipUT>
+        <skipIT>true</skipIT>
     </properties>
 
     <dependencyManagement>
@@ -110,9 +115,25 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-alert-server</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-standalone-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-ui</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-aop</artifactId>
@@ -125,34 +146,10 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-plugins</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-plugins</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-all</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-api</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-remote</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-service</artifactId>
@@ -177,9 +174,10 @@
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-python</artifactId>
+                <artifactId>dolphinscheduler-tools</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-alert-api</artifactId>
@@ -187,59 +185,10 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-server</artifactId>
+                <artifactId>dolphinscheduler-alert-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-dingtalk</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-email</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-feishu</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-http</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-script</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-slack</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-wechat</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-pagerduty</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-webexteams</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-alert-telegram</artifactId>
-                <version>${project.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-registry-api</artifactId>
@@ -247,12 +196,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-registry-mysql</artifactId>
+                <artifactId>dolphinscheduler-registry-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -263,18 +207,18 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-scheduler-quartz</artifactId>
+                <artifactId>dolphinscheduler-scheduler-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-datasource-all</artifactId>
+                <artifactId>dolphinscheduler-datasource-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-datasource-api</artifactId>
+                <artifactId>dolphinscheduler-datasource-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -285,25 +229,71 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-task-python</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-ui</artifactId>
+                <artifactId>dolphinscheduler-storage-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-tools</artifactId>
+                <artifactId>dolphinscheduler-storage-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-master</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-worker</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-extract-alert</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-plugin-all</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-h2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-mysql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-dao-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
@@ -597,8 +587,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
-                    <skip>false</skip>
-                    <!--not skip compile test classes-->
                 </configuration>
             </plugin>
             <plugin>
@@ -606,10 +594,32 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
+                    <skip>${skipUT}</skip>
+                    <excludes>
+                        <exclude>**/*IT.java</exclude>
+                    </excludes>
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${maven-failsafe-plugin.version}</version>
+                <configuration>
+                    <skip>${skipIT}</skip>
+                    <additionalClasspathElements>dolphinscheduler-dao/src/main/resources</additionalClasspathElements>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- jenkins plugin jacoco report-->
@@ -669,17 +679,18 @@
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless.version}</version>
                 <configuration>
+                    <skip>${spotless.skip}</skip>
                     <java>
                         <eclipse>
-                            <file>style/spotless_dolphinscheduler_formatter.xml</file>
+                            <file>${maven.multiModuleProjectDirectory}/style/spotless_dolphinscheduler_formatter.xml</file>
                         </eclipse>
                         <removeUnusedImports />
                         <importOrder>
-                            <file>style/eclipse.importorder</file>
+                            <file>${maven.multiModuleProjectDirectory}/style/eclipse.importorder</file>
                         </importOrder>
                         <replaceRegex>
                             <name>Remove wildcard imports</name>
-                            <searchRegex>import\s+[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
+                            <searchRegex>import\s+(static)*\s*[^\*\s]+\*;(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
                         <replaceRegex>
@@ -690,6 +701,11 @@
                         <replaceRegex>
                             <name>Block jUnit4 imports</name>
                             <searchRegex>import\s+org\.junit\.[^jupiter][^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
+                            <replacement>$1</replacement>
+                        </replaceRegex>
+                        <replaceRegex>
+                            <name>Block kubernetes-client</name>
+                            <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
                     </java>
@@ -722,6 +738,9 @@
                         </excludes>
                         <flexmark />
                     </markdown>
+                    <upToDateChecking>
+                        <enabled>true</enabled>
+                    </upToDateChecking>
                 </configuration>
                 <executions>
                     <execution>
@@ -808,6 +827,38 @@
                 <docker.build.skip>false</docker.build.skip>
                 <docker.push.skip>false</docker.push.skip>
             </properties>
+        </profile>
+        <profile>
+            <id>helm-doc</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>helm-doc</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <executable>docker</executable>
+                                    <workingDirectory>${project.basedir}</workingDirectory>
+                                    <arguments>
+                                        <argument>run</argument>
+                                        <argument>--rm</argument>
+                                        <argument>--volume</argument>
+                                        <argument>${project.basedir}/deploy/kubernetes:/helm-docs</argument>
+                                        <argument>jnorwood/helm-docs:v1.11.3</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

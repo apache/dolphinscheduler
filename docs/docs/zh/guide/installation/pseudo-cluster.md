@@ -1,6 +1,6 @@
 # 伪集群部署
 
-伪集群部署目的是在单台机器部署 DolphinScheduler 服务，该模式下master、worker、api server 都在同一台机器上
+伪集群部署目的是在单台机器部署 DolphinScheduler 服务，该模式下 master、worker、api server 都在同一台机器上
 
 如果你是新手，想要体验 DolphinScheduler 的功能，推荐使用[Standalone](standalone.md)方式体检。如果你想体验更完整的功能，或者更大的任务量，推荐使用[伪集群部署](pseudo-cluster.md)。如果你是在生产中使用，推荐使用[集群部署](cluster.md)或者[kubernetes](kubernetes.md)
 
@@ -8,13 +8,13 @@
 
 伪分布式部署 DolphinScheduler 需要有外部软件的支持
 
-* JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
-* 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download/download.html)下载 DolphinScheduler 二进制包
-* 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.16
-* 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[下载地址][zookeeper]
-* 进程树分析
-  * macOS安装`pstree`
-  * Fedora/Red/Hat/CentOS/Ubuntu/Debian安装`psmisc`
+- JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
+- 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download)下载 DolphinScheduler 二进制包
+- 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.16
+- 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[下载地址][zookeeper]
+- 进程树分析
+  - macOS 安装`pstree`
+  - Fedora/Red/Hat/CentOS/Ubuntu/Debian 安装`psmisc`
 
 > **_注意:_** DolphinScheduler 本身不依赖 Hadoop、Hive、Spark，但如果你运行的任务需要依赖他们，就需要有对应的环境支持
 
@@ -42,12 +42,12 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 
 > **_注意:_**
 >
-> * 因为任务执行服务是以 `sudo -u {linux-user}` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
-> * 如果发现 `/etc/sudoers` 文件中有 "Defaults requirett" 这行，也请注释掉
+> - 因为任务执行服务是以 `sudo -u {linux-user}` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
+> - 如果发现 `/etc/sudoers` 文件中有 "Defaults requirett" 这行，也请注释掉
 
-### 配置机器SSH免密登陆
+### 配置机器 SSH 免密登陆
 
-由于安装的时候需要向不同机器发送资源，所以要求各台机器间能实现SSH免密登陆。配置免密登陆的步骤如下
+由于安装的时候需要向不同机器发送资源，所以要求各台机器间能实现 SSH 免密登陆。配置免密登陆的步骤如下
 
 ```shell
 su dolphinscheduler
@@ -57,9 +57,9 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
-> **_注意:_** 配置完成后，可以通过运行命令 `ssh localhost` 判断是否成功，如果不需要输入密码就能ssh登陆则证明成功
+> **_注意:_** 配置完成后，可以通过运行命令 `ssh localhost` 判断是否成功，如果不需要输入密码就能 ssh 登陆则证明成功
 
-### 启动zookeeper
+### 启动 zookeeper
 
 进入 zookeeper 的安装目录，将 `zoo_sample.cfg` 配置文件复制到 `conf/zoo.cfg`，并将 `conf/zoo.cfg` 中 dataDir 中的值改成 `dataDir=./tmp/zookeeper`
 
@@ -74,7 +74,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 ### 修改 `install_env.sh` 文件
 
-文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，可通过以下方式更改env变量,export <ENV_NAME>=<VALUE>，配置详情如下。
+文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，可通过以下方式更改 env 变量,export <ENV_NAME>=<VALUE>，配置详情如下。
 
 ```shell
 # ---------------------------------------------------------
@@ -99,8 +99,8 @@ deployUser="dolphinscheduler"
 
 文件 `./bin/env/dolphinscheduler_env.sh` 描述了下列配置：
 
-* DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库](#初始化数据库)
-* 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
+- DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库]
+- 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
 
 如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 
@@ -128,17 +128,17 @@ export REGISTRY_ZOOKEEPER_CONNECT_STRING=${REGISTRY_ZOOKEEPER_CONNECT_STRING:-lo
 export HADOOP_HOME=${HADOOP_HOME:-/opt/soft/hadoop}
 export HADOOP_CONF_DIR=${HADOOP_CONF_DIR:-/opt/soft/hadoop/etc/hadoop}
 export SPARK_HOME=${SPARK_HOME:-/opt/soft/spark}
-export PYTHON_HOME=${PYTHON_HOME:-/opt/soft/python}
+export PYTHON_LAUNCHER=${PYTHON_LAUNCHER:-/opt/soft/python}
 export HIVE_HOME=${HIVE_HOME:-/opt/soft/hive}
 export FLINK_HOME=${FLINK_HOME:-/opt/soft/flink}
-export DATAX_HOME=${DATAX_HOME:-/opt/soft/datax}
+export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/python3}
 
-export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_HOME/bin:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_HOME/bin:$PATH
+export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 ```
 
 ## 初始化数据库
 
-请参考 [数据源配置](../howto/datasource-setting.md) `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
+请参考 [数据源配置] `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 
 ## 启动 DolphinScheduler
 
@@ -152,7 +152,7 @@ bash ./bin/install.sh
 
 ## 登录 DolphinScheduler
 
-浏览器访问地址 http://localhost:12345/dolphinscheduler/ui 即可登录系统UI。默认的用户名和密码是 **admin/dolphinscheduler123**
+浏览器访问地址 http://localhost:12345/dolphinscheduler/ui 即可登录系统 UI。默认的用户名和密码是 **admin/dolphinscheduler123**
 
 ## 启停服务
 
@@ -180,12 +180,12 @@ bash ./bin/dolphinscheduler-daemon.sh start alert-server
 bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 ```
 
-> **_注意1:_**: 每个服务在路径 `<service>/conf/dolphinscheduler_env.sh` 中都有 `dolphinscheduler_env.sh` 文件，这是可以为微
+> **_注意 1:_**: 每个服务在路径 `<service>/conf/dolphinscheduler_env.sh` 中都有 `dolphinscheduler_env.sh` 文件，这是可以为微
 > 服务需求提供便利。意味着您可以基于不同的环境变量来启动各个服务，只需要在对应服务中配置 `<service>/conf/dolphinscheduler_env.sh` 然后通过 `<service>/bin/start.sh`
 > 命令启动即可。但是如果您使用命令 `/bin/dolphinscheduler-daemon.sh start <service>` 启动服务器，它将会用文件 `bin/env/dolphinscheduler_env.sh`
 > 覆盖 `<service>/conf/dolphinscheduler_env.sh` 然后启动服务，目的是为了减少用户修改配置的成本.
 >
-> **_注意2:_**：服务用途请具体参见《系统架构设计》小节。Python gateway service 默认与 api-server 一起启动，如果您不想启动 Python gateway service
+> **_注意 2:_**：服务用途请具体参见《系统架构设计》小节。Python gateway service 默认与 api-server 一起启动，如果您不想启动 Python gateway service
 > 请通过更改 api-server 配置文件 `api-server/conf/application.yaml` 中的 `python-gateway.enabled : false` 来禁用它。
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html

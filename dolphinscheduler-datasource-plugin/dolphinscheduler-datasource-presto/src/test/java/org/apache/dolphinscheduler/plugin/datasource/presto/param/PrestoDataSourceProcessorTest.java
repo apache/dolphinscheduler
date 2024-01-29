@@ -77,8 +77,7 @@ public class PrestoDataSourceProcessorTest {
     public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
-        prestoConnectionParam.setOther("other");
-        Assertions.assertEquals("jdbc:postgresql://localhost:1234/default?other",
+        Assertions.assertEquals("jdbc:postgresql://localhost:1234/default",
                 prestoDatasourceProcessor.getJdbcUrl(prestoConnectionParam));
 
     }

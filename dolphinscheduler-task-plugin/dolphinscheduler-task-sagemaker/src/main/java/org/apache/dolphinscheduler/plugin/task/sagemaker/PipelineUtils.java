@@ -26,9 +26,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
 import com.amazonaws.services.sagemaker.model.DescribePipelineExecutionRequest;
@@ -41,10 +39,9 @@ import com.amazonaws.services.sagemaker.model.StartPipelineExecutionResult;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionRequest;
 import com.amazonaws.services.sagemaker.model.StopPipelineExecutionResult;
 
+@Slf4j
 public class PipelineUtils {
 
-    protected final Logger logger =
-            LoggerFactory.getLogger(String.format(TaskConstants.TASK_LOG_LOGGER_NAME_FORMAT, getClass()));
     private static final String EXECUTING = "Executing";
     private static final String SUCCEEDED = "Succeeded";
 
@@ -52,7 +49,7 @@ public class PipelineUtils {
         StartPipelineExecutionResult result = client.startPipelineExecution(request);
         String pipelineExecutionArn = result.getPipelineExecutionArn();
         String clientRequestToken = request.getClientRequestToken();
-        logger.info("Start success, pipeline: {}, token: {}", pipelineExecutionArn, clientRequestToken);
+        log.info("Start success, pipeline: {}, token: {}", pipelineExecutionArn, clientRequestToken);
 
         return new PipelineId(pipelineExecutionArn, clientRequestToken);
     }
@@ -63,23 +60,23 @@ public class PipelineUtils {
         request.setClientRequestToken(pipelineId.getClientRequestToken());
 
         StopPipelineExecutionResult result = client.stopPipelineExecution(request);
-        logger.info("Stop pipeline: {} success", result.getPipelineExecutionArn());
+        log.info("Stop pipeline: {} success", result.getPipelineExecutionArn());
     }
 
     public int checkPipelineExecutionStatus(AmazonSageMaker client, PipelineId pipelineId) {
         String pipelineStatus = describePipelineExecution(client, pipelineId);
         while (EXECUTING.equals(pipelineStatus)) {
-            logger.info("check Pipeline Steps running");
+            log.info("check Pipeline Steps running");
             listPipelineExecutionSteps(client, pipelineId);
             ThreadUtils.sleep(SagemakerConstants.CHECK_PIPELINE_EXECUTION_STATUS_INTERVAL);
-            describePipelineExecution(client, pipelineId);
+            pipelineStatus = describePipelineExecution(client, pipelineId);
         }
 
         int exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
         if (SUCCEEDED.equals(pipelineStatus)) {
             exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
         }
-        logger.info("PipelineExecutionStatus : {}, exitStatusCode: {}", pipelineStatus, exitStatusCode);
+        log.info("PipelineExecutionStatus : {}, exitStatusCode: {}", pipelineStatus, exitStatusCode);
         return exitStatusCode;
     }
 
@@ -87,7 +84,7 @@ public class PipelineUtils {
         DescribePipelineExecutionRequest request = new DescribePipelineExecutionRequest();
         request.setPipelineExecutionArn(pipelineId.getPipelineExecutionArn());
         DescribePipelineExecutionResult result = client.describePipelineExecution(request);
-        logger.info("PipelineExecutionStatus: {}", result.getPipelineExecutionStatus());
+        log.info("PipelineExecutionStatus: {}", result.getPipelineExecutionStatus());
         return result.getPipelineExecutionStatus();
     }
 
@@ -98,10 +95,10 @@ public class PipelineUtils {
         ListPipelineExecutionStepsResult result = client.listPipelineExecutionSteps(request);
         List<PipelineExecutionStep> steps = result.getPipelineExecutionSteps();
         Collections.reverse(steps);
-        logger.info("pipelineStepsStatus: ");
+        log.info("pipelineStepsStatus: ");
         for (PipelineExecutionStep step : steps) {
             String stepMessage = step.toString();
-            logger.info(stepMessage);
+            log.info(stepMessage);
         }
     }
 

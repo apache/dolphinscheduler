@@ -54,7 +54,6 @@ public class TenantControllerTest extends AbstractControllerTest {
         paramsMap.add("tenantCode", "hayden");
         paramsMap.add("queueId", "1");
         paramsMap.add("description", "tenant description");
-        Mockito.when(PropertyUtils.getResUploadStartupState()).thenReturn(false);
 
         MvcResult mvcResult = mockMvc.perform(post("/tenants")
                 .header(SESSION_ID, sessionId)
@@ -70,7 +69,7 @@ public class TenantControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryTenantlistPaging() throws Exception {
+    public void testQueryTenantListPaging() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pageNo", "1");
         paramsMap.add("searchVal", "tenant");
@@ -146,7 +145,7 @@ public class TenantControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryTenantlist() throws Exception {
+    public void testQueryTenantList() throws Exception {
 
         MvcResult mvcResult = mockMvc.perform(get("/tenants/list")
                 .header(SESSION_ID, sessionId))

@@ -15,114 +15,16 @@
  * limitations under the License.
  */
 
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useDynamicLocales } from './use-dynamic-locales'
 import { useFormField } from './use-form-field'
 import { useFormValidate } from './use-form-validate'
 import { useFormStructure } from './use-form-structure'
 import { useFormRequest } from './use-form-request'
 
-const data = {
-  task: 'shell',
-  locales: {
-    zh_CN: {
-      node_name: '节点名称',
-      node_name_tips: '请输入节点名称',
-      node_name_validate_message: '节点名称不能为空',
-      script_validate_message: '脚本内容不能为空',
-      task_priority: '任务优先级',
-      highest: '最高',
-      high: '高',
-      medium: '中',
-      low: '低',
-      lowest: '最低',
-      worker_group: 'Worker 分组',
-      script: '脚本'
-    },
-    en_US: {
-      node_name: 'Node Name',
-      node_name_tips: 'Please entry node name',
-      node_name_validate_message: 'Node name cannot be empty',
-      script_validate_message: 'Script content cannot be empty',
-      task_priority: 'Task Priority',
-      highest: 'Highest',
-      high: 'High',
-      medium: 'Medium',
-      low: 'Low',
-      lowest: 'Lowest',
-      worker_group: 'Worker Group',
-      script: 'Script'
-    }
-  },
-  apis: {
-    getWorkerGroupList: {
-      url: '/worker-groups/all',
-      method: 'get'
-    }
-  },
-  forms: [
-    {
-      label: 'task_components.node_name',
-      type: 'input',
-      field: 'name',
-      defaultValue: '',
-      clearable: true,
-      placeholder: 'task_components.node_name_tips',
-      validate: {
-        required: true,
-        trigger: ['input', 'blur'],
-        type: 'non-empty',
-        message: 'task_components.node_name_validate_message'
-      }
-    },
-    {
-      label: 'task_components.task_priority',
-      type: 'select',
-      field: 'taskPriority',
-      options: [
-        { label: 'task_components.highest', value: 'HIGHEST' },
-        { label: 'task_components.high', value: 'HIGH' },
-        { label: 'task_components.medium', value: 'MEDIUM' },
-        { label: 'task_components.low', value: 'LOW' },
-        { label: 'task_components.lowest', value: 'LOWEST' }
-      ],
-      optionsLocale: true,
-      defaultValue: 'MEDIUM',
-      validate: {
-        required: true,
-        trigger: ['input', 'blur']
-      }
-    },
-    {
-      label: 'task_components.worker_group',
-      type: 'select',
-      field: 'workerGroup',
-      options: [],
-      optionsLocale: false,
-      defaultValue: 'default',
-      api: 'getWorkerGroupList',
-      validate: {
-        required: true,
-        trigger: ['input', 'blur']
-      }
-    },
-    {
-      label: 'task_components.script',
-      type: 'studio',
-      field: 'taskParams.rawScript',
-      defaultValue: '',
-      validate: {
-        required: true,
-        trigger: ['input', 'blur'],
-        type: 'non-empty',
-        message: 'task_components.script_validate_message'
-      }
-    }
-  ]
-}
-
-export function useTaskForm() {
+export function useTaskForm(data: any) {
   const variables = reactive({
+    taskForm: ref(),
     formStructure: {},
     model: {},
     rules: {}
@@ -131,9 +33,18 @@ export function useTaskForm() {
   useDynamicLocales(data.locales)
   variables.model = useFormField(data.forms)
   variables.rules = useFormValidate(data.forms, variables.model)
-  variables.formStructure = useFormStructure(useFormRequest(data.apis, data.forms))
+  variables.formStructure = useFormStructure(
+    useFormRequest(data.apis, data.forms)
+  )
+
+  const handleValidate = () => {
+    variables.taskForm.validate((err: any) => {
+      if (err) return
+    })
+  }
 
   return {
-    variables
+    variables,
+    handleValidate
   }
 }

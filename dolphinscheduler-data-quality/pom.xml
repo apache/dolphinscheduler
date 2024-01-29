@@ -106,7 +106,12 @@
         </dependency>
 
         <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
+            <groupId>io.trino</groupId>
+            <artifactId>trino-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
             <exclusions>
                 <exclusion>
@@ -114,6 +119,11 @@
                     <artifactId>jackson-core</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>com.databend</groupId>
+            <artifactId>databend-jdbc</artifactId>
         </dependency>
 
         <dependency>
@@ -166,6 +176,26 @@
             <artifactId>janino</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>org.apache.dolphinscheduler.data.quality.DataQualityApplication</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

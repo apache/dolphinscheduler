@@ -33,9 +33,13 @@
     </select>
     <select id="queryByUserNameAccurately" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
-        <include refid="baseSql"/>
-        from t_ds_user
-        where user_name=#{userName}
+        <include refid="baseSqlV2">
+            <property name="alias" value="u"/>
+        </include>
+        , t.tenant_code
+        from t_ds_user u
+        left join t_ds_tenant t on u.tenant_id = t.id
+        where u.user_name = #{userName}
     </select>
     <select id="queryUserByNamePassword" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
@@ -44,7 +48,7 @@
         where user_name=#{userName} and user_password = #{password}
     </select>
     <select id="queryUserPaging" resultType="org.apache.dolphinscheduler.dao.entity.User">
-        select u.id,u.user_name,u.user_password,u.user_type,u.email,u.phone,u.tenant_id,u.create_time,
+        select u.id,u.user_name,u.user_type,u.email,u.phone,u.tenant_id,u.create_time,
         u.update_time,t.tenant_code,u.state,
         case when u.queue  <![CDATA[ <> ]]> '' then u.queue else q.queue_name end as queue, q.queue_name
         from t_ds_user u
@@ -138,5 +142,28 @@
         <include refid="baseSql"/>
         from t_ds_user
         where state = 1
+    </select>
+    <select id="queryUserWithProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode">
+        select
+            dl.code as process_definition_code,
+            pd.version as process_definition_version,
+            u.id as modifier_id,
+            u.user_name as modifier_name,
+            u2.id as creator_id,
+            u2.user_name as creator_name
+        from t_ds_process_definition_log dl
+        inner join t_ds_process_definition pd
+        on pd.code = dl.code
+        and pd.version = dl.version
+        inner join t_ds_user u
+        on dl.operator = u.id
+        inner join t_ds_user u2
+        on pd.user_id = u2.id
+        <if test="processDefinitionCodes != null and processDefinitionCodes.size() != 0">
+            where dl.code in
+            <foreach item="code" collection="processDefinitionCodes" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </if>
     </select>
 </mapper>

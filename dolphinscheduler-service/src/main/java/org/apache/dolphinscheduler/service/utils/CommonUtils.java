@@ -19,27 +19,21 @@ package org.apache.dolphinscheduler.service.utils;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.security.UserGroupInformation;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * common utils
  */
+@Slf4j
 public class CommonUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(CommonUtils.class);
 
     private static final Base64 BASE64 = new Base64();
 
@@ -57,86 +51,13 @@ public class CommonUtils {
 
             if (envDefaultPath != null) {
                 envPath = envDefaultPath.getPath();
-                logger.debug("env path :{}", envPath);
+                log.debug("env path :{}", envPath);
             } else {
                 envPath = "/etc/profile";
             }
         }
 
         return envPath;
-    }
-
-    /**
-     * @return is develop mode
-     */
-    public static boolean isDevelopMode() {
-        return PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
-    }
-
-    /**
-     * if upload resource is HDFS and kerberos startup is true , else false
-     *
-     * @return true if upload resource is HDFS and kerberos startup
-     */
-    public static boolean getKerberosStartupState() {
-        String resUploadStartupType = PropertyUtils.getUpperCaseString(Constants.RESOURCE_STORAGE_TYPE);
-        ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-        Boolean kerberosStartupState =
-                PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        return resUploadType == ResUploadType.HDFS && kerberosStartupState;
-    }
-
-    /**
-     * load kerberos configuration
-     *
-     * @param configuration
-     * @return load kerberos config return true
-     * @throws IOException errors
-     */
-    public static boolean loadKerberosConf(Configuration configuration) throws IOException {
-        return loadKerberosConf(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH),
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH), configuration);
-    }
-
-    /**
-     * load kerberos configuration
-     *
-     * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
-     * @param loginUserKeytabUsername loginUserKeytabUsername
-     * @param loginUserKeytabPath loginUserKeytabPath
-     * @throws IOException errors
-     */
-    public static void loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
-                                        String loginUserKeytabPath) throws IOException {
-        loadKerberosConf(javaSecurityKrb5Conf, loginUserKeytabUsername, loginUserKeytabPath, new Configuration());
-    }
-
-    /**
-     * load kerberos configuration
-     *
-     * @param javaSecurityKrb5Conf javaSecurityKrb5Conf
-     * @param loginUserKeytabUsername loginUserKeytabUsername
-     * @param loginUserKeytabPath loginUserKeytabPath
-     * @param configuration configuration
-     * @return load kerberos config return true
-     * @throws IOException errors
-     */
-    public static boolean loadKerberosConf(String javaSecurityKrb5Conf, String loginUserKeytabUsername,
-                                           String loginUserKeytabPath, Configuration configuration) throws IOException {
-        if (CommonUtils.getKerberosStartupState()) {
-            System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf,
-                    PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH)));
-            configuration.set(Constants.HADOOP_SECURITY_AUTHENTICATION, Constants.KERBEROS);
-            UserGroupInformation.setConfiguration(configuration);
-            UserGroupInformation.loginUserFromKeytab(
-                    StringUtils.defaultIfBlank(loginUserKeytabUsername,
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)),
-                    StringUtils.defaultIfBlank(loginUserKeytabPath,
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH)));
-            return true;
-        }
-        return false;
     }
 
     /**
@@ -178,7 +99,7 @@ public class CommonUtils {
                 DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
         if (!passwordWithSalt.startsWith(salt)) {
-            logger.warn("There is a password and salt mismatch: {} ", password);
+            log.warn("There is a password and salt mismatch: {} ", password);
             return password;
         }
         return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8);

@@ -29,13 +29,11 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +55,7 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
         athenaDatasourceParamDTO.setAwsRegion(connectionParams.getAwsRegion());
         athenaDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         athenaDatasourceParamDTO.setUserName(connectionParams.getUser());
-        athenaDatasourceParamDTO.setOther(this.parseOther(connectionParams.getOther()));
+        athenaDatasourceParamDTO.setOther(connectionParams.getOther());
 
         return athenaDatasourceParamDTO;
     }
@@ -72,13 +70,12 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
         athenaConnectionParam.setUser(athenaParam.getUserName());
         athenaConnectionParam.setPassword(PasswordUtils.encodePassword(athenaParam.getPassword()));
         athenaConnectionParam.setAwsRegion(athenaParam.getAwsRegion());
-        athenaConnectionParam.setOther(this.transformOther(athenaParam.getOther()));
+        athenaConnectionParam.setOther(athenaParam.getOther());
         athenaConnectionParam.setAddress(address);
         athenaConnectionParam.setJdbcUrl(address);
         athenaConnectionParam.setDatabase(athenaParam.getDatabase());
         athenaConnectionParam.setDriverClassName(this.getDatasourceDriver());
         athenaConnectionParam.setValidationQuery(this.getValidationQuery());
-        athenaConnectionParam.setProps(athenaParam.getOther());
 
         return athenaConnectionParam;
     }
@@ -101,8 +98,9 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         AthenaConnectionParam athenaConnectionParam = (AthenaConnectionParam) connectionParam;
-        if (!StringUtils.isEmpty(athenaConnectionParam.getOther())) {
-            return String.format("%s%s", athenaConnectionParam.getJdbcUrl(), athenaConnectionParam.getOther());
+        if (MapUtils.isNotEmpty(athenaConnectionParam.getOther())) {
+            return String.format("%s;%s", athenaConnectionParam.getJdbcUrl(),
+                    transformOther(athenaConnectionParam.getOther()));
         }
         return athenaConnectionParam.getJdbcUrl();
     }
@@ -132,18 +130,6 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
             return String.join(Constants.SEMICOLON, list);
         }
         return null;
-    }
-
-    private Map<String, String> parseOther(String other) {
-        Map<String, String> otherMap = new LinkedHashMap<>();
-        if (StringUtils.isEmpty(other)) {
-            return otherMap;
-        }
-        String[] configs = other.split(Constants.SEMICOLON);
-        for (String config : configs) {
-            otherMap.put(config.split(Constants.EQUAL_SIGN)[0], config.split(Constants.EQUAL_SIGN)[1]);
-        }
-        return otherMap;
     }
 
     @Override

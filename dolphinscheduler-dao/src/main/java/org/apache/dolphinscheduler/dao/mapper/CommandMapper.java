@@ -36,13 +36,13 @@ public interface CommandMapper extends BaseMapper<Command> {
      * count command state
      * @param startTime startTime
      * @param endTime endTime
-     * @param projectCodeArray projectCodeArray
+     * @param projectCodes projectCodes
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
                                          @Param("startTime") Date startTime,
                                          @Param("endTime") Date endTime,
-                                         @Param("projectCodeArray") Long[] projectCodeArray);
+                                         @Param("projectCodes") List<Long> projectCodes);
 
     /**
      * query command page
@@ -54,7 +54,7 @@ public interface CommandMapper extends BaseMapper<Command> {
      * query command page by slot
      * @return command list
      */
-    List<Command> queryCommandPageBySlot(@Param("limit") int limit, @Param("offset") int offset,
+    List<Command> queryCommandPageBySlot(@Param("limit") int limit,
                                          @Param("masterCount") int masterCount,
                                          @Param("thisMasterSlot") int thisMasterSlot);
 }

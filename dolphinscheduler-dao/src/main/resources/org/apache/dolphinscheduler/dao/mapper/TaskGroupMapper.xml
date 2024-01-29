@@ -41,12 +41,6 @@
         </include>
         from t_ds_task_group
         <where>
-            <if test="ids != null and ids.size() > 0">
-                and id in
-                <foreach collection="ids" item="i" open="(" close=")" separator=",">
-                    #{i}
-                </foreach>
-            </if>
             <if test="status != null">
                 and status = #{status}
             </if>
@@ -62,23 +56,25 @@
         <include refid="baseSql">
         </include>
         from t_ds_task_group
-        where 1=1
-        <if test="ids != null and ids.size() > 0">
-            and id in
-            <foreach collection="ids" item="i" open="(" close=")" separator=",">
-                #{i}
-            </foreach>
-        </if>
-        and project_code in ( #{projectCode} ,  0)
+        where project_code in ( #{projectCode} , 0)
         order by update_time desc
     </select>
 
+    <select id="selectByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group
+        where project_code = #{projectCode}
+    </select>
+
     <!--modify data by id-->
-    <update id="updateTaskGroupResource">
+    <update id="robTaskGroupResource">
         update t_ds_task_group
-           set use_size = use_size+1
-        where id = #{id} and use_size  &lt; group_size and
-         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
+        set use_size = use_size + 1
+        where id = #{id}
+          and use_size &lt; group_size
+          and use_size = #{currentUseSize}
+          and (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus}) = 1
     </update>
 
     <!--modify data by id-->

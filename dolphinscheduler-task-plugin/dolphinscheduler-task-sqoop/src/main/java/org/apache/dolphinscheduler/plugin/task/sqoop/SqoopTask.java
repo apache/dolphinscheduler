@@ -17,31 +17,28 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop;
 
+import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * sqoop task extends the shell task
  */
+@Slf4j
 public class SqoopTask extends AbstractYarnTask {
 
-    /**
-     * sqoop task params
-     */
     private SqoopParameters sqoopParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
     private SqoopTaskExecutionContext sqoopTaskExecutionContext;
@@ -53,39 +50,34 @@ public class SqoopTask extends AbstractYarnTask {
 
     @Override
     public void init() {
-        logger.info("sqoop task params {}", taskExecutionContext.getTaskParams());
         sqoopParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
-        // check sqoop task params
+        log.info("Initialize sqoop task params {}", JSONUtils.toPrettyJsonString(sqoopParameters));
         if (null == sqoopParameters) {
-            throw new IllegalArgumentException("Sqoop Task params is null");
+            throw new TaskException("Sqoop Task params is null");
         }
 
         if (!sqoopParameters.checkParameters()) {
-            throw new IllegalArgumentException("Sqoop Task params check fail");
+            throw new TaskException("Sqoop Task params check fail");
         }
 
         sqoopTaskExecutionContext =
                 sqoopParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+
+        SensitiveDataConverter.addMaskPattern(SqoopConstants.SQOOP_PASSWORD_REGEX);
     }
 
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // get sqoop scripts
         SqoopJobGenerator generator = new SqoopJobGenerator();
-        String script = generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
-
-        // combining local and global parameters
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-
-        String resultScripts = ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
-        logger.info("sqoop script: {}", resultScripts);
-        return resultScripts;
+        return generator.generateSqoopJob(sqoopParameters, sqoopTaskExecutionContext);
 
     }
 
     @Override
-    protected void setMainJarName() {
+    protected Map<String, String> getProperties() {
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     @Override

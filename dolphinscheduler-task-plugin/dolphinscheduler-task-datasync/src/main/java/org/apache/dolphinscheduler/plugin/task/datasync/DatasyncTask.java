@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +44,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 
 @Setter
+@Slf4j
 public class DatasyncTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper =
@@ -68,9 +70,9 @@ public class DatasyncTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        logger.info("Datasync task params {}", taskExecutionContext.getTaskParams());
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatasyncParameters.class);
+        log.info("Initialize Datasync task params {}", JSONUtils.toPrettyJsonString(parameters));
         initParams();
 
         hook = new DatasyncHook();
@@ -84,10 +86,9 @@ public class DatasyncTask extends AbstractRemoteTask {
             try {
                 parameters = objectMapper.readValue(parameters.getJson(), DatasyncParameters.class);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+                throw new TaskException("Convert json to task params failed", e);
             }
-            // parameters = JSONUtils.parseObject(parameters.getJson(), DatasyncParameters.class);
-            logger.info("Datasync convert task params {}", parameters);
+            log.info("Success convert json to task params {}", JSONUtils.toPrettyJsonString(parameters));
         }
     }
 

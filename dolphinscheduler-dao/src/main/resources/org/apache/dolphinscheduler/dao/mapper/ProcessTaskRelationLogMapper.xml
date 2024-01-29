@@ -70,4 +70,16 @@
         and post_task_code = #{processTaskRelation.postTaskCode}
         and post_task_version = #{processTaskRelation.postTaskVersion}
     </select>
+
+    <select id="queryByProcessCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_task_relation_log
+        WHERE process_definition_code = #{workflowDefinitionCode}
+    </select>
+    <delete id="deleteByWorkflowDefinitionCode">
+        delete
+        from t_ds_process_task_relation_log
+        WHERE process_definition_code = #{workflowDefinitionCode}
+    </delete>
 </mapper>

@@ -86,11 +86,13 @@ public interface ProcessTaskRelationService {
      *
      * @param loginUser login user
      * @param taskCode relation upstream code
+     * @param needSyncDag needSyncDag
      * @param taskRelationUpdateUpstreamRequest relation downstream code
      */
-    List<ProcessTaskRelation> updateUpstreamTaskDefinition(User loginUser,
-                                                           long taskCode,
-                                                           TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
+    List<ProcessTaskRelation> updateUpstreamTaskDefinitionWithSyncDag(User loginUser,
+                                                                      long taskCode,
+                                                                      Boolean needSyncDag,
+                                                                      TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest);
 
     /**
      * delete task upstream relation
@@ -156,4 +158,8 @@ public interface ProcessTaskRelationService {
      */
     Map<String, Object> deleteEdge(User loginUser, long projectCode, long processDefinitionCode, long preTaskCode,
                                    long postTaskCode);
+
+    List<ProcessTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
+
+    void deleteByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

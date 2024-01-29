@@ -21,34 +21,22 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Task Instance DAO
  */
-public interface TaskInstanceDao {
+public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * Update or Insert task instance to DB.
      * ID is null -> Insert
      * ID is not null -> Update
+     *
      * @param taskInstance task instance
      * @return result
      */
     boolean upsertTaskInstance(TaskInstance taskInstance);
-
-    /**
-     * Insert task instance to DB.
-     * @param taskInstance task instance
-     * @return result
-     */
-    boolean insertTaskInstance(TaskInstance taskInstance);
-
-    /**
-     * Update task instance to DB.
-     * @param taskInstance task instance
-     * @return result
-     */
-    boolean updateTaskInstance(TaskInstance taskInstance);
 
     /**
      * Submit a task instance to DB.
@@ -56,7 +44,7 @@ public interface TaskInstanceDao {
      * @param processInstance process instance
      * @return task instance
      */
-    TaskInstance submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
+    boolean submitTaskInstanceToDB(TaskInstance taskInstance, ProcessInstance processInstance);
 
     /**
      * Query list of valid task instance by process instance id
@@ -64,27 +52,59 @@ public interface TaskInstanceDao {
      * @param testFlag test flag
      * @return list of valid task instance
      */
-    List<TaskInstance> findValidTaskListByProcessId(Integer processInstanceId, int testFlag);
+    List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer processInstanceId, int testFlag);
+
+    /**
+     * Query list of task instance by process instance id and task code
+     * @param processInstanceId processInstanceId
+     * @param taskCode task code
+     * @return list of valid task instance
+     */
+    TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer processInstanceId, Long taskCode);
 
     /**
      * find previous task list by work process id
      * @param processInstanceId processInstanceId
      * @return task instance list
      */
-    List<TaskInstance> findPreviousTaskListByWorkProcessId(Integer processInstanceId);
+    List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer processInstanceId);
 
     /**
-     * find task instance by id
-     * @param taskId task id
+     * find task instance by cache_key
+     * @param cacheKey cache key
      * @return task instance
      */
-    TaskInstance findTaskInstanceById(Integer taskId);
+    TaskInstance queryByCacheKey(String cacheKey);
 
     /**
-     * find task instance list by id list
-     * @param idList task id list
+     * clear task instance cache by cache_key
+     * @param cacheKey cache key
+     * @return task instance
+     */
+    Boolean clearCacheByCacheKey(String cacheKey);
+
+    void deleteByWorkflowInstanceId(int workflowInstanceId);
+
+    List<TaskInstance> queryByWorkflowInstanceId(Integer processInstanceId);
+
+    /**
+     * find last task instance list corresponding to taskCodes in the date interval
+     *
+     * @param processInstanceId Task's parent process instance id
+     * @param taskCodes taskCodes
+     * @param testFlag test flag
      * @return task instance list
      */
-    List<TaskInstance> findTaskInstanceByIdList(List<Integer> idList);
+    List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
+                                                                          Set<Long> taskCodes, int testFlag);
 
+    /**
+     * find last task instance corresponding to taskCode in the date interval
+     * @param processInstanceId Task's parent process instance id
+     * @param depTaskCode taskCode
+     * @param testFlag test flag
+     * @return task instance
+     */
+    TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId,
+                                                                long depTaskCode, int testFlag);
 }

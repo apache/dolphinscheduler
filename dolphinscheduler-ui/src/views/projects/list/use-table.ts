@@ -82,7 +82,10 @@ export function useTable() {
             ButtonLink,
             {
               onClick: () => {
-                router.push({ path: `/projects/${row.code}` })
+                router.push({
+                  path: `/projects/${row.code}`,
+                  query: { projectName: row.name }
+                })
               }
             },
             {
@@ -213,7 +216,7 @@ export function useTable() {
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
-    searchVal: ref(null),
+    searchVal: ref(''),
     totalPage: ref(1),
     showModalRef: ref(false),
     statusRef: ref(0),

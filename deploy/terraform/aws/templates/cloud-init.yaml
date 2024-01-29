@@ -1,0 +1,89 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+#cloud-config
+
+groups:
+  - ds
+
+users:
+  - name: ds
+    shell: /bin/bash
+    primary_group: ds
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+  - name: root
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+write_files:
+  - path: /etc/systemd/system/dolphinscheduler-schema.service
+    content: |
+      [Unit]
+      Description=DolphinScheduler service to init database schema
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=yes
+      Environment="DATABASE=postgresql"
+      Environment="SPRING_PROFILES_ACTIVE=postgresql"
+      Environment="SPRING_DATASOURCE_URL=jdbc:postgresql://${database_address}:${database_port}/${database_name}"
+      Environment="SPRING_DATASOURCE_USERNAME=${database_username}"
+      Environment="SPRING_DATASOURCE_PASSWORD=${database_password}"
+      User=ds
+      WorkingDirectory=/opt/dolphinscheduler
+      ExecStart=bash -l /opt/dolphinscheduler/tools/bin/upgrade-schema.sh
+
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/systemd/system/dolphinscheduler.service
+    content: |
+      [Unit]
+      Description=DolphinScheduler Service ${dolphinscheduler_component}
+      Requires=dolphinscheduler-schema.service
+
+      [Service]
+      Environment="DATABASE=postgresql"
+      Environment="SPRING_PROFILES_ACTIVE=postgresql"
+      Environment="SPRING_DATASOURCE_URL=jdbc:postgresql://${database_address}:${database_port}/${database_name}"
+      Environment="SPRING_DATASOURCE_USERNAME=${database_username}"
+      Environment="SPRING_DATASOURCE_PASSWORD=${database_password}"
+      Environment="REGISTRY_ZOOKEEPER_CONNECT_STRING=${zookeeper_connect_string}"
+      Environment="WORKER_ALERT_LISTEN_HOST=${alert_server_host}"
+      User=ds
+      WorkingDirectory=/opt/dolphinscheduler
+      ExecStart=bash -l /opt/dolphinscheduler/${dolphinscheduler_component}/bin/start.sh
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+
+packages: []
+
+runcmd:
+  - chown -R ds:ds /opt/dolphinscheduler
+  - find /opt/dolphinscheduler/ -name "start.sh" | xargs -I{} chmod +x {}
+  - find /opt/dolphinscheduler/ -name "common.properties" | xargs -I{} sed -ie "s/^resource.storage.type=.*/resource.storage.type=S3/g" {}
+  - find /opt/dolphinscheduler/ -name "common.properties" | xargs -I{} sed -ie "s/^resource.aws.access.key.id=.*/resource.aws.access.key.id=${s3_access_key_id}/g" {}
+  - find /opt/dolphinscheduler/ -name "common.properties" | xargs -I{} sed -ie "s:^resource.aws.secret.access.key=.*:resource.aws.secret.access.key=${s3_secret_access_key}:g" {}
+  - find /opt/dolphinscheduler/ -name "common.properties" | xargs -I{} sed -ie "s/^resource.aws.region=.*/resource.aws.region=${s3_region}/g" {}
+  - find /opt/dolphinscheduler/ -name "common.properties" | xargs -I{} sed -ie "s/^resource.aws.s3.bucket.name=.*/resource.aws.s3.bucket.name=${s3_bucket_name}/g" {}
+  - find /opt/dolphinscheduler/ -name "common.properties" | xargs -I{} sed -ie "s/^resource.aws.s3.endpoint=.*/resource.aws.s3.endpoint=${s3_endpoint}/g" {}
+  - systemctl enable dolphinscheduler
+  - systemctl start dolphinscheduler-schema
+  - systemctl start dolphinscheduler
