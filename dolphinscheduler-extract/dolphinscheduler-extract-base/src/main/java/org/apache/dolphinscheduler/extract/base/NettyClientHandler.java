@@ -67,7 +67,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         future.release();
         if (future.getInvokeCallback() != null) {
             future.removeFuture();
-            this.callbackExecutor.submit(future::executeInvokeCallback);
+            this.callbackExecutor.execute(future::executeInvokeCallback);
         } else {
             future.putResponse(deserialize);
         }
