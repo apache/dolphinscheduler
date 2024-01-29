@@ -41,7 +41,7 @@ public class RetryUtils {
      */
     public static <T> T retryFunction(@NonNull Supplier<T> supplier, @NonNull RetryPolicy retryPolicy) {
         int retryCount = 0;
-        long retryInterval = 0L;
+        long retryInterval = retryPolicy.getRetryInterval();
         while (true) {
             try {
                 return supplier.get();
