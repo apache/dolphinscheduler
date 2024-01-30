@@ -33,31 +33,37 @@ public class NettyServerConfig {
     /**
      * init the server connectable queue
      */
+    @Builder.Default
     private int soBacklog = 1024;
 
     /**
      * whether tpc delay
      */
+    @Builder.Default
     private boolean tcpNoDelay = true;
 
     /**
      * whether keep alive
      */
+    @Builder.Default
     private boolean soKeepalive = true;
 
     /**
      * send buffer size
      */
+    @Builder.Default
     private int sendBufferSize = 65535;
 
     /**
      * receive buffer size
      */
+    @Builder.Default
     private int receiveBufferSize = 65535;
 
     /**
      * worker threads，default get machine cpus
      */
+    @Builder.Default
     private int workerThread = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
