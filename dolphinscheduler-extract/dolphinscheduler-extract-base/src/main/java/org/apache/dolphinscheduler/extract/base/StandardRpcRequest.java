@@ -40,7 +40,7 @@ public class StandardRpcRequest implements IRpcRequest {
         final Class<?>[] argsTypes = new Class[args.length];
         for (int i = 0; i < args.length; i++) {
             argsBytes[i] = JsonSerializer.serialize(args[i]);
-            argsTypes[i] = args[i].getClass();
+            argsTypes[i] = args[i] == null ? null : args[i].getClass();
         }
         return new StandardRpcRequest(argsBytes, argsTypes);
     }
