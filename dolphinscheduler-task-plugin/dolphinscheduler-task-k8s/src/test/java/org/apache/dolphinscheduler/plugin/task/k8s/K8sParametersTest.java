@@ -33,7 +33,7 @@ public class K8sParametersTest {
     private K8sTaskParameters k8sTaskParameters = null;
     private final String image = "ds-dev";
     private final String imagePullPolicy = "IfNotPresent";
-    private final String namespace = "{\"name\":\"default\",\"cluster\":\"lab\"}";
+    private final String namespace = "namespace";
     private final double minCpuCores = 2;
     private final double minMemorySpace = 10;
     private final String command = "[\"/bin/bash\", \"-c\"]";

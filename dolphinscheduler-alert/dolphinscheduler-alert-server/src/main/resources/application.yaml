@@ -80,7 +80,8 @@ alert:
   # Mark each alert of alert server if late after x milliseconds as failed.
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
-  heartbeat-interval: 60s
+  max-heartbeat-interval: 60s
+  query_alert_threshold: 100
 
 registry:
   type: zookeeper

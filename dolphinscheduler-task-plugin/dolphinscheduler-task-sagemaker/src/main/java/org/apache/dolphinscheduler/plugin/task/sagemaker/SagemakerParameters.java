@@ -17,27 +17,55 @@
 
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
 @ToString
+@Slf4j
 public class SagemakerParameters extends AbstractParameters {
 
     /**
      * request script
      */
     private String sagemakerRequestJson;
+    private String username;
+    private String password;
+    private String awsRegion;
+    private int datasource;
+    private String type;
 
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(sagemakerRequestJson);
+    }
+
+    public SagemakerTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        SagemakerTaskExecutionContext sagemakerTaskExecutionContext = new SagemakerTaskExecutionContext();
+        sagemakerTaskExecutionContext.setConnectionParams(
+                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
+        return sagemakerTaskExecutionContext;
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+        resources.put(ResourceType.DATASOURCE, datasource);
+        return resources;
     }
 
 }

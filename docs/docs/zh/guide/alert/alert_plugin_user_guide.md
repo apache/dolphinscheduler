@@ -10,6 +10,8 @@
 
 然后选择告警组管理，创建告警组，选择相应的告警实例即可。
 
+> 可以使用`测试发送`功能来验证配置的告警实例是否正确。
+
 ![alert-instance01](../../../../img/new_ui/dev/alert/alert_instance01.png)
 ![alert-instance02](../../../../img/new_ui/dev/alert/alert_instance02.png)
 ![alert-instance03](../../../../img/new_ui/dev/alert/alert_instance03.png)

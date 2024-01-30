@@ -39,7 +39,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -129,8 +128,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                 .build();
 
         if (taskGroupMapper.insert(taskGroup) > 0) {
-            permissionPostHandle(AuthorizationType.TASK_GROUP, loginUser.getId(),
-                    Collections.singletonList(taskGroup.getId()), log);
             log.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
             putMsg(result, Status.SUCCESS);
         } else {

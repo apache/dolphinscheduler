@@ -156,14 +156,9 @@ public class ProjectController extends BaseController {
                                          @RequestParam("pageSize") Integer pageSize,
                                          @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            log.warn("Pagination parameters check failed, pageNo:{}, pageSize:{}", pageNo, pageSize);
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
-        return result;
+        return projectService.queryProjectListPaging(loginUser, pageSize, pageNo, searchVal);
     }
 
     /**
@@ -192,14 +187,10 @@ public class ProjectController extends BaseController {
                                                             @RequestParam("pageSize") Integer pageSize,
                                                             @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
+        return projectService.queryProjectWithAuthorizedLevelListPaging(userId, loginUser, pageSize, pageNo,
                 searchVal);
-        return result;
     }
 
     /**
@@ -226,7 +217,7 @@ public class ProjectController extends BaseController {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return the projects which user have not permission to see
+     * @return the projects which user have no permission to see
      */
     @Operation(summary = "queryUnauthorizedProject", description = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @Parameters({

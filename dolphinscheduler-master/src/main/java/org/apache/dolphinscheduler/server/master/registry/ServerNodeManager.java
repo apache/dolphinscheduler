@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.extract.base.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
+import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -101,6 +102,9 @@ public class ServerNodeManager implements InitializingBean {
     @Autowired
     private MasterConfig masterConfig;
 
+    @Autowired
+    private ListenerEventAlertManager listenerEventAlertManager;
+
     private final List<WorkerInfoChangeListener> workerInfoChangeListeners = new ArrayList<>();
 
     private final List<MasterInfoChangeListener> masterInfoChangeListeners = new ArrayList<>();
@@ -112,8 +116,8 @@ public class ServerNodeManager implements InitializingBean {
         refreshNodesAndGroupMappings();
 
         // init executor service
-        executorService =
-                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
+        executorService = Executors
+                .newSingleThreadScheduledExecutor(ThreadUtils.newDaemonThreadFactory("ServerNodeManagerExecutor"));
         executorService.scheduleWithFixedDelay(
                 new WorkerNodeInfoAndGroupDbSyncTask(),
                 0,
@@ -170,7 +174,9 @@ public class ServerNodeManager implements InitializingBean {
                         log.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
                         log.info("Worker node : {} down.", path);
+                        removeSingleWorkerNode(workerAddress);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
+                        listenerEventAlertManager.publishServerDownListenerEvent(path, "WORKER");
                     } else if (type == Type.UPDATE) {
                         syncSingleWorkerNodeInfo(workerAddress, JSONUtils.parseObject(data, WorkerHeartBeat.class));
                     }
@@ -184,6 +190,16 @@ public class ServerNodeManager implements InitializingBean {
             workerNodeInfoWriteLock.lock();
             try {
                 workerNodeInfo.put(workerAddress, info);
+            } finally {
+                workerNodeInfoWriteLock.unlock();
+            }
+        }
+
+        private void removeSingleWorkerNode(String workerAddress) {
+            workerNodeInfoWriteLock.lock();
+            try {
+                workerNodeInfo.remove(workerAddress);
+                log.info("remove worker node {} from workerNodeInfo when worker server down", workerAddress);
             } finally {
                 workerNodeInfoWriteLock.unlock();
             }
@@ -203,6 +219,7 @@ public class ServerNodeManager implements InitializingBean {
                     } else if (type.equals(Type.REMOVE)) {
                         log.info("master node : {} down.", path);
                         alertDao.sendServerStoppedAlert(1, path, "MASTER");
+                        listenerEventAlertManager.publishServerDownListenerEvent(path, "MASTER");
                     }
                 } catch (Exception ex) {
                     log.error("MasterNodeListener capture data change and get data failed.", ex);

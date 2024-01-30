@@ -44,8 +44,11 @@ public enum AuthorizationType {
      * 16 USER;
      * 17 Data_Quality;
      */
+    @Deprecated
     RESOURCE_FILE_ID(0, "resource file id"),
+    @Deprecated
     RESOURCE_FILE_NAME(1, "resource file name"),
+    @Deprecated
     UDF_FILE(2, "udf file"),
     DATASOURCE(3, "data source"),
     UDF(4, "udf function"),

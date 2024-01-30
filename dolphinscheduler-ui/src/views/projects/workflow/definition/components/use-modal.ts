@@ -28,7 +28,7 @@ import {
 } from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
-import { listAlertGroupById } from '@/service/modules/alert-group'
+import { listNormalAlertGroupById } from '@/service/modules/alert-group'
 import { startProcessInstance } from '@/service/modules/executors'
 import {
   createSchedule,
@@ -256,7 +256,7 @@ export function useModal(
   }
 
   const getAlertGroups = () => {
-    listAlertGroupById().then((res: any) => {
+    listNormalAlertGroupById().then((res: any) => {
       variables.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id

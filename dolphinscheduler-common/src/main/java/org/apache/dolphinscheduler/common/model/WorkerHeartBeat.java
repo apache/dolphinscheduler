@@ -33,11 +33,9 @@ public class WorkerHeartBeat implements HeartBeat {
     private long startupTime;
     private long reportTime;
     private double cpuUsage;
+    private double jvmMemoryUsage;
     private double memoryUsage;
-    private double loadAverage;
-    private double availablePhysicalMemorySize;
-    private double reservedMemory;
-    private double diskAvailable;
+    private double diskUsage;
     private ServerStatus serverStatus;
     private int processId;
 
@@ -45,7 +43,11 @@ public class WorkerHeartBeat implements HeartBeat {
     private int port;
 
     private int workerHostWeight; // worker host weight
-    private int workerWaitingTaskCount; // worker waiting task count
-    private int workerExecThreadCount; // worker thread pool thread count
+    private int threadPoolUsage; // worker waiting task count
+
+    @Override
+    public ServerStatus getServerStatus() {
+        return serverStatus;
+    }
 
 }
