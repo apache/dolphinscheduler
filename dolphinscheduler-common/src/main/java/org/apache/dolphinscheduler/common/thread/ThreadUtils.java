@@ -31,24 +31,20 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class ThreadUtils {
 
-    /**
-     * Wrapper over newDaemonFixedThreadExecutor.
-     *
-     * @param threadName threadName
-     * @param threadsNum threadsNum
-     * @return ExecutorService
-     */
     public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder().setDaemon(true).setNameFormat(threadName).build();
-        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, threadFactory);
+        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, newDaemonThreadFactory(threadName));
     }
 
     public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadName) {
-        ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat(threadName)
+        return Executors.newSingleThreadScheduledExecutor(newDaemonThreadFactory(threadName));
+    }
+
+    public static ThreadFactory newDaemonThreadFactory(String threadName) {
+        return new ThreadFactoryBuilder()
                 .setDaemon(true)
+                .setNameFormat(threadName)
+                .setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance())
                 .build();
-        return Executors.newSingleThreadScheduledExecutor(threadFactory);
     }
 
     /**

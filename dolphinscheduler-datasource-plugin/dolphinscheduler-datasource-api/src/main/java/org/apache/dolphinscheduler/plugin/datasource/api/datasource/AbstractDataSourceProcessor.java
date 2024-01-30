@@ -29,12 +29,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 
@@ -67,7 +69,8 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      * @param host datasource host
      */
     protected void checkHost(String host) {
-        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+        if (com.google.common.net.InetAddresses.isInetAddress(host)) {
+        } else if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
             throw new IllegalArgumentException("datasource host illegal");
         }
     }
@@ -127,5 +130,10 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
             log.error("Check datasource connectivity for: {} error", getDbType().name(), e);
             return false;
         }
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.other);
     }
 }

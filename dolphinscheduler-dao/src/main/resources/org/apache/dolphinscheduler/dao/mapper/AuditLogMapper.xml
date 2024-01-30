@@ -60,5 +60,8 @@
         <if test="resourceType != null and resourceType == 'USER'">
             select user_name from t_ds_user where id = #{resourceId}
         </if>
+        <if test="resourceType != null and resourceType == 'PROJECT'">
+            select name from t_ds_project where id = #{resourceId}
+        </if>
     </select>
 </mapper>
