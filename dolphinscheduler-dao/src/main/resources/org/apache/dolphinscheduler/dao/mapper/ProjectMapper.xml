@@ -215,10 +215,10 @@
 
     <select id="queryRunningProcessInstanceNumber" resultType="org.apache.dolphinscheduler.dao.model.ProjectInstanceRunningDTO">
         SELECT COUNT(distinct inst.id) as inst_running_count,def.project_code
-        FROM t_ds_process_definition_log def,
+        FROM t_ds_process_definition def,
         t_ds_process_instance inst
-        WHERE def.code =
-        inst.process_definition_code and def.version = inst.process_definition_version
+        WHERE def.code = inst.process_definition_code
+        and def.version = inst.process_definition_version
         <if test="projectsCodes != null and projectsCodes.size() > 0">
             and def.project_code in
             <foreach item="code" index="index" collection="projectsCodes" open="(" separator="," close=")">
