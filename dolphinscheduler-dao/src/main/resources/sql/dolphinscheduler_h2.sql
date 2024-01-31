@@ -1054,7 +1054,7 @@ CREATE TABLE t_ds_version
 -- Records of t_ds_version
 -- ----------------------------
 INSERT INTO t_ds_version
-VALUES ('1', '3.3.0');
+VALUES ('1', '3.2.1');
 
 
 -- ----------------------------

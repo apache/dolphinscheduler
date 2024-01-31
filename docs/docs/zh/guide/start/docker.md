@@ -18,7 +18,7 @@
 你可以最快速的体验到 DolphinScheduler 的大部分功能，了解主要和概念和内容。
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=<version>
+$ DOLPHINSCHEDULER_VERSION=3.2.1
 $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
@@ -33,11 +33,11 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 服务重启的时候保留元数据（如需要挂载到本地路径需要做指定）。他更健壮，能保证用户体验更加完整的 DolphinScheduler 服务。这种方式需要先安装
 [docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux，Windows。
 
-确保 docker-compose 顺利安装后，需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)
+确保 docker-compose 顺利安装后，需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/en-us/download/3.2.1)
 下载对应版本源码包可能是最快的方法，当下载完源码后就可以运行命令进行部署了。
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=<version>
+$ DOLPHINSCHEDULER_VERSION=3.2.1
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Mac Linux 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
@@ -61,7 +61,7 @@ $ docker-compose --profile all up -d
 ZooKeeper 且不想启动新的服务，可以使用这个方式分别启动 DolphinScheduler 容器。
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=<version>
+$ DOLPHINSCHEDULER_VERSION=3.2.1
 # 初始化数据库，其确保数据库 <DATABASE> 已经存在
 $ docker run -d --name dolphinscheduler-tools \
     -e DATABASE="postgresql" \
