@@ -86,6 +86,7 @@ export function formatParams(data: INodeData): {
   }
   if (data.taskType === 'HTTP') {
     taskParams.httpMethod = data.httpMethod
+    taskParams.httpBody = data.httpBody
     taskParams.httpCheckCondition = data.httpCheckCondition
     taskParams.httpParams = data.httpParams
     taskParams.url = data.url

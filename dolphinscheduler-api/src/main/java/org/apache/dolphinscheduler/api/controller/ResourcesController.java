@@ -316,7 +316,7 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param fileName resource full name
-     * @param tenantCode tenantcode of the owner of the resource
+     * @param tenantCode tenantCode of the owner of the resource
      * @param type resource type
      * @return true if the resource name not exists, otherwise return false
      */
