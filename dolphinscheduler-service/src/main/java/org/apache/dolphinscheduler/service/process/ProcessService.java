@@ -194,4 +194,6 @@ public interface ProcessService {
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 
     void saveCommandTrigger(Integer commandId, Integer processInstanceId);
+
+    void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam);
 }
