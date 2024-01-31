@@ -488,6 +488,8 @@ export default {
     http_url_validator: '请求地址需包含http或者https',
     http_method: '请求类型',
     http_parameters: '请求参数',
+    http_body: '请求Body',
+    http_body_tips: '请填写http body,如若填写将忽略请求参数中的body类型参数',
     http_check_condition: '校验条件',
     http_condition: '校验内容',
     http_condition_tips: '请填写校验内容',
