@@ -46,6 +46,11 @@ public class HttpParameters extends AbstractParameters {
     private List<HttpProperty> httpParams;
 
     /**
+     * httpBody
+     */
+    private String httpBody;
+
+    /**
      * httpCheckCondition
      */
     private HttpCheckCondition httpCheckCondition = HttpCheckCondition.STATUS_CODE_DEFAULT;
@@ -131,5 +136,13 @@ public class HttpParameters extends AbstractParameters {
 
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
+    }
+
+    public String getHttpBody() {
+        return httpBody;
+    }
+
+    public void setHttpBody(String httpBody) {
+        this.httpBody = httpBody;
     }
 }

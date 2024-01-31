@@ -287,6 +287,7 @@ interface ITaskParams {
   mainArgs?: string
   others?: string
   httpMethod?: string
+  httpBody?: string
   httpCheckCondition?: string
   httpParams?: []
   url?: string

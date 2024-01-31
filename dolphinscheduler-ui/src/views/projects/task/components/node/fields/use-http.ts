@@ -128,6 +128,15 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       ]
     },
     {
+      type: 'input',
+      field: 'httpBody',
+      name: t('project.node.http_body'),
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.http_body_tips')
+      }
+    },
+    {
       type: 'select',
       field: 'httpCheckCondition',
       name: t('project.node.http_check_condition'),

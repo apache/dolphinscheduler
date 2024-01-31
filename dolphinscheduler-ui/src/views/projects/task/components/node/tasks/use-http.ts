@@ -44,6 +44,7 @@ export function useHttp({
     delayTime: 0,
     timeout: 30,
     httpMethod: 'GET',
+    httpBody: '',
     httpCheckCondition: 'STATUS_CODE_DEFAULT',
     httpParams: [],
     url: '',
