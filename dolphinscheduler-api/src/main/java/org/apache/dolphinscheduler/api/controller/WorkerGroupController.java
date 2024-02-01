@@ -78,7 +78,7 @@ public class WorkerGroupController extends BaseController {
             @Parameter(name = "name", description = "WORKER_GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "addrList", description = "WORKER_ADDR_LIST", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "description", description = "WORKER_DESC", required = false, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "otherParamsJson", description = "WORKER_PARMS_JSON", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "otherParamsJson", description = "WORKER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class)),
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)

@@ -246,7 +246,7 @@ public class SchedulerController extends BaseController {
      *
      * @param loginUser login user
      * @param projectCode project code
-     * @param id scheule id
+     * @param id schedule id
      * @return delete result code
      */
     @Operation(summary = "deleteScheduleById", description = "DELETE_SCHEDULE_NOTES")

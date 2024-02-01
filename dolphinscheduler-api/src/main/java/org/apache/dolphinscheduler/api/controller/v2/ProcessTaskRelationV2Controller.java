@@ -113,7 +113,7 @@ public class ProcessTaskRelationV2Controller extends BaseController {
      */
     @Operation(summary = "update", description = "UPDATE_PROCESS_TASK_RELATION_NOTES")
     @Parameters({
-            @Parameter(name = "code", description = "DOWMSTREAM_TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
+            @Parameter(name = "code", description = "DOWNSTREAM_TASK_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "123456", required = true))
     })
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)

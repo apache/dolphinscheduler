@@ -100,7 +100,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     }
 
     /**
-     * create namespace,if not exist on k8s,will create,if exist only register in db
+     * register namespace in db,need to create namespace in k8s first
      *
      * @param loginUser    login user
      * @param namespace    namespace
@@ -108,7 +108,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return
      */
     @Override
-    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode) {
+    public Map<String, Object> registerK8sNamespace(User loginUser, String namespace, Long clusterCode) {
         Map<String, Object> result = new HashMap<>();
         if (isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);

@@ -34,15 +34,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AuditLogMapperTest extends BaseDaoTest {
 
     @Autowired
-    AuditLogMapper logMapper;
+    private AuditLogMapper logMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
 
-    /**
-     * insert
-     * @return
-     */
     private void insertOne(AuditObjectType objectType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);

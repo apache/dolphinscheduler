@@ -80,7 +80,7 @@ public class AlertGroupController extends BaseController {
      * @param description description
      * @return create result code
      */
-    @Operation(summary = "createAlertgroup", description = "CREATE_ALERT_GROUP_NOTES")
+    @Operation(summary = "createAlertGroup", description = "CREATE_ALERT_GROUP_NOTES")
     @Parameters({
             @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "description", description = "DESC", schema = @Schema(implementation = String.class)),
@@ -104,7 +104,7 @@ public class AlertGroupController extends BaseController {
      * @param loginUser login user
      * @return alert group list
      */
-    @Operation(summary = "listAlertgroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
+    @Operation(summary = "listAlertGroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
@@ -120,7 +120,7 @@ public class AlertGroupController extends BaseController {
      * @param loginUser login user
      * @return normal alert group list
      */
-    @Operation(summary = "listNormalAlertgroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
+    @Operation(summary = "listNormalAlertGroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
     @GetMapping(value = "/normal-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
@@ -159,7 +159,7 @@ public class AlertGroupController extends BaseController {
     }
 
     /**
-     * check alarm group detail by Id
+     * check alarm group detail by id
      *
      * @param loginUser login user
      * @param id        alert group id
@@ -189,7 +189,7 @@ public class AlertGroupController extends BaseController {
      * @param description description
      * @return update result code
      */
-    @Operation(summary = "updateAlertgroup", description = "UPDATE_ALERT_GROUP_NOTES")
+    @Operation(summary = "updateAlertGroup", description = "UPDATE_ALERT_GROUP_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "groupName", description = "GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
@@ -217,7 +217,7 @@ public class AlertGroupController extends BaseController {
      * @param id alert group id
      * @return delete result code
      */
-    @Operation(summary = "delAlertgroupById", description = "DELETE_ALERT_GROUP_BY_ID_NOTES")
+    @Operation(summary = "delAlertGroupById", description = "DELETE_ALERT_GROUP_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })

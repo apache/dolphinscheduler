@@ -267,7 +267,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param name data source name
-     * @return true if data source name not exists.otherwise return false
+     * @return true if data source name not exists, otherwise return false
      */
     @Operation(summary = "verifyDataSourceName", description = "VERIFY_DATA_SOURCE_NOTES")
     @Parameters({
@@ -287,9 +287,9 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param userId user id
-     * @return unauthed data source result code
+     * @return unauthorized data source result code
      */
-    @Operation(summary = "unauthDatasource", description = "UNAUTHORIZED_DATA_SOURCE_NOTES")
+    @Operation(summary = "unauthorizedDatasource", description = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
             @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
