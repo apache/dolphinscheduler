@@ -107,16 +107,16 @@ public class K8SNamespaceServiceTest {
     public void createK8sNamespace() {
         // namespace is null
         Map<String, Object> result =
-                k8sNamespaceService.createK8sNamespace(getLoginUser(), null, clusterCode);
+                k8sNamespaceService.registerK8sNamespace(getLoginUser(), null, clusterCode);
         logger.info(result.toString());
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
         // k8s is null
-        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, null);
+        result = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, null);
         logger.info(result.toString());
         Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
         // correct
         Mockito.when(clusterMapper.queryByClusterCode(Mockito.anyLong())).thenReturn(getCluster());
-        result = k8sNamespaceService.createK8sNamespace(getLoginUser(), namespace, clusterCode);
+        result = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, clusterCode);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
     }
