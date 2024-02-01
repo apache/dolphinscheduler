@@ -122,7 +122,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                 .description(description)
                 .groupSize(groupSize)
                 .userId(loginUser.getId())
-                .status(Flag.YES.getCode())
+                .status(Flag.YES)
                 .createTime(now)
                 .updateTime(now)
                 .build();
@@ -180,7 +180,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
             return result;
         }
-        if (taskGroup.getStatus() != Flag.YES.getCode()) {
+        if (taskGroup.getStatus() != Flag.YES) {
             log.warn("Task group has been closed, taskGroupId:{}.", id);
             putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
             return result;
@@ -200,17 +200,6 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             putMsg(result, Status.UPDATE_TASK_GROUP_ERROR);
         }
         return result;
-    }
-
-    /**
-     * get task group status
-     *
-     * @param id task group id
-     * @return is the task group available
-     */
-    @Override
-    public boolean isTheTaskGroupAvailable(int id) {
-        return taskGroupMapper.selectCountByIdStatus(id, Flag.YES.getCode()) == 1;
     }
 
     /**
@@ -331,12 +320,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        if (taskGroup.getStatus() == Flag.NO.getCode()) {
+        if (taskGroup.getStatus() == Flag.NO) {
             log.info("Task group has been closed, taskGroupId:{}.", id);
             putMsg(result, Status.TASK_GROUP_STATUS_CLOSED);
             return result;
         }
-        taskGroup.setStatus(Flag.NO.getCode());
+        taskGroup.setStatus(Flag.NO);
         int update = taskGroupMapper.updateById(taskGroup);
         if (update > 0)
             log.info("Task group close complete, taskGroupId:{}.", id);
@@ -364,12 +353,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
             return result;
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        if (taskGroup.getStatus() == Flag.YES.getCode()) {
+        if (taskGroup.getStatus() == Flag.YES) {
             log.info("Task group has been started, taskGroupId:{}.", id);
             putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
             return result;
         }
-        taskGroup.setStatus(Flag.YES.getCode());
+        taskGroup.setStatus(Flag.YES);
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
         int update = taskGroupMapper.updateById(taskGroup);
         if (update > 0)

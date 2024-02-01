@@ -17,26 +17,21 @@
 
 package org.apache.dolphinscheduler.extract.master.transportor;
 
+import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @NoArgsConstructor
-public class TaskInstanceWakeupRequest {
-
-    private String key;
+@AllArgsConstructor
+public class TaskInstanceWakeupRequest implements Serializable {
 
     private int processInstanceId;
 
     private int taskInstanceId;
-
-    public TaskInstanceWakeupRequest(
-                                     int processInstanceId,
-                                     int taskInstanceId) {
-        this.key = String.format("%d-%d", processInstanceId, taskInstanceId);
-
-        this.processInstanceId = processInstanceId;
-        this.taskInstanceId = taskInstanceId;
-    }
 
 }

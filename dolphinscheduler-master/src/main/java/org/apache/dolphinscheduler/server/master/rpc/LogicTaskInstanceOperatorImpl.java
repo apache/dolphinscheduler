@@ -24,9 +24,6 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillReque
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,17 +53,6 @@ public class LogicTaskInstanceOperatorImpl implements ILogicTaskInstanceOperator
     public LogicTaskPauseResponse pauseLogicTask(LogicTaskPauseRequest taskPauseRequest) {
         return logicTaskInstanceOperationFunctionManager.getLogicTaskInstancePauseOperationFunction()
                 .operate(taskPauseRequest);
-    }
-
-    @Override
-    public TaskInstanceForceStartResponse forceStartTaskInstance(TaskInstanceForceStartRequest taskForceStartRequest) {
-        return logicTaskInstanceOperationFunctionManager.getTaskInstanceForceStartOperationFunction()
-                .operate(taskForceStartRequest);
-    }
-
-    @Override
-    public void wakeupTaskInstance(TaskInstanceWakeupRequest taskWakeupRequest) {
-        logicTaskInstanceOperationFunctionManager.getTaskInstanceWakeupOperationFunction().operate(taskWakeupRequest);
     }
 
 }

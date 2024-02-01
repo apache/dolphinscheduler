@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -49,7 +50,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -104,6 +104,8 @@ public class WorkflowExecuteRunnableTest {
 
     private ListenerEventAlertManager listenerEventAlertManager;
 
+    private TaskGroupCoordinator taskGroupCoordinator;
+
     @BeforeEach
     public void init() throws Exception {
         applicationContext = Mockito.mock(ApplicationContext.class);
@@ -138,6 +140,8 @@ public class WorkflowExecuteRunnableTest {
         Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
         Mockito.when(workflowGraph.getDag()).thenReturn(new DAG<>());
 
+        taskGroupCoordinator = Mockito.mock(TaskGroupCoordinator.class);
+
         workflowExecuteThread = Mockito.spy(
                 new WorkflowExecuteRunnable(
                         workflowExecuteContext,
@@ -150,11 +154,12 @@ public class WorkflowExecuteRunnableTest {
                         curingGlobalParamsService,
                         taskInstanceDao,
                         defaultTaskExecuteRunnableFactory,
-                        listenerEventAlertManager));
+                        listenerEventAlertManager,
+                        taskGroupCoordinator));
     }
 
     @Test
-    public void testParseStartNodeName() throws ParseException {
+    public void testParseStartNodeName() {
         try {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODES, "1,2,3");

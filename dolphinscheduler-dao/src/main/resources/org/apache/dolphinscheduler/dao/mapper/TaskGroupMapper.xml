@@ -67,46 +67,12 @@
         where project_code = #{projectCode}
     </select>
 
-    <!--modify data by id-->
-    <update id="robTaskGroupResource">
-        update t_ds_task_group
-        set use_size = use_size + 1
-        where id = #{id}
-          and use_size &lt; group_size
-          and use_size = #{currentUseSize}
-          and (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus}) = 1
-    </update>
-
-    <!--modify data by id-->
-    <update id="releaseTaskGroupResource">
-        update t_ds_task_group
-          set use_size = use_size-1
-        where id = #{id} and use_size > 0 and
-         (select count(1) FROM t_ds_task_group_queue where id = #{queueId} and status = #{queueStatus} ) = 1
-    </update>
-
     <select id="queryByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
         select
         <include refid="baseSql" />
         from t_ds_task_group
         where
         user_id = #{userId} and name =  #{name}
-    </select>
-
-    <select id="selectAvailableCountById" resultType="java.lang.Integer">
-        select
-        count(1)
-        from t_ds_task_group
-        where
-        id = #{groupId} and use_size &lt; group_size
-    </select>
-
-    <select id="selectCountByIdStatus" resultType="java.lang.Integer">
-        select
-        count(1)
-        from t_ds_task_group
-        where
-        id = #{id} and status = #{status}
     </select>
 
     <select id="listAuthorizedResource" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
@@ -118,5 +84,33 @@
             and user_id = #{userId}
         </if>
     </select>
+
+    <select id="queryAvailableTaskGroups" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group
+        where use_size <![CDATA[ < ]]> group_size
+    </select>
+
+    <select id="queryUsedTaskGroups" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroup">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group
+        where use_size <![CDATA[ > ]]> 0
+    </select>
+
+    <update id="acquireTaskGroupSlot">
+        update t_ds_task_group
+        set use_size = use_size + 1
+        where id = #{id}
+        and use_size &lt; group_size
+    </update>
+
+    <update id="releaseTaskGroupSlot">
+        update t_ds_task_group
+        set use_size = use_size - 1
+        where id = #{id}
+        and use_size > 0
+    </update>
 
 </mapper>

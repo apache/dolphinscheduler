@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 
@@ -24,16 +25,12 @@ import java.util.Date;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public class TaskGroupMapperTest extends BaseDaoTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(TaskGroupMapperTest.class);
 
     @Autowired
     TaskGroupMapper taskGroupMapper;
@@ -46,7 +43,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         taskGroup.setName("task group");
         taskGroup.setId(1);
         taskGroup.setUserId(1);
-        taskGroup.setStatus(1);
+        taskGroup.setStatus(Flag.YES);
         taskGroup.setGroupSize(10);
         taskGroup.setDescription("this is a task group");
         Date date = new Date(System.currentTimeMillis());
@@ -88,7 +85,7 @@ public class TaskGroupMapperTest extends BaseDaoTest {
         Page<TaskGroup> page = new Page(1, 3);
         IPage<TaskGroup> taskGroupIPage = taskGroupMapper.queryTaskGroupPaging(
                 page,
-                taskGroup.getName(), taskGroup.getStatus());
+                taskGroup.getName(), taskGroup.getStatus().getCode());
 
         Assertions.assertEquals(taskGroupIPage.getTotal(), 1);
     }

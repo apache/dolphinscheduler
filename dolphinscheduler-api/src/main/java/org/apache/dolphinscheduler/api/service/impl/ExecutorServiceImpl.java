@@ -55,7 +55,6 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -83,14 +82,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.master.IStreamingTaskOperator;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -552,16 +549,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> result = new HashMap<>();
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check process instance exist
-        ProcessInstance processInstance = processInstanceMapper.selectById(taskGroupQueue.getProcessId());
-        if (processInstance == null) {
-            log.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.",
-                    taskGroupQueue.getProjectCode(), taskGroupQueue.getProcessId());
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId());
-            return result;
-        }
-
+        ProcessInstance processInstance = processInstanceDao.queryOptionalById(taskGroupQueue.getProcessId())
+                .orElseThrow(
+                        () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId()));
         checkMasterExists();
-        return forceStart(processInstance, taskGroupQueue);
+
+        if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
+            throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);
+        }
+        taskGroupQueue.setForceStart(Flag.YES.getCode());
+        taskGroupQueue.setUpdateTime(new Date());
+        taskGroupQueueMapper.updateById(taskGroupQueue);
+
+        result.put(Constants.STATUS, Status.SUCCESS);
+        return result;
     }
 
     public void checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
@@ -661,32 +662,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             log.error("Process instance state update error, processInstanceName:{}.", processInstance.getName());
             putMsg(result, Status.EXECUTE_PROCESS_INSTANCE_ERROR);
         }
-        return result;
-    }
-
-    /**
-     * prepare to update process instance command type and status
-     *
-     * @param processInstance process instance
-     * @return update result
-     */
-    private Map<String, Object> forceStart(ProcessInstance processInstance, TaskGroupQueue taskGroupQueue) {
-        Map<String, Object> result = new HashMap<>();
-        if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
-            log.warn("Task group queue already starts, taskGroupQueueId:{}.", taskGroupQueue.getId());
-            putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
-            return result;
-        }
-
-        taskGroupQueue.setForceStart(Flag.YES.getCode());
-        taskGroupQueue.setUpdateTime(new Date());
-        processService.updateTaskGroupQueue(taskGroupQueue);
-        log.info("Sending force start command to master: {}.", processInstance.getHost());
-        ILogicTaskInstanceOperator iLogicTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
-        iLogicTaskInstanceOperator.forceStartTaskInstance(
-                new TaskInstanceForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()));
-        putMsg(result, Status.SUCCESS);
         return result;
     }
 
