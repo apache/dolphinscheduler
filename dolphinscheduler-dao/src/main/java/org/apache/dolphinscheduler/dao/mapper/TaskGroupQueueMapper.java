@@ -104,5 +104,22 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
 
+    void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
+
     void deleteByTaskGroupIds(@Param("taskGroupIds") List<Integer> taskGroupIds);
+
+    void updateTaskGroupPriorityByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId,
+                                                 @Param("priority") int taskGroupPriority);
+
+    List<TaskGroupQueue> queryAllInQueueTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
+                                                                @Param("inQueue") int inQueue);
+
+    List<TaskGroupQueue> queryAllTaskGroupQueueByInQueue(@Param("inQueue") int inQueue);
+
+    List<TaskGroupQueue> queryByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId);
+
+    List<TaskGroupQueue> queryUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
+                                                           @Param("status") int status,
+                                                           @Param("inQueue") int inQueue,
+                                                           @Param("forceStart") int forceStart);
 }

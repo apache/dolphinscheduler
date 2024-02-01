@@ -51,14 +51,6 @@ public interface TaskGroupService {
                                         String description, int groupSize);
 
     /**
-     * get task group status
-     *
-     * @param id task group id
-     * @return the result code and msg
-     */
-    boolean isTheTaskGroupAvailable(int id);
-
-    /**
      * query all task group by user id
      *
      * @param loginUser login user
