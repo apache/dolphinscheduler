@@ -191,7 +191,7 @@ public class JsonSplitDao {
                 insert.setLong(12, taskDefinitionLog.getEnvironmentCode());
                 insert.setInt(13, taskDefinitionLog.getFailRetryTimes());
                 insert.setInt(14, taskDefinitionLog.getFailRetryInterval());
-                insert.setInt(15, taskDefinitionLog.getTimeoutFlag().getCode());
+                insert.setInt(15, taskDefinitionLog.getTimeoutFlag() == null ? TimeoutFlag.CLOSE.getCode() : taskDefinitionLog.getTimeoutFlag().getCode());
                 insert.setInt(16, taskDefinitionLog.getTimeoutNotifyStrategy() == null ? 0
                         : taskDefinitionLog.getTimeoutNotifyStrategy().getCode());
                 insert.setInt(17, taskDefinitionLog.getTimeout());
