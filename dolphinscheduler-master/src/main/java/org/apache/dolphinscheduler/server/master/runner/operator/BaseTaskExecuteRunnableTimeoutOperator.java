@@ -38,18 +38,8 @@ public abstract class BaseTaskExecuteRunnableTimeoutOperator implements TaskExec
 
     @Override
     public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
-        // Right now, if the task is running in worker, the timeout strategy will be handled at worker side.
-        // if the task is in master, the timeout strategy will be handled at master side.
-        // todo: we should unify this, the master only need to handle the timeout strategy. and send request to worker
-        // to kill the task, if the strategy is timeout_failed.
         TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
-        if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
-                && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {
-            log.warn("TaskInstance: {} timeout, the current timeout strategy is {}, will continue running",
-                    taskInstance.getName(), taskTimeoutStrategy.name());
-            return;
-        }
         try {
             timeoutTaskInstanceInDB(taskInstance);
             killRemoteTaskInstanceInThreadPool(taskInstance);
