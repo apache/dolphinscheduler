@@ -59,8 +59,8 @@ public class AuditLogController extends BaseController {
      *
      * @param loginUser         login user
      * @param pageNo            page number
-     * @param resourceType     resource type
-     * @param operationType     operation type
+     * @param objectTypeCodes       object type codes
+     * @param operationTypeCodes    operation type codes
      * @param startDate         start time
      * @param endDate           end time
      * @param userName          user name
@@ -71,8 +71,8 @@ public class AuditLogController extends BaseController {
     @Parameters({
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "resourceType", description = "RESOURCE_TYPE", schema = @Schema(implementation = AuditObjectType.class)),
-            @Parameter(name = "operationType", description = "OPERATION_TYPE", schema = @Schema(implementation = AuditOperationType.class)),
+            @Parameter(name = "objectTypeCodes", description = "OBJECT_TYPE_CODES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "operationTypeCodes", description = "OPERATION_TYPE_CODES", schema = @Schema(implementation = String.class)),
             @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
@@ -83,16 +83,16 @@ public class AuditLogController extends BaseController {
     public Result<PageInfo<AuditDto>> queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam("pageNo") Integer pageNo,
                                                               @RequestParam("pageSize") Integer pageSize,
-                                                              @RequestParam(value = "resourceType", required = false) AuditObjectType resourceType,
-                                                              @RequestParam(value = "operationType", required = false) AuditOperationType operationType,
+                                                              @RequestParam(value = "objectTypeCodes", required = false) String objectTypeCodes,
+                                                              @RequestParam(value = "operationTypeCodes", required = false) String operationTypeCodes,
                                                               @RequestParam(value = "startDate", required = false) String startDate,
                                                               @RequestParam(value = "endDate", required = false) String endDate,
                                                               @RequestParam(value = "userName", required = false) String userName) {
         checkPageParams(pageNo, pageSize);
         PageInfo<AuditDto> auditDtoPageInfo = auditService.queryLogListPaging(
                 loginUser,
-                resourceType,
-                operationType,
+                objectTypeCodes,
+                operationTypeCodes,
                 startDate,
                 endDate,
                 userName,

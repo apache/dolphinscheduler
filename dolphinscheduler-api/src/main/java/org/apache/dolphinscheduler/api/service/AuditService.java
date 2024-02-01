@@ -41,18 +41,18 @@ public interface AuditService {
     /**
      * query audit log list
      *
-     * @param loginUser         login user
-     * @param resourceType      resource type
-     * @param operationType     operation type
-     * @param startTime         start time
-     * @param endTime           end time
-     * @param userName          query user name
-     * @param pageNo            page number
-     * @param pageSize          page size
-     * @return                  audit log string
+     * @param loginUser           login user
+     * @param objectTypeCodes     object type codes
+     * @param operationTypeCodes  operation type codes
+     * @param startTime           start time
+     * @param endTime             end time
+     * @param userName            query user name
+     * @param pageNo              page number
+     * @param pageSize            page size
+     * @return                    audit log string
      */
-    PageInfo<AuditDto> queryLogListPaging(User loginUser, AuditObjectType resourceType,
-                                          AuditOperationType operationType, String startTime,
+    PageInfo<AuditDto> queryLogListPaging(User loginUser, String objectTypeCodes,
+                                          String operationTypeCodes, String startTime,
                                           String endTime, String userName,
                                           Integer pageNo, Integer pageSize);
 

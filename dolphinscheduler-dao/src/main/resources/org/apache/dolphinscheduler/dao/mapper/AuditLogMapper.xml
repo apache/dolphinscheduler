@@ -38,16 +38,23 @@
         <if test="startDate != null">
             and log.time > #{startDate} and log.time <![CDATA[ <=]]> #{endDate}
         </if>
-        <if test="objectType != null and objectType.length > 0">
+        <if test="objectTypeCodeList != null and objectTypeCodeList.size() > 0">
             and log.object_type in
-            <foreach collection="objectType" index="index" item="i" open="(" separator="," close=")">
-                #{i}
+            <foreach item="code" index="index" collection="objectTypeCodeList" open="(" separator="," close=")">
+                #{code}
             </foreach>
         </if>
-        <if test="operationType != null and operationType.length > 0">
+        <if test="objectTypeCodeList != null and objectTypeCodeList.size() > 0">
+            and log.object_type in
+            <foreach item="code" index="index" collection="objectTypeCodeList" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </if>
+
+        <if test="operationTypeCodeList != null and operationTypeCodeList.size() > 0">
             and log.operation_type in
-            <foreach collection="operationType" index="index" item="j" open="(" separator="," close=")">
-                #{j}
+            <foreach item="operation_type" index="index" collection="operationTypeCodeList" open="(" separator="," close=")">
+                #{operation_type}
             </foreach>
         </if>
         <if test="userName != null and userName != ''">

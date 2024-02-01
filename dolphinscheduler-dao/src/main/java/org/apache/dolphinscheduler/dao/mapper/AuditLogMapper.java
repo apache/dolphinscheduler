@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -32,8 +33,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface AuditLogMapper extends BaseMapper<AuditLog> {
 
     IPage<AuditLog> queryAuditLog(IPage<AuditLog> page,
-                                  @Param("objectType") int[] objectType,
-                                  @Param("operationType") int[] operationType,
+                                  @Param("objectTypeCodeList") List<Integer> objectTypeCodeList,
+                                  @Param("operationTypeCodeList") List<Integer> operationTypeCodeList,
                                   @Param("userName") String userName,
                                   @Param("startDate") Date startDate,
                                   @Param("endDate") Date endDate);
