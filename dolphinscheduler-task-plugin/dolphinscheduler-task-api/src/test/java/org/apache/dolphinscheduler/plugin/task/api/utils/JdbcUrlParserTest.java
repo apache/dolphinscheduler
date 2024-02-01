@@ -39,5 +39,16 @@ public class JdbcUrlParserTest {
                             "params={useUnicode=true, characterEncoding=UTF-8}, address=jdbc:mysql://localhost:3306, jdbcUrl=jdbc:mysql://localhost:3306/dolphinscheduler)";
             Assertions.assertEquals(expected, jdbcInfoStr);
         }
+
+        // bad jdbc url case
+        jdbcInfo = JdbcUrlParser.getJdbcInfo("jdbc:mysql://localhost:3306/dolphinscheduler?"
+                + "useUnicode=true&&characterEncoding=UTF-8");
+        if (jdbcInfo != null) {
+            String jdbcInfoStr = jdbcInfo.toString();
+            String expected =
+                "JdbcInfo(host=localhost, port=3306, driverName=mysql, database=dolphinscheduler, " +
+                    "params={useUnicode=true, characterEncoding=UTF-8}, address=jdbc:mysql://localhost:3306, jdbcUrl=jdbc:mysql://localhost:3306/dolphinscheduler)";
+            Assertions.assertEquals(expected, jdbcInfoStr);
+        }
     }
 }

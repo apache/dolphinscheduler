@@ -114,6 +114,10 @@ public class JdbcUrlParser {
             Map<String, String> others = new HashMap<>();
             String[] paramList = params.split("&");
             for (String param : paramList) {
+                // handle bad params
+                if (StringUtils.isEmpty(param) || !param.contains(EQUAL_SIGN)) {
+                    continue;
+                }
                 String[] kv = param.split(EQUAL_SIGN);
                 others.put(kv[0], kv[1]);
             }
