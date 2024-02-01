@@ -25,9 +25,6 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillReque
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskKillResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskPauseResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartRequest;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
 
 @RpcService
 public interface ILogicTaskInstanceOperator {
@@ -40,11 +37,5 @@ public interface ILogicTaskInstanceOperator {
 
     @RpcMethod
     LogicTaskPauseResponse pauseLogicTask(LogicTaskPauseRequest taskPauseRequest);
-
-    @RpcMethod
-    TaskInstanceForceStartResponse forceStartTaskInstance(TaskInstanceForceStartRequest taskForceStartRequest);
-
-    @RpcMethod
-    void wakeupTaskInstance(TaskInstanceWakeupRequest taskWakeupRequest);
 
 }

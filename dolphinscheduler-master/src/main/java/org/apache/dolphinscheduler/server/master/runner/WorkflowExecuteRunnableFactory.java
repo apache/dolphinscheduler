@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -73,6 +74,9 @@ public class WorkflowExecuteRunnableFactory {
     @Autowired
     private ListenerEventAlertManager listenerEventAlertManager;
 
+    @Autowired
+    private TaskGroupCoordinator taskGroupCoordinator;
+
     public Optional<WorkflowExecuteRunnable> createWorkflowExecuteRunnable(Command command) throws WorkflowCreateException {
         try {
             Optional<IWorkflowExecuteContext> workflowExecuteRunnableContextOptional =
@@ -88,9 +92,10 @@ public class WorkflowExecuteRunnableFactory {
                     curingGlobalParamsService,
                     taskInstanceDao,
                     defaultTaskExecuteRunnableFactory,
-                    listenerEventAlertManager));
+                    listenerEventAlertManager,
+                    taskGroupCoordinator));
         } catch (Exception ex) {
-            throw new WorkflowCreateException("Create workflow execute runnable failed", ex);
+            throw new WorkflowCreateException("Create WorkflowExecuteRunnable failed", ex);
         }
     }
 

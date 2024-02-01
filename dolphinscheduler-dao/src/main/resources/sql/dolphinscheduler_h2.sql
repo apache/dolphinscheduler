@@ -1976,6 +1976,7 @@ CREATE TABLE t_ds_task_group_queue
    in_queue     int(4) DEFAULT '0' ,
    create_time  datetime DEFAULT NULL ,
    update_time  datetime DEFAULT NULL ,
+   KEY idx_t_ds_task_group_queue_in_queue (in_queue) ,
    PRIMARY KEY (id)
 );
 

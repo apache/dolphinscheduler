@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
-import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
-import org.apache.dolphinscheduler.server.master.processor.queue.StateEventResponseService;
+import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,20 +36,30 @@ public class TaskInstanceWakeupOperationFunction
             ITaskInstanceOperationFunction<TaskInstanceWakeupRequest, TaskInstanceWakeupResponse> {
 
     @Autowired
-    private StateEventResponseService stateEventResponseService;
+    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @Override
     public TaskInstanceWakeupResponse operate(TaskInstanceWakeupRequest taskInstanceWakeupRequest) {
-        TaskStateEvent stateEvent = TaskStateEvent.builder()
-                .processInstanceId(taskInstanceWakeupRequest.getProcessInstanceId())
-                .taskInstanceId(taskInstanceWakeupRequest.getTaskInstanceId())
-                .key(taskInstanceWakeupRequest.getKey())
-                .type(StateEventType.WAKE_UP_TASK_GROUP)
-                .build();
         try {
-            LogUtils.setWorkflowAndTaskInstanceIDMDC(stateEvent.getProcessInstanceId(), stateEvent.getTaskInstanceId());
-            log.info("Received wakeupTaskInstance request, event: {}", stateEvent);
-            stateEventResponseService.addEvent2WorkflowExecute(stateEvent);
+            log.info("Received TaskInstanceWakeupRequest request{}", taskInstanceWakeupRequest);
+
+            int workflowInstanceId = taskInstanceWakeupRequest.getProcessInstanceId();
+            int taskInstanceId = taskInstanceWakeupRequest.getTaskInstanceId();
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstanceId, taskInstanceId);
+            WorkflowExecuteRunnable workflowExecuteRunnable =
+                    processInstanceExecCacheManager.getByProcessInstanceId(workflowInstanceId);
+            if (workflowExecuteRunnable == null) {
+                log.warn("cannot find WorkflowExecuteRunnable: {}, no need to Wakeup task", workflowInstanceId);
+                return TaskInstanceWakeupResponse.failed("cannot find WorkflowExecuteRunnable: " + workflowInstanceId);
+            }
+            DefaultTaskExecuteRunnable defaultTaskExecuteRunnable =
+                    workflowExecuteRunnable.getTaskExecuteRunnableById(taskInstanceId).orElse(null);
+            if (defaultTaskExecuteRunnable == null) {
+                log.warn("Cannot find DefaultTaskExecuteRunnable: {}, cannot Wakeup task", taskInstanceId);
+                return TaskInstanceWakeupResponse.failed("Cannot find DefaultTaskExecuteRunnable: " + taskInstanceId);
+            }
+            defaultTaskExecuteRunnable.dispatch();
+            log.info("Success Wakeup TaskInstance: {}", taskInstanceId);
             return TaskInstanceWakeupResponse.success();
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
