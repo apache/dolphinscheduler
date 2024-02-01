@@ -155,9 +155,12 @@ public class CommonUtils {
 
             // standalone mode
             if (StringUtils.isEmpty(DEFAULT_DATA_QUALITY_JAR_PATH)) {
-                log.info("Can not get data quality jar from path {}, maybe service running in standalone mode, will try to find another path", currentLibPath);
+                log.info(
+                        "Can not get data quality jar from path {}, maybe service running in standalone mode, will try to find another path",
+                        currentLibPath);
                 currentLibPath = currentAbsolutePath + "/../../worker-server/libs";
-                getDataQualityJarPathFromPath(currentLibPath).ifPresent(jarName -> DEFAULT_DATA_QUALITY_JAR_PATH = jarName);
+                getDataQualityJarPathFromPath(currentLibPath)
+                        .ifPresent(jarName -> DEFAULT_DATA_QUALITY_JAR_PATH = jarName);
             }
         } catch (IOException e) {
             throw new RuntimeException("get default data quality jar path error", e);
@@ -165,7 +168,6 @@ public class CommonUtils {
         log.info("get default data quality jar name: {}", DEFAULT_DATA_QUALITY_JAR_PATH);
         return DEFAULT_DATA_QUALITY_JAR_PATH;
     }
-
 
     private static Optional<String> getDataQualityJarPathFromPath(String path) {
         log.info("Try to get data quality jar from path {}", path);

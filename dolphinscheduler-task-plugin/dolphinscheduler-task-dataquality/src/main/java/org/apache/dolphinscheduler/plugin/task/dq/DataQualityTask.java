@@ -50,7 +50,6 @@ import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
