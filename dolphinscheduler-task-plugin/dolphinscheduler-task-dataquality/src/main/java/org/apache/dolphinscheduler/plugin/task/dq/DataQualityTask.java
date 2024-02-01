@@ -117,6 +117,7 @@ public class DataQualityTask extends AbstractYarnTask {
         DataQualityConfiguration dataQualityConfiguration =
                 ruleManager.generateDataQualityParameter();
 
+        log.info("data quality configuration: {}", JSONUtils.toPrettyJsonString(dataQualityConfiguration));
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""

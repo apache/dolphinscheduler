@@ -36,16 +36,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
+import java.io.File;
 import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * common utils
  */
+@Slf4j
 public class CommonUtils {
 
     private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
     }
+
+    private static String DEFAULT_DATA_QUALITY_JAR_NAME = null;
 
     private static final boolean IS_DEVELOP_MODE = PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
 
@@ -127,10 +135,35 @@ public class CommonUtils {
         String dqsJarName = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
 
         if (StringUtils.isEmpty(dqsJarName)) {
-            return "dolphinscheduler-data-quality.jar";
+            return getDefaultDataQualityJarName();
         }
 
         return dqsJarName;
+    }
+
+    private static String getDefaultDataQualityJarName() {
+        if (StringUtils.isNotEmpty(DEFAULT_DATA_QUALITY_JAR_NAME)) {
+            return DEFAULT_DATA_QUALITY_JAR_NAME;
+        }
+        try {
+            String currentAbsolutePath = new ClassPathResource("./").getFile().getAbsolutePath();
+            log.info("current absolute path: {}", currentAbsolutePath);
+
+            final File[] jars = new File(currentAbsolutePath + "/../libs").listFiles();
+            if (jars == null) {
+                throw new RuntimeException("no data quality jar found");
+            }
+            for (File jar : jars) {
+                if (jar.getName().startsWith("dolphinscheduler-data-quality")) {
+                    DEFAULT_DATA_QUALITY_JAR_NAME = jar.getName();
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("get default data quality jar path error", e);
+        }
+        log.info("get default data quality jar name: {}", DEFAULT_DATA_QUALITY_JAR_NAME);
+        return DEFAULT_DATA_QUALITY_JAR_NAME;
     }
 
     /**
