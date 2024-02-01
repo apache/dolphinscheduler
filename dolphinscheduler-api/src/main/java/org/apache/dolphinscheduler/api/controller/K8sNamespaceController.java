@@ -92,7 +92,7 @@ public class K8sNamespaceController extends BaseController {
     }
 
     /**
-     * create namespace,if not exist on k8s,will create,if exist only register in db
+     * register namespace in db,need to create namespace in k8s first
      *
      * @param loginUser
      * @param namespace    k8s namespace
@@ -111,7 +111,7 @@ public class K8sNamespaceController extends BaseController {
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode) {
         Map<String, Object> result =
-                k8sNamespaceService.createK8sNamespace(loginUser, namespace, clusterCode);
+                k8sNamespaceService.registerK8sNamespace(loginUser, namespace, clusterCode);
         return returnDataList(result);
     }
 
