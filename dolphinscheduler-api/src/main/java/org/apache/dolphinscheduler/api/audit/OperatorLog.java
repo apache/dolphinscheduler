@@ -1,7 +1,24 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.apache.dolphinscheduler.api.audit;
 
-import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -9,13 +26,45 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Custom annotation for logging and auditing operator actions in the system.
+ * This annotation can be applied to methods to indicate the type of operation, object type,
+ * and specific parameters to be recorded in the logs.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface OperatorLog {
 
-    String describe() default "";
+    /**
+     * Specifies the type of object involved in the audit operation (default: PROJECT).
+     * Possible values include PROJECT, USER, etc.
+     */
     AuditObjectType objectType() default AuditObjectType.PROJECT;
+
+    /**
+     * Specifies the type of the audit operation (default: CREATE).
+     * Possible values include CREATE, UPDATE, DELETE, etc.
+     */
     AuditOperationType operationType() default AuditOperationType.CREATE;
 
+    /**
+     * The names of the fields in the API request to be recorded.
+     * Represents an array of key-value pairs, e.g., ["id", "status"].
+     */
+    String[] requestParamName() default {};
+
+    /**
+     * The name of the object to be returned after the operation.
+     * For operations like create and import, specify the object name to retrieve details from the response.
+     * For update and delete, the necessary information is usually provided in the request parameters.
+     */
+    String returnObjectName() default "";
+
+    /**
+     * The names of the fields in the returned object to be recorded.
+     * Represents an array of field names, e.g., ["id", "code"].
+     * Specify the field names to record from the returned object.
+     */
+    String[] returnObjectFieldName() default {};
 }

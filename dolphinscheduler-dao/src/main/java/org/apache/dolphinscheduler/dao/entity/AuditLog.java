@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 @Data
 @TableName("t_ds_audit_log_1")
@@ -53,7 +54,7 @@ public class AuditLog {
     /**
      * object id
      */
-    private Integer objectId;
+    private Long objectId;
 
     /**
      * user name
@@ -67,4 +68,16 @@ public class AuditLog {
     private Date time;
 
     private String detail;
+
+    private String description;
+
+    private String objectName;
+
+    private long duration;
+
+    public static AuditLog copyNewOne(AuditLog auditLog) {
+        AuditLog auditLogNew = new AuditLog();
+        BeanUtils.copyProperties(auditLog, auditLogNew);
+        return auditLogNew;
+    }
 }

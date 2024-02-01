@@ -65,7 +65,7 @@ public class AuditServiceTest {
         IPage<AuditLog> page = new Page<>(1, 10);
         page.setRecords(getLists());
         page.setTotal(1L);
-        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(""),
+        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(-1),
                 eq(start), eq(end))).thenReturn(page);
         Assertions.assertDoesNotThrow(() -> {
             auditService.queryLogListPaging(
@@ -74,7 +74,7 @@ public class AuditServiceTest {
                     null,
                     "2020-11-01 00:00:00",
                     "2020-11-02 00:00:00",
-                    "",
+                    -1,
                     1,
                     10);
         });

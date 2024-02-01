@@ -24,12 +24,15 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_CLUSTER_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.dto.ClusterDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ClusterService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -81,6 +84,7 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_CLUSTER_ERROR)
+    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
     public Result<Long> createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("name") String name,
                                       @RequestParam("config") String config,
@@ -110,6 +114,7 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_CLUSTER_ERROR)
+    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.UPDATE, requestParamName = {"code"})
     public Result<Cluster> updateCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("code") Long code,
                                          @RequestParam("name") String name,
@@ -181,6 +186,7 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_CLUSTER_ERROR)
+    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.DELETE, requestParamName = {"clusterCode"})
     public Result<Boolean> deleteCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("clusterCode") Long clusterCode) {
 

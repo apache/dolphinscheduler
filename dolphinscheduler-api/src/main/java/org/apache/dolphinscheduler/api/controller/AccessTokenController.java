@@ -24,11 +24,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_BY_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ACCESSTOKEN_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ACCESS_TOKEN_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AccessTokenService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -83,6 +86,7 @@ public class AccessTokenController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
+    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
     public Result<AccessToken> createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "userId") int userId,
                                            @RequestParam(value = "expireTime") String expireTime,
@@ -169,13 +173,15 @@ public class AccessTokenController extends BaseController {
      * @return delete result code
      */
     @Parameter(hidden = true)
+    @Operation(summary = "deleteToken", description = "DELETE_TOKEN_NOTES")
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
+    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
     public Result<Boolean> delAccessTokenById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @PathVariable(value = "id") int id) {
         accessTokenService.deleteAccessTokenById(loginUser, id);
-        return Result.success(true);
+        return Result.success(false);
     }
 
     /**
@@ -198,6 +204,7 @@ public class AccessTokenController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
+    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
     public Result<AccessToken> updateToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int id,
                                            @RequestParam(value = "userId") int userId,

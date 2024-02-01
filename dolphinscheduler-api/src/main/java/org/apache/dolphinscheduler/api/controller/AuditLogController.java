@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.List;
 
 @Tag(name = "AUDIT_LOG_TAG")
 @RestController
@@ -97,5 +99,31 @@ public class AuditLogController extends BaseController {
                 pageNo,
                 pageSize);
         return Result.success(auditDtoPageInfo);
+    }
+
+    /**
+     * query audit log operation type list
+     *
+     * @return object type list
+     */
+    @Operation(summary = "queryAuditOperationTypeList", description = "QUERY_AUDIT_OPERATION_TYPE_LIST")
+    @GetMapping(value = "/audit-log-operation-type")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
+    public Result<List<AuditOperationType>> queryAuditOperationTypeList() {
+        return Result.success(AuditOperationType.getOperationList());
+    }
+
+    /**
+     * query audit log object type list
+     *
+     * @return object type list
+     */
+    @Operation(summary = "queryAuditObjectTypeList", description = "QUERY_AUDIT_OBJECT_TYPE_LIST")
+    @GetMapping(value = "/audit-log-object-type")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
+    public Result<List<AuditObjectType>> queryAuditObjectTypeList() {
+        return Result.success(AuditObjectType.getAuditObjectTreeList());
     }
 }

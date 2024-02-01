@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -42,13 +43,13 @@ public class AuditLogMapperTest extends BaseDaoTest {
      * insert
      * @return
      */
-    private void insertOne(AuditResourceType resourceType) {
+    private void insertOne(AuditObjectType objectType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);
         auditLog.setTime(new Date());
-        auditLog.setResourceType(resourceType.getCode());
-        auditLog.setOperation(0);
-        auditLog.setResourceId(0);
+        auditLog.setObjectType(objectType.getCode());
+        auditLog.setOperationType(0);
+        auditLog.setObjectId(1L);
         logMapper.insert(auditLog);
     }
 
@@ -68,24 +69,13 @@ public class AuditLogMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryAuditLog() {
-        insertOne(AuditResourceType.USER_MODULE);
-        insertOne(AuditResourceType.PROJECT_MODULE);
+        insertOne(AuditObjectType.USER);
+        insertOne(AuditObjectType.PROJECT);
         Page<AuditLog> page = new Page<>(1, 3);
         int[] resourceType = new int[0];
         int[] operationType = new int[0];
 
-        IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, resourceType, operationType, "", null, null);
+        IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, resourceType, operationType, -1, null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
-    }
-
-    @Test
-    public void testQueryResourceNameByType() {
-        String resourceNameByUser = logMapper.queryResourceNameByType(AuditResourceType.USER_MODULE.getMsg(), 1);
-        Assertions.assertEquals("admin", resourceNameByUser);
-        Project project = insertProject();
-        String resourceNameByProject = logMapper.queryResourceNameByType(AuditResourceType.PROJECT_MODULE.getMsg(), 1);
-        Assertions.assertEquals(project.getName(), resourceNameByProject);
-        int delete = projectMapper.deleteById(project.getId());
-        Assertions.assertEquals(delete, 1);
     }
 }

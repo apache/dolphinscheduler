@@ -33,8 +33,8 @@ import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -90,7 +90,7 @@ public class ProjectController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROJECT_ERROR)
-    @OperatorLog(describe = "createProject", objectType = AuditObjectType.PROJECT, operationType = AuditOperationType.CREATE)
+    @OperatorLog(objectType = AuditObjectType.PROJECT, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
     public Result createProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam("projectName") String projectName,
                                 @RequestParam(value = "description", required = false) String description) {
@@ -115,7 +115,7 @@ public class ProjectController extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROJECT_ERROR)
-    @OperatorLog(describe = "updateProject", objectType = AuditObjectType.PROJECT, operationType = AuditOperationType.UPDATE)
+    @OperatorLog(objectType = AuditObjectType.PROJECT, operationType = AuditOperationType.UPDATE, requestParamName = {"code"})
     public Result updateProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code,
                                 @RequestParam("projectName") String projectName,
@@ -216,7 +216,7 @@ public class ProjectController extends BaseController {
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROJECT_ERROR)
-    @OperatorLog(describe = "deleteProject", objectType = AuditObjectType.PROJECT, operationType = AuditOperationType.DELETE)
+    @OperatorLog(objectType = AuditObjectType.PROJECT, operationType = AuditOperationType.DELETE, requestParamName = {"code"})
     public Result deleteProject(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable("code") Long code) {
         return projectService.deleteProject(loginUser, code);

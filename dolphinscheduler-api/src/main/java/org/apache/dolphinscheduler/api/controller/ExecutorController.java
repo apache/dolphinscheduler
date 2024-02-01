@@ -23,20 +23,14 @@ import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTA
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.RunMode;
-import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
@@ -130,6 +124,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(objectType = AuditObjectType.PROCESS, operationType = AuditOperationType.START, requestParamName = {"processDefinitionCode"})
     public Result startProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
@@ -227,6 +222,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(objectType = AuditObjectType.PROCESS, operationType = AuditOperationType.START, requestParamName = {"processDefinitionCodes"})
     public Result batchStartProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
@@ -316,6 +312,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(objectType = AuditObjectType.PROCESS, operationType = AuditOperationType.RERUN, requestParamName = {"processInstanceId"})
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
@@ -342,6 +339,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(objectType = AuditObjectType.PROCESS, operationType = AuditOperationType.RERUN, requestParamName = {"processInstanceIds"})
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
@@ -438,6 +436,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.START, requestParamName = {"code"})
     public Result<Boolean> startStreamTaskInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                    @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
@@ -480,6 +479,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute-task")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(objectType = AuditObjectType.PROCESS_INSTANCE, operationType = AuditOperationType.START, requestParamName = {"processInstanceId"})
     public Result executeTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                               @RequestParam("processInstanceId") Integer processInstanceId,

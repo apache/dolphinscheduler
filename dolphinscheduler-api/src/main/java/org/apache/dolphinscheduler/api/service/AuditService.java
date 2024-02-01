@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.util.List;
 
 /**
  * audit information service
@@ -31,6 +33,8 @@ public interface AuditService {
 
 
     void addAudit(AuditLog auditLog);
+
+    void addAudit(List<AuditLog> auditLogList, long duration);
 
     void addQuartzLog(int processId);
 
@@ -51,4 +55,6 @@ public interface AuditService {
                                           AuditOperationType operationType, String startTime,
                                           String endTime, String userName,
                                           Integer pageNo, Integer pageSize);
+
+    String getObjectNameByObjectId(Long objectId, AuditObjectType objectType);
 }

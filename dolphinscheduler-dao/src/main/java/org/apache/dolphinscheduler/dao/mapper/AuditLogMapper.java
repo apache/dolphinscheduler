@@ -37,7 +37,4 @@ public interface AuditLogMapper extends BaseMapper<AuditLog> {
                                   @Param("userName") String userName,
                                   @Param("startDate") Date startDate,
                                   @Param("endDate") Date endDate);
-
-    String queryResourceNameByType(@Param("objectType") String objectType,
-                                   @Param("objectId") Integer objectId);
 }

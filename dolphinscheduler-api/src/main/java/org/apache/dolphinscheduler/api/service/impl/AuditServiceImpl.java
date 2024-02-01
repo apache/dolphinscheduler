@@ -20,16 +20,16 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.Audit.AuditOperationType;
-import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.dao.entity.*;
+import org.apache.dolphinscheduler.dao.mapper.*;
 
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.parquet.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,17 +42,76 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     @Autowired
     private AuditLogMapper auditLogMapper;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
+
+    @Autowired
+    private ProcessInstanceMapper processInstanceMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private UdfFuncMapper udfFuncMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private DataSourceMapper dataSourceMapper;
+
+    @Autowired
+    private TenantMapper tenantMapper;
+
+    @Autowired
+    private AlertGroupMapper alertGroupMapper;
+
+    @Autowired
+    private AlertPluginInstanceMapper alertPluginInstanceMapper;
+
+    @Autowired
+    private WorkerGroupMapper workerGroupMapper;
+
+    @Autowired
+    private QueueMapper queueMapper;
+
+    @Autowired
+    private EnvironmentMapper environmentMapper;
+
+    @Autowired
+    private ClusterMapper clusterMapper;
+
+    @Autowired
+    private K8sNamespaceMapper k8sNamespaceMapper;
+
+    @Autowired
+    private AccessTokenMapper accessTokenMapper;
+
     @Override
     public void addAudit(AuditLog auditLog) {
         auditLogMapper.insert(auditLog);
     }
 
     @Override
+    public void addAudit(List<AuditLog> auditLogList, long duration) {
+        auditLogList.forEach(auditLog -> {
+            auditLog.setDuration(duration);
+            addAudit(auditLog);
+        });
+    }
+
+    @Override
     public void addQuartzLog(int processId) {
         AuditLog auditLog = new AuditLog();
-        auditLog.setObjectId(processId);
-        auditLog.setObjectType(AuditObjectType.WORKFLOW.getCode());
-        auditLog.setOperationType(AuditOperationType.SCHEDULE_RUN.getCode());
+        auditLog.setObjectId((long)processId);
+        auditLog.setObjectType(AuditObjectType.PROCESS.getCode());
+        auditLog.setOperationType(AuditOperationType.RUN.getCode());
         auditLog.setTime(new Date());
         auditLog.setUserId(-1);
         auditLogMapper.insert(auditLog);
@@ -100,7 +159,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
                 logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
 
         PageInfo<AuditDto> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) auditDtos.size());
+        pageInfo.setTotal((int) logIPage.getTotal());
         pageInfo.setTotalList(auditDtos);
         return pageInfo;
     }
@@ -113,12 +172,89 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      */
     private AuditDto transformAuditLog(AuditLog auditLog) {
         AuditDto auditDto = new AuditDto();
-        String resourceType = AuditObjectType.of(auditLog.getObjectType()).getName();
-        auditDto.setResource(resourceType);
+        AuditObjectType objectType = AuditObjectType.of(auditLog.getObjectType());
+        auditDto.setObjectType(objectType.getName());
+        auditDto.setObjectName(auditLog.getObjectName());
         auditDto.setOperation(AuditOperationType.of(auditLog.getOperationType()).getName());
         auditDto.setUserName(auditLog.getUserName());
-        auditDto.setResourceName(auditLogMapper.queryResourceNameByType(resourceType, auditLog.getObjectId()));
+        auditDto.setDuration(auditLog.getDuration());
+        auditDto.setDetail(auditLog.getDetail());
+        auditDto.setDescription(auditLog.getDescription());
         auditDto.setTime(auditLog.getTime());
         return auditDto;
+    }
+
+    @Override
+    public String getObjectNameByObjectId(Long objectId, AuditObjectType objectType) {
+        switch (objectType) {
+            case PROCESS_INSTANCE: {
+                ProcessInstance obj = processInstanceMapper.queryDetailById(objectId.intValue());
+                return obj == null ? "" : obj.getName();
+            }
+            case UDP_FUNCTION: {
+                UdfFunc obj = udfFuncMapper.selectUdfById(objectId.intValue());
+                return obj == null ? "" :obj.getFuncName();
+            }
+            case DATASOURCE: {
+                DataSource obj = dataSourceMapper.selectById(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            case TENANT: {
+                Tenant obj = tenantMapper.selectById(objectId);
+                return obj == null ? "" :obj.getTenantCode();
+            }
+            case USER: {
+                User obj = userMapper.selectById(objectId);
+                return obj == null ? "" :obj.getUserName();
+            }
+            case ALARM_GROUP: {
+                AlertGroup obj = alertGroupMapper.selectById(objectId);
+                return obj == null ? "" :obj.getGroupName();
+            }
+            case ALARM_INSTANCE: {
+                AlertPluginInstance obj = alertPluginInstanceMapper.selectById(objectId);
+                return obj == null ? "" :obj.getInstanceName();
+            }
+            case WORKER_GROUP: {
+                WorkerGroup obj = workerGroupMapper.selectById(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            case YARN_QUEUE: {
+                Queue obj = queueMapper.selectById(objectId);
+                return obj == null ? "" :obj.getQueueName();
+            }
+            case K8S_NAMESPACE: {
+                K8sNamespace obj = k8sNamespaceMapper.selectById(objectId);
+                return obj == null ? "" :obj.getNamespace();
+            }
+            case TOKEN: {
+                AccessToken obj = accessTokenMapper.selectById(objectId);
+                if (obj == null) return "";
+                User user = userMapper.selectById(obj.getUserId());
+                return user == null ? "" :user.getUserName();
+            }
+            case PROJECT: {
+                Project obj = projectMapper.queryByCode(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            case PROCESS: {
+                ProcessDefinition obj = processDefinitionMapper.queryByCode(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            case TASK: {
+                TaskDefinition obj = taskDefinitionMapper.queryByCode(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            case ENVIRONMENT: {
+                Environment obj = environmentMapper.queryByEnvironmentCode(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            case CLUSTER: {
+                Cluster obj = clusterMapper.queryByClusterCode(objectId);
+                return obj == null ? "" :obj.getName();
+            }
+            default:
+                return "";
+        }
     }
 }
