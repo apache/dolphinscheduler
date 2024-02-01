@@ -103,3 +103,10 @@ CALL drop_t_ds_k8s_namespace_col_pod_request_memory;
 DROP PROCEDURE drop_t_ds_k8s_namespace_col_pod_request_memory;
 
 ALTER TABLE `t_ds_project_parameter` MODIFY COLUMN `param_value` text NOT NULL COMMENT 'project parameter value';
+
+ALTER TABLE `t_ds_process_definition` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "process definition version";
+ALTER TABLE `t_ds_process_definition_log` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "process definition version";
+ALTER TABLE `t_ds_process_instance` MODIFY COLUMN `process_definition_version` int NOT NULL DEFAULT 1 COMMENT "process definition version";
+ALTER TABLE `t_ds_task_definition` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
+ALTER TABLE `t_ds_task_definition_log` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
+ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_definition_version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
