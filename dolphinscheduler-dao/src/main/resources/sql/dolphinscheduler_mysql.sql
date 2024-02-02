@@ -1992,10 +1992,14 @@ DROP TABLE IF EXISTS `t_ds_audit_log`;
 CREATE TABLE `t_ds_audit_log` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
-  `resource_type` int(11) NOT NULL COMMENT 'resource type',
-  `operation` int(11) NOT NULL COMMENT 'operation',
-  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  `object_id` bigint(20) DEFAULT NULL COMMENT 'object id',
+  `object_name` varchar(100) DEFAULT NULL COMMENT 'object id',
+  `object_type` int(11) NOT NULL COMMENT 'object type',
+  `operation_type` int(11) NOT NULL COMMENT 'operation type',
+  `description` varchar(100) DEFAULT NULL COMMENT 'api description',
+  `duration` int(11) DEFAULT NULL COMMENT 'api cost seconds',
+  `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail',
+  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'operation time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 

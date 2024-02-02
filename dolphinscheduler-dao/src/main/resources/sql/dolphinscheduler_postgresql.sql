@@ -1971,11 +1971,15 @@ CREATE TABLE t_ds_task_group (
 DROP TABLE IF EXISTS t_ds_audit_log;
 CREATE TABLE t_ds_audit_log (
     id serial NOT NULL,
-    user_id int NOT NULL,
-    resource_type int NOT NULL,
-    operation int NOT NULL,
-    time timestamp DEFAULT NULL ,
-    resource_id int NOT NULL,
+    user_id         int NOT NULL,
+    object_id       bigint NOT NULL,
+    object_name     VARCHAR(255) NOT NULL,
+    object_type     int NOT NULL,
+    operation_type  int NOT NULL,
+    description     VARCHAR(255) NOT NULL,
+    duration        int NOT NULL,
+    detail          VARCHAR(255) NOT NULL,
+    time            timestamp DEFAULT NULL ,
     PRIMARY KEY (id)
 );
 

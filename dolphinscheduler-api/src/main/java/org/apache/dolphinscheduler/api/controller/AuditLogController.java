@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUDIT_LOG_LIST_PAGING;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
+import org.apache.dolphinscheduler.api.dto.auditLog.AuditObjectTypeDto;
+import org.apache.dolphinscheduler.api.dto.auditLog.AuditOperationTypeDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -44,6 +46,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Tag(name = "AUDIT_LOG_TAG")
@@ -110,8 +113,8 @@ public class AuditLogController extends BaseController {
     @GetMapping(value = "/audit-log-operation-type")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
-    public Result<List<AuditOperationType>> queryAuditOperationTypeList() {
-        return Result.success(AuditOperationType.getOperationList());
+    public Result<List<AuditOperationTypeDto>> queryAuditOperationTypeList() {
+        return Result.success(AuditOperationTypeDto.getlist());
     }
 
     /**
@@ -123,7 +126,7 @@ public class AuditLogController extends BaseController {
     @GetMapping(value = "/audit-log-object-type")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
-    public Result<List<AuditObjectType>> queryAuditObjectTypeList() {
-        return Result.success(AuditObjectType.getAuditObjectTreeList());
+    public Result<List<AuditObjectTypeDto>> queryAuditObjectTypeList() {
+        return Result.success(AuditObjectTypeDto.getlist());
     }
 }

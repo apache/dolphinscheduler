@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -50,55 +49,10 @@ public class OperatorLogAspect {
     private AuditService auditService;
 
     @Autowired
-    private ProjectMapper projectMapper;
-
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
-
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private UdfFuncMapper udfFuncMapper;
-
-    @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
-
-    @Autowired
-    private TenantMapper tenantMapper;
-
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
-
-    @Autowired
-    private AlertPluginInstanceMapper alertPluginInstanceMapper;
-
-    @Autowired
-    private WorkerGroupMapper workerGroupMapper;
-
-    @Autowired
-    private QueueMapper queueMapper;
-
-    @Autowired
-    private EnvironmentMapper environmentMapper;
-
-    @Autowired
-    private ClusterMapper clusterMapper;
-
-    @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
-
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
 
     @Pointcut("@annotation(OperatorLog)")
     public void logPointCut() {

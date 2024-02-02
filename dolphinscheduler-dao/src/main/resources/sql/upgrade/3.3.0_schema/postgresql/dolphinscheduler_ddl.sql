@@ -69,3 +69,29 @@ ALTER TABLE "t_ds_task_definition" ALTER COLUMN "version" SET DEFAULT 1;
 ALTER TABLE "t_ds_task_definition_log" ALTER COLUMN "version" SET DEFAULT 1;
 ALTER TABLE "t_ds_process_instance" ALTER COLUMN "process_definition_version" SET NOT NULL, ALTER COLUMN "process_definition_version" SET DEFAULT 1;
 ALTER TABLE "t_ds_task_instance" ALTER COLUMN "task_definition_version" SET NOT NULL, ALTER COLUMN "task_definition_version" SET DEFAULT 1;
+
+-- modify_data_t_ds_audit_log_input_entry
+delimiter d//
+CREATE OR REPLACE FUNCTION modify_data_t_ds_audit_log_input_entry() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_audit_log'
+                  AND column_name = 'resource_type')
+      THEN
+ALTER TABLE t_ds_audit_log
+    drop resource_type, drop operation, drop resource_id,
+    add object_id       bigint NOT NULL,
+    add object_name     VARCHAR(255) NOT NULL,
+    add object_type     int NOT NULL,
+    add operation_type  int NOT NULL,
+    add description     VARCHAR(255) NOT NULL,
+    add duration        int NOT NULL,
+    add detail          VARCHAR(255) NOT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select modify_data_t_ds_audit_log_input_entry();
+DROP FUNCTION IF EXISTS modify_data_t_ds_audit_log_input_entry();

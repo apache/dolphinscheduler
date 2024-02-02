@@ -55,13 +55,6 @@ public @interface OperatorLog {
     String[] requestParamName() default {};
 
     /**
-     * The name of the object to be returned after the operation.
-     * For operations like create and import, specify the object name to retrieve details from the response.
-     * For update and delete, the necessary information is usually provided in the request parameters.
-     */
-    String returnObjectName() default "";
-
-    /**
      * The names of the fields in the returned object to be recorded.
      * Represents an array of field names, e.g., ["id", "code"].
      * Specify the field names to record from the returned object.

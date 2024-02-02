@@ -81,3 +81,30 @@ ALTER TABLE `t_ds_process_instance` MODIFY COLUMN `process_definition_version` i
 ALTER TABLE `t_ds_task_definition` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
 ALTER TABLE `t_ds_task_definition_log` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
 ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_definition_version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
+
+-- modify_data_t_ds_audit_log_input_entry behavior change
+--DROP PROCEDURE if EXISTS modify_data_t_ds_audit_log_input_entry;
+DROP PROCEDURE if EXISTS modify_data_t_ds_audit_log_input_entry;
+delimiter d//
+CREATE PROCEDURE modify_data_t_ds_audit_log_input_entry()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_audit_log'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='resource_type')
+   THEN
+    ALTER TABLE `t_ds_audit_log`
+    drop resource_type, drop operation, drop resource_id,
+      add `object_id` bigint(20) DEFAULT NULL COMMENT 'object id',
+      add `object_name` varchar(100) DEFAULT NULL COMMENT 'object id',
+      add `object_type` int(11) NOT NULL COMMENT 'object type',
+      add `operation_type` int(11) NOT NULL COMMENT 'operation type',
+      add `description` varchar(100) DEFAULT NULL COMMENT 'api description',
+      add `duration` int(11) DEFAULT NULL COMMENT 'api cost seconds',
+      add `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail';
+END IF;
+END;
+d//
+delimiter ;
+CALL modify_data_t_ds_audit_log_input_entry;
+DROP PROCEDURE modify_data_t_ds_audit_log_input_entry;

@@ -30,10 +30,19 @@ import java.util.List;
  * audit information service
  */
 public interface AuditService {
-
-
+    /**
+     * add audit object
+     *
+     * @param auditLog         auditLog
+     */
     void addAudit(AuditLog auditLog);
 
+    /**
+     * add audit by list
+     *
+     * @param auditLogList         auditLog list
+     * @param duration             api cost seconds
+     */
     void addAudit(List<AuditLog> auditLogList, long duration);
 
     void addQuartzLog(int processId);
@@ -56,5 +65,12 @@ public interface AuditService {
                                           String endTime, String userName,
                                           Integer pageNo, Integer pageSize);
 
+    /**
+     * query real object name by object id or code
+     *
+     * @param objectId           objectId
+     * @param objectType         objectType
+     * @return                   object name
+     */
     String getObjectNameByObjectId(Long objectId, AuditObjectType objectType);
 }
