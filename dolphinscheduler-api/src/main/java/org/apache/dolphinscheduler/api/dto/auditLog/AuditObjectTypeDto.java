@@ -14,29 +14,31 @@ public class AuditObjectTypeDto {
 
     private String name;
 
-    private List<AuditObjectTypeDto> child = new ArrayList<>();
+    private List<AuditObjectTypeDto> child = null;
 
-    public static List<AuditObjectTypeDto> getlist() {
+    public static List<AuditObjectTypeDto> getObjectTypeDtoList() {
         List<AuditObjectTypeDto> dtoList = new ArrayList<>();
-        trans(dtoList, AuditObjectType.getAuditObjectTreeList());
+        transFromEnumListToDto(dtoList, AuditObjectType.getAuditObjectTreeList());
         return dtoList;
     }
 
-    public static List<AuditObjectTypeDto> trans(List<AuditObjectTypeDto> dtoList, List<AuditObjectType> objectTypeList) {
+    public static List<AuditObjectTypeDto> transFromEnumListToDto(List<AuditObjectTypeDto> dtoList, List<AuditObjectType> objectTypeList) {
         for (AuditObjectType operationType: objectTypeList) {
-            dtoList.add(transToDto(operationType));
+            dtoList.add(transFromEnumToDto(operationType));
         }
 
         return dtoList;
     }
 
-    public static AuditObjectTypeDto transToDto(AuditObjectType operationType) {
+    public static AuditObjectTypeDto transFromEnumToDto(AuditObjectType operationType) {
         AuditObjectTypeDto dto = new AuditObjectTypeDto();
         dto.setName(operationType.getName());
         dto.setCode(operationType.getCode());
+
         if(!operationType.getChild().isEmpty()) {
-            dto.setChild(trans(new ArrayList<>(), operationType.getChild()));
+            dto.setChild(transFromEnumListToDto(new ArrayList<>(), operationType.getChild()));
         }
+
         return dto;
     }
 }

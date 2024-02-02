@@ -114,7 +114,7 @@ public class AuditLogController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
     public Result<List<AuditOperationTypeDto>> queryAuditOperationTypeList() {
-        return Result.success(AuditOperationTypeDto.getlist());
+        return Result.success(AuditOperationTypeDto.getOperationTypeDtoList());
     }
 
     /**
@@ -127,6 +127,6 @@ public class AuditLogController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
     public Result<List<AuditObjectTypeDto>> queryAuditObjectTypeList() {
-        return Result.success(AuditObjectTypeDto.getlist());
+        return Result.success(AuditObjectTypeDto.getObjectTypeDtoList());
     }
 }

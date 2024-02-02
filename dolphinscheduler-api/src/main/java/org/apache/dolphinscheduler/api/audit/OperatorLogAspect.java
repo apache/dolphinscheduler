@@ -66,8 +66,9 @@ public class OperatorLogAspect {
         Method method = signature.getMethod();
 
         OperatorLog operatorLog = method.getAnnotation(OperatorLog.class);
+        // Api don't need record log
         if (operatorLog == null) {
-            return null;
+            return point.proceed();
         }
 
         AuditObjectType auditObjectType = operatorLog.objectType();
@@ -75,8 +76,8 @@ public class OperatorLogAspect {
 
         Operation operation = method.getAnnotation(Operation.class);
         if (operation == null) {
-            log.error("Operation is null");
-            return null;
+            log.error("api operation is null");
+            return point.proceed();
         }
 
         Object[] args = point.getArgs();
@@ -94,11 +95,11 @@ public class OperatorLogAspect {
         }
 
         if(user == null) {
-            log.error("user is null");
-            return null;
+            log.error("api param user is null");
+            return point.proceed();
         }
 
-
+        // Change object and operation for resource part
         ResourceType resourceType = (ResourceType)paramsMap.get("type");
 
         switch (auditObjectType) {
@@ -177,10 +178,11 @@ public class OperatorLogAspect {
         Result result = (Result)point.proceed();
 
         if (resultFail(result)) {
-            log.error("request fail");
+            log.error("request fail, code {}", result.getCode());
             return result;
         }
 
+        // need get field by created obj like create operation
         if (operatorLog.returnObjectFieldName().length != 0) {
             auditLog.setObjectId(getObjectIfFromReturnObject(result.getData(), operatorLog.returnObjectFieldName()));
             auditLog.setObjectName(auditService.getObjectNameByObjectId(auditLog.getObjectId(), auditObjectType));
@@ -268,9 +270,8 @@ public class OperatorLogAspect {
 
                 auditLogList.remove(0);
             } else if (name.toLowerCase().contains("code")) {
-                String detail = "";
                 long code = (long)paramsMap.get(name);
-                detail = auditService.getObjectNameByObjectId(code, objectType);
+                String detail = auditService.getObjectNameByObjectId(code, objectType);
                 auditLogList.get(0).setObjectName(detail);
                 auditLogList.get(0).setObjectId(code);
             } else if (name.toLowerCase().contains("ids")) {
@@ -294,14 +295,11 @@ public class OperatorLogAspect {
                     detail =  obj.getEmail();
                 }
                 auditLogList.get(0).setObjectName(detail);
-            }
-
-            else if (name.toLowerCase().contains("id")) {
+            } else if (name.toLowerCase().contains("id")) {
                 int id = (int)paramsMap.get(name);
                 auditLogList.get(0).setObjectId((long) id);
                 String detail = auditService.getObjectNameByObjectId((long) id, objectType);
                 auditLogList.get(0).setObjectName(detail);
-
             } else {
                 auditLogList.get(0).setObjectName(paramsMap.get(name).toString());
             }
@@ -337,8 +335,9 @@ public class OperatorLogAspect {
                 clazz = clazz.getSuperclass();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("get object if from return object error", e);
         }
+
         return -1;
     }
 }

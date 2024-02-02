@@ -54,14 +54,14 @@ public enum AuditOperationType {
     PAUSE(13, "Pause", false, false),
     MOVE(14, "Move", false, false),
 
-    SWITCH_STATUS(15, "Switch_status", false, false),
-    SWITCH_VERSION(16, "Switch_version", false, false),
-    DELETE_VERSION(17, "Delete_version", false, false),
-    FORCE_SUCCESS(18, "Force_success", false, false),
+    SWITCH_STATUS(15, "Switch status", false, false),
+    SWITCH_VERSION(16, "Switch version", false, false),
+    DELETE_VERSION(17, "Delete version", false, false),
+    FORCE_SUCCESS(18, "Force success", false, false),
     RENAME(19, "Rename", false, false),
     UPLOAD(20, "Upload", false, false),
     AUTHORIZE(21, "Authorize", false, false),
-    UN_AUTHORIZE(21, "UN_Authorize", false, false),
+    UN_AUTHORIZE(21, "Un authorize", false, false),
     COPY(22, "Copy", false, true),
     ;
 

@@ -29,32 +29,32 @@ import java.util.stream.Collectors;
 public enum AuditObjectType {
     PROJECT(1000, -1, "Project", true),
     PROCESS(1001,1000, "Process", true),
-    PROCESS_INSTANCE(1002,1001, "Process Instance", true),
+    PROCESS_INSTANCE(1002,1001, "Process instance", true),
     TASK(1003,1001, "Task", true),
-    TASK_INSTANCE(1004,1003, "Task Instance", true),
+    TASK_INSTANCE(1004,1003, "Task instance", true),
     SCHEDULE(1005,1001, "Schedule", true),
 
     RESOURCE(2000,-1, "Resource", false),
     FOLDER(2001,2000, "Folder", true),
     FILE(2002,2001, "File", true),
-    UDF_FOLDER(2003,2000, "UDF Folder", true),
-    UDF_FILE(2004,2003, "UDF File", true),
-    UDP_FUNCTION(2005,2000, "UDF Function", true),
-    TASK_GROUP(2006,2000, "Task Group", true),
-    TASK_GROUP_QUEUE(2007,2000, "Task Group Queue", true),
+    UDF_FOLDER(2003,2000, "UDF folder", true),
+    UDF_FILE(2004,2003, "UDF file", true),
+    UDP_FUNCTION(2005,2000, "UDF function", true),
+    TASK_GROUP(2006,2000, "Task group", true),
+    TASK_GROUP_QUEUE(2007,2000, "Task group queue", true),
 
     DATASOURCE(3000,-1, "Datasource", true),
 
     SECURITY(4000,-1, "Security", false),
     TENANT(4001,4000, "Tenant", true),
     USER(4002,4000, "User", true),
-    ALARM_GROUP(4003,4000, "Alarm Group", true),
-    ALARM_INSTANCE(4004,4000, "Alarm Instance", true),
-    WORKER_GROUP(4005,4000, "Worker Group", true),
-    YARN_QUEUE(4006,4000, "Yarn Queue", true),
+    ALARM_GROUP(4003,4000, "Alarm group", true),
+    ALARM_INSTANCE(4004,4000, "Alarm instance", true),
+    WORKER_GROUP(4005,4000, "Worker group", true),
+    YARN_QUEUE(4006,4000, "Yarn queue", true),
     ENVIRONMENT(4007,4000, "Environment", true),
     CLUSTER(4008,4000, "Cluster", true),
-    K8S_NAMESPACE(4009,4000, "K8s Namespace", true),
+    K8S_NAMESPACE(4009,4000, "K8s namespace", true),
     TOKEN(4010,4000, "Token", true),
     ;
     private final int code;
@@ -90,6 +90,7 @@ public enum AuditObjectType {
         if (AUDIT_OBJECT_MAP.containsKey(code)) {
             return AUDIT_OBJECT_MAP.get(code);
         }
+
         throw new IllegalArgumentException("invalid audit operation type code " + code);
     }
 
@@ -98,14 +99,5 @@ public enum AuditObjectType {
         this.parentCode = parentCode;
         this.name = name;
         this.hasLogs = hasLogs;
-    }
-
-    private static int getParentCode(int code) {
-        for (AuditObjectType objectType : values()) {
-            if (objectType.code == code) {
-                return objectType.parentCode;
-            }
-        }
-        return -1;
     }
 }
