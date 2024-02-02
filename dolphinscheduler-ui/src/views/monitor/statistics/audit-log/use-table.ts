@@ -91,8 +91,8 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['note']
       },
       {
-        title: t('monitor.audit_log.duration') + ' (s)',
-        key: 'duration',
+        title: t('monitor.audit_log.latency') + ' (s)',
+        key: 'latency',
         ...COLUMN_WIDTH_CONFIG['times']
       },
       {
