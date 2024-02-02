@@ -140,14 +140,14 @@ api:
   # global max request number per second
   # default tenant-level max request number
   traffic-control:
-    global-switch: false
-    max-global-qps-rate: 300
-    tenant-switch: false
-    default-tenant-qps-rate: 10
-      #customize-tenant-qps-rate:
-    # eg.
-    #tenant1: 11
-    #tenant2: 20
+      global-switch: false
+      max-global-qps-rate: 300
+      tenant-switch: false
+      default-tenant-qps-rate: 10
+        #customize-tenant-qps-rate:
+        # eg.
+      #tenant1: 11
+      #tenant2: 20
   python-gateway:
     # Weather enable python gateway server or not. The default value is true.
     enabled: true
