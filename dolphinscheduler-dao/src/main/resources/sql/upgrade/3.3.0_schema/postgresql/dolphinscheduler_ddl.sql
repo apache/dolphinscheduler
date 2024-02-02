@@ -87,7 +87,7 @@ ALTER TABLE t_ds_audit_log
     add operation_type  int NOT NULL,
     add description     VARCHAR(255) NOT NULL,
     add latency         int NOT NULL,
-    add detail          VARCHAR(255) NOT NULL;
+    add detail          VARCHAR(255) DEFAULT NULL;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
