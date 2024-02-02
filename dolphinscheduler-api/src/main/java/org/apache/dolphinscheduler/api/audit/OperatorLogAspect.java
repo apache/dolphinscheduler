@@ -106,7 +106,7 @@ public class OperatorLogAspect {
                 if(resourceType != null && resourceType.equals(ResourceType.UDF))  auditObjectType = AuditObjectType.UDF_FOLDER;
                 break;
             case FILE:
-                if(resourceType != null && resourceType.equals(ResourceType.UDF))  auditObjectType = AuditObjectType.UDP_FILE;
+                if(resourceType != null && resourceType.equals(ResourceType.UDF))  auditObjectType = AuditObjectType.UDF_FILE;
                 break;
             case WORKER_GROUP:
                 if(auditOperationType == AuditOperationType.CREATE &&
