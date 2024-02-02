@@ -51,6 +51,7 @@ export function useTable() {
     ObjectTypeData: [],
     OperationTypeData: [],
     userName: ref(null),
+    objectName: ref(null),
     datePickerRange: ref(null),
     totalPage: ref(1),
     loadingRef: ref(false)
@@ -136,6 +137,7 @@ export function useTable() {
       objectTypeCodes: params.objectType,
       operationTypeCodes: params.operationType,
       userName: params.userName,
+      objectName: params.objectName,
       startDate: params.datePickerRange
         ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',

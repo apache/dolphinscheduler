@@ -57,6 +57,7 @@ const AuditLog = defineComponent({
         objectType: variables.objectType,
         operationType: variables.operationType,
         userName: variables.userName,
+        objectName: variables.objectName,
         datePickerRange: variables.datePickerRange
       })
     }
@@ -105,6 +106,13 @@ const AuditLog = defineComponent({
               v-model={[this.userName, 'value']}
               size='small'
               placeholder={t('monitor.audit_log.user_name')}
+              clearable
+            />
+            <NInput
+              allowInput={this.trim}
+              v-model={[this.objectName, 'value']}
+              size='small'
+              placeholder={t('monitor.audit_log.object_name')}
               clearable
             />
             <NCascader
