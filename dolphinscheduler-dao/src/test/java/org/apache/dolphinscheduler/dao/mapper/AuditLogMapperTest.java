@@ -47,11 +47,12 @@ public class AuditLogMapperTest extends BaseDaoTest {
         auditLog.setUserId(1);
         auditLog.setObjectName("name");
         auditLog.setDetail("detail");
-        auditLog.setDuration(1L);
+        auditLog.setLatency(1L);
         auditLog.setTime(new Date());
         auditLog.setObjectType(objectType.getCode());
         auditLog.setOperationType(0);
         auditLog.setObjectId(1L);
+        auditLog.setDescription("description");
         logMapper.insert(auditLog);
     }
 
@@ -74,10 +75,10 @@ public class AuditLogMapperTest extends BaseDaoTest {
         insertOne(AuditObjectType.USER);
         insertOne(AuditObjectType.PROJECT);
         Page<AuditLog> page = new Page<>(1, 3);
-        List<Integer> objectTypeCodeList = Lists.newArrayList(1);
-        List<Integer> operationTypeCodeList = Lists.newArrayList(1);
+        List<Integer> objectTypeCodeList = new ArrayList<>();
+        List<Integer> operationTypeCodeList = Lists.newArrayList(0);
 
-        IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, objectTypeCodeList, operationTypeCodeList, "", null, null);
+        IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, objectTypeCodeList, operationTypeCodeList, "", "", null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
     }
 }

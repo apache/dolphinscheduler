@@ -100,7 +100,7 @@ BEGIN
       add `object_type` int(11) NOT NULL COMMENT 'object type',
       add `operation_type` int(11) NOT NULL COMMENT 'operation type',
       add `description` varchar(100) DEFAULT NULL COMMENT 'api description',
-      add `duration` int(11) DEFAULT NULL COMMENT 'api cost seconds',
+      add `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',
       add `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail';
 END IF;
 END;

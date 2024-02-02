@@ -102,22 +102,11 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     }
 
     @Override
-    public void addAudit(List<AuditLog> auditLogList, long duration) {
+    public void addAudit(List<AuditLog> auditLogList, long latency) {
         auditLogList.forEach(auditLog -> {
-            auditLog.setDuration(duration);
+            auditLog.setLatency(latency);
             addAudit(auditLog);
         });
-    }
-
-    @Override
-    public void addQuartzLog(int processId) {
-        AuditLog auditLog = new AuditLog();
-        auditLog.setObjectId((long)processId);
-        auditLog.setObjectType(AuditObjectType.PROCESS.getCode());
-        auditLog.setOperationType(AuditOperationType.RUN.getCode());
-        auditLog.setTime(new Date());
-        auditLog.setUserId(-1);
-        auditLogMapper.insert(auditLog);
     }
 
     /**
@@ -129,6 +118,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      * @param startDate           start time
      * @param endDate             end time
      * @param userName            query user name
+     * @param objectName          query object name
      * @param pageNo              page number
      * @param pageSize            page size
      * @return audit log string data
@@ -140,6 +130,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
                                                  String startDate,
                                                  String endDate,
                                                  String userName,
+                                                 String objectName,
                                                  Integer pageNo,
                                                  Integer pageSize) {
 
@@ -150,7 +141,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         Date end = checkAndParseDateParameters(endDate);
 
         IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(new Page<>(pageNo, pageSize), objectTypeCodeList, operationTypeCodeList,
-                userName, start, end);
+                userName, objectName, start, end);
         List<AuditDto> auditDtos =
                 logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
 
@@ -183,7 +174,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         auditDto.setObjectName(auditLog.getObjectName());
         auditDto.setOperation(AuditOperationType.of(auditLog.getOperationType()).getName());
         auditDto.setUserName(auditLog.getUserName());
-        auditDto.setDuration(auditLog.getDuration());
+        auditDto.setLatency(String.format("%.2f", (double) auditLog.getLatency() / 1000));
         auditDto.setDetail(auditLog.getDetail());
         auditDto.setDescription(auditLog.getDescription());
         auditDto.setTime(auditLog.getTime());

@@ -40,5 +40,5 @@ public class AuditDto {
 
     private String detail;
 
-    private Long duration;
+    private String latency;
 }

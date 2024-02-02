@@ -27,7 +27,7 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 @Data
-@TableName("t_ds_audit_log_1")
+@TableName("t_ds_audit_log")
 public class AuditLog {
 
     /**
@@ -73,7 +73,7 @@ public class AuditLog {
 
     private String objectName;
 
-    private long duration;
+    private long latency;
 
     public static AuditLog copyNewOne(AuditLog auditLog) {
         AuditLog auditLogNew = new AuditLog();

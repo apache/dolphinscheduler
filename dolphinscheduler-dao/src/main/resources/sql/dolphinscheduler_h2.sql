@@ -2008,7 +2008,7 @@ CREATE TABLE t_ds_audit_log
     object_type         int(11) NOT NULL,
     operation_type      int(11) NOT NULL,
     description         varchar(255) NOT NULL,
-    duration            int(11) NOT NULL,
+    latency             int(11) NOT NULL,
     detail              varchar(255) NOT NULL,
     time                timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)

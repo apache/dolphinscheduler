@@ -77,6 +77,7 @@ public class AuditLogController extends BaseController {
             @Parameter(name = "objectTypeCodes", description = "OBJECT_TYPE_CODES", schema = @Schema(implementation = String.class)),
             @Parameter(name = "operationTypeCodes", description = "OPERATION_TYPE_CODES", schema = @Schema(implementation = String.class)),
             @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "objectName", description = "OBJECT_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
@@ -90,7 +91,8 @@ public class AuditLogController extends BaseController {
                                                               @RequestParam(value = "operationTypeCodes", required = false) String operationTypeCodes,
                                                               @RequestParam(value = "startDate", required = false) String startDate,
                                                               @RequestParam(value = "endDate", required = false) String endDate,
-                                                              @RequestParam(value = "userName", required = false) String userName) {
+                                                              @RequestParam(value = "userName", required = false) String userName,
+                                                              @RequestParam(value = "objectName", required = false) String objectName) {
         checkPageParams(pageNo, pageSize);
         PageInfo<AuditDto> auditDtoPageInfo = auditService.queryLogListPaging(
                 loginUser,
@@ -99,6 +101,7 @@ public class AuditLogController extends BaseController {
                 startDate,
                 endDate,
                 userName,
+                objectName,
                 pageNo,
                 pageSize);
         return Result.success(auditDtoPageInfo);

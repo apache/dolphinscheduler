@@ -41,11 +41,9 @@ public interface AuditService {
      * add audit by list
      *
      * @param auditLogList         auditLog list
-     * @param duration             api cost seconds
+     * @param latency             api latency milliseconds
      */
-    void addAudit(List<AuditLog> auditLogList, long duration);
-
-    void addQuartzLog(int processId);
+    void addAudit(List<AuditLog> auditLogList, long latency);
 
     /**
      * query audit log list
@@ -62,7 +60,7 @@ public interface AuditService {
      */
     PageInfo<AuditDto> queryLogListPaging(User loginUser, String objectTypeCodes,
                                           String operationTypeCodes, String startTime,
-                                          String endTime, String userName,
+                                          String endTime, String userName, String objectName,
                                           Integer pageNo, Integer pageSize);
 
     /**

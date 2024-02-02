@@ -188,9 +188,9 @@ public class OperatorLogAspect {
             auditLog.setObjectName(auditService.getObjectNameByObjectId(auditLog.getObjectId(), auditObjectType));
         }
 
-        long duration = System.currentTimeMillis() - beginTime;
+        long latency = System.currentTimeMillis() - beginTime;
 
-        auditService.addAudit(auditLogList, duration);
+        auditService.addAudit(auditLogList, latency);
 
         return result;
     }

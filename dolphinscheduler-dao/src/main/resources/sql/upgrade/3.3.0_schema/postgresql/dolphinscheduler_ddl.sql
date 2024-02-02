@@ -86,7 +86,7 @@ ALTER TABLE t_ds_audit_log
     add object_type     int NOT NULL,
     add operation_type  int NOT NULL,
     add description     VARCHAR(255) NOT NULL,
-    add duration        int NOT NULL,
+    add latency         int NOT NULL,
     add detail          VARCHAR(255) NOT NULL;
 END IF;
 END;

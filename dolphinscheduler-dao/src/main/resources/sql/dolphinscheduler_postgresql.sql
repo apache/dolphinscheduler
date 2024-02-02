@@ -1977,7 +1977,7 @@ CREATE TABLE t_ds_audit_log (
     object_type     int NOT NULL,
     operation_type  int NOT NULL,
     description     VARCHAR(255) NOT NULL,
-    duration        int NOT NULL,
+    latency        int NOT NULL,
     detail          VARCHAR(255) NOT NULL,
     time            timestamp DEFAULT NULL ,
     PRIMARY KEY (id)

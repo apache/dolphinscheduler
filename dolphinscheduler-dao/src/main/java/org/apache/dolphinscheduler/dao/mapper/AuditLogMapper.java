@@ -36,6 +36,8 @@ public interface AuditLogMapper extends BaseMapper<AuditLog> {
                                   @Param("objectTypeCodeList") List<Integer> objectTypeCodeList,
                                   @Param("operationTypeCodeList") List<Integer> operationTypeCodeList,
                                   @Param("userName") String userName,
+                                  @Param("objectName") String objectName,
                                   @Param("startDate") Date startDate,
                                   @Param("endDate") Date endDate);
+
 }
