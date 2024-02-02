@@ -66,8 +66,13 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
      * @return tasks list
      */
     @Override
-    public Map<String, Object> queryTasksByGroupId(User loginUser, String taskName, String processName, Integer status,
-                                                   int groupId, int pageNo, int pageSize) {
+    public Map<String, Object> queryTasksByGroupId(User loginUser,
+                                                   String taskName,
+                                                   String processName,
+                                                   Integer status,
+                                                   int groupId,
+                                                   int pageNo,
+                                                   int pageSize) {
         Map<String, Object> result = new HashMap<>();
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -79,8 +84,13 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
             return result;
         }
         List<Project> projects = projectMapper.selectBatchIds(projectIds);
-        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(page,
-                taskName, processName, status, groupId, projects);
+        IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(
+                page,
+                taskName,
+                processName,
+                status,
+                groupId,
+                projects);
 
         pageInfo.setTotal((int) taskGroupQueue.getTotal());
         pageInfo.setTotalList(taskGroupQueue.getRecords());
