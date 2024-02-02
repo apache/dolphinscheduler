@@ -83,7 +83,8 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ENVIRONMENT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "code"})
     public Result<Long> createEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("name") String name,
                                           @RequestParam("config") String config,
@@ -115,7 +116,8 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ENVIRONMENT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.UPDATE, requestParamName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "code"})
     public Result<Environment> updateEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @RequestParam("code") Long code,
                                                  @RequestParam("name") String name,
@@ -188,7 +190,8 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ENVIRONMENT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.DELETE, requestParamName = {"environmentCode"})
+    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.DELETE, requestParamName = {
+            "environmentCode"})
     public Result deleteEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("environmentCode") Long environmentCode) {
 

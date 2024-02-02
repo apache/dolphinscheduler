@@ -1,15 +1,15 @@
 package org.apache.dolphinscheduler.api.dto.auditLog;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+
 @Data
 public class AuditObjectTypeDto {
+
     private int code;
 
     private String name;
@@ -22,8 +22,9 @@ public class AuditObjectTypeDto {
         return dtoList;
     }
 
-    public static List<AuditObjectTypeDto> transFromEnumListToDto(List<AuditObjectTypeDto> dtoList, List<AuditObjectType> objectTypeList) {
-        for (AuditObjectType operationType: objectTypeList) {
+    public static List<AuditObjectTypeDto> transFromEnumListToDto(List<AuditObjectTypeDto> dtoList,
+                                                                  List<AuditObjectType> objectTypeList) {
+        for (AuditObjectType operationType : objectTypeList) {
             dtoList.add(transFromEnumToDto(operationType));
         }
 
@@ -35,7 +36,7 @@ public class AuditObjectTypeDto {
         dto.setName(operationType.getName());
         dto.setCode(operationType.getCode());
 
-        if(!operationType.getChild().isEmpty()) {
+        if (!operationType.getChild().isEmpty()) {
             dto.setChild(transFromEnumListToDto(new ArrayList<>(), operationType.getChild()));
         }
 

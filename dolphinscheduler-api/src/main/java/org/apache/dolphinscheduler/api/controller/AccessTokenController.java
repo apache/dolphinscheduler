@@ -86,7 +86,8 @@ public class AccessTokenController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ACCESS_TOKEN_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result<AccessToken> createToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam(value = "userId") int userId,
                                            @RequestParam(value = "expireTime") String expireTime,
@@ -177,7 +178,8 @@ public class AccessTokenController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ACCESS_TOKEN_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result<Boolean> delAccessTokenById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @PathVariable(value = "id") int id) {
         accessTokenService.deleteAccessTokenById(loginUser, id);
@@ -204,7 +206,8 @@ public class AccessTokenController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ACCESS_TOKEN_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TOKEN, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result<AccessToken> updateToken(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int id,
                                            @RequestParam(value = "userId") int userId,

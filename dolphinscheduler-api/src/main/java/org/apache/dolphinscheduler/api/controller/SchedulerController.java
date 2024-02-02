@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.*;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -103,7 +102,8 @@ public class SchedulerController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_SCHEDULE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.CREATE, requestParamName = {"processDefinitionCode"})
+    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.CREATE, requestParamName = {
+            "processDefinitionCode"})
     public Result createSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                  @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
@@ -161,7 +161,8 @@ public class SchedulerController extends BaseController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result updateSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                  @PathVariable(value = "id") Integer id,
@@ -186,7 +187,8 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/{id}/online")
     @ApiException(PUBLISH_SCHEDULE_ONLINE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.ONLINE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.ONLINE, requestParamName = {
+            "id"})
     public Result<Boolean> publishScheduleOnline(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @PathVariable("id") Integer id) {
@@ -200,7 +202,8 @@ public class SchedulerController extends BaseController {
     })
     @PostMapping("/{id}/offline")
     @ApiException(OFFLINE_SCHEDULE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.OFFLINE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.OFFLINE, requestParamName = {
+            "id"})
     public Result<Boolean> offlineSchedule(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable("id") Integer id) {
@@ -256,7 +259,8 @@ public class SchedulerController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_SCHEDULE_BY_ID_ERROR)
-    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result deleteScheduleById(@RequestAttribute(value = SESSION_USER) User loginUser,
                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                      @PathVariable("id") Integer id) {
@@ -329,7 +333,8 @@ public class SchedulerController extends BaseController {
     @PutMapping("/update/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_SCHEDULE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.UPDATE, requestParamName = {"processDefinitionCode"})
+    @OperatorLog(objectType = AuditObjectType.SCHEDULE, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "processDefinitionCode"})
     public Result updateScheduleByProcessDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                         @PathVariable(value = "code") long processDefinitionCode,

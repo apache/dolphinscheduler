@@ -110,7 +110,8 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_K8S_NAMESPACE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.K8S_NAMESPACE, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.K8S_NAMESPACE, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "code"})
     public Result createNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode) {
@@ -156,7 +157,8 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_K8S_NAMESPACE_BY_ID_ERROR)
-    @OperatorLog(objectType = AuditObjectType.K8S_NAMESPACE, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.K8S_NAMESPACE, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result delNamespaceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) {
         Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(loginUser, id);

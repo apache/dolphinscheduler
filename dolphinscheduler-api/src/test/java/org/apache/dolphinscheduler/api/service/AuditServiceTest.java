@@ -67,7 +67,8 @@ public class AuditServiceTest {
         IPage<AuditLog> page = new Page<>(1, 10);
         page.setRecords(getLists());
         page.setTotal(1L);
-        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(""), Mockito.eq(""),
+        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(""),
+                Mockito.eq(""),
                 eq(start), eq(end))).thenReturn(page);
         Assertions.assertDoesNotThrow(() -> {
             auditService.queryLogListPaging(

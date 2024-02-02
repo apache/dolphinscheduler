@@ -127,7 +127,8 @@ public class QueueController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.YARN_QUEUE, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.YARN_QUEUE, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result<Queue> createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "queue") String queue,
                                      @RequestParam(value = "queueName") String queueName) {
@@ -152,7 +153,8 @@ public class QueueController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.YARN_QUEUE, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.YARN_QUEUE, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result<Queue> updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable(value = "id") int id,
                                      @RequestParam(value = "queue") String queue,
@@ -174,7 +176,8 @@ public class QueueController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_QUEUE_BY_ID_ERROR)
-    @OperatorLog(objectType = AuditObjectType.YARN_QUEUE, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.YARN_QUEUE, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result<Boolean> deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int id) throws Exception {
         queueService.deleteQueueById(loginUser, id);

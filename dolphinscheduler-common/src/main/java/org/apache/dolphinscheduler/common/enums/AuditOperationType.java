@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import lombok.Getter;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import lombok.Getter;
 
 /**
  * Audit Operation type
  */
 @Getter
 public enum AuditOperationType {
+
     CREATE(0, "Create", false, false),
     UPDATE(1, "Update", false, false),
     DELETE(2, "Delete", false, true),

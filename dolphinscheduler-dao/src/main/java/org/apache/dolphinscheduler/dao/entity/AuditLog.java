@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
+import org.springframework.beans.BeanUtils;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 @Data
 @TableName("t_ds_audit_log")

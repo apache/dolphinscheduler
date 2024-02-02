@@ -84,7 +84,8 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_CLUSTER_ERROR)
-    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "code"})
     public Result<Long> createCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                       @RequestParam("name") String name,
                                       @RequestParam("config") String config,
@@ -114,7 +115,8 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_CLUSTER_ERROR)
-    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.UPDATE, requestParamName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "code"})
     public Result<Cluster> updateCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("code") Long code,
                                          @RequestParam("name") String name,
@@ -186,7 +188,8 @@ public class ClusterController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_CLUSTER_ERROR)
-    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.DELETE, requestParamName = {"clusterCode"})
+    @OperatorLog(objectType = AuditObjectType.CLUSTER, operationType = AuditOperationType.DELETE, requestParamName = {
+            "clusterCode"})
     public Result<Boolean> deleteCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam("clusterCode") Long clusterCode) {
 

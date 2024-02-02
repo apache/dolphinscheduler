@@ -91,7 +91,8 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_USER_ERROR)
-    @OperatorLog(objectType = AuditObjectType.USER, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.USER, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result createUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "userName") String userName,
                              @RequestParam(value = "userPassword") String userPassword,
@@ -163,7 +164,8 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_USER_ERROR)
-    @OperatorLog(objectType = AuditObjectType.USER, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.USER, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result<User> updateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id,
                                    @RequestParam(value = "userName") String userName,
@@ -201,7 +203,8 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_USER_BY_ID_ERROR)
-    @OperatorLog(objectType = AuditObjectType.USER, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.USER, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result delUserById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "id") int id) throws Exception {
         Map<String, Object> result = usersService.deleteUserById(loginUser, id);

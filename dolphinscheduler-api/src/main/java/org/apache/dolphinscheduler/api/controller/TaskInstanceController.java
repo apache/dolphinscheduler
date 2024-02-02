@@ -153,7 +153,8 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.FORCE_SUCCESS, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.FORCE_SUCCESS, requestParamName = {
+            "id"})
     public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
                                    @PathVariable(value = "id") Integer id) {

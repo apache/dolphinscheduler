@@ -91,7 +91,8 @@ public class TaskDefinitionController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_DEFINITION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "code"})
     public Result createTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson) {
@@ -120,7 +121,8 @@ public class TaskDefinitionController extends BaseController {
     @PostMapping("/save-single")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_DEFINITION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "code"})
     public Result createTaskBindsWorkFlow(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
@@ -149,7 +151,8 @@ public class TaskDefinitionController extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TASK_DEFINITION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.UPDATE, requestParamName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "code"})
     public Result updateTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @PathVariable(value = "code") long code,
@@ -179,7 +182,8 @@ public class TaskDefinitionController extends BaseController {
     @PutMapping(value = "/{code}/with-upstream")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TASK_DEFINITION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.UPDATE, requestParamName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "code"})
     public Result updateTaskWithUpstream(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                          @PathVariable(value = "code") long code,
@@ -236,7 +240,8 @@ public class TaskDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_TASK_DEFINITION_VERSION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.SWITCH_VERSION, requestParamName = {"code", "version"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.SWITCH_VERSION, requestParamName = {
+            "code", "version"})
     public Result switchTaskDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable(value = "code") long code,
@@ -262,7 +267,8 @@ public class TaskDefinitionController extends BaseController {
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_DEFINITION_VERSION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.DELETE_VERSION, requestParamName = {"code", "version"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.DELETE_VERSION, requestParamName = {
+            "code", "version"})
     public Result deleteTaskDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                               @PathVariable(value = "code") long code,
@@ -287,7 +293,8 @@ public class TaskDefinitionController extends BaseController {
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TASK_DEFINE_BY_CODE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.DELETE, requestParamName = {"code"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.DELETE, requestParamName = {
+            "code"})
     public Result deleteTaskDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @PathVariable(value = "code") long code) {
@@ -394,7 +401,8 @@ public class TaskDefinitionController extends BaseController {
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RELEASE_TASK_DEFINITION_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.RELEASE, requestParamName = {"code", "releaseState"})
+    @OperatorLog(objectType = AuditObjectType.TASK, operationType = AuditOperationType.RELEASE, requestParamName = {
+            "code", "releaseState"})
     public Result releaseTaskDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @PathVariable(value = "code", required = true) long code,

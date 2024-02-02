@@ -83,7 +83,8 @@ public class WorkerGroupController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SAVE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.WORKER_GROUP, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.WORKER_GROUP, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result saveWorkerGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
@@ -151,7 +152,8 @@ public class WorkerGroupController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
-    @OperatorLog(objectType = AuditObjectType.WORKER_GROUP, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.WORKER_GROUP, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result deleteWorkerGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable("id") Integer id) {
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);

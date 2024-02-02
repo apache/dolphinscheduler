@@ -89,7 +89,8 @@ public class AlertGroupController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ALARM_GROUP, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.ALARM_GROUP, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result<AlertGroup> createAlertGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "groupName") String groupName,
                                                @RequestParam(value = "description", required = false) String description,
@@ -199,7 +200,8 @@ public class AlertGroupController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ALARM_GROUP, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.ALARM_GROUP, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result<AlertGroup> updateAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @PathVariable(value = "id") int id,
                                                    @RequestParam(value = "groupName") String groupName,
@@ -224,7 +226,8 @@ public class AlertGroupController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ALARM_GROUP, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.ALARM_GROUP, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result<Boolean> deleteAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @PathVariable(value = "id") int id) {
         alertGroupService.deleteAlertGroupById(loginUser, id);

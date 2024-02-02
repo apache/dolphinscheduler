@@ -17,21 +17,19 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.*;
-
-import io.swagger.v3.oas.annotations.Operation;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -39,6 +37,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 @Aspect
 @Component
@@ -90,28 +90,30 @@ public class OperatorLogAspect {
             paramsMap.put(strings[i], args[i]);
 
             if (args[i] instanceof User) {
-                user = (User)args[i];
+                user = (User) args[i];
             }
         }
 
-        if(user == null) {
+        if (user == null) {
             log.error("api param user is null");
             return point.proceed();
         }
 
         // Change object and operation for resource part
-        ResourceType resourceType = (ResourceType)paramsMap.get("type");
+        ResourceType resourceType = (ResourceType) paramsMap.get("type");
 
         switch (auditObjectType) {
             case FOLDER:
-                if(resourceType != null && resourceType.equals(ResourceType.UDF))  auditObjectType = AuditObjectType.UDF_FOLDER;
+                if (resourceType != null && resourceType.equals(ResourceType.UDF))
+                    auditObjectType = AuditObjectType.UDF_FOLDER;
                 break;
             case FILE:
-                if(resourceType != null && resourceType.equals(ResourceType.UDF))  auditObjectType = AuditObjectType.UDF_FILE;
+                if (resourceType != null && resourceType.equals(ResourceType.UDF))
+                    auditObjectType = AuditObjectType.UDF_FILE;
                 break;
             case WORKER_GROUP:
-                if(auditOperationType == AuditOperationType.CREATE &&
-                        !paramsMap.get("id").toString().equals("0"))  {
+                if (auditOperationType == AuditOperationType.CREATE &&
+                        !paramsMap.get("id").toString().equals("0")) {
                     auditOperationType = AuditOperationType.UPDATE;
                 }
                 break;
@@ -119,10 +121,10 @@ public class OperatorLogAspect {
                 break;
         }
 
-        if(auditOperationType.isIntermediateState()) {
+        if (auditOperationType.isIntermediateState()) {
             switch (auditOperationType) {
                 case RELEASE:
-                    ReleaseState releaseState = (ReleaseState)paramsMap.get("releaseState");
+                    ReleaseState releaseState = (ReleaseState) paramsMap.get("releaseState");
                     switch (releaseState) {
                         case ONLINE:
                             auditOperationType = AuditOperationType.ONLINE;
@@ -135,7 +137,7 @@ public class OperatorLogAspect {
                     }
                     break;
                 case EXECUTE:
-                    ExecuteType executeType = (ExecuteType)paramsMap.get("executeType");
+                    ExecuteType executeType = (ExecuteType) paramsMap.get("executeType");
                     switch (executeType) {
                         case REPEAT_RUNNING:
                             auditOperationType = AuditOperationType.RERUN;
@@ -175,7 +177,7 @@ public class OperatorLogAspect {
 
         setInformation(operatorLog, auditLogList, paramsMap);
 
-        Result result = (Result)point.proceed();
+        Result result = (Result) point.proceed();
 
         if (resultFail(result)) {
             log.error("request fail, code {}", result.getCode());
@@ -216,7 +218,7 @@ public class OperatorLogAspect {
                 break;
         }
 
-        if(auditLogList.get(0).getObjectId() == null) {
+        if (auditLogList.get(0).getObjectId() == null) {
             auditLogList.get(0).setObjectId(getObjectIdentityByParma(paramNameArr, paramsMap));
         }
     }
@@ -224,7 +226,7 @@ public class OperatorLogAspect {
     private long getObjectIdentityByParma(String[] paramNameArr, Map<String, Object> paramsMap) {
         for (String name : paramNameArr) {
             if (paramsMap.get(name) instanceof String) {
-                String param = (String)paramsMap.get(name);
+                String param = (String) paramsMap.get(name);
                 if (param.matches("\\d+")) {
                     return Long.parseLong(param);
                 }
@@ -239,7 +241,7 @@ public class OperatorLogAspect {
             case SCHEDULE:
                 for (int i = 0; i < paramNameArr.length; i++) {
                     if (paramNameArr[i].equals("id")) {
-                        int id = (int)paramsMap.get(paramNameArr[i]);
+                        int id = (int) paramsMap.get(paramNameArr[i]);
                         Schedule schedule = scheduleMapper.selectById(id);
                         paramsMap.put("code", schedule.getProcessDefinitionCode());
                         paramNameArr[i] = "code";
@@ -251,14 +253,14 @@ public class OperatorLogAspect {
         }
     }
 
-
-    private void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap, AuditObjectType objectType, List<AuditLog> auditLogList) {
+    private void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap, AuditObjectType objectType,
+                                  List<AuditLog> auditLogList) {
         for (String name : paramNameArr) {
             if (name.toLowerCase().contains("codes")) {
-                String[] codes = ((String)paramsMap.get(name)).split(",");
+                String[] codes = ((String) paramsMap.get(name)).split(",");
                 AuditLog auditLog = auditLogList.get(0);
 
-                for(String code : codes) {
+                for (String code : codes) {
                     String detail = auditService.getObjectNameByObjectId(
                             Long.parseLong(code), objectType);
 
@@ -270,15 +272,15 @@ public class OperatorLogAspect {
 
                 auditLogList.remove(0);
             } else if (name.toLowerCase().contains("code")) {
-                long code = (long)paramsMap.get(name);
+                long code = (long) paramsMap.get(name);
                 String detail = auditService.getObjectNameByObjectId(code, objectType);
                 auditLogList.get(0).setObjectName(detail);
                 auditLogList.get(0).setObjectId(code);
             } else if (name.toLowerCase().contains("ids")) {
-                String[] ids = ((String)paramsMap.get(name)).split(",");
+                String[] ids = ((String) paramsMap.get(name)).split(",");
                 AuditLog auditLog = auditLogList.get(0);
 
-                for(String id : ids) {
+                for (String id : ids) {
                     String detail = auditService.getObjectNameByObjectId(Long.parseLong(id), objectType);
                     auditLog.setObjectId(Long.parseLong(id));
                     auditLog.setObjectName(detail);
@@ -289,14 +291,14 @@ public class OperatorLogAspect {
                 auditLogList.remove(0);
             } else if (name.toLowerCase().contains("userid")) {
                 String detail = "";
-                int id = (int)paramsMap.get(name);
-                if(objectType.equals(AuditObjectType.UDP_FUNCTION)) {
+                int id = (int) paramsMap.get(name);
+                if (objectType.equals(AuditObjectType.UDP_FUNCTION)) {
                     User obj = userMapper.selectById(id);
-                    detail =  obj.getEmail();
+                    detail = obj.getEmail();
                 }
                 auditLogList.get(0).setObjectName(detail);
             } else if (name.toLowerCase().contains("id")) {
-                int id = (int)paramsMap.get(name);
+                int id = (int) paramsMap.get(name);
                 auditLogList.get(0).setObjectId((long) id);
                 String detail = auditService.getObjectNameByObjectId((long) id, objectType);
                 auditLogList.get(0).setObjectName(detail);
@@ -306,8 +308,8 @@ public class OperatorLogAspect {
         }
     }
 
-    private boolean resultFail(Result result){
-        if(result != null && result.isFailed()) {
+    private boolean resultFail(Result result) {
+        if (result != null && result.isFailed()) {
             return true;
         }
 
@@ -319,7 +321,7 @@ public class OperatorLogAspect {
             Class<?> clazz = obj.getClass();
 
             if (clazz.equals(Long.class)) {
-                return  (Long) obj;
+                return (Long) obj;
             }
 
             while (clazz != null) {

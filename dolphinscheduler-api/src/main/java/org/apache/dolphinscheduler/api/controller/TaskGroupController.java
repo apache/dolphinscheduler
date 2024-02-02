@@ -84,7 +84,8 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TASK_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.CREATE, requestParamName = {"name"})
+    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.CREATE, requestParamName = {
+            "name"})
     public Result createTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("name") String name,
                                   @RequestParam(value = "projectCode", required = false, defaultValue = "0") Long projectCode,
@@ -116,7 +117,8 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_TASK_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.UPDATE, requestParamName = {"name"})
+    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "name"})
     public Result updateTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam("id") Integer id,
                                   @RequestParam("name") String name,
@@ -219,7 +221,8 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/close-task-group")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CLOSE_TASK_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.CLOSE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.CLOSE, requestParamName = {
+            "id"})
     public Result closeTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id", required = false) Integer id) {
 
@@ -241,7 +244,8 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/start-task-group")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.START, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.START, requestParamName = {
+            "id"})
     public Result startTaskGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "id", required = false) Integer id) {
         Map<String, Object> result = taskGroupService.startTaskGroup(loginUser, id);
@@ -262,7 +266,8 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/forceStart")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK_GROUP_QUEUE, operationType = AuditOperationType.START, requestParamName = {"queueId"})
+    @OperatorLog(objectType = AuditObjectType.TASK_GROUP_QUEUE, operationType = AuditOperationType.START, requestParamName = {
+            "queueId"})
     public Result forceStart(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "queueId") Integer queueId) {
         Map<String, Object> result = taskGroupService.forceStartTask(loginUser, queueId);
@@ -284,7 +289,8 @@ public class TaskGroupController extends BaseController {
     @PostMapping(value = "/modifyPriority")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(START_TASK_GROUP_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.UPDATE, requestParamName = {"queueId", "priority"})
+    @OperatorLog(objectType = AuditObjectType.TASK_GROUP, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "queueId", "priority"})
     public Result modifyPriority(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "queueId") Integer queueId,
                                  @RequestParam(value = "priority") Integer priority) {

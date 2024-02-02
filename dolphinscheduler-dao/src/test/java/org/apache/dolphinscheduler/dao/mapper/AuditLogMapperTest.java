@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.google.common.collect.Lists;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -33,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 public class AuditLogMapperTest extends BaseDaoTest {
 
@@ -78,7 +78,8 @@ public class AuditLogMapperTest extends BaseDaoTest {
         List<Integer> objectTypeCodeList = new ArrayList<>();
         List<Integer> operationTypeCodeList = Lists.newArrayList(0);
 
-        IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, objectTypeCodeList, operationTypeCodeList, "", "", null, null);
+        IPage<AuditLog> logIPage =
+                logMapper.queryAuditLog(page, objectTypeCodeList, operationTypeCodeList, "", "", null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
     }
 }

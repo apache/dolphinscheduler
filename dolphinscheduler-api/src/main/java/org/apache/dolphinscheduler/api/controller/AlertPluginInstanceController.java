@@ -94,7 +94,8 @@ public class AlertPluginInstanceController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ALARM_INSTANCE, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.ALARM_INSTANCE, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result<AlertPluginInstance> createAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                                                  @RequestParam(value = "instanceName") String instanceName,
@@ -138,7 +139,8 @@ public class AlertPluginInstanceController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_PLUGIN_INSTANCE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ALARM_INSTANCE, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.ALARM_INSTANCE, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result<AlertPluginInstance> updateAlertPluginInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                      @PathVariable(value = "id") int id,
                                                                      @RequestParam(value = "instanceName") String instanceName,
@@ -163,7 +165,8 @@ public class AlertPluginInstanceController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ALARM_INSTANCE, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.ALARM_INSTANCE, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result<Boolean> deleteAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @PathVariable(value = "id") int id) {
 

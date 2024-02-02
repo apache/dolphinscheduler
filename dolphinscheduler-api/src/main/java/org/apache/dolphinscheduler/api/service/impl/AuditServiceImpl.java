@@ -17,14 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.dao.entity.*;
-import org.apache.dolphinscheduler.dao.mapper.*;
+
+import org.apache.parquet.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.parquet.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -140,8 +138,9 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         Date start = checkAndParseDateParameters(startDate);
         Date end = checkAndParseDateParameters(endDate);
 
-        IPage<AuditLog> logIPage = auditLogMapper.queryAuditLog(new Page<>(pageNo, pageSize), objectTypeCodeList, operationTypeCodeList,
-                userName, objectName, start, end);
+        IPage<AuditLog> logIPage =
+                auditLogMapper.queryAuditLog(new Page<>(pageNo, pageSize), objectTypeCodeList, operationTypeCodeList,
+                        userName, objectName, start, end);
         List<AuditDto> auditDtos =
                 logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
 
@@ -152,7 +151,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     }
 
     private List<Integer> convertStringToIntList(String codes) {
-        if(Strings.isNullOrEmpty(codes)) {
+        if (Strings.isNullOrEmpty(codes)) {
             return new ArrayList<>();
         }
 
@@ -190,65 +189,66 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             }
             case UDP_FUNCTION: {
                 UdfFunc obj = udfFuncMapper.selectUdfById(objectId.intValue());
-                return obj == null ? "" :obj.getFuncName();
+                return obj == null ? "" : obj.getFuncName();
             }
             case DATASOURCE: {
                 DataSource obj = dataSourceMapper.selectById(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             case TENANT: {
                 Tenant obj = tenantMapper.selectById(objectId);
-                return obj == null ? "" :obj.getTenantCode();
+                return obj == null ? "" : obj.getTenantCode();
             }
             case USER: {
                 User obj = userMapper.selectById(objectId);
-                return obj == null ? "" :obj.getUserName();
+                return obj == null ? "" : obj.getUserName();
             }
             case ALARM_GROUP: {
                 AlertGroup obj = alertGroupMapper.selectById(objectId);
-                return obj == null ? "" :obj.getGroupName();
+                return obj == null ? "" : obj.getGroupName();
             }
             case ALARM_INSTANCE: {
                 AlertPluginInstance obj = alertPluginInstanceMapper.selectById(objectId);
-                return obj == null ? "" :obj.getInstanceName();
+                return obj == null ? "" : obj.getInstanceName();
             }
             case WORKER_GROUP: {
                 WorkerGroup obj = workerGroupMapper.selectById(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             case YARN_QUEUE: {
                 Queue obj = queueMapper.selectById(objectId);
-                return obj == null ? "" :obj.getQueueName();
+                return obj == null ? "" : obj.getQueueName();
             }
             case K8S_NAMESPACE: {
                 K8sNamespace obj = k8sNamespaceMapper.selectById(objectId);
-                return obj == null ? "" :obj.getNamespace();
+                return obj == null ? "" : obj.getNamespace();
             }
             case TOKEN: {
                 AccessToken obj = accessTokenMapper.selectById(objectId);
-                if (obj == null) return "";
+                if (obj == null)
+                    return "";
                 User user = userMapper.selectById(obj.getUserId());
-                return user == null ? "" :user.getUserName();
+                return user == null ? "" : user.getUserName();
             }
             case PROJECT: {
                 Project obj = projectMapper.queryByCode(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             case PROCESS: {
                 ProcessDefinition obj = processDefinitionMapper.queryByCode(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             case TASK: {
                 TaskDefinition obj = taskDefinitionMapper.queryByCode(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             case ENVIRONMENT: {
                 Environment obj = environmentMapper.queryByEnvironmentCode(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             case CLUSTER: {
                 Cluster obj = clusterMapper.queryByClusterCode(objectId);
-                return obj == null ? "" :obj.getName();
+                return obj == null ? "" : obj.getName();
             }
             default:
                 return "";

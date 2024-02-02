@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -30,6 +29,7 @@ import java.util.List;
  * audit information service
  */
 public interface AuditService {
+
     /**
      * add audit object
      *

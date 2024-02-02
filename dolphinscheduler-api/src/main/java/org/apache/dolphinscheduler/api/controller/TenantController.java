@@ -86,7 +86,8 @@ public class TenantController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TENANT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TENANT, operationType = AuditOperationType.CREATE, returnObjectFieldName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TENANT, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
+            "id"})
     public Result<Tenant> createTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "tenantCode") String tenantCode,
                                        @RequestParam(value = "queueId") int queueId,
@@ -159,7 +160,8 @@ public class TenantController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TENANT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TENANT, operationType = AuditOperationType.UPDATE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TENANT, operationType = AuditOperationType.UPDATE, requestParamName = {
+            "id"})
     public Result<Boolean> updateTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable(value = "id") int id,
                                         @RequestParam(value = "tenantCode") String tenantCode,
@@ -184,7 +186,8 @@ public class TenantController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
-    @OperatorLog(objectType = AuditObjectType.TENANT, operationType = AuditOperationType.DELETE, requestParamName = {"id"})
+    @OperatorLog(objectType = AuditObjectType.TENANT, operationType = AuditOperationType.DELETE, requestParamName = {
+            "id"})
     public Result<Boolean> deleteTenantById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable(value = "id") int id) throws Exception {
         tenantService.deleteTenantById(loginUser, id);
