@@ -45,4 +45,20 @@ interface AuditListRes {
   start: number
 }
 
-export { AuditListReq, AuditListRes }
+interface AuditObjectTypeItem {
+  code: number
+  name: string
+  child: AuditObjectTypeItem[] | null
+}
+
+interface AuditOperationTypeItem {
+  code: number
+  name: string
+}
+
+export {
+  AuditListReq,
+  AuditListRes,
+  AuditObjectTypeItem,
+  AuditOperationTypeItem
+}

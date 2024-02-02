@@ -18,21 +18,38 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { queryAuditLogListPaging } from '@/service/modules/audit'
+import {
+  queryAuditLogListPaging,
+  queryAuditLogObjectType,
+  queryAuditLogOperationType
+} from '@/service/modules/audit'
 import { format } from 'date-fns'
 import { parseTime } from '@/common/common'
-import type { AuditListRes } from '@/service/modules/audit/types'
+import type {
+  AuditListRes,
+  AuditObjectTypeItem,
+  AuditOperationTypeItem
+} from '@/service/modules/audit/types'
+import {
+  COLUMN_WIDTH_CONFIG,
+  calculateTableWidth,
+  DefaultTableWidth
+} from '@/common/column-width-config'
+import { sortBy } from 'lodash'
 
 export function useTable() {
   const { t } = useI18n()
 
   const variables = reactive({
     columns: [],
+    tableWidth: DefaultTableWidth,
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
-    resourceType: ref(null),
+    objectType: ref(null),
     operationType: ref(null),
+    ObjectTypeData: [],
+    OperationTypeData: [],
     userName: ref(null),
     datePickerRange: ref(null),
     totalPage: ref(1),
@@ -44,29 +61,70 @@ export function useTable() {
       {
         title: '#',
         key: 'index',
-        render: (row: any, index: number) => index + 1
+        render: (row: any, index: number) => index + 1,
+        ...COLUMN_WIDTH_CONFIG['index']
       },
       {
         title: t('monitor.audit_log.user_name'),
-        key: 'userName'
+        key: 'userName',
+        ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
-        title: t('monitor.audit_log.resource_type'),
-        key: 'resource'
+        title: t('monitor.audit_log.object_type'),
+        key: 'objectType',
+        ...COLUMN_WIDTH_CONFIG['type']
       },
       {
-        title: t('monitor.audit_log.project_name'),
-        key: 'resourceName'
+        title: t('monitor.audit_log.object_name'),
+        key: 'objectName',
+        ...COLUMN_WIDTH_CONFIG['name']
       },
       {
         title: t('monitor.audit_log.operation_type'),
-        key: 'operation'
+        key: 'operation',
+        ...COLUMN_WIDTH_CONFIG['type']
+      },
+
+      {
+        title: t('monitor.audit_log.description'),
+        key: 'description',
+        ...COLUMN_WIDTH_CONFIG['note']
+      },
+      {
+        title: t('monitor.audit_log.latency') + ' (s)',
+        key: 'latency',
+        ...COLUMN_WIDTH_CONFIG['times']
       },
       {
         title: t('monitor.audit_log.create_time'),
-        key: 'time'
+        key: 'time',
+        ...COLUMN_WIDTH_CONFIG['time']
       }
     ]
+
+    if (variables.tableWidth) {
+      variables.tableWidth = calculateTableWidth(variables.columns)
+    }
+  }
+
+  const getObjectTypeData = async () => {
+    try {
+      variables.ObjectTypeData = await queryAuditLogObjectType().then(
+        (res: AuditObjectTypeItem[]) => res || []
+      )
+    } catch {
+      variables.ObjectTypeData = []
+    }
+  }
+
+  const getOperationTypeData = async () => {
+    try {
+      variables.OperationTypeData = await queryAuditLogOperationType().then(
+        (res: AuditOperationTypeItem[]) => sortBy(res, 'name')
+      )
+    } catch {
+      variables.OperationTypeData = []
+    }
   }
 
   const getTableData = (params: any) => {
@@ -75,8 +133,8 @@ export function useTable() {
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
-      resourceType: params.resourceType,
-      operationType: params.operationType,
+      objectTypeCodes: params.objectType,
+      operationTypeCodes: params.operationType,
       userName: params.userName,
       startDate: params.datePickerRange
         ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
@@ -106,6 +164,8 @@ export function useTable() {
     t,
     variables,
     getTableData,
-    createColumns
+    createColumns,
+    getObjectTypeData,
+    getOperationTypeData
   }
 }
