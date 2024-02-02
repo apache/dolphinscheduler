@@ -95,3 +95,5 @@ d//
 
 select modify_data_t_ds_audit_log_input_entry();
 DROP FUNCTION IF EXISTS modify_data_t_ds_audit_log_input_entry();
+
+CREATE INDEX IF NOT EXISTS idx_t_ds_task_group_queue_in_queue ON t_ds_task_group_queue(in_queue);

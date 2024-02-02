@@ -108,3 +108,18 @@ d//
 delimiter ;
 CALL modify_data_t_ds_audit_log_input_entry;
 DROP PROCEDURE modify_data_t_ds_audit_log_input_entry;
+
+-- create idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue
+DROP PROCEDURE IF EXISTS create_idx_t_ds_task_group_queue_in_queue;
+delimiter d//
+CREATE PROCEDURE create_idx_t_ds_task_group_queue_in_queue()
+BEGIN
+    DECLARE index_exists INT DEFAULT 0;
+    SELECT COUNT(*) INTO index_exists FROM information_schema.statistics WHERE table_schema = (SELECT DATABASE()) AND  table_name = 't_ds_task_group_queue' AND index_name = 'idx_t_ds_task_group_queue_in_queue';
+    IF index_exists = 0 THEN CREATE INDEX idx_t_ds_task_group_queue_in_queue ON t_ds_task_group_queue(in_queue);
+END IF;
+END;
+d//
+delimiter ;
+CALL create_idx_t_ds_task_group_queue_in_queue;
+DROP PROCEDURE create_idx_t_ds_task_group_queue_in_queue;
