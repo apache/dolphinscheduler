@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAVA;
 
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -155,7 +156,7 @@ public class JavaTaskTest {
             try {
                 Path path = Paths.get(fileName);
                 if (!Files.exists(path)) {
-                    Files.createDirectories(path);
+                    FileUtils.createDirectoryWith755(path);
                 }
                 javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
             } finally {
