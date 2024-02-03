@@ -25,8 +25,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VI
 import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
-import org.apache.dolphinscheduler.common.exception.FileOperateException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.SystemUtils;
 
@@ -38,9 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
@@ -48,11 +44,10 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * file utils
- */
+@UtilityClass
 @Slf4j
 public class FileUtils {
 
@@ -62,14 +57,7 @@ public class FileUtils {
 
     public static final String KUBE_CONFIG_FILE = "config";
 
-    private static final String RWXR_XR_X = "rwxr-xr-x";
-
-    private static final FileAttribute<Set<PosixFilePermission>> PERMISSION_755 =
-            PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(RWXR_XR_X));
-
-    private FileUtils() {
-        throw new UnsupportedOperationException("Construct FileUtils");
-    }
+    private static final Set<PosixFilePermission> PERMISSION_755 = PosixFilePermissions.fromString("rwxr-xr-x");
 
     /**
      * get download file absolute path and name
@@ -162,34 +150,6 @@ public class FileUtils {
     }
 
     /**
-     * create directory if absent
-     *
-     * @param execLocalPath execute local path
-     * @throws IOException errors
-     */
-    public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        // if work dir exists, first delete
-        File execLocalPathFile = new File(execLocalPath);
-
-        if (execLocalPathFile.exists()) {
-            try {
-                org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
-            } catch (Exception ex) {
-                if (ex instanceof NoSuchFileException || ex.getCause() instanceof NoSuchFileException) {
-                    // this file is already be deleted.
-                } else {
-                    throw ex;
-                }
-            }
-        }
-
-        // create work dir
-        org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
-        String mkdirLog = "create dir success " + execLocalPath;
-        log.info(mkdirLog);
-    }
-
-    /**
      * write content to file ,if parent path not exists, it will do one's utmost to mkdir
      *
      * @param content content
@@ -229,25 +189,6 @@ public class FileUtils {
      */
     public static void deleteFile(String filename) {
         org.apache.commons.io.FileUtils.deleteQuietly(new File(filename));
-    }
-
-    /**
-     * Gets all the parent subdirectories of the parentDir directory
-     *
-     * @param parentDir parent dir
-     * @return all dirs
-     */
-    public static File[] getAllDir(String parentDir) {
-        if (parentDir == null || "".equals(parentDir)) {
-            throw new RuntimeException("parentDir can not be empty");
-        }
-
-        File file = new File(parentDir);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new RuntimeException("parentDir not exist, or is not a directory:" + parentDir);
-        }
-
-        return file.listFiles(File::isDirectory);
     }
 
     /**
@@ -325,59 +266,47 @@ public class FileUtils {
         return crcString;
     }
 
-    public static void setFileOwner(Path filePath, String fileOwner) throws FileOperateException {
-        try {
-            // We use linux command to set the file owner, since jdk api will not use sudo.
-            String command = String.format("sudo chown %s %s", fileOwner, filePath.toString());
-            Runtime.getRuntime().exec(command);
-            Process process = Runtime.getRuntime().exec(command);
-            int exitCode = process.waitFor();
-            if (0 != exitCode) {
-                throw new FileOperateException(
-                        "Set file: " + filePath + " to owner: " + fileOwner + " failed, existCode(" + exitCode + ")");
-            }
-        } catch (FileOperateException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
-
-        }
-    }
-
-    public static void setDirectoryOwner(Path filePath, String fileOwner) throws FileOperateException {
-        try {
-            // We use linux command to set the file owner, since jdk api will not use sudo.
-            String command = String.format("sudo chown -R %s %s", fileOwner, filePath.toString());
-            Runtime.getRuntime().exec(command);
-            Process process = Runtime.getRuntime().exec(command);
-            int exitCode = process.waitFor();
-            if (0 != exitCode) {
-                throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner
-                        + " failed, existCode(" + exitCode + ")");
-            }
-        } catch (FileOperateException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
-
-        }
-    }
-
-    public static void createDirectoryIfNotPresent(Path path) throws IOException {
-        if (Files.exists(path)) {
-            return;
-        }
-        Files.createDirectories(path);
-    }
-
-    /**
-     * Create a file with '755'.
-     */
     public static void createFileWith755(@NonNull Path path) throws IOException {
         if (SystemUtils.IS_OS_WINDOWS) {
             Files.createFile(path);
         } else {
-            Files.createFile(path, PERMISSION_755);
+            Files.createFile(path);
+            Files.setPosixFilePermissions(path, PERMISSION_755);
+        }
+    }
+
+    public static void createDirectoryWith755(@NonNull Path path) throws IOException {
+        if (path.toFile().exists()) {
+            return;
+        }
+        if (OSUtils.isWindows()) {
+            Files.createDirectories(path);
+        } else {
+            Path parent = path.getParent();
+            if (parent != null && !parent.toFile().exists()) {
+                createDirectoryWith755(parent);
+            }
+
+            Files.createDirectory(path);
+            Files.setPosixFilePermissions(path, PERMISSION_755);
+
+        }
+    }
+
+    public static void setFileTo755(File file) throws IOException {
+        if (OSUtils.isWindows()) {
+            return;
+        }
+        if (file.isFile()) {
+            Files.setPosixFilePermissions(file.toPath(), PERMISSION_755);
+            return;
+        }
+        Files.setPosixFilePermissions(file.toPath(), PERMISSION_755);
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                setFileTo755(f);
+            }
         }
     }
 

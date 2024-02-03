@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -213,7 +214,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            Files.createDirectories(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
         }
         OSSObject ossObject = ossClient.getObject(bucketName, srcFilePath);
         try (
