@@ -19,8 +19,13 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -55,12 +60,23 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testCreateWorkDirIfAbsent() {
+    public void createDirectoryWith755() throws IOException {
+        Path path = Paths.get("/tmp/createWorkDirAndUserIfAbsent");
         try {
-            FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
-            Assertions.assertTrue(true);
+            FileUtils.createDirectoryWith755(path);
+            File file = path.toFile();
+            Assertions.assertTrue(file.exists());
+            Assertions.assertTrue(file.isDirectory());
+            Assertions.assertTrue(file.canExecute());
+            Assertions.assertTrue(file.canRead());
+            Assertions.assertTrue(file.canWrite());
+
+            FileUtils.createDirectoryWith755(Paths.get("/"));
         } catch (Exception e) {
-            Assertions.fail();
+            e.printStackTrace();
+            Assertions.fail(e.getMessage());
+        } finally {
+            Files.deleteIfExists(path);
         }
     }
 

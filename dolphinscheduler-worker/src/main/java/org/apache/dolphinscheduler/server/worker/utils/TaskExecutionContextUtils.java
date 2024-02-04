@@ -97,7 +97,7 @@ public class TaskExecutionContextUtils {
                 log.warn("The TaskInstance WorkingDirectory: {} is exist, will recreate again",
                         taskInstanceWorkingDirectory);
             }
-            Files.createDirectories(Paths.get(taskInstanceWorkingDirectory));
+            FileUtils.createDirectoryWith755(Paths.get(taskInstanceWorkingDirectory));
 
             taskExecutionContext.setExecutePath(taskInstanceWorkingDirectory);
             taskExecutionContext.setAppInfoPath(FileUtils.getAppInfoPath(taskInstanceWorkingDirectory));
@@ -137,6 +137,7 @@ public class TaskExecutionContextUtils {
                     storageOperate.download(resourceAbsolutePathInStorage, resourceAbsolutePathInLocal, true);
                     log.debug("Download resource file {} under: {} successfully", resourceAbsolutePathInStorage,
                             resourceAbsolutePathInLocal);
+                    FileUtils.setFileTo755(file);
                     WorkerServerMetrics
                             .recordWorkerResourceDownloadTime(System.currentTimeMillis() - resourceDownloadStartTime);
                     WorkerServerMetrics
