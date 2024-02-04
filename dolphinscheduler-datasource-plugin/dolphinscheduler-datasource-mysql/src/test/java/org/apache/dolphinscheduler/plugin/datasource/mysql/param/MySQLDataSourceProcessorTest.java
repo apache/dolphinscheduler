@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.mysql.param;
 
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -65,6 +66,17 @@ public class MySQLDataSourceProcessorTest {
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:mysql://localhost:3306/default\"}";
         MySQLConnectionParam connectionParams = (MySQLConnectionParam) mysqlDatasourceProcessor
                 .createConnectionParams(connectionJson);
+        Assertions.assertNotNull(connectionJson);
+        Assertions.assertEquals("root", connectionParams.getUser());
+    }
+
+    @Test
+    public void testCreateConnectionParams3() {
+        String connectionJson =
+                "{\"user\":\"root\",\"password\":\"123\",\"address\":\"jdbc:mysql://127.0.0.1:3307\",\"database\":\"test\",\"jdbcUrl\":\"jdbc:mysql://127.0.0.1:3307/test\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"validationQuery\":\"select 1\",\"other\":\"tinyInt1isBit=false&zeroDateTimeBehavior=convertToNull&\",\"props\":{\"zeroDateTimeBehavior\":\"convertToNull\",\"tinyInt1isBit\":\"false\"}}";
+        MySQLConnectionParam connectionParams =
+                (MySQLConnectionParam) DataSourceUtils.getDatasourceProcessor(DbType.MYSQL)
+                        .createConnectionParams(connectionJson);
         Assertions.assertNotNull(connectionJson);
         Assertions.assertEquals("root", connectionParams.getUser());
     }

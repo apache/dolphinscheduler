@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.datasource.api.plugin;
 import static java.lang.String.format;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DecoratorDataSourceProcessor;
 
 import java.util.Collections;
 import java.util.Map;
@@ -55,6 +56,6 @@ public class DataSourceProcessorManager {
 
     private void loadDatasourceClient(DataSourceProcessor processor) {
         DataSourceProcessor instance = processor.create();
-        dataSourceProcessorMap.put(processor.getDbType().name(), instance);
+        dataSourceProcessorMap.put(processor.getDbType().name(), DecoratorDataSourceProcessor.wrap(instance));
     }
 }
