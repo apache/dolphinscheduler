@@ -71,7 +71,7 @@ public class OperatorLogAspect {
 
     @Around("logPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
-        try{
+        try {
             long beginTime = System.currentTimeMillis();
             MethodSignature signature = (MethodSignature) point.getSignature();
             Method method = signature.getMethod();
@@ -197,7 +197,8 @@ public class OperatorLogAspect {
 
             // need get field by created obj like create operation
             if (operatorLog.returnObjectFieldName().length != 0) {
-                auditLog.setObjectId(getObjectIfFromReturnObject(result.getData(), operatorLog.returnObjectFieldName()));
+                auditLog.setObjectId(
+                        getObjectIfFromReturnObject(result.getData(), operatorLog.returnObjectFieldName()));
                 auditLog.setObjectName(auditService.getObjectNameByObjectId(auditLog.getObjectId(), auditObjectType));
             }
 
@@ -207,7 +208,7 @@ public class OperatorLogAspect {
             return result;
         } catch (Exception e) {
             log.error("audit log aspect error", e);
-//            return point.proceed();
+            // return point.proceed();
             return null;
         }
     }
@@ -258,7 +259,7 @@ public class OperatorLogAspect {
                     if (paramNameArr[i].equals("id")) {
                         int id = (int) paramsMap.get(paramNameArr[i]);
                         Schedule schedule = scheduleMapper.selectById(id);
-                        if(schedule != null) {
+                        if (schedule != null) {
                             paramsMap.put("code", schedule.getProcessDefinitionCode());
                             paramNameArr[i] = "code";
                         }
