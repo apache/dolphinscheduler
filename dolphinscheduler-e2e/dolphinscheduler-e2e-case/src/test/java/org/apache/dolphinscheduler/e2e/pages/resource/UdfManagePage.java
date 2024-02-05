@@ -24,6 +24,7 @@ import lombok.Getter;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -80,7 +81,7 @@ public class UdfManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public UdfManagePage uploadFile(String filePath) {
-        new WebDriverWait(driver, 10).until(ExpectedConditions.elementToBeClickable(buttonUploadUdf));
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonUploadUdf));
 
         buttonUploadUdf().click();
 

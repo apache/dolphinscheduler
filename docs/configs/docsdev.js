@@ -358,6 +358,10 @@ export default {
                             {
                                 title: 'HANA',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/hana.html',
+                            },
+                            {
+                                title: 'doris',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/doris.html',
                             }
                         ],
                     },
@@ -403,6 +407,9 @@ export default {
                             {
                                 title: 'Slack',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/slack.html',
+                            },{
+                                title: 'Aliyun Voice',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/aliyun-voice.html',
                             },
                         ],
                     },
@@ -1067,6 +1074,10 @@ export default {
                             {
                                 title: 'HANA',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/hana.html',
+                            },
+                            {
+                                title: 'Doris',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/doris.html',
                             }
                         ],
                     },
@@ -1112,6 +1123,10 @@ export default {
                             {
                                 title: 'Slack告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/slack.html',
+                            },
+                            {
+                                title: '阿里云语音告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/aliyun-voice.html',
                             },
                         ],
                     },

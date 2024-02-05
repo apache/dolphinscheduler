@@ -32,13 +32,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -49,17 +47,6 @@ public class BaseServiceImpl implements BaseService {
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
-
-    @Override
-    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids,
-                                     Logger logger) {
-        try {
-            resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
-        } catch (Exception e) {
-            log.error("Post handle error, userId:{}.", userId, e);
-            throw new RuntimeException("Resource association user error", e);
-        }
-    }
 
     /**
      * check admin
@@ -76,17 +63,12 @@ public class BaseServiceImpl implements BaseService {
      * isNotAdmin
      *
      * @param loginUser login user
-     * @param result result code
      * @return true if not administrator, otherwise false
      */
     @Override
-    public boolean isNotAdmin(User loginUser, Map<String, Object> result) {
+    public boolean isNotAdmin(User loginUser) {
         // only admin can operate
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return true;
-        }
-        return false;
+        return !isAdmin(loginUser);
     }
 
     /**
@@ -203,5 +185,13 @@ public class BaseServiceImpl implements BaseService {
     @Override
     public boolean checkDescriptionLength(String description) {
         return description != null && description.codePointCount(0, description.length()) > 255;
+    }
+
+    protected Date transformDate(String dateStr) {
+        Date date = DateUtils.stringToDate(dateStr);
+        if (date == null) {
+            throw new IllegalArgumentException("dateStr: [" + dateStr + "] is invalid");
+        }
+        return date;
     }
 }

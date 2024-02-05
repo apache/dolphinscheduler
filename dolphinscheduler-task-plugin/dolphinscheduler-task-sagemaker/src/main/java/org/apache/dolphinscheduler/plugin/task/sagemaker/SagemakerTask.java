@@ -23,19 +23,23 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.sagemaker.param.SagemakerConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import lombok.extern.slf4j.Slf4j;
 
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -50,6 +54,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 /**
  * SagemakerTask task, Used to start Sagemaker pipeline
  */
+@Slf4j
 public class SagemakerTask extends AbstractRemoteTask {
 
     private static final ObjectMapper objectMapper = JsonMapper.builder()
@@ -64,14 +69,16 @@ public class SagemakerTask extends AbstractRemoteTask {
      */
     private SagemakerParameters parameters;
 
-    private final AmazonSageMaker client;
-    private final PipelineUtils utils;
+    private AmazonSageMaker client;
+    private PipelineUtils utils;
     private PipelineUtils.PipelineId pipelineId;
+    private SagemakerConnectionParam sagemakerConnectionParam;
+    private SagemakerTaskExecutionContext sagemakerTaskExecutionContext;
+    private TaskExecutionContext taskExecutionContext;
 
     public SagemakerTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        client = createClient();
-        utils = new PipelineUtils();
+        this.taskExecutionContext = taskExecutionContext;
     }
 
     @Override
@@ -83,15 +90,24 @@ public class SagemakerTask extends AbstractRemoteTask {
     public void init() {
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), SagemakerParameters.class);
-
-        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
         if (parameters == null) {
             throw new SagemakerTaskException("Sagemaker task params is empty");
         }
         if (!parameters.checkParameters()) {
             throw new SagemakerTaskException("Sagemaker task params is not valid");
         }
+        sagemakerTaskExecutionContext =
+                parameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
+        sagemakerConnectionParam =
+                (SagemakerConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(parameters.getType()),
+                        sagemakerTaskExecutionContext.getConnectionParams());
+        parameters.setUsername(sagemakerConnectionParam.getUserName());
+        parameters.setPassword(sagemakerConnectionParam.getPassword());
+        parameters.setAwsRegion(sagemakerConnectionParam.getAwsRegion());
+        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
 
+        client = createClient();
+        utils = new PipelineUtils();
     }
 
     @Override
@@ -170,9 +186,9 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     protected AmazonSageMaker createClient() {
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
+        final String awsAccessKeyId = parameters.getUsername();
+        final String awsSecretAccessKey = parameters.getPassword();
+        final String awsRegion = parameters.getAwsRegion();
         final BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
         final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
         // create a SageMaker client

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -173,6 +174,7 @@ public class TaskExecutionContext implements Serializable {
 
     /**
      * definedParams
+     * // todo: we need to rename definedParams, prepareParamsMap, paramsMap, this is confusing
      */
     private Map<String, String> definedParams;
 
@@ -226,10 +228,8 @@ public class TaskExecutionContext implements Serializable {
      * k8s TaskExecutionContext
      */
     private K8sTaskExecutionContext k8sTaskExecutionContext;
-    /**
-     * resources full name and tenant code
-     */
-    private Map<String, String> resources;
+
+    private ResourceContext resourceContext;
 
     /**
      * taskInstance varPool
@@ -261,4 +261,13 @@ public class TaskExecutionContext implements Serializable {
     private int testFlag;
 
     private boolean logBufferEnable;
+
+    /**
+     * dispatch fail times
+     */
+    private int dispatchFailTimes;
+
+    public void increaseDispatchFailTimes() {
+        this.dispatchFailTimes++;
+    }
 }

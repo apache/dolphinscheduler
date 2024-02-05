@@ -36,9 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
@@ -46,11 +44,10 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
 import lombok.NonNull;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * file utils
- */
+@UtilityClass
 @Slf4j
 public class FileUtils {
 
@@ -60,14 +57,7 @@ public class FileUtils {
 
     public static final String KUBE_CONFIG_FILE = "config";
 
-    private static final String RWXR_XR_X = "rwxr-xr-x";
-
-    private static final FileAttribute<Set<PosixFilePermission>> PERMISSION_755 =
-            PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(RWXR_XR_X));
-
-    private FileUtils() {
-        throw new UnsupportedOperationException("Construct FileUtils");
-    }
+    private static final Set<PosixFilePermission> PERMISSION_755 = PosixFilePermissions.fromString("rwxr-xr-x");
 
     /**
      * get download file absolute path and name
@@ -115,12 +105,12 @@ public class FileUtils {
      * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(String tenant,
-                                           long projectCode,
-                                           long processDefineCode,
-                                           int processDefineVersion,
-                                           int processInstanceId,
-                                           int taskInstanceId) {
+    public static String getTaskInstanceWorkingDirectory(String tenant,
+                                                         long projectCode,
+                                                         long processDefineCode,
+                                                         int processDefineVersion,
+                                                         int processInstanceId,
+                                                         int taskInstanceId) {
         return String.format(
                 "%s/exec/process/%s/%d/%d_%d/%d/%d",
                 DATA_BASEDIR,
@@ -157,34 +147,6 @@ public class FileUtils {
      */
     public static String getResourceViewSuffixes() {
         return PropertyUtils.getString(RESOURCE_VIEW_SUFFIXES, RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE);
-    }
-
-    /**
-     * create directory if absent
-     *
-     * @param execLocalPath execute local path
-     * @throws IOException errors
-     */
-    public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        // if work dir exists, first delete
-        File execLocalPathFile = new File(execLocalPath);
-
-        if (execLocalPathFile.exists()) {
-            try {
-                org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
-            } catch (Exception ex) {
-                if (ex instanceof NoSuchFileException || ex.getCause() instanceof NoSuchFileException) {
-                    // this file is already be deleted.
-                } else {
-                    throw ex;
-                }
-            }
-        }
-
-        // create work dir
-        org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
-        String mkdirLog = "create dir success " + execLocalPath;
-        log.info(mkdirLog);
     }
 
     /**
@@ -227,25 +189,6 @@ public class FileUtils {
      */
     public static void deleteFile(String filename) {
         org.apache.commons.io.FileUtils.deleteQuietly(new File(filename));
-    }
-
-    /**
-     * Gets all the parent subdirectories of the parentDir directory
-     *
-     * @param parentDir parent dir
-     * @return all dirs
-     */
-    public static File[] getAllDir(String parentDir) {
-        if (parentDir == null || "".equals(parentDir)) {
-            throw new RuntimeException("parentDir can not be empty");
-        }
-
-        File file = new File(parentDir);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new RuntimeException("parentDir not exist, or is not a directory:" + parentDir);
-        }
-
-        return file.listFiles(File::isDirectory);
     }
 
     /**
@@ -323,14 +266,47 @@ public class FileUtils {
         return crcString;
     }
 
-    /**
-     * Create a file with '755'.
-     */
     public static void createFileWith755(@NonNull Path path) throws IOException {
         if (SystemUtils.IS_OS_WINDOWS) {
             Files.createFile(path);
         } else {
-            Files.createFile(path, PERMISSION_755);
+            Files.createFile(path);
+            Files.setPosixFilePermissions(path, PERMISSION_755);
+        }
+    }
+
+    public static void createDirectoryWith755(@NonNull Path path) throws IOException {
+        if (path.toFile().exists()) {
+            return;
+        }
+        if (OSUtils.isWindows()) {
+            Files.createDirectories(path);
+        } else {
+            Path parent = path.getParent();
+            if (parent != null && !parent.toFile().exists()) {
+                createDirectoryWith755(parent);
+            }
+
+            Files.createDirectory(path);
+            Files.setPosixFilePermissions(path, PERMISSION_755);
+
+        }
+    }
+
+    public static void setFileTo755(File file) throws IOException {
+        if (OSUtils.isWindows()) {
+            return;
+        }
+        if (file.isFile()) {
+            Files.setPosixFilePermissions(file.toPath(), PERMISSION_755);
+            return;
+        }
+        Files.setPosixFilePermissions(file.toPath(), PERMISSION_755);
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                setFileTo755(f);
+            }
         }
     }
 

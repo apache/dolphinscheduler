@@ -22,44 +22,35 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COL
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
 import java.util.List;
-import java.util.regex.Pattern;
+import java.util.Map;
 
-/**
- * abstract yarn task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public abstract class AbstractYarnTask extends AbstractRemoteTask {
 
-    /**
-     * process task
-     */
     private ShellCommandExecutor shellCommandExecutor;
 
-    /**
-     * rules for extracting application ID
-     */
-    protected static final Pattern YARN_APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
-
-    /**
-     * Abstract Yarn Task
-     *
-     * @param taskRequest taskRequest
-     */
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
     }
 
     // todo split handle to submit and track
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
+            IShellInterceptorBuilder shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .properties(getProperties())
+                    // todo: do we need to move the replace to subclass?
+                    .appendScript(getScript().replaceAll("\\r\\n", System.lineSeparator()));
             // SHELL task exit code
-            TaskResponse response = shellCommandExecutor.run(buildCommand(), taskCallBack);
+            TaskResponse response = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(response.getExitStatusCode());
             // set appIds
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
@@ -115,10 +106,12 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     }
 
     /**
-     * create command
-     *
-     * @return String
+     * Get the script used to bootstrap the task
      */
-    protected abstract String buildCommand();
+    protected abstract String getScript();
 
+    /**
+     * Get the properties of the task used to replace the placeholders in the script.
+     */
+    protected abstract Map<String, String> getProperties();
 }

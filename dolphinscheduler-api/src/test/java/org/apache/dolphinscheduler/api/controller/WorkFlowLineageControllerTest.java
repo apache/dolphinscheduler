@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.text.MessageFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -73,23 +74,16 @@ public class WorkFlowLineageControllerTest {
     public void testQueryWorkFlowLineageByName() {
         long projectCode = 1L;
         String searchVal = "test";
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, 1);
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal)).thenReturn(result);
-        Result response = workFlowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal))
+                .thenReturn(Collections.emptyList());
+        assertDoesNotThrow(() -> workFlowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal));
     }
 
     @Test
     public void testQueryWorkFlowLineageByCode() {
         long projectCode = 1L;
         long code = 1L;
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS);
-        result.put(Constants.DATA_LIST, 1);
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(result);
-        Result response = workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(new HashMap<>());
+        assertDoesNotThrow(() -> workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code));
     }
 }

@@ -30,6 +30,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -45,9 +47,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * seatunnel task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class SeatunnelTask extends AbstractRemoteTask {
 
     private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
@@ -76,9 +78,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
         super(taskExecutionContext);
 
         this.taskExecutionContext = taskExecutionContext;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskExecutionContext,
-                log);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
     }
 
     @Override
@@ -100,11 +100,14 @@ public class SeatunnelTask extends AbstractRemoteTask {
         try {
             // construct process
             String command = buildCommand();
-            TaskResponse commandExecuteResult = shellCommandExecutor.run(command, taskCallBack);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .appendScript(command);
+
+            TaskResponse commandExecuteResult = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
             setExitStatusCode(commandExecuteResult.getExitStatusCode());
             setAppIds(String.join(TaskConstants.COMMA, getApplicationIds()));
             setProcessId(commandExecuteResult.getProcessId());
-            seatunnelParameters.dealOutParam(shellCommandExecutor.getVarPool());
+            seatunnelParameters.dealOutParam(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("The current SeaTunnel task has been interrupted", e);

@@ -55,7 +55,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
         "casdoor.certificate=public-key",
         "casdoor.organization-name=built-in",
         "casdoor.application-name=app-built-in",
-        "casdoor.redirect-url=http://localhost:8888/view/login/index.html"
+        "casdoor.redirect-url=http://localhost:8888/view/login/index.html",
+        "security.authentication.casdoor.user.admin=admin"
 })
 public class CasdoorAuthenticatorTest extends AbstractControllerTest {
 
@@ -111,7 +112,7 @@ public class CasdoorAuthenticatorTest extends AbstractControllerTest {
     @Test
     public void testAuthenticate() {
         when(usersService.getUserByUserName(casdoorUsername)).thenReturn(mockUser);
-        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
+        when(sessionService.createSessionIfAbsent(mockUser)).thenReturn(mockSession);
 
         when(casdoorAuthService.getOAuthToken(code, state)).thenReturn(token);
         when(casdoorAuthService.parseJwtToken(token)).thenReturn(mockCasdoorUser);
@@ -130,13 +131,13 @@ public class CasdoorAuthenticatorTest extends AbstractControllerTest {
 
         Objects.requireNonNull(request.getSession()).setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-        when(sessionService.createSession(mockUser, ip)).thenReturn(null);
+        when(sessionService.createSessionIfAbsent(mockUser)).thenReturn(null);
         result = casdoorAuthenticator.authenticate(state, code, ip);
         Assertions.assertEquals(Status.LOGIN_SESSION_FAILED.getCode(), (int) result.getCode());
 
         Objects.requireNonNull(request.getSession()).setAttribute(Constants.SSO_LOGIN_USER_STATE, state);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
-        when(sessionService.createSession(mockUser, ip)).thenReturn(mockSession.getId());
+        when(sessionService.createSessionIfAbsent(mockUser)).thenReturn(mockSession);
         when(usersService.getUserByUserName(casdoorUsername)).thenReturn(null);
         when(usersService.createUser(userType, casdoorUsername, casdoorEmail)).thenReturn(null);
         result = casdoorAuthenticator.authenticate(state, code, ip);

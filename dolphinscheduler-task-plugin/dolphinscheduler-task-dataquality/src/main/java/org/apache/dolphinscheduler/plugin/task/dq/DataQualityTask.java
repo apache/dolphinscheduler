@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
@@ -51,18 +50,21 @@ import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * In DataQualityTask, the input parameters will be converted into DataQualityConfiguration,
  * which will be converted into a string as the parameter of DataQualityApplication,
  * and DataQualityApplication is spark application
  */
+@Slf4j
 public class DataQualityTask extends AbstractYarnTask {
 
     /**
@@ -114,6 +116,7 @@ public class DataQualityTask extends AbstractYarnTask {
         DataQualityConfiguration dataQualityConfiguration =
                 ruleManager.generateDataQualityParameter();
 
+        log.info("data quality configuration: {}", JSONUtils.toPrettyJsonString(dataQualityConfiguration));
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""
@@ -160,26 +163,21 @@ public class DataQualityTask extends AbstractYarnTask {
     }
 
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         List<String> args = new ArrayList<>();
-
         args.add(SPARK_COMMAND);
         args.addAll(SparkArgsUtils.buildArgs(dataQualityParameters.getSparkParameters()));
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        // replace placeholder
-        Map<String, Property> paramsMap = dqTaskExecutionContext.getPrepareParamsMap();
-        String command =
-                ParameterUtils.convertParameterPlaceholders(String.join(" ", args), ParameterUtils.convert(paramsMap));
-        log.info("data quality task command: {}", command);
-
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return ParameterUtils.convert(dqTaskExecutionContext.getPrepareParamsMap());
     }
 
     protected void setMainJarName() {
         ResourceInfo mainJar = new ResourceInfo();
-        String basePath = System.getProperty("user.dir").replace(File.separator + "bin", "");
-        mainJar.setResourceName(
-                basePath + File.separator + "libs" + File.separator + CommonUtils.getDataQualityJarName());
+        mainJar.setResourceName(CommonUtils.getDataQualityJarPath());
         dataQualityParameters.getSparkParameters().setMainJar(mainJar);
     }
 

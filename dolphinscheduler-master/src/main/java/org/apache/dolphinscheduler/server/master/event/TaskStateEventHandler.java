@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
@@ -55,11 +54,16 @@ public class TaskStateEventHandler implements StateEventHandler {
                 "Handle task instance state event, the current task instance state {} will be changed to {}",
                 task.getState().name(), taskStateEvent.getStatus().name());
 
+        if (taskStateEvent.getStatus().isRunning()) {
+            workflowExecuteRunnable.taskStart(task);
+        }
+
         Set<Long> completeTaskSet = workflowExecuteRunnable.getCompleteTaskCodes();
         if (task.getState().isFinished()
                 && (taskStateEvent.getStatus() != null && taskStateEvent.getStatus().isRunning())) {
             String errorMessage = String.format(
-                    "The current task instance state is %s, but the task state event status is %s, so the task state event will be ignored",
+                    "The current TaskInstance: %s state is %s, but the task state event status is %s, so the task state event will be ignored",
+                    task.getName(),
                     task.getState().name(),
                     taskStateEvent.getStatus().name());
             log.warn(errorMessage);
@@ -72,14 +76,6 @@ public class TaskStateEventHandler implements StateEventHandler {
                 return true;
             }
             workflowExecuteRunnable.taskFinished(task);
-            if (task.getTaskGroupId() > 0) {
-                log.info("The task instance need to release task Group: {}", task.getTaskGroupId());
-                try {
-                    workflowExecuteRunnable.releaseTaskGroup(task);
-                } catch (RemotingException | InterruptedException e) {
-                    throw new StateEventHandleException("Release task group failed", e);
-                }
-            }
             return true;
         }
         return true;

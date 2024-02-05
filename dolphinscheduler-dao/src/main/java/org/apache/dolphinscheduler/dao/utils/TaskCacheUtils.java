@@ -183,7 +183,7 @@ public class TaskCacheUtils {
         log.info("{} --- Remote:{} to Local:{}", "CRC file", resourceCRCWholePath, targetPath);
         String crcString = "";
         try {
-            storageOperate.download(context.getTenantCode(), resourceCRCWholePath, targetPath, true);
+            storageOperate.download(resourceCRCWholePath, targetPath, true);
             crcString = FileUtils.readFile2Str(new FileInputStream(targetPath));
             fileProperty.setValue(crcString);
         } catch (IOException e) {

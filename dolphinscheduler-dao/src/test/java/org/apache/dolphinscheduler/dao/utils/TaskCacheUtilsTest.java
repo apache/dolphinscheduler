@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
-
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -36,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -167,7 +166,7 @@ class TaskCacheUtilsTest {
         // task definition version is changed, so cache key changed
         Assertions.assertNotEquals(cacheKeyD, cacheKeyE);
 
-        taskInstance.setEnvironmentConfig("export PYTHON_HOME=/bin/python3");
+        taskInstance.setEnvironmentConfig("export PYTHON_LAUNCHER=/bin/python3");
         String cacheKeyF = TaskCacheUtils.generateCacheKey(taskInstance, taskExecutionContext, storageOperate);
         // EnvironmentConfig is changed, so cache key changed
         Assertions.assertNotEquals(cacheKeyE, cacheKeyF);
@@ -182,8 +181,8 @@ class TaskCacheUtilsTest {
     @Test
     void testReplaceWithCheckSum() {
         String content = "abcdefg";
-        String filePath = "test/testFile.txt";
-        FileUtils.writeContent2File(content, filePath + CRC_SUFFIX);
+        String filePath = "test/testFile.txt.crc";
+        FileUtils.writeContent2File(content, filePath);
 
         Property property = new Property();
         property.setProp("f1");
@@ -196,5 +195,10 @@ class TaskCacheUtilsTest {
 
         String crc = TaskCacheUtils.getValCheckSum(property, taskExecutionContext, storageOperate);
         Assertions.assertEquals(crc, content);
+    }
+
+    @AfterEach
+    public void tearDown() {
+        FileUtils.deleteFile("test");
     }
 }

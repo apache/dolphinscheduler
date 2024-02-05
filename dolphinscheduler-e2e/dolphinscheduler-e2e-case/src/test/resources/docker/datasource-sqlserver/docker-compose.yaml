@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-version: "2.1"
+version: "3.8"
 
 services:
   dolphinscheduler:
@@ -23,28 +23,28 @@ services:
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
-    expose:
-      - 12345
+    ports:
+      - "12345:12345"
     networks:
       - e2e
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
     depends_on:
       sqlserver:
         condition: service_healthy
   sqlserver:
     image: alexk002/sqlserver2019_demo:1
-    expose:
-      - 1433
+    ports:
+      - "1433:1433"
     networks:
       - e2e
     healthcheck:
       test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P OcP2020123 -Q "SELECT 1"
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
 
 networks:

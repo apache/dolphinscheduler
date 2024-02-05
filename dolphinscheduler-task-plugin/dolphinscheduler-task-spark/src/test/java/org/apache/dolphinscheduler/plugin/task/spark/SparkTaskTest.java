@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.util.Collections;
-import java.util.HashMap;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -54,17 +54,21 @@ public class SparkTaskTest {
                         "--conf spark.executor.memory=1G " +
                         "--name sparksql " +
                         "-f /tmp/5536_node.sql",
-                sparkTask.buildCommand());
+                sparkTask.getScript());
     }
 
     @Test
     public void testBuildCommandWithSparkSubmit() {
         String parameters = buildSparkParametersWithSparkSubmit();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        HashMap<String, String> map = new HashMap<>();
-        map.put("/lib/dolphinscheduler-task-spark.jar", "/lib/dolphinscheduler-task-spark.jar");
-        Mockito.when(taskExecutionContext.getResources()).thenReturn(map);
+        ResourceContext.ResourceItem resourceItem = new ResourceContext.ResourceItem();
+        resourceItem.setResourceAbsolutePathInStorage("/lib/dolphinscheduler-task-spark.jar");
+        resourceItem.setResourceAbsolutePathInLocal("/lib/dolphinscheduler-task-spark.jar");
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem);
+
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
         sparkTask.init();
         Assertions.assertEquals(
@@ -79,7 +83,7 @@ public class SparkTaskTest {
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
                         "/lib/dolphinscheduler-task-spark.jar",
-                sparkTask.buildCommand());
+                sparkTask.getScript());
     }
 
     private String buildSparkParametersWithSparkSql() {
@@ -113,8 +117,6 @@ public class SparkTaskTest {
         sparkParameters.setExecutorMemory("1G");
         sparkParameters.setExecutorCores(2);
         ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(1);
-        resourceInfo.setRes("dolphinscheduler-task-spark.jar");
         resourceInfo.setResourceName("/lib/dolphinscheduler-task-spark.jar");
         sparkParameters.setMainJar(resourceInfo);
         return JSONUtils.toJsonString(sparkParameters);

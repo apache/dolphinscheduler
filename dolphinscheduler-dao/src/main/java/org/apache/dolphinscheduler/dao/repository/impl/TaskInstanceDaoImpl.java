@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -171,4 +172,16 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
         return mybatisMapper.findByWorkflowInstanceId(workflowInstanceId);
     }
 
+    @Override
+    public List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
+                                                                                 Set<Long> taskCodes,
+                                                                                 int testFlag) {
+        return mybatisMapper.findLastTaskInstances(processInstanceId, taskCodes, testFlag);
+    }
+
+    @Override
+    public TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId, long depTaskCode,
+                                                                       int testFlag) {
+        return mybatisMapper.findLastTaskInstance(processInstanceId, depTaskCode, testFlag);
+    }
 }

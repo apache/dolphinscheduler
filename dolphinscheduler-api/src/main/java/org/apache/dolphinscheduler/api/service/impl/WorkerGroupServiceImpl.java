@@ -27,15 +27,19 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -61,6 +65,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.facebook.presto.jdbc.internal.guava.base.Strings;
 
 /**
@@ -87,6 +92,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private ScheduleMapper scheduleMapper;
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * create or update a worker group
@@ -115,11 +126,17 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         WorkerGroup workerGroup = null;
         if (id != 0) {
             workerGroup = workerGroupMapper.selectById(id);
+            if (Objects.nonNull(workerGroup) && !workerGroup.getName().equals(name)) {
+                if (checkWorkerGroupDependencies(workerGroup, result)) {
+                    return result;
+                }
+            }
         }
         if (workerGroup == null) {
             workerGroup = new WorkerGroup();
             workerGroup.setCreateTime(now);
         }
+
         workerGroup.setName(name);
         workerGroup.setAddrList(addrList);
         workerGroup.setUpdateTime(now);
@@ -136,6 +153,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.WORKER_ADDRESS_INVALID, invalidAddr);
             return result;
         }
+
         handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
         log.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
@@ -148,8 +166,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroupMapper.updateById(workerGroup);
         } else {
             workerGroupMapper.insert(workerGroup);
-            permissionPostHandle(AuthorizationType.WORKER_GROUP, loginUser.getId(),
-                    Collections.singletonList(workerGroup.getId()), log);
         }
     }
 
@@ -174,6 +190,53 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 return true;
             }
         }
+        return false;
+    }
+
+    /**
+     * check if the worker group has any dependent tasks,schedulers or environments.
+     *
+     * @param workerGroup worker group
+     * @return boolean
+     */
+    private boolean checkWorkerGroupDependencies(WorkerGroup workerGroup, Map<String, Object> result) {
+        // check if the worker group has any dependent tasks
+        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.selectList(
+                new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getWorkerGroup, workerGroup.getName()));
+
+        if (CollectionUtils.isNotEmpty(taskDefinitions)) {
+            List<String> taskNames = taskDefinitions.stream().limit(3).map(taskDefinition -> taskDefinition.getName())
+                    .collect(Collectors.toList());
+
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS, taskDefinitions.size(),
+                    JSONUtils.toJsonString(taskNames));
+            return true;
+        }
+
+        // check if the worker group has any dependent schedulers
+        List<Schedule> schedules = scheduleMapper
+                .selectList(new QueryWrapper<Schedule>().lambda().eq(Schedule::getWorkerGroup, workerGroup.getName()));
+
+        if (CollectionUtils.isNotEmpty(schedules)) {
+            List<String> processNames = schedules.stream().limit(3)
+                    .map(schedule -> processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode()).getName())
+                    .collect(Collectors.toList());
+
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
+                    JSONUtils.toJsonString(processNames));
+            return true;
+        }
+
+        // check if the worker group has any dependent environments
+        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
+                environmentWorkerGroupRelationMapper.selectList(new QueryWrapper<EnvironmentWorkerGroupRelation>()
+                        .lambda().eq(EnvironmentWorkerGroupRelation::getWorkerGroup, workerGroup.getName()));
+
+        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelations)) {
+            putMsg(result, Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS, environmentWorkerGroupRelations.size());
+            return true;
+        }
+
         return false;
     }
 
@@ -341,15 +404,13 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, processInstances.size());
             return result;
         }
-        List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelationList =
-                environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName());
-        if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelationList)) {
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL_ENV, environmentWorkerGroupRelationList.size(),
-                    workerGroup.getName());
+
+        if (checkWorkerGroupDependencies(workerGroup, result)) {
             return result;
         }
+
         workerGroupMapper.deleteById(id);
-        processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), "");
+
         log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
         return result;

@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
@@ -45,24 +46,18 @@ import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.collect.Maps;
 
-/**
- * procedure task
- */
+@Slf4j
 public class ProcedureTask extends AbstractTask {
 
-    /**
-     * procedure parameters
-     */
-    private ProcedureParameters procedureParameters;
+    private final ProcedureParameters procedureParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    private ProcedureTaskExecutionContext procedureTaskExecutionContext;
+    private final ProcedureTaskExecutionContext procedureTaskExecutionContext;
 
     /**
      * constructor
@@ -96,11 +91,10 @@ public class ProcedureTask extends AbstractTask {
                 procedureParameters.getLocalParams());
 
         DbType dbType = DbType.valueOf(procedureParameters.getType());
-        DataSourceProcessor dataSourceProcessor =
-                DataSourceProcessorProvider.getInstance().getDataSourceProcessor(dbType);
+        DataSourceProcessor dataSourceProcessor = DataSourceProcessorProvider.getDataSourceProcessor(dbType);
         ConnectionParam connectionParams =
                 dataSourceProcessor.createConnectionParams(procedureTaskExecutionContext.getConnectionParams());
-        try (Connection connection = dataSourceProcessor.getConnection(connectionParams)) {
+        try (Connection connection = DataSourceClientProvider.getAdHocConnection(dbType, connectionParams)) {
             Map<Integer, Property> sqlParamsMap = new HashMap<>();
             Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap() == null ? Maps.newHashMap()
                     : taskExecutionContext.getPrepareParamsMap();

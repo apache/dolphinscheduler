@@ -32,6 +32,7 @@ import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -63,6 +64,12 @@ public abstract class TaskNodeForm {
             @FindBy(className = "n-base-selection"),
     })
     private WebElement selectPreTasks;
+
+    @FindBys({
+            @FindBy(className = "env-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectEnv;
 
     @FindBys({
             @FindBy(className = "btn-custom-parameters"),
@@ -111,12 +118,31 @@ public abstract class TaskNodeForm {
         return this;
     }
 
+    public TaskNodeForm selectEnv(String envName){
+        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectEnv);
+
+        final By optionsLocator = By.className("n-base-selection-input__content");
+
+        new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+
+        webElements.stream()
+                .filter(it -> it.getText().contains(envName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such envName: " + envName))
+                .click();
+
+        return this;
+    }
+
     public TaskNodeForm preTask(String preTaskName) {
         ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
 
         final By optionsLocator = By.className("option-pre-tasks");
 
-        new WebDriverWait(parent.driver(), 10)
+        new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements =  parent.driver().findElements(optionsLocator);

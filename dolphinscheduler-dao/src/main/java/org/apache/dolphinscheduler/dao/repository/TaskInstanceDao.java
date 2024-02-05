@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Task Instance DAO
@@ -85,4 +86,25 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
     void deleteByWorkflowInstanceId(int workflowInstanceId);
 
     List<TaskInstance> queryByWorkflowInstanceId(Integer processInstanceId);
+
+    /**
+     * find last task instance list corresponding to taskCodes in the date interval
+     *
+     * @param processInstanceId Task's parent process instance id
+     * @param taskCodes taskCodes
+     * @param testFlag test flag
+     * @return task instance list
+     */
+    List<TaskInstance> queryLastTaskInstanceListIntervalInProcessInstance(Integer processInstanceId,
+                                                                          Set<Long> taskCodes, int testFlag);
+
+    /**
+     * find last task instance corresponding to taskCode in the date interval
+     * @param processInstanceId Task's parent process instance id
+     * @param depTaskCode taskCode
+     * @param testFlag test flag
+     * @return task instance
+     */
+    TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId,
+                                                                long depTaskCode, int testFlag);
 }

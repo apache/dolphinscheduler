@@ -20,18 +20,29 @@ package org.apache.dolphinscheduler.server.master.utils;
 import static org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters.DependentFailurePolicyEnum.DEPENDENT_FAILURE_WAITING;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -40,6 +51,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,6 +84,30 @@ public class DependentExecute {
      * depend result map
      */
     private Map<String, DependResult> dependResultMap = new HashMap<>();
+
+    /**
+     * process service
+     */
+    private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
+
+    /**
+     * task definition log dao
+     */
+    private final TaskDefinitionLogDao taskDefinitionLogDao =
+            SpringApplicationContext.getBean(TaskDefinitionLogDao.class);
+
+    /**
+     * task definition dao
+     */
+    private final TaskDefinitionDao taskDefinitionDao = SpringApplicationContext.getBean(TaskDefinitionDao.class);
+
+    private Map<String, Property> dependTaskVarPoolPropertyMap = new HashMap<>();
+
+    private Map<String, Long> dependTaskVarPoolEndTimeMap = new HashMap<>();
+
+    private Map<String, Property> dependItemVarPoolPropertyMap = new HashMap<>();
+
+    private Map<String, Long> dependItemVarPoolEndTimeMap = new HashMap<>();
 
     /**
      * constructor
@@ -118,10 +155,12 @@ public class DependentExecute {
                 return DependResult.WAITING;
             }
             // need to check workflow for updates, so get all task and check the task state
-            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+            if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
                 result = dependResultByProcessInstance(processInstance);
+            } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
+                result = dependResultByAllTaskOfProcessInstance(processInstance, testFlag);
             } else {
-                result = getDependTaskResult(dependentItem.getDepTaskCode(), processInstance, testFlag);
+                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), testFlag);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -131,7 +170,7 @@ public class DependentExecute {
     }
 
     /**
-     * depend type = depend_all
+     * depend type = depend_work_flow
      *
      * @return
      */
@@ -140,44 +179,130 @@ public class DependentExecute {
             return DependResult.WAITING;
         }
         if (processInstance.getState().isSuccess()) {
+            addItemVarPool(processInstance.getVarPool(), processInstance.getEndTime().getTime());
+            return DependResult.SUCCESS;
+        }
+        log.warn(
+                "The dependent workflow did not execute successfully, so return depend failed. processCode: {}, processName: {}",
+                processInstance.getProcessDefinitionCode(), processInstance.getName());
+        return DependResult.FAILED;
+    }
+
+    /**
+     * depend type = depend_all
+     *
+     * @return
+     */
+    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance, int testFlag) {
+        if (!processInstance.getState().isFinished()) {
+            log.info("Wait for the dependent workflow to complete, processCode: {}, processInstanceId: {}.",
+                    processInstance.getProcessDefinitionCode(), processInstance.getId());
+            return DependResult.WAITING;
+        }
+        if (processInstance.getState().isSuccess()) {
+            List<ProcessTaskRelation> processTaskRelations =
+                    processService.findRelationByCode(processInstance.getProcessDefinitionCode(),
+                            processInstance.getProcessDefinitionVersion());
+            List<TaskDefinitionLog> taskDefinitionLogs =
+                    taskDefinitionLogDao.queryTaskDefineLogList(processTaskRelations);
+            Map<Long, String> taskDefinitionCodeMap =
+                    taskDefinitionLogs.stream().filter(taskDefinitionLog -> taskDefinitionLog.getFlag() == Flag.YES)
+                            .collect(Collectors.toMap(TaskDefinitionLog::getCode, TaskDefinitionLog::getName));
+
+            List<TaskInstance> taskInstanceList =
+                    taskInstanceDao.queryLastTaskInstanceListIntervalInProcessInstance(processInstance.getId(),
+                            taskDefinitionCodeMap.keySet(), testFlag);
+            Map<Long, TaskExecutionStatus> taskExecutionStatusMap =
+                    taskInstanceList.stream()
+                            .filter(taskInstance -> taskInstance.getTaskExecuteType() != TaskExecuteType.STREAM)
+                            .collect(Collectors.toMap(TaskInstance::getTaskCode, TaskInstance::getState));
+
+            for (Long taskCode : taskDefinitionCodeMap.keySet()) {
+                if (!taskExecutionStatusMap.containsKey(taskCode)) {
+                    log.warn(
+                            "The task of the workflow is not being executed, taskCode: {}, processInstanceId: {}, processName: {}.",
+                            taskCode, processInstance.getProcessDefinitionCode(), processInstance.getName());
+                    return DependResult.FAILED;
+                } else {
+                    if (!taskExecutionStatusMap.get(taskCode).isSuccess()) {
+                        log.warn(
+                                "The task of the workflow is not being executed successfully, taskCode: {}, processInstanceId: {}, processName: {}.",
+                                taskCode, processInstance.getProcessDefinitionCode(), processInstance.getName());
+                        return DependResult.FAILED;
+                    }
+                }
+            }
+            addItemVarPool(processInstance.getVarPool(), processInstance.getEndTime().getTime());
             return DependResult.SUCCESS;
         }
         return DependResult.FAILED;
     }
 
     /**
-     * get depend task result
+     * depend type = depend_task
      *
-     * @param taskCode
-     * @param processInstance
-     * @return
+     * @param processInstance last process instance in the date interval
+     * @param depTaskCode the dependent task code
+     * @param testFlag test flag
+     * @return depend result
      */
-    private DependResult getDependTaskResult(long taskCode, ProcessInstance processInstance, int testFlag) {
-        DependResult result;
-        TaskInstance taskInstance = null;
-        List<TaskInstance> taskInstanceList =
-                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(), testFlag);
-
-        for (TaskInstance task : taskInstanceList) {
-            if (task.getTaskCode() == taskCode) {
-                taskInstance = task;
-                break;
-            }
-        }
+    private DependResult dependResultBySingleTaskInstance(ProcessInstance processInstance, long depTaskCode,
+                                                          int testFlag) {
+        TaskInstance taskInstance =
+                taskInstanceDao.queryLastTaskInstanceIntervalInProcessInstance(processInstance.getId(),
+                        depTaskCode, testFlag);
 
         if (taskInstance == null) {
-            // cannot find task in the process instance
-            // maybe because process instance is running or failed.
-            if (processInstance.getState().isFinished()) {
-                result = DependResult.FAILED;
-            } else {
+            TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(depTaskCode);
+
+            if (taskDefinition == null) {
+                log.error("The dependent task definition can not be find, so return depend failed, taskCode: {}",
+                        depTaskCode);
+                return DependResult.FAILED;
+            }
+
+            if (taskDefinition.getFlag() == Flag.NO) {
+                log.info(
+                        "The dependent task is a forbidden task, so return depend success. Task code: {}, task name: {}",
+                        taskDefinition.getCode(), taskDefinition.getName());
+                return DependResult.SUCCESS;
+            }
+
+            if (!processInstance.getState().isFinished()) {
+                log.info("Wait for the dependent workflow to complete, processCode: {}, processInstanceId: {}.",
+                        processInstance.getProcessDefinitionCode(), processInstance.getId());
                 return DependResult.WAITING;
             }
-        } else {
-            result = getDependResultByState(taskInstance.getState());
-        }
 
-        return result;
+            return DependResult.FAILED;
+        } else {
+            if (TaskExecuteType.STREAM == taskInstance.getTaskExecuteType()) {
+                log.info(
+                        "The dependent task is a streaming task, so return depend success. Task code: {}, task name: {}.",
+                        taskInstance.getTaskCode(), taskInstance.getName());
+                addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
+                return DependResult.SUCCESS;
+            }
+            return getDependResultByState(taskInstance.getState());
+        }
+    }
+
+    /**
+     * add varPool to dependItemVarPoolMap
+     *
+     * @param varPoolStr
+     * @param endTime
+     */
+    private void addItemVarPool(String varPoolStr, Long endTime) {
+        List<Property> varPool = new ArrayList<>(JSONUtils.toList(varPoolStr, Property.class));
+        if (!varPool.isEmpty()) {
+            Map<String, Property> varPoolPropertyMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
+                    .collect(Collectors.toMap(Property::getProp, Function.identity()));
+            Map<String, Long> varPoolEndTimeMap = varPool.stream().filter(p -> p.getDirect().equals(Direct.OUT))
+                    .collect(Collectors.toMap(Property::getProp, d -> endTime));
+            dependItemVarPoolPropertyMap.putAll(varPoolPropertyMap);
+            dependItemVarPoolEndTimeMap.putAll(varPoolEndTimeMap);
+        }
     }
 
     /**
@@ -221,6 +346,9 @@ public class DependentExecute {
         } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
+            log.warn(
+                    "The dependent task were not executed successfully, so return depend failed. Task code: {}, task name: {}.",
+                    taskInstance.getTaskCode(), taskInstance.getName());
             return DependResult.FAILED;
         }
     }
@@ -267,7 +395,13 @@ public class DependentExecute {
             DependResult dependResult = getDependResultForItem(dependentItem, currentTime, testFlag);
             if (dependResult != DependResult.WAITING && dependResult != DependResult.FAILED) {
                 dependResultMap.put(dependentItem.getKey(), dependResult);
+                if (dependentItem.getParameterPassing() && !dependItemVarPoolPropertyMap.isEmpty()) {
+                    DependentUtils.addTaskVarPool(dependItemVarPoolPropertyMap, dependItemVarPoolEndTimeMap,
+                            dependTaskVarPoolPropertyMap, dependTaskVarPoolEndTimeMap);
+                }
             }
+            dependItemVarPoolPropertyMap.clear();
+            dependItemVarPoolEndTimeMap.clear();
             dependResultList.add(dependResult);
         }
         return DependentUtils.getDependResultForRelation(this.relation, dependResultList);
@@ -290,6 +424,14 @@ public class DependentExecute {
 
     public Map<String, DependResult> getDependResultMap() {
         return dependResultMap;
+    }
+
+    public Map<String, Property> getDependTaskVarPoolPropertyMap() {
+        return dependTaskVarPoolPropertyMap;
+    }
+
+    public Map<String, Long> getDependTaskVarPoolEndTimeMap() {
+        return dependTaskVarPoolEndTimeMap;
     }
 
     /**

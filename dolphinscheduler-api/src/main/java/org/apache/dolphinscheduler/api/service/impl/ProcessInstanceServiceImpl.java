@@ -337,10 +337,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                                       Integer pageSize) {
 
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
-                ApiFuncIdentificationConstant.WORKFLOW_INSTANCE);
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
 
         int[] statusArray = null;
         // filter by state
@@ -356,7 +354,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         IPage<ProcessInstance> processInstanceList = processInstanceMapper.queryProcessInstanceListPaging(
                 page,
-                project.getCode(),
+                projectCode,
                 processDefineCode,
                 searchVal,
                 executorName,
@@ -685,14 +683,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
                                                      String taskDefinitionJson, String scheduleTime, Boolean syncDefine,
                                                      String globalParams,
                                                      String locations, int timeout) {
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        ApiFuncIdentificationConstant.INSTANCE_UPDATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
+                ApiFuncIdentificationConstant.INSTANCE_UPDATE);
+        Map<String, Object> result = new HashMap<>();
         // check process instance exists
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
                 .orElseThrow(() -> new ServiceException(PROCESS_INSTANCE_NOT_EXIST, processInstanceId));
@@ -1016,22 +1010,20 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         GanttDto ganttDto = new GanttDto();
-        DAG<String, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(processDefinition);
         // topological sort
-        List<String> nodeList = dag.topologicalSort();
+        List<Long> nodeList = dag.topologicalSort();
 
         ganttDto.setTaskNames(nodeList);
 
         List<Task> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(nodeList)) {
-            List<Long> taskCodes = nodeList.stream().map(Long::parseLong).collect(Collectors.toList());
             List<TaskInstance> taskInstances = taskInstanceMapper.queryByProcessInstanceIdsAndTaskCodes(
-                    Collections.singletonList(processInstanceId), taskCodes);
-            for (String node : nodeList) {
+                    Collections.singletonList(processInstanceId), nodeList);
+            for (Long node : nodeList) {
                 TaskInstance taskInstance = null;
                 for (TaskInstance instance : taskInstances) {
-                    if (instance.getProcessInstanceId() == processInstanceId
-                            && instance.getTaskCode() == Long.parseLong(node)) {
+                    if (instance.getProcessInstanceId() == processInstanceId && instance.getTaskCode() == node) {
                         taskInstance = instance;
                         break;
                     }

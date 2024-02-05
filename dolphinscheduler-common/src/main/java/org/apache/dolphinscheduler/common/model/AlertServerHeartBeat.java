@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,6 +35,15 @@ public class AlertServerHeartBeat implements HeartBeat {
     private long reportTime;
     private double cpuUsage;
     private double memoryUsage;
-    private double availablePhysicalMemorySize;
-    private String alertServerAddress;
+    private double jvmMemoryUsage;
+
+    private ServerStatus serverStatus;
+
+    private String host;
+    private int port;
+
+    @Override
+    public ServerStatus getServerStatus() {
+        return serverStatus;
+    }
 }

@@ -18,19 +18,26 @@
 package org.apache.dolphinscheduler.plugin.task.sagemaker;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.sagemaker.param.SagemakerConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.io.IOUtils;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -49,14 +56,29 @@ public class SagemakerTaskTest {
     private AmazonSageMaker client;
     private PipelineUtils pipelineUtils = new PipelineUtils();
 
+    private static final String MOCK_USERNAME = "lucky";
+    private static final String MOCK_PASSWORD = "root";
+    private static final String MOCK_TYPE = "SAGEMAKER";
+    private static final String MOCK_AWS_REGION = "REGION";
+
+    private static MockedStatic<DataSourceUtils> dataSourceUtilsStaticMock = null;
+
     @BeforeEach
     public void before() {
         String parameters = buildParameters();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        ResourceParametersHelper resourceParametersHelper = Mockito.mock(ResourceParametersHelper.class);
+        SagemakerConnectionParam sagemakerConnectionParam = Mockito.mock(SagemakerConnectionParam.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
+        Mockito.when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
+
+        dataSourceUtilsStaticMock = Mockito.mockStatic(DataSourceUtils.class);
+        dataSourceUtilsStaticMock.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+                .thenReturn(sagemakerConnectionParam);
 
         client = Mockito.mock(AmazonSageMaker.class);
-        sagemakerTask = new SagemakerTask(taskExecutionContext);
+        sagemakerTask = spy(new SagemakerTask(taskExecutionContext));
+        doReturn(client).when(sagemakerTask).createClient();
         sagemakerTask.init();
 
         StartPipelineExecutionResult startPipelineExecutionResult = Mockito.mock(StartPipelineExecutionResult.class);
@@ -73,6 +95,11 @@ public class SagemakerTaskTest {
         Mockito.lenient().when(client.startPipelineExecution(any())).thenReturn(startPipelineExecutionResult);
         Mockito.lenient().when(client.stopPipelineExecution(any())).thenReturn(stopPipelineExecutionResult);
         Mockito.lenient().when(client.describePipelineExecution(any())).thenReturn(describePipelineExecutionResult);
+    }
+
+    @AfterEach
+    public void afterEach() {
+        dataSourceUtilsStaticMock.close();
     }
 
     @Test
@@ -105,6 +132,10 @@ public class SagemakerTaskTest {
             throw new RuntimeException(e);
         }
         parameters.setSagemakerRequestJson(sagemakerRequestJson);
+        parameters.setUsername(MOCK_USERNAME);
+        parameters.setPassword(MOCK_PASSWORD);
+        parameters.setAwsRegion(MOCK_AWS_REGION);
+        parameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(parameters);
     }

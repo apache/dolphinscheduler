@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.alert;
 
+import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
+import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
 import javax.annotation.PreDestroy;
@@ -44,6 +47,8 @@ public class AlertServer {
     @Autowired
     private AlertBootstrapService alertBootstrapService;
     @Autowired
+    private ListenerEventPostService listenerEventPostService;
+    @Autowired
     private AlertRpcServer alertRpcServer;
     @Autowired
     private AlertPluginManager alertPluginManager;
@@ -51,6 +56,8 @@ public class AlertServer {
     private AlertRegistryClient alertRegistryClient;
 
     public static void main(String[] args) {
+        AlertServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
         new SpringApplicationBuilder(AlertServer.class).run(args);
     }
@@ -61,6 +68,7 @@ public class AlertServer {
         alertPluginManager.start();
         alertRegistryClient.start();
         alertBootstrapService.start();
+        listenerEventPostService.start();
         alertRpcServer.start();
         log.info("Alert server is started ...");
     }
@@ -88,6 +96,7 @@ public class AlertServer {
             try (
                     AlertRpcServer closedAlertRpcServer = alertRpcServer;
                     AlertBootstrapService closedAlertBootstrapService = alertBootstrapService;
+                    ListenerEventPostService closedListenerEventPostService = listenerEventPostService;
                     AlertRegistryClient closedAlertRegistryClient = alertRegistryClient) {
                 // close resource
             }

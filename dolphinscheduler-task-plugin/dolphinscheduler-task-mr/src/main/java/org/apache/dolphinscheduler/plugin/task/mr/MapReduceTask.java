@@ -28,10 +28,11 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- * mapreduce task
- */
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class MapReduceTask extends AbstractYarnTask {
 
     /**
@@ -40,20 +41,10 @@ public class MapReduceTask extends AbstractYarnTask {
      */
     private static final String MAPREDUCE_COMMAND = TaskConstants.HADOOP;
 
-    /**
-     * mapreduce parameters
-     */
     private MapReduceParameters mapreduceParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * constructor
-     * @param taskExecutionContext taskExecutionContext
-     */
     public MapReduceTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
@@ -90,19 +81,19 @@ public class MapReduceTask extends AbstractYarnTask {
      * @return command
      */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // hadoop jar <jar> [mainClass] [GENERIC_OPTIONS] args...
         List<String> args = new ArrayList<>();
         args.add(MAPREDUCE_COMMAND);
 
         // other parameters
         args.addAll(MapReduceArgsUtils.buildArgs(mapreduceParameters, taskExecutionContext));
+        return args.stream().collect(Collectors.joining(" "));
+    }
 
-        String command = ParameterUtils.convertParameterPlaceholders(String.join(" ", args),
-                taskExecutionContext.getDefinedParams());
-        log.info("mapreduce task command: {}", command);
-
-        return command;
+    @Override
+    protected Map<String, String> getProperties() {
+        return taskExecutionContext.getDefinedParams();
     }
 
     @Override

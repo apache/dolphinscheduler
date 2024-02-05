@@ -129,6 +129,9 @@ public class TaskDefinitionServiceImplTest {
     @Mock
     private ProcessTaskRelationLogDao processTaskRelationLogDao;
 
+    @Mock
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
     private static final String TASK_PARAMETER =
             "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";;
     private static final long PROJECT_CODE = 1L;
@@ -188,9 +191,14 @@ public class TaskDefinitionServiceImplTest {
         Mockito.when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(new TaskDefinition());
         Mockito.when(taskDefinitionMapper.updateById(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.insert(Mockito.any(TaskDefinitionLog.class))).thenReturn(1);
+        Mockito.when(processTaskRelationLogDao.insert(Mockito.any(ProcessTaskRelationLog.class))).thenReturn(1);
+        Mockito.when(processDefinitionMapper.queryByCode(2L)).thenReturn(new ProcessDefinition());
+        Mockito.when(processDefinitionMapper.updateById(Mockito.any(ProcessDefinition.class))).thenReturn(1);
+        Mockito.when(processDefinitionLogMapper.insert(Mockito.any(ProcessDefinitionLog.class))).thenReturn(1);
         Mockito.when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
         Mockito.when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
-        Mockito.when(processTaskRelationMapper.queryByTaskCode(3)).thenReturn(getProcessTaskRelationList2());
+        Mockito.when(processTaskRelationMapper.queryProcessTaskRelationByTaskCodeAndTaskVersion(TASK_CODE, 0))
+                .thenReturn(getProcessTaskRelationList2());
         Mockito.when(processTaskRelationMapper
                 .updateProcessTaskRelationTaskVersion(Mockito.any(ProcessTaskRelation.class))).thenReturn(1);
         result = taskDefinitionService.updateTaskDefinition(user, PROJECT_CODE, TASK_CODE, taskDefinitionJson);
@@ -555,8 +563,8 @@ public class TaskDefinitionServiceImplTest {
 
         // saveTaskRelation
         List<ProcessTaskRelationLog> processTaskRelationLogList = getProcessTaskRelationLogList();
-        Mockito.when(processTaskRelationMapper.queryByProcessCode(eq(processDefinition.getProjectCode()),
-                eq(processDefinition.getCode()))).thenReturn(processTaskRelationList);
+        Mockito.when(processTaskRelationMapper.queryByProcessCode(eq(processDefinition.getCode())))
+                .thenReturn(processTaskRelationList);
         Mockito.when(processTaskRelationMapper.batchInsert(isA(List.class))).thenReturn(1);
         Mockito.when(processTaskRelationLogMapper.batchInsert(isA(List.class))).thenReturn(1);
         int insertResult = processServiceImpl.saveTaskRelation(loginUser, processDefinition.getProjectCode(),

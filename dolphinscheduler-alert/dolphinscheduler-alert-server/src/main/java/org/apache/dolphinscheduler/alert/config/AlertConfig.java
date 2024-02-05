@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.alert.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 
 import lombok.Data;
@@ -39,7 +41,7 @@ public final class AlertConfig implements Validator {
 
     private int waitTimeout;
 
-    private Duration heartbeatInterval = Duration.ofSeconds(60);
+    private Duration maxHeartbeatInterval = Duration.ofSeconds(60);
 
     private String alertServerAddress;
 
@@ -52,17 +54,20 @@ public final class AlertConfig implements Validator {
     public void validate(Object target, Errors errors) {
         AlertConfig alertConfig = (AlertConfig) target;
 
-        if (heartbeatInterval.getSeconds() <= 0) {
-            errors.rejectValue("heartbeat-interval", null, "should be a valid duration");
+        if (maxHeartbeatInterval.getSeconds() <= 0) {
+            errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
         }
 
-        alertConfig.setAlertServerAddress(NetUtils.getAddr(port));
+        if (StringUtils.isEmpty(alertServerAddress)) {
+            alertConfig.setAlertServerAddress(NetUtils.getAddr(alertConfig.getPort()));
+        }
+
         printConfig();
     }
 
     private void printConfig() {
         log.info("Alert config: port -> {}", port);
         log.info("Alert config: alertServerAddress -> {}", alertServerAddress);
-        log.info("Alert config: heartbeatInterval -> {}", heartbeatInterval);
+        log.info("Alert config: maxHeartbeatInterval -> {}", maxHeartbeatInterval);
     }
 }
