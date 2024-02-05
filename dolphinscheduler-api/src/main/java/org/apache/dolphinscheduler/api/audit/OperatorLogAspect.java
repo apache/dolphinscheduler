@@ -71,140 +71,145 @@ public class OperatorLogAspect {
 
     @Around("logPointCut()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
-        long beginTime = System.currentTimeMillis();
-        MethodSignature signature = (MethodSignature) point.getSignature();
-        Method method = signature.getMethod();
+        try{
+            long beginTime = System.currentTimeMillis();
+            MethodSignature signature = (MethodSignature) point.getSignature();
+            Method method = signature.getMethod();
 
-        OperatorLog operatorLog = method.getAnnotation(OperatorLog.class);
-        // Api don't need record log
-        if (operatorLog == null) {
-            return point.proceed();
-        }
-
-        AuditObjectType auditObjectType = operatorLog.objectType();
-        AuditOperationType auditOperationType = operatorLog.operationType();
-
-        Operation operation = method.getAnnotation(Operation.class);
-        if (operation == null) {
-            log.error("api operation is null");
-            return point.proceed();
-        }
-
-        Object[] args = point.getArgs();
-        String[] strings = signature.getParameterNames();
-
-        User user = null;
-
-        Map<String, Object> paramsMap = new HashMap<>();
-        for (int i = 0; i < strings.length; i++) {
-            paramsMap.put(strings[i], args[i]);
-
-            if (args[i] instanceof User) {
-                user = (User) args[i];
+            OperatorLog operatorLog = method.getAnnotation(OperatorLog.class);
+            // Api don't need record log
+            if (operatorLog == null) {
+                return point.proceed();
             }
-        }
 
-        if (user == null) {
-            log.error("api param user is null");
-            return point.proceed();
-        }
+            AuditObjectType auditObjectType = operatorLog.objectType();
+            AuditOperationType auditOperationType = operatorLog.operationType();
 
-        // Change object and operation for resource part
-        ResourceType resourceType = (ResourceType) paramsMap.get("type");
+            Operation operation = method.getAnnotation(Operation.class);
+            if (operation == null) {
+                log.error("api operation is null");
+                return point.proceed();
+            }
 
-        switch (auditObjectType) {
-            case FOLDER:
-                if (resourceType != null && resourceType.equals(ResourceType.UDF))
-                    auditObjectType = AuditObjectType.UDF_FOLDER;
-                break;
-            case FILE:
-                if (resourceType != null && resourceType.equals(ResourceType.UDF))
-                    auditObjectType = AuditObjectType.UDF_FILE;
-                break;
-            case WORKER_GROUP:
-                if (auditOperationType == AuditOperationType.CREATE &&
-                        !paramsMap.get("id").toString().equals("0")) {
-                    auditOperationType = AuditOperationType.UPDATE;
+            Object[] args = point.getArgs();
+            String[] strings = signature.getParameterNames();
+
+            User user = null;
+
+            Map<String, Object> paramsMap = new HashMap<>();
+            for (int i = 0; i < strings.length; i++) {
+                paramsMap.put(strings[i], args[i]);
+
+                if (args[i] instanceof User) {
+                    user = (User) args[i];
                 }
-                break;
-            default:
-                break;
-        }
+            }
 
-        if (auditOperationType.isIntermediateState()) {
-            switch (auditOperationType) {
-                case RELEASE:
-                    ReleaseState releaseState = (ReleaseState) paramsMap.get("releaseState");
-                    switch (releaseState) {
-                        case ONLINE:
-                            auditOperationType = AuditOperationType.ONLINE;
-                            break;
-                        case OFFLINE:
-                            auditOperationType = AuditOperationType.OFFLINE;
-                            break;
-                        default:
-                            break;
-                    }
+            if (user == null) {
+                log.error("api param user is null");
+                return point.proceed();
+            }
+
+            // Change object and operation for resource part
+            ResourceType resourceType = (ResourceType) paramsMap.get("type");
+
+            switch (auditObjectType) {
+                case FOLDER:
+                    if (resourceType != null && resourceType.equals(ResourceType.UDF))
+                        auditObjectType = AuditObjectType.UDF_FOLDER;
                     break;
-                case EXECUTE:
-                    ExecuteType executeType = (ExecuteType) paramsMap.get("executeType");
-                    switch (executeType) {
-                        case REPEAT_RUNNING:
-                            auditOperationType = AuditOperationType.RERUN;
-                            break;
-                        case RECOVER_SUSPENDED_PROCESS:
-                            auditOperationType = AuditOperationType.RESUME_PAUSE;
-                            break;
-                        case START_FAILURE_TASK_PROCESS:
-                            auditOperationType = AuditOperationType.RESUME_FAILURE;
-                            break;
-                        case STOP:
-                            auditOperationType = AuditOperationType.STOP;
-                            break;
-                        case PAUSE:
-                            auditOperationType = AuditOperationType.PAUSE;
-                            break;
-                        case EXECUTE_TASK:
-                            auditOperationType = AuditOperationType.EXECUTE;
-                            break;
-                        default:
-                            break;
+                case FILE:
+                    if (resourceType != null && resourceType.equals(ResourceType.UDF))
+                        auditObjectType = AuditObjectType.UDF_FILE;
+                    break;
+                case WORKER_GROUP:
+                    if (auditOperationType == AuditOperationType.CREATE &&
+                            !paramsMap.get("id").toString().equals("0")) {
+                        auditOperationType = AuditOperationType.UPDATE;
                     }
                     break;
                 default:
                     break;
             }
-        }
 
-        List<AuditLog> auditLogList = new ArrayList<>();
-        AuditLog auditLog = new AuditLog();
-        auditLog.setUserId(user.getId());
-        auditLog.setObjectType(auditObjectType.getCode());
-        auditLog.setOperationType(auditOperationType.getCode());
-        auditLog.setDescription(operation.description());
-        auditLog.setTime(new Date());
-        auditLogList.add(auditLog);
+            if (auditOperationType.isIntermediateState()) {
+                switch (auditOperationType) {
+                    case RELEASE:
+                        ReleaseState releaseState = (ReleaseState) paramsMap.get("releaseState");
+                        switch (releaseState) {
+                            case ONLINE:
+                                auditOperationType = AuditOperationType.ONLINE;
+                                break;
+                            case OFFLINE:
+                                auditOperationType = AuditOperationType.OFFLINE;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case EXECUTE:
+                        ExecuteType executeType = (ExecuteType) paramsMap.get("executeType");
+                        switch (executeType) {
+                            case REPEAT_RUNNING:
+                                auditOperationType = AuditOperationType.RERUN;
+                                break;
+                            case RECOVER_SUSPENDED_PROCESS:
+                                auditOperationType = AuditOperationType.RESUME_PAUSE;
+                                break;
+                            case START_FAILURE_TASK_PROCESS:
+                                auditOperationType = AuditOperationType.RESUME_FAILURE;
+                                break;
+                            case STOP:
+                                auditOperationType = AuditOperationType.STOP;
+                                break;
+                            case PAUSE:
+                                auditOperationType = AuditOperationType.PAUSE;
+                                break;
+                            case EXECUTE_TASK:
+                                auditOperationType = AuditOperationType.EXECUTE;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
 
-        setInformation(operatorLog, auditLogList, paramsMap);
+            List<AuditLog> auditLogList = new ArrayList<>();
+            AuditLog auditLog = new AuditLog();
+            auditLog.setUserId(user.getId());
+            auditLog.setObjectType(auditObjectType.getCode());
+            auditLog.setOperationType(auditOperationType.getCode());
+            auditLog.setDescription(operation.description());
+            auditLog.setTime(new Date());
+            auditLogList.add(auditLog);
 
-        Result result = (Result) point.proceed();
+            setInformation(operatorLog, auditLogList, paramsMap);
 
-        if (resultFail(result)) {
-            log.error("request fail, code {}", result.getCode());
+            Result result = (Result) point.proceed();
+
+            if (resultFail(result)) {
+                log.error("request fail, code {}", result.getCode());
+                return result;
+            }
+
+            // need get field by created obj like create operation
+            if (operatorLog.returnObjectFieldName().length != 0) {
+                auditLog.setObjectId(getObjectIfFromReturnObject(result.getData(), operatorLog.returnObjectFieldName()));
+                auditLog.setObjectName(auditService.getObjectNameByObjectId(auditLog.getObjectId(), auditObjectType));
+            }
+
+            long latency = System.currentTimeMillis() - beginTime;
+
+            auditService.addAudit(auditLogList, latency);
             return result;
+        } catch (Exception e) {
+            log.error("audit log aspect error", e);
+//            return point.proceed();
+            return null;
         }
-
-        // need get field by created obj like create operation
-        if (operatorLog.returnObjectFieldName().length != 0) {
-            auditLog.setObjectId(getObjectIfFromReturnObject(result.getData(), operatorLog.returnObjectFieldName()));
-            auditLog.setObjectName(auditService.getObjectNameByObjectId(auditLog.getObjectId(), auditObjectType));
-        }
-
-        long latency = System.currentTimeMillis() - beginTime;
-
-        auditService.addAudit(auditLogList, latency);
-
-        return result;
     }
 
     private void setInformation(OperatorLog operatorLog, List<AuditLog> auditLogList, Map<String, Object> paramsMap) {
@@ -253,8 +258,10 @@ public class OperatorLogAspect {
                     if (paramNameArr[i].equals("id")) {
                         int id = (int) paramsMap.get(paramNameArr[i]);
                         Schedule schedule = scheduleMapper.selectById(id);
-                        paramsMap.put("code", schedule.getProcessDefinitionCode());
-                        paramNameArr[i] = "code";
+                        if(schedule != null) {
+                            paramsMap.put("code", schedule.getProcessDefinitionCode());
+                            paramNameArr[i] = "code";
+                        }
                     }
                 }
                 break;
