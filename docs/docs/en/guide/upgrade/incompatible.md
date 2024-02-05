@@ -10,7 +10,7 @@ This document records the incompatible updates between each version. You need to
 * Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
 * Change the default unix shell executor from sh to bash ([#12180](https://github.com/apache/dolphinscheduler/pull/12180)).
 * Remove `deleteSource` in `download()` of `StorageOperate` ([#14084](https://github.com/apache/dolphinscheduler/pull/14084))
-* Remove default key for attribute `data-quality.jar.name` in `common.properties` ([#15551](https://github.com/apache/dolphinscheduler/pull/15551))
+* Rename attribute `data-quality.jar.name` to `data-quality.jar.dir` in `common.properties` ([#15551](https://github.com/apache/dolphinscheduler/pull/15551))
 
 ## 3.2.0
 

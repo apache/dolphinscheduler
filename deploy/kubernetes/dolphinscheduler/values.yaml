@@ -328,7 +328,7 @@ conf:
     datasource.encryption.salt: '!@#$%^&*'
 
     # -- data quality option
-    data-quality.jar.name: dolphinscheduler-data-quality-dev-SNAPSHOT.jar
+    data-quality.jar.dir:
 
     # -- Whether hive SQL is executed in the same session
     support.hive.oneSession: false
