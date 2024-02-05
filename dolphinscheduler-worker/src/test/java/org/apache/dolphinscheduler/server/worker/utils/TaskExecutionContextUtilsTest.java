@@ -49,7 +49,7 @@ class TaskExecutionContextUtilsTest {
         try {
             // Test if the working directory is exist
             // will delete it and recreate
-            Files.createDirectories(Paths.get(taskWorkingDirectory));
+            FileUtils.createDirectoryWith755(Paths.get(taskWorkingDirectory));
             Files.createFile(Paths.get(taskWorkingDirectory, "text.txt"));
             Assertions.assertTrue(Files.exists(Paths.get(taskWorkingDirectory, "text.txt")));
 
