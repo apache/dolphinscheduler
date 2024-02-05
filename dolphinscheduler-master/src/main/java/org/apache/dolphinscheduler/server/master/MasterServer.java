@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
+import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import javax.annotation.PostConstruct;
@@ -84,6 +85,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private MasterSlotManager masterSlotManager;
 
+    @Autowired
+    private TaskGroupCoordinator taskGroupCoordinator;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -115,6 +119,7 @@ public class MasterServer implements IStoppable {
         this.failoverExecuteThread.start();
 
         this.schedulerApi.start();
+        this.taskGroupCoordinator.start();
 
         MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();

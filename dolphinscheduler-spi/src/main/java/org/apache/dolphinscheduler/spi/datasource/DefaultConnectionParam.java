@@ -15,28 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.spi.datasource;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public class DefaultConnectionParam extends BaseConnectionParam {
 
-@Data
-@NoArgsConstructor
-public class TaskInstanceForceStartRequest {
-
-    private String key;
-
-    private int processInstanceId;
-
-    private int taskInstanceId;
-
-    public TaskInstanceForceStartRequest(
-                                         int processInstanceId,
-                                         int taskInstanceId) {
-        this.key = String.format("%d-%d", processInstanceId, taskInstanceId);
-
-        this.processInstanceId = processInstanceId;
-        this.taskInstanceId = taskInstanceId;
+    @Override
+    public String toString() {
+        return "DefaultConnectionParam{"
+                + "user='" + user + '\''
+                + ", password='" + password + '\''
+                + ", address='" + address + '\''
+                + ", database='" + database + '\''
+                + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
+                + ", other='" + other + '\''
+                + '}';
     }
-
 }

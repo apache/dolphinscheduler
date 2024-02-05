@@ -41,14 +41,14 @@ public interface K8sNamespaceService {
     Result queryListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
-     * create namespace,if not exist on k8s,will create,if exist only register in db
+     * register namespace in db,need to create namespace in k8s first
      *
      * @param loginUser    login user
      * @param namespace    namespace
      * @param clusterCode  k8s not null
      * @return
      */
-    Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode);
+    Map<String, Object> registerK8sNamespace(User loginUser, String namespace, Long clusterCode);
 
     /**
      * verify namespace and k8s

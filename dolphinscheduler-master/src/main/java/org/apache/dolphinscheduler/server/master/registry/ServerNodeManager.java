@@ -174,6 +174,7 @@ public class ServerNodeManager implements InitializingBean {
                         log.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
                         log.info("Worker node : {} down.", path);
+                        removeSingleWorkerNode(workerAddress);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                         listenerEventAlertManager.publishServerDownListenerEvent(path, "WORKER");
                     } else if (type == Type.UPDATE) {
@@ -189,6 +190,16 @@ public class ServerNodeManager implements InitializingBean {
             workerNodeInfoWriteLock.lock();
             try {
                 workerNodeInfo.put(workerAddress, info);
+            } finally {
+                workerNodeInfoWriteLock.unlock();
+            }
+        }
+
+        private void removeSingleWorkerNode(String workerAddress) {
+            workerNodeInfoWriteLock.lock();
+            try {
+                workerNodeInfo.remove(workerAddress);
+                log.info("remove worker node {} from workerNodeInfo when worker server down", workerAddress);
             } finally {
                 workerNodeInfoWriteLock.unlock();
             }
