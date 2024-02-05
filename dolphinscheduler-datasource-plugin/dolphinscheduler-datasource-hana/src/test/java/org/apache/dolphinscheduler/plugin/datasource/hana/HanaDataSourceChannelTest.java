@@ -27,13 +27,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class HanaDataSourceChannelTest {
+class HanaDataSourceChannelTest {
 
     @Test
-    public void testCreateDataSourceClient() {
+    void testCreateDataSourceClient() {
         HanaDataSourceChannel sourceChannel = Mockito.mock(HanaDataSourceChannel.class);
-        HanaDataSourceClient dataSourceClient = Mockito.mock(HanaDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new HanaConnectionParam(), DbType.HANA));
+        HanaPooledDataSourceClient dataSourceClient = Mockito.mock(HanaPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new HanaConnectionParam(), DbType.HANA));
     }
 }

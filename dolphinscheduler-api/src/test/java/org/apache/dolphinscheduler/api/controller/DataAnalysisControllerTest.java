@@ -24,8 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -77,8 +77,8 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result<TaskInstanceCountVo> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Result<TaskInstanceCountVo>>() {
+        Result<TaskInstanceCountVO> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<TaskInstanceCountVO>>() {
                 });
         assertThat(result.getCode())
                 .isNotNull()
@@ -101,8 +101,8 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result<WorkflowInstanceCountVo> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Result<WorkflowInstanceCountVo>>() {
+        Result<WorkflowInstanceCountVO> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<WorkflowInstanceCountVO>>() {
                 });
         assertThat(result.getCode())
                 .isEqualTo(Status.SUCCESS.getCode());

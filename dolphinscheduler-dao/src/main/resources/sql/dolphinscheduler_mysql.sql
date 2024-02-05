@@ -415,7 +415,7 @@ CREATE TABLE `t_ds_process_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
-  `version` int(11) DEFAULT '0' COMMENT 'process definition version',
+  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'process definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
@@ -444,7 +444,7 @@ CREATE TABLE `t_ds_process_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `name` varchar(255) DEFAULT NULL COMMENT 'process definition name',
-  `version` int(11) DEFAULT '0' COMMENT 'process definition version',
+  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'process definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `release_state` tinyint(4) DEFAULT NULL COMMENT 'process definition release state：0:offline,1:online',
@@ -471,7 +471,7 @@ CREATE TABLE `t_ds_task_definition` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `name` varchar(255) DEFAULT NULL COMMENT 'task definition name',
-  `version` int(11) DEFAULT '0' COMMENT 'task definition version',
+  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'task definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
@@ -507,7 +507,7 @@ CREATE TABLE `t_ds_task_definition_log` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `name` varchar(255) DEFAULT NULL COMMENT 'task definition name',
-  `version` int(11) DEFAULT '0' COMMENT 'task definition version',
+  `version` int(11) NOT NULL DEFAULT '1' COMMENT 'task definition version',
   `description` text COMMENT 'description',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'task definition creator id',
@@ -595,7 +595,7 @@ CREATE TABLE `t_ds_process_instance` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
   `process_definition_code` bigint(20) NOT NULL COMMENT 'process definition code',
-  `process_definition_version` int(11) DEFAULT '0' COMMENT 'process definition version',
+  `process_definition_version` int(11) NOT NULL DEFAULT '1' COMMENT 'process definition version',
   `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
   `state` tinyint(4) DEFAULT NULL COMMENT 'process instance Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
   `state_history` text DEFAULT NULL COMMENT 'state history desc',
@@ -669,7 +669,7 @@ DROP TABLE IF EXISTS `t_ds_project_parameter`;
 CREATE TABLE `t_ds_project_parameter` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `param_name` varchar(255) NOT NULL COMMENT 'project parameter name',
-  `param_value` varchar(255) NOT NULL COMMENT 'project parameter value',
+  `param_value` text NOT NULL COMMENT 'project parameter value',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
@@ -783,6 +783,7 @@ CREATE TABLE `t_ds_relation_project_user` (
 -- ----------------------------
 -- Table structure for t_ds_relation_resources_user
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS `t_ds_relation_resources_user`;
 CREATE TABLE `t_ds_relation_resources_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -815,6 +816,7 @@ CREATE TABLE `t_ds_relation_udfs_user` (
 -- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS `t_ds_resources`;
 CREATE TABLE `t_ds_resources` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
@@ -892,7 +894,7 @@ CREATE TABLE `t_ds_task_instance` (
   `task_type` varchar(50) NOT NULL COMMENT 'task type',
   `task_execute_type` int(11) DEFAULT '0' COMMENT 'task execute type: 0-batch, 1-stream',
   `task_code` bigint(20) NOT NULL COMMENT 'task definition code',
-  `task_definition_version` int(11) DEFAULT '0' COMMENT 'task definition version',
+  `task_definition_version` int(11) NOT NULL DEFAULT '1' COMMENT 'task definition version',
   `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
   `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
   `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
@@ -1962,6 +1964,7 @@ CREATE TABLE `t_ds_task_group_queue` (
   `in_queue` tinyint(4) DEFAULT '0' COMMENT 'ready to get the queue by other task finish 0 NO ,1 YES',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_t_ds_task_group_queue_in_queue` (`in_queue`),
   PRIMARY KEY( `id` )
 )ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
@@ -2089,6 +2092,10 @@ CREATE TABLE `t_ds_fav_task`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
 
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_trigger_relation`;
 CREATE TABLE `t_ds_trigger_relation` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',

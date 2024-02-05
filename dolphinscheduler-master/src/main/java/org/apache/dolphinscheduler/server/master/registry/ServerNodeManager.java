@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
-import org.apache.dolphinscheduler.extract.base.utils.NamedThreadFactory;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -116,8 +116,8 @@ public class ServerNodeManager implements InitializingBean {
         refreshNodesAndGroupMappings();
 
         // init executor service
-        executorService =
-                Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("ServerNodeManagerExecutor"));
+        executorService = Executors
+                .newSingleThreadScheduledExecutor(ThreadUtils.newDaemonThreadFactory("ServerNodeManagerExecutor"));
         executorService.scheduleWithFixedDelay(
                 new WorkerNodeInfoAndGroupDbSyncTask(),
                 0,
@@ -174,6 +174,7 @@ public class ServerNodeManager implements InitializingBean {
                         log.info("Worker: {} added, currentNode : {}", path, workerAddress);
                     } else if (type == Type.REMOVE) {
                         log.info("Worker node : {} down.", path);
+                        removeSingleWorkerNode(workerAddress);
                         alertDao.sendServerStoppedAlert(1, path, "WORKER");
                         listenerEventAlertManager.publishServerDownListenerEvent(path, "WORKER");
                     } else if (type == Type.UPDATE) {
@@ -189,6 +190,16 @@ public class ServerNodeManager implements InitializingBean {
             workerNodeInfoWriteLock.lock();
             try {
                 workerNodeInfo.put(workerAddress, info);
+            } finally {
+                workerNodeInfoWriteLock.unlock();
+            }
+        }
+
+        private void removeSingleWorkerNode(String workerAddress) {
+            workerNodeInfoWriteLock.lock();
+            try {
+                workerNodeInfo.remove(workerAddress);
+                log.info("remove worker node {} from workerNodeInfo when worker server down", workerAddress);
             } finally {
                 workerNodeInfoWriteLock.unlock();
             }

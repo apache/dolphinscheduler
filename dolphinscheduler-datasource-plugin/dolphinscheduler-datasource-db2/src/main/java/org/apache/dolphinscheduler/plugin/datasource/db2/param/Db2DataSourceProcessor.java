@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -127,6 +128,11 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getValidationQuery() {
         return DB2_VALIDATION_QUERY;
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.db2);
     }
 
     private String transformOther(Map<String, String> otherMap) {

@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -46,13 +45,10 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -100,9 +96,6 @@ public class UsersServiceTest {
     private TenantMapper tenantMapper;
 
     @Mock
-    private ResourceMapper resourceMapper;
-
-    @Mock
     private AlertGroupMapper alertGroupMapper;
 
     @Mock
@@ -110,9 +103,6 @@ public class UsersServiceTest {
 
     @Mock
     private ProjectUserMapper projectUserMapper;
-
-    @Mock
-    private ResourceUserMapper resourceUserMapper;
 
     @Mock
     private MetricsCleanUpService metricsCleanUpService;
@@ -335,6 +325,20 @@ public class UsersServiceTest {
                 "queue",
                 1,
                 "Asia/Shanghai"));
+
+        // non-admin should not modify tenantId and queue
+        when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
+        User user = userMapper.selectById(2);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
+                2,
+                userName,
+                userPassword,
+                "abc@qq.com",
+                null,
+                "13457864543",
+                "offline",
+                1,
+                "Asia/Shanghai"));
     }
 
     @Test
@@ -510,26 +514,6 @@ public class UsersServiceTest {
         result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testGrantResources() {
-        String resourceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantResources(loginUser, 2, resourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        // success
-        when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
-        when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
-        result = usersService.grantResources(loginUser, 1, resourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
     }
 
     @Test
@@ -890,6 +874,23 @@ public class UsersServiceTest {
     }
 
     /**
+     * get non-admin user
+     *
+     * @return user
+     */
+    private User getNonAdminUser() {
+
+        User user = new User();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setUserName("userTest0001");
+        user.setUserPassword("userTest0001");
+        user.setTenantId(2);
+        user.setQueue("queue");
+        return user;
+    }
+
+    /**
      * get tenant
      *
      * @return tenant
@@ -898,22 +899,6 @@ public class UsersServiceTest {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         return tenant;
-    }
-
-    /**
-     * get resource
-     *
-     * @return resource
-     */
-    private Resource getResource() {
-        Resource resource = new Resource();
-        resource.setPid(-1);
-        resource.setUserId(1);
-        resource.setDescription("ResourcesServiceTest.jar");
-        resource.setAlias("ResourcesServiceTest.jar");
-        resource.setFullName("/ResourcesServiceTest.jar");
-        resource.setType(ResourceType.FILE);
-        return resource;
     }
 
     private List<AlertGroup> getAlertGroups() {

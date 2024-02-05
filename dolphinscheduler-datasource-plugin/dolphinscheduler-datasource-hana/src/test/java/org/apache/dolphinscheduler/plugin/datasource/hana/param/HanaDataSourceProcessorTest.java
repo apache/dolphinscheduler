@@ -31,12 +31,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class HanaDataSourceProcessorTest {
+class HanaDataSourceProcessorTest {
 
     private HanaDataSourceProcessor hanaDataSourceProcessor = new HanaDataSourceProcessor();
 
     @Test
-    public void testCreateConnectionParams() {
+    void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         HanaDataSourceParamDTO mysqlDatasourceParamDTO = new HanaDataSourceParamDTO();
         mysqlDatasourceParamDTO.setUserName("root");
@@ -55,7 +55,7 @@ public class HanaDataSourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams2() {
+    void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sap://localhost:30015\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sap://localhost:30015?currentschema=default\"}";
         HanaConnectionParam connectionParams = (HanaConnectionParam) hanaDataSourceProcessor
@@ -74,12 +74,12 @@ public class HanaDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDbType() {
+    void testGetDbType() {
         Assertions.assertEquals(DbType.HANA, hanaDataSourceProcessor.getDbType());
     }
 
     @Test
-    public void testGetDatasourceUniqueId() {
+    void testGetDatasourceUniqueId() {
         HanaConnectionParam mysqlConnectionParam = new HanaConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015?currentschema=default");
         mysqlConnectionParam.setUser("root");

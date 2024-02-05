@@ -30,6 +30,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -168,7 +169,7 @@ public class ProcessUtils {
                 taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
                 if (StringUtils.isEmpty(taskExecutionContext.getExecutePath())) {
                     taskExecutionContext
-                            .setExecutePath(FileUtils.getProcessExecDir(
+                            .setExecutePath(FileUtils.getTaskInstanceWorkingDirectory(
                                     taskExecutionContext.getTenantCode(),
                                     taskExecutionContext.getProjectCode(),
                                     taskExecutionContext.getProcessDefineCode(),
@@ -176,7 +177,7 @@ public class ProcessUtils {
                                     taskExecutionContext.getProcessInstanceId(),
                                     taskExecutionContext.getTaskInstanceId()));
                 }
-                FileUtils.createWorkDirIfAbsent(taskExecutionContext.getExecutePath());
+                FileUtils.createDirectoryWith755(Paths.get(taskExecutionContext.getExecutePath()));
                 org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils.cancelApplication(taskExecutionContext);
                 return appIds;
             } else {
