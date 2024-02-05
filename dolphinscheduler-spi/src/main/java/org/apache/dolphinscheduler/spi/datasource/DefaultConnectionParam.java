@@ -15,35 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+package org.apache.dolphinscheduler.spi.datasource;
 
-import java.util.Map;
+public class DefaultConnectionParam extends BaseConnectionParam {
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-/**
- * JdbcInfo
- */
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class JdbcInfo {
-
-    private String host;
-
-    private String port;
-
-    private String driverName;
-
-    private String database;
-
-    private Map<String, String> params;
-
-    private String address;
-
-    private String jdbcUrl;
+    @Override
+    public String toString() {
+        return "DefaultConnectionParam{"
+                + "user='" + user + '\''
+                + ", password='" + password + '\''
+                + ", address='" + address + '\''
+                + ", database='" + database + '\''
+                + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
+                + ", other='" + other + '\''
+                + '}';
+    }
 }

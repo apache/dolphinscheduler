@@ -36,16 +36,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.core.io.ClassPathResource;
 
 /**
  * common utils
  */
+@Slf4j
 public class CommonUtils {
 
     private CommonUtils() {
         throw new UnsupportedOperationException("Construct CommonUtils");
     }
+
+    private static String DEFAULT_DATA_QUALITY_JAR_PATH = null;
 
     private static final boolean IS_DEVELOP_MODE = PropertyUtils.getBoolean(Constants.DEVELOPMENT_STATE, true);
 
@@ -123,14 +132,56 @@ public class CommonUtils {
         return false;
     }
 
-    public static String getDataQualityJarName() {
-        String dqsJarName = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
+    public static String getDataQualityJarPath() {
+        String dqsJarPath = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
 
-        if (StringUtils.isEmpty(dqsJarName)) {
-            return "dolphinscheduler-data-quality.jar";
+        if (StringUtils.isEmpty(dqsJarPath)) {
+            log.info("data quality jar path is empty, will try to get it from data quality jar name");
+            return getDefaultDataQualityJarPath();
         }
 
-        return dqsJarName;
+        return dqsJarPath;
+    }
+
+    private static String getDefaultDataQualityJarPath() {
+        if (StringUtils.isNotEmpty(DEFAULT_DATA_QUALITY_JAR_PATH)) {
+            return DEFAULT_DATA_QUALITY_JAR_PATH;
+        }
+        try {
+            // not standalone mode
+            String currentAbsolutePath = new ClassPathResource("./").getFile().getAbsolutePath();
+            String currentLibPath = currentAbsolutePath + "/../libs";
+            getDataQualityJarPathFromPath(currentLibPath).ifPresent(jarName -> DEFAULT_DATA_QUALITY_JAR_PATH = jarName);
+
+            // standalone mode
+            if (StringUtils.isEmpty(DEFAULT_DATA_QUALITY_JAR_PATH)) {
+                log.info(
+                        "Can not get data quality jar from path {}, maybe service running in standalone mode, will try to find another path",
+                        currentLibPath);
+                currentLibPath = currentAbsolutePath + "/../../worker-server/libs";
+                getDataQualityJarPathFromPath(currentLibPath)
+                        .ifPresent(jarName -> DEFAULT_DATA_QUALITY_JAR_PATH = jarName);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("get default data quality jar path error", e);
+        }
+        log.info("get default data quality jar name: {}", DEFAULT_DATA_QUALITY_JAR_PATH);
+        return DEFAULT_DATA_QUALITY_JAR_PATH;
+    }
+
+    private static Optional<String> getDataQualityJarPathFromPath(String path) {
+        log.info("Try to get data quality jar from path {}", path);
+        File[] jars = new File(path).listFiles();
+        if (jars == null) {
+            log.warn("No data quality related jar found from path {}", path);
+            return Optional.empty();
+        }
+        for (File jar : jars) {
+            if (jar.getName().startsWith("dolphinscheduler-data-quality")) {
+                return Optional.of(jar.getAbsolutePath());
+            }
+        }
+        return Optional.empty();
     }
 
     /**

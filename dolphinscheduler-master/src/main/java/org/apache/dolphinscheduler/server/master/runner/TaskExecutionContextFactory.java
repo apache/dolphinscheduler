@@ -17,13 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.ADDRESS;
-import static org.apache.dolphinscheduler.common.constants.Constants.DATABASE;
-import static org.apache.dolphinscheduler.common.constants.Constants.JDBC_URL;
-import static org.apache.dolphinscheduler.common.constants.Constants.OTHER;
-import static org.apache.dolphinscheduler.common.constants.Constants.PASSWORD;
-import static org.apache.dolphinscheduler.common.constants.Constants.SINGLE_SLASH;
-import static org.apache.dolphinscheduler.common.constants.Constants.USER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DATA_QUALITY;
@@ -70,6 +63,8 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
+import org.apache.dolphinscheduler.spi.datasource.DefaultConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -80,7 +75,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -400,15 +394,16 @@ public class TaskExecutionContextFactory {
         dataSource.setUserName(hikariDataSource.getUsername());
         JdbcInfo jdbcInfo = JdbcUrlParser.getJdbcInfo(hikariDataSource.getJdbcUrl());
         if (jdbcInfo != null) {
-            Properties properties = new Properties();
-            properties.setProperty(USER, hikariDataSource.getUsername());
-            properties.setProperty(PASSWORD, hikariDataSource.getPassword());
-            properties.setProperty(DATABASE, jdbcInfo.getDatabase());
-            properties.setProperty(ADDRESS, jdbcInfo.getAddress());
-            properties.setProperty(OTHER, jdbcInfo.getParams());
-            properties.setProperty(JDBC_URL, jdbcInfo.getAddress() + SINGLE_SLASH + jdbcInfo.getDatabase());
+            //
+            BaseConnectionParam baseConnectionParam = new DefaultConnectionParam();
+            baseConnectionParam.setUser(hikariDataSource.getUsername());
+            baseConnectionParam.setPassword(hikariDataSource.getPassword());
+            baseConnectionParam.setDatabase(jdbcInfo.getDatabase());
+            baseConnectionParam.setAddress(jdbcInfo.getAddress());
+            baseConnectionParam.setJdbcUrl(jdbcInfo.getJdbcUrl());
+            baseConnectionParam.setOther(jdbcInfo.getParams());
             dataSource.setType(DbType.of(JdbcUrlParser.getDbType(jdbcInfo.getDriverName()).getCode()));
-            dataSource.setConnectionParams(JSONUtils.toJsonString(properties));
+            dataSource.setConnectionParams(JSONUtils.toJsonString(baseConnectionParam));
         }
 
         return dataSource;

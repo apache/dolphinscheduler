@@ -33,6 +33,7 @@ import org.apache.commons.collections4.MapUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -115,6 +116,10 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         MySQLConnectionParam mysqlConnectionParam = (MySQLConnectionParam) connectionParam;
+        if (MapUtils.isNotEmpty(mysqlConnectionParam.getOther())) {
+            return String.format("%s?%s", mysqlConnectionParam.getJdbcUrl(),
+                    transformOther(mysqlConnectionParam.getOther()));
+        }
         return mysqlConnectionParam.getJdbcUrl();
     }
 
@@ -180,6 +185,15 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
                 && !key.contains(AUTO_DESERIALIZE)
                 && !key.contains(ALLOW_LOCAL_IN_FILE_NAME)
                 && !key.contains(ALLOW_URL_IN_LOCAL_IN_FILE_NAME);
+    }
+
+    private String transformOther(Map<String, String> otherMap) {
+        if (MapUtils.isNotEmpty(otherMap)) {
+            List<String> list = new ArrayList<>(otherMap.size());
+            otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
+            return String.join("&", list);
+        }
+        return null;
     }
 
 }
