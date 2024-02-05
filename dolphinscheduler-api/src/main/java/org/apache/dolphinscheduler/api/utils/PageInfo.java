@@ -56,6 +56,18 @@ public class PageInfo<T> {
 
     }
 
+    public void setTotal(Integer total) {
+        this.total = total;
+        // cal totalPage
+        calculateTotalPage();
+    }
+
+    private void calculateTotalPage() {
+        if (total != null && total > 0 && pageSize > 0) {
+            this.totalPage = (int) Math.ceil((double) total / pageSize);
+        }
+    }
+
     public PageInfo(Integer currentPage, Integer pageSize) {
         if (currentPage == null) {
             currentPage = 1;
