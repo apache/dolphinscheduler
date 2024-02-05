@@ -71,7 +71,7 @@ public final class ProcessUtils {
      * Initialization regularization, solve the problem of pre-compilation performance,
      * avoid the thread safety problem of multi-thread operation
      */
-    private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
+    private static final Pattern MACPATTERN = Pattern.compile("-[+|-][-|=]\\s(\\d+)");
 
     /**
      * Expression of PID recognition in Windows scene
