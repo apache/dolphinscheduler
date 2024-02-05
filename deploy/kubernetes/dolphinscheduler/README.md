@@ -11,7 +11,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 ## Values
 
 | Key | Type | Default | Description |
-|-----|------|-------|-------------|
+|-----|------|---------|-------------|
 | alert.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | alert.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
 | alert.enabled | bool | `true` | Enable or disable the Alert-Server component |
