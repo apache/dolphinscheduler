@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -99,7 +100,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     }
 
     /**
-     * create namespace,if not exist on k8s,will create,if exist only register in db
+     * register namespace in db,need to create namespace in k8s first
      *
      * @param loginUser    login user
      * @param namespace    namespace
@@ -107,11 +108,10 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return
      */
     @Override
-    public Map<String, Object> createK8sNamespace(User loginUser, String namespace, Long clusterCode) {
+    public Map<String, Object> registerK8sNamespace(User loginUser, String namespace, Long clusterCode) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            log.warn("Only admin can create K8s namespace, current login user name:{}.", loginUser.getUserName());
-            return result;
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         if (StringUtils.isEmpty(namespace)) {
@@ -220,9 +220,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Map<String, Object> deleteNamespaceById(User loginUser, int id) {
         Map<String, Object> result = new HashMap<>();
-        if (isNotAdmin(loginUser, result)) {
-            log.warn("Only admin can delete K8s namespace, current login user name:{}.", loginUser.getUserName());
-            return result;
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         K8sNamespace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
@@ -258,8 +257,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     @Override
     public Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
-            return result;
+        if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         // query all namespace list, this auth does not like project
         List<K8sNamespace> namespaceList = k8sNamespaceMapper.selectList(null);
@@ -286,8 +285,8 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     public Map<String, Object> queryAuthorizedNamespace(User loginUser, Integer userId) {
         Map<String, Object> result = new HashMap<>();
 
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
-            return result;
+        if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         List<K8sNamespace> namespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);

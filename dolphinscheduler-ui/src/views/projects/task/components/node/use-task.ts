@@ -14,69 +14,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ref, Ref, unref } from 'vue'
+import {ref, Ref, unref} from 'vue'
 import nodes from './tasks'
 import getElementByJson from '@/components/form/get-elements-by-json'
-import { useTaskNodeStore } from '@/store/project/task-node'
-import { TASK_TYPES_MAP } from '@/store/project/task-type'
-import type {
-  IFormItem,
-  IJsonItem,
-  INodeData,
-  ITaskData,
-  FormRules,
-  EditWorkflowDefinition
-} from './types'
+import {useTaskNodeStore} from '@/store/project/task-node'
+import {TASK_TYPES_MAP} from '@/store/project/task-type'
+import type {EditWorkflowDefinition, FormRules, IFormItem, IJsonItem, INodeData, ITaskData} from './types'
 
 export function useTask({
-  data,
-  projectCode,
-  from,
-  readonly,
-  definition
-}: {
-  data: ITaskData
-  projectCode: number
-  from?: number
-  readonly?: boolean
-  definition?: EditWorkflowDefinition
+                            data,
+                            projectCode,
+                            from,
+                            readonly,
+                            definition
+                        }: {
+    data: ITaskData
+    projectCode: number
+    from?: number
+    readonly?: boolean
+    definition?: EditWorkflowDefinition
 }): {
-  elementsRef: Ref<IFormItem[]>
-  rulesRef: Ref<FormRules>
-  model: INodeData
+    elementsRef: Ref<IFormItem[]>
+    rulesRef: Ref<FormRules>
+    model: INodeData
 } {
-  const taskStore = useTaskNodeStore()
-  taskStore.updateDefinition(unref(definition), data?.code)
+    const taskStore = useTaskNodeStore()
+    taskStore.updateDefinition(unref(definition), data?.code)
 
-  const jsonRef = ref([]) as Ref<IJsonItem[]>
-  const elementsRef = ref([]) as Ref<IFormItem[]>
-  const rulesRef = ref({})
+    const jsonRef = ref([]) as Ref<IJsonItem[]>
+    const elementsRef = ref([]) as Ref<IFormItem[]>
+    const rulesRef = ref({})
 
-  const params = {
-    projectCode,
-    from,
-    readonly,
-    data,
-    jsonRef,
-    updateElements: () => {
-      getElements()
+    const params = {
+        projectCode,
+        from,
+        readonly,
+        data,
+        jsonRef,
+        updateElements: () => {
+            getElements()
+        }
     }
-  }
 
-  const { model, json } = nodes[data.taskType || 'SHELL'](params)
-  jsonRef.value = json
-  model.preTasks = taskStore.getPreTasks
-  model.name = taskStore.getName
-  model.taskExecuteType =
-    TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
+    const {model, json} = nodes[data.taskType || 'SHELL'](params)
+    jsonRef.value = json
+    model.preTasks = taskStore.getPreTasks
+    model.name = taskStore.getName
+    model.taskExecuteType =
+        TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
 
-  const getElements = () => {
-    const { rules, elements } = getElementByJson(jsonRef.value, model)
-    elementsRef.value = elements
-    rulesRef.value = rules
-  }
+    const getElements = () => {
+        const {rules, elements} = getElementByJson(jsonRef.value, model)
+        elementsRef.value = elements
+        rulesRef.value = rules
+    }
 
-  getElements()
+    getElements()
 
-  return { elementsRef, rulesRef, model }
+    return {elementsRef, rulesRef, model}
 }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -37,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.runner.task.TaskInstanceKey;
 
 import java.util.Optional;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
@@ -147,8 +147,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                     continue;
                 }
                 long timeRemain = DateUtils.getRemainTime(processInstance.getStartTime(),
-                        (long) processInstance.getTimeout()
-                                * Constants.MINUTE_2_SECOND_TIME_UNIT);
+                        TimeUnit.MINUTES.toSeconds(processInstance.getTimeout()));
                 if (timeRemain < 0) {
                     log.info("Workflow instance {} timeout, adding timeout event", processInstance.getId());
                     addProcessTimeoutEvent(processInstance);
@@ -247,8 +246,7 @@ public class StateWheelExecuteThread extends BaseDaemonThread {
                 TaskInstance taskInstance = taskInstanceOptional.get();
                 if (TimeoutFlag.OPEN == taskInstance.getTaskDefine().getTimeoutFlag()) {
                     long timeRemain = DateUtils.getRemainTime(taskInstance.getStartTime(),
-                            (long) taskInstance.getTaskDefine().getTimeout()
-                                    * Constants.MINUTE_2_SECOND_TIME_UNIT);
+                            TimeUnit.MINUTES.toSeconds(taskInstance.getTaskDefine().getTimeout()));
                     if (timeRemain < 0) {
                         log.info("Task instance is timeout, adding task timeout event and remove the check");
                         addTaskTimeoutEvent(taskInstance);

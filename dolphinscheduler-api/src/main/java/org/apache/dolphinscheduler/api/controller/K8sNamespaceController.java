@@ -86,17 +86,13 @@ public class K8sNamespaceController extends BaseController {
                                            @RequestParam("pageSize") Integer pageSize,
                                            @RequestParam("pageNo") Integer pageNo) {
 
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        return k8sNamespaceService.queryListPaging(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**
-     * create namespace,if not exist on k8s,will create,if exist only register in db
+     * register namespace in db,need to create namespace in k8s first
      *
      * @param loginUser
      * @param namespace    k8s namespace
@@ -115,7 +111,7 @@ public class K8sNamespaceController extends BaseController {
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode) {
         Map<String, Object> result =
-                k8sNamespaceService.createK8sNamespace(loginUser, namespace, clusterCode);
+                k8sNamespaceService.registerK8sNamespace(loginUser, namespace, clusterCode);
         return returnDataList(result);
     }
 
@@ -167,7 +163,7 @@ public class K8sNamespaceController extends BaseController {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return the namespaces which user have not permission to see
+     * @return the namespaces which user have no permission to see
      */
     @Operation(summary = "queryUnauthorizedNamespace", description = "QUERY_UNAUTHORIZED_NAMESPACE_NOTES")
     @Parameters({

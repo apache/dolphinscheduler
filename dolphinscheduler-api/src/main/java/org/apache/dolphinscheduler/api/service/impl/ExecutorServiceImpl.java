@@ -55,7 +55,6 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -83,14 +82,12 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.master.IStreamingTaskOperator;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -107,6 +104,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -227,11 +225,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    boolean allLevelDependent, ExecutionOrder executionOrder) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
+
+        Map<String, Object> result = new HashMap<>();
         // timeout is invalid
         if (timeout <= 0 || timeout > MAX_TASK_TIMEOUT) {
             log.warn("Parameter timeout is invalid, timeout:{}.", timeout);
@@ -464,10 +460,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         WorkflowExecuteResponse response = new WorkflowExecuteResponse();
 
-        Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
 
         ProcessInstance processInstance = processService.findProcessInstanceDetailById(processInstanceId)
@@ -555,16 +549,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> result = new HashMap<>();
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check process instance exist
-        ProcessInstance processInstance = processInstanceMapper.selectById(taskGroupQueue.getProcessId());
-        if (processInstance == null) {
-            log.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.",
-                    taskGroupQueue.getProjectCode(), taskGroupQueue.getProcessId());
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId());
-            return result;
-        }
-
+        ProcessInstance processInstance = processInstanceDao.queryOptionalById(taskGroupQueue.getProcessId())
+                .orElseThrow(
+                        () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId()));
         checkMasterExists();
-        return forceStart(processInstance, taskGroupQueue);
+
+        if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
+            throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);
+        }
+        taskGroupQueue.setForceStart(Flag.YES.getCode());
+        taskGroupQueue.setUpdateTime(new Date());
+        taskGroupQueueMapper.updateById(taskGroupQueue);
+
+        result.put(Constants.STATUS, Status.SUCCESS);
+        return result;
     }
 
     public void checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
@@ -668,31 +666,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * prepare to update process instance command type and status
-     *
-     * @param processInstance process instance
-     * @return update result
-     */
-    private Map<String, Object> forceStart(ProcessInstance processInstance, TaskGroupQueue taskGroupQueue) {
-        Map<String, Object> result = new HashMap<>();
-        if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
-            log.warn("Task group queue already starts, taskGroupQueueId:{}.", taskGroupQueue.getId());
-            putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
-            return result;
-        }
-
-        taskGroupQueue.setForceStart(Flag.YES.getCode());
-        processService.updateTaskGroupQueue(taskGroupQueue);
-        log.info("Sending force start command to master: {}.", processInstance.getHost());
-        ILogicTaskInstanceOperator iLogicTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
-        iLogicTaskInstanceOperator.forceStartTaskInstance(
-                new TaskInstanceForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()));
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
      * check whether sub processes are offline before starting process definition
      *
      * @param processDefinitionCode process definition code
@@ -710,8 +683,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return result;
         }
 
-        List<Long> codes = new ArrayList<>();
-        processService.recurseFindSubProcess(processDefinition.getCode(), codes);
+        List<Long> codes = processService.findAllSubWorkflowDefinitionCode(processDefinition.getCode());
         if (!codes.isEmpty()) {
             List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryByCodes(codes);
             if (processDefinitionList != null) {
@@ -1158,18 +1130,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode,
-                                                      int taskDefinitionVersion,
-                                                      int warningGroupId, String workerGroup, String tenantCode,
-                                                      Long environmentCode,
-                                                      Map<String, String> startParams, int dryRun) {
+    public void execStreamTaskInstance(User loginUser, long projectCode, long taskDefinitionCode,
+                                       int taskDefinitionVersion,
+                                       int warningGroupId, String workerGroup, String tenantCode,
+                                       Long environmentCode,
+                                       Map<String, String> startParams, int dryRun) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_START);
+
         checkValidTenant(tenantCode);
         checkMasterExists();
         // todo dispatch improvement
@@ -1195,13 +1164,11 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 streamingTaskOperator.triggerStreamingTask(taskExecuteStartMessage);
         if (streamingTaskTriggerResponse.isSuccess()) {
             log.info("Send task execute start command complete, response is {}.", streamingTaskOperator);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            log.error(
-                    "Start to execute stream task instance error, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}, response: {}.",
-                    projectCode, taskDefinitionCode, taskDefinitionVersion, streamingTaskTriggerResponse);
-            putMsg(result, Status.START_TASK_INSTANCE_ERROR);
+            return;
         }
-        return result;
+        log.error(
+                "Start to execute stream task instance error, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}, response: {}.",
+                projectCode, taskDefinitionCode, taskDefinitionVersion, streamingTaskTriggerResponse);
+        throw new ServiceException(Status.START_TASK_INSTANCE_ERROR);
     }
 }

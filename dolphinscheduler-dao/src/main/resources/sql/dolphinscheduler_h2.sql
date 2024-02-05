@@ -412,7 +412,7 @@ CREATE TABLE t_ds_process_definition
     id               int(11) NOT NULL AUTO_INCREMENT,
     code             bigint(20) NOT NULL,
     name             varchar(255) DEFAULT NULL,
-    version          int(11) DEFAULT NULL,
+    version          int(11) NOT NULL DEFAULT 1,
     description      text,
     project_code     bigint(20) NOT NULL,
     release_state    tinyint(4) DEFAULT NULL,
@@ -443,7 +443,7 @@ CREATE TABLE t_ds_process_definition_log
     id               int(11) NOT NULL AUTO_INCREMENT,
     code             bigint(20) NOT NULL,
     name             varchar(255) DEFAULT NULL,
-    version          int(11) DEFAULT NULL,
+    version          int(11) NOT NULL DEFAULT '1',
     description      text,
     project_code     bigint(20) NOT NULL,
     release_state    tinyint(4) DEFAULT NULL,
@@ -471,7 +471,7 @@ CREATE TABLE t_ds_task_definition
     id                      int(11) NOT NULL AUTO_INCREMENT,
     code                    bigint(20) NOT NULL,
     name                    varchar(255) DEFAULT NULL,
-    version                 int(11) DEFAULT NULL,
+    version                 int(11) NOT NULL DEFAULT '1',
     description             text,
     project_code            bigint(20) NOT NULL,
     user_id                 int(11) DEFAULT NULL,
@@ -508,7 +508,7 @@ CREATE TABLE t_ds_task_definition_log
     id                      int(11) NOT NULL AUTO_INCREMENT,
     code                    bigint(20) NOT NULL,
     name                    varchar(255) DEFAULT NULL,
-    version                 int(11) DEFAULT NULL,
+    version                 int(11) NOT NULL DEFAULT '1',
     description             text,
     project_code            bigint(20) NOT NULL,
     user_id                 int(11) DEFAULT NULL,
@@ -592,7 +592,7 @@ CREATE TABLE t_ds_process_instance
 (
     id                         int(11) NOT NULL AUTO_INCREMENT,
     name                       varchar(255) DEFAULT NULL,
-    process_definition_version int(11) DEFAULT NULL,
+    process_definition_version int(11) NOT NULL DEFAULT '1',
     process_definition_code    bigint(20) not NULL,
     project_code               bigint(20) DEFAULT NULL,
     state                      tinyint(4) DEFAULT NULL,
@@ -666,7 +666,7 @@ CREATE TABLE t_ds_project_parameter
 (
     id              int(11) NOT NULL AUTO_INCREMENT,
     param_name      varchar(255) NOT NULL,
-    param_value     varchar(255) NOT NULL,
+    param_value     text NOT NULL,
     code            bigint(20) NOT NULL,
     project_code    bigint(20) NOT NULL,
     user_id         int(11) DEFAULT NULL,
@@ -784,6 +784,7 @@ CREATE TABLE t_ds_relation_project_user
 -- ----------------------------
 -- Table structure for t_ds_relation_resources_user
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_relation_resources_user CASCADE;
 CREATE TABLE t_ds_relation_resources_user
 (
@@ -818,6 +819,7 @@ CREATE TABLE t_ds_relation_udfs_user
 -- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_resources CASCADE;
 CREATE TABLE t_ds_resources
 (
@@ -899,7 +901,7 @@ CREATE TABLE t_ds_task_instance
     task_type               varchar(50) NOT NULL,
     task_execute_type       int(11) DEFAULT '0',
     task_code               bigint(20) NOT NULL,
-    task_definition_version int(11) DEFAULT NULL,
+    task_definition_version int(11) NOT NULL DEFAULT '1',
     process_instance_id     int(11) DEFAULT NULL,
     process_instance_name   varchar(255) DEFAULT NULL,
     project_code            bigint(20) DEFAULT NULL,
@@ -1974,6 +1976,7 @@ CREATE TABLE t_ds_task_group_queue
    in_queue     int(4) DEFAULT '0' ,
    create_time  datetime DEFAULT NULL ,
    update_time  datetime DEFAULT NULL ,
+   KEY idx_t_ds_task_group_queue_in_queue (in_queue) ,
    PRIMARY KEY (id)
 );
 

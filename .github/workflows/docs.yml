@@ -62,6 +62,41 @@ jobs:
           for file in $(find . -name "*.md" -not \( -path ./deploy/terraform/aws/README.md -prune \)); do
             markdown-link-check -c .dlc.json -q "$file"
           done
+  paths-filter:
+    name: Helm-Doc-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      helm-doc: ${{ steps.filter.outputs.helm-doc }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            helm-doc:
+              - 'deploy/**'
+  helm-doc:
+    name: Helm-Doc-Execute
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.helm-doc == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Generating helm-doc
+        run: |
+          ./mvnw validate -P helm-doc -pl :dolphinscheduler
+      - name: Check helm-doc
+        run: |
+          DIFF=$(git diff ${GITHUB_WORKSPACE}/deploy/kubernetes/*md)
+          if [ ! -z "$DIFF" ]; then
+              echo "###### ERROR: helm-doc is not up to date ######"
+              echo "Please execute './mvnw validate -P helm-doc -pl :dolphinscheduler' in your clone, of your fork, of the project, and commit an updated deploy/kubernetes/README.md for the chart."
+              echo "###### ERROR: helm-doc is not up to date ######"
+          fi
+          git diff --exit-code
   result:
     name: Docs
     runs-on: ubuntu-latest
@@ -70,9 +105,13 @@ jobs:
       - style
       - img-check
       - dead-link
-    if: success()
+    if: always()
     steps:
-      - name: success
+      - name: Status
         run: |
-          echo "Docs check success"
-          exit 0
+          if [[ ${{ contains(needs.*.result, 'failure') }} == 'true' || ${{ contains(needs.*.result, 'cancelled') }} == 'true' ]]; then
+            echo "Build Failed!"
+            exit 1
+          else
+            echo "Build Success!"
+          fi

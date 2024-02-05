@@ -18,13 +18,14 @@
 package org.apache.dolphinscheduler.plugin.datasource.hana;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class HanaDataSourceChannelFactoryTest {
+class HanaDataSourceChannelFactoryTest {
 
     @Test
-    public void testCreate() {
+    void testCreate() {
         HanaDataSourceChannelFactory sourceChannelFactory = new HanaDataSourceChannelFactory();
         DataSourceChannel dataSourceChannel = sourceChannelFactory.create();
         Assertions.assertNotNull(dataSourceChannel);

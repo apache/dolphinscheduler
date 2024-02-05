@@ -114,24 +114,16 @@ public interface UsersService {
      */
     Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
-    /**
-     * updateProcessInstance user
-     *
-     *
-     * @param loginUser
-     * @param userId user id
-     * @param userName user name
-     * @param userPassword user password
-     * @param email email
-     * @param tenantId tennat id
-     * @param phone phone
-     * @param queue queue
-     * @return update result code
-     * @throws Exception exception
-     */
-    Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state,
-                                   String timeZone) throws IOException;
+    User updateUser(User loginUser,
+                    Integer userId,
+                    String userName,
+                    String userPassword,
+                    String email,
+                    Integer tenantId,
+                    String phone,
+                    String queue,
+                    int state,
+                    String timeZone) throws IOException;
 
     /**
      * delete user
@@ -190,16 +182,6 @@ public interface UsersService {
      * @return
      */
     Map<String, Object> revokeProject(User loginUser, int userId, long projectCode);
-
-    /**
-     * grant resource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param resourceIds resource id array
-     * @return grant result code
-     */
-    Map<String, Object> grantResources(User loginUser, int userId, String resourceIds);
 
     /**
      * grant udf function

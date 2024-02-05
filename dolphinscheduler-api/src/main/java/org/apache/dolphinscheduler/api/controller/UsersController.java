@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.GRANT_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
@@ -76,18 +75,6 @@ public class UsersController extends BaseController {
     @Autowired
     private UsersService usersService;
 
-    /**
-     * create user
-     *
-     * @param loginUser login user
-     * @param userName user name
-     * @param userPassword user password
-     * @param email email
-     * @param tenantId tenant id
-     * @param phone phone
-     * @param queue queue
-     * @return create result code
-     */
     @Operation(summary = "createUser", description = "CREATE_USER_NOTES")
     @Parameters({
             @Parameter(name = "userName", description = "USER_NAME", required = true, schema = @Schema(implementation = String.class)),
@@ -140,14 +127,9 @@ public class UsersController extends BaseController {
                                 @RequestParam("pageNo") Integer pageNo,
                                 @RequestParam("pageSize") Integer pageSize,
                                 @RequestParam(value = "searchVal", required = false) String searchVal) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-
-        }
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
-        return result;
+        return usersService.queryUserList(loginUser, searchVal, pageNo, pageSize);
     }
 
     /**
@@ -177,19 +159,27 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_USER_ERROR)
-    public Result updateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam(value = "id") int id,
-                             @RequestParam(value = "userName") String userName,
-                             @RequestParam(value = "userPassword") String userPassword,
-                             @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
-                             @RequestParam(value = "email") String email,
-                             @RequestParam(value = "tenantId") int tenantId,
-                             @RequestParam(value = "phone", required = false) String phone,
-                             @RequestParam(value = "state", required = false) int state,
-                             @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
-        Map<String, Object> result = usersService.updateUser(loginUser, id, userName, userPassword, email, tenantId,
-                phone, queue, state, timeZone);
-        return returnDataList(result);
+    public Result<User> updateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                   @RequestParam(value = "id") int id,
+                                   @RequestParam(value = "userName") String userName,
+                                   @RequestParam(value = "userPassword") String userPassword,
+                                   @RequestParam(value = "queue", required = false, defaultValue = "") String queue,
+                                   @RequestParam(value = "email") String email,
+                                   @RequestParam(value = "tenantId") int tenantId,
+                                   @RequestParam(value = "phone", required = false) String phone,
+                                   @RequestParam(value = "state", required = false) int state,
+                                   @RequestParam(value = "timeZone", required = false) String timeZone) throws Exception {
+        User user = usersService.updateUser(loginUser,
+                id,
+                userName,
+                userPassword,
+                email,
+                tenantId,
+                phone,
+                queue,
+                state,
+                timeZone);
+        return Result.success(user);
     }
 
     /**
@@ -324,29 +314,6 @@ public class UsersController extends BaseController {
                                 @RequestParam(value = "userId") int userId,
                                 @RequestParam(value = "projectCode") long projectCode) {
         Map<String, Object> result = this.usersService.revokeProject(loginUser, userId, projectCode);
-        return returnDataList(result);
-    }
-
-    /**
-     * grant resource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param resourceIds resource id array
-     * @return grant result code
-     */
-    @Operation(summary = "grantResource", description = "GRANT_RESOURCE_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "resourceIds", description = "RESOURCE_IDS", required = true, schema = @Schema(implementation = String.class))
-    })
-    @PostMapping(value = "/grant-file")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(GRANT_RESOURCE_ERROR)
-    public Result grantResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam(value = "userId") int userId,
-                                @RequestParam(value = "resourceIds") String resourceIds) {
-        Map<String, Object> result = usersService.grantResources(loginUser, userId, resourceIds);
         return returnDataList(result);
     }
 
