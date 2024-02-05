@@ -152,9 +152,10 @@ datasource.encryption.enable=false
 # datasource encryption salt
 datasource.encryption.salt=!@#$%^&*
 
-# data quality absolute path, it would auto discovery from libs directory. You can also specific the jar name in libs directory
-# if you re-build it alone, or auto discovery mechanism fail
-data-quality.jar.name=
+# data quality jar directory path, it would auto discovery data quality jar from this given dir. You should keep it empty if you do not change anything in
+# data-quality, it will auto discovery by dolphinscheduler itself. Change it only if you want to use your own data-quality jar and it is not in worker-server
+# libs directory(but may sure your jar name start with `dolphinscheduler-data-quality`).
+data-quality.jar.dir=
 
 #data-quality.error.output.path=/tmp/data-quality-error-data
 

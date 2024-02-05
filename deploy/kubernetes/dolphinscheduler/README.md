@@ -121,7 +121,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."alert.rpc.port" | int | `50052` | rpc port |
 | conf.common."appId.collect" | string | `"log"` | way to collect applicationId: log, aop |
 | conf.common."conda.path" | string | `"/opt/anaconda3/etc/profile.d/conda.sh"` | set path of conda.sh |
-| conf.common."data-quality.jar.name" | string | `"dolphinscheduler-data-quality-dev-SNAPSHOT.jar"` | data quality option |
+| conf.common."data-quality.jar.dir" | string | `nil` | data quality option |
 | conf.common."data.basedir.path" | string | `"/tmp/dolphinscheduler"` | user data local directory path, please make sure the directory exists and have read write permissions |
 | conf.common."datasource.encryption.enable" | bool | `false` | datasource encryption enable |
 | conf.common."datasource.encryption.salt" | string | `"!@#$%^&*"` | datasource encryption salt |
