@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COLON;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DOUBLE_SLASH;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EQUAL_SIGN;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.QUESTION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SEMICOLON;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_SLASH;
@@ -29,6 +30,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * JdbcUrlParser
@@ -105,8 +109,24 @@ public class JdbcUrlParser {
         jdbcInfo.setHost(host);
         jdbcInfo.setPort(port);
         jdbcInfo.setDatabase(database);
-        jdbcInfo.setParams(params);
-        jdbcInfo.setAddress("jdbc:" + driverName + "://" + host + COLON + port);
+
+        if (StringUtils.isNotEmpty(params)) {
+            Map<String, String> others = new HashMap<>();
+            String[] paramList = params.split("&");
+            for (String param : paramList) {
+                // handle bad params
+                if (StringUtils.isEmpty(param) || !param.contains(EQUAL_SIGN)) {
+                    continue;
+                }
+                String[] kv = param.split(EQUAL_SIGN);
+                others.put(kv[0], kv[1]);
+            }
+            jdbcInfo.setParams(others);
+        }
+
+        String address = "jdbc:" + driverName + "://" + host + COLON + port;
+        jdbcInfo.setAddress(address);
+        jdbcInfo.setJdbcUrl(address + SINGLE_SLASH + database);
 
         return jdbcInfo;
     }
