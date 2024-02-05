@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,7 @@ import javax.script.ScriptException;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 @Slf4j
 public class SwitchTaskUtils {
@@ -40,6 +42,15 @@ public class SwitchTaskUtils {
     private static final ScriptEngineManager manager;
     private static final ScriptEngine engine;
     private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
+
+    private static final Set<String> blackKeySet = Sets.newHashSet(
+            "java",
+            "invoke",
+            "new",
+            "eval",
+            "function",
+            "import",
+            "\\\\");
 
     static {
         manager = new ScriptEngineManager();
@@ -81,6 +92,12 @@ public class SwitchTaskUtils {
             }
             log.info("paramName:{}，paramValue:{}", paramName, value);
             content = content.replace("${" + paramName + "}", value);
+        }
+
+        for (String blackKey : blackKeySet) {
+            if (content.contains(blackKey)) {
+                throw new IllegalArgumentException("condition is not valid, please check it. condition: " + condition);
+            }
         }
 
         // if not replace any params, throw exception to avoid illegal condition
