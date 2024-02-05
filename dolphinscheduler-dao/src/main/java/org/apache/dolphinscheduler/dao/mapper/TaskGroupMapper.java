@@ -35,20 +35,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
 
-    int robTaskGroupResource(@Param("id") int id,
-                             @Param("currentUseSize") int currentUseSize,
-                             @Param("queueId") int queueId,
-                             @Param("queueStatus") int queueStatus);
-
-    /**
-     * update table of task group
-     *
-     * @param id primary key
-     * @return affected rows
-     */
-    int releaseTaskGroupResource(@Param("id") int id, @Param("useSize") int useSize,
-                                 @Param("queueId") int queueId, @Param("queueStatus") int queueStatus);
-
     /**
      * select task groups paging
      *
@@ -57,7 +43,8 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      * @param status status
      * @return result page
      */
-    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page, @Param("name") String name,
+    IPage<TaskGroup> queryTaskGroupPaging(IPage<TaskGroup> page,
+                                          @Param("name") String name,
                                           @Param("status") Integer status);
 
     /**
@@ -68,13 +55,6 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
      * @return task group
      */
     TaskGroup queryByName(@Param("userId") int userId, @Param("name") String name);
-
-    /**
-     * Select the groupSize > useSize Count
-     */
-    int selectAvailableCountById(@Param("groupId") int groupId);
-
-    int selectCountByIdStatus(@Param("id") int id, @Param("status") int status);
 
     IPage<TaskGroup> queryTaskGroupPagingByProjectCode(Page<TaskGroup> page, @Param("projectCode") Long projectCode);
 
@@ -87,4 +67,12 @@ public interface TaskGroupMapper extends BaseMapper<TaskGroup> {
     List<TaskGroup> listAuthorizedResource(@Param("userId") int userId);
 
     List<TaskGroup> selectByProjectCode(@Param("projectCode") long projectCode);
+
+    List<TaskGroup> queryAvailableTaskGroups();
+
+    List<TaskGroup> queryUsedTaskGroups();
+
+    int acquireTaskGroupSlot(@Param("id") Integer id);
+
+    int releaseTaskGroupSlot(@Param("id") Integer id);
 }
