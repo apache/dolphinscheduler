@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -36,11 +37,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLException;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -61,6 +62,8 @@ import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.options.WatchOption;
 import io.etcd.jetcd.support.Observers;
 import io.etcd.jetcd.watch.WatchEvent;
+import io.grpc.netty.GrpcSslContexts;
+import io.netty.handler.ssl.SslContext;
 
 /**
  * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on Etcd cluster to
@@ -68,11 +71,14 @@ import io.etcd.jetcd.watch.WatchEvent;
  */
 @Component
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
+@Slf4j
 public class EtcdRegistry implements Registry {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(EtcdRegistry.class);
     private final Client client;
     private EtcdConnectionStateListener etcdConnectionStateListener;
+
+    private EtcdKeepAliveLeaseManager etcdKeepAliveLeaseManager;
+
     public static final String FOLDER_SEPARATOR = "/";
     // save the lock info for thread
     // key:lockKey Value:leaseId
@@ -81,7 +87,7 @@ public class EtcdRegistry implements Registry {
     private final Map<String, Watch.Watcher> watcherMap = new ConcurrentHashMap<>();
 
     private static final long TIME_TO_LIVE_SECONDS = 30L;
-    public EtcdRegistry(EtcdRegistryProperties registryProperties) {
+    public EtcdRegistry(EtcdRegistryProperties registryProperties) throws SSLException {
         ClientBuilder clientBuilder = Client.builder()
                 .endpoints(Util.toURIs(Splitter.on(",").trimResults().splitToList(registryProperties.getEndpoints())))
                 .namespace(byteSequence(registryProperties.getNamespace()))
@@ -101,9 +107,23 @@ public class EtcdRegistry implements Registry {
         if (StringUtils.hasLength(registryProperties.getAuthority())) {
             clientBuilder.authority(registryProperties.getAuthority());
         }
+        if (StringUtils.hasLength(registryProperties.getCertFile())
+                && StringUtils.hasLength(registryProperties.getKeyCertChainFile())
+                && StringUtils.hasLength(registryProperties.getKeyFile())) {
+            String userDir = System.getProperty("user.dir") + "/";
+            File certFile = new File(userDir + registryProperties.getCertFile());
+            File keyCertChainFile = new File(userDir + registryProperties.getKeyCertChainFile());
+            File keyFile = new File(userDir + registryProperties.getKeyFile());
+            SslContext context = GrpcSslContexts.forClient()
+                    .trustManager(certFile)
+                    .keyManager(keyCertChainFile, keyFile)
+                    .build();
+            clientBuilder.sslContext(context);
+        }
         client = clientBuilder.build();
-        LOGGER.info("Started Etcd Registry...");
+        log.info("Started Etcd Registry...");
         etcdConnectionStateListener = new EtcdConnectionStateListener(client);
+        etcdKeepAliveLeaseManager = new EtcdKeepAliveLeaseManager(client);
     }
 
     /**
@@ -111,9 +131,9 @@ public class EtcdRegistry implements Registry {
      */
     @PostConstruct
     public void start() {
-        LOGGER.info("Starting Etcd ConnectionListener...");
+        log.info("Starting Etcd ConnectionListener...");
         etcdConnectionStateListener.start();
-        LOGGER.info("Started Etcd ConnectionListener...");
+        log.info("Started Etcd ConnectionListener...");
     }
 
     @Override
@@ -131,7 +151,8 @@ public class EtcdRegistry implements Registry {
     public boolean subscribe(String path, SubscribeListener listener) {
         try {
             ByteSequence watchKey = byteSequence(path);
-            WatchOption watchOption = WatchOption.newBuilder().isPrefix(true).build();
+            WatchOption watchOption =
+                    WatchOption.newBuilder().withPrevKV(true).isPrefix(true).build();
             watcherMap.computeIfAbsent(path,
                     $ -> client.getWatchClient().watch(watchKey, watchOption, watchResponse -> {
                         for (WatchEvent event : watchResponse.getEvents()) {
@@ -190,9 +211,7 @@ public class EtcdRegistry implements Registry {
         try {
             if (deleteOnDisconnect) {
                 // keep the key by lease, if disconnected, the lease will expire and the key will delete
-                long leaseId = client.getLeaseClient().grant(TIME_TO_LIVE_SECONDS).get().getID();
-                client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
-                }));
+                long leaseId = etcdKeepAliveLeaseManager.getOrCreateKeepAliveLease(key, TIME_TO_LIVE_SECONDS);
                 PutOption putOption = PutOption.newBuilder().withLeaseId(leaseId).build();
                 client.getKVClient().put(byteSequence(key), byteSequence(value), putOption).get();
             } else {
@@ -334,7 +353,11 @@ public class EtcdRegistry implements Registry {
 
             switch (event.getEventType()) {
                 case PUT:
-                    type(Type.ADD);
+                    if (event.getPrevKV().getKey().isEmpty()) {
+                        type(Type.ADD);
+                    } else {
+                        type(Type.UPDATE);
+                    }
                     break;
                 case DELETE:
                     type(Type.REMOVE);

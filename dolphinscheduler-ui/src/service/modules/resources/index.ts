@@ -45,21 +45,29 @@ export function queryResourceListPaging(
   })
 }
 
+export function queryBaseDir(params: ResourceTypeReq): any {
+  return axios({
+    url: '/resources/base-dir',
+    method: 'get',
+    params
+  })
+}
+
 export function queryCurrentResourceByFileName(
-  params: ResourceTypeReq & FileNameReq & TenantCodeReq,
+  params: ResourceTypeReq & FileNameReq & TenantCodeReq
 ): any {
   return axios({
-    url: `/resources/query-file-name`,
+    url: '/resources/query-file-name',
     method: 'get',
     params
   })
 }
 
 export function queryCurrentResourceByFullName(
-  params: ResourceTypeReq & FullNameReq & TenantCodeReq,
+  params: ResourceTypeReq & FullNameReq & TenantCodeReq
 ): any {
   return axios({
-    url: `/resources/query-full-name`,
+    url: '/resources/query-full-name',
     method: 'get',
     params
   })
@@ -71,7 +79,8 @@ export function createResource(
   return axios({
     url: '/resources',
     method: 'post',
-    data
+    data,
+    timeout: 0
   })
 }
 
@@ -185,21 +194,19 @@ export function verifyResourceName(params: FullNameReq & ResourceTypeReq): any {
   })
 }
 
-export function doesResourceExist(
-  params: FullNameReq & ResourceTypeReq,
-): any {
+export function doesResourceExist(params: FullNameReq & ResourceTypeReq): any {
   return axios({
-    url: `/resources/verify-name`,
+    url: '/resources/verify-name',
     method: 'get',
     params
   })
 }
 
 export function updateResource(
-  data: NameReq & ResourceTypeReq & DescriptionReq & FullNameReq & TenantCodeReq,
+  data: NameReq & ResourceTypeReq & DescriptionReq & FullNameReq & TenantCodeReq
 ): any {
   return axios({
-    url: `/resources`,
+    url: '/resources',
     method: 'put',
     data
   })
@@ -207,14 +214,14 @@ export function updateResource(
 
 export function deleteResource(params: FullNameReq & TenantCodeReq): any {
   return axios({
-    url: `/resources`,
+    url: '/resources',
     method: 'delete',
     params
   })
 }
 
 export function downloadResource(params: FullNameReq): void {
-  utils.downloadFile(`resources/download`, params)
+  utils.downloadFile('resources/download', params)
 }
 
 export function viewUIUdfFunction(id: IdReq): any {
@@ -224,36 +231,35 @@ export function viewUIUdfFunction(id: IdReq): any {
   })
 }
 
-export function updateResourceContent(data: ContentReq & TenantCodeReq & FullNameReq): any {
+export function updateResourceContent(
+  data: ContentReq & TenantCodeReq & FullNameReq
+): any {
   return axios({
-    url: `/resources/update-content`,
+    url: '/resources/update-content',
     method: 'put',
     data
   })
 }
 
-export function viewResource(params: ViewResourceReq & FullNameReq & TenantCodeReq): any {
+export function viewResource(
+  params: ViewResourceReq & FullNameReq & TenantCodeReq
+): any {
   return axios({
-    url: `/resources/view`,
+    url: '/resources/view',
     method: 'get',
     params
   })
 }
 
-export function createUdfFunc(
-  data: UdfFuncReq
-): any {
+export function createUdfFunc(data: UdfFuncReq): any {
   return axios({
-    url: `/resources/udf-func`,
+    url: '/resources/udf-func',
     method: 'post',
     data
   })
 }
 
-export function updateUdfFunc(
-  data: UdfFuncReq,
-  id: number
-): any {
+export function updateUdfFunc(data: UdfFuncReq, id: number): any {
   return axios({
     url: `/resources/udf-func/${id}`,
     method: 'put',

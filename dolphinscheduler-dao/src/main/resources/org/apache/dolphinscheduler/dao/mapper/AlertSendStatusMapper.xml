@@ -22,14 +22,22 @@
     <insert id="batchInsert">
         insert into t_ds_alert_send_status (alert_id, alert_plugin_instance_id, send_status, log, create_time)
         values
-        <foreach collection="alertSendStatuses" item="alertSendStatus" separator="," open="(" close=")">
-            #{alertSendStatus.alertId},
+        <foreach collection="alertSendStatuses" item="alertSendStatus" separator=",">
+            (#{alertSendStatus.alertId},
             #{alertSendStatus.alertPluginInstanceId},
             #{alertSendStatus.sendStatus},
             #{alertSendStatus.log},
-            #{alertSendStatus.createTime},
+            #{alertSendStatus.createTime})
         </foreach>
-
     </insert>
+
+    <delete id="deleteByAlertIds">
+        delete
+        from t_ds_alert_send_status
+        where alert_id in
+        <foreach collection="alertIds" item="alertId" separator="," open="(" close=")">
+            #{alertId}
+        </foreach>
+    </delete>
 
 </mapper>

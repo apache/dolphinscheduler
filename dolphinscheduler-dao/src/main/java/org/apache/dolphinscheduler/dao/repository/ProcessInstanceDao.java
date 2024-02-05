@@ -18,17 +18,59 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
-public interface ProcessInstanceDao {
+import org.apache.ibatis.annotations.Param;
 
-    public int insertProcessInstance(ProcessInstance processInstance);
-
-    public int updateProcessInstance(ProcessInstance processInstance);
+public interface ProcessInstanceDao extends IDao<ProcessInstance> {
 
     /**
      * insert or update work process instance to database
      *
      * @param processInstance processInstance
      */
-    public int upsertProcessInstance(ProcessInstance processInstance);
+    void upsertProcessInstance(ProcessInstance processInstance);
+
+    /**
+     * performs an "upsert" operation (update or insert) on a ProcessInstance object within a new transaction
+     *
+     * @param processInstance processInstance
+     */
+    void performTransactionalUpsert(ProcessInstance processInstance);
+
+    /**
+     * find last scheduler process instance in the date interval
+     *
+     * @param definitionCode definitionCode
+     * @param dateInterval   dateInterval
+     * @return process instance
+     */
+    ProcessInstance queryLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
+
+    /**
+     * find last manual process instance interval
+     *
+     * @param definitionCode process definition code
+     * @param dateInterval   dateInterval
+     * @return process instance
+     */
+    ProcessInstance queryLastManualProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag);
+
+    /**
+     * query first schedule process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    ProcessInstance queryFirstScheduleProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+
+    /**
+     * query first manual process instance
+     *
+     * @param definitionCode definitionCode
+     * @return process instance
+     */
+    ProcessInstance queryFirstStartProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+
+    ProcessInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId);
 }

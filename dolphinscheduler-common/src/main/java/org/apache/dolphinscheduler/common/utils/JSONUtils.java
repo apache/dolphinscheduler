@@ -21,6 +21,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
@@ -39,8 +40,7 @@ import java.util.TimeZone;
 
 import javax.annotation.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -65,12 +65,11 @@ import com.google.common.base.Strings;
 /**
  * json utils
  */
-public class JSONUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
+@Slf4j
+public final class JSONUtils {
 
     static {
-        logger.info("init timezone: {}", TimeZone.getDefault());
+        log.info("init timezone: {}", TimeZone.getDefault());
     }
 
     private static final ObjectMapper objectMapper = JsonMapper.builder()
@@ -78,6 +77,7 @@ public class JSONUtils {
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .configure(FAIL_ON_EMPTY_BEANS, false)
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
@@ -117,7 +117,7 @@ public class JSONUtils {
             ObjectWriter writer = objectMapper.writer(feature);
             return writer.writeValueAsString(object);
         } catch (Exception e) {
-            logger.error("object to json exception!", e);
+            log.error("object to json exception!", e);
         }
 
         return null;
@@ -145,7 +145,7 @@ public class JSONUtils {
         try {
             return objectMapper.readValue(json, clazz);
         } catch (Exception e) {
-            logger.error("Parse object exception, jsonStr: {}, class: {}", json, clazz, e);
+            log.error("Parse object exception, jsonStr: {}, class: {}", json, clazz, e);
         }
         return null;
     }
@@ -183,7 +183,7 @@ public class JSONUtils {
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {
-            logger.error("parse list exception!", e);
+            log.error("parse list exception!", e);
         }
 
         return Collections.emptyList();
@@ -205,7 +205,7 @@ public class JSONUtils {
             objectMapper.readTree(json);
             return true;
         } catch (IOException e) {
-            logger.error("check json object valid exception!", e);
+            log.error("check json object valid exception!", e);
         }
 
         return false;
@@ -261,7 +261,7 @@ public class JSONUtils {
             return objectMapper.readValue(json, new TypeReference<Map<K, V>>() {
             });
         } catch (Exception e) {
-            logger.error("json to map exception!", e);
+            log.error("json to map exception!", e);
         }
 
         return Collections.emptyMap();
@@ -302,7 +302,7 @@ public class JSONUtils {
         try {
             return objectMapper.readValue(json, type);
         } catch (Exception e) {
-            logger.error("json to map exception!", e);
+            log.error("json to map exception!", e);
         }
 
         return null;
@@ -345,7 +345,7 @@ public class JSONUtils {
         try {
             json = toJsonString(obj);
         } catch (Exception e) {
-            logger.error("json serialize exception.", e);
+            log.error("json serialize exception.", e);
         }
 
         return json.getBytes(UTF_8);

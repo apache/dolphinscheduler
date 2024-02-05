@@ -17,21 +17,27 @@
 
 package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter
 @ToString
+@Slf4j
 public class ZeppelinParameters extends AbstractParameters {
 
     /**
@@ -43,10 +49,14 @@ public class ZeppelinParameters extends AbstractParameters {
     private String restEndpoint;
     private String productionNoteDirectory;
     private String parameters;
+    private String username;
+    private String password;
+    private int datasource;
+    private String type;
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(this.noteId) && StringUtils.isNotEmpty(this.restEndpoint);
+        return StringUtils.isNotEmpty(this.noteId);
     }
 
     @Override
@@ -54,4 +64,19 @@ public class ZeppelinParameters extends AbstractParameters {
         return Collections.emptyList();
     }
 
+    public ZeppelinTaskExecutionContext generateExtendedContext(ResourceParametersHelper parametersHelper) {
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
+        ZeppelinTaskExecutionContext zeppelinTaskExecutionContext = new ZeppelinTaskExecutionContext();
+        zeppelinTaskExecutionContext.setConnectionParams(
+                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
+        return zeppelinTaskExecutionContext;
+    }
+
+    @Override
+    public ResourceParametersHelper getResources() {
+        ResourceParametersHelper resources = super.getResources();
+        resources.put(ResourceType.DATASOURCE, datasource);
+        return resources;
+    }
 }

@@ -49,7 +49,9 @@ export function useEnvironmentName(
     if (options.value.length === 0) {
       model.environmentCode = null
     } else {
-      isCreate && (model.environmentCode = options.value[0].value)
+      isCreate &&
+        !model.environmentCode &&
+        (model.environmentCode = options.value[0].value)
     }
   }
 
@@ -66,8 +68,20 @@ export function useEnvironmentName(
       options.value = environmentList.filter((option: IEnvironmentNameOption) =>
         filterByWorkerGroup(option)
       )
-      model.environmentCode =
-        options.value.length === 0 ? null : options.value[0].value
+      if (model?.environmentCode) {
+        if (options.value) {
+          let elementExists =
+            options.value.find(
+              (item) => item.value === model.environmentCode
+            ) !== undefined
+          if (!elementExists) {
+            model.environmentCode = null
+          }
+        }
+      } else {
+        model.environmentCode =
+          options.value.length === 0 ? null : options.value[0].value
+      }
     }
   )
 
@@ -79,6 +93,7 @@ export function useEnvironmentName(
   return {
     type: 'select',
     field: 'environmentCode',
+    class: 'env-select',
     span: 12,
     name: t('project.node.environment_name'),
     props: {

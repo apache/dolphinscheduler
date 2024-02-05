@@ -28,19 +28,12 @@ public final class Constants {
         throw new UnsupportedOperationException("Construct Constants");
     }
 
+    public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
+
     /**
      * common properties path
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
-
-    /**
-     * registry properties
-     */
-    public static final String REGISTRY_DOLPHINSCHEDULER_MASTERS = "/nodes/master";
-    public static final String REGISTRY_DOLPHINSCHEDULER_WORKERS = "/nodes/worker";
-    public static final String REGISTRY_DOLPHINSCHEDULER_NODE = "/nodes";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_MASTERS = "/lock/masters";
-    public static final String REGISTRY_DOLPHINSCHEDULER_LOCK_FAILOVER_MASTERS = "/lock/failover/masters";
 
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
@@ -141,6 +134,19 @@ public final class Constants {
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
 
+    public static final String GOOGLE_CLOUD_STORAGE_BUCKET_NAME = "resource.google.cloud.storage.bucket.name";
+
+    public static final String GOOGLE_CLOUD_STORAGE_CREDENTIAL = "resource.google.cloud.storage.credential";
+
+    public static final String AZURE_BLOB_STORAGE_CONNECTION_STRING = "resource.azure.blob.storage.connection.string";
+
+    public static final String AZURE_BLOB_STORAGE_CONTAINER_NAME = "resource.azure.blob.storage.container.name";
+
+    public static final String AZURE_BLOB_STORAGE_ACCOUNT_NAME = "resource.azure.blob.storage.account.name";
+
+    public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
+    public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
+
     /**
      * fetch applicationId way
      */
@@ -183,11 +189,6 @@ public final class Constants {
     public static final String DOUBLE_SLASH = "//";
 
     /**
-     * EQUAL SIGN
-     */
-    public static final String EQUAL_SIGN = "=";
-
-    /**
      * AT SIGN
      */
     public static final String AT_SIGN = "@";
@@ -222,14 +223,9 @@ public final class Constants {
     public static final int HTTP_CONNECTION_REQUEST_TIMEOUT = 60 * 1000;
 
     /**
-     * httpclient soceket time out
+     * httpclient socket time out
      */
     public static final int SOCKET_TIMEOUT = 60 * 1000;
-
-    /**
-     * registry session timeout
-     */
-    public static final int REGISTRY_SESSION_TIMEOUT = 10 * 1000;
 
     /**
      * http header
@@ -292,22 +288,6 @@ public final class Constants {
     public static final int MAX_TASK_TIMEOUT = 24 * 3600;
 
     /**
-     * worker host weight
-     */
-    public static final int DEFAULT_WORKER_HOST_WEIGHT = 100;
-
-    /**
-     * time unit secong to minutes
-     */
-    public static final int SEC_2_MINUTES_TIME_UNIT = 60;
-
-    /***
-     *
-     * rpc port
-     */
-    public static final String RPC_PORT = "rpc.port";
-
-    /**
      * forbid running task
      */
     public static final String FLOWNODE_RUN_FLAG_FORBIDDEN = "FORBIDDEN";
@@ -327,6 +307,9 @@ public final class Constants {
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
 
+    // suffix of crc file
+    public static final String CRC_SUFFIX = ".crc";
+
     /**
      * complement date default cron string
      */
@@ -343,21 +326,6 @@ public final class Constants {
     public static final long SLEEP_TIME_MILLIS_SHORT = 100L;
 
     public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
-
-    /**
-     * one second mils
-     */
-    public static final long SECOND_TIME_MILLIS = 1_000L;
-
-    /**
-     * master task instance cache-database refresh interval
-     */
-    public static final long CACHE_REFRESH_TIME_MILLIS = 20 * 1_000L;
-
-    /**
-     * heartbeat for zk info length
-     */
-    public static final int HEARTBEAT_FOR_ZOOKEEPER_INFO_LENGTH = 14;
 
     /**
      * jar
@@ -397,38 +365,9 @@ public final class Constants {
     public static final int VERSION_FIRST = 1;
 
     /**
-     * ACCEPTED
-     */
-    public static final String ACCEPTED = "ACCEPTED";
-
-    /**
-     * SUCCEEDED
-     */
-    public static final String SUCCEEDED = "SUCCEEDED";
-    /**
-     * ENDED
-     */
-    public static final String ENDED = "ENDED";
-    /**
-     * NEW
-     */
-    public static final String NEW = "NEW";
-    /**
-     * NEW_SAVING
-     */
-    public static final String NEW_SAVING = "NEW_SAVING";
-    /**
-     * SUBMITTED
-     */
-    public static final String SUBMITTED = "SUBMITTED";
-    /**
      * FAILED
      */
     public static final String FAILED = "FAILED";
-    /**
-     * KILLED
-     */
-    public static final String KILLED = "KILLED";
     /**
      * RUNNING
      */
@@ -437,25 +376,11 @@ public final class Constants {
      * underline  "_"
      */
     public static final String UNDERLINE = "_";
-    /**
-     * application regex
-     */
-    public static final String APPLICATION_REGEX = "application_\\d+_\\d+";
+
     public static final String PID = SystemUtils.IS_OS_WINDOWS ? "handle" : "pid";
 
-    public static final char SUBTRACT_CHAR = '-';
-    public static final char ADD_CHAR = '+';
-    public static final char MULTIPLY_CHAR = '*';
-    public static final char DIVISION_CHAR = '/';
-    public static final char LEFT_BRACE_CHAR = '(';
-    public static final char RIGHT_BRACE_CHAR = ')';
-    public static final String ADD_STRING = "+";
     public static final String STAR = "*";
-    public static final String DIVISION_STRING = "/";
-    public static final String LEFT_BRACE_STRING = "(";
-    public static final char P = 'P';
     public static final char N = 'N';
-    public static final String SUBTRACT_STRING = "-";
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
     public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
@@ -470,20 +395,11 @@ public final class Constants {
     public static final String QUEUE_NAME = "queueName";
     public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
     public static final int LOG_QUERY_LIMIT = 4096;
-    public static final String BLOCKING_CONDITION = "blockingCondition";
-    public static final String ALERT_WHEN_BLOCKING = "alertWhenBlocking";
-
-    /**
-     * master/worker server use for zk
-     */
-    public static final String MASTER_TYPE = "master";
-    public static final String WORKER_TYPE = "worker";
-    public static final String DELETE_OP = "delete";
-    public static final String ADD_OP = "add";
     public static final String ALIAS = "alias";
     public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
-    public static final long DEPENDENT_ALL_TASK_CODE = 0;
+    public static final long DEPENDENT_ALL_TASK_CODE = -1;
+    public static final long DEPENDENT_WORKFLOW_CODE = 0;
 
     /**
      * preview schedule execute count
@@ -522,11 +438,6 @@ public final class Constants {
             "hadoop.security.authentication.startup.state";
 
     /**
-     * com.amazonaws.services.s3.enableV4
-     */
-    public static final String AWS_S3_V4 = "com.amazonaws.services.s3.enableV4";
-
-    /**
      * loginUserFromKeytab user
      */
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
@@ -536,13 +447,13 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
+    /**
+     * sso.login.user.state
+     */
+    public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
+
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
-
-    /**
-     * task log info format
-     */
-    public static final String TASK_LOG_INFO_FORMAT = "TaskLogInfo-%s";
 
     /**
      * double brackets left
@@ -636,14 +547,6 @@ public final class Constants {
      * authorize writable perm
      */
     public static final int AUTHORIZE_WRITABLE_PERM = 7;
-    /**
-     * authorize readable perm
-     */
-    public static final int AUTHORIZE_READABLE_PERM = 4;
-
-    public static final int NORMAL_NODE_STATUS = 0;
-    public static final int ABNORMAL_NODE_STATUS = 1;
-    public static final int BUSY_NODE_STATUE = 2;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
@@ -653,18 +556,6 @@ public final class Constants {
      * system line separator
      */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
-
-    /**
-     * network interface preferred
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_INTERFACE_PREFERRED =
-            "dolphin.scheduler.network.interface.preferred";
-
-    /**
-     * network IP gets priority, default inner outer
-     */
-    public static final String DOLPHIN_SCHEDULER_NETWORK_PRIORITY_STRATEGY =
-            "dolphin.scheduler.network.priority.strategy";
 
     /**
      * exec shell scripts
@@ -687,15 +578,11 @@ public final class Constants {
      */
     public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
 
-    public static final String CACHE_KEY_VALUE_ALL = "'all'";
-
     /**
      * use for k8s
      */
     public static final String NAMESPACE = "namespace";
     public static final String CLUSTER = "cluster";
-    public static final String LIMITS_CPU = "limitsCpu";
-    public static final String LIMITS_MEMORY = "limitsMemory";
     public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
     /**
@@ -791,14 +678,61 @@ public final class Constants {
      */
     public static final String SUPPORT_HIVE_ONE_SESSION = "support.hive.oneSession";
 
-    public static final String PRINCIPAL = "principal";
-    public static final String ORACLE_DB_CONNECT_TYPE = "connectType";
-    public static final String KERBEROS_KRB5_CONF_PATH = "javaSecurityKrb5Conf";
-    public static final String KERBEROS_KEY_TAB_USERNAME = "loginUserKeytabUsername";
-    public static final String KERBEROS_KEY_TAB_PATH = "loginUserKeytabPath";
-
     public static final Integer QUERY_ALL_ON_SYSTEM = 0;
     public static final Integer QUERY_ALL_ON_PROJECT = 1;
     public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
     public static final Integer QUERY_ALL_ON_TASK = 3;
+
+    /**
+     * remote logging
+     */
+    public static final String REMOTE_LOGGING_ENABLE = "remote.logging.enable";
+
+    public static final String REMOTE_LOGGING_TARGET = "remote.logging.target";
+
+    public static final String REMOTE_LOGGING_BASE_DIR = "remote.logging.base.dir";
+
+    public static final String REMOTE_LOGGING_THREAD_POOL_SIZE = "remote.logging.thread.pool.size";
+
+    /**
+     * remote logging for OSS
+     */
+    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_ID = "remote.logging.oss.access.key.id";
+
+    public static final String REMOTE_LOGGING_OSS_ACCESS_KEY_SECRET = "remote.logging.oss.access.key.secret";
+
+    public static final String REMOTE_LOGGING_OSS_BUCKET_NAME = "remote.logging.oss.bucket.name";
+
+    public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
+
+    /**
+     * remote logging for S3
+     */
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_ID = "remote.logging.s3.access.key.id";
+
+    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_SECRET = "remote.logging.s3.access.key.secret";
+
+    public static final String REMOTE_LOGGING_S3_BUCKET_NAME = "remote.logging.s3.bucket.name";
+
+    public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
+
+    public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
+
+    /**
+     * remote logging for GCS
+     */
+    public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
+
+    public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
+
+    /**
+     * data quality
+     */
+    public static final String DATABASES_QUERY = "show databases";
+    public static final String DATABASES_QUERY_PG = "SELECT datname FROM pg_database";
+
+    /**
+     * K8S sensitive param
+     */
+    public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 }

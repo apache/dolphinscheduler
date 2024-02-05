@@ -37,7 +37,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.dialect.oracle.parser.OracleStatementParser;
+import com.alibaba.druid.sql.parser.SQLParserFeature;
+import com.alibaba.druid.sql.parser.SQLStatementParser;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -56,6 +61,7 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         oracleDatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         oracleDatasourceParamDTO.setUserName(connectionParams.getUser());
         oracleDatasourceParamDTO.setOther(connectionParams.getOther());
+        oracleDatasourceParamDTO.setConnectType(connectionParams.getConnectType());
 
         String hostSeperator = Constants.DOUBLE_SLASH;
         if (DbConnectType.ORACLE_SID.equals(connectionParams.connectType)) {
@@ -139,6 +145,13 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new OracleDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        SQLStatementParser parser = new OracleStatementParser(sql, SQLParserFeature.KeepComments);
+        List<SQLStatement> statementList = parser.parseStatementList();
+        return statementList.stream().map(SQLStatement::toString).collect(Collectors.toList());
     }
 
     private String transformOther(Map<String, String> otherMap) {

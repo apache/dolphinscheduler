@@ -44,4 +44,10 @@
         from t_ds_relation_process_instance
         where parent_process_instance_id = #{parentInstanceId}
     </select>
+
+    <delete id="deleteByParentId">
+        delete
+        from t_ds_relation_process_instance
+        where parent_process_instance_id = #{parentWorkflowInstanceId}
+    </delete>
 </mapper>

@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.DefinitionGroupByUser;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
 import java.util.List;
@@ -85,7 +85,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     @Test
     public void testInsert() {
         TaskDefinition taskDefinition = insertOne();
-        Assertions.assertNotEquals(taskDefinition.getId().intValue(), 0);
+        Assertions.assertNotEquals(0, taskDefinition.getId().intValue());
     }
 
     @Test
@@ -111,7 +111,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         TaskDefinition taskDefinition = insertOne();
         List<TaskDefinition> taskDefinitions =
                 taskDefinitionMapper.queryAllDefinitionList(taskDefinition.getProjectCode());
-        Assertions.assertNotEquals(taskDefinitions.size(), 0);
+        Assertions.assertNotEquals(0, taskDefinitions.size());
 
     }
 
@@ -123,9 +123,9 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         User un = userMapper.queryByUserNameAccurately("un");
         TaskDefinition taskDefinition = insertOne(un.getId());
 
-        List<DefinitionGroupByUser> users =
+        List<WorkflowDefinitionCountDto> users =
                 taskDefinitionMapper.countDefinitionGroupByUser(new Long[]{taskDefinition.getProjectCode()});
-        Assertions.assertNotEquals(users.size(), 0);
+        Assertions.assertNotEquals(0, users.size());
 
     }
 
@@ -133,7 +133,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     public void testListResources() {
         TaskDefinition taskDefinition = insertOne();
         List<Map<String, Object>> maps = taskDefinitionMapper.listResources();
-        Assertions.assertNotEquals(maps.size(), 0);
+        Assertions.assertNotEquals(0, maps.size());
 
     }
 
@@ -146,7 +146,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
         TaskDefinition taskDefinition = insertOne(un.getId());
 
         List<Map<String, Object>> maps = taskDefinitionMapper.listResourcesByUser(taskDefinition.getUserId());
-        Assertions.assertNotEquals(maps.size(), 0);
+        Assertions.assertNotEquals(0, maps.size());
 
     }
 
@@ -154,7 +154,7 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     public void testDeleteByCode() {
         TaskDefinition taskDefinition = insertOne();
         int i = taskDefinitionMapper.deleteByCode(taskDefinition.getCode());
-        Assertions.assertNotEquals(i, 0);
+        Assertions.assertNotEquals(0, i);
 
     }
 

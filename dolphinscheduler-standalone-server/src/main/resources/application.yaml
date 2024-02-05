@@ -16,6 +16,8 @@
 #
 
 spring:
+  profiles:
+    active: h2
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
@@ -74,6 +76,19 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
 
+mybatis-plus:
+  mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
+  type-aliases-package: org.apache.dolphinscheduler.dao.entity
+  configuration:
+    cache-enabled: false
+    call-setters-on-nulls: true
+    map-underscore-to-camel-case: true
+    jdbc-type-for-null: NULL
+  global-config:
+    db-config:
+      id-type: auto
+    banner: false
+
 registry:
   type: zookeeper
   zookeeper:
@@ -90,7 +105,7 @@ registry:
 
 security:
   authentication:
-    # Authentication types (supported types: PASSWORD,LDAP)
+    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
@@ -106,20 +121,53 @@ security:
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
         not-exist-action: CREATE
+      ssl:
+        enable: false
+        # jks file absolute path && password
+        trust-store: "/ldapkeystore.jks"
+        trust-store-password: ""
+    casdoor:
+      user:
+        admin: admin
+    oauth2:
+      enable: false
+      provider:
+        github:
+          authorizationUri: "https://github.com/login/oauth/authorize"
+          redirectUri: "http://localhost:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://github.com/login/oauth/access_token"
+          userInfoUri: "https://api.github.com/user"
+          callbackUrl: "http://localhost:5173/login"
+          iconUri: ""
+          provider: github
+        gitee:
+          authorizationUri: "https://gitee.com/oauth/authorize"
+          redirectUri: "http://127.0.0.1:12345/dolphinscheduler/redirect/login/oauth2"
+          clientId: ""
+          clientSecret: ""
+          tokenUri: "https://gitee.com/oauth/token?grant_type=authorization_code"
+          userInfoUri: "https://gitee.com/api/v5/user"
+          callbackUrl: "http://127.0.0.1:5173/login"
+          iconUri: ""
+          provider: gitee
 
-# Traffic control, if you turn on this config, the maximum number of request/s will be limited.
-# global max request number per second
-# default tenant-level max request number
-traffic:
-  control:
-    global-switch: false
-    max-global-qps-rate: 300
-    tenant-switch: false
-    default-tenant-qps-rate: 10
-    #customize-tenant-qps-rate:
-      # eg.
-      #tenant1: 11
-      #tenant2: 20
+casdoor:
+  # Your Casdoor server url
+  endpoint: http://localhost:8000
+  client-id: ""
+  client-secret: ""
+  # The certificate may be multi-line, you can use `|-` for ease
+  certificate: ""
+  # Your organization name added in Casdoor
+  organization-name: built-in
+  # Your application name added in Casdoor
+  application-name: dolphinscheduler
+  # Doplhinscheduler login url
+  redirect-url: http://localhost:5173/login
+
+
 
 master:
   listen-port: 5678
@@ -134,20 +182,26 @@ master:
   # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
   host-selector: lower_weight
   # master heartbeat interval
-  heartbeat-interval: 10s
+  max-heartbeat-interval: 10s
   # master commit task retry times
   task-commit-retry-times: 5
   # master commit task interval
   task-commit-interval: 1s
   state-wheel-interval: 5s
-  # master max cpuload avg, only higher than the system cpu load average, master server can schedule. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: 50
-  # master reserved memory, only lower than system available memory, master server can schedule. default value 0.3, the unit is G
-  reserved-memory: 0.03
+  server-load-protection:
+    enabled: true
+    # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
+    max-cpu-usage-percentage-thresholds: 0.9
+    # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
+    max-jvm-memory-usage-percentage-thresholds: 0.9
+    # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+    max-system-memory-usage-percentage-thresholds: 0.9
+    # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
+    max-disk-usage-percentage-thresholds: 0.9
   # failover interval
   failover-interval: 10m
-  # kill yarn jon when failover taskInstance, default true
-  kill-yarn-job-when-task-failover: true
+  # kill yarn/k8s application when failover taskInstance, default true
+  kill-application-when-task-failover: true
   worker-group-refresh-interval: 10s
 
 worker:
@@ -156,53 +210,72 @@ worker:
   # worker execute thread number to limit task instances in parallel
   exec-threads: 10
   # worker heartbeat interval
-  heartbeat-interval: 10s
+  max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
-  # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
-  tenant-auto-create: true
-  #Scenes to be used for distributed users.For example,users created by FreeIpa are stored in LDAP.This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
-  tenant-distributed-user: false
-  # worker max cpuload avg, only higher than the system cpu load average, worker server can be dispatched tasks. default value -1: the number of cpu cores * 2
-  max-cpu-load-avg: -1
-  # worker reserved memory, only lower than system available memory, worker server can be dispatched tasks. default value 0.3, the unit is G
-  reserved-memory: 0.3
-  # default worker groups separated by comma, like 'worker.groups=default,test'
-  groups:
-    - default
-  # alert server listen host
-  alert-listen-host: localhost
-  alert-listen-port: 50052
+  server-load-protection:
+    enabled: true
+    # Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks.
+    max-cpu-usage-percentage-thresholds: 0.9
+    # Worker max JVM memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks.
+    max-jvm-memory-usage-percentage-thresholds: 0.9
+    # Worker max System memory usage , when the worker's system memory usage is smaller then this value, worker server can be dispatched tasks.
+    max-system-memory-usage-percentage-thresholds: 0.9
+    # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+    max-disk-usage-percentage-thresholds: 0.9
   task-execute-threads-full-policy: REJECT
+  tenant-config:
+    # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+    auto-create-tenant-enabled: true
+    # Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
+    distributed-tenant: false
+    # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
+    default-tenant-enabled: true
 
 alert:
   port: 50052
   # Mark each alert of alert server if late after x milliseconds as failed.
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
+  max-heartbeat-interval: 60s
+  query_alert_threshold: 100
 
-python-gateway:
-  # Weather enable python gateway server or not. The default value is true.
-  enabled: true
-  # Authentication token for connection from python api to python gateway server. Should be changed the default value
-  # when you deploy in public network.
-  auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
-  # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
-  # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
-  gateway-server-address: 0.0.0.0
-  # The port of Python gateway server start. Define which port you could connect to Python gateway server from
-  # Python API side.
-  gateway-server-port: 25333
-  # The address of Python callback client.
-  python-address: 127.0.0.1
-  # The port of Python callback client.
-  python-port: 25334
-  # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
-  # and socket server would never close even though no requests accept
-  connect-timeout: 0
-  # Close each active connection of socket server if python program not active after x milliseconds. Define value is
-  # (0 = infinite), and socket server would never close even though no requests accept
-  read-timeout: 0
+api:
+  audit-enable: false
+  # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
+  # global max request number per second
+  # default tenant-level max request number
+  traffic-control:
+    global-switch: false
+    max-global-qps-rate: 300
+    tenant-switch: false
+    default-tenant-qps-rate: 10
+      #customize-tenant-qps-rate:
+    # eg.
+    #tenant1: 11
+    #tenant2: 20
+  python-gateway:
+    # Weather enable python gateway server or not. The default value is true.
+    enabled: true
+    # Authentication token for connection from python api to python gateway server. Should be changed the default value
+    # when you deploy in public network.
+    auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
+    # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
+    # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
+    gateway-server-address: 0.0.0.0
+    # The port of Python gateway server start. Define which port you could connect to Python gateway server from
+    # Python API side.
+    gateway-server-port: 25333
+    # The address of Python callback client.
+    python-address: 127.0.0.1
+    # The port of Python callback client.
+    python-port: 25334
+    # Close connection of socket server if no other request accept after x milliseconds. Define value is (0 = infinite),
+    # and socket server would never close even though no requests accept
+    connect-timeout: 0
+    # Close each active connection of socket server if python program not active after x milliseconds. Define value is
+    # (0 = infinite), and socket server would never close even though no requests accept
+    read-timeout: 0
 
 server:
   port: 12345
@@ -215,6 +288,9 @@ server:
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json,application/xml
   jetty:
     max-http-form-post-size: 5000000
+    accesslog:
+      enabled: true
+      custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 management:
   endpoints:
@@ -233,9 +309,6 @@ management:
   metrics:
     tags:
       application: ${spring.application.name}
-
-audit:
-  enabled: true
 
 metrics:
   enabled: true
@@ -267,4 +340,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
-    password: root
+    password: root@123

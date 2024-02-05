@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -36,8 +35,11 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
@@ -89,6 +91,12 @@ public class WorkerGroupServiceTest {
 
     @Mock
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
+
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private ScheduleMapper scheduleMapper;
 
     private final String GROUP_NAME = "testWorkerGroup";
 
@@ -155,7 +163,7 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost1:0000", "");
-        Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);
+        Mockito.when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
 
         Map<String, Object> result =
                 workerGroupService.saveWorkerGroup(loginUser, 1, GROUP_NAME, "localhost:0000", "test group", "");
@@ -175,7 +183,7 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.queryWorkerGroupByName(GROUP_NAME)).thenReturn(null);
         Map<String, String> serverMaps = new HashMap<>();
         serverMaps.put("localhost:0000", "");
-        Mockito.when(registryClient.getServerMaps(NodeType.WORKER)).thenReturn(serverMaps);
+        Mockito.when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
         Mockito.when(workerGroupMapper.insert(any())).thenReturn(1);
 
         Map<String, Object> result =
@@ -197,7 +205,7 @@ public class WorkerGroupServiceTest {
         Set<String> activeWorkerNodes = new HashSet<>();
         activeWorkerNodes.add("localhost:12345");
         activeWorkerNodes.add("localhost:23456");
-        Mockito.when(registryClient.getServerNodeSet(NodeType.WORKER)).thenReturn(activeWorkerNodes);
+        Mockito.when(registryClient.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(activeWorkerNodes);
 
         Result result = workerGroupService.queryAllGroupPaging(loginUser, 1, 1, null);
         Assertions.assertEquals(result.getCode(), Status.SUCCESS.getCode());
@@ -257,11 +265,16 @@ public class WorkerGroupServiceTest {
         Mockito.when(workerGroupMapper.selectById(1)).thenReturn(workerGroup);
         Mockito.when(processInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES)).thenReturn(null);
+
         Mockito.when(workerGroupMapper.deleteById(1)).thenReturn(1);
-        Mockito.when(processInstanceMapper.updateProcessInstanceByWorkerGroupName(workerGroup.getName(), ""))
-                .thenReturn(1);
+
         Mockito.when(environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName()))
                 .thenReturn(null);
+
+        Mockito.when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
+
+        Mockito.when(scheduleMapper.selectList(Mockito.any())).thenReturn(null);
+
         Map<String, Object> successResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(),
                 ((Status) successResult.get(Constants.STATUS)).getCode());

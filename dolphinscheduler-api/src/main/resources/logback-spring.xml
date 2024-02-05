@@ -18,11 +18,12 @@
 
 <configuration scan="true" scanPeriod="120 seconds">
     <property name="log.base" value="logs"/>
+    <property scope="context" name="log.base.ctx" value="${log.base}" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - %msg%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{10}:[%line] - %msg%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -39,7 +40,7 @@
         </rollingPolicy>
         <encoder>
             <pattern>
-                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - %msg%n
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{10}:[%line] - %msg%n
             </pattern>
             <charset>UTF-8</charset>
         </encoder>
@@ -55,7 +56,6 @@
                 <appender-ref ref="STDOUT"/>
             </then>
         </if>
-        <appender-ref ref="STDOUT"/>
         <appender-ref ref="APILOGFILE"/>
     </root>
 </configuration>

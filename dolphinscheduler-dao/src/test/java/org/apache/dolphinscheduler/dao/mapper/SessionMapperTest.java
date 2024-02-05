@@ -27,6 +27,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 public class SessionMapperTest extends BaseDaoTest {
 
     @Autowired
@@ -57,7 +59,7 @@ public class SessionMapperTest extends BaseDaoTest {
         session.setLastLoginTime(new Date());
         // update
         int update = sessionMapper.updateById(session);
-        Assertions.assertEquals(update, 1);
+        Assertions.assertEquals(1, update);
     }
 
     /**
@@ -67,7 +69,7 @@ public class SessionMapperTest extends BaseDaoTest {
     public void testDelete() {
         Session session = insertOne();
         int delete = sessionMapper.deleteById(session.getId());
-        Assertions.assertEquals(delete, 1);
+        Assertions.assertEquals(1, delete);
     }
 
     /**
@@ -78,7 +80,7 @@ public class SessionMapperTest extends BaseDaoTest {
         Session session = insertOne();
         // query
         List<Session> sessions = sessionMapper.selectList(null);
-        Assertions.assertNotEquals(sessions.size(), 0);
+        Assertions.assertNotEquals(0, sessions.size());
     }
 
     /**
@@ -87,8 +89,9 @@ public class SessionMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByUserId() {
         Session session = insertOne();
-        List<Session> sessions = sessionMapper.queryByUserId(session.getUserId());
-        Assertions.assertNotEquals(sessions.size(), 0);
+        List<Session> sessions =
+                sessionMapper.selectList(new QueryWrapper<>(Session.builder().userId(session.getUserId()).build()));
+        Assertions.assertNotEquals(0, sessions.size());
 
     }
 }

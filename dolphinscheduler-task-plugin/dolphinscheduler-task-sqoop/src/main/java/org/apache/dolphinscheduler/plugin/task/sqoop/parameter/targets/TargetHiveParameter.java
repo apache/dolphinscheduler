@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
+
 /**
  * target hive parameter
  */
-public class TargetHiveParameter {
+public class TargetHiveParameter extends TargetCommonParameter {
 
     /**
      * hive database

@@ -33,6 +33,8 @@ public class TaskInstanceUtils {
         target.setName(source.getName());
         target.setTaskType(source.getTaskType());
         target.setProcessInstanceId(source.getProcessInstanceId());
+        target.setProcessInstanceName(source.getProcessInstanceName());
+        target.setProjectCode(source.getProjectCode());
         target.setTaskCode(source.getTaskCode());
         target.setTaskDefinitionVersion(source.getTaskDefinitionVersion());
         target.setProcessInstanceName(source.getProcessInstanceName());
@@ -69,7 +71,6 @@ public class TaskInstanceUtils {
         target.setExecutorId(source.getExecutorId());
         target.setVarPool(source.getVarPool());
         target.setExecutorName(source.getExecutorName());
-        target.setResources(source.getResources());
         target.setDelayTime(source.getDelayTime());
         target.setDryRun(source.getDryRun());
         target.setTaskGroupId(source.getTaskGroupId());

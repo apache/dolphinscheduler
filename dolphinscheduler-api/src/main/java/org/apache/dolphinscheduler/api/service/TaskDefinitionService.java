@@ -253,4 +253,6 @@ public interface TaskDefinitionService {
                                               long projectCode,
                                               long code,
                                               ReleaseState releaseState);
+
+    void deleteTaskByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion);
 }

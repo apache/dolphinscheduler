@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.BaseService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -31,35 +32,21 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * base service impl
  */
+@Slf4j
 public class BaseServiceImpl implements BaseService {
-
-    private static final Logger logger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
     @Autowired
     protected ResourcePermissionCheckService resourcePermissionCheckService;
-
-    @Override
-    public void permissionPostHandle(AuthorizationType authorizationType, Integer userId, List<Integer> ids,
-                                     Logger logger) {
-        try {
-            resourcePermissionCheckService.postHandle(authorizationType, userId, ids, logger);
-        } catch (Exception e) {
-            logger.error("Post handle error, userId:{}.", userId, e);
-            throw new RuntimeException("Resource association user error", e);
-        }
-    }
 
     /**
      * check admin
@@ -76,17 +63,12 @@ public class BaseServiceImpl implements BaseService {
      * isNotAdmin
      *
      * @param loginUser login user
-     * @param result result code
      * @return true if not administrator, otherwise false
      */
     @Override
-    public boolean isNotAdmin(User loginUser, Map<String, Object> result) {
+    public boolean isNotAdmin(User loginUser) {
         // only admin can operate
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return true;
-        }
-        return false;
+        return !isAdmin(loginUser);
     }
 
     /**
@@ -178,50 +160,38 @@ public class BaseServiceImpl implements BaseService {
     @Override
     public boolean canOperatorPermissions(User user, Object[] ids, AuthorizationType type, String permissionKey) {
         boolean operationPermissionCheck =
-                resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, logger);
+                resourcePermissionCheckService.operationPermissionCheck(type, user.getId(), permissionKey, log);
         boolean resourcePermissionCheck = resourcePermissionCheckService.resourcePermissionCheck(type, ids,
-                user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), logger);
+                user.getUserType().equals(UserType.ADMIN_USER) ? 0 : user.getId(), log);
         return operationPermissionCheck && resourcePermissionCheck;
     }
 
     /**
      * check and parse date parameters
-     *
-     * @param startDateStr start date string
-     * @param endDateStr end date string
-     * @return map<status,startDate,endDate>
      */
     @Override
-    public Map<String, Object> checkAndParseDateParameters(String startDateStr, String endDateStr) {
-        Map<String, Object> result = new HashMap<>();
+    public Date checkAndParseDateParameters(String startDateStr) throws ServiceException {
         Date start = null;
         if (!StringUtils.isEmpty(startDateStr)) {
             start = DateUtils.stringToDate(startDateStr);
             if (Objects.isNull(start)) {
-                logger.warn("Parameter startDateStr is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
+                log.warn("Parameter startDateStr is invalid.");
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
             }
         }
-        result.put(Constants.START_TIME, start);
-
-        Date end = null;
-        if (!StringUtils.isEmpty(endDateStr)) {
-            end = DateUtils.stringToDate(endDateStr);
-            if (Objects.isNull(end)) {
-                logger.warn("Parameter endDateStr is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-                return result;
-            }
-        }
-        result.put(Constants.END_TIME, end);
-
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return start;
     }
 
     @Override
     public boolean checkDescriptionLength(String description) {
         return description != null && description.codePointCount(0, description.length()) > 255;
+    }
+
+    protected Date transformDate(String dateStr) {
+        Date date = DateUtils.stringToDate(dateStr);
+        if (date == null) {
+            throw new IllegalArgumentException("dateStr: [" + dateStr + "] is invalid");
+        }
+        return date;
     }
 }

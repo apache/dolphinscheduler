@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DqExecuteResultService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -30,8 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,24 +42,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * DqExecuteResultServiceImpl
  */
 @Service
+@Slf4j
 public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExecuteResultService {
-
-    private final Logger logger = LoggerFactory.getLogger(DqExecuteResultServiceImpl.class);
 
     @Autowired
     private DqExecuteResultMapper dqExecuteResultMapper;
 
     @Override
-    public Result queryResultListPaging(User loginUser,
-                                        String searchVal,
-                                        Integer state,
-                                        Integer ruleType,
-                                        String startTime,
-                                        String endTime,
-                                        Integer pageNo,
-                                        Integer pageSize) {
+    public PageInfo<DqExecuteResult> queryResultListPaging(User loginUser,
+                                                           String searchVal,
+                                                           Integer state,
+                                                           Integer ruleType,
+                                                           String startTime,
+                                                           String endTime,
+                                                           Integer pageNo,
+                                                           Integer pageSize) {
 
-        Result result = new Result();
         int[] statusArray = null;
         // filter by state
         if (state != null) {
@@ -76,9 +74,7 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
                 end = DateUtils.stringToDate(endTime);
             }
         } catch (Exception e) {
-            logger.warn("Parameter startTime or endTime is invalid.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "startTime,endTime");
         }
 
         Page<DqExecuteResult> page = new Page<>(pageNo, pageSize);
@@ -100,8 +96,6 @@ public class DqExecuteResultServiceImpl extends BaseServiceImpl implements DqExe
 
         pageInfo.setTotal((int) dqsResultPage.getTotal());
         pageInfo.setTotalList(dqsResultPage.getRecords());
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return pageInfo;
     }
 }

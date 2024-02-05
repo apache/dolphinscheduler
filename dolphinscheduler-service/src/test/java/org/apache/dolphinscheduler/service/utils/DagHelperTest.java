@@ -51,16 +51,16 @@ public class DagHelperTest {
 
     @Test
     public void testHaveSubAfterNode() {
-        String parentNodeCode = "5293789969856";
+        Long parentNodeCode = 5293789969856L;
         List<TaskNodeRelation> taskNodeRelations = new ArrayList<>();
         TaskNodeRelation relation = new TaskNodeRelation();
-        relation.setStartNode("5293789969856");
-        relation.setEndNode("5293789969857");
+        relation.setStartNode(5293789969856L);
+        relation.setEndNode(5293789969857L);
         taskNodeRelations.add(relation);
 
         TaskNodeRelation relationNext = new TaskNodeRelation();
-        relationNext.setStartNode("5293789969856");
-        relationNext.setEndNode("5293789969858");
+        relationNext.setStartNode(5293789969856L);
+        relationNext.setEndNode(5293789969858L);
         taskNodeRelations.add(relationNext);
 
         List<TaskNode> taskNodes = new ArrayList<>();
@@ -85,7 +85,7 @@ public class DagHelperTest {
         ProcessDag processDag = new ProcessDag();
         processDag.setEdges(taskNodeRelations);
         processDag.setNodes(taskNodes);
-        DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
         boolean canSubmit = DagHelper.haveAllNodeAfterNode(parentNodeCode, dag);
         Assertions.assertTrue(canSubmit);
 
@@ -108,34 +108,34 @@ public class DagHelperTest {
     public void testTaskNodeCanSubmit() throws IOException {
         // 1->2->3->5->7
         // 4->3->6
-        DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
-        TaskNode taskNode3 = dag.getNode("3");
-        Map<String, TaskInstance> completeTaskList = new HashMap<>();
-        Map<String, TaskNode> skipNodeList = new HashMap<>();
-        completeTaskList.putIfAbsent("1", new TaskInstance());
+        DAG<Long, TaskNode, TaskNodeRelation> dag = generateDag();
+        TaskNode taskNode3 = dag.getNode(3L);
+        Map<Long, TaskInstance> completeTaskList = new HashMap<>();
+        Map<Long, TaskNode> skipNodeList = new HashMap<>();
+        completeTaskList.putIfAbsent(1L, new TaskInstance());
         Boolean canSubmit = false;
 
         // 2/4 are forbidden submit 3
-        TaskNode node2 = dag.getNode("2");
+        TaskNode node2 = dag.getNode(2L);
         node2.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
-        TaskNode nodex = dag.getNode("4");
+        TaskNode nodex = dag.getNode(4L);
         nodex.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, skipNodeList, completeTaskList);
         Assertions.assertEquals(canSubmit, true);
 
         // 2forbidden, 3 cannot be submit
-        completeTaskList.putIfAbsent("2", new TaskInstance());
-        TaskNode nodey = dag.getNode("4");
+        completeTaskList.putIfAbsent(2L, new TaskInstance());
+        TaskNode nodey = dag.getNode(4L);
         nodey.setRunFlag("");
         canSubmit = DagHelper.allDependsForbiddenOrEnd(taskNode3, dag, skipNodeList, completeTaskList);
         Assertions.assertEquals(canSubmit, false);
 
         // 2/3 forbidden submit 5
-        TaskNode node3 = dag.getNode("3");
+        TaskNode node3 = dag.getNode(3L);
         node3.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
-        TaskNode node8 = dag.getNode("8");
+        TaskNode node8 = dag.getNode(8L);
         node8.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
-        TaskNode node5 = dag.getNode("5");
+        TaskNode node5 = dag.getNode(5L);
         canSubmit = DagHelper.allDependsForbiddenOrEnd(node5, dag, skipNodeList, completeTaskList);
         Assertions.assertEquals(canSubmit, true);
     }
@@ -145,64 +145,64 @@ public class DagHelperTest {
      */
     @Test
     public void testParsePostNodeList() throws IOException {
-        DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
-        Map<String, TaskInstance> completeTaskList = new HashMap<>();
-        Map<String, TaskNode> skipNodeList = new HashMap<>();
+        DAG<Long, TaskNode, TaskNodeRelation> dag = generateDag();
+        Map<Long, TaskInstance> completeTaskList = new HashMap<>();
+        Map<Long, TaskNode> skipNodeList = new HashMap<>();
 
-        Set<String> postNodes = null;
+        Set<Long> postNodes = null;
         // complete : null
         // expect post: 1/4
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("1"));
-        Assertions.assertTrue(postNodes.contains("4"));
+        Assertions.assertTrue(postNodes.contains(1L));
+        Assertions.assertTrue(postNodes.contains(4L));
 
         // complete : 1
         // expect post: 2/4
-        completeTaskList.put("1", new TaskInstance());
+        completeTaskList.put(1L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("2"));
-        Assertions.assertTrue(postNodes.contains("4"));
+        Assertions.assertTrue(postNodes.contains(2L));
+        Assertions.assertTrue(postNodes.contains(4L));
 
         // complete : 1/2
         // expect post: 4
-        completeTaskList.put("2", new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("4"));
-        Assertions.assertTrue(postNodes.contains("8"));
+        Assertions.assertTrue(postNodes.contains(4L));
+        Assertions.assertTrue(postNodes.contains(8L));
 
         // complete : 1/2/4
         // expect post: 3
-        completeTaskList.put("4", new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("3"));
-        Assertions.assertTrue(postNodes.contains("8"));
+        Assertions.assertTrue(postNodes.contains(3L));
+        Assertions.assertTrue(postNodes.contains(8L));
 
         // complete : 1/2/4/3
         // expect post: 8/6
-        completeTaskList.put("3", new TaskInstance());
+        completeTaskList.put(3L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("8"));
-        Assertions.assertTrue(postNodes.contains("6"));
+        Assertions.assertTrue(postNodes.contains(8L));
+        Assertions.assertTrue(postNodes.contains(6L));
 
         // complete : 1/2/4/3/8
         // expect post: 6/5
-        completeTaskList.put("8", new TaskInstance());
+        completeTaskList.put(8L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("5"));
-        Assertions.assertTrue(postNodes.contains("6"));
+        Assertions.assertTrue(postNodes.contains(5L));
+        Assertions.assertTrue(postNodes.contains(6L));
         // complete : 1/2/4/3/5/6/8
         // expect post: 7
-        completeTaskList.put("6", new TaskInstance());
-        completeTaskList.put("5", new TaskInstance());
+        completeTaskList.put(6L, new TaskInstance());
+        completeTaskList.put(5L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("7"));
+        Assertions.assertTrue(postNodes.contains(7L));
     }
 
     /**
@@ -212,35 +212,35 @@ public class DagHelperTest {
      */
     @Test
     public void testForbiddenPostNode() throws IOException {
-        DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
-        Map<String, TaskInstance> completeTaskList = new HashMap<>();
-        Map<String, TaskNode> skipNodeList = new HashMap<>();
-        Set<String> postNodes = null;
+        DAG<Long, TaskNode, TaskNodeRelation> dag = generateDag();
+        Map<Long, TaskInstance> completeTaskList = new HashMap<>();
+        Map<Long, TaskNode> skipNodeList = new HashMap<>();
+        Set<Long> postNodes = null;
         // dag: 1-2-3-5-7 4-3-6 2-8-5-7
         // forbid:2 complete:1 post:4/8
-        completeTaskList.put("1", new TaskInstance());
-        TaskNode node2 = dag.getNode("2");
+        completeTaskList.put(1L, new TaskInstance());
+        TaskNode node2 = dag.getNode(2L);
         node2.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("4"));
-        Assertions.assertTrue(postNodes.contains("8"));
+        Assertions.assertTrue(postNodes.contains(4L));
+        Assertions.assertTrue(postNodes.contains(8L));
 
         // forbid:2/4 complete:1 post:3/8
-        TaskNode node4 = dag.getNode("4");
+        TaskNode node4 = dag.getNode(4L);
         node4.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(2, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("3"));
-        Assertions.assertTrue(postNodes.contains("8"));
+        Assertions.assertTrue(postNodes.contains(3L));
+        Assertions.assertTrue(postNodes.contains(8L));
 
         // forbid:2/4/5 complete:1/8 post:3
-        completeTaskList.put("8", new TaskInstance());
-        TaskNode node5 = dag.getNode("5");
+        completeTaskList.put(8L, new TaskInstance());
+        TaskNode node5 = dag.getNode(5L);
         node5.setRunFlag(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("3"));
+        Assertions.assertTrue(postNodes.contains(3L));
     }
 
     /**
@@ -250,16 +250,16 @@ public class DagHelperTest {
      */
     @Test
     public void testConditionPostNode() throws IOException {
-        DAG<String, TaskNode, TaskNodeRelation> dag = generateDag();
-        Map<String, TaskInstance> completeTaskList = new HashMap<>();
-        Map<String, TaskNode> skipNodeList = new HashMap<>();
-        Set<String> postNodes = null;
+        DAG<Long, TaskNode, TaskNodeRelation> dag = generateDag();
+        Map<Long, TaskInstance> completeTaskList = new HashMap<>();
+        Map<Long, TaskNode> skipNodeList = new HashMap<>();
+        Set<Long> postNodes = null;
         // dag: 1-2-3-5-7 4-3-6 2-8-5-7
         // 3-if
-        completeTaskList.put("1", new TaskInstance());
-        completeTaskList.put("2", new TaskInstance());
-        completeTaskList.put("4", new TaskInstance());
-        TaskNode node3 = dag.getNode("3");
+        completeTaskList.put(1L, new TaskInstance());
+        completeTaskList.put(2L, new TaskInstance());
+        completeTaskList.put(4L, new TaskInstance());
+        TaskNode node3 = dag.getNode(3L);
         node3.setType(TASK_TYPE_CONDITIONS);
         node3.setConditionResult("{\n"
                 +
@@ -272,51 +272,51 @@ public class DagHelperTest {
                 "                ]\n"
                 +
                 "            }");
-        completeTaskList.remove("3");
+        completeTaskList.remove(3L);
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
         // complete 1/2/3/4 expect:8
-        completeTaskList.put("3", taskInstance);
+        completeTaskList.put(3L, taskInstance);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("8"));
+        Assertions.assertTrue(postNodes.contains(8L));
 
         // 2.complete 1/2/3/4/8 expect:5 skip:6
-        completeTaskList.put("8", new TaskInstance());
+        completeTaskList.put(8L, new TaskInstance());
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assertions.assertTrue(postNodes.contains("5"));
+        Assertions.assertTrue(postNodes.contains(5L));
         Assertions.assertEquals(1, skipNodeList.size());
-        Assertions.assertTrue(skipNodeList.containsKey("6"));
+        Assertions.assertTrue(skipNodeList.containsKey(6L));
 
         // 3.complete 1/2/3/4/5/8 expect post:7 skip:6
         skipNodeList.clear();
         TaskInstance taskInstance1 = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUCCESS);
-        completeTaskList.put("5", taskInstance1);
+        completeTaskList.put(5L, taskInstance1);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("7"));
+        Assertions.assertTrue(postNodes.contains(7L));
         Assertions.assertEquals(1, skipNodeList.size());
-        Assertions.assertTrue(skipNodeList.containsKey("6"));
+        Assertions.assertTrue(skipNodeList.containsKey(6L));
 
         // dag: 1-2-3-5-7 4-3-6
         // 3-if , complete:1/2/3/4
         // 1.failure:3 expect post:6 skip:5/7
         skipNodeList.clear();
-        completeTaskList.remove("3");
+        completeTaskList.remove(3L);
         taskInstance = new TaskInstance();
 
         Map<String, Object> taskParamsMap = new HashMap<>();
         taskParamsMap.put(Constants.SWITCH_RESULT, "");
         taskInstance.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
         taskInstance.setState(TaskExecutionStatus.FAILURE);
-        completeTaskList.put("3", taskInstance);
+        completeTaskList.put(3L, taskInstance);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
-        Assertions.assertTrue(postNodes.contains("6"));
+        Assertions.assertTrue(postNodes.contains(6L));
         Assertions.assertEquals(2, skipNodeList.size());
-        Assertions.assertTrue(skipNodeList.containsKey("5"));
-        Assertions.assertTrue(skipNodeList.containsKey("7"));
+        Assertions.assertTrue(skipNodeList.containsKey(5L));
+        Assertions.assertTrue(skipNodeList.containsKey(7L));
 
         // dag: 1-2-3-5-7 4-3-6
         // 3-if , complete:1/2/3/4
@@ -325,11 +325,29 @@ public class DagHelperTest {
         skipNodeList.clear();
         completeTaskList.clear();
         taskInstance.setSwitchDependency(getSwitchNode());
-        completeTaskList.put("1", taskInstance);
-        postNodes = DagHelper.parsePostNodes("1", skipNodeList, dag, completeTaskList);
+        completeTaskList.put(1L, taskInstance);
+        postNodes = DagHelper.parsePostNodes(1L, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
     }
 
+    @Test
+    public void testSwitchPostNode() throws IOException {
+        DAG<Long, TaskNode, TaskNodeRelation> dag = generateDag2();
+        Map<Long, TaskNode> skipTaskNodeList = new HashMap<>();
+        Map<Long, TaskInstance> completeTaskList = new HashMap<>();
+        completeTaskList.put(0l, new TaskInstance());
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setState(TaskExecutionStatus.SUCCESS);
+        taskInstance.setTaskCode(1l);
+        Map<String, Object> taskParamsMap = new HashMap<>();
+        taskParamsMap.put(Constants.SWITCH_RESULT, "");
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
+        taskInstance.setSwitchDependency(getSwitchNode());
+        completeTaskList.put(1l, taskInstance);
+        DagHelper.skipTaskNode4Switch(dag.getNode(1l), skipTaskNodeList, completeTaskList, dag);
+        Assertions.assertNotNull(skipTaskNodeList.get(2L));
+        Assertions.assertEquals(1, skipTaskNodeList.size());
+    }
     /**
      * process:
      * 1->2->3->5->7
@@ -345,7 +363,7 @@ public class DagHelperTest {
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
      */
-    private DAG<String, TaskNode, TaskNodeRelation> generateDag() throws IOException {
+    private DAG<Long, TaskNode, TaskNodeRelation> generateDag() throws IOException {
         List<TaskNode> taskNodeList = new ArrayList<>();
         TaskNode node1 = new TaskNode();
         node1.setId("1");
@@ -423,8 +441,8 @@ public class DagHelperTest {
         node8.setPreTasks(JSONUtils.toJsonString(dep8));
         taskNodeList.add(node8);
 
-        List<String> startNodes = new ArrayList<>();
-        List<String> recoveryNodes = new ArrayList<>();
+        List<Long> startNodes = new ArrayList<>();
+        List<Long> recoveryNodes = new ArrayList<>();
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
                 startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
@@ -436,16 +454,18 @@ public class DagHelperTest {
 
     /**
      * DAG graph:
-     *    2
-     *    ↑
-     * 0->1(switch)
-     *    ↓
-     *    4
+     *           -> 2->
+     *         /        \
+     *      /               \
+     * 0->1(switch)->5          6
+     *      \               /
+     *        \         /
+     *          -> 4->
      *
      * @return dag
      * @throws JsonProcessingException if error throws JsonProcessingException
      */
-    private DAG<String, TaskNode, TaskNodeRelation> generateDag2() throws IOException {
+    private DAG<Long, TaskNode, TaskNodeRelation> generateDag2() throws IOException {
         List<TaskNode> taskNodeList = new ArrayList<>();
 
         TaskNode node = new TaskNode();
@@ -484,17 +504,28 @@ public class DagHelperTest {
         taskNodeList.add(node4);
 
         TaskNode node5 = new TaskNode();
-        node5.setId("4");
-        node5.setName("4");
-        node5.setCode(4);
+        node5.setId("5");
+        node5.setName("5");
+        node5.setCode(5);
         node5.setType("SHELL");
-        List<String> dep5 = new ArrayList<>();
-        dep5.add("1");
+        List<Long> dep5 = new ArrayList<>();
+        dep5.add(1L);
         node5.setPreTasks(JSONUtils.toJsonString(dep5));
         taskNodeList.add(node5);
 
-        List<String> startNodes = new ArrayList<>();
-        List<String> recoveryNodes = new ArrayList<>();
+        TaskNode node6 = new TaskNode();
+        node5.setId("6");
+        node5.setName("6");
+        node5.setCode(6);
+        node5.setType("SHELL");
+        List<Long> dep6 = new ArrayList<>();
+        dep5.add(2L);
+        dep5.add(4L);
+        node5.setPreTasks(JSONUtils.toJsonString(dep6));
+        taskNodeList.add(node6);
+
+        List<Long> startNodes = new ArrayList<>();
+        List<Long> recoveryNodes = new ArrayList<>();
         List<TaskNode> destTaskNodeList = DagHelper.generateFlowNodeListByStartNode(taskNodeList,
                 startNodes, recoveryNodes, TaskDependType.TASK_POST);
         List<TaskNodeRelation> taskNodeRelations = DagHelper.generateRelationListByFlowNodes(destTaskNodeList);
@@ -508,17 +539,17 @@ public class DagHelperTest {
         SwitchParameters conditionsParameters = new SwitchParameters();
         SwitchResultVo switchResultVo1 = new SwitchResultVo();
         switchResultVo1.setCondition(" 2 == 1");
-        switchResultVo1.setNextNode("2");
+        switchResultVo1.setNextNode(2L);
         SwitchResultVo switchResultVo2 = new SwitchResultVo();
         switchResultVo2.setCondition(" 2 == 2");
-        switchResultVo2.setNextNode("4");
+        switchResultVo2.setNextNode(4L);
         List<SwitchResultVo> list = new ArrayList<>();
         list.add(switchResultVo1);
         list.add(switchResultVo2);
         conditionsParameters.setDependTaskList(list);
-        conditionsParameters.setNextNode("5");
+        conditionsParameters.setNextNode(5L);
         conditionsParameters.setRelation("AND");
-
+        conditionsParameters.setResultConditionLocation(1);
         // in: AND(AND(1 is SUCCESS))
         return conditionsParameters;
     }
@@ -540,7 +571,7 @@ public class DagHelperTest {
         assert processData != null;
         List<TaskNode> taskNodeList = processData.getTasks();
         ProcessDag processDag = DagHelper.getProcessDag(taskNodeList);
-        DAG<String, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
+        DAG<Long, TaskNode, TaskNodeRelation> dag = DagHelper.buildDagGraph(processDag);
         Assertions.assertNotNull(dag);
     }
 

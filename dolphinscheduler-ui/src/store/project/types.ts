@@ -23,6 +23,7 @@ type TaskExecuteType = 'STREAM' | 'BATCH'
 type TaskType =
   | 'SHELL'
   | 'SUB_PROCESS'
+  | 'DYNAMIC'
   | 'PROCEDURE'
   | 'SQL'
   | 'SPARK'
@@ -56,6 +57,8 @@ type TaskType =
   | 'DATASYNC'
   | 'KUBEFLOW'
   | 'LINKIS'
+  | 'DATA_FACTORY'
+  | 'REMOTESHELL'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

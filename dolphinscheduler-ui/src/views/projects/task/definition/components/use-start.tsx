@@ -22,8 +22,9 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import { queryTenantList } from '@/service/modules/tenants'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
-import { listAlertGroupById } from '@/service/modules/alert-group'
+import { listNormalAlertGroupById } from '@/service/modules/alert-group'
 import type { EnvironmentItem } from '@/service/modules/environment/types'
 import type { IStartState } from '../types'
 
@@ -40,6 +41,7 @@ export const useStart = (
       warningType: 'NONE',
       warningGroupId: null,
       workerGroup: 'default',
+      tenantCode: 'default',
       environmentCode: null,
       startParams: null as null | string,
       dryRun: 0
@@ -47,6 +49,7 @@ export const useStart = (
     startState: {
       projectCode: Number(route.params.projectCode),
       workerGroups: [],
+      tenantList: [],
       alertGroups: [],
       environmentList: [],
       startParamsList: []
@@ -67,6 +70,15 @@ export const useStart = (
     })
   }
 
+  const getTenantList = () => {
+    queryTenantList().then((res: any) => {
+      variables.startState.tenantList = res.map((item: any) => ({
+        label: item.tenantCode,
+        value: item.tenantCode
+      }))
+    })
+  }
+
   const getEnvironmentList = () => {
     queryAllEnvironmentList().then((res: Array<EnvironmentItem>) => {
       variables.startState.environmentList = res.map((item) => ({
@@ -78,7 +90,7 @@ export const useStart = (
   }
 
   const getAlertGroups = () => {
-    listAlertGroupById().then((res: any) => {
+    listNormalAlertGroupById().then((res: any) => {
       variables.startState.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id
@@ -135,6 +147,7 @@ export const useStart = (
   return {
     variables,
     getWorkerGroups,
+    getTenantList,
     getEnvironmentList,
     getAlertGroups,
     getStartParamsList,

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -52,8 +53,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -61,10 +62,9 @@ import org.springframework.util.CollectionUtils;
 /**
  * work flow lineage service impl
  */
+@Slf4j
 @Service
 public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkFlowLineageService {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageServiceImpl.class);
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
@@ -79,39 +79,28 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Override
-    public Map<String, Object> queryWorkFlowLineageByName(long projectCode, String workFlowName) {
-        Map<String, Object> result = new HashMap<>();
+    public List<WorkFlowLineage> queryWorkFlowLineageByName(long projectCode, String workFlowName) {
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            logger.error("Project does not exist, projectCode:{}.", projectCode);
-            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-            return result;
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        List<WorkFlowLineage> workFlowLineageList =
-                workFlowLineageMapper.queryWorkFlowLineageByName(projectCode, workFlowName);
-        result.put(Constants.DATA_LIST, workFlowLineageList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return workFlowLineageMapper.queryWorkFlowLineageByName(projectCode, workFlowName);
     }
 
     @Override
     public Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long sourceWorkFlowCode) {
-        Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            logger.error("Project does not exist, projectCode:{}.", projectCode);
-            putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-            return result;
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
         List<WorkFlowLineage> workFlowLineages = new ArrayList<>();
         Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
         recursiveWorkFlow(projectCode, sourceWorkFlowCode, workFlowLineages, workFlowRelations);
         Map<String, Object> workFlowLists = new HashMap<>();
+        // todo: use vo
         workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineages);
         workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
-        result.put(Constants.DATA_LIST, workFlowLists);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return workFlowLists;
     }
 
     private void recursiveWorkFlow(long projectCode,
@@ -172,7 +161,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            logger.error("Project does not exist, projectCode:{}.", projectCode);
+            log.error("Project does not exist, projectCode:{}.", projectCode);
             putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
@@ -234,7 +223,8 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                     DependentParameters dependentParameters =
                             JSONUtils.parseObject(taskDefinitionLog.getDependence(), DependentParameters.class);
                     if (dependentParameters != null) {
-                        List<DependentTaskModel> dependTaskList = dependentParameters.getDependTaskList();
+                        List<DependentTaskModel> dependTaskList =
+                                dependentParameters.getDependTaskList();
                         if (!CollectionUtils.isEmpty(dependTaskList)) {
                             for (DependentTaskModel taskModel : dependTaskList) {
                                 List<DependentItem> dependItemList = taskModel.getDependItemList();

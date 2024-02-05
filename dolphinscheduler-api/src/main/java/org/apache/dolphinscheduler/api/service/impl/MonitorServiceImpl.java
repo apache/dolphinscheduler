@@ -17,40 +17,35 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.MonitorService;
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerServerModel;
-import org.apache.dolphinscheduler.dao.MonitorDBDao;
-import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
  * monitor service impl
  */
 @Service
+@Slf4j
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {
 
-    public static final Logger logger = LoggerFactory.getLogger(MonitorServiceImpl.class);
-
     @Autowired
-    private MonitorDBDao monitorDBDao;
+    private DatabaseMonitor databaseMonitor;
 
     @Autowired
     private RegistryClient registryClient;
@@ -62,12 +57,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return data base state
      */
     @Override
-    public Map<String, Object> queryDatabaseState(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-        List<MonitorRecord> monitorRecordList = monitorDBDao.queryDatabaseState();
-        result.put(Constants.DATA_LIST, monitorRecordList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+    public List<DatabaseMetrics> queryDatabaseState(User loginUser) {
+        return Lists.newArrayList(databaseMonitor.getDatabaseMetrics());
     }
 
     /**
@@ -77,13 +68,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return master information list
      */
     @Override
-    public Map<String, Object> queryMaster(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-        List<Server> masterServers = getServerListFromRegistry(true);
-        result.put(Constants.DATA_LIST, masterServers);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+    public List<Server> queryMaster(User loginUser) {
+        return registryClient.getServerList(RegistryNodeType.MASTER);
     }
 
     /**
@@ -93,10 +79,9 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
      * @return worker information list
      */
     @Override
-    public Map<String, Object> queryWorker(User loginUser) {
+    public List<WorkerServerModel> queryWorker(User loginUser) {
 
-        Map<String, Object> result = new HashMap<>();
-        List<WorkerServerModel> workerServers = getServerListFromRegistry(false)
+        return registryClient.getServerList(RegistryNodeType.WORKER)
                 .stream()
                 .map((Server server) -> {
                     WorkerServerModel model = new WorkerServerModel();
@@ -111,28 +96,13 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
                 })
                 .collect(Collectors.toList());
 
-        Map<String, WorkerServerModel> workerHostPortServerMapping = workerServers
-                .stream()
-                .collect(Collectors.toMap(
-                        (WorkerServerModel worker) -> {
-                            String[] s = worker.getZkDirectories().iterator().next().split("/");
-                            return s[s.length - 1];
-                        }, Function.identity(), (WorkerServerModel oldOne, WorkerServerModel newOne) -> {
-                            oldOne.getZkDirectories().addAll(newOne.getZkDirectories());
-                            return oldOne;
-                        }));
-
-        result.put(Constants.DATA_LIST, workerHostPortServerMapping.values());
-        putMsg(result, Status.SUCCESS);
-
-        return result;
     }
 
     @Override
     public List<Server> getServerListFromRegistry(boolean isMaster) {
         return isMaster
-                ? registryClient.getServerList(NodeType.MASTER)
-                : registryClient.getServerList(NodeType.WORKER);
+                ? registryClient.getServerList(RegistryNodeType.MASTER)
+                : registryClient.getServerList(RegistryNodeType.WORKER);
     }
 
 }

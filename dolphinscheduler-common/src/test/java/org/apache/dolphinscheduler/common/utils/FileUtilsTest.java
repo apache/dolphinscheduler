@@ -19,11 +19,15 @@ package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
-
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,29 +55,28 @@ public class FileUtilsTest {
 
     @Test
     public void testGetProcessExecDir() {
-        String dir = FileUtils.getProcessExecDir("test", 1L, 2L, 1, 3, 4);
+        String dir = FileUtils.getTaskInstanceWorkingDirectory("test", 1L, 2L, 1, 3, 4);
         Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/test/1/2_1/3/4", dir);
     }
 
     @Test
-    public void testCreateWorkDirIfAbsent() {
+    public void createDirectoryWith755() throws IOException {
+        Path path = Paths.get("/tmp/createWorkDirAndUserIfAbsent");
         try {
-            FileUtils.createWorkDirIfAbsent("/tmp/createWorkDirAndUserIfAbsent");
-            Assertions.assertTrue(true);
-        } catch (Exception e) {
-            Assertions.fail();
-        }
-    }
+            FileUtils.createDirectoryWith755(path);
+            File file = path.toFile();
+            Assertions.assertTrue(file.exists());
+            Assertions.assertTrue(file.isDirectory());
+            Assertions.assertTrue(file.canExecute());
+            Assertions.assertTrue(file.canRead());
+            Assertions.assertTrue(file.canWrite());
 
-    @Test
-    public void testSetValue() {
-        try {
-            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "true");
-            Assertions.assertTrue(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
-            PropertyUtils.setValue(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, "false");
-            Assertions.assertFalse(PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE));
+            FileUtils.createDirectoryWith755(Paths.get("/"));
         } catch (Exception e) {
-            Assertions.fail();
+            e.printStackTrace();
+            Assertions.fail(e.getMessage());
+        } finally {
+            Files.deleteIfExists(path);
         }
     }
 
@@ -116,6 +119,35 @@ public class FileUtilsTest {
 
         path = "abc/def...txt";
         Assertions.assertTrue(FileUtils.directoryTraversal(path));
+    }
+
+    @Test
+    void testGetFileChecksum() throws Exception {
+        String filePath1 = "test/testFile1.txt";
+        String filePath2 = "test/testFile2.txt";
+        String filePath3 = "test/testFile3.txt";
+        String content1 = "正正正faffdasfasdfas，한국어； 한글……にほんご\nfrançais";
+        String content2 = "正正正faffdasfasdfas，한국어； 한글……にほん\nfrançais";
+        FileUtils.writeContent2File(content1, filePath1);
+        FileUtils.writeContent2File(content2, filePath2);
+        FileUtils.writeContent2File(content1, filePath3);
+
+        String checksum1 = FileUtils.getFileChecksum(filePath1);
+        String checksum2 = FileUtils.getFileChecksum(filePath2);
+        String checksum3 = FileUtils.getFileChecksum(filePath3);
+
+        Assertions.assertNotEquals(checksum1, checksum2);
+        Assertions.assertEquals(checksum1, checksum3);
+
+        String dirPath = "test/";
+
+        Assertions.assertDoesNotThrow(
+                () -> FileUtils.getFileChecksum(dirPath));
+    }
+
+    @AfterEach
+    public void tearDown() {
+        FileUtils.deleteFile("test");
     }
 
 }

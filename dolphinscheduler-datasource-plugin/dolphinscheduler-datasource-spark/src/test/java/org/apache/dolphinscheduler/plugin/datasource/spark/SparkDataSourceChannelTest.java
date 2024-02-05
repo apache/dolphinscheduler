@@ -32,8 +32,9 @@ public class SparkDataSourceChannelTest {
     @Test
     public void testCreateDataSourceClient() {
         SparkDataSourceChannel sourceChannel = Mockito.mock(SparkDataSourceChannel.class);
-        SparkDataSourceClient dataSourceClient = Mockito.mock(SparkDataSourceClient.class);
-        Mockito.when(sourceChannel.createDataSourceClient(Mockito.any(), Mockito.any())).thenReturn(dataSourceClient);
-        Assertions.assertNotNull(sourceChannel.createDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
+        SparkPooledDataSourceClient dataSourceClient = Mockito.mock(SparkPooledDataSourceClient.class);
+        Mockito.when(sourceChannel.createPooledDataSourceClient(Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceClient);
+        Assertions.assertNotNull(sourceChannel.createPooledDataSourceClient(new SparkConnectionParam(), DbType.SPARK));
     }
 }

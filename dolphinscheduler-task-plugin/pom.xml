@@ -61,6 +61,8 @@
         <module>dolphinscheduler-task-datasync</module>
         <module>dolphinscheduler-task-kubeflow</module>
         <module>dolphinscheduler-task-linkis</module>
+        <module>dolphinscheduler-task-datafactory</module>
+        <module>dolphinscheduler-task-remoteshell</module>
     </modules>
 
     <dependencyManagement>

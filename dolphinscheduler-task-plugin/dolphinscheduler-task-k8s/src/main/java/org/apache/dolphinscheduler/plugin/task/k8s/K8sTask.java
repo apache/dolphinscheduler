@@ -17,46 +17,70 @@
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CLUSTER;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.NAMESPACE_NAME;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.k8s.param.K8sConnectionParam;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
+import org.apache.dolphinscheduler.plugin.task.api.model.Label;
+import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
+
+@Slf4j
 public class K8sTask extends AbstractK8sTask {
 
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
 
-    /**
-     * task parameters
-     */
-    private final K8sTaskParameters k8sTaskParameters;
+    private K8sTaskParameters k8sTaskParameters;
 
-    /**
-     * @param taskRequest taskRequest
-     */
+    private K8sTaskExecutionContext k8sTaskExecutionContext;
+
+    private K8sConnectionParam k8sConnectionParam;
     public K8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskExecutionContext = taskRequest;
-        this.k8sTaskParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), K8sTaskParameters.class);
-        logger.info("Initialize k8s task parameters {}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
+    }
+
+    @Override
+    public void init() {
+        String taskParams = taskExecutionContext.getTaskParams();
+        k8sTaskParameters = JSONUtils.parseObject(taskParams, K8sTaskParameters.class);
         if (k8sTaskParameters == null || !k8sTaskParameters.checkParameters()) {
             throw new TaskException("K8S task params is not valid");
         }
+
+        k8sTaskExecutionContext =
+                k8sTaskParameters.generateK8sTaskExecutionContext(taskExecutionContext.getResourceParametersHelper(),
+                        k8sTaskParameters.getDatasource());
+        k8sConnectionParam =
+                (K8sConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(k8sTaskParameters.getType()),
+                        k8sTaskExecutionContext.getConnectionParams());
+        String kubeConfig = k8sConnectionParam.getKubeConfig();
+        k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());
+        k8sTaskParameters.setKubeConfig(kubeConfig);
+        k8sTaskExecutionContext.setConfigYaml(kubeConfig);
+        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
+        log.info("Initialize k8s task params:{}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
     }
 
     @Override
@@ -73,17 +97,50 @@ public class K8sTask extends AbstractK8sTask {
     protected String buildCommand() {
         K8sTaskMainParameters k8sTaskMainParameters = new K8sTaskMainParameters();
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        Map<String, String> namespace = JSONUtils.toMap(k8sTaskParameters.getNamespace());
-        String namespaceName = namespace.get(NAMESPACE_NAME);
-        String clusterName = namespace.get(CLUSTER);
+        String namespaceName = k8sTaskParameters.getNamespace();
         k8sTaskMainParameters.setImage(k8sTaskParameters.getImage());
+        k8sTaskMainParameters.setPullSecret(k8sTaskParameters.getPullSecret());
         k8sTaskMainParameters.setNamespaceName(namespaceName);
-        k8sTaskMainParameters.setClusterName(clusterName);
         k8sTaskMainParameters.setMinCpuCores(k8sTaskParameters.getMinCpuCores());
         k8sTaskMainParameters.setMinMemorySpace(k8sTaskParameters.getMinMemorySpace());
-        k8sTaskMainParameters.setParamsMap(ParamUtils.convert(paramsMap));
+        k8sTaskMainParameters.setParamsMap(ParameterUtils.convert(paramsMap));
+        k8sTaskMainParameters.setLabelMap(convertToLabelMap(k8sTaskParameters.getCustomizedLabels()));
+        k8sTaskMainParameters
+                .setNodeSelectorRequirements(convertToNodeSelectorRequirements(k8sTaskParameters.getNodeSelectors()));
         k8sTaskMainParameters.setCommand(k8sTaskParameters.getCommand());
+        k8sTaskMainParameters.setArgs(k8sTaskParameters.getArgs());
+        k8sTaskMainParameters.setImagePullPolicy(k8sTaskParameters.getImagePullPolicy());
         return JSONUtils.toJsonString(k8sTaskMainParameters);
+    }
+
+    @Override
+    protected void dealOutParam(Map<String, String> taskOutputParams) {
+        this.k8sTaskParameters.dealOutParam(taskOutputParams);
+    }
+
+    public List<NodeSelectorRequirement> convertToNodeSelectorRequirements(List<NodeSelectorExpression> expressions) {
+        if (CollectionUtils.isEmpty(expressions)) {
+            return Collections.emptyList();
+        }
+
+        return expressions.stream().map(expression -> new NodeSelectorRequirement(
+                expression.getKey(),
+                expression.getOperator(),
+                StringUtils.isEmpty(expression.getValues()) ? Collections.emptyList()
+                        : Arrays.asList(expression.getValues().trim().split("\\s*,\\s*"))))
+                .collect(Collectors.toList());
+    }
+
+    public Map<String, String> convertToLabelMap(List<Label> labels) {
+        if (CollectionUtils.isEmpty(labels)) {
+            return Collections.emptyMap();
+        }
+
+        HashMap<String, String> labelMap = new HashMap<>();
+        labels.forEach(label -> {
+            labelMap.put(label.getLabel(), label.getValue());
+        });
+        return labelMap;
     }
 
 }

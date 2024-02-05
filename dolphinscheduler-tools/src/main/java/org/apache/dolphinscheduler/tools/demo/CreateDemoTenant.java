@@ -22,13 +22,13 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Slf4j
 public class CreateDemoTenant {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateDemoTenant.class);
     @Autowired
     private TenantMapper tenantMapper;
 
@@ -46,9 +46,9 @@ public class CreateDemoTenant {
                 tenant.setUpdateTime(now);
                 // save
                 tenantMapper.insert(tenant);
-                logger.info("create tenant success");
+                log.info("create tenant success");
             } else {
-                logger.warn("os tenant code already exists");
+                log.warn("os tenant code already exists");
             }
         }
     }

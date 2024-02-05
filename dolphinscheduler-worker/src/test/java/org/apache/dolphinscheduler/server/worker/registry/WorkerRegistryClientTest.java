@@ -19,15 +19,16 @@ package org.apache.dolphinscheduler.server.worker.registry;
 
 import static org.mockito.BDDMockito.given;
 
-import org.apache.dolphinscheduler.common.enums.NodeType;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 
 import java.time.Duration;
-import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,20 +37,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Sets;
 
 /**
  * worker registry test
  */
 @ExtendWith(MockitoExtension.class)
 public class WorkerRegistryClientTest {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
-
-    private static final String TEST_WORKER_GROUP = "test";
 
     @InjectMocks
     private WorkerRegistryClient workerRegistryClient;
@@ -61,29 +54,23 @@ public class WorkerRegistryClientTest {
     private WorkerConfig workerConfig;
 
     @Mock
-    private Set<String> workerGroups = Sets.newHashSet("127.0.0.1");
+    private MetricsProvider metricsProvider;
 
     @Mock
-    private ScheduledExecutorService heartBeatExecutor;
-
-    @Mock
-    private WorkerManagerThread workerManagerThread;
+    private WorkerTaskExecutorThreadPool workerManagerThread;
 
     @Mock
     private WorkerConnectStrategy workerConnectStrategy;
-
-    // private static final Set<String> workerGroups;
-
-    static {
-        // workerGroups = Sets.newHashSet(DEFAULT_WORKER_GROUP, TEST_WORKER_GROUP);
-    }
 
     @Test
     public void testStart() {
 
         given(workerConfig.getWorkerAddress()).willReturn(NetUtils.getAddr(1234));
-        given(workerConfig.getHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
-        given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(NodeType.class))).willReturn(true);
+        given(workerConfig.getMaxHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
+        given(workerConfig.getServerLoadProtection()).willReturn(new WorkerServerLoadProtection());
+        given(metricsProvider.getSystemMetrics()).willReturn(new SystemMetrics());
+        given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(RegistryNodeType.class)))
+                .willReturn(true);
 
         workerRegistryClient.initWorkRegistry();
         workerRegistryClient.start();

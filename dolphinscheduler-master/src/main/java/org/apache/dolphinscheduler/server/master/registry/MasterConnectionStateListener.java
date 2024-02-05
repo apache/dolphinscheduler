@@ -20,33 +20,22 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+@Slf4j
 public class MasterConnectionStateListener implements ConnectionListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MasterConnectionStateListener.class);
-
-    private final MasterConfig masterConfig;
-    private final RegistryClient registryClient;
     private final MasterConnectStrategy masterConnectStrategy;
 
-    public MasterConnectionStateListener(@NonNull MasterConfig masterConfig,
-                                         @NonNull RegistryClient registryClient,
-                                         @NonNull MasterConnectStrategy masterConnectStrategy) {
-        this.masterConfig = masterConfig;
-        this.registryClient = registryClient;
+    public MasterConnectionStateListener(@NonNull MasterConnectStrategy masterConnectStrategy) {
         this.masterConnectStrategy = masterConnectStrategy;
     }
 
     @Override
     public void onUpdate(ConnectionState state) {
-        logger.info("Master received a {} event from registry, the current server state is {}", state,
+        log.info("Master received a {} event from registry, the current server state is {}", state,
                 ServerLifeCycleManager.getServerStatus());
         switch (state) {
             case CONNECTED:

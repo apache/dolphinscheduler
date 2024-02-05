@@ -31,9 +31,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Data
 public class ProjectUpdateRequest {
 
-    @Schema(example = "admin", required = true)
-    private String userName;
-
     @Schema(example = "pro123", required = true)
     private String projectName;
 

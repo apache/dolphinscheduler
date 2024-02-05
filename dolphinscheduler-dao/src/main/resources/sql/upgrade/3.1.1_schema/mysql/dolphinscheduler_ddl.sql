@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
---- rename t_ds_fav_task task_name to task_type
+-- rename t_ds_fav_task task_name to task_type
 drop procedure if exists modify_t_ds_fav_task_task_name;
 delimiter d//
 CREATE PROCEDURE modify_t_ds_fav_task_task_name()
@@ -65,5 +65,22 @@ d//
 delimiter ;
 
 -- ALTER TABLE t_ds_worker_group ADD COLUMN description varchar(255) DEFAULT NULL COMMENT 'ds worker group description';
-call add_column_safety('t_ds_worker_group','description', 'varchar(255)' , "DEFAULT NULL COMMENT 'ds worker group description'");
-drop procedure if exists add_column_safety;
+drop procedure if exists modify_t_ds_worker_group_description;
+delimiter d//
+CREATE PROCEDURE modify_t_ds_worker_group_description()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_worker_group'
+        AND TABLE_SCHEMA=(SELECT DATABASE())
+        AND COLUMN_NAME='description')
+    THEN
+    alter table `t_ds_worker_group` add column `description` varchar(255) DEFAULT NULL COMMENT "ds worker group description";
+ELSE
+alter table `t_ds_worker_group` modify column `description` varchar(255) DEFAULT NULL COMMENT "ds worker group description";
+END IF;
+END;
+d//
+delimiter ;
+
+call modify_t_ds_worker_group_description();
+drop procedure if exists modify_t_ds_worker_group_description;

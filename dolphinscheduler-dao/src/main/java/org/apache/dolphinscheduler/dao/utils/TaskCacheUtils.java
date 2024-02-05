@@ -17,9 +17,14 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
+
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
@@ -27,8 +32,11 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +44,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
+@Slf4j
 public class TaskCacheUtils {
 
     private TaskCacheUtils() {
@@ -54,15 +65,17 @@ public class TaskCacheUtils {
      * 4. input VarPool, from upstream task and workflow global parameters
      * @param taskInstance task instance
      * @param taskExecutionContext taskExecutionContext
+     * @param storageOperate storageOperate
      * @return cache key
      */
-    public static String generateCacheKey(TaskInstance taskInstance, TaskExecutionContext taskExecutionContext) {
+    public static String generateCacheKey(TaskInstance taskInstance, TaskExecutionContext taskExecutionContext,
+                                          StorageOperate storageOperate) {
         List<String> keyElements = new ArrayList<>();
         keyElements.add(String.valueOf(taskInstance.getTaskCode()));
         keyElements.add(String.valueOf(taskInstance.getTaskDefinitionVersion()));
         keyElements.add(String.valueOf(taskInstance.getIsCache().getCode()));
         keyElements.add(String.valueOf(taskInstance.getEnvironmentConfig()));
-        keyElements.add(getTaskInputVarPoolData(taskInstance, taskExecutionContext));
+        keyElements.add(getTaskInputVarPoolData(taskInstance, taskExecutionContext, storageOperate));
         String data = StringUtils.join(keyElements, "_");
         return DigestUtils.sha256Hex(data);
     }
@@ -109,7 +122,8 @@ public class TaskCacheUtils {
      * @param taskInstance task instance
      * taskExecutionContext taskExecutionContext
      */
-    public static String getTaskInputVarPoolData(TaskInstance taskInstance, TaskExecutionContext context) {
+    public static String getTaskInputVarPoolData(TaskInstance taskInstance, TaskExecutionContext context,
+                                                 StorageOperate storageOperate) {
         JsonNode taskParams = JSONUtils.parseObject(taskInstance.getTaskParams());
 
         // The set of input values considered from localParams in the taskParams
@@ -122,6 +136,12 @@ public class TaskCacheUtils {
 
         // var pool value from upstream task
         List<Property> varPool = JSONUtils.toList(taskInstance.getVarPool(), Property.class);
+
+        Map<String, String> fileCheckSumMap = new HashMap<>();
+        List<Property> fileInput = varPool.stream().filter(property -> property.getType().equals(DataType.FILE))
+                .collect(Collectors.toList());
+        fileInput.forEach(
+                property -> fileCheckSumMap.put(property.getProp(), getValCheckSum(property, context, storageOperate)));
 
         // var pool value from workflow global parameters
         if (context.getPrepareParamsMap() != null) {
@@ -139,7 +159,37 @@ public class TaskCacheUtils {
                 .filter(property -> propertyInSet.contains(property.getProp()))
                 .sorted(Comparator.comparing(Property::getProp))
                 .collect(Collectors.toList());
+
+        varPool.forEach(property -> {
+            if (property.getType() == DataType.FILE) {
+                property.setValue(fileCheckSumMap.get(property.getValue()));
+            }
+        });
         return JSONUtils.toJsonString(varPool);
+    }
+
+    /**
+     * get checksum from crc32 file of file property in varPool
+     * cache can be used if content of upstream output files are the same
+     * @param fileProperty
+     * @param context
+     * @param storageOperate
+     */
+    public static String getValCheckSum(Property fileProperty, TaskExecutionContext context,
+                                        StorageOperate storageOperate) {
+        String resourceCRCPath = fileProperty.getValue() + CRC_SUFFIX;
+        String resourceCRCWholePath = storageOperate.getResourceFullName(context.getTenantCode(), resourceCRCPath);
+        String targetPath = String.format("%s/%s", context.getExecutePath(), resourceCRCPath);
+        log.info("{} --- Remote:{} to Local:{}", "CRC file", resourceCRCWholePath, targetPath);
+        String crcString = "";
+        try {
+            storageOperate.download(resourceCRCWholePath, targetPath, true);
+            crcString = FileUtils.readFile2Str(new FileInputStream(targetPath));
+            fileProperty.setValue(crcString);
+        } catch (IOException e) {
+            log.error("Replace checksum failed for file property {}.", fileProperty.getProp());
+        }
+        return crcString;
     }
 
     /**

@@ -19,9 +19,10 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUDIT_LOG_LIST_PAGING;
 
-import org.apache.dolphinscheduler.api.aspect.AccessLogAnnotation;
+import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
@@ -77,21 +78,24 @@ public class AuditLogController extends BaseController {
     @GetMapping(value = "/audit-log-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
-    @AccessLogAnnotation(ignoreRequestArgs = "loginUser")
-    public Result queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam("pageNo") Integer pageNo,
-                                          @RequestParam("pageSize") Integer pageSize,
-                                          @RequestParam(value = "resourceType", required = false) AuditResourceType resourceType,
-                                          @RequestParam(value = "operationType", required = false) AuditOperationType operationType,
-                                          @RequestParam(value = "startDate", required = false) String startDate,
-                                          @RequestParam(value = "endDate", required = false) String endDate,
-                                          @RequestParam(value = "userName", required = false) String userName) {
-        Result result = checkPageParams(pageNo, pageSize);
-        if (!result.checkResult()) {
-            return result;
-        }
-        result = auditService.queryLogListPaging(loginUser, resourceType, operationType, startDate, endDate, userName,
-                pageNo, pageSize);
-        return result;
+    public Result<PageInfo<AuditDto>> queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                              @RequestParam("pageNo") Integer pageNo,
+                                                              @RequestParam("pageSize") Integer pageSize,
+                                                              @RequestParam(value = "resourceType", required = false) AuditResourceType resourceType,
+                                                              @RequestParam(value = "operationType", required = false) AuditOperationType operationType,
+                                                              @RequestParam(value = "startDate", required = false) String startDate,
+                                                              @RequestParam(value = "endDate", required = false) String endDate,
+                                                              @RequestParam(value = "userName", required = false) String userName) {
+        checkPageParams(pageNo, pageSize);
+        PageInfo<AuditDto> auditDtoPageInfo = auditService.queryLogListPaging(
+                loginUser,
+                resourceType,
+                operationType,
+                startDate,
+                endDate,
+                userName,
+                pageNo,
+                pageSize);
+        return Result.success(auditDtoPageInfo);
     }
 }

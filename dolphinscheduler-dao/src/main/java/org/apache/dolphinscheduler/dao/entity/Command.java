@@ -25,7 +25,10 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -33,6 +36,9 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("t_ds_command")
 public class Command {
 
@@ -55,10 +61,12 @@ public class Command {
     private String commandParam;
 
     @TableField("task_depend_type")
-    private TaskDependType taskDependType;
+    @Builder.Default
+    private TaskDependType taskDependType = TaskDependType.TASK_POST;
 
     @TableField("failure_strategy")
-    private FailureStrategy failureStrategy;
+    @Builder.Default
+    private FailureStrategy failureStrategy = FailureStrategy.CONTINUE;
 
     @TableField("warning_type")
     private WarningType warningType;
@@ -70,16 +78,22 @@ public class Command {
     private Date scheduleTime;
 
     @TableField("start_time")
-    private Date startTime;
+    private Date startTime = new Date();
 
     @TableField("process_instance_priority")
     private Priority processInstancePriority;
 
     @TableField("update_time")
-    private Date updateTime;
+    @Builder.Default
+    private Date updateTime = new Date();
 
     @TableField("worker_group")
     private String workerGroup;
+
+    /**
+     * tenant code
+     */
+    private String tenantCode;
 
     @TableField("environment_code")
     private Long environmentCode;
@@ -98,13 +112,6 @@ public class Command {
      */
     @TableField("test_flag")
     private int testFlag;
-
-    public Command() {
-        this.taskDependType = TaskDependType.TASK_POST;
-        this.failureStrategy = FailureStrategy.CONTINUE;
-        this.startTime = new Date();
-        this.updateTime = new Date();
-    }
 
     public Command(
                    CommandType commandType,

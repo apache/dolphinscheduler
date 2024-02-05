@@ -469,7 +469,7 @@ BEGIN
 ALTER TABLE `t_ds_alert` ADD COLUMN `project_code` bigint DEFAULT NULL COMMENT 'project_code';
 ALTER TABLE `t_ds_alert` ADD COLUMN `process_definition_code` bigint DEFAULT NULL COMMENT 'process_definition_code';
 ALTER TABLE `t_ds_alert` ADD COLUMN `process_instance_id` int DEFAULT NULL COMMENT 'process_instance_id';
-ALTER TABLE `t_ds_alert` MODIFY COLUMN `alert_type` int DEFAULT NULL COMMENT 'alert_type';
+ALTER TABLE `t_ds_alert` ADD COLUMN `alert_type` int DEFAULT NULL COMMENT 'alert_type';
 END IF;
 END;
 d//

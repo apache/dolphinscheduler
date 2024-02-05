@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.dispatch.host;
 
-import org.apache.dolphinscheduler.remote.utils.Host;
-import org.apache.dolphinscheduler.server.master.dispatch.context.ExecutionContext;
-import org.apache.dolphinscheduler.server.master.dispatch.enums.ExecutorType;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostWorker;
 import org.apache.dolphinscheduler.server.master.registry.ServerNodeManager;
 
@@ -28,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,36 +43,18 @@ public abstract class CommonHostManager implements HostManager {
     @Autowired
     protected ServerNodeManager serverNodeManager;
 
-    /**
-     * select host
-     *
-     * @param context context
-     * @return host
-     */
     @Override
-    public Host select(ExecutionContext context) {
-        List<HostWorker> candidates = null;
-        String workerGroup = context.getWorkerGroup();
-        ExecutorType executorType = context.getExecutorType();
-        switch (executorType) {
-            case WORKER:
-                candidates = getWorkerCandidates(workerGroup);
-                break;
-            case CLIENT:
-                break;
-            default:
-                throw new IllegalArgumentException("invalid executorType : " + executorType);
-        }
-
+    public Optional<Host> select(String workerGroup) throws WorkerGroupNotFoundException {
+        List<HostWorker> candidates = getWorkerCandidates(workerGroup);
         if (CollectionUtils.isEmpty(candidates)) {
-            return new Host();
+            return Optional.empty();
         }
-        return select(candidates);
+        return Optional.ofNullable(select(candidates));
     }
 
     protected abstract HostWorker select(Collection<HostWorker> nodes);
 
-    protected List<HostWorker> getWorkerCandidates(String workerGroup) {
+    protected List<HostWorker> getWorkerCandidates(String workerGroup) throws WorkerGroupNotFoundException {
         List<HostWorker> hostWorkers = new ArrayList<>();
         Set<String> nodes = serverNodeManager.getWorkerGroupNodes(workerGroup);
         if (CollectionUtils.isNotEmpty(nodes)) {

@@ -17,25 +17,26 @@
 
 package org.apache.dolphinscheduler.server.master.event;
 
+import org.apache.dolphinscheduler.common.enums.StateEventType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.runner.StateWheelExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowSubmitStatue;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowStartStatus;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkflowStartEventHandler implements WorkflowEventHandler {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkflowStartEventHandler.class);
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
@@ -46,32 +47,36 @@ public class WorkflowStartEventHandler implements WorkflowEventHandler {
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
-    @Autowired
-    private WorkflowEventQueue workflowEventQueue;
-
     @Override
     public void handleWorkflowEvent(final WorkflowEvent workflowEvent) throws WorkflowEventHandleError {
-        logger.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
+        log.info("Handle workflow start event, begin to start a workflow, event: {}", workflowEvent);
         WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
                 workflowEvent.getWorkflowInstanceId());
         if (workflowExecuteRunnable == null) {
             throw new WorkflowEventHandleError(
                     "The workflow start event is invalid, cannot find the workflow instance from cache");
         }
-        ProcessInstanceMetrics.incProcessInstanceByState("submit");
-        ProcessInstance processInstance = workflowExecuteRunnable.getProcessInstance();
+        ProcessInstance processInstance =
+                workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
+        ProcessInstanceMetrics.incProcessInstanceByStateAndProcessDefinitionCode("submit",
+                processInstance.getProcessDefinitionCode().toString());
         CompletableFuture.supplyAsync(workflowExecuteRunnable::call, workflowExecuteThreadPool)
-                .thenAccept(workflowSubmitStatue -> {
-                    if (WorkflowSubmitStatue.SUCCESS == workflowSubmitStatue) {
-                        logger.info("Success submit the workflow instance");
+                .thenAccept(workflowStartStatus -> {
+                    if (WorkflowStartStatus.SUCCESS == workflowStartStatus) {
+                        log.info("Success submit the workflow instance");
                         if (processInstance.getTimeout() > 0) {
                             stateWheelExecuteThread.addProcess4TimeoutCheck(processInstance);
                         }
-                    } else {
-                        // submit failed will resend the event to workflow event queue
-                        logger.error("Failed to submit the workflow instance, will resend the workflow start event: {}",
+                    } else if (WorkflowStartStatus.FAILED == workflowStartStatus) {
+                        log.error(
+                                "Failed to submit the workflow instance, will send fail state event: {}",
                                 workflowEvent);
-                        workflowEventQueue.addEvent(workflowEvent);
+                        WorkflowStateEvent stateEvent = WorkflowStateEvent.builder()
+                                .processInstanceId(processInstance.getId())
+                                .type(StateEventType.PROCESS_SUBMIT_FAILED)
+                                .status(WorkflowExecutionStatus.FAILURE)
+                                .build();
+                        workflowExecuteRunnable.addStateEvent(stateEvent);
                     }
                 });
     }

@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.Date;
+import java.util.Objects;
 
 import lombok.Data;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -80,17 +80,6 @@ public class DataSource {
      */
     private Date updateTime;
 
-    /**
-     * test flag
-     */
-    protected int testFlag;
-
-    /**
-     * bind test data source id
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    protected Integer bindTestId;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -102,7 +91,7 @@ public class DataSource {
 
         DataSource that = (DataSource) o;
 
-        if (id != that.id) {
+        if (!Objects.equals(id, that.id)) {
             return false;
         }
         return name.equals(that.name);

@@ -2,7 +2,7 @@
 
 ## 综述
 
-`SeaTunnel` 任务类型，用于创建并执行 `SeaTunnel` 类型任务。worker 执行该任务的时候，会通过 `start-seatunnel-spark.sh` 或 `start-seatunnel-flink.sh` 命令解析 config 文件。
+`SeaTunnel` 任务类型，用于创建并执行 `SeaTunnel` 类型任务。worker 执行该任务的时候，会通过 `start-seatunnel-spark.sh` 、 `start-seatunnel-flink.sh` 和 `seatunnel.sh` 命令解析 config 文件。
 点击 [这里](https://seatunnel.apache.org/) 获取更多关于 `Apache SeaTunnel` 的信息。
 
 ## 创建任务
@@ -16,19 +16,21 @@
 [//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
-- 引擎：支持 FLINK 和 SPARK
+- 启动脚本：选择你想要运行任务的启动脚本，包括 `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - 运行模型：支持 `run` 和 `run-application` 两种模式
 - 选项参数：用于添加 Flink 引擎本身参数，例如 `-m yarn-cluster -ynm seatunnel`
 - SPARK
-- 部署方式：指定部署模式，`cluster` `client` `local`
+- 部署方式：指定部署模式，`cluster` `client`
 - Master：指定 `Master` 模型，`yarn` `local` `spark` `mesos`，其中 `spark` 和 `mesos` 需要指定 `Master` 服务地址，例如：127.0.0.1:7077
+- SEATUNNEL_ENGINE
+- 部署方式：指定部署模式，`cluster` `local`
 
-          > 点击 [这里](https://seatunnel.apache.org/docs/2.1.2/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
+          > 点击 [这里](https://seatunnel.apache.org/docs/2.3.3/command/usage) 获取更多关于`Apache SeaTunnel command` 使用的信息
 
 - 自定义配置：支持自定义配置或从资源中心选择配置文件
 
-  > 点击 [这里](https://seatunnel.apache.org/docs/2.1.2/concept/config) 获取更多关于`Apache SeaTunnel config` 文件介绍
+  > 点击 [这里](https://seatunnel.apache.org/docs/2.3.3/concept/config) 获取更多关于`Apache SeaTunnel config` 文件介绍
 
 - 脚本：在任务节点那自定义配置信息，包括四部分：`env` `source` `transform` `sink`
 
@@ -74,4 +76,10 @@ sink {
 }
 
 ```
+
+### 支持 SeaTunnel 版本
+
+- 2.3.1
+- 2.3.2
+- 2.3.3
 

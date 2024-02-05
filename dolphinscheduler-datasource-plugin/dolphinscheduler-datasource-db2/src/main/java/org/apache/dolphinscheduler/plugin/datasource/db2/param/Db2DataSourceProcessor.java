@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -54,7 +55,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
         Db2DataSourceParamDTO db2DatasourceParamDTO = new Db2DataSourceParamDTO();
         db2DatasourceParamDTO.setDatabase(connectionParams.getDatabase());
         db2DatasourceParamDTO.setOther(connectionParams.getOther());
-        db2DatasourceParamDTO.setUserName(db2DatasourceParamDTO.getUserName());
+        db2DatasourceParamDTO.setUserName(connectionParams.getUser());
 
         String[] hostSeperator = connectionParams.getAddress().split(Constants.DOUBLE_SLASH);
         String[] hostPortArray = hostSeperator[hostSeperator.length - 1].split(Constants.COMMA);
@@ -97,7 +98,7 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     public String getJdbcUrl(ConnectionParam connectionParam) {
         Db2ConnectionParam db2ConnectionParam = (Db2ConnectionParam) connectionParam;
         if (MapUtils.isNotEmpty(db2ConnectionParam.getOther())) {
-            return String.format("%s;%s", db2ConnectionParam.getJdbcUrl(),
+            return String.format("%s:%s", db2ConnectionParam.getJdbcUrl(),
                     transformOther(db2ConnectionParam.getOther()));
         }
         return db2ConnectionParam.getJdbcUrl();
@@ -124,6 +125,11 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getValidationQuery() {
         return DataSourceConstants.DB2_VALIDATION_QUERY;
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.db2);
     }
 
     private String transformOther(Map<String, String> otherMap) {

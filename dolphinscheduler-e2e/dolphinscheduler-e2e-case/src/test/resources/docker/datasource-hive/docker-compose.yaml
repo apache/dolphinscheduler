@@ -23,15 +23,16 @@ services:
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
-    expose:
-      - 12345
+    ports:
+      - "12345:12345"
     networks:
       - e2e
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
+      start_period: 60s
     depends_on:
       hive-server:
         condition: service_healthy
@@ -43,12 +44,12 @@ services:
       - ./hadoop-hive.env
     networks:
       - e2e
-    expose:
-      - "50070"
+    ports:
+      - "50070:50070"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50070/" ]
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
   datanode:
     image: bde2020/hadoop-datanode:2.0.0-hadoop2.7.4-java8
@@ -58,12 +59,12 @@ services:
       SERVICE_PRECONDITION: "namenode:50070"
     networks:
       - e2e
-    expose:
-      - "50075"
+    ports:
+      - "50075:50075"
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:50075" ]
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
   hive-server:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -74,8 +75,8 @@ services:
     environment:
       HIVE_CORE_CONF_javax_jdo_option_ConnectionURL: "jdbc:postgresql://hive-metastore/metastore"
       SERVICE_PRECONDITION: "hive-metastore:9083"
-    expose:
-      - "10000"
+    ports:
+      - "10000:10000"
     depends_on:
       datanode:
         condition: service_healthy
@@ -84,7 +85,7 @@ services:
     healthcheck:
       test: beeline -u "jdbc:hive2://127.0.0.1:10000/default" -n health_check -e "show databases;"
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
   hive-metastore:
     image: bde2020/hive:2.3.2-postgresql-metastore
@@ -95,8 +96,8 @@ services:
       - e2e
     environment:
       SERVICE_PRECONDITION: "namenode:50070 datanode:50075 hive-metastore-postgresql:5432"
-    expose:
-      - "9083"
+    ports:
+      - "9083:9083"
     depends_on:
       hive-metastore-postgresql:
         condition: service_healthy
@@ -104,12 +105,12 @@ services:
     image: bde2020/hive-metastore-postgresql:2.3.0
     networks:
       - e2e
-    expose:
-      - "5432"
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
-      timeout: 60s
+      timeout: 5s
       retries: 120
 
 

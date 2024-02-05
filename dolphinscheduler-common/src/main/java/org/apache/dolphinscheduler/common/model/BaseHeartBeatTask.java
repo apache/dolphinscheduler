@@ -23,12 +23,18 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
+public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonThread {
+
+    private static final long DEFAULT_HEARTBEAT_SCAN_INTERVAL = 1_000L;
 
     private final String threadName;
     private final long heartBeatInterval;
 
     protected boolean runningFlag;
+
+    protected long lastWriteTime = 0L;
+
+    protected T lastHeartBeat = null;
 
     public BaseHeartBeatTask(String threadName, long heartBeatInterval) {
         super(threadName);
@@ -39,9 +45,9 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
 
     @Override
     public synchronized void start() {
-        log.info("Starting {}", threadName);
+        log.info("Starting {}...", threadName);
         super.start();
-        log.info("Started {}, heartBeatInterval: {}", threadName, heartBeatInterval);
+        log.info("Started {}, heartBeatInterval: {}...", threadName, heartBeatInterval);
     }
 
     @Override
@@ -54,12 +60,18 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
                     continue;
                 }
                 T heartBeat = getHeartBeat();
-                writeHeartBeat(heartBeat);
+                // if first time or heartBeat status changed, write heartBeatInfo into registry
+                if (System.currentTimeMillis() - lastWriteTime >= heartBeatInterval
+                        || !lastHeartBeat.getServerStatus().equals(heartBeat.getServerStatus())) {
+                    lastHeartBeat = heartBeat;
+                    writeHeartBeat(heartBeat);
+                    lastWriteTime = System.currentTimeMillis();
+                }
             } catch (Exception ex) {
                 log.error("{} task execute failed", threadName, ex);
             } finally {
                 try {
-                    Thread.sleep(heartBeatInterval);
+                    Thread.sleep(DEFAULT_HEARTBEAT_SCAN_INTERVAL);
                 } catch (InterruptedException e) {
                     handleInterruptException(e);
                 }
@@ -68,8 +80,8 @@ public abstract class BaseHeartBeatTask<T> extends BaseDaemonThread {
     }
 
     public void shutdown() {
-        log.warn("{} task finished", threadName);
         runningFlag = false;
+        log.warn("{} finished...", threadName);
     }
 
     private void handleInterruptException(InterruptedException ex) {

@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -44,27 +45,32 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.Data;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
-import com.aliyun.oss.model.Bucket;
+import com.aliyun.oss.ServiceException;
+import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.ListObjectsV2Request;
+import com.aliyun.oss.model.ListObjectsV2Result;
 import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.OSSObjectSummary;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 
 @Data
+@Slf4j
 public class OssStorageOperator implements Closeable, StorageOperate {
-
-    private static final Logger logger = LoggerFactory.getLogger(OssStorageOperator.class);
 
     private String accessKeyId;
 
@@ -169,16 +175,11 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fileName) {
+    public String getResourceFullName(String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
         }
         return String.format(FORMAT_S_S, getOssResDir(tenantCode), fileName);
-    }
-
-    @Override
-    public String getResourceFileName(String fullName) {
-        return null;
     }
 
     @Override
@@ -190,18 +191,30 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean delete(String filePath, List<String> childrenPathArray, boolean recursive) throws IOException {
-        return false;
+    public boolean delete(String fullName, List<String> childrenPathList, boolean recursive) throws IOException {
+        // append the resource fullName to the list for deletion.
+        childrenPathList.add(fullName);
+
+        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName)
+                .withKeys(childrenPathList);
+        try {
+            ossClient.deleteObjects(deleteObjectsRequest);
+        } catch (Exception e) {
+            log.error("delete objects error", e);
+            return false;
+        }
+
+        return true;
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath, boolean deleteSource,
+    public void download(String srcFilePath, String dstFilePath,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            Files.createDirectories(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
         }
         OSSObject ossObject = ossClient.getObject(bucketName, srcFilePath);
         try (
@@ -215,7 +228,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         } catch (OSSException e) {
             throw new IOException(e);
         } catch (FileNotFoundException e) {
-            logger.error("cannot fin the destination file {}", dstFilePath);
+            log.error("cannot find the destination file {}", dstFilePath);
             throw e;
         }
     }
@@ -231,7 +244,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
             ossClient.deleteObject(bucketName, filePath);
             return true;
         } catch (OSSException e) {
-            logger.error("fail to delete the object, the resource path is {}", filePath, e);
+            log.error("fail to delete the object, the resource path is {}", filePath, e);
             return false;
         }
     }
@@ -239,7 +252,9 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         ossClient.copyObject(bucketName, srcPath, bucketName, dstPath);
-        ossClient.deleteObject(bucketName, srcPath);
+        if (deleteSource) {
+            ossClient.deleteObject(bucketName, srcPath);
+        }
         return true;
     }
 
@@ -250,6 +265,8 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                 return getUdfDir(tenantCode);
             case FILE:
                 return getResDir(tenantCode);
+            case ALL:
+                return getOssDataBasePath();
             default:
                 return "";
         }
@@ -260,9 +277,12 @@ public class OssStorageOperator implements Closeable, StorageOperate {
                           boolean overwrite) throws IOException {
         try {
             ossClient.putObject(bucketName, dstPath, new File(srcFile));
+            if (deleteSource) {
+                Files.delete(Paths.get(srcFile));
+            }
             return true;
         } catch (OSSException e) {
-            logger.error("upload failed, the bucketName is {}, the filePath is {}", bucketName, dstPath, e);
+            log.error("upload failed, the bucketName is {}, the filePath is {}", bucketName, dstPath, e);
             return false;
         }
     }
@@ -270,7 +290,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     @Override
     public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
         if (StringUtils.isBlank(filePath)) {
-            logger.error("file path:{} is empty", filePath);
+            log.error("file path:{} is empty", filePath);
             return Collections.emptyList();
         }
         OSSObject ossObject = ossClient.getObject(bucketName, filePath);
@@ -288,19 +308,164 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     @Override
     public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
                                                           ResourceType type) {
-        return null;
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+        LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
+
+        StorageEntity initialEntity = null;
+        try {
+            initialEntity = getFileStatus(path, defaultPath, tenantCode, type);
+        } catch (Exception e) {
+            log.error("error while listing files status recursively, path: {}", path, e);
+            return storageEntityList;
+        }
+        foldersToFetch.add(initialEntity);
+
+        while (!foldersToFetch.isEmpty()) {
+            String pathToExplore = foldersToFetch.pop().getFullName();
+            try {
+                List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
+                for (StorageEntity temp : tempList) {
+                    if (temp.isDirectory()) {
+                        foldersToFetch.add(temp);
+                    }
+                }
+                storageEntityList.addAll(tempList);
+            } catch (Exception e) {
+                log.error("error while listing files stat:wus recursively, path: {}", pathToExplore, e);
+            }
+        }
+
+        return storageEntityList;
     }
 
     @Override
     public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
                                                ResourceType type) throws Exception {
-        return null;
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+
+        ListObjectsV2Result result = null;
+        String nextContinuationToken = null;
+        do {
+            try {
+                ListObjectsV2Request request = new ListObjectsV2Request();
+                request.setBucketName(bucketName);
+                request.setPrefix(path);
+                request.setDelimiter(FOLDER_SEPARATOR);
+                request.setContinuationToken(nextContinuationToken);
+
+                result = ossClient.listObjectsV2(request);
+            } catch (Exception e) {
+                throw new ServiceException("Get OSS file list exception", e);
+            }
+
+            List<OSSObjectSummary> summaries = result.getObjectSummaries();
+
+            for (OSSObjectSummary summary : summaries) {
+                if (!summary.getKey().endsWith(FOLDER_SEPARATOR)) {
+                    // the path is a file
+                    String[] aliasArr = summary.getKey().split(FOLDER_SEPARATOR);
+                    String alias = aliasArr[aliasArr.length - 1];
+                    String fileName = StringUtils.difference(defaultPath, summary.getKey());
+
+                    StorageEntity entity = new StorageEntity();
+                    entity.setAlias(alias);
+                    entity.setFileName(fileName);
+                    entity.setFullName(summary.getKey());
+                    entity.setDirectory(false);
+                    entity.setUserName(tenantCode);
+                    entity.setType(type);
+                    entity.setSize(summary.getSize());
+                    entity.setCreateTime(summary.getLastModified());
+                    entity.setUpdateTime(summary.getLastModified());
+                    entity.setPfullName(path);
+
+                    storageEntityList.add(entity);
+                }
+            }
+
+            for (String commonPrefix : result.getCommonPrefixes()) {
+                // the paths in commonPrefix are directories
+                String suffix = StringUtils.difference(path, commonPrefix);
+                String fileName = StringUtils.difference(defaultPath, commonPrefix);
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(suffix);
+                entity.setFileName(fileName);
+                entity.setFullName(commonPrefix);
+                entity.setDirectory(true);
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(0);
+                entity.setCreateTime(null);
+                entity.setUpdateTime(null);
+                entity.setPfullName(path);
+
+                storageEntityList.add(entity);
+            }
+
+            nextContinuationToken = result.getNextContinuationToken();
+        } while (result.isTruncated());
+
+        return storageEntityList;
     }
 
     @Override
     public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
                                        ResourceType type) throws Exception {
-        return null;
+        ListObjectsV2Request request = new ListObjectsV2Request();
+        request.setBucketName(bucketName);
+        request.setPrefix(path);
+        request.setDelimiter(FOLDER_SEPARATOR);
+
+        ListObjectsV2Result result;
+        try {
+            result = ossClient.listObjectsV2(request);
+        } catch (Exception e) {
+            throw new ServiceException("Get OSS file list exception", e);
+        }
+
+        List<OSSObjectSummary> summaries = result.getObjectSummaries();
+
+        if (path.endsWith(FOLDER_SEPARATOR)) {
+            // the path is a directory that may or may not exist in OSS
+            String alias = findDirAlias(path);
+            String fileName = StringUtils.difference(defaultPath, path);
+
+            StorageEntity entity = new StorageEntity();
+            entity.setAlias(alias);
+            entity.setFileName(fileName);
+            entity.setFullName(path);
+            entity.setDirectory(true);
+            entity.setUserName(tenantCode);
+            entity.setType(type);
+            entity.setSize(0);
+
+            return entity;
+
+        } else {
+            // the path is a file
+            if (summaries.size() > 0) {
+                OSSObjectSummary summary = summaries.get(0);
+                String[] aliasArr = summary.getKey().split(FOLDER_SEPARATOR);
+                String alias = aliasArr[aliasArr.length - 1];
+                String fileName = StringUtils.difference(defaultPath, summary.getKey());
+
+                StorageEntity entity = new StorageEntity();
+                entity.setAlias(alias);
+                entity.setFileName(fileName);
+                entity.setFullName(summary.getKey());
+                entity.setDirectory(false);
+                entity.setUserName(tenantCode);
+                entity.setType(type);
+                entity.setSize(summary.getSize());
+                entity.setCreateTime(summary.getLastModified());
+                entity.setUpdateTime(summary.getLastModified());
+
+                return entity;
+            }
+        }
+
+        throw new FileNotFoundException("Object is not found in OSS Bucket: " + bucketName);
     }
 
     @Override
@@ -338,17 +503,13 @@ public class OssStorageOperator implements Closeable, StorageOperate {
             throw new IllegalArgumentException("resource.alibaba.cloud.oss.bucket.name is empty");
         }
 
-        Bucket existsBucket = ossClient.listBuckets()
-                .stream()
-                .filter(
-                        bucket -> bucket.getName().equals(bucketName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    return new IllegalArgumentException(
-                            "bucketName: " + bucketName + " does not exist, you need to create them by yourself");
-                });
+        boolean existsBucket = ossClient.doesBucketExist(bucketName);
+        if (!existsBucket) {
+            throw new IllegalArgumentException(
+                    "bucketName: " + bucketName + " is not exists, you need to create them by yourself");
+        }
 
-        logger.info("bucketName: {} has been found, the current regionName is {}", existsBucket.getName(), region);
+        log.info("bucketName: {} has been found, the current regionName is {}", bucketName, region);
     }
 
     protected void deleteDir(String directoryName) {
@@ -359,5 +520,14 @@ public class OssStorageOperator implements Closeable, StorageOperate {
 
     protected OSS buildOssClient() {
         return OssClientFactory.buildOssClient(ossConnection);
+    }
+
+    private String findDirAlias(String dirPath) {
+        if (!dirPath.endsWith(FOLDER_SEPARATOR)) {
+            return dirPath;
+        }
+
+        Path path = Paths.get(dirPath);
+        return path.getName(path.getNameCount() - 1) + FOLDER_SEPARATOR;
     }
 }

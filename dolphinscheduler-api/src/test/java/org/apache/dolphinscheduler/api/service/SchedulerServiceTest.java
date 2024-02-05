@@ -38,10 +38,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,6 +93,9 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     @Mock
     private EnvironmentMapper environmentMapper;
 
+    @Mock
+    private TenantMapper tenantMapper;
+
     protected static User user;
     protected Exception exception;
     private static final String userName = "userName";
@@ -117,56 +119,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     }
 
     @Test
-    public void testSetScheduleState() {
-        Map<String, Object> result;
-        Project project = getProject();
-
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setProjectCode(projectCode);
-
-        Schedule schedule = new Schedule();
-        schedule.setId(1);
-        schedule.setProcessDefinitionCode(1);
-        schedule.setReleaseState(ReleaseState.OFFLINE);
-
-        Mockito.when(scheduleMapper.selectById(1)).thenReturn(schedule);
-
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-
-        Mockito.when(processDefinitionMapper.queryByCode(1)).thenReturn(processDefinition);
-
-        // hash no auth
-        result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-
-        Mockito.when(projectService.hasProjectAndPerm(user, project, result, null)).thenReturn(true);
-        // schedule not exists
-        result = schedulerService.setScheduleState(user, project.getCode(), 2, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.SCHEDULE_CRON_NOT_EXISTS, result.get(Constants.STATUS));
-
-        // SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE
-        result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.OFFLINE);
-        Assertions.assertEquals(Status.SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE, result.get(Constants.STATUS));
-
-        // PROCESS_DEFINE_NOT_EXIST
-        schedule.setProcessDefinitionCode(2);
-        result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.PROCESS_DEFINE_NOT_EXIST, result.get(Constants.STATUS));
-        schedule.setProcessDefinitionCode(1);
-
-        result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
-
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-
-        result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
-
-        // SUCCESS
-        result = schedulerService.setScheduleState(user, project.getCode(), 1, ReleaseState.ONLINE);
-        Assertions.assertEquals(Status.PROCESS_DAG_IS_EMPTY, result.get(Constants.STATUS));
-    }
-
-    @Test
     public void testCreateSchedulesV2() {
         Project project = this.getProject();
         ProcessDefinition processDefinition = this.getProcessDefinition();
@@ -175,6 +127,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         ScheduleCreateRequest scheduleCreateRequest = new ScheduleCreateRequest();
         scheduleCreateRequest.setProcessDefinitionCode(processDefinitionCode);
         scheduleCreateRequest.setEnvironmentCode(environmentCode);
+        scheduleCreateRequest.setTenantCode(Constants.DEFAULT);
 
         // error process definition not exists
         exception = Assertions.assertThrows(ServiceException.class,
@@ -228,6 +181,14 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         String badCrontab = "0 0 123 * * ? *";
         scheduleCreateRequest.setStartTime(startTime);
         scheduleCreateRequest.setCrontab(badCrontab);
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
+        Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
+
+        // error schedule crontab
+        String badCrontab2 = "0 0 13/0 * * ? *";
+        scheduleCreateRequest.setStartTime(startTime);
+        scheduleCreateRequest.setCrontab(badCrontab2);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.createSchedulesV2(user, scheduleCreateRequest));
         Assertions.assertEquals(Status.SCHEDULE_CRON_CHECK_FAILED.getCode(), ((ServiceException) exception).getCode());
@@ -428,6 +389,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
     private Project getProject() {
         Project project = new Project();
+        project.setId(1);
         project.setName(projectName);
         project.setCode(projectCode);
         project.setUserId(userId);

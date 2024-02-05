@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_SLASH;
+import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
@@ -32,9 +32,11 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExistException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
@@ -51,8 +53,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.base.Preconditions;
 
+@Slf4j
 public class JavaTask extends AbstractTask {
 
     /**
@@ -78,9 +83,7 @@ public class JavaTask extends AbstractTask {
     public JavaTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
         this.taskRequest = taskRequest;
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle,
-                taskRequest,
-                logger);
+        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
     }
 
     /**
@@ -93,26 +96,7 @@ public class JavaTask extends AbstractTask {
         if (javaParameters == null || !javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
         }
-        if (javaParameters.getRunType().equals(JavaConstants.RUN_TYPE_JAR)) {
-            setMainJarName();
-        }
-        logger.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
-    }
-
-    /**
-     *  Gets the Java source file that was initially processed
-     *
-     * @return String
-     **/
-    @Override
-    public String getPreScript() {
-        String rawJavaScript = javaParameters.getRawScript().replaceAll("\\r\\n", "\n");
-        try {
-            rawJavaScript = convertJavaSourceCodePlaceholders(rawJavaScript);
-        } catch (StringIndexOutOfBoundsException e) {
-            logger.error("setShareVar field format error, raw java script: {}", rawJavaScript);
-        }
-        return rawJavaScript;
+        log.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
     }
 
     /**
@@ -142,22 +126,24 @@ public class JavaTask extends AbstractTask {
                     throw new RunTypeNotFoundException("run type is required, but it is null now.");
             }
             Preconditions.checkNotNull(command, "command not be null.");
-            TaskResponse taskResponse = shellCommandExecutor.run(command);
-            logger.info("java task run result: {}", taskResponse);
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .appendScript(command);
+            TaskResponse taskResponse = shellCommandExecutor.run(shellActuatorBuilder, taskCallBack);
+            log.info("java task run result: {}", taskResponse);
             setExitStatusCode(taskResponse.getExitStatusCode());
             setAppIds(taskResponse.getAppIds());
             setProcessId(taskResponse.getProcessId());
-            setVarPool(shellCommandExecutor.getVarPool());
+            setTaskOutputParams(shellCommandExecutor.getTaskOutputParams());
         } catch (InterruptedException e) {
-            logger.error("java task interrupted ", e);
+            log.error("java task interrupted ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             Thread.currentThread().interrupt();
         } catch (RunTypeNotFoundException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw e;
         } catch (Exception e) {
-            logger.error("java task failed ", e);
+            log.error("java task failed ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("run java task error", e);
         }
@@ -185,42 +171,25 @@ public class JavaTask extends AbstractTask {
         return builder.toString();
     }
 
-    private void setMainJarName() {
-        ResourceInfo mainJar = javaParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        javaParameters.setMainJar(mainJar);
-    }
-
     /**
      * Construct a shell command for the java -jar Run mode
      *
      * @return String
      **/
     protected String buildJarCommand() {
-        String fullName = javaParameters.getMainJar().getResourceName();
-        String mainJarName = fullName.substring(0, fullName.lastIndexOf('.'));
-        mainJarName = mainJarName.substring(mainJarName.lastIndexOf('.') + 1) + ".jar";
+        ResourceContext resourceContext = taskRequest.getResourceContext();
+        String mainJarName = resourceContext.getResourceItem(javaParameters.getMainJar().getResourceName())
+                .getResourceAbsolutePathInLocal();
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
-                .append(taskRequest.getExecutePath())
+                .append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
         return builder.toString();
-    }
-
-    private String getResourceNameOfMainJar(ResourceInfo mainJar) {
-        if (null == mainJar) {
-            throw new RuntimeException("The jar for the task is required.");
-        }
-        return mainJar.getId() == 0
-                ? mainJar.getRes()
-                // when update resource maybe has error
-                : mainJar.getResourceName().replaceFirst(SINGLE_SLASH, "");
     }
 
     @Override
@@ -279,9 +248,9 @@ public class JavaTask extends AbstractTask {
      * @return String
      **/
     protected void createJavaSourceFileIfNotExists(String sourceCode, String fileName) throws IOException {
-        logger.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
+        log.info("tenantCode: {}, task dir:{}", taskRequest.getTenantCode(), taskRequest.getExecutePath());
         if (!Files.exists(Paths.get(fileName))) {
-            logger.info("the java source code:{}, will be write to the file: {}", fileName, sourceCode);
+            log.info("the java source code:{}, will be write to the file: {}", fileName, sourceCode);
             // write data to file
             FileUtils.writeStringToFile(new File(fileName),
                     sourceCode,
@@ -311,15 +280,19 @@ public class JavaTask extends AbstractTask {
         if (javaParameters.isModulePath()) {
             builder.append("--module-path");
         } else {
-            builder.append("--class-path");
+            builder.append("-classpath");
         }
-        builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
+        builder.append(" ")
+                .append(JavaConstants.CLASSPATH_CURRENT_DIR)
                 .append(JavaConstants.PATH_SEPARATOR)
                 .append(taskRequest.getExecutePath());
+        ResourceContext resourceContext = taskRequest.getResourceContext();
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
-            builder.append(taskRequest.getExecutePath())
-                    .append(info.getResourceName());
+            builder
+                    .append(taskRequest.getExecutePath())
+                    .append(FOLDER_SEPARATOR)
+                    .append(resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal());
         }
         return builder.toString();
     }
@@ -360,8 +333,8 @@ public class JavaTask extends AbstractTask {
         if (MapUtils.isNotEmpty(taskRequest.getParamsMap())) {
             paramsMap.putAll(taskRequest.getParamsMap());
         }
-        logger.info("The current java source code will begin to replace the placeholder: {}", rawJavaScript);
-        rawJavaScript = ParameterUtils.convertParameterPlaceholders(rawJavaScript, ParamUtils.convert(paramsMap));
+        log.info("The current java source code will begin to replace the placeholder: {}", rawJavaScript);
+        rawJavaScript = ParameterUtils.convertParameterPlaceholders(rawJavaScript, ParameterUtils.convert(paramsMap));
         return rawJavaScript;
     }
 

@@ -28,36 +28,36 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources.SourceHdf
 
 import org.apache.commons.lang3.StringUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * hdfs source generator
- */
+/** hdfs source generator */
+@Slf4j
 public class HdfsSourceGenerator implements ISourceGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(HdfsSourceGenerator.class);
-
     @Override
-    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+    public String generate(
+                           SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder hdfsSourceSb = new StringBuilder();
 
         try {
             SourceHdfsParameter sourceHdfsParameter =
-                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHdfsParameter.class);
+                    JSONUtils.parseObject(
+                            sqoopParameters.getSourceParams(), SourceHdfsParameter.class);
 
             if (null != sourceHdfsParameter) {
                 if (StringUtils.isNotEmpty(sourceHdfsParameter.getExportDir())) {
-                    hdfsSourceSb.append(SPACE).append(HDFS_EXPORT_DIR)
-                            .append(SPACE).append(sourceHdfsParameter.getExportDir());
+                    hdfsSourceSb
+                            .append(SPACE)
+                            .append(HDFS_EXPORT_DIR)
+                            .append(SPACE)
+                            .append(sourceHdfsParameter.getExportDir());
                 } else {
                     throw new IllegalArgumentException("Sqoop hdfs export dir is null");
                 }
-
             }
         } catch (Exception e) {
-            logger.error(String.format("Sqoop hdfs source parmas build failed: [%s]", e.getMessage()));
+            log.error(String.format("Sqoop hdfs source parmas build failed: [%s]", e.getMessage()));
         }
 
         return hdfsSourceSb.toString();

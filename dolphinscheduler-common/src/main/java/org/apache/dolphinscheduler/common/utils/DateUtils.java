@@ -35,9 +35,9 @@ import java.util.TimeZone;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class DateUtils {
 
     static final long C0 = 1L;
@@ -48,7 +48,6 @@ public final class DateUtils {
     static final long C5 = C4 * 60L;
     static final long C6 = C5 * 24L;
 
-    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
     private static final DateTimeFormatter YYYY_MM_DD_HH_MM_SS =
             DateTimeFormatter.ofPattern(DateConstants.YYYY_MM_DD_HH_MM_SS);
 
@@ -76,7 +75,7 @@ public final class DateUtils {
      * @return local datetime
      */
     private static LocalDateTime date2LocalDateTime(Date date, ZoneId zoneId) {
-        return LocalDateTime.ofInstant(date.toInstant(), zoneId);
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(date.getTime()), zoneId);
     }
 
     /**
@@ -218,7 +217,7 @@ public final class DateUtils {
             }
             return localDateTime2Date(ldt, ZoneId.of(timezone));
         } catch (Exception e) {
-            logger.error("error while parse date:" + date, e);
+            log.error("error while parse date:" + date, e);
         }
         return null;
     }
@@ -357,7 +356,7 @@ public final class DateUtils {
             end = new Date();
         }
         if (start.after(end)) {
-            logger.warn("start Time {} is later than end Time {}", start, end);
+            log.warn("start Time {} is later than end Time {}", start, end);
             return null;
         }
         return format2Duration(differMs(start, end));
@@ -585,6 +584,14 @@ public final class DateUtils {
         return intervalSeconds - usedTime;
     }
 
+    public static long getRemainTime(Long baseTime, long intervalSeconds) {
+        if (baseTime == null) {
+            return 0;
+        }
+        long usedTime = (System.currentTimeMillis() - baseTime) / 1000;
+        return intervalSeconds - usedTime;
+    }
+
     /**
      * get current time stamp : yyyyMMddHHmmssSSS
      *
@@ -721,7 +728,7 @@ public final class DateUtils {
             LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
             return localDateTime2Date(ldt);
         } catch (Exception e) {
-            logger.error("error while parse date:" + date, e);
+            log.error("error while parse date:" + date, e);
         }
         return null;
     }

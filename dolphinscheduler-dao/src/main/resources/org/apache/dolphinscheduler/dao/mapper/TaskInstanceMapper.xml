@@ -19,9 +19,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper">
     <sql id="baseSql">
-        id, name, task_type, process_instance_id, task_code, task_definition_version, state, submit_time,
+        id, name, task_type, process_instance_id, process_instance_name, project_code, task_code, task_definition_version, state, submit_time,
         start_time, end_time, host, execute_path, log_path, alert_flag, retry_times, pid, app_link,
-        flag, is_cache, cache_key, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id,
+        flag, is_cache, cache_key, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id, executor_name,
         first_submit_time, delay_time, task_params, var_pool, dry_run, test_flag, task_group_id, cpu_quota, memory_max, task_execute_type
     </sql>
     <sql id="baseSqlV2">
@@ -78,26 +78,26 @@
             </foreach>
         </if>
     </select>
-    <select id="countTaskInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
+
+    <select id="countTaskInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto">
         select state, count(0) as count
-        from t_ds_task_instance t
-        left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
-        left join t_ds_project p on p.code=d.project_code
+        from t_ds_task_instance
         where 1=1
-        <if test="projectCodes != null and projectCodes.length != 0">
-            and d.project_code in
+        <if test="projectCodes != null and projectCodes.size() != 0">
+            and project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         <if test="startTime != null">
-            and t.start_time <![CDATA[ > ]]> #{startTime}
+            and start_time <![CDATA[ > ]]> #{startTime}
         </if>
         <if test="endTime != null">
-            and t.start_time <![CDATA[ <= ]]> #{endTime}
+            and start_time <![CDATA[ <= ]]> #{endTime}
         </if>
-        group by t.state
+        group by state
     </select>
+
     <select id="countTaskInstanceStateByProjectIdsV2" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select state, count(0) as count
         from t_ds_task_instance t
@@ -123,7 +123,6 @@
         state, count(0) as count
         from t_ds_task_instance t
         left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
-        left join t_ds_project p on p.code=d.project_code
         where 1=1
         <if test="states != null and states.size != 0">
             and t.state in
@@ -250,93 +249,86 @@
     </select>
     <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="instance"/>
-        </include>
-        ,
-        process.name as process_instance_name
-        from t_ds_task_instance instance
-        left join t_ds_task_definition_log define on define.code=instance.task_code and define.version=instance.task_definition_version
-        left join t_ds_process_instance process on process.id=instance.process_instance_id
-        where define.project_code = #{projectCode}
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time <![CDATA[ >=]]> #{startTime}
+            and start_time <![CDATA[ >=]]> #{startTime}
         </if>
         <if test="endTime != null">
-            and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="processInstanceId != 0">
-            and instance.process_instance_id = #{processInstanceId}
+            and process_instance_id = #{processInstanceId}
         </if>
         <if test="searchVal != null and searchVal != ''">
-            and instance.name like concat('%', #{searchVal}, '%')
+            and name like concat('%', #{searchVal}, '%')
         </if>
         <if test="taskName != null and taskName != ''">
-            and instance.name=#{taskName}
+            and name = #{taskName}
+        </if>
+        <if test="taskCode != null">
+            and task_code = #{taskCode}
         </if>
         <if test="states != null and states.length != 0">
-            and instance.state in
+            and state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         <if test="host != null and host != ''">
-            and instance.host like concat('%', #{host}, '%')
+            and host like concat('%', #{host}, '%')
         </if>
         <if test="taskExecuteType != null">
-            and instance.task_execute_type = #{taskExecuteType.code}
+            and task_execute_type = #{taskExecuteType.code}
         </if>
-        <if test="executorId != 0">
-            and instance.executor_id = #{executorId}
+        <if test="executorName != null and executorName != ''">
+            and executor_name = #{executorName}
         </if>
         <if test="processInstanceName != null and processInstanceName != ''">
-            and process.name like concat('%', #{processInstanceName}, '%')
+            and process_instance_name like concat('%', #{processInstanceName}, '%')
         </if>
-        order by instance.submit_time desc
+        order by submit_time desc
     </select>
     <select id="queryStreamTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="instance"/>
-        </include>
-        ,
-        process.name as process_definition_name
-        from t_ds_task_instance instance
-        left join t_ds_task_definition_log define on define.code=instance.task_code and define.version=instance.task_definition_version
-        left join t_ds_process_task_relation relation on relation.post_task_code = define.code and relation.post_task_version = define.version
-        left join t_ds_process_definition process on process.code=relation.process_definition_code and process.version = relation.process_definition_version
-        where define.project_code = #{projectCode}
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where project_code = #{projectCode}
         <if test="startTime != null">
-            and instance.start_time <![CDATA[ >=]]> #{startTime}
+            and start_time <![CDATA[ >=]]> #{startTime}
         </if>
         <if test="endTime != null">
-            and instance.start_time <![CDATA[ <=]]> #{endTime}
+            and start_time <![CDATA[ <=]]> #{endTime}
         </if>
         <if test="searchVal != null and searchVal != ''">
-            and instance.name like concat('%', #{searchVal}, '%')
+            and name like concat('%', #{searchVal}, '%')
         </if>
         <if test="taskName != null and taskName != ''">
-            and instance.name=#{taskName}
+            and name=#{taskName}
+        </if>
+        <if test="taskCode != null">
+            and task_code = #{taskCode}
         </if>
         <if test="states != null and states.length != 0">
-            and instance.state in
+            and state in
             <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
         <if test="host != null and host != ''">
-            and instance.host like concat('%', #{host}, '%')
+            and host like concat('%', #{host}, '%')
         </if>
         <if test="taskExecuteType != null">
-            and instance.task_execute_type = #{taskExecuteType.code}
+            and task_execute_type = #{taskExecuteType.code}
         </if>
-        <if test="executorId != 0">
-            and instance.executor_id = #{executorId}
+        <if test="executorName != null and executorName != ''">
+            and executor_name = #{executorName}
         </if>
         <if test="processDefinitionName != null and processDefinitionName != ''">
-            and process.name like concat('%', #{processDefinitionName}, '%')
+            and process_instance_name like concat('%', #{processDefinitionName}, '%')
         </if>
-        order by instance.start_time desc
+        order by start_time desc
     </select>
     <select id="loadAllInfosNoRelease" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
@@ -348,7 +340,38 @@
         where instance.process_instance_id = #{processInstanceId}
         and que.status = #{status}
     </select>
-    
+    <select id="findLastTaskInstances" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="instance"/>
+        </include>
+        from t_ds_task_instance instance
+        join (
+        select task_code, max(end_time) as max_end_time
+        from t_ds_task_instance
+        where 1=1 and test_flag = #{testFlag}
+        and instance.process_instance_id = #{processInstanceId}
+        <if test="taskCodes != null and taskCodes.size() != 0">
+            and task_code in
+            <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+        </if>
+        group by task_code
+        ) t_max
+        on instance.process_instance_id = t_max.process_instance_id
+        and instance.task_code = t_max.task_code
+        and instance.end_time = t_max.max_end_time
+    </select>
+    <select id="findLastTaskInstance" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_instance
+        where process_instance_id = #{processInstanceId}
+        and task_code = #{taskCode}
+        order by end_time desc limit 1
+    </select>
+
     <delete id="deleteByWorkflowInstanceId">
         delete
         from t_ds_task_instance

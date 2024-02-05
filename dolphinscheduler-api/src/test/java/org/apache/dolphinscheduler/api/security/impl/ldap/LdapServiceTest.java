@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 
+import java.lang.reflect.Field;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -44,6 +46,9 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.user.identity-attribute=uid",
         "security.authentication.ldap.user.email-attribute=mail",
         "security.authentication.ldap.user.not-exist-action=CREATE",
+        "security.authentication.ldap.ssl.enable=false",
+        "security.authentication.ldap.ssl.trust-store=",
+        "security.authentication.ldap.ssl.trust-store-password=",
 })
 public class LdapServiceTest {
 
@@ -51,6 +56,9 @@ public class LdapServiceTest {
     protected AutowireCapableBeanFactory beanFactory;
 
     private LdapService ldapService;
+
+    private final String username = "tesla";
+    private final String correctPassword = "password";
 
     @BeforeEach
     public void setUp() {
@@ -65,20 +73,35 @@ public class LdapServiceTest {
     }
 
     @Test
-    public void ldapLogin() {
-        String email = ldapService.ldapLogin("tesla", "password");
+    public void ldapLogin() throws NoSuchFieldException, IllegalAccessException {
+        changeSslEnable(false);
+        String email = ldapService.ldapLogin(username, correctPassword);
         Assertions.assertEquals("tesla@ldap.forumsys.com", email);
+    }
 
-        String email2 = ldapService.ldapLogin("tesla", "error password");
+    @Test
+    public void ldapLoginError() throws NoSuchFieldException, IllegalAccessException {
+        changeSslEnable(false);
+        String email2 = ldapService.ldapLogin(username, "error password");
         Assertions.assertNull(email2);
     }
 
     @Test
-    public void ldapLoginError() {
-        String email = ldapService.ldapLogin("tesla", "password");
-        Assertions.assertEquals("tesla@ldap.forumsys.com", email);
+    public void ldapLoginSSL() throws NoSuchFieldException, IllegalAccessException {
+        changeSslEnable(true);
+        String email = ldapService.ldapLogin(username, correctPassword);
+        Assertions.assertNull(email);
+    }
 
-        String email2 = ldapService.ldapLogin("tesla", "error password");
-        Assertions.assertNull(email2);
+    private void changeSslEnable(boolean sslEnable) throws NoSuchFieldException, IllegalAccessException {
+        Class<LdapService> ldapServiceClass = LdapService.class;
+        Field sslEnableField = ldapServiceClass.getDeclaredField("sslEnable");
+        sslEnableField.setAccessible(true);
+        sslEnableField.set(ldapService, sslEnable);
+        if (sslEnable) {
+            Field trustStorePasswordField = ldapServiceClass.getDeclaredField("trustStorePassword");
+            trustStorePasswordField.setAccessible(true);
+            trustStorePasswordField.set(ldapService, "trustStorePassword");
+        }
     }
 }

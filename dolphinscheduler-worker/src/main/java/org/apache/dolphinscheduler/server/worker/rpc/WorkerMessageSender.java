@@ -17,75 +17,71 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.remote.command.BaseCommand;
-import org.apache.dolphinscheduler.remote.command.CommandType;
-import org.apache.dolphinscheduler.remote.exceptions.RemotingException;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.server.worker.message.MessageSender;
+import org.apache.dolphinscheduler.server.worker.message.TaskInstanceExecutionEventSender;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class WorkerMessageSender {
-
-    private final Logger logger = LoggerFactory.getLogger(WorkerMessageSender.class);
 
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private ApplicationContext applicationContext;
+    private List<TaskInstanceExecutionEventSender> messageSenders;
 
-    private Map<CommandType, MessageSender> messageSenderMap = new HashMap<>();
+    private final Map<ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType, TaskInstanceExecutionEventSender> messageSenderMap =
+            new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Map<String, MessageSender> messageSenders = applicationContext.getBeansOfType(MessageSender.class);
-        messageSenders.values().forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
+        messageSenders.forEach(messageSender -> messageSenderMap.put(messageSender.getMessageType(),
                 messageSender));
     }
 
     // todo: use message rather than context
     public void sendMessageWithRetry(@NonNull TaskExecutionContext taskExecutionContext,
-                                     @NonNull String messageReceiverAddress,
-                                     @NonNull CommandType messageType) {
-        MessageSender messageSender = messageSenderMap.get(messageType);
+                                     @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType eventType) {
+        TaskInstanceExecutionEventSender messageSender = messageSenderMap.get(eventType);
         if (messageSender == null) {
-            throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
+            throw new IllegalArgumentException("The messageType is invalidated, messageType: " + eventType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent = messageSender.buildEvent(taskExecutionContext);
         try {
-            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), messageType, baseCommand);
-            messageSender.sendMessage(baseCommand);
-        } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            messageRetryRunner.addRetryMessage(taskExecutionContext.getTaskInstanceId(), iTaskInstanceExecutionEvent);
+            messageSender.sendEvent(iTaskInstanceExecutionEvent);
+        } catch (Exception e) {
+            log.error("Send message error, eventType: {}, event: {}", eventType, iTaskInstanceExecutionEvent);
         }
     }
 
     public void sendMessage(@NonNull TaskExecutionContext taskExecutionContext,
-                            @NonNull String messageReceiverAddress,
-                            @NonNull CommandType messageType) {
-        MessageSender messageSender = messageSenderMap.get(messageType);
+                            @NonNull ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType taskInstanceExecutionEventType) {
+        TaskInstanceExecutionEventSender messageSender = messageSenderMap.get(taskInstanceExecutionEventType);
         if (messageSender == null) {
-            throw new IllegalArgumentException("The messageType is invalidated, messageType: " + messageType);
+            throw new IllegalArgumentException(
+                    "The eventType is invalidated, eventType: " + taskInstanceExecutionEventType);
         }
-        BaseCommand baseCommand = messageSender.buildMessage(taskExecutionContext, messageReceiverAddress);
+        ITaskInstanceExecutionEvent iTaskInstanceExecutionEvent = messageSender.buildEvent(taskExecutionContext);
         try {
-            messageSender.sendMessage(baseCommand);
-        } catch (RemotingException e) {
-            logger.error("Send message error, messageType: {}, message: {}", messageType, baseCommand);
+            messageSender.sendEvent(iTaskInstanceExecutionEvent);
+        } catch (Exception e) {
+            log.error("Send message error, eventType: {}, event: {}", taskInstanceExecutionEventType,
+                    iTaskInstanceExecutionEvent);
         }
     }
 

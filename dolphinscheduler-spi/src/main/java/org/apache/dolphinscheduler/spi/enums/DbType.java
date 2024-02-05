@@ -42,8 +42,20 @@ public enum DbType {
     ATHENA(11, "athena"),
     TRINO(12, "trino"),
     STARROCKS(13, "starrocks"),
-    AZURESQL(14, "azuresql");
+    AZURESQL(14, "azuresql"),
+    DAMENG(15, "dameng"),
+    OCEANBASE(16, "oceanbase"),
+    SSH(17, "ssh"),
+    KYUUBI(18, "kyuubi"),
+    DATABEND(19, "databend"),
+    SNOWFLAKE(20, "snowflake"),
+    VERTICA(21, "vertica"),
+    HANA(22, "hana"),
+    DORIS(23, "doris"),
+    ZEPPELIN(24, "zeppelin"),
+    SAGEMAKER(25, "sagemaker"),
 
+    K8S(26, "k8s");
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
     @EnumValue

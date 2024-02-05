@@ -145,7 +145,7 @@
         AND a.task_type = #{taskType}
     </select>
 
-    <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="DependentProcessDefinition">
+    <select id="queryDependentProcessDefinitionByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition">
         SELECT
         c.code AS process_definition_code
         ,c.name AS process_definition_name

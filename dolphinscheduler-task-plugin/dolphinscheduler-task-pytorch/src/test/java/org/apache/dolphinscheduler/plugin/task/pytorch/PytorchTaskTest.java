@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -68,7 +67,7 @@ public class PytorchTaskTest {
         envManager.setPythonEnvTool(PythonEnvManager.ENV_TOOL_VENV);
         String venvEnvCommand = envManager.getBuildEnvCommand(requirementPath);
         Assertions.assertEquals(venvEnvCommand,
-                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r "
+                "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r "
                         + requirementPath);
 
     }
@@ -103,15 +102,15 @@ public class PytorchTaskTest {
         PytorchTask task1 = initTask(parameters);
         Assertions.assertEquals(task1.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
-                        "${PYTHON_HOME} main.py --epochs=1 --dry-run");
+                        "${PYTHON_LAUNCHER} main.py --epochs=1 --dry-run");
 
-        parameters.setPythonCommand("");
+        parameters.setPythonLauncher("");
         PytorchTask task2 = initTask(parameters);
         Assertions.assertEquals(task2.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
-                        "${PYTHON_HOME} main.py --epochs=1 --dry-run");
+                        "${PYTHON_LAUNCHER} main.py --epochs=1 --dry-run");
 
-        parameters.setPythonCommand("/usr/bin/python");
+        parameters.setPythonLauncher("/usr/bin/python");
         PytorchTask task3 = initTask(parameters);
         Assertions.assertEquals(task3.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
@@ -151,7 +150,7 @@ public class PytorchTaskTest {
         PytorchTask task = initTask(parameters);
         Assertions.assertEquals(task.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
-                        "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r requirements.txt\n"
+                        "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r requirements.txt\n"
                         +
                         "./venv/bin/python main.py --epochs=1 --dry-run");
 
@@ -178,7 +177,7 @@ public class PytorchTaskTest {
         createFile(scriptFile);
 
         String expected = "export PYTHONPATH=%s\n" +
-                "virtualenv -p ${PYTHON_HOME} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r %s\n"
+                "virtualenv -p ${PYTHON_LAUNCHER} ./venv && source ./venv/bin/activate && ./venv/bin/python -m pip install -r %s\n"
                 +
                 "./venv/bin/python %s";
         System.out.println(task.buildPythonExecuteCommand());
@@ -198,7 +197,6 @@ public class PytorchTaskTest {
         String parameters = JSONUtils.toJsonString(pytorchParameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
         return taskExecutionContext;
     }
 

@@ -17,79 +17,94 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.exception.BaseException;
-import org.apache.dolphinscheduler.common.utils.HttpUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.KerberosHttpClient;
+import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.COMMA;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
+
+import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
+import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManager;
+import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManagerContext;
+import org.apache.dolphinscheduler.plugin.task.api.am.YarnApplicationManagerContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.io.File;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.ServiceLoader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
+import io.fabric8.kubernetes.client.dsl.LogWatch;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
+@Slf4j
 public final class ProcessUtils {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProcessUtils.class);
 
     private ProcessUtils() {
         throw new IllegalStateException("Utility class");
+    }
+
+    private static final Map<ResourceManagerType, ApplicationManager> applicationManagerMap = new HashMap<>();
+
+    static {
+        ServiceLoader.load(ApplicationManager.class)
+                .forEach(applicationManager -> applicationManagerMap.put(applicationManager.getResourceManagerType(),
+                        applicationManager));
     }
 
     /**
      * Initialization regularization, solve the problem of pre-compilation performance,
      * avoid the thread safety problem of multi-thread operation
      */
-    private static final Pattern MACPATTERN = Pattern.compile("-[+|-]-\\s(\\d+)");
+    private static final Pattern MACPATTERN = Pattern.compile("-[+|-][-|=]\\s(\\d+)");
 
     /**
      * Expression of PID recognition in Windows scene
      */
-    private static final Pattern WINDOWSATTERN = Pattern.compile("(\\d+)");
+    private static final Pattern WINDOWSPATTERN = Pattern.compile("(\\d+)");
 
-    private static final String RM_HA_IDS = PropertyUtils.getString(Constants.YARN_RESOURCEMANAGER_HA_RM_IDS);
-    private static final String APP_ADDRESS = PropertyUtils.getString(Constants.YARN_APPLICATION_STATUS_ADDRESS);
-    private static final String JOB_HISTORY_ADDRESS =
-            PropertyUtils.getString(Constants.YARN_JOB_HISTORY_STATUS_ADDRESS);
-    private static final int HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE =
-            PropertyUtils.getInt(Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT, 8088);
+    /**
+     * Expression of PID recognition in Linux scene
+     */
+    private static final Pattern LINUXPATTERN = Pattern.compile("\\((\\d+)\\)");
 
     /**
      * kill tasks according to different task types.
      */
+    @Deprecated
     public static boolean kill(@NonNull TaskExecutionContext request) {
         try {
-            logger.info("Begin kill task instance, processId: {}", request.getProcessId());
+            log.info("Begin kill task instance, processId: {}", request.getProcessId());
             int processId = request.getProcessId();
             if (processId == 0) {
-                logger.error("Task instance kill failed, processId is not exist");
+                log.error("Task instance kill failed, processId is not exist");
                 return false;
             }
 
             String cmd = String.format("kill -9 %s", getPidsStr(processId));
             cmd = OSUtils.getSudoCmd(request.getTenantCode(), cmd);
-            logger.info("process id:{}, cmd:{}", processId, cmd);
+            log.info("process id:{}, cmd:{}", processId, cmd);
 
             OSUtils.exeCmd(cmd);
-            logger.info("Success kill task instance, processId: {}", request.getProcessId());
+            log.info("Success kill task instance, processId: {}", request.getProcessId());
             return true;
         } catch (Exception e) {
-            logger.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
             return false;
         }
     }
@@ -107,12 +122,19 @@ public final class ProcessUtils {
         // pstree pid get sub pids
         if (SystemUtils.IS_OS_MAC) {
             String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-            if (null != pids) {
+            if (StringUtils.isNotEmpty(pids)) {
                 mat = MACPATTERN.matcher(pids);
+            }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
+            if (StringUtils.isNotEmpty(pids)) {
+                mat = LINUXPATTERN.matcher(pids);
             }
         } else {
             String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            mat = WINDOWSATTERN.matcher(pids);
+            if (StringUtils.isNotEmpty(pids)) {
+                mat = WINDOWSPATTERN.matcher(pids);
+            }
         }
 
         if (null != mat) {
@@ -125,278 +147,87 @@ public final class ProcessUtils {
     }
 
     /**
-     * kill yarn application.
+     * cancel k8s / yarn application
      *
-     * @param appIds      app id list
-     * @param logger      logger
-     * @param tenantCode  tenant code
-     * @param executePath execute path
+     * @param taskExecutionContext
+     * @return
      */
-    public static void cancelApplication(List<String> appIds, Logger logger, String tenantCode, String executePath) {
-        if (appIds == null || appIds.isEmpty()) {
-            return;
-        }
-
-        for (String appId : appIds) {
-            try {
-                TaskExecutionStatus applicationStatus = getApplicationStatus(appId);
-
-                if (!applicationStatus.isFinished()) {
-                    String commandFile = String.format("%s/%s.kill", executePath, appId);
-                    String cmd = getKerberosInitCommand() + "yarn application -kill " + appId;
-                    execYarnKillCommand(logger, tenantCode, appId, commandFile, cmd);
-                }
-            } catch (Exception e) {
-                logger.error("Get yarn application app id [{}}] status failed", appId, e);
-            }
-        }
-    }
-
-    /**
-     * get the state of an application
-     *
-     * @param applicationId application id
-     * @return the return may be null or there may be other parse exceptions
-     */
-    public static TaskExecutionStatus getApplicationStatus(String applicationId) throws BaseException {
-        if (StringUtils.isEmpty(applicationId)) {
-            return null;
-        }
-
-        String result;
-        String applicationUrl = getApplicationUrl(applicationId);
-        logger.debug("generate yarn application url, applicationUrl={}", applicationUrl);
-
-        String responseContent = Boolean.TRUE
-                .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
-                        ? KerberosHttpClient.get(applicationUrl)
-                        : HttpUtils.get(applicationUrl);
-        if (responseContent != null) {
-            ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-            if (!jsonObject.has("app")) {
-                return TaskExecutionStatus.FAILURE;
-            }
-            result = jsonObject.path("app").path("finalStatus").asText();
-
-        } else {
-            // may be in job history
-            String jobHistoryUrl = getJobHistoryUrl(applicationId);
-            logger.debug("generate yarn job history application url, jobHistoryUrl={}", jobHistoryUrl);
-            responseContent = Boolean.TRUE
-                    .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
-                            ? KerberosHttpClient.get(jobHistoryUrl)
-                            : HttpUtils.get(jobHistoryUrl);
-
-            if (null != responseContent) {
-                ObjectNode jsonObject = JSONUtils.parseObject(responseContent);
-                if (!jsonObject.has("job")) {
-                    return TaskExecutionStatus.FAILURE;
-                }
-                result = jsonObject.path("job").path("state").asText();
-            } else {
-                return TaskExecutionStatus.FAILURE;
-            }
-        }
-
-        return getExecutionStatus(result);
-    }
-
-    /**
-     * get application url
-     * if rmHaIds contains xx, it signs not use resourcemanager
-     * otherwise:
-     * if rmHaIds is empty, single resourcemanager enabled
-     * if rmHaIds not empty: resourcemanager HA enabled
-     *
-     * @param applicationId application id
-     * @return url of application
-     */
-    private static String getApplicationUrl(String applicationId) throws BaseException {
-
-        String appUrl = StringUtils.isEmpty(RM_HA_IDS) ? APP_ADDRESS : getAppAddress(APP_ADDRESS, RM_HA_IDS);
-        if (StringUtils.isBlank(appUrl)) {
-            throw new BaseException("yarn application url generation failed");
-        }
-        logger.debug("yarn application url:{}, applicationId:{}", appUrl, applicationId);
-        return String.format(appUrl, HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE, applicationId);
-    }
-
-    private static String getJobHistoryUrl(String applicationId) {
-        // eg:application_1587475402360_712719 -> job_1587475402360_712719
-        String jobId = applicationId.replace("application", "job");
-        return String.format(JOB_HISTORY_ADDRESS, jobId);
-    }
-
-    /**
-     * build kill command for yarn application
-     *
-     * @param logger logger
-     * @param tenantCode tenant code
-     * @param appId app id
-     * @param commandFile command file
-     * @param cmd cmd
-     */
-    private static void execYarnKillCommand(Logger logger, String tenantCode, String appId, String commandFile,
-                                            String cmd) {
+    public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
         try {
-            StringBuilder sb = new StringBuilder();
-            sb.append("#!/bin/sh\n");
-            sb.append("BASEDIR=$(cd `dirname $0`; pwd)\n");
-            sb.append("cd $BASEDIR\n");
-
-            sb.append("\n\n");
-            sb.append(cmd);
-
-            File f = new File(commandFile);
-
-            if (!f.exists()) {
-                org.apache.commons.io.FileUtils.writeStringToFile(new File(commandFile), sb.toString(),
-                        StandardCharsets.UTF_8);
-            }
-
-            String runCmd = String.format("%s %s", Constants.SH, commandFile);
-            runCmd = org.apache.dolphinscheduler.common.utils.OSUtils.getSudoCmd(tenantCode, runCmd);
-            logger.info("kill cmd:{}", runCmd);
-            org.apache.dolphinscheduler.common.utils.OSUtils.exeCmd(runCmd);
-        } catch (Exception e) {
-            logger.error(String.format("Kill yarn application app id [%s] failed: [%s]", appId, e.getMessage()));
-        }
-    }
-
-    private static TaskExecutionStatus getExecutionStatus(String result) {
-        switch (result) {
-            case Constants.ACCEPTED:
-                return TaskExecutionStatus.SUBMITTED_SUCCESS;
-            case Constants.SUCCEEDED:
-            case Constants.ENDED:
-                return TaskExecutionStatus.SUCCESS;
-            case Constants.NEW:
-            case Constants.NEW_SAVING:
-            case Constants.SUBMITTED:
-            case Constants.FAILED:
-                return TaskExecutionStatus.FAILURE;
-            case Constants.KILLED:
-                return TaskExecutionStatus.KILL;
-            case Constants.RUNNING:
-            default:
-                return TaskExecutionStatus.RUNNING_EXECUTION;
-        }
-    }
-
-    /**
-     * getAppAddress
-     *
-     * @param appAddress app address
-     * @param rmHa       resource manager ha
-     * @return app address
-     */
-    private static String getAppAddress(String appAddress, String rmHa) {
-
-        String[] split1 = appAddress.split(Constants.DOUBLE_SLASH);
-
-        if (split1.length != 2) {
-            return null;
-        }
-
-        String start = split1[0] + Constants.DOUBLE_SLASH;
-        String[] split2 = split1[1].split(Constants.COLON);
-
-        if (split2.length != 2) {
-            return null;
-        }
-
-        String end = Constants.COLON + split2[1];
-
-        // get active ResourceManager
-        String activeRM = YarnHAAdminUtils.getActiveRMName(start, rmHa);
-
-        if (StringUtils.isEmpty(activeRM)) {
-            return null;
-        }
-
-        return start + activeRM + end;
-    }
-
-    /**
-     * get kerberos init command
-     */
-    private static String getKerberosInitCommand() {
-        logger.info("get kerberos init command");
-        StringBuilder kerberosCommandBuilder = new StringBuilder();
-        boolean hadoopKerberosState =
-                PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        if (hadoopKerberosState) {
-            kerberosCommandBuilder.append("export KRB5_CONFIG=")
-                    .append(PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH))
-                    .append("\n\n")
-                    .append(String.format("kinit -k -t %s %s || true",
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
-                            PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME)))
-                    .append("\n\n");
-            logger.info("kerberos init command: {}", kerberosCommandBuilder);
-        }
-        return kerberosCommandBuilder.toString();
-    }
-
-    /**
-     * yarn ha admin utils
-     */
-    private static final class YarnHAAdminUtils {
-
-        /**
-         * get active resourcemanager node
-         *
-         * @param protocol http protocol
-         * @param rmIds    yarn ha ids
-         * @return yarn active node
-         */
-        public static String getActiveRMName(String protocol, String rmIds) {
-
-            String[] rmIdArr = rmIds.split(Constants.COMMA);
-
-            String yarnUrl = protocol + "%s:" + HADOOP_RESOURCE_MANAGER_HTTP_ADDRESS_PORT_VALUE + "/ws/v1/cluster/info";
-
-            try {
-
-                /**
-                 * send http get request to rm
-                 */
-
-                for (String rmId : rmIdArr) {
-                    String state = getRMState(String.format(yarnUrl, rmId));
-                    if (Constants.HADOOP_RM_STATE_ACTIVE.equals(state)) {
-                        return rmId;
-                    }
+            if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext())) {
+                if (!TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
+                    // Set empty container name for Spark on K8S task
+                    applicationManagerMap.get(ResourceManagerType.KUBERNETES)
+                            .killApplication(new KubernetesApplicationManagerContext(
+                                    taskExecutionContext.getK8sTaskExecutionContext(),
+                                    taskExecutionContext.getTaskAppId(), ""));
                 }
-
-            } catch (Exception e) {
-                logger.error("yarn ha application url generation failed, message:{}", e.getMessage());
+            } else {
+                String host = taskExecutionContext.getHost();
+                String executePath = taskExecutionContext.getExecutePath();
+                String tenantCode = taskExecutionContext.getTenantCode();
+                List<String> appIds;
+                if (StringUtils.isNotEmpty(taskExecutionContext.getAppIds())) {
+                    // is failover
+                    appIds = Arrays.asList(taskExecutionContext.getAppIds().split(COMMA));
+                } else {
+                    String logPath = taskExecutionContext.getLogPath();
+                    String appInfoPath = taskExecutionContext.getAppInfoPath();
+                    if (logPath == null || appInfoPath == null || executePath == null || tenantCode == null) {
+                        log.error(
+                                "Kill yarn job error, the input params is illegal, host: {}, logPath: {}, appInfoPath: {}, executePath: {}, tenantCode: {}",
+                                host, logPath, appInfoPath, executePath, tenantCode);
+                        throw new TaskException("Cancel application failed!");
+                    }
+                    log.info("Get appIds from worker {}, taskLogPath: {}", host, logPath);
+                    appIds = LogUtils.getAppIds(logPath, appInfoPath,
+                            PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));
+                    taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
+                }
+                if (CollectionUtils.isEmpty(appIds)) {
+                    log.info("The appId is empty");
+                    return;
+                }
+                ApplicationManager applicationManager = applicationManagerMap.get(ResourceManagerType.YARN);
+                applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
             }
-            return null;
-        }
-
-        /**
-         * get ResourceManager state
-         */
-        public static String getRMState(String url) {
-
-            String retStr = Boolean.TRUE
-                    .equals(PropertyUtils.getBoolean(Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false))
-                            ? KerberosHttpClient.get(url)
-                            : HttpUtils.get(url);
-
-            if (StringUtils.isEmpty(retStr)) {
-                return null;
-            }
-            // to json
-            ObjectNode jsonObject = JSONUtils.parseObject(retStr);
-
-            // get ResourceManager state
-            if (!jsonObject.has("clusterInfo")) {
-                return null;
-            }
-            return jsonObject.get("clusterInfo").path("haState").asText();
+        } catch (Exception e) {
+            log.error("Cancel application failed: {}", e.getMessage());
         }
     }
 
+    /**
+     * get k8s application status
+     *
+     * @param k8sTaskExecutionContext
+     * @param taskAppId
+     * @return
+     */
+    public static TaskExecutionStatus getApplicationStatus(K8sTaskExecutionContext k8sTaskExecutionContext,
+                                                           String taskAppId) {
+        if (Objects.isNull(k8sTaskExecutionContext)) {
+            return TaskExecutionStatus.SUCCESS;
+        }
+        KubernetesApplicationManager applicationManager =
+                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
+        return applicationManager
+                .getApplicationStatus(new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, ""));
+    }
+
+    /**
+     * get driver pod logs
+     *
+     * @param k8sTaskExecutionContext
+     * @param taskAppId
+     * @return
+     */
+    public static LogWatch getPodLogWatcher(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId,
+                                            String containerName) {
+        KubernetesApplicationManager applicationManager =
+                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
+
+        return applicationManager
+                .getPodLogWatcher(
+                        new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, containerName));
+    }
 }

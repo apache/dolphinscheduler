@@ -31,6 +31,8 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import java.util.TimeZone;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -44,6 +46,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy;
  *
  * @since v3.1.0
  */
+@Slf4j
 public abstract class AbstractEmrTask extends AbstractRemoteTask {
 
     final TaskExecutionContext taskExecutionContext;
@@ -79,7 +82,7 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         emrParameters = JSONUtils.parseObject(taskParams, EmrParameters.class);
-        logger.info("Initialize emr task params:{}", JSONUtils.toPrettyJsonString(taskParams));
+        log.info("Initialize emr task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         if (emrParameters == null || !emrParameters.checkParameters()) {
             throw new EmrTaskException("emr task params is not valid");
         }

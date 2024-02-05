@@ -67,70 +67,32 @@ Click `Project Management -> Workflow -> Workflow Definition` to enter the workf
 
 ![workflow-list](../../../../img/new_ui/dev/project/workflow-list.png)
 
-Workflow running parameter description:
-
-* **Failure strategy**: When a task node fails to execute, other parallel task nodes need to execute the strategy. "Continue" means: After a task fails, other task nodes execute normally; "End" means: Terminate all tasks being executed, and terminate the entire process.
-* **Notification strategy**: When the process ends, send process execution information notification emails according to the process status, including no status, success, failure, success or failure.
-* **Process priority**: The priority of process execution, there are five different priorities: the highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), the lowest (LOWEST). When the number of master threads is insufficient, processes with higher priorities in the execution queue will run first. Processes with the same priority will run in first-come-first-served fashion.
-* **Worker grouping**: This process can only be executed in the specified worker machine group. The default is Default, which can be executed on any worker.
-* **Notification Group**: Select Notification Policy||Timeout Alarm||When fault tolerance occurs, process information or emails will be sent to all members in the notification group.
-* **Startup parameters**: Set or override the value of global parameters when starting a new process instance.
-* **Complement(Backfill)**: Run workflow for a specified historical period. There are two strategies: serial complement and parallel complement.
-
-  > You could select the time period or fill in it manually in UI. The date range is left closed and right closed time interval (startDate <= N <= endDate)
-
-  * Serial complement: Run the workflow from start date to end date according to the time period you set in serial.
-
-  ![workflow-serial](../../../../img/new_ui/dev/project/workflow-serial.png)
-
-  * Parallel complement: Run the workflow from start date to end date according to the time period you set in parallel.
-
-  ![workflow-parallel](../../../../img/new_ui/dev/project/workflow-parallel.png)
-
-  * Parallelism: The max number of workflow instances of the workflow definition you choose for complement.
-    ![workflow-concurrency-from](../../../../img/new_ui/dev/project/workflow-concurrency-from.png)
-
-  ![workflow-concurrency](../../../../img/new_ui/dev/project/workflow-concurrency.png)
-
-  * Mode of dependent: Whether to trigger downstream workflow definition for complement.
-
-  ![workflow-dependency](../../../../img/new_ui/dev/project/workflow-dependency.png)
-
-  * Schedule date：
-
-    1. Select from pop-up window:
-
-    ![workflow-pageSelection](../../../../img/new_ui/dev/project/workflow-pageSelection.png)
-
-    2. Fill in the time period manually:
-
-    ![workflow-input](../../../../img/new_ui/dev/project/workflow-input.png)
-
-  * Complement with or without scheduling：
-
-    1. `Unconfigured timing` or `Configured timing and timing status offline`: Complement the number according to the selected time range combined with the timing default configuration (0:00 every day). e.g. the workflow scheduling date is from July 7th to July 10th:
-
-    ![workflow-unconfiguredTimingResult](../../../../img/new_ui/dev/project/workflow-unconfiguredTimingResult.png)
-
-    2. `Configured timing and timing status online`: Complement the number according to the selected time range combined with the timing configuration. e.g. the workflow scheduling date is from July 7th to July 10th, and the timing is configured (running at 5 am every day):
-
-    ![workflow-configuredTiming](../../../../img/new_ui/dev/project/workflow-configuredTiming.png)
-
-    ![workflow-configuredTimingResult](../../../../img/new_ui/dev/project/workflow-configuredTimingResult.png)
-
-The following are the operation functions of the workflow definition list:
+### Actions Supported by a Single Workflow
 
 - **Edit:** Only "Offline" workflow definitions can be edited. Workflow DAG editing is the same as [Create Workflow Definition](#create-workflow-definition)
+- **Run:** Only workflow in the online state can run. See [Run Workflow](#run-the-workflow) for the operation steps.
 - **Online:** When the workflow status is "Offline", used to make workflow online. Only the workflow in the "Online" state can run, but cannot edit.
 - **Offline:** When the workflow status is "Online", used to make workflow offline. Only the workflow in the "Offline" state can be edited, but cannot run.
-- **Run:** Only workflow in the online state can run. See [Run Workflow](#run-the-workflow) for the operation steps.
-- **Timing:** Timing can only set to online workflows, and the system automatically schedules to run the workflow on time. The status after creating a timing setting is "offline", and the timing must set online on the timing management page to make effect. See [Workflow Timing](#workflow-schedule) for timing operation steps.
+- **Timing:** Timing can only set to online workflows, and the system automatically schedules to run the workflow on time. The status after creating a timing setting is "offline", You need to click the <img src="../../../../img/scheduler_online.png" width="20"/>button on the right to go online to take effect. See [Workflow Timing](#workflow-schedule) for timing operation steps.
+- **Timing Online：** Scheduled online, schedule can only be clicked after the schedule is created and the workflow status is "online".
+- **Timing Offline：** Scheduled offline.
 - **Timing Management:** The timing management page can edit, online or offline and delete timing.
 - **Delete:** Delete the workflow definition. In the same project, only the workflow definition created by yourself can be deleted, and the workflow definition of other users cannot be deleted. If you need to delete it, please contact the user who created it or the administrator.
 - **Download:** Download workflow definition to local.
+- **Copy:** Under the current project, copy a new workflow based on the current workflow, and the name of the new workflow will be suffixed with `_copy_<date>` on the basis of the original workflow name.
+- **Export:** Export workflow definition json file.
+- **Version Info:** View the workflow version information, and switch the workflow version in the version information list.
 - **Tree Diagram:** Display the task node type and task status in a tree structure, as shown in the figure below:
 
 ![workflow-tree](../../../../img/new_ui/dev/project/workflow-tree.png)
+
+### Workflow batch operations
+
+After selecting multiple workflows, you can perform batch operations at the bottom of the workflow definition list, as follows:
+
+- **Batch Delete:** Batch delete multiple workflow definitions.
+- **Batch Export:** Batch export multiple workflow definitions to a json file.
+- **Batch Copy:** Batch copy multiple workflow definitions, you can choose under which project to generate the copied workflow.
 
 ## Run the Workflow
 
@@ -219,9 +181,12 @@ Description of workflow operating parameters:
 
 - Click the "Create" button to create the timing. Now the timing status is "**Offline**" and the timing needs to be **Online** to make effect.
 
-- Schedule online: Click the `Timing Management` button <img src="../../../../img/timeManagement.png" width="35"/>, enter the timing management page, click the `online` button, the timing status will change to `online`, as shown in the below figure, the workflow makes effect regularly.
+- Schedule online: Click the `Timing online` button <img src="../../../../img/scheduler_online.png" width="30"/>, click the `online` button, the timing status will change to `online`, as shown in the below figure, the workflow makes effect regularly.
 
   ![workflow-time03](../../../../img/new_ui/dev/project/workflow-time03.png)
+
+- View the Schedule Timing：After the scheduled time goes online, you can check the current timing situation through the "Timing" button<img src="../../../../img/timing.png" width="35"/>. But it cannot be modified, as shown in the below figure.
+  ![workflow-time04](../../../../img/new_ui/dev/project/workflow-time04.png)
 
 ## Import Workflow
 

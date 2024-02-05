@@ -17,20 +17,26 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResultAlertContent;
 import org.apache.dolphinscheduler.dao.entity.ProcessAlertContent;
+import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskAlertContent;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -39,8 +45,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,18 +54,20 @@ import org.springframework.stereotype.Component;
  * process alert manager
  */
 @Component
+@Slf4j
 public class ProcessAlertManager {
-
-    /**
-     * logger of AlertManager
-     */
-    private static final Logger logger = LoggerFactory.getLogger(ProcessAlertManager.class);
 
     /**
      * alert dao
      */
     @Autowired
     private AlertDao alertDao;
+
+    @Autowired
+    private ProcessDefinitionLogMapper processDefinitionLogMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * command type convert chinese
@@ -106,6 +114,16 @@ public class ProcessAlertManager {
                                             ProjectUser projectUser) {
 
         String res = "";
+        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion());
+
+        String modifyBy = "";
+        if (processDefinitionLog != null) {
+            User operator = userMapper.selectById(processDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
+
         if (processInstance.getState().isSuccess()) {
             List<ProcessAlertContent> successTaskList = new ArrayList<>(1);
             ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
@@ -117,6 +135,7 @@ public class ProcessAlertManager {
                     .processName(processInstance.getName())
                     .processType(processInstance.getCommandType())
                     .processState(processInstance.getState())
+                    .modifyBy(modifyBy)
                     .recovery(processInstance.getRecovery())
                     .runTimes(processInstance.getRunTimes())
                     .processStartTime(processInstance.getStartTime())
@@ -139,6 +158,7 @@ public class ProcessAlertManager {
                         .processId(processInstance.getId())
                         .processDefinitionCode(processInstance.getProcessDefinitionCode())
                         .processName(processInstance.getName())
+                        .modifyBy(modifyBy)
                         .taskCode(task.getTaskCode())
                         .taskName(task.getName())
                         .taskType(task.getTaskType())
@@ -146,6 +166,7 @@ public class ProcessAlertManager {
                         .taskStartTime(task.getStartTime())
                         .taskEndTime(task.getEndTime())
                         .taskHost(task.getHost())
+                        .taskPriority(task.getTaskInstancePriority().getDescp())
                         .logPath(task.getLogPath())
                         .build();
                 failedTaskList.add(processAlertContent);
@@ -167,14 +188,25 @@ public class ProcessAlertManager {
 
         List<ProcessAlertContent> toleranceTaskInstanceList = new ArrayList<>();
 
+        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion());
+        String modifyBy = "";
+        if (processDefinitionLog != null) {
+            User operator = userMapper.selectById(processDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
+
         for (TaskInstance taskInstance : toleranceTaskList) {
             ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                     .processId(processInstance.getId())
                     .processDefinitionCode(processInstance.getProcessDefinitionCode())
                     .processName(processInstance.getName())
+                    .modifyBy(modifyBy)
                     .taskCode(taskInstance.getTaskCode())
                     .taskName(taskInstance.getName())
                     .taskHost(taskInstance.getHost())
+                    .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
                     .retryTimes(taskInstance.getRetryTimes())
                     .build();
             toleranceTaskInstanceList.add(processAlertContent);
@@ -202,7 +234,7 @@ public class ProcessAlertManager {
             alertDao.addAlert(alert);
 
         } catch (Exception e) {
-            logger.error("send alert failed:{} ", e.getMessage());
+            log.error("send alert failed:{} ", e.getMessage());
         }
 
     }
@@ -275,6 +307,9 @@ public class ProcessAlertManager {
      * @param processInstance success process instance
      */
     public void closeAlert(ProcessInstance processInstance) {
+        if (!PropertyUtils.getBoolean(Constants.AUTO_CLOSE_ALERT, false)) {
+            return;
+        }
         List<Alert> alerts = alertDao.listAlerts(processInstance.getId());
         if (CollectionUtils.isEmpty(alerts)) {
             // no need to close alert
@@ -386,6 +421,7 @@ public class ProcessAlertManager {
                 .startTime(taskInstance.getStartTime())
                 .endTime(taskInstance.getEndTime())
                 .host(taskInstance.getHost())
+                .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
                 .logPath(taskInstance.getLogPath())
                 .build();
 
@@ -409,6 +445,17 @@ public class ProcessAlertManager {
         Alert alert = new Alert();
         String cmdName = getCommandCnName(processInstance.getCommandType());
         List<ProcessAlertContent> blockingNodeList = new ArrayList<>(1);
+
+        ProcessDefinitionLog processDefinitionLog = processDefinitionLogMapper
+                .queryByDefinitionCodeAndVersion(processInstance.getProcessDefinitionCode(),
+                        processInstance.getProcessDefinitionVersion());
+
+        String modifyBy = "";
+        if (processDefinitionLog != null) {
+            User operator = userMapper.selectById(processDefinitionLog.getOperator());
+            modifyBy = operator == null ? "" : operator.getUserName();
+        }
+
         ProcessAlertContent processAlertContent = ProcessAlertContent.builder()
                 .projectCode(projectUser.getProjectCode())
                 .projectName(projectUser.getProjectName())
@@ -417,6 +464,7 @@ public class ProcessAlertManager {
                 .processName(processInstance.getName())
                 .processType(processInstance.getCommandType())
                 .processState(processInstance.getState())
+                .modifyBy(modifyBy)
                 .runTimes(processInstance.getRunTimes())
                 .processStartTime(processInstance.getStartTime())
                 .processEndTime(processInstance.getEndTime())

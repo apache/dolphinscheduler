@@ -18,7 +18,7 @@
 import _ from 'lodash'
 import { defineComponent, onMounted, PropType, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { listAlertGroupById } from '@/service/modules/alert-group'
+import { listNormalAlertGroupById } from '@/service/modules/alert-group'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { runningType, warningTypeList } from '@/common/common'
 import { IStartupParam } from './types'
@@ -42,7 +42,7 @@ export default defineComponent({
     const commandParam = JSON.parse(props.startupParam?.commandParam || '{}')
 
     const getAlertGroupList = () => {
-      listAlertGroupById().then((res: any) => {
+      listNormalAlertGroupById().then((res: any) => {
         alertGroupListRef.value = res
       })
     }
@@ -103,6 +103,7 @@ export default defineComponent({
   render() {
     const { t } = this
 
+    // @ts-ignore
     return (
       <div class={styles.box}>
         <ul class={styles['box-bd']}>
@@ -152,6 +153,10 @@ export default defineComponent({
                 ? this.startupParam?.workerGroup
                 : '-'}
             </span>
+          </li>
+          <li>
+            <span class={styles.tab}>{t('project.workflow.tenant_code')}:</span>
+            <span class={styles.content}>{this.startupParam?.tenantCode}</span>
           </li>
           <li>
             <span class={styles.tab}>

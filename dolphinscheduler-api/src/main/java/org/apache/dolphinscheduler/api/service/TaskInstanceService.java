@@ -37,6 +37,7 @@ public interface TaskInstanceService {
      * @param processInstanceId process instance id
      * @param searchVal search value
      * @param taskName task name
+     * @param taskCode task code
      * @param stateType state type
      * @param host host
      * @param startDate start time
@@ -52,6 +53,7 @@ public interface TaskInstanceService {
                                String processInstanceName,
                                String processDefinitionName,
                                String taskName,
+                               Long taskCode,
                                String executorName,
                                String startDate,
                                String endDate,
@@ -110,4 +112,6 @@ public interface TaskInstanceService {
      * @return
      */
     TaskInstanceRemoveCacheResponse removeTaskInstanceCache(User loginUser, long projectCode, Integer taskInstanceId);
+
+    void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 }

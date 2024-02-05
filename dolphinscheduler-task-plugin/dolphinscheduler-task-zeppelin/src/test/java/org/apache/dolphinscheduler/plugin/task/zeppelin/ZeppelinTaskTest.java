@@ -28,9 +28,13 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
+import org.apache.dolphinscheduler.plugin.datasource.zeppelin.param.ZeppelinConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.zeppelin.client.NoteResult;
 import org.apache.zeppelin.client.ParagraphResult;
@@ -39,6 +43,7 @@ import org.apache.zeppelin.client.ZeppelinClient;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,21 +63,38 @@ public class ZeppelinTaskTest {
     private static final String MOCK_REST_ENDPOINT = "localhost:8080";
     private static final String MOCK_CLONE_NOTE_ID = "3GYJR92R8";
     private static final String MOCK_PRODUCTION_DIRECTORY = "/prod/";
+    private static final String MOCK_TYPE = "ZEPPELIN";
+    private static MockedStatic<DataSourceUtils> dataSourceUtilsStaticMock = null;
     private final ObjectMapper mapper = new ObjectMapper();
 
     private ZeppelinClient zClient;
     private ZeppelinTask zeppelinTask;
     private ParagraphResult paragraphResult;
     private NoteResult noteResult;
-    private TaskCallBack taskCallBack = (taskInstanceId, appIds) -> {
+    private TaskCallBack taskCallBack = new TaskCallBack() {
 
+        @Override
+        public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
+
+        }
+
+        @Override
+        public void updateTaskInstanceInfo(int taskInstanceId) {
+
+        }
     };
 
     @BeforeEach
     public void before() throws Exception {
-        String zeppelinParameters = buildZeppelinTaskParameters();
+        String zeppelinTaskParameters = buildZeppelinTaskParameters();
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParameters);
+        ResourceParametersHelper resourceParametersHelper = mock(ResourceParametersHelper.class);
+        ZeppelinConnectionParam zeppelinConnectionParam = mock(ZeppelinConnectionParam.class);
+        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinTaskParameters);
+        when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
+        dataSourceUtilsStaticMock = Mockito.mockStatic(DataSourceUtils.class);
+        dataSourceUtilsStaticMock.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
+                .thenReturn(zeppelinConnectionParam);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
         this.zClient = mock(ZeppelinClient.class);
@@ -81,6 +103,11 @@ public class ZeppelinTaskTest {
         doReturn(this.zClient).when(this.zeppelinTask).getZeppelinClient();
 
         this.zeppelinTask.init();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        dataSourceUtilsStaticMock.close();
     }
 
     @Test
@@ -148,9 +175,11 @@ public class ZeppelinTaskTest {
 
     @Test
     public void testHandleWithNoteExecutionSuccess() throws Exception {
-        String zeppelinParametersWithNoParagraphId = buildZeppelinTaskParametersWithNoParagraphId();
+        String zeppelinTaskParametersWithNoParagraphId = buildZeppelinTaskParametersWithNoParagraphId();
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
-        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
+        ResourceParametersHelper resourceParametersHelper = mock(ResourceParametersHelper.class);
+        when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinTaskParametersWithNoParagraphId);
+        when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
         this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
         this.zClient = mock(ZeppelinClient.class);
         this.noteResult = mock(NoteResult.class);
@@ -173,6 +202,9 @@ public class ZeppelinTaskTest {
 
         try (MockedStatic<DateUtils> mockedStaticDateUtils = Mockito.mockStatic(DateUtils.class)) {
             when(taskExecutionContext.getTaskParams()).thenReturn(zeppelinParametersWithNoParagraphId);
+            ResourceParametersHelper resourceParametersHelper = mock(ResourceParametersHelper.class);
+            when(taskExecutionContext.getResourceParametersHelper()).thenReturn(resourceParametersHelper);
+
             this.zeppelinTask = spy(new ZeppelinTask(taskExecutionContext));
 
             this.zClient = mock(ZeppelinClient.class);
@@ -201,6 +233,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setParagraphId(MOCK_PARAGRAPH_ID);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
+        zeppelinParameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }
@@ -210,6 +243,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setNoteId(MOCK_NOTE_ID);
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
+        zeppelinParameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }
@@ -220,6 +254,7 @@ public class ZeppelinTaskTest {
         zeppelinParameters.setParameters(MOCK_PARAMETERS);
         zeppelinParameters.setRestEndpoint(MOCK_REST_ENDPOINT);
         zeppelinParameters.setProductionNoteDirectory(MOCK_PRODUCTION_DIRECTORY);
+        zeppelinParameters.setType(MOCK_TYPE);
 
         return JSONUtils.toJsonString(zeppelinParameters);
     }

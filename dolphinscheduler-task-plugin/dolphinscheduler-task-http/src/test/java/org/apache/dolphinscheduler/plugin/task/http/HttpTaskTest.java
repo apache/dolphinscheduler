@@ -21,7 +21,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -147,8 +150,23 @@ public class HttpTaskTest {
         prepareParamsMap.put("day", "20220812");
         // The MockWebServer will return the request body as response body directly
         // So we just need to check if the response body contains string "20220812"
-        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST,
+        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST, null,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
+                HttpStatus.SC_OK, "");
+        httpTask.handle(null);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testHandleWithHttpBody() throws Exception {
+        String httpBody = "{\"day\": ${day}}";
+
+        Map<String, String> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("day", "20220812");
+        // The MockWebServer will return the request body as response body directly
+        // So we just need to check if the response body contains string "20220812"
+        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST, httpBody,
+                null, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, "");
         httpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
@@ -167,11 +185,27 @@ public class HttpTaskTest {
         prepareParamsMap.put("day", "20220812");
         // The MockWebServer will return the request parameter as response body directly
         // So we just need to check if the response body contains string "20220812"
-        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY, HttpMethod.POST,
+        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY, HttpMethod.POST, null,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
                 HttpStatus.SC_OK, "");
         httpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testAddDefaultOutput() throws Exception {
+        HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_OK);
+        AbstractParameters httpParameters = httpTask.getParameters();
+        String response = "{\"status\": \"success\"}";
+        httpTask.addDefaultOutput(response);
+
+        List<Property> varPool = httpParameters.getVarPool();
+        Assertions.assertEquals(1, varPool.size());
+        Property property = varPool.get(0);
+        Assertions.assertEquals("null.response", property.getProp());
+        Assertions.assertEquals(Direct.OUT, property.getDirect());
+        Assertions.assertEquals(DataType.VARCHAR, property.getType());
+        Assertions.assertEquals(response, property.getValue());
     }
 
     private String withMockWebServer(String path, int actualResponseCode,
@@ -184,22 +218,24 @@ public class HttpTaskTest {
     }
 
     private HttpTask generateHttpTask(HttpMethod httpMethod, int actualResponseCode) throws IOException {
-        return generateHttpTask("/test", httpMethod, null, null,
+        return generateHttpTask("/test", httpMethod, null, null, null,
                 HttpCheckCondition.STATUS_CODE_DEFAULT, "", actualResponseCode, "");
     }
 
     private HttpTask generateHttpTask(HttpMethod httpMethod, HttpCheckCondition httpCheckConditionType,
                                       String condition, int actualResponseCode,
                                       String actualResponseBody) throws IOException {
-        return generateHttpTask("/test", httpMethod, null, null,
+        return generateHttpTask("/test", httpMethod, null, null, null,
                 httpCheckConditionType, condition, actualResponseCode, actualResponseBody);
     }
-    private HttpTask generateHttpTask(String mockPath, HttpMethod httpMethod, List<HttpProperty> httpParams,
+    private HttpTask generateHttpTask(String mockPath, HttpMethod httpMethod, String httpBody,
+                                      List<HttpProperty> httpParams,
                                       Map<String, String> prepareParamsMap, HttpCheckCondition httpCheckConditionType,
                                       String condition, int actualResponseCode,
                                       String actualResponseBody) throws IOException {
         String url = withMockWebServer(mockPath, actualResponseCode, actualResponseBody);
-        String paramData = generateHttpParameters(url, httpMethod, httpParams, httpCheckConditionType, condition);
+        String paramData =
+                generateHttpParameters(url, httpMethod, httpBody, httpParams, httpCheckConditionType, condition);
         return generateHttpTaskFromParamData(paramData, prepareParamsMap);
     }
 
@@ -221,13 +257,15 @@ public class HttpTaskTest {
         return httpTask;
     }
 
-    private String generateHttpParameters(String url, HttpMethod httpMethod, List<HttpProperty> httpParams,
+    private String generateHttpParameters(String url, HttpMethod httpMethod, String httpBody,
+                                          List<HttpProperty> httpParams,
                                           HttpCheckCondition httpCheckConditionType,
                                           String condition) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         HttpParameters httpParameters = new HttpParameters();
         httpParameters.setUrl(url);
         httpParameters.setHttpMethod(httpMethod);
+        httpParameters.setHttpBody(httpBody);
         httpParameters.setHttpCheckCondition(httpCheckConditionType);
         httpParameters.setCondition(condition);
         httpParameters.setConnectTimeout(10000);

@@ -21,27 +21,24 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
-    /**
-     * flink parameters
-     */
     private FlinkStreamParameters flinkParameters;
 
-    /**
-     * taskExecutionContext
-     */
-    private TaskExecutionContext taskExecutionContext;
+    private final TaskExecutionContext taskExecutionContext;
 
     public FlinkStreamTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -52,13 +49,11 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void init() {
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
-        logger.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
+        log.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-        flinkParameters.setQueue(taskExecutionContext.getQueue());
-        setMainJarName();
 
         FileUtils.generateScriptFile(taskExecutionContext, flinkParameters);
     }
@@ -69,23 +64,15 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
      * @return command
      */
     @Override
-    protected String buildCommand() {
+    protected String getScript() {
         // flink run/run-application [OPTIONS] <jar-file> <arguments>
         List<String> args = FlinkArgsUtils.buildRunCommandLine(taskExecutionContext, flinkParameters);
-
-        String command = ParameterUtils
-                .convertParameterPlaceholders(String.join(" ", args), taskExecutionContext.getDefinedParams());
-
-        logger.info("flink task command : {}", command);
-        return command;
+        return args.stream().collect(Collectors.joining(" "));
     }
 
     @Override
-    protected void setMainJarName() {
-        ResourceInfo mainJar = flinkParameters.getMainJar();
-        String resourceName = getResourceNameOfMainJar(mainJar);
-        mainJar.setRes(resourceName);
-        flinkParameters.setMainJar(mainJar);
+    protected Map<String, String> getProperties() {
+        return taskExecutionContext.getDefinedParams();
     }
 
     @Override
@@ -97,13 +84,13 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void cancelApplication() throws TaskException {
         List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
-            logger.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
+            log.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;
         }
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
 
-        logger.info("cancel application args:{}", args);
+        log.info("cancel application args:{}", args);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);
@@ -118,13 +105,13 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void savePoint() throws Exception {
         List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
-            logger.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
+            log.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
             return;
         }
 
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
-        logger.info("savepoint args:{}", args);
+        log.info("savepoint args:{}", args);
 
         ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command(args);

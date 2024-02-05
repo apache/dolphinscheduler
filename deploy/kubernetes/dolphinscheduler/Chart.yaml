@@ -16,7 +16,7 @@
 #
 
 apiVersion: v2
-name: dolphinscheduler
+name: dolphinscheduler-helm
 description: Dolphin Scheduler is a distributed and easy-to-expand visual DAG workflow scheduling system, dedicated to solving the complex dependencies in data processing, making the scheduling system out of the box for data processing.
 home: https://dolphinscheduler.apache.org
 icon: https://dolphinscheduler.apache.org/img/hlogo_colorful.svg
@@ -61,6 +61,6 @@ dependencies:
   repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: mysql.enabled
 - name: minio
-  version: 2022.10.29
+  version: 11.10.13
   repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
   condition: minio.enabled
