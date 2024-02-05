@@ -33,6 +33,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 
+import org.apache.commons.collections4.MapUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -233,5 +235,47 @@ public class CuringParamsServiceTest {
                 String.valueOf(taskDefinition.getCode()));
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE).getValue(),
                 String.valueOf(processDefinition.getCode()));
+    }
+
+    @Test
+    public void testParseWorkflowStartParam() {
+        Map<String, Property> result = new HashMap<>();
+        // empty cmd param
+        Map<String, String> startParamMap = new HashMap<>();
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowStartParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        // without key
+        startParamMap.put("testStartParam", "$[yyyyMMdd]");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowStartParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        startParamMap.put("StartParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowStartParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertEquals(2, result.keySet().size());
+        Assertions.assertEquals("11111", result.get("param1").getValue());
+        Assertions.assertEquals("22222", result.get("param2").getValue());
+    }
+
+    @Test
+    public void testParseWorkflowFatherParam() {
+        Map<String, Property> result = new HashMap<>();
+        // empty cmd param
+        Map<String, String> startParamMap = new HashMap<>();
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowFatherParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        // without key
+        startParamMap.put("testfatherParams", "$[yyyyMMdd]");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowFatherParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isEmpty(result));
+
+        startParamMap.put("fatherParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
+        result = dolphinSchedulerCuringGlobalParams.parseWorkflowFatherParam(startParamMap);
+        Assertions.assertTrue(MapUtils.isNotEmpty(result));
+        Assertions.assertEquals(2, result.keySet().size());
+        Assertions.assertEquals("11111", result.get("param1").getValue());
+        Assertions.assertEquals("22222", result.get("param2").getValue());
     }
 }
