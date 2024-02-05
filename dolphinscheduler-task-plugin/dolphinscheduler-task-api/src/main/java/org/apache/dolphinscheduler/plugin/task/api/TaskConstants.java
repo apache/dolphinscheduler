@@ -358,9 +358,9 @@ public class TaskConstants {
     public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
     /**
-     * data.quality.jar.name
+     * data.quality.jar.dir
      */
-    public static final String DATA_QUALITY_JAR_NAME = "data-quality.jar.name";
+    public static final String DATA_QUALITY_JAR_DIR = "data-quality.jar.dir";
 
     public static final String TASK_TYPE_CONDITIONS = "CONDITIONS";
 
