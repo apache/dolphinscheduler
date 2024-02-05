@@ -422,7 +422,7 @@ public class ResourcesController extends BaseController {
     @PutMapping(value = "/update-content")
     @ApiException(EDIT_RESOURCE_FILE_ON_LINE_ERROR)
     @OperatorLog(objectType = AuditObjectType.FILE, operationType = AuditOperationType.UPDATE, requestParamName = {
-            "fileName"})
+            "fullName"})
     public Result updateResourceContent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "fullName") String fullName,
                                         @RequestParam(value = "tenantCode") String tenantCode,
@@ -640,7 +640,7 @@ public class ResourcesController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_UDF_FUNCTION_ERROR)
     @OperatorLog(objectType = AuditObjectType.UDP_FUNCTION, operationType = AuditOperationType.DELETE, requestParamName = {
-            "id"})
+            "udfFuncId"})
     public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId) {
         return udfFuncService.delete(loginUser, udfFuncId);

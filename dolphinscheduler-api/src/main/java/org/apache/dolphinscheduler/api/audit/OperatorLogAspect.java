@@ -109,16 +109,15 @@ public class OperatorLogAspect {
             return point.proceed();
         }
 
-        // Change object and operation for resource part
-        ResourceType resourceType = (ResourceType) paramsMap.get("type");
-
         switch (auditObjectType) {
+            // Change object and operation for resource part
             case FOLDER:
-                if (resourceType != null && resourceType.equals(ResourceType.UDF))
-                    auditObjectType = AuditObjectType.UDF_FOLDER;
-                break;
             case FILE:
-                if (resourceType != null && resourceType.equals(ResourceType.UDF))
+                ResourceType resourceType = (ResourceType) paramsMap.get("type");
+                if (resourceType != null && resourceType.equals(ResourceType.UDF)
+                        && auditObjectType == AuditObjectType.FOLDER)
+                    auditObjectType = AuditObjectType.UDF_FOLDER;
+                else if (resourceType != null && resourceType.equals(ResourceType.UDF))
                     auditObjectType = AuditObjectType.UDF_FILE;
                 break;
             case WORKER_GROUP:
@@ -316,9 +315,11 @@ public class OperatorLogAspect {
                 int id = (int) paramsMap.get(name);
                 if (objectType.equals(AuditObjectType.UDP_FUNCTION)) {
                     User obj = userMapper.selectById(id);
-                    detail = obj.getEmail();
+                    if (obj != null) {
+                        detail = obj.getEmail();
+                        auditLogList.get(0).setObjectName(detail);
+                    }
                 }
-                auditLogList.get(0).setObjectName(detail);
             } else if (name.toLowerCase().contains("id")) {
                 int id = (int) paramsMap.get(name);
                 auditLogList.get(0).setObjectId((long) id);
