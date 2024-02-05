@@ -137,7 +137,9 @@ public class CommonUtils {
         String dqJarDir = PropertyUtils.getString(DATA_QUALITY_JAR_DIR);
 
         if (StringUtils.isNotEmpty(dqJarDir)) {
-            log.info("Configuration data-quality.jar.dir is not empty, will try to get data quality jar from directory {}", dqJarDir);
+            log.info(
+                    "Configuration data-quality.jar.dir is not empty, will try to get data quality jar from directory {}",
+                    dqJarDir);
             getDataQualityJarPathFromPath(dqJarDir).ifPresent(jarName -> DEFAULT_DATA_QUALITY_JAR_PATH = jarName);
         }
 
@@ -147,7 +149,8 @@ public class CommonUtils {
         }
 
         if (StringUtils.isEmpty(DEFAULT_DATA_QUALITY_JAR_PATH)) {
-            log.error("Can not find data quality jar in both configuration and auto discover, please check your configuration or report a bug.");
+            log.error(
+                    "Can not find data quality jar in both configuration and auto discover, please check your configuration or report a bug.");
             throw new RuntimeException("data quality jar path is empty");
         }
 
