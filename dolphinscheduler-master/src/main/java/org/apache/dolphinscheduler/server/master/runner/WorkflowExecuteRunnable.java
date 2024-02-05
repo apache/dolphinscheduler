@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_FATHER_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
@@ -28,6 +29,8 @@ import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
+import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -857,7 +860,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             Map<String, String> cmdParam = JSONUtils.toMap(workflowInstance.getCommandParam());
             if (cmdParam != null) {
                 // reset global params while there are start parameters
-                processService.setGlobalParamIfCommanded(workflowDefinition, cmdParam);
+                setGlobalParamIfCommanded(workflowDefinition, cmdParam);
 
                 Date start = null;
                 Date end = null;
@@ -1188,7 +1191,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     }
                 }
             }
-            if (!allProperty.isEmpty()) {
+            if (allProperty.size() > 0) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
         } else {
@@ -1570,10 +1573,10 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         if (this.taskFailedSubmit) {
             return true;
         }
-        if (!this.errorTaskMap.isEmpty()) {
+        if (this.errorTaskMap.size() > 0) {
             return true;
         }
-        return !this.dependFailedTaskSet.isEmpty();
+        return this.dependFailedTaskSet.size() > 0;
     }
 
     /**
@@ -1651,7 +1654,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
     private WorkflowExecutionStatus getProcessInstanceState(ProcessInstance instance) {
         WorkflowExecutionStatus state = instance.getState();
 
-        if (!taskExecuteRunnableMap.isEmpty() || hasRetryTaskInStandBy()) {
+        if (taskExecuteRunnableMap.size() > 0 || hasRetryTaskInStandBy()) {
             // active task and retry task exists
             WorkflowExecutionStatus executionStatus = runningState(state);
             log.info("The workflowInstance has task running, the workflowInstance status is {}", executionStatus);
@@ -1697,7 +1700,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         // success
         if (state == WorkflowExecutionStatus.RUNNING_EXECUTION) {
             List<TaskInstance> killTasks = getCompleteTaskByState(TaskExecutionStatus.KILL);
-            if (standByTaskInstancePriorityQueue.size() > 0 || !waitToRetryTaskInstanceMap.isEmpty()) {
+            if (standByTaskInstancePriorityQueue.size() > 0 || waitToRetryTaskInstanceMap.size() > 0) {
                 // tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return WorkflowExecutionStatus.RUNNING_EXECUTION;
             } else if (CollectionUtils.isNotEmpty(killTasks)) {
