@@ -120,8 +120,8 @@ public class WorkFlowLineageServiceTest {
                 (Collection<WorkFlowLineage>) workFlowLists.get(Constants.WORKFLOW_LIST);
         Set<WorkFlowRelation> workFlowRelations =
                 (Set<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
-        Assertions.assertTrue(workFlowLineageList.size() > 0);
-        Assertions.assertTrue(workFlowRelations.size() > 0);
+        Assertions.assertFalse(workFlowLineageList.isEmpty());
+        Assertions.assertFalse(workFlowRelations.isEmpty());
     }
 
     private List<WorkFlowLineage> getWorkFlowLineages() {

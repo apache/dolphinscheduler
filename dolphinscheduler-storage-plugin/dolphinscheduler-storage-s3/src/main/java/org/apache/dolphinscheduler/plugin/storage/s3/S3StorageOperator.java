@@ -565,7 +565,7 @@ public class S3StorageOperator implements Closeable, StorageOperate {
 
         } else {
             // the path is a file
-            if (summaries.size() > 0) {
+            if (!summaries.isEmpty()) {
                 S3ObjectSummary summary = summaries.get(0);
                 String[] aliasArr = summary.getKey().split("/");
                 String alias = aliasArr[aliasArr.length - 1];

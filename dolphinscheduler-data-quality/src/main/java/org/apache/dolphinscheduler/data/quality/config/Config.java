@@ -77,7 +77,7 @@ public class Config {
     }
 
     public boolean isNotEmpty() {
-        return configuration.size() > 0;
+        return !configuration.isEmpty();
     }
 
     public void put(String key, Object value) {

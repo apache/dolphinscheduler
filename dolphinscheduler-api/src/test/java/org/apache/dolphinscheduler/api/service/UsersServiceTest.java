@@ -271,7 +271,7 @@ public class UsersServiceTest {
         when(userMapper.queryEnabledUsers()).thenReturn(getUserList());
         result = usersService.queryUserList(user);
         List<User> userList = (List<User>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(userList.size() > 0);
+        Assertions.assertFalse(userList.isEmpty());
     }
 
     @Test
@@ -291,7 +291,7 @@ public class UsersServiceTest {
         result = usersService.queryUserList(user, "userTest", 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
         PageInfo<User> pageInfo = (PageInfo<User>) result.getData();
-        Assertions.assertTrue(pageInfo.getTotalList().size() > 0);
+        Assertions.assertTrue(!pageInfo.getTotalList().isEmpty());
     }
 
     @Test

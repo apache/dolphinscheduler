@@ -224,7 +224,7 @@ public class DatasyncHook {
 
     private static void castParamPropertyPackage(DatasyncParameters parameters, CreateTaskRequest.Builder builder) {
         List<DatasyncParameters.TagListEntry> tags = parameters.getTags();
-        if (tags != null && tags.size() > 0) {
+        if (tags != null && !tags.isEmpty()) {
             List<TagListEntry> collect =
                     tags.stream().map(e -> TagListEntry.builder().key(e.getKey()).value(e.getValue()).build())
                             .collect(Collectors.toList());
@@ -243,14 +243,14 @@ public class DatasyncHook {
             builder.options(option);
         }
         List<DatasyncParameters.FilterRule> excludes = parameters.getExcludes();
-        if (excludes != null && excludes.size() > 0) {
+        if (excludes != null && !excludes.isEmpty()) {
             List<FilterRule> collect = excludes.stream()
                     .map(e -> FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build())
                     .collect(Collectors.toList());
             builder.excludes(collect);
         }
         List<DatasyncParameters.FilterRule> includes = parameters.getIncludes();
-        if (includes != null && includes.size() > 0) {
+        if (includes != null && !includes.isEmpty()) {
             List<FilterRule> collect = includes.stream()
                     .map(e -> FilterRule.builder().filterType(e.getFilterType()).value(e.getValue()).build())
                     .collect(Collectors.toList());

@@ -107,7 +107,7 @@ public class V132DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
 
                 replaceProcessDefinitionMap.put(entry.getKey(), jsonObject.toString());
             }
-            if (replaceProcessDefinitionMap.size() > 0) {
+            if (!replaceProcessDefinitionMap.isEmpty()) {
                 processDefinitionDao.updateProcessDefinitionJson(connection, replaceProcessDefinitionMap);
             }
         } catch (Exception e) {

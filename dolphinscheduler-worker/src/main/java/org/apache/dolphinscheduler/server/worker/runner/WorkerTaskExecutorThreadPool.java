@@ -64,7 +64,7 @@ public class WorkerTaskExecutorThreadPool {
     }
 
     public boolean isOverload() {
-        return threadPoolExecutor.getQueue().size() > 0;
+        return !threadPoolExecutor.getQueue().isEmpty();
     }
 
     public int getWaitingTaskExecutorSize() {

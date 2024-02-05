@@ -1191,7 +1191,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     }
                 }
             }
-            if (allProperty.size() > 0) {
+            if (!allProperty.isEmpty()) {
                 taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
             }
         } else {
@@ -1573,10 +1573,10 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         if (this.taskFailedSubmit) {
             return true;
         }
-        if (this.errorTaskMap.size() > 0) {
+        if (!this.errorTaskMap.isEmpty()) {
             return true;
         }
-        return this.dependFailedTaskSet.size() > 0;
+        return !this.dependFailedTaskSet.isEmpty();
     }
 
     /**
@@ -1654,7 +1654,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
     private WorkflowExecutionStatus getProcessInstanceState(ProcessInstance instance) {
         WorkflowExecutionStatus state = instance.getState();
 
-        if (taskExecuteRunnableMap.size() > 0 || hasRetryTaskInStandBy()) {
+        if (!taskExecuteRunnableMap.isEmpty() || hasRetryTaskInStandBy()) {
             // active task and retry task exists
             WorkflowExecutionStatus executionStatus = runningState(state);
             log.info("The workflowInstance has task running, the workflowInstance status is {}", executionStatus);
@@ -1700,7 +1700,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         // success
         if (state == WorkflowExecutionStatus.RUNNING_EXECUTION) {
             List<TaskInstance> killTasks = getCompleteTaskByState(TaskExecutionStatus.KILL);
-            if (standByTaskInstancePriorityQueue.size() > 0 || waitToRetryTaskInstanceMap.size() > 0) {
+            if (standByTaskInstancePriorityQueue.size() > 0 || !waitToRetryTaskInstanceMap.isEmpty()) {
                 // tasks currently pending submission, no retries, indicating that depend is waiting to complete
                 return WorkflowExecutionStatus.RUNNING_EXECUTION;
             } else if (CollectionUtils.isNotEmpty(killTasks)) {
@@ -2073,7 +2073,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         // set start param into global params
         Map<String, String> globalMap = processDefinition.getGlobalParamMap();
         List<Property> globalParamList = processDefinition.getGlobalParamList();
-        if (startParamMap.size() > 0 && globalMap != null) {
+        if (!startParamMap.isEmpty() && globalMap != null) {
             // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
                 String val = startParamMap.get(param.getKey());

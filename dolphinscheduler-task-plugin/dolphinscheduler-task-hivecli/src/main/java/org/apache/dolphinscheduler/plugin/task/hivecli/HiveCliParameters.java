@@ -46,7 +46,7 @@ public class HiveCliParameters extends AbstractParameters {
         if (HiveCliConstants.TYPE_SCRIPT.equals(hiveCliTaskExecutionType)) {
             return StringUtils.isNotEmpty(hiveSqlScript);
         } else if (HiveCliConstants.TYPE_FILE.equals(hiveCliTaskExecutionType)) {
-            return (resourceList != null) && (resourceList.size() > 0);
+            return (resourceList != null) && (!resourceList.isEmpty());
         } else {
             return false;
         }

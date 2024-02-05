@@ -444,7 +444,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
 
         } else {
             // the path is a file
-            if (summaries.size() > 0) {
+            if (!summaries.isEmpty()) {
                 OSSObjectSummary summary = summaries.get(0);
                 String[] aliasArr = summary.getKey().split(FOLDER_SEPARATOR);
                 String alias = aliasArr[aliasArr.length - 1];

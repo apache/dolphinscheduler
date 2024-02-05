@@ -49,6 +49,6 @@ public class LinkisParameters extends AbstractParameters {
     @Override
     public boolean checkParameters() {
         return ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
-                || (BooleanUtils.isFalse(useCustom) && paramScript.size() > 0));
+                || (BooleanUtils.isFalse(useCustom) && !paramScript.isEmpty()));
     }
 }

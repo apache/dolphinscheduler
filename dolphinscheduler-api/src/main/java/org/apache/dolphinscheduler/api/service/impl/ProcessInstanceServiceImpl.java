@@ -935,7 +935,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             timeParams.put(property.getProp(), property.getValue());
         }
 
-        if (userDefinedParams != null && userDefinedParams.length() > 0) {
+        if (userDefinedParams != null && !userDefinedParams.isEmpty()) {
             globalParams = JSONUtils.toList(userDefinedParams, Property.class);
         }
 

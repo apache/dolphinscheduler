@@ -35,14 +35,14 @@ public class PluginDefineTest extends BaseDaoTest {
     public void testQueryAllPluginDefineList() {
         createPluginDefine();
         List<PluginDefine> pluginDefines = pluginDefineMapper.queryAllPluginDefineList();
-        Assertions.assertTrue(pluginDefines.size() > 0);
+        Assertions.assertFalse(pluginDefines.isEmpty());
     }
 
     @Test
     public void testQeryByPluginType() {
         PluginDefine pluginDefine = createPluginDefine();
         List<PluginDefine> pluginDefines = pluginDefineMapper.queryByPluginType(pluginDefine.getPluginType());
-        Assertions.assertTrue(pluginDefines.size() > 0);
+        Assertions.assertFalse(pluginDefines.isEmpty());
         Assertions.assertEquals(pluginDefines.get(0).getPluginType(), pluginDefine.getPluginType());
     }
 
