@@ -19,7 +19,7 @@ on:
   pull_request:
   push:
     branches:
-      - dev
+      - fix-ci
 
 name: E2E
 

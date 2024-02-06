@@ -46,7 +46,7 @@ public final class WorkflowRunDialog {
     public WorkflowDefinitionTab submit() {
         new WebDriverWait(parent().driver(), Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
 
-        buttonSubmit().click();
+        ((]avascriptExecutor) parent().driver()),executescript("arguments[0].click();", buttonsubmit());
 
         return parent();
     }
