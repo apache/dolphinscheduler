@@ -68,6 +68,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .cpuUsage(systemMetrics.getTotalCpuUsedPercentage())
                 .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
                 .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
+                .diskUsage(systemMetrics.getDiskUsedPercentage())
                 .processId(processId)
                 .workerHostWeight(workerConfig.getHostWeight())
                 .threadPoolUsage(workerTaskExecutorThreadPool.getRunningTaskExecutorSize()
