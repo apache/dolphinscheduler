@@ -82,7 +82,7 @@ public class ZeppelinTask extends AbstractRemoteTask {
         zeppelinParameters.setUsername(zeppelinConnectionParam.getUsername());
         zeppelinParameters.setPassword(zeppelinConnectionParam.getPassword());
         zeppelinParameters.setRestEndpoint(zeppelinConnectionParam.getRestEndpoint());
-        log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(zeppelinParameters));
+        log.info("Initialize zeppelin task params:{}", JSONUtils.toPrettyJsonString(taskParams));
         this.zClient = getZeppelinClient();
     }
 
