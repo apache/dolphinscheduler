@@ -196,7 +196,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
                     try {
                         return Integer.parseInt(code);
                     } catch (NumberFormatException e) {
-                        log.error("code are not all numbers, {}", code);
+                        log.error("codes are not all numbers");
                         throw new IllegalArgumentException("illegal parameter codes " + codes);
                     }
                 })
