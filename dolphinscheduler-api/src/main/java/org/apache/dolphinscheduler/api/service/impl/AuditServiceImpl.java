@@ -148,7 +148,6 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * query audit log paging
      *
-     * @param loginUser           login user
      * @param objectTypeCodes     object type codes
      * @param operationTypeCodes  operation type codes
      * @param startDate           start time
@@ -196,9 +195,8 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             return Arrays.stream(codes.split(","))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
-        } catch (Exception e) {
-            String msg = String.format("codes has illegal parameter : %s", codes);
-            log.error(msg);
+        } catch (NumberFormatException e) {
+            log.error("codes has illegal parameter : {}", codes);
             throw new IllegalArgumentException("illegal parameter codes " + codes);
         }
     }
