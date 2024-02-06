@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_STORAGE_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATA_QUALITY_JAR_NAME;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATA_QUALITY_JAR_DIR;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JAVA_SECURITY_KRB5_CONF;
@@ -133,14 +133,28 @@ public class CommonUtils {
     }
 
     public static String getDataQualityJarPath() {
-        String dqsJarPath = PropertyUtils.getString(DATA_QUALITY_JAR_NAME);
+        log.info("Trying to get data quality jar in path");
+        String dqJarDir = PropertyUtils.getString(DATA_QUALITY_JAR_DIR);
 
-        if (StringUtils.isEmpty(dqsJarPath)) {
-            log.info("data quality jar path is empty, will try to get it from data quality jar name");
-            return getDefaultDataQualityJarPath();
+        if (StringUtils.isNotEmpty(dqJarDir)) {
+            log.info(
+                    "Configuration data-quality.jar.dir is not empty, will try to get data quality jar from directory {}",
+                    dqJarDir);
+            getDataQualityJarPathFromPath(dqJarDir).ifPresent(jarName -> DEFAULT_DATA_QUALITY_JAR_PATH = jarName);
         }
 
-        return dqsJarPath;
+        if (StringUtils.isEmpty(DEFAULT_DATA_QUALITY_JAR_PATH)) {
+            log.info("data quality jar path is empty, will try to auto discover it from build-in rules.");
+            getDefaultDataQualityJarPath();
+        }
+
+        if (StringUtils.isEmpty(DEFAULT_DATA_QUALITY_JAR_PATH)) {
+            log.error(
+                    "Can not find data quality jar in both configuration and auto discover, please check your configuration or report a bug.");
+            throw new RuntimeException("data quality jar path is empty");
+        }
+
+        return DEFAULT_DATA_QUALITY_JAR_PATH;
     }
 
     private static String getDefaultDataQualityJarPath() {
@@ -173,7 +187,7 @@ public class CommonUtils {
         log.info("Try to get data quality jar from path {}", path);
         File[] jars = new File(path).listFiles();
         if (jars == null) {
-            log.warn("No data quality related jar found from path {}", path);
+            log.warn("No any files find given path {}", path);
             return Optional.empty();
         }
         for (File jar : jars) {
@@ -181,6 +195,7 @@ public class CommonUtils {
                 return Optional.of(jar.getAbsolutePath());
             }
         }
+        log.warn("No data quality related jar found from path {}", path);
         return Optional.empty();
     }
 
