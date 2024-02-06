@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThread
 
 import java.time.Duration;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,16 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
 
     @Autowired
     private WorkerTaskExecutorThreadPool workerManagerThread;
+
+    public WorkerWaitingStrategy(@NonNull WorkerConfig workerConfig,
+                                 @NonNull RegistryClient registryClient,
+                                 @NonNull MessageRetryRunner messageRetryRunner,
+                                 @NonNull WorkerTaskExecutorThreadPool workerManagerThread) {
+        this.workerConfig = workerConfig;
+        this.registryClient = registryClient;
+        this.messageRetryRunner = messageRetryRunner;
+        this.workerManagerThread = workerManagerThread;
+    }
 
     @Override
     public void disconnect() {
