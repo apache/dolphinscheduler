@@ -100,9 +100,10 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**
      * find last task instance corresponding to taskCode in the date interval
+     *
      * @param processInstanceId Task's parent process instance id
-     * @param depTaskCode taskCode
-     * @param testFlag test flag
+     * @param depTaskCode       taskCode
+     * @param testFlag          test flag
      * @return task instance
      */
     TaskInstance queryLastTaskInstanceIntervalInProcessInstance(Integer processInstanceId,
