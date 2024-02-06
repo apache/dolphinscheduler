@@ -35,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
@@ -287,8 +288,13 @@ public class FileUtils {
                 createDirectoryWith755(parent);
             }
 
-            Files.createDirectory(path);
-            Files.setPosixFilePermissions(path, PERMISSION_755);
+            try {
+                Files.createDirectory(path);
+                Files.setPosixFilePermissions(path, PERMISSION_755);
+            } catch (FileAlreadyExistsException fileAlreadyExistsException) {
+                // Catch the FileAlreadyExistsException here to avoid create the same parent directory in parallel
+                log.debug("The directory: {} already exists", path);
+            }
 
         }
     }
