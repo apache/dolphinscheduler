@@ -191,14 +191,16 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             return new ArrayList<>();
         }
 
-        try {
-            return Arrays.stream(codes.split(","))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
-        } catch (NumberFormatException e) {
-            log.error("codes has illegal parameter : {}", codes);
-            throw new IllegalArgumentException("illegal parameter codes " + codes);
-        }
+        return Arrays.stream(codes.split(","))
+                .map(code -> {
+                    try {
+                        return Integer.parseInt(code);
+                    } catch (NumberFormatException e) {
+                        log.error("code are not all numbers, {}", code);
+                        throw new IllegalArgumentException("illegal parameter codes " + codes);
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     /**
