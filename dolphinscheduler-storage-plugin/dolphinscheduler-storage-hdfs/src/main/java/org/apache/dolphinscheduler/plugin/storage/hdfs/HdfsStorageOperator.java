@@ -71,7 +71,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Slf4j
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
-    private static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
+    protected static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
     private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private volatile boolean yarnEnabled = false;
