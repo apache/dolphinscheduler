@@ -44,10 +44,6 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-task-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-storage-api</artifactId>
                 </exclusion>
             </exclusions>
