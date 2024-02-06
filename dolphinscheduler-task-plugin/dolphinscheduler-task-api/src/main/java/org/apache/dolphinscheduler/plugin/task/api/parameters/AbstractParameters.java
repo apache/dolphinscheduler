@@ -18,12 +18,9 @@
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -87,16 +84,6 @@ public abstract class AbstractParameters implements IParameters {
             }
         }
         return localParametersMaps;
-    }
-
-    public K8sTaskExecutionContext generateK8sTaskExecutionContext(ResourceParametersHelper parametersHelper,
-                                                                   int datasource) {
-        DataSourceParameters dataSourceParameters =
-                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
-        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
-        k8sTaskExecutionContext.setConnectionParams(
-                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
-        return k8sTaskExecutionContext;
     }
 
     /**

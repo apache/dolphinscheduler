@@ -300,7 +300,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String configYaml = k8sTaskExecutionContext.getConfigYaml();
+            String connectionParams = k8sTaskExecutionContext.getConnectionParams();
+            String kubeConfig = JSONUtils.getNodeString(connectionParams, "kubeConfig");
+            String configYaml = kubeConfig;
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
