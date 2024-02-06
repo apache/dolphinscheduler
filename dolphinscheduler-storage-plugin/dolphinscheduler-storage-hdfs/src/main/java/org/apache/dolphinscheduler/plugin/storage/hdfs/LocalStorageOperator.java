@@ -17,26 +17,23 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import lombok.extern.slf4j.Slf4j;
 
-import com.google.auto.service.AutoService;
+@Slf4j
+public class LocalStorageOperator extends HdfsStorageOperator {
 
-@AutoService(StorageOperateFactory.class)
-public class LocalStorageOperatorFactory implements StorageOperateFactory {
+    public LocalStorageOperator() {
+        super(new HdfsStorageProperties());
+    }
 
-    private static final String LOCAL_DEFAULT_FS = "file:/";
-
-    @Override
-    public StorageOperate createStorageOperate() {
-        HdfsStorageProperties hdfsStorageProperties = new HdfsStorageProperties();
-        hdfsStorageProperties.setDefaultFS(LOCAL_DEFAULT_FS);
-        return new LocalStorageOperator(hdfsStorageProperties);
+    public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
+        super(hdfsStorageProperties);
     }
 
     @Override
-    public StorageType getStorageOperate() {
-        return StorageType.LOCAL;
+    public String getResourceFileName(String tenantCode, String fullName) {
+        // prefix schema `file:/` should be remove in local file mode
+        String fullNameRemoveSchema = fullName.replaceFirst(hdfsProperties.getDefaultFS(), "");
+        return super.getResourceFileName(tenantCode, fullNameRemoveSchema);
     }
 }
