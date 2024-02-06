@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 
 import java.util.ArrayList;
@@ -72,7 +71,6 @@ public class AuditServiceTest {
                 eq(start), eq(end))).thenReturn(page);
         Assertions.assertDoesNotThrow(() -> {
             auditService.queryLogListPaging(
-                    new User(),
                     "",
                     "",
                     "2020-11-01 00:00:00",
