@@ -66,6 +66,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -73,6 +75,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @Service
+@Slf4j
 public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
     @Autowired
@@ -157,8 +160,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      * @return audit log string data
      */
     @Override
-    public PageInfo<AuditDto> queryLogListPaging(User loginUser,
-                                                 String objectTypeCodes,
+    public PageInfo<AuditDto> queryLogListPaging(String objectTypeCodes,
                                                  String operationTypeCodes,
                                                  String startDate,
                                                  String endDate,
@@ -190,9 +192,15 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
             return new ArrayList<>();
         }
 
-        return Arrays.stream(codes.split(","))
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        try {
+            return Arrays.stream(codes.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            String msg = String.format("codes has illegal parameter : %s", codes);
+            log.error(msg);
+            throw new IllegalArgumentException("illegal parameter codes " + codes);
+        }
     }
 
     /**

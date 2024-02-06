@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 
@@ -48,7 +47,6 @@ public interface AuditService {
     /**
      * query audit log list
      *
-     * @param loginUser           login user
      * @param objectTypeCodes     object type codes
      * @param operationTypeCodes  operation type codes
      * @param startTime           start time
@@ -58,7 +56,7 @@ public interface AuditService {
      * @param pageSize            page size
      * @return                    audit log string
      */
-    PageInfo<AuditDto> queryLogListPaging(User loginUser, String objectTypeCodes,
+    PageInfo<AuditDto> queryLogListPaging(String objectTypeCodes,
                                           String operationTypeCodes, String startTime,
                                           String endTime, String userName, String objectName,
                                           Integer pageNo, Integer pageSize);

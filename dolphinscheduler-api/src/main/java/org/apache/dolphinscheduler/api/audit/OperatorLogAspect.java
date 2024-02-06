@@ -246,8 +246,12 @@ public class OperatorLogAspect {
         for (String name : paramNameArr) {
             if (paramsMap.get(name) instanceof String) {
                 String param = (String) paramsMap.get(name);
-                if (param.matches("\\d+")) {
-                    return Long.parseLong(param);
+                try {
+                    if (param.matches("\\d+")) {
+                        return Long.parseLong(param);
+                    }
+                } catch (NumberFormatException e) {
+                    return -1;
                 }
             }
         }
@@ -281,11 +285,19 @@ public class OperatorLogAspect {
                 String[] codes = ((String) paramsMap.get(name)).split(",");
                 AuditLog auditLog = auditLogList.get(0);
 
-                for (String code : codes) {
-                    String detail = auditService.getObjectNameByObjectId(
-                            Long.parseLong(code), objectType);
+                for (String codeString : codes) {
+                    long code;
+                    try {
+                        code = Long.parseLong(codeString);
+                    } catch (Exception e) {
+                        log.error("code is not long, code: {}", codeString);
+                        continue;
+                    }
 
-                    auditLog.setObjectId(Long.parseLong(code));
+                    String detail = auditService.getObjectNameByObjectId(
+                            code, objectType);
+
+                    auditLog.setObjectId(code);
                     auditLog.setObjectName(detail);
                     auditLogList.add(auditLog);
                     auditLog = AuditLog.copyNewOne(auditLog);
@@ -293,7 +305,14 @@ public class OperatorLogAspect {
 
                 auditLogList.remove(0);
             } else if (name.toLowerCase().contains("code")) {
-                long code = (long) paramsMap.get(name);
+                long code;
+                try {
+                    code = (long) paramsMap.get(name);
+                } catch (Exception e) {
+                    log.error("code is not long, code: {}", paramsMap.get(name));
+                    continue;
+                }
+
                 String detail = auditService.getObjectNameByObjectId(code, objectType);
                 auditLogList.get(0).setObjectName(detail);
                 auditLogList.get(0).setObjectId(code);
@@ -301,9 +320,16 @@ public class OperatorLogAspect {
                 String[] ids = ((String) paramsMap.get(name)).split(",");
                 AuditLog auditLog = auditLogList.get(0);
 
-                for (String id : ids) {
-                    String detail = auditService.getObjectNameByObjectId(Long.parseLong(id), objectType);
-                    auditLog.setObjectId(Long.parseLong(id));
+                for (String idString : ids) {
+                    long id;
+                    try {
+                        id = Long.parseLong(idString);
+                    } catch (Exception e) {
+                        log.error("id is not long, id: {}", idString);
+                        continue;
+                    }
+                    String detail = auditService.getObjectNameByObjectId(id, objectType);
+                    auditLog.setObjectId(id);
                     auditLog.setObjectName(detail);
                     auditLogList.add(auditLog);
                     auditLog = AuditLog.copyNewOne(auditLog);
@@ -311,13 +337,11 @@ public class OperatorLogAspect {
 
                 auditLogList.remove(0);
             } else if (name.toLowerCase().contains("userid")) {
-                String detail = "";
                 int id = (int) paramsMap.get(name);
                 if (objectType.equals(AuditObjectType.UDP_FUNCTION)) {
                     User obj = userMapper.selectById(id);
                     if (obj != null) {
-                        detail = obj.getEmail();
-                        auditLogList.get(0).setObjectName(detail);
+                        auditLogList.get(0).setObjectName(obj.getEmail());
                     }
                 }
             } else if (name.toLowerCase().contains("id")) {
@@ -326,7 +350,11 @@ public class OperatorLogAspect {
                 String detail = auditService.getObjectNameByObjectId((long) id, objectType);
                 auditLogList.get(0).setObjectName(detail);
             } else {
-                auditLogList.get(0).setObjectName(paramsMap.get(name).toString());
+                if (paramsMap.get(name) == null) {
+                    log.error("request param name not contains in paramsMap, name: {}, paramsMap: {}", name, paramsMap);
+                } else {
+                    auditLogList.get(0).setObjectName(paramsMap.get(name).toString());
+                }
             }
         }
     }

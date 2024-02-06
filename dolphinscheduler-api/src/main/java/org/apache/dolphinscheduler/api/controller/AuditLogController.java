@@ -92,7 +92,6 @@ public class AuditLogController extends BaseController {
                                                               @RequestParam(value = "objectName", required = false) String objectName) {
         checkPageParams(pageNo, pageSize);
         PageInfo<AuditDto> auditDtoPageInfo = auditService.queryLogListPaging(
-                loginUser,
                 objectTypeCodes,
                 operationTypeCodes,
                 startDate,
