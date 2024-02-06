@@ -25,7 +25,7 @@ default_language_version:
 repos:
   # Python API Hooks
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 5.10.1
     hooks:
       - id: isort
         name: isort (python)
@@ -55,6 +55,6 @@ repos:
       # Spotless Hooks
       - id: spotless
         name: spotless lint
-        entry: mvnw.cmd spotless:check
+        entry: ./mvnw spotless:check
         language: script
         pass_filenames: false
