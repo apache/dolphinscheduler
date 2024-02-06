@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_FILE_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZE_RESOURCE_TREE;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_UDF_FUNCTION_ERROR;
@@ -318,7 +316,7 @@ public class ResourcesController extends BaseController {
      *
      * @param loginUser login user
      * @param fileName resource full name
-     * @param tenantCode tenantcode of the owner of the resource
+     * @param tenantCode tenantCode of the owner of the resource
      * @param type resource type
      * @return true if the resource name not exists, otherwise return false
      */
@@ -623,46 +621,6 @@ public class ResourcesController extends BaseController {
     public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId) {
         return udfFuncService.delete(loginUser, udfFuncId);
-    }
-
-    /**
-     * authorized file resource list
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result
-     */
-    @Operation(summary = "authorizedFile", description = "AUTHORIZED_FILE_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/authed-file")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(AUTHORIZED_FILE_RESOURCE_ERROR)
-    public Result authorizedFile(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                 @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = resourceService.authorizedFile(loginUser, userId);
-        return returnDataList(result);
-    }
-
-    /**
-     * unauthorized file resource list
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthorized result code
-     */
-    @Operation(summary = "authorizeResourceTree", description = "AUTHORIZE_RESOURCE_TREE_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/authed-resource-tree")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(AUTHORIZE_RESOURCE_TREE)
-    public Result authorizeResourceTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = resourceService.authorizeResourceTree(loginUser, userId);
-        return returnDataList(result);
     }
 
     /**

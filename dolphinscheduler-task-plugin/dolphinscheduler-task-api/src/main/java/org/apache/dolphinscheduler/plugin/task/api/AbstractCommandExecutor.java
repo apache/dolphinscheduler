@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -106,13 +105,7 @@ public abstract class AbstractCommandExecutor {
                             TaskCallBack taskCallBack) throws Exception {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
-        if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-            log.warn(
-                    "Cannot find the taskInstance: {} from TaskExecutionContextCacheManager, the task might already been killed",
-                    taskInstanceId);
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            return result;
-        }
+        // todo: we need to use state like JDK Thread to make sure the killed task should not be executed
         iShellInterceptorBuilder = iShellInterceptorBuilder
                 .shellDirectory(taskRequest.getExecutePath())
                 .shellName(taskRequest.getTaskAppId());
@@ -131,11 +124,7 @@ public abstract class AbstractCommandExecutor {
         // Set sudo (This is only work in Linux)
         iShellInterceptorBuilder.sudoMode(OSUtils.isSudoEnable());
         // Set tenant (This is only work in Linux)
-        if (TenantConstants.DEFAULT_TENANT_CODE.equals(taskRequest.getTenantCode())) {
-            iShellInterceptorBuilder.runUser(TenantConstants.BOOTSTRAPT_SYSTEM_USER);
-        } else {
-            iShellInterceptorBuilder.runUser(taskRequest.getTenantCode());
-        }
+        iShellInterceptorBuilder.runUser(taskRequest.getTenantCode());
         // Set CPU Quota (This is only work in Linux)
         if (taskRequest.getCpuQuota() != null) {
             iShellInterceptorBuilder.cpuQuota(taskRequest.getCpuQuota());
@@ -160,13 +149,7 @@ public abstract class AbstractCommandExecutor {
 
         // cache processId
         taskRequest.setProcessId(processId);
-        boolean updateTaskExecutionContextStatus =
-                TaskExecutionContextCacheManager.updateTaskExecutionContext(taskRequest);
-        if (Boolean.FALSE.equals(updateTaskExecutionContextStatus)) {
-            result.setExitStatusCode(EXIT_CODE_KILL);
-            cancelApplication();
-            return result;
-        }
+
         // print process id
         log.info("process start, process id is: {}", processId);
 
@@ -282,7 +265,7 @@ public abstract class AbstractCommandExecutor {
         // todo: remove this this thread pool.
         ExecutorService getOutputLogService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("ResolveOutputLog-thread-" + taskRequest.getTaskName());
-        getOutputLogService.submit(() -> {
+        getOutputLogService.execute(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());

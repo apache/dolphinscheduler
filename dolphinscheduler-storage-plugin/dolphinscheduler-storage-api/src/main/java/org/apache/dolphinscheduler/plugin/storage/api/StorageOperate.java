@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -69,10 +71,20 @@ public interface StorageOperate {
 
     /**
      * get the path of the resource file excluding the base path (fileName)
-     * @param fullName
-     * @return
      */
-    String getResourceFileName(String tenantCode, String fullName);
+    default String getResourceFileName(String tenantCode, String fullName) {
+        String resDir = getResDir(tenantCode);
+        String filenameReplaceResDir = fullName.replaceFirst(resDir, "");
+        if (!filenameReplaceResDir.equals(fullName)) {
+            return filenameReplaceResDir;
+        }
+
+        // Replace resource dir not effective in case of run workflow with different tenant from resource file's.
+        // this is backup solution to get related path, by split with RESOURCE_TYPE_FILE
+        return filenameReplaceResDir.contains(RESOURCE_TYPE_FILE)
+                ? filenameReplaceResDir.split(String.format("%s/", RESOURCE_TYPE_FILE))[1]
+                : filenameReplaceResDir;
+    }
 
     /**
      * get the path of the file
@@ -137,14 +149,13 @@ public interface StorageOperate {
 
     /**
      * download the srcPath to local
-     * @param tenantCode
+     *
      * @param srcFilePath the full path of the srcPath
      * @param dstFile
      * @param overwrite
      * @throws IOException
      */
-    void download(String tenantCode, String srcFilePath, String dstFile,
-                  boolean overwrite) throws IOException;
+    void download(String srcFilePath, String dstFile, boolean overwrite) throws IOException;
 
     /**
      * vim the context of filePath

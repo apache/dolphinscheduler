@@ -29,6 +29,7 @@ import {
   queryListPaging,
   release
 } from '@/service/modules/process-definition'
+import { offline, online } from '@/service/modules/schedules'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
 import { NTag, NSpace, NIcon, NButton, NEllipsis, NTooltip } from 'naive-ui'
@@ -58,6 +59,8 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
+    timingType: ref('create'),
+    timingState: ref('OFFLINE'),
     showRef: ref(false),
     startShowRef: ref(false),
     timingShowRef: ref(false),
@@ -260,9 +263,9 @@ export function useTable() {
             onVersionWorkflow: () => versionWorkflow(row),
             onDeleteWorkflow: () => deleteWorkflow(row),
             onReleaseWorkflow: () => releaseWorkflow(row),
+            onReleaseScheduler: () => releaseScheduler(row),
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
-            onGotoTimingManage: () => gotoTimingManage(row),
             onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
@@ -287,7 +290,13 @@ export function useTable() {
 
   const timingWorkflow = (row: any) => {
     variables.timingShowRef = true
-    variables.row = row
+    if (row?.schedule) {
+      variables.row = row.schedule
+      variables.timingType = 'update'
+      variables.timingState = row.scheduleReleaseState
+    } else {
+      variables.row = row
+    }
   }
 
   const versionWorkflow = (row: any) => {
@@ -368,6 +377,23 @@ export function useTable() {
     })
   }
 
+  const releaseScheduler = (row: any) => {
+    if (row.schedule) {
+      let handle = online
+      if (row.schedule.releaseState === 'ONLINE') {
+        handle = offline
+      }
+      handle(variables.projectCode, row.schedule.id).then(() => {
+        window.$message.success(t('project.workflow.success'))
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+      })
+    }
+  }
+
   const copyWorkflow = (row: any) => {
     const data = {
       codes: String(row.code),
@@ -419,13 +445,6 @@ export function useTable() {
     })
   }
 
-  const gotoTimingManage = (row: any) => {
-    router.push({
-      name: 'workflow-definition-timing',
-      params: { projectCode: variables.projectCode, definitionCode: row.code }
-    })
-  }
-
   const gotoWorkflowTree = (row: any) => {
     router.push({
       name: 'workflow-definition-tree',
@@ -455,7 +474,6 @@ export function useTable() {
     getTableData,
     batchDeleteWorkflow,
     batchExportWorkflow,
-    batchCopyWorkflow,
-    gotoTimingManage
+    batchCopyWorkflow
   }
 }

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
-import org.apache.dolphinscheduler.common.exception.FileOperateException;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
@@ -62,13 +61,16 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Shell file is : \n{}", finalScript);
+        log.info("Final Shell file is: ");
+        log.info(
+                "****************************** Script Content *****************************************************************");
+        log.info(finalScript);
+        log.info(
+                "****************************** Script Content *****************************************************************");
     }
 
-    protected List<String> generateBootstrapCommand() throws FileOperateException {
+    protected List<String> generateBootstrapCommand() {
         if (sudoEnable) {
-            // Set the tenant owner as the working directory
-            FileUtils.setDirectoryOwner(Paths.get(shellDirectory), runUser);
             return bootstrapCommandInSudoMode();
         }
         return bootstrapCommandInNormalMode();

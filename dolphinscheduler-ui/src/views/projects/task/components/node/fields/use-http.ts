@@ -43,6 +43,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'input',
+      class: 'input-url-name',
       field: 'url',
       name: t('project.node.http_url'),
       props: {
@@ -125,6 +126,15 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
           }
         }
       ]
+    },
+    {
+      type: 'input',
+      field: 'httpBody',
+      name: t('project.node.http_body'),
+      props: {
+        type: 'textarea',
+        placeholder: t('project.node.http_body_tips')
+      }
     },
     {
       type: 'select',

@@ -27,6 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import lombok.NonNull;
 
 public interface CuringParamsService {
@@ -79,6 +81,16 @@ public interface CuringParamsService {
     Map<String, Property> paramParsingPreparation(@NonNull TaskInstance taskInstance,
                                                   @NonNull AbstractParameters parameters,
                                                   @NonNull ProcessInstance processInstance);
+
+    /**
+     * Parse workflow star parameter
+     */
+    Map<String, Property> parseWorkflowStartParam(@Nullable Map<String, String> cmdParam);
+
+    /**
+     * Parse workflow father parameter
+     */
+    Map<String, Property> parseWorkflowFatherParam(@Nullable Map<String, String> cmdParam);
 
     /**
      * preBuildBusinessParams

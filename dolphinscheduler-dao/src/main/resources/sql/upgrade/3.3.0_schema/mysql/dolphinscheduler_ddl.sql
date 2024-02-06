@@ -74,3 +74,25 @@ d//
 delimiter ;
 CALL modify_data_value_t_ds_dq_rule_input_entry;
 DROP PROCEDURE modify_data_value_t_ds_dq_rule_input_entry;
+
+ALTER TABLE `t_ds_process_definition` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "process definition version";
+ALTER TABLE `t_ds_process_definition_log` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "process definition version";
+ALTER TABLE `t_ds_process_instance` MODIFY COLUMN `process_definition_version` int NOT NULL DEFAULT 1 COMMENT "process definition version";
+ALTER TABLE `t_ds_task_definition` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
+ALTER TABLE `t_ds_task_definition_log` MODIFY COLUMN `version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
+ALTER TABLE `t_ds_task_instance` MODIFY COLUMN `task_definition_version` int NOT NULL DEFAULT 1 COMMENT "task definition version";
+
+-- create idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue
+DROP PROCEDURE IF EXISTS create_idx_t_ds_task_group_queue_in_queue;
+delimiter d//
+CREATE PROCEDURE create_idx_t_ds_task_group_queue_in_queue()
+BEGIN
+    DECLARE index_exists INT DEFAULT 0;
+    SELECT COUNT(*) INTO index_exists FROM information_schema.statistics WHERE table_schema = (SELECT DATABASE()) AND  table_name = 't_ds_task_group_queue' AND index_name = 'idx_t_ds_task_group_queue_in_queue';
+    IF index_exists = 0 THEN CREATE INDEX idx_t_ds_task_group_queue_in_queue ON t_ds_task_group_queue(in_queue);
+END IF;
+END;
+d//
+delimiter ;
+CALL create_idx_t_ds_task_group_queue_in_queue;
+DROP PROCEDURE create_idx_t_ds_task_group_queue_in_queue;

@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.constants.DateConstants;
 
 import java.time.Duration;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
 
@@ -34,11 +33,6 @@ public class TaskConstants {
     public static final String YARN_APPLICATION_REGEX = "application_\\d+_\\d+";
 
     public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
-
-    /**
-     * string false
-     */
-    public static final String STRING_FALSE = "false";
 
     /**
      * exit code kill
@@ -145,11 +139,6 @@ public class TaskConstants {
     public static final String PSTREE = "pstree";
 
     public static final String RWXR_XR_X = "rwxr-xr-x";
-
-    /**
-     * date format of yyyyMMdd
-     */
-    public static final String PARAMETER_FORMAT_DATE = "yyyyMMdd";
 
     /**
      * date format of yyyyMMddHHmmss
@@ -291,22 +280,9 @@ public class TaskConstants {
     public static final char P = 'P';
     public static final char N = 'N';
     public static final String SUBTRACT_STRING = "-";
-    public static final String GLOBAL_PARAMS = "globalParams";
-    public static final String LOCAL_PARAMS = "localParams";
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
-    public static final String SUBPROCESS_INSTANCE_ID = "subProcessInstanceId";
-    public static final String PROCESS_INSTANCE_STATE = "processInstanceState";
-    public static final String PARENT_WORKFLOW_INSTANCE = "parentWorkflowInstance";
-    public static final String CONDITION_RESULT = "conditionResult";
-    public static final String SWITCH_RESULT = "switchResult";
-    public static final String DEPENDENCE = "dependence";
     public static final String TASK_TYPE = "taskType";
-    public static final String TASK_LIST = "taskList";
     public static final String QUEUE = "queue";
-    public static final String QUEUE_NAME = "queueName";
-    public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
-    public static final int LOG_QUERY_LIMIT = 4096;
-
     /**
      * default display rows
      */
@@ -328,43 +304,11 @@ public class TaskConstants {
     public static final String D = "-D";
 
     /**
-     * jdbc url
-     */
-    public static final String JDBC_MYSQL = "jdbc:mysql://";
-    public static final String JDBC_POSTGRESQL = "jdbc:postgresql://";
-    public static final String JDBC_HIVE_2 = "jdbc:hive2://";
-    public static final String JDBC_CLICKHOUSE = "jdbc:clickhouse://";
-    public static final String JDBC_DATABEND = "jdbc:databend://";
-    public static final String JDBC_ORACLE_SID = "jdbc:oracle:thin:@";
-    public static final String JDBC_ORACLE_SERVICE_NAME = "jdbc:oracle:thin:@//";
-    public static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
-    public static final String JDBC_DB2 = "jdbc:db2://";
-    public static final String JDBC_PRESTO = "jdbc:presto://";
-
-    /**
-     * driver
-     */
-    public static final String ORG_POSTGRESQL_DRIVER = "org.postgresql.Driver";
-    public static final String COM_MYSQL_CJ_JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    public static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
-    public static final String COM_CLICKHOUSE_JDBC_DRIVER = "com.clickhouse.jdbc.ClickHouseDriver";
-    public static final String COM_DATABEND_JDBC_DRIVER = "com.databend.jdbc.DatabendDriver";
-    public static final String COM_ORACLE_JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-    public static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    public static final String COM_DB2_JDBC_DRIVER = "com.ibm.db2.jcc.DB2Driver";
-    public static final String COM_PRESTO_JDBC_DRIVER = "com.facebook.presto.jdbc.PrestoDriver";
-
-    /**
      * datasource encryption salt
      */
     public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
-
-    /**
-     * resource storage type
-     */
-    // public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     /**
      * kerberos
@@ -408,25 +352,15 @@ public class TaskConstants {
             "hadoop.security.authentication.startup.state";
 
     /**
-     * Task Logger Thread's name
-     */
-    public static final String TASK_LOGGER_THREAD_NAME = "TaskLogInfo";
-
-    /**
      * hdfs/s3 configuration
      * resource.storage.upload.base.path
      */
     public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
     /**
-     * data.quality.jar.name
+     * data.quality.jar.dir
      */
-    public static final String DATA_QUALITY_JAR_NAME = "data-quality.jar.name";
-
-    /**
-     * data.quality.error.output.path
-     */
-    public static final String DATA_QUALITY_ERROR_OUTPUT_PATH = "data-quality.error.output.path";
+    public static final String DATA_QUALITY_JAR_DIR = "data-quality.jar.dir";
 
     public static final String TASK_TYPE_CONDITIONS = "CONDITIONS";
 
@@ -442,13 +376,9 @@ public class TaskConstants {
 
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
-    public static final String DEPLOY_MODE_KUBERNETES = "Kubernetes";
-
     public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
 
     public static final String TASK_TYPE_BLOCKING = "BLOCKING";
-
-    public static final String TASK_TYPE_STREAM = "STREAM";
 
     /**
      * azure config
@@ -483,7 +413,6 @@ public class TaskConstants {
      * use for k8s task
      */
     public static final String API_VERSION = "batch/v1";
-    public static final String IMAGE_PULL_POLICY = "Always";
     public static final String RESTART_POLICY = "Never";
     public static final String MEMORY = "memory";
     public static final String CPU = "cpu";
@@ -496,7 +425,6 @@ public class TaskConstants {
     public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
-    public static final Pattern COMMAND_SPLIT_REGEX = Pattern.compile("[^\\s\"'`]+|\"([^\"]+)\"|'([^']+)'|`([^`]+)`");
 
     /**
      * spark / flink on k8s label name

@@ -21,7 +21,6 @@ import static java.util.Collections.singletonList;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.API_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.CPU;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.JOB_TTL_SECONDS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LAYER_LABEL;
@@ -39,7 +38,6 @@ import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
@@ -114,11 +112,17 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         Map<String, Quantity> limitRes = new HashMap<>();
         limitRes.put(MEMORY, new Quantity(String.format("%s%s", limitPodMem, MI)));
         limitRes.put(CPU, new Quantity(String.valueOf(limitPodCpu)));
+
         Map<String, String> labelMap = k8STaskMainParameters.getLabelMap();
-        labelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
-        labelMap.put(NAME_LABEL, k8sJobName);
+        Map<String, String> jobLabelMap = new HashMap<>();
+        jobLabelMap.put(LAYER_LABEL, LAYER_LABEL_VALUE);
+        jobLabelMap.put(NAME_LABEL, k8sJobName);
+        jobLabelMap.putAll(labelMap);
+
         Map<String, String> podLabelMap = new HashMap<>();
         podLabelMap.put(UNIQUE_LABEL_NAME, taskRequest.getTaskAppId());
+        podLabelMap.putAll(labelMap);
+
         EnvVar taskInstanceIdVar = new EnvVar(TASK_INSTANCE_ID, taskInstanceId, null);
         List<EnvVar> envVars = new ArrayList<>();
         envVars.add(taskInstanceIdVar);
@@ -163,7 +167,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .withApiVersion(API_VERSION)
                 .withNewMetadata()
                 .withName(k8sJobName)
-                .withLabels(labelMap)
+                .withLabels(jobLabelMap)
                 .withNamespace(namespaceName)
                 .endMetadata()
                 .withNewSpec()
@@ -201,6 +205,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             @Override
             public void eventReceived(Action action, Job job) {
                 try {
+                    LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                            taskRequest.getTaskInstanceId());
                     LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                     log.info("event received : job:{} action:{}", job.getMetadata().getName(), action);
                     if (action == Action.DELETED) {
@@ -218,14 +224,18 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     }
                 } finally {
                     LogUtils.removeTaskInstanceLogFullPathMDC();
+                    LogUtils.removeWorkflowAndTaskInstanceIdMDC();
                 }
             }
 
             @Override
             public void onClose(WatcherException e) {
+                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                        taskRequest.getTaskInstanceId());
                 log.error("[K8sJobExecutor-{}] fail in k8s: {}", job.getMetadata().getName(), e.getMessage());
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
                 countDownLatch.countDown();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         };
         try (Watch watch = k8sUtils.createBatchJobWatcher(job.getMetadata().getName(), watcher)) {
@@ -256,10 +266,12 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         String containerName = String.format("%s-%s", taskName, taskInstanceId);
         podLogOutputFuture = collectPodLogExecutorService.submit(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
+            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
+                    taskRequest.getTaskInstanceId());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
             try (
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), containerName)) {
-                LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
@@ -284,18 +296,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         TaskResponse result = new TaskResponse();
         int taskInstanceId = taskRequest.getTaskInstanceId();
         try {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(taskInstanceId)) {
-                result.setExitStatusCode(EXIT_CODE_KILL);
-                return result;
-            }
             if (StringUtils.isEmpty(k8sParameterStr)) {
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskInstanceId);
                 return result;
             }
             K8sTaskExecutionContext k8sTaskExecutionContext = taskRequest.getK8sTaskExecutionContext();
-            String connectionParams = k8sTaskExecutionContext.getConnectionParams();
-            String kubeConfig = JSONUtils.getNodeString(connectionParams, "kubeConfig");
-            String configYaml = kubeConfig;
+            String configYaml = k8sTaskExecutionContext.getConfigYaml();
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
@@ -373,10 +378,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
-            if (null == TaskExecutionContextCacheManager.getByTaskInstanceId(Integer.valueOf(taskInstanceId))) {
-                log.info("[K8sJobExecutor-{}] killed", job.getMetadata().getName());
-                taskResponse.setExitStatusCode(EXIT_CODE_KILL);
-            } else if (jobStatus == EXIT_CODE_SUCCESS) {
+            if (jobStatus == EXIT_CODE_SUCCESS) {
                 log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {

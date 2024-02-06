@@ -332,7 +332,7 @@ CREATE TABLE t_ds_process_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT 1,
   description text ,
   project_code bigint DEFAULT NULL ,
   release_state int DEFAULT NULL ,
@@ -360,7 +360,7 @@ CREATE TABLE t_ds_process_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   release_state int DEFAULT NULL ,
@@ -389,7 +389,7 @@ CREATE TABLE t_ds_task_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
@@ -428,7 +428,7 @@ CREATE TABLE t_ds_task_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
@@ -522,7 +522,7 @@ CREATE TABLE t_ds_process_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int DEFAULT NULL ,
+  process_definition_version int NOT NULL DEFAULT 1 ,
   project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
@@ -695,7 +695,7 @@ create index relation_project_user_id_index on t_ds_relation_project_user (user_
 --
 -- Table structure for table t_ds_relation_resources_user
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_relation_resources_user;
 CREATE TABLE t_ds_relation_resources_user (
   id int NOT NULL ,
@@ -726,7 +726,7 @@ CREATE TABLE t_ds_relation_udfs_user (
 --
 -- Table structure for table t_ds_resources
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_resources;
 CREATE TABLE t_ds_resources (
   id int NOT NULL  ,
@@ -795,7 +795,7 @@ CREATE TABLE t_ds_task_instance (
   task_type varchar(50) DEFAULT NULL ,
   task_execute_type int DEFAULT '0',
   task_code bigint NOT NULL,
-  task_definition_version int DEFAULT NULL ,
+  task_definition_version int NOT NULL DEFAULT '1' ,
   process_instance_id int DEFAULT NULL ,
   process_instance_name varchar(255) DEFAULT NULL,
   project_code bigint DEFAULT NULL,
@@ -1945,6 +1945,8 @@ CREATE TABLE t_ds_task_group_queue (
    update_time  timestamp DEFAULT NULL ,
    PRIMARY KEY (id)
 );
+
+create index idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue(in_queue);
 
 --
 -- Table structure for table t_ds_task_group
