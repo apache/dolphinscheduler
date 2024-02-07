@@ -47,8 +47,7 @@ public final class WorkflowRunDialog {
         new WebDriverWait(parent().driver(), Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
 
         buttonSubmit().click();
-
-
+        
         return parent();
     }
 }
