@@ -66,6 +66,7 @@ public class SagemakerTaskTest {
     @BeforeEach
     public void before() {
         String parameters = buildParameters();
+        System.out.println(parameters);
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         ResourceParametersHelper resourceParametersHelper = Mockito.mock(ResourceParametersHelper.class);
         SagemakerConnectionParam sagemakerConnectionParam = Mockito.mock(SagemakerConnectionParam.class);

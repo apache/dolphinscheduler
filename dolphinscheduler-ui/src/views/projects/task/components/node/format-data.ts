@@ -351,9 +351,6 @@ export function formatParams(data: INodeData): {
     taskParams.args = data.args
     taskParams.customizedLabels = data.customizedLabels
     taskParams.nodeSelectors = data.nodeSelectors
-    taskParams.datasource = data.datasource
-    taskParams.type = data.type
-    taskParams.kubeConfig = data.kubeConfig
     taskParams.pullSecret = data.pullSecret
   }
 
