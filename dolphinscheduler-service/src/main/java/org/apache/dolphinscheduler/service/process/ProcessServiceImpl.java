@@ -763,22 +763,27 @@ public class ProcessServiceImpl implements ProcessService {
             case DYNAMIC_GENERATION:
                 break;
             case START_FAILURE_TASK_PROCESS:
-                // find failed tasks and init these tasks
-                List<Integer> failedList =
-                        this.findTaskIdByInstanceState(processInstance.getId(), TaskExecutionStatus.FAILURE);
-                List<Integer> toleranceList = this.findTaskIdByInstanceState(processInstance.getId(),
-                        TaskExecutionStatus.NEED_FAULT_TOLERANCE);
-                List<Integer> killedList =
-                        this.findTaskIdByInstanceState(processInstance.getId(), TaskExecutionStatus.KILL);
-                cmdParam.remove(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING);
+            case RECOVER_SUSPENDED_PROCESS:
+                List<TaskInstance> needToStartTaskInstances = taskInstanceDao
+                        .queryValidTaskListByWorkflowInstanceId(processInstance.getId(), processInstance.getTestFlag())
+                        .stream()
+                        .filter(taskInstance -> {
+                            TaskExecutionStatus state = taskInstance.getState();
+                            return state == TaskExecutionStatus.FAILURE
+                                    || state == TaskExecutionStatus.PAUSE
+                                    || state == TaskExecutionStatus.NEED_FAULT_TOLERANCE
+                                    || state == TaskExecutionStatus.KILL;
+                        })
+                        .collect(Collectors.toList());
 
-                failedList.addAll(killedList);
-                failedList.addAll(toleranceList);
-                for (Integer taskId : failedList) {
-                    initTaskInstance(taskInstanceDao.queryById(taskId));
+                for (TaskInstance taskInstance : needToStartTaskInstances) {
+                    initTaskInstance(taskInstance);
                 }
-                cmdParam.put(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                        String.join(Constants.COMMA, convertIntListToString(failedList)));
+                String startTaskInstanceIds = needToStartTaskInstances.stream()
+                        .map(TaskInstance::getId)
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(Constants.COMMA));
+                cmdParam.put(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING, startTaskInstanceIds);
                 processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
                 processInstance.setRunTimes(runTime + 1);
                 break;
@@ -786,22 +791,16 @@ public class ProcessServiceImpl implements ProcessService {
                 break;
             case RECOVER_WAITING_THREAD:
                 break;
-            case RECOVER_SUSPENDED_PROCESS:
-                // find pause tasks and init task's state
-                cmdParam.remove(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING);
-                List<Integer> stopNodeList = findTaskIdByInstanceState(processInstance.getId(),
-                        TaskExecutionStatus.KILL);
-                for (Integer taskId : stopNodeList) {
-                    // initialize the pause state
-                    initTaskInstance(taskInstanceDao.queryById(taskId));
-                }
-                cmdParam.put(CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING,
-                        String.join(Constants.COMMA, convertIntListToString(stopNodeList)));
-                processInstance.setCommandParam(JSONUtils.toJsonString(cmdParam));
-                processInstance.setRunTimes(runTime + 1);
-                break;
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 // recover tolerance fault process
+                // If the workflow instance is in ready state, we will change to running, this can avoid the workflow
+                // instance
+                // status is not correct with taskInsatnce status
+                if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE
+                        || processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
+                    // todo: If we handle the ready state in WorkflowExecuteRunnable then we can remove below code
+                    processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+                }
                 processInstance.setRecovery(Flag.YES);
                 processInstance.setRunTimes(runTime + 1);
                 runStatus = processInstance.getState();
@@ -1310,18 +1309,6 @@ public class ProcessServiceImpl implements ProcessService {
                     JSONUtils.toJsonString(resourceInfo));
         }
         return resourceInfo;
-    }
-
-    /**
-     * get id list by task state
-     *
-     * @param instanceId instanceId
-     * @param state      state
-     * @return task instance states
-     */
-    @Override
-    public List<Integer> findTaskIdByInstanceState(int instanceId, TaskExecutionStatus state) {
-        return taskInstanceMapper.queryTaskByProcessIdAndState(instanceId, state.getCode());
     }
 
     /**
