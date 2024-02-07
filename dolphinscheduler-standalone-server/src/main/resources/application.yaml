@@ -191,7 +191,7 @@ master:
   server-load-protection:
     enabled: true
     # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
-    max-cpu-usage-percentage-thresholds: 1.2
+    max-cpu-usage-percentage-thresholds: 1.5
     # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
     max-jvm-memory-usage-percentage-thresholds: 0.9
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
@@ -216,7 +216,7 @@ worker:
   server-load-protection:
     enabled: true
     # Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks.
-    max-cpu-usage-percentage-thresholds: 1.2
+    max-cpu-usage-percentage-thresholds: 1.5
     # Worker max JVM memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks.
     max-jvm-memory-usage-percentage-thresholds: 0.9
     # Worker max System memory usage , when the worker's system memory usage is smaller then this value, worker server can be dispatched tasks.
