@@ -45,11 +45,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -96,8 +96,6 @@ public interface ProcessService {
     void packageTaskInstance(TaskInstance taskInstance, ProcessInstance processInstance);
 
     void updateTaskDefinitionResources(TaskDefinition taskDefinition);
-
-    List<Integer> findTaskIdByInstanceState(int instanceId, TaskExecutionStatus state);
 
     int deleteWorkProcessMapByParentId(int parentWorkProcessId);
 
@@ -194,4 +192,6 @@ public interface ProcessService {
     void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
 
     void saveCommandTrigger(Integer commandId, Integer processInstanceId);
+
+    void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam);
 }

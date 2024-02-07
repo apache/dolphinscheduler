@@ -15,38 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.registry;
+package org.apache.dolphinscheduler.api.metrics;
 
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.registry.api.StrategyType;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
+import org.springframework.boot.actuate.health.Health;
+import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.stereotype.Component;
 
-@Service
-@ConditionalOnProperty(prefix = "worker.registry-disconnect-strategy", name = "strategy", havingValue = "stop", matchIfMissing = true)
-@Slf4j
-public class WorkerStopStrategy implements WorkerConnectStrategy {
+@Component
+public class ApiHealthIndicator implements HealthIndicator {
 
     @Autowired
-    public RegistryClient registryClient;
+    private RegistryClient registryClient;
 
     @Override
-    public void disconnect() {
-        registryClient.getStoppable()
-                .stop("Worker disconnected from registry, will stop myself due to the stop strategy");
+    public Health health() {
+        try {
+            if (registryClient.isConnected()) {
+                return Health.up().build();
+            }
+            return Health.down().build();
+        } catch (Exception ex) {
+            return Health.down().withException(ex).build();
+        }
     }
 
-    @Override
-    public void reconnect() {
-        log.warn("The current connect strategy is stop, so the worker will not reconnect to registry");
-    }
-
-    @Override
-    public StrategyType getStrategyType() {
-        return StrategyType.STOP;
-    }
 }
