@@ -195,4 +195,7 @@ public class MasterRegistryClient implements AutoCloseable {
         }
     }
 
+    public boolean isAvailable() {
+        return registryClient.isConnected();
+    }
 }

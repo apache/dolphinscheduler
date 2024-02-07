@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLException;
 
 import lombok.NonNull;
@@ -124,16 +123,16 @@ public class EtcdRegistry implements Registry {
         log.info("Started Etcd Registry...");
         etcdConnectionStateListener = new EtcdConnectionStateListener(client);
         etcdKeepAliveLeaseManager = new EtcdKeepAliveLeaseManager(client);
-    }
 
-    /**
-     * Start the etcd Connection stateListeer
-     */
-    @PostConstruct
-    public void start() {
         log.info("Starting Etcd ConnectionListener...");
         etcdConnectionStateListener.start();
         log.info("Started Etcd ConnectionListener...");
+
+    }
+
+    @Override
+    public boolean isConnected() {
+        return client.getKVClient().get(byteSequence("/")).join() != null;
     }
 
     @Override

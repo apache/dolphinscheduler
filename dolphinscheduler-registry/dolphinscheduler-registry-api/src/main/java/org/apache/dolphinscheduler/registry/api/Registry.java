@@ -30,6 +30,8 @@ import lombok.NonNull;
  */
 public interface Registry extends Closeable {
 
+    boolean isConnected();
+
     /**
      * Connect to the registry, will wait in the given timeout
      *
