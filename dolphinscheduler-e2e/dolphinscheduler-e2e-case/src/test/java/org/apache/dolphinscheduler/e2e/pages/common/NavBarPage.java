@@ -65,13 +65,13 @@ public class NavBarPage {
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(projectTab));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", projectTab());
+            projectTab.click();
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(securityTab));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", securityTab());
+            securityTab.click();
             return nav.cast(new SecurityPage(driver));
         }
 
@@ -83,7 +83,7 @@ public class NavBarPage {
 
         if (nav == DataSourcePage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", dataSourceTab());
+            dataSourceTab.click();
             return nav.cast(new DataSourcePage(driver));
         }
 
