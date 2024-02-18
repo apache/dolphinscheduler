@@ -61,17 +61,22 @@ const WorkerGroupModal = defineComponent({
     }
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
-    const workerGroupOptions: Option[] =
+    const workerGroupOptions:Option[]  = []
 
-    const createWorkerGroupOptions = () => {
+    const createOptions = () => {
       queryAllWorkerGroups().then((res: any) => {
-        console.log(res)
+        for (const workerGroup of res) {
+          workerGroupOptions.push({label: workerGroup, value: workerGroup})
+        }
       })
     }
 
-    // const assignedWorkerGroups = ref([1])
+    const assignedWorkerGroups = ref([])
 
-    variables.model.assignedWorkerGroups
+
+    createOptions()
+
+    // variables.model.assignedWorkerGroups
     // variables.model.workerGroupOptions = createWorkerGroupOptions()
 
     watch(
@@ -83,7 +88,7 @@ const WorkerGroupModal = defineComponent({
         }
     )
 
-    return { ...toRefs(variables), t, cancelModal, confirmModal, trim }
+    return { ...toRefs(variables), t, cancelModal, confirmModal, workerGroupOptions, assignedWorkerGroups, trim }
   },
   render() {
     const { t } = this
@@ -98,10 +103,9 @@ const WorkerGroupModal = defineComponent({
         >
           <NTransfer
               virtualScroll
-              filterable
               class={styles.transfer}
-              options={}
-              value={this.assignedWorkerGroups}
+              options={this.workerGroupOptions}
+              v-model:value={this.assignedWorkerGroups}
           />
         </Modal>
     )

@@ -31,8 +31,7 @@ export function useWorkerGroup(
     model: {
       projectName: '',
       description: '',
-      userName: (userStore.getUserInfo as UserInfoRes).userName,
-      assignedWorkerGroups: ref([] as number[])
+      userName: (userStore.getUserInfo as UserInfoRes).userName
     }
   })
 
