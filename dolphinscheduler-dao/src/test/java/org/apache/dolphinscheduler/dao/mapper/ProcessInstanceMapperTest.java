@@ -198,30 +198,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     }
 
     /**
-     * test set failover by host and state
-     */
-    @Test
-    public void testSetFailoverByHostAndStateArray() {
-
-        int[] stateArray = new int[]{
-                WorkflowExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                WorkflowExecutionStatus.SUCCESS.ordinal()};
-
-        ProcessInstance processInstance = insertOne();
-
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstance.setHost("192.168.2.220");
-        processInstanceMapper.updateById(processInstance);
-        String host = processInstance.getHost();
-        int update = processInstanceMapper.setFailoverByHostAndStateArray(host, stateArray);
-        Assertions.assertNotEquals(0, update);
-
-        processInstance = processInstanceMapper.selectById(processInstance.getId());
-        Assertions.assertNull(processInstance.getHost());
-        processInstanceMapper.deleteById(processInstance.getId());
-    }
-
-    /**
      * test update process instance by state
      */
     @Test

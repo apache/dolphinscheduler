@@ -1981,6 +1981,7 @@ CREATE TABLE `t_ds_task_group_queue` (
   `in_queue` tinyint(4) DEFAULT '0' COMMENT 'ready to get the queue by other task finish 0 NO ,1 YES',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY `idx_t_ds_task_group_queue_in_queue` (`in_queue`),
   PRIMARY KEY( `id` )
 )ENGINE= INNODB AUTO_INCREMENT= 1 DEFAULT CHARSET= utf8 COLLATE = utf8_bin;
 
@@ -2108,6 +2109,10 @@ CREATE TABLE `t_ds_fav_task`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
 
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_trigger_relation`;
 CREATE TABLE `t_ds_trigger_relation` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',

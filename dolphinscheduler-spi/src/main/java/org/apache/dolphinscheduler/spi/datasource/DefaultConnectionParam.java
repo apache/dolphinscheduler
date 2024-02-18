@@ -13,6 +13,24 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', current_timestamp, current_timestamp);
+ */
+
+package org.apache.dolphinscheduler.spi.datasource;
+
+public class DefaultConnectionParam extends BaseConnectionParam {
+
+    @Override
+    public String toString() {
+        return "DefaultConnectionParam{"
+                + "user='" + user + '\''
+                + ", password='" + password + '\''
+                + ", address='" + address + '\''
+                + ", database='" + database + '\''
+                + ", jdbcUrl='" + jdbcUrl + '\''
+                + ", driverLocation='" + driverLocation + '\''
+                + ", driverClassName='" + driverClassName + '\''
+                + ", validationQuery='" + validationQuery + '\''
+                + ", other='" + other + '\''
+                + '}';
+    }
+}

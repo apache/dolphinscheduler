@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TY
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -170,7 +171,7 @@ public class AbsStorageOperator implements Closeable, StorageOperate {
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            Files.createDirectories(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
         }
 
         BlobClient blobClient = blobContainerClient.getBlobClient(srcFilePath);

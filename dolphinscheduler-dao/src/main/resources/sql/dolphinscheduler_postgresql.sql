@@ -1965,6 +1965,8 @@ CREATE TABLE t_ds_task_group_queue (
    PRIMARY KEY (id)
 );
 
+create index idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue(in_queue);
+
 --
 -- Table structure for table t_ds_task_group
 --
