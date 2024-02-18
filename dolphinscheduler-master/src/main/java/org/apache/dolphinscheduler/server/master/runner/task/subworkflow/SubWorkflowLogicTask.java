@@ -27,11 +27,11 @@ import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventLis
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,16 +41,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameters> {
 
     public static final String TASK_TYPE = "SUB_PROCESS";
-    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
     private final ProcessInstanceDao processInstanceDao;
 
     public SubWorkflowLogicTask(TaskExecutionContext taskExecutionContext,
-                                ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                                IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository,
                                 ProcessInstanceDao processInstanceDao) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<SubProcessParameters>() {
                 }));
-        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.IWorkflowExecuteRunnableRepository = IWorkflowExecuteRunnableRepository;
         this.processInstanceDao = processInstanceDao;
     }
 
@@ -62,8 +62,8 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        WorkflowExecutionRunnable workflowExecuteRunnable = null;
+        // IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         if (workflowExecuteRunnable == null) {
             log.warn("Cannot find WorkflowExecuteRunnable");
             return;
@@ -99,8 +99,8 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
 
     @Override
     public void kill() {
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        WorkflowExecutionRunnable workflowExecuteRunnable = null;
+        // IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         if (workflowExecuteRunnable == null) {
             log.warn("Cannot find WorkflowExecuteRunnable");
             return;

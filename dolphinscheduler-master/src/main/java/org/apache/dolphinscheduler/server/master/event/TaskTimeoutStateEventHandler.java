@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ import com.google.auto.service.AutoService;
 public class TaskTimeoutStateEventHandler implements StateEventHandler {
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+    public boolean handleStateEvent(WorkflowExecutionRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleError, StateEventHandleException {
         TaskStateEvent taskStateEvent = (TaskStateEvent) stateEvent;
 
@@ -56,7 +56,7 @@ public class TaskTimeoutStateEventHandler implements StateEventHandler {
         }
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine()
                 .getTimeoutNotifyStrategy();
-        Map<Long, DefaultTaskExecuteRunnable> taskExecuteRunnableMap =
+        Map<Long, TaskExecutionRunnable> taskExecuteRunnableMap =
                 workflowExecuteRunnable.getTaskExecuteRunnableMap();
         if ((TaskTimeoutStrategy.FAILED == taskTimeoutStrategy
                 || TaskTimeoutStrategy.WARNFAILED == taskTimeoutStrategy)) {

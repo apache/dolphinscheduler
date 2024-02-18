@@ -52,7 +52,7 @@ public class WorkflowExecuteContextFactory {
     @Autowired
     private MasterConfig masterConfig;
 
-    public Optional<IWorkflowExecuteContext> createWorkflowExecuteRunnableContext(Command command) throws Exception {
+    public Optional<IWorkflowExecutionContext> createWorkflowExecuteRunnableContext(Command command) throws Exception {
         Optional<ProcessInstance> workflowInstanceOptional = createWorkflowInstance(command);
         if (!workflowInstanceOptional.isPresent()) {
             return Optional.empty();
@@ -64,7 +64,7 @@ public class WorkflowExecuteContextFactory {
 
         IWorkflowGraph workflowGraph = workflowGraphFactory.createWorkflowGraph(workflowInstance);
 
-        return Optional.of(new WorkflowExecuteContext(workflowDefinition, workflowInstance, workflowGraph));
+        return Optional.of(new WorkflowExecutionContext(workflowDefinition, workflowInstance, workflowGraph));
     }
 
     private Optional<ProcessInstance> createWorkflowInstance(Command command) throws CronParseException {

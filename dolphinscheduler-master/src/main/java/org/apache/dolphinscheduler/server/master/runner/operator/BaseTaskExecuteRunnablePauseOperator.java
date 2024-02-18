@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,9 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseTaskExecuteRunnablePauseOperator implements TaskExecuteRunnableOperator {
 
     @Override
-    public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
+    public void operate(TaskExecutionRunnable taskExecuteRunnable) {
         try {
-            pauseRemoteTaskInstanceInThreadPool(taskExecuteRunnable.getTaskInstance());
+            pauseRemoteTaskInstanceInThreadPool(
+                    taskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance());
         } catch (Exception e) {
             log.error("Pause DefaultTaskExecuteRunnable failed", e);
         }

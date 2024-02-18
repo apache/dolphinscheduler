@@ -146,7 +146,7 @@ public class StreamTaskExecuteRunnable implements Runnable {
         processDefinition = processService.findProcessDefinition(processDefinitionCode, processDefinitionVersion);
 
         try {
-            DefaultTaskExecuteRunnable taskExecuteRunnable =
+            TaskExecutionRunnable taskExecuteRunnable =
                     defaultTaskExecuteRunnableFactory.createTaskExecuteRunnable(taskInstance);
             workerTaskDispatcher.dispatchTask(taskExecuteRunnable);
         } catch (Exception e) {

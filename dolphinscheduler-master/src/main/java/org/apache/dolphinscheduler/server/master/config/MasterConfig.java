@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -59,7 +59,7 @@ public class MasterConfig implements Validator {
     /**
      * todo: We may need to split the process/task into different thread size.
      * The thread number used to handle processInstance and task event.
-     * Will create two thread poll to execute {@link WorkflowExecuteRunnable} and {@link TaskExecuteRunnable}.
+     * Will create two thread poll to execute {@link WorkflowExecutionRunnable} and {@link TaskExecuteRunnable}.
      */
     private int execThreads = 10;
 

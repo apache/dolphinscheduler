@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -77,7 +78,7 @@ import com.google.common.collect.Sets;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class WorkflowExecuteRunnableTest {
 
-    private WorkflowExecuteRunnable workflowExecuteThread;
+    private WorkflowExecutionRunnable workflowExecuteThread;
 
     private ProcessInstance processInstance;
 
@@ -134,7 +135,7 @@ public class WorkflowExecuteRunnableTest {
         stateWheelExecuteThread = Mockito.mock(StateWheelExecuteThread.class);
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
-        WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
+        WorkflowExecutionContext workflowExecuteContext = Mockito.mock(WorkflowExecutionContext.class);
         Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
         IWorkflowGraph workflowGraph = Mockito.mock(IWorkflowGraph.class);
         Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
@@ -143,7 +144,7 @@ public class WorkflowExecuteRunnableTest {
         taskGroupCoordinator = Mockito.mock(TaskGroupCoordinator.class);
 
         workflowExecuteThread = Mockito.spy(
-                new WorkflowExecuteRunnable(
+                new WorkflowExecutionRunnable(
                         workflowExecuteContext,
                         commandService,
                         processService,
@@ -163,7 +164,7 @@ public class WorkflowExecuteRunnableTest {
         try {
             Map<String, String> cmdParam = new HashMap<>();
             cmdParam.put(CMD_PARAM_START_NODES, "1,2,3");
-            Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
+            Class<WorkflowExecutionRunnable> masterExecThreadClass = WorkflowExecutionRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("parseStartNodeName", String.class);
             method.setAccessible(true);
             List<String> nodeNames =
@@ -191,7 +192,7 @@ public class WorkflowExecuteRunnableTest {
                     Arrays.asList(taskInstance1.getId(), taskInstance2.getId(), taskInstance3.getId(),
                             taskInstance4.getId())))
                     .thenReturn(Arrays.asList(taskInstance1, taskInstance2, taskInstance3, taskInstance4));
-            Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
+            Class<WorkflowExecutionRunnable> masterExecThreadClass = WorkflowExecutionRunnable.class;
             Method method = masterExecThreadClass.getDeclaredMethod("getRecoverTaskInstanceList", String.class);
             method.setAccessible(true);
             List<TaskInstance> taskInstances =
@@ -241,7 +242,7 @@ public class WorkflowExecuteRunnableTest {
             completeTaskSet.add(taskInstance1.getTaskCode());
             completeTaskSet.add(taskInstance2.getTaskCode());
 
-            Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
+            Class<WorkflowExecutionRunnable> masterExecThreadClass = WorkflowExecutionRunnable.class;
 
             Field completeTaskSetField = masterExecThreadClass.getDeclaredField("completeTaskSet");
             completeTaskSetField.setAccessible(true);
@@ -321,7 +322,7 @@ public class WorkflowExecuteRunnableTest {
         completeTaskSet.add(taskInstance1.getTaskCode());
         completeTaskSet.add(taskInstance2.getTaskCode());
 
-        Class<WorkflowExecuteRunnable> masterExecThreadClass = WorkflowExecuteRunnable.class;
+        Class<WorkflowExecutionRunnable> masterExecThreadClass = WorkflowExecutionRunnable.class;
 
         Field completeTaskMapField = masterExecThreadClass.getDeclaredField("completeTaskSet");
         completeTaskMapField.setAccessible(true);
@@ -346,7 +347,7 @@ public class WorkflowExecuteRunnableTest {
         Mockito.when(dag.containsNode(1L)).thenReturn(true);
         Mockito.when(dag.containsNode(2L)).thenReturn(false);
 
-        WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
+        WorkflowExecutionContext workflowExecuteContext = Mockito.mock(WorkflowExecutionContext.class);
         Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
         IWorkflowGraph workflowGraph = Mockito.mock(IWorkflowGraph.class);
         Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
@@ -388,14 +389,14 @@ public class WorkflowExecuteRunnableTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.PAUSE);
         Mockito.when(processInstance.isBlocked()).thenReturn(true);
-        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
-        workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
-        Mockito.verify(taskExecuteRunnable, Mockito.never()).dispatch();
+        ITaskExecutionRunnable ITaskExecutionRunnable = Mockito.mock(ITaskExecutionRunnable.class);
+        workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, ITaskExecutionRunnable);
+        Mockito.verify(ITaskExecutionRunnable, Mockito.never()).dispatch();
 
         // submit success should dispatch
         taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-        workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
-        Mockito.verify(taskExecuteRunnable).dispatch();
+        workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, ITaskExecutionRunnable);
+        Mockito.verify(ITaskExecutionRunnable).dispatch();
     }
 }

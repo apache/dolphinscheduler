@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.processor.queue;
 
 import org.apache.dolphinscheduler.common.enums.TaskEventType;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.TaskEventHandler;
@@ -48,7 +48,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
     private MasterConfig masterConfig;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private List<TaskEventHandler> taskEventHandlerList;
@@ -81,7 +81,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
                     .addTaskEvent(taskEvent);
             return;
         }
-        if (!processInstanceExecCacheManager.contains(taskEvent.getProcessInstanceId())) {
+        if (!IWorkflowExecuteRunnableRepository.contains(taskEvent.getProcessInstanceId())) {
             log.warn("Cannot find workflowExecuteThread from cacheManager, event: {}", taskEvent);
             return;
         }
@@ -111,7 +111,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             public void onFailure(Throwable ex) {
                 Integer processInstanceId = taskExecuteThread.getProcessInstanceId();
                 log.error("[WorkflowInstance-{}] persist event failed", processInstanceId, ex);
-                if (!processInstanceExecCacheManager.contains(processInstanceId)) {
+                if (!IWorkflowExecuteRunnableRepository.contains(processInstanceId)) {
                     taskExecuteThreadMap.remove(processInstanceId);
                     log.info(
                             "[WorkflowInstance-{}] Cannot find processInstance from cacheManager, remove process instance from threadMap",
@@ -124,7 +124,7 @@ public class TaskExecuteThreadPool extends ThreadPoolTaskExecutor {
             public void onSuccess(Object result) {
                 Integer processInstanceId = taskExecuteThread.getProcessInstanceId();
                 log.info("[WorkflowInstance-{}] persist events succeeded", processInstanceId);
-                if (!processInstanceExecCacheManager.contains(processInstanceId)) {
+                if (!IWorkflowExecuteRunnableRepository.contains(processInstanceId)) {
                     taskExecuteThreadMap.remove(processInstanceId);
                     log.info(
                             "[WorkflowInstance-{}] Cannot find processInstance from cacheManager, remove process instance from threadMap",

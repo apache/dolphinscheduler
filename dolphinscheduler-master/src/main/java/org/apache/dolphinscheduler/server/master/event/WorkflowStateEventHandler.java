@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +32,7 @@ import com.google.auto.service.AutoService;
 public class WorkflowStateEventHandler implements StateEventHandler {
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+    public boolean handleStateEvent(WorkflowExecutionRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleException {
         WorkflowStateEvent workflowStateEvent = (WorkflowStateEvent) stateEvent;
         ProcessInstance processInstance =

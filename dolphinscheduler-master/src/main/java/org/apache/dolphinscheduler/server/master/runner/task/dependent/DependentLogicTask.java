@@ -26,12 +26,12 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import java.util.Date;
 
@@ -48,7 +48,7 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
     private final TaskInstanceDao taskInstanceDao;
     private final ProcessInstanceDao processInstanceDao;
 
-    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     public DependentLogicTask(TaskExecutionContext taskExecutionContext,
                               ProjectDao projectDao,
@@ -56,9 +56,9 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
                               TaskDefinitionDao taskDefinitionDao,
                               TaskInstanceDao taskInstanceDao,
                               ProcessInstanceDao processInstanceDao,
-                              ProcessInstanceExecCacheManager processInstanceExecCacheManager) throws LogicTaskInitializeException {
+                              IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository) throws LogicTaskInitializeException {
         super(taskExecutionContext,
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
+                IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
                         .getTaskInstance(taskExecutionContext.getTaskInstanceId())
                         .orElseThrow(() -> new LogicTaskInitializeException(
                                 "Cannot find the task instance in workflow execute runnable"))
@@ -68,7 +68,7 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
         this.processInstanceDao = processInstanceDao;
-        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.IWorkflowExecuteRunnableRepository = IWorkflowExecuteRunnableRepository;
 
     }
 
@@ -85,8 +85,8 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        WorkflowExecutionRunnable workflowExecuteRunnable =
+                IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
         if (workflowExecuteRunnable == null) {
             log.error("Cannot find the WorkflowExecuteRunnable");
             return;

@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.ITaskExecutionRunnable;
 
 import java.util.Optional;
 
@@ -53,13 +53,15 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+    protected void doDispatch(ITaskExecutionRunnable ITaskExecutionRunnable) throws TaskDispatchException {
+        TaskExecutionContext taskExecutionContext =
+                ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext();
         try {
             ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskExecutionContext.getHost(), ITaskInstanceOperator.class);
             TaskInstanceDispatchResponse taskInstanceDispatchResponse = taskInstanceOperator
-                    .dispatchTask(new TaskInstanceDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
+                    .dispatchTask(new TaskInstanceDispatchRequest(
+                            ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext()));
             if (!taskInstanceDispatchResponse.isDispatchSuccess()) {
                 throw new TaskDispatchException(String.format("Dispatch task to %s failed, response is: %s",
                         taskExecutionContext.getHost(), taskInstanceDispatchResponse));
@@ -73,8 +75,9 @@ public class WorkerTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecuteRunnable) throws WorkerGroupNotFoundException {
-        String workerGroup = taskExecuteRunnable.getTaskExecutionContext().getWorkerGroup();
+    protected Optional<Host> getTaskInstanceDispatchHost(ITaskExecutionRunnable ITaskExecutionRunnable) throws WorkerGroupNotFoundException {
+        String workerGroup =
+                ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext().getWorkerGroup();
         return hostManager.select(workerGroup);
 
     }

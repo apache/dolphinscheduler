@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 
 import java.util.Date;
 
@@ -37,12 +37,12 @@ public abstract class BaseTaskExecuteRunnableTimeoutOperator implements TaskExec
     }
 
     @Override
-    public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
+    public void operate(TaskExecutionRunnable taskExecuteRunnable) {
         // Right now, if the task is running in worker, the timeout strategy will be handled at worker side.
         // if the task is in master, the timeout strategy will be handled at master side.
         // todo: we should unify this, the master only need to handle the timeout strategy. and send request to worker
         // to kill the task, if the strategy is timeout_failed.
-        TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
+        TaskInstance taskInstance = taskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance();
         TaskTimeoutStrategy taskTimeoutStrategy = taskInstance.getTaskDefine().getTimeoutNotifyStrategy();
         if (TaskTimeoutStrategy.FAILED != taskTimeoutStrategy
                 && TaskTimeoutStrategy.WARNFAILED != taskTimeoutStrategy) {

@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task.blocking;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +36,11 @@ public class BlockingLogicTaskPluginFactory implements ILogicTaskPluginFactory<B
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Override
     public BlockingLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
-        return new BlockingLogicTask(taskExecutionContext, processInstanceExecCacheManager, processInstanceDao,
+        return new BlockingLogicTask(taskExecutionContext, IWorkflowExecuteRunnableRepository, processInstanceDao,
                 taskInstanceDao);
     }
 

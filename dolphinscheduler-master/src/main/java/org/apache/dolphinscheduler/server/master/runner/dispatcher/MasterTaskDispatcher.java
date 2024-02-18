@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
 import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.ITaskExecutionRunnable;
 
 import java.util.Optional;
 
@@ -48,13 +48,15 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+    protected void doDispatch(ITaskExecutionRunnable ITaskExecutionRunnable) throws TaskDispatchException {
+        TaskExecutionContext taskExecutionContext =
+                ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext();
         try {
             ILogicTaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
                     .getProxyClient(taskExecutionContext.getHost(), ILogicTaskInstanceOperator.class);
             LogicTaskDispatchResponse logicTaskDispatchResponse = taskInstanceOperator
-                    .dispatchLogicTask(new LogicTaskDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
+                    .dispatchLogicTask(new LogicTaskDispatchRequest(
+                            ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext()));
             if (!logicTaskDispatchResponse.isDispatchSuccess()) {
                 throw new TaskDispatchException(String.format("Dispatch LogicTask to %s failed, response is: %s",
                         taskExecutionContext.getHost(), logicTaskDispatchResponse));
@@ -68,7 +70,7 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) {
+    protected Optional<Host> getTaskInstanceDispatchHost(ITaskExecutionRunnable taskExecutionContext) {
         return masterTaskExecuteHost;
     }
 }

@@ -21,8 +21,9 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.cache.StreamTaskInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.workflow.IWorkflowExecutionRunnable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -36,7 +37,7 @@ import org.springframework.stereotype.Service;
 public class EventExecuteService extends BaseDaemonThread {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository<? extends IWorkflowExecutionRunnable> IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
@@ -76,11 +77,12 @@ public class EventExecuteService extends BaseDaemonThread {
     }
 
     private void workflowEventHandler() {
-        for (WorkflowExecuteRunnable workflowExecuteThread : this.processInstanceExecCacheManager.getAll()) {
+        for (IWorkflowExecutionRunnable workflowExecutionRunnable : this.IWorkflowExecuteRunnableRepository.getAll()) {
             try {
                 LogUtils.setWorkflowInstanceIdMDC(
-                        workflowExecuteThread.getWorkflowExecuteContext().getWorkflowInstance().getId());
-                workflowExecuteThreadPool.executeEvent(workflowExecuteThread);
+                        workflowExecutionRunnable.getWorkflowExecutionContext().getWorkflowInstance().getId());
+                // todo: remove this class, the event should be handled by the event bus
+                // workflowExecuteThreadPool.executeEvent(workflowExecutionRunnable);
 
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();

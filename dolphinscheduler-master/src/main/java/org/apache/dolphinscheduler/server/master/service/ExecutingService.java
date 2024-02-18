@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.service;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.master.dto.TaskInstanceExecuteDto;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -44,11 +44,11 @@ import org.springframework.stereotype.Component;
 public class ExecutingService {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     public Optional<WorkflowExecuteDto> queryWorkflowExecutingData(Integer processInstanceId) {
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        WorkflowExecutionRunnable workflowExecuteRunnable = null;
+        // IWorkflowExecuteRunnableRepository.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             log.info("workflow execute data not found, maybe it has finished, workflow id:{}", processInstanceId);
             return Optional.empty();

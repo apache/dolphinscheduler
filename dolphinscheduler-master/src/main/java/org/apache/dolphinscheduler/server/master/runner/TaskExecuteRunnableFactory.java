@@ -21,12 +21,19 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
 
 /**
- * Use to create TaskExecuteRunnable
+ * The factory use to create {@link ITaskExecutionRunnable}.
  *
- * @param <T> TaskExecuteRunnable
+ * @param <T> TaskExecuteRunnable type
  */
-public interface TaskExecuteRunnableFactory<T extends TaskExecuteRunnable> {
+public interface TaskExecuteRunnableFactory<T extends ITaskExecutionRunnable> {
 
+    /**
+     * Create {@link ITaskExecutionRunnable}.
+     *
+     * @param taskInstance task instance
+     * @return TaskExecuteRunnable
+     * @throws TaskExecuteRunnableCreateException If create TaskExecuteRunnable failed
+     */
     T createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException;
 
 }

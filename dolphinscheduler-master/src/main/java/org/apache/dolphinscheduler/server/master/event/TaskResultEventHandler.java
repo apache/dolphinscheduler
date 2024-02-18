@@ -25,15 +25,13 @@ import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionFinishEventAck;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.server.master.workflow.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class TaskResultEventHandler implements TaskEventHandler {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
@@ -67,20 +65,21 @@ public class TaskResultEventHandler implements TaskEventHandler {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
-        WorkflowExecuteRunnable workflowExecuteRunnable = this.processInstanceExecCacheManager.getByProcessInstanceId(
-                processInstanceId);
+        IWorkflowExecutionRunnable workflowExecuteRunnable =
+                this.IWorkflowExecuteRunnableRepository.getByProcessInstanceId(
+                        processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
                     "Handle task result event error, cannot find related workflow instance from cache, will discard this event");
         }
-        Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
-        if (!taskInstanceOptional.isPresent()) {
+        TaskInstance taskInstance = workflowExecuteRunnable.getTaskExecutionRunnableById(taskInstanceId)
+                .getTaskExecutionRunnableContext().getTaskInstance();
+        if (taskInstance == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(
                     "Handle task result event error, cannot find the taskInstance from cache, will discord this event");
         }
-        TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState().isFinished()) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError(

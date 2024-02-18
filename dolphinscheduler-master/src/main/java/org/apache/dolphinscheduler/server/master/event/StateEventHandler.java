@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.event;
 
 import org.apache.dolphinscheduler.common.enums.StateEventType;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 public interface StateEventHandler {
 
@@ -30,7 +30,7 @@ public interface StateEventHandler {
      * @throws StateEventHandleError     this exception means it cannot be recovered, so the event need to drop.
      * @throws StateEventHandleException this means it can be recovered.
      */
-    boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+    boolean handleStateEvent(WorkflowExecutionRunnable workflowExecuteRunnable,
                              StateEvent stateEvent) throws StateEventHandleException, StateEventHandleError, StateEventHandleFailure;
 
     StateEventType getEventType();

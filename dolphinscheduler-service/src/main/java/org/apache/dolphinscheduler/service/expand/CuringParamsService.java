@@ -34,22 +34,6 @@ import lombok.NonNull;
 public interface CuringParamsService {
 
     /**
-     * time function need expand
-     * @param placeholderName
-     * @return
-     */
-    boolean timeFunctionNeedExpand(String placeholderName);
-
-    /**
-     * time function extension
-     * @param processInstanceId
-     * @param timezone
-     * @param placeholderName
-     * @return
-     */
-    String timeFunctionExtension(Integer processInstanceId, String timezone, String placeholderName);
-
-    /**
      * convert parameter placeholders
      * @param val
      * @param allParamMap

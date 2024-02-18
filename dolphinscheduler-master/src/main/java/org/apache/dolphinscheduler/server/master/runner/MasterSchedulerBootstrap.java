@@ -22,20 +22,21 @@ import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
-import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
-import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
 import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
+import org.apache.dolphinscheduler.server.master.workflow.IWorkflowEngine;
+import org.apache.dolphinscheduler.server.master.workflow.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecuteRunnableFactory;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -63,7 +64,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
     private MasterConfig masterConfig;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository<IWorkflowExecutionRunnable> workflowExecuteRunnableRepository;
 
     @Autowired
     private WorkflowExecuteRunnableFactory workflowExecuteRunnableFactory;
@@ -82,6 +83,9 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private MetricsProvider metricsProvider;
+
+    @Autowired
+    private IWorkflowEngine workflowEngine;
 
     protected MasterSchedulerBootstrap() {
         super("MasterCommandLoopThread");
@@ -132,31 +136,24 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     continue;
                 }
 
-                commands.parallelStream()
-                        .forEach(command -> {
-                            try {
-                                Optional<WorkflowExecuteRunnable> workflowExecuteRunnableOptional =
-                                        workflowExecuteRunnableFactory.createWorkflowExecuteRunnable(command);
-                                if (!workflowExecuteRunnableOptional.isPresent()) {
-                                    log.warn(
-                                            "The command execute success, will not trigger a WorkflowExecuteRunnable, this workflowInstance might be in serial mode");
-                                    return;
-                                }
-                                WorkflowExecuteRunnable workflowExecuteRunnable = workflowExecuteRunnableOptional.get();
-                                ProcessInstance processInstance = workflowExecuteRunnable
-                                        .getWorkflowExecuteContext().getWorkflowInstance();
-                                if (processInstanceExecCacheManager.contains(processInstance.getId())) {
-                                    log.error(
-                                            "The workflow instance is already been cached, this case shouldn't be happened");
-                                }
-                                processInstanceExecCacheManager.cache(processInstance.getId(), workflowExecuteRunnable);
-                                workflowEventQueue.addEvent(
-                                        new WorkflowEvent(WorkflowEventType.START_WORKFLOW, processInstance.getId()));
-                            } catch (WorkflowCreateException workflowCreateException) {
-                                log.error("Master handle command {} error ", command.getId(), workflowCreateException);
-                                commandService.moveToErrorCommand(command, workflowCreateException.toString());
-                            }
-                        });
+                for (Command command : commands) {
+                    try {
+                        Optional<WorkflowExecutionRunnable> workflowExecuteRunnableOptional =
+                                workflowExecuteRunnableFactory.createWorkflowExecuteRunnable(command);
+                        if (!workflowExecuteRunnableOptional.isPresent()) {
+                            log.warn(
+                                    "Transform command: {} to WorkflowExecutionRunnable failed, the workflowInstance might be in serial mode",
+                                    command);
+                            return;
+                        }
+                        WorkflowExecutionRunnable workflowExecuteRunnable =
+                                workflowExecuteRunnableOptional.get();
+                        workflowEngine.triggerWorkflow(workflowExecuteRunnable);
+                    } catch (WorkflowCreateException workflowCreateException) {
+                        log.error("Master handle command {} error ", command.getId(), workflowCreateException);
+                        commandService.moveToErrorCommand(command, workflowCreateException.toString());
+                    }
+                }
                 MasterServerMetrics.incMasterConsumeCommand(commands.size());
             } catch (InterruptedException interruptedException) {
                 log.warn("Master schedule bootstrap interrupted, close the loop", interruptedException);

@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.master.rpc;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,7 @@ public class TaskInstanceWakeupOperationFunction
             ITaskInstanceOperationFunction<TaskInstanceWakeupRequest, TaskInstanceWakeupResponse> {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Override
     public TaskInstanceWakeupResponse operate(TaskInstanceWakeupRequest taskInstanceWakeupRequest) {
@@ -46,13 +46,13 @@ public class TaskInstanceWakeupOperationFunction
             int workflowInstanceId = taskInstanceWakeupRequest.getProcessInstanceId();
             int taskInstanceId = taskInstanceWakeupRequest.getTaskInstanceId();
             LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstanceId, taskInstanceId);
-            WorkflowExecuteRunnable workflowExecuteRunnable =
-                    processInstanceExecCacheManager.getByProcessInstanceId(workflowInstanceId);
+            WorkflowExecutionRunnable workflowExecuteRunnable = null;
+            // IWorkflowExecuteRunnableRepository.getByProcessInstanceId(workflowInstanceId);
             if (workflowExecuteRunnable == null) {
                 log.warn("cannot find WorkflowExecuteRunnable: {}, no need to Wakeup task", workflowInstanceId);
                 return TaskInstanceWakeupResponse.failed("cannot find WorkflowExecuteRunnable: " + workflowInstanceId);
             }
-            DefaultTaskExecuteRunnable defaultTaskExecuteRunnable =
+            TaskExecutionRunnable defaultTaskExecuteRunnable =
                     workflowExecuteRunnable.getTaskExecuteRunnableById(taskInstanceId).orElse(null);
             if (defaultTaskExecuteRunnable == null) {
                 log.warn("Cannot find DefaultTaskExecuteRunnable: {}, cannot Wakeup task", taskInstanceId);

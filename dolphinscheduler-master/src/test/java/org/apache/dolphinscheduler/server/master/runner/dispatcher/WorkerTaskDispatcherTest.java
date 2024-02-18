@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.ITaskExecutionRunnable;
 
 import java.util.Optional;
 
@@ -45,9 +45,12 @@ public class WorkerTaskDispatcherTest {
         WorkerTaskDispatcher workerTaskDispatcher =
                 new WorkerTaskDispatcher(taskEventService, masterConfig, hostManager);
 
-        TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
-        Mockito.when(taskExecuteRunnable.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
-        Optional<Host> taskInstanceDispatchHost = workerTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable);
+        ITaskExecutionRunnable ITaskExecutionRunnable =
+                Mockito.mock(ITaskExecutionRunnable.class, Mockito.RETURNS_DEEP_STUBS);
+        Mockito.when(ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext())
+                .thenReturn(new TaskExecutionContext());
+        Optional<Host> taskInstanceDispatchHost =
+                workerTaskDispatcher.getTaskInstanceDispatchHost(ITaskExecutionRunnable);
         Assertions.assertEquals("localhost:1234", taskInstanceDispatchHost.get().getAddress());
     }
 }
