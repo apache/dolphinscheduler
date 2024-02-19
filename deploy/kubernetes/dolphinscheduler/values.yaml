@@ -328,7 +328,7 @@ conf:
     datasource.encryption.salt: '!@#$%^&*'
 
     # -- data quality option
-    data-quality.jar.name: dolphinscheduler-data-quality-dev-SNAPSHOT.jar
+    data-quality.jar.dir:
 
     # -- Whether hive SQL is executed in the same session
     support.hive.oneSession: false
@@ -496,8 +496,8 @@ master:
     MASTER_DISPATCH_TASK_NUM: "3"
     # -- Master host selector to select a suitable worker, optional values include Random, RoundRobin, LowerWeight
     MASTER_HOST_SELECTOR: "LowerWeight"
-    # -- Master heartbeat interval, the unit is second
-    MASTER_HEARTBEAT_INTERVAL: "10s"
+    # -- Master max heartbeat interval
+    MASTER_MAX_HEARTBEAT_INTERVAL: "10s"
     # -- Master heartbeat error threshold
     MASTER_HEARTBEAT_ERROR_THRESHOLD: "5"
     # -- Master commit task retry times
@@ -506,10 +506,16 @@ master:
     MASTER_TASK_COMMIT_INTERVAL: "1s"
     # -- master state wheel interval, the unit is second
     MASTER_STATE_WHEEL_INTERVAL: "5s"
-    # -- Master max cpuload avg, only higher than the system cpu load average, master server can schedule
-    MASTER_MAX_CPU_LOAD_AVG: "1"
-    # -- Master reserved memory, only lower than system available memory, master server can schedule, the unit is G
-    MASTER_RESERVED_MEMORY: "0.3"
+    # -- If set true, will open master overload protection
+    MASTER_SERVER_LOAD_PROTECTION_ENABLED: false
+    # -- Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Master failover interval, the unit is minute
     MASTER_FAILOVER_INTERVAL: "10m"
     # -- Master kill application when handle failover
@@ -621,18 +627,29 @@ worker:
       # -- `PersistentVolumeClaim` size
       storage: "20Gi"
   env:
-    # -- Worker max cpu load avg, only higher than the system cpu load average, worker server can be dispatched tasks
-    WORKER_MAX_CPU_LOAD_AVG: "1"
-    # -- Worker reserved memory, only lower than system available memory, worker server can be dispatched tasks, the unit is G
-    WORKER_RESERVED_MEMORY: "0.3"
+    # -- If set true, will open worker overload protection
+    WORKER_SERVER_LOAD_PROTECTION_ENABLED: false
+    # -- Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks.
+    WORKER_SERVER_LOAD_PROTECTION_MAX_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Worker max jvm memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks.
+    WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks.
+    WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+    WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Worker execute thread number to limit task instances
     WORKER_EXEC_THREADS: "100"
-    # -- Worker heartbeat interval, the unit is second
-    WORKER_HEARTBEAT_INTERVAL: "10s"
-    # -- Worker heartbeat error threshold
-    WORKER_HEART_ERROR_THRESHOLD: "5"
+    # -- Worker heartbeat interval
+    WORKER_MAX_HEARTBEAT_INTERVAL: "10s"
     # -- Worker host weight to dispatch tasks
     WORKER_HOST_WEIGHT: "100"
+    # -- tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+    WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: true
+    # -- Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
+    WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT: false
+    # -- If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
+    DEFAULT_TENANT_ENABLED: false
+
   keda:
     # -- Enable or disable the Keda component
     enabled: false

@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAVA;
 
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -84,7 +85,7 @@ public class JavaTaskTest {
         String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
         JavaTask javaTask = runJarType();
         Assertions.assertEquals(javaTask.buildJarCommand(), homeBinPath
-                + "java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+                + "java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -106,7 +107,7 @@ public class JavaTaskTest {
                 Files.delete(path);
             }
             Assertions.assertEquals(homeBinPath
-                    + "javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
+                    + "javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
                     javaTask.buildJavaCompileCommand(sourceCode));
         } finally {
             Path path = Paths.get(fileName);
@@ -125,7 +126,7 @@ public class JavaTaskTest {
     @Test
     public void buildJavaCommand() throws Exception {
         String wantJavaCommand =
-                "${JAVA_HOME}/bin/javac --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java --class-path .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m";
+                "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m";
         JavaTask javaTask = runJavaType();
         String sourceCode = javaTask.buildJavaSourceContent();
         String publicClassName = javaTask.getPublicClassName(sourceCode);
@@ -155,7 +156,7 @@ public class JavaTaskTest {
             try {
                 Path path = Paths.get(fileName);
                 if (!Files.exists(path)) {
-                    Files.createDirectories(path);
+                    FileUtils.createDirectoryWith755(path);
                 }
                 javaTask.createJavaSourceFileIfNotExists(sourceCode, fileName);
             } finally {

@@ -34,9 +34,8 @@ public class SwitchTaskUtilsTest {
         String content = "${test}==1";
         Map<String, Property> globalParams = new HashMap<>();
         Map<String, Property> varParams = new HashMap<>();
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
-        });
+        Assertions.assertDoesNotThrow(
+                () -> SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams));
 
         globalParams.put("test", new Property("test", Direct.IN, DataType.INTEGER, "1"));
         String result = SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
@@ -52,5 +51,19 @@ public class SwitchTaskUtilsTest {
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
             SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
         });
+
+        String cmd = "bash /tmp/shell";
+        String cmdContent = "java.lang.Runtime.getRuntime().exec(\"${cmd}\")";
+        globalParams.put("cmd", new Property("cmd", Direct.IN, DataType.VARCHAR, cmd));
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            SwitchTaskUtils.generateContentWithTaskParams(cmdContent, globalParams, varParams);
+        });
+
+        String contentWithUnicode =
+                "\\\\u006a\\\\u0061\\\\u0076\\\\u0061\\\\u002e\\\\u006c\\\\u0061\\\\u006e\\\\u0067\\\\u002e\\\\u0052\\\\u0075\\\\u006e\\\\u0074\\\\u0069\\\\u006d\\\\u0065.getRuntime().exec(\\\"open -a Calculator.app\\";
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            SwitchTaskUtils.generateContentWithTaskParams(contentWithUnicode, globalParams, varParams);
+        });
+
     }
 }

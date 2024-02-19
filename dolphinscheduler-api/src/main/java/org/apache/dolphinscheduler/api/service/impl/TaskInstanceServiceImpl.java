@@ -255,6 +255,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         // change the state of the task instance
         task.setState(TaskExecutionStatus.FORCED_SUCCESS);
+        task.setEndTime(new Date());
         int changedNum = taskInstanceMapper.updateById(task);
         if (changedNum > 0) {
             processService.forceProcessInstanceSuccessByTaskInstanceId(taskInstanceId);
@@ -379,9 +380,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return;
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
-            ILogService iLogService =
-                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
-            iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+            if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
+                ILogService iLogService =
+                        SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(),
+                                ILogService.class);
+                iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+            }
         }
 
         dqExecuteResultDao.deleteByWorkflowInstanceId(workflowInstanceId);

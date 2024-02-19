@@ -749,22 +749,6 @@ public class ProcessServiceTest {
         Assertions.assertNotNull(taskGroupQueue);
     }
 
-    @Test
-    public void testDoRelease() {
-
-        TaskGroupQueue taskGroupQueue = getTaskGroupQueue();
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setProcessInstanceId(1);
-        taskInstance.setTaskGroupId(taskGroupQueue.getGroupId());
-
-        when(taskGroupQueueMapper.queryByTaskId(1)).thenReturn(taskGroupQueue);
-        when(taskGroupQueueMapper.updateById(taskGroupQueue)).thenReturn(1);
-
-        processService.releaseTaskGroup(taskInstance);
-
-    }
-
     private TaskGroupQueue getTaskGroupQueue() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task name");
