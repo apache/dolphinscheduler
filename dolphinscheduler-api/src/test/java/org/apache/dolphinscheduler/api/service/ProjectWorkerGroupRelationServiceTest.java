@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import java.util.ArrayList;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -35,6 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -99,8 +97,8 @@ public class ProjectWorkerGroupRelationServiceTest {
     @Test
     public void testQueryWorkerGroupsByProject() {
 
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.anyMap(),Mockito.any()))
-            .thenReturn(true);
+        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.anyMap(), Mockito.any()))
+                .thenReturn(true);
 
         Mockito.when(projectMapper.queryByCode(projectCode))
                 .thenReturn(getProject());
@@ -109,12 +107,13 @@ public class ProjectWorkerGroupRelationServiceTest {
                 .thenReturn(Lists.newArrayList(getProjectWorkerGroup()));
 
         Mockito.when(taskDefinitionMapper.queryAllDefinitionList(Mockito.anyLong()))
-            .thenReturn(new ArrayList<>());
+                .thenReturn(new ArrayList<>());
 
         Mockito.when(scheduleMapper.querySchedulerListByProjectName(Mockito.any()))
-            .thenReturn(Lists.newArrayList());
+                .thenReturn(Lists.newArrayList());
 
-        Map<String, Object> result = projectWorkerGroupRelationService.queryWorkerGroupsByProject(getGeneralUser(), projectCode);
+        Map<String, Object> result =
+                projectWorkerGroupRelationService.queryWorkerGroupsByProject(getGeneralUser(), projectCode);
 
         ProjectWorkerGroup[] actualValue =
                 ((List<ProjectWorkerGroup>) result.get(Constants.DATA_LIST)).toArray(new ProjectWorkerGroup[0]);

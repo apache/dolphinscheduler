@@ -588,11 +588,12 @@ public enum Status {
 
     WORKER_GROUP_NOT_EXIST(1402001, "The Worker group [{0}] not exists", "Worker组[{0}]不存在."),
     ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR(1402002, "Failed to assign these worker groups to the project",
-        "给项目分配工作组失败"),
+            "给项目分配工作组失败"),
     WORKER_GROUP_TO_PROJECT_IS_EMPTY(1402003, "Need to assign at least one worker group to the project",
-        "需要给项目至少分配一个Worker组"),
-    USED_WORKER_GROUP_EXISTS(1402004, "You can't reassign worker groups to the project, cause these worker groups {0} are already used.",
-        "Worker组{0}被项目中任务或定时引用，无法重新分配"),
+            "需要给项目至少分配一个Worker组"),
+    USED_WORKER_GROUP_EXISTS(1402004,
+            "You can't reassign worker groups to the project, cause these worker groups {0} are already used.",
+            "Worker组{0}被项目中任务或定时引用，无法重新分配"),
             ;
     private final int code;
     private final String enMsg;

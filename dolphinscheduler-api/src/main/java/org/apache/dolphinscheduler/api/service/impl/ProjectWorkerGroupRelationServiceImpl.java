@@ -17,20 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import java.util.TreeSet;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
-import org.apache.dolphinscheduler.api.service.SchedulerService;
-import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
@@ -40,6 +34,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -47,11 +42,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.hadoop.yarn.webapp.hamlet2.Hamlet.P;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -143,7 +138,8 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             Set<String> usedWorkerGroups = getAllUsedWorkerGroups(project);
 
             if (CollectionUtils.isNotEmpty(usedWorkerGroups) && usedWorkerGroups.containsAll(difference)) {
-                throw new ServiceException(Status.USED_WORKER_GROUP_EXISTS, SetUtils.intersection(usedWorkerGroups, difference).toSet());
+                throw new ServiceException(Status.USED_WORKER_GROUP_EXISTS,
+                        SetUtils.intersection(usedWorkerGroups, difference).toSet());
             }
 
             int deleted = projectWorkerGroupMapper.delete(
@@ -202,7 +198,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
 
         projectWorkerGroupMapper.selectList(
                 new QueryWrapper<ProjectWorkerGroup>().lambda().eq(ProjectWorkerGroup::getProjectCode, projectCode))
-            .stream().forEach(projectWorkerGroup -> assignedWorkerGroups.add(projectWorkerGroup.getWorkerGroup()));
+                .stream().forEach(projectWorkerGroup -> assignedWorkerGroups.add(projectWorkerGroup.getWorkerGroup()));
 
         List<ProjectWorkerGroup> projectWorkerGroups = assignedWorkerGroups.stream().map(workerGroup -> {
             ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
@@ -227,9 +223,9 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
 
         // query all worker groups that timings depend on
         scheduleMapper.querySchedulerListByProjectName(project.getName())
-            .stream()
-            .filter(schedule -> StringUtils.isNotEmpty(schedule.getWorkerGroup()))
-            .forEach(schedule -> usedWorkerGroups.add(schedule.getWorkerGroup()));
+                .stream()
+                .filter(schedule -> StringUtils.isNotEmpty(schedule.getWorkerGroup()))
+                .forEach(schedule -> usedWorkerGroups.add(schedule.getWorkerGroup()));
 
         return usedWorkerGroups;
     }
