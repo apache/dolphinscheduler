@@ -52,7 +52,7 @@ public enum DbType {
     VERTICA(21, "vertica"),
     HANA(22, "hana"),
     DORIS(23, "doris"),
-    XUGU(27, "xugu");
+    XUGU(27, "xugu"),
     ZEPPELIN(24, "zeppelin"),
     SAGEMAKER(25, "sagemaker"),
 
