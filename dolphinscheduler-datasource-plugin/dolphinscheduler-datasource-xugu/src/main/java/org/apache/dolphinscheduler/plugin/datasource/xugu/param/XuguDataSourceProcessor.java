@@ -49,7 +49,7 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson){
+    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
         XuguConnectionParam connectionParams = (XuguConnectionParam) createConnectionParams(connectionJson);
         XuguDataSourceParamDTO xuguDataSourceParamDTO = new XuguDataSourceParamDTO();
 
