@@ -40,8 +40,9 @@ public interface ProjectWorkerGroupRelationService {
     /**
      * query worker groups that assigned to the project
      *
+     * @param loginUser the login user
      * @param projectCode project code
      */
-    Map<String, Object> queryWorkerGroupsByProject(Long projectCode);
+    Map<String, Object> queryWorkerGroupsByProject(User loginUser, Long projectCode);
 
 }

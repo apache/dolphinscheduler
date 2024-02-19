@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_PROCESS_DEFINITION_ERROR;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -74,12 +77,13 @@ public class ProjectWorkerGroupController extends BaseController {
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
+    @ApiException(ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR)
     public Result assignWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                     @RequestBody List<String> workerGroups) {
+                                     @Parameter(name = "workerGroups") String[] workerGroups) {
 
-        return projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, workerGroups);
+        List<String> workerGroupList = Arrays.stream(workerGroups).collect(Collectors.toList());
+        return projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode, workerGroupList);
     }
 
     /**
@@ -94,8 +98,9 @@ public class ProjectWorkerGroupController extends BaseController {
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, Object> queryWorkerGroups(@Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        return projectWorkerGroupRelationService.queryWorkerGroupsByProject(projectCode);
+    public Map<String, Object> queryWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return projectWorkerGroupRelationService.queryWorkerGroupsByProject(loginUser, projectCode);
     }
 
 }
