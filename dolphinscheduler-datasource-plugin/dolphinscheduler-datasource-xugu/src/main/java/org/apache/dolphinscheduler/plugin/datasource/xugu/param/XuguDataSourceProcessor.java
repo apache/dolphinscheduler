@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -48,7 +49,7 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException{
+    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson){
         XuguConnectionParam connectionParams = (XuguConnectionParam) createConnectionParams(connectionJson);
         XuguDataSourceParamDTO xuguDataSourceParamDTO = new XuguDataSourceParamDTO();
 
@@ -127,6 +128,11 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new XuguDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.xugu);
     }
 
     private String transformOther(Map<String, String> paramMap) {
