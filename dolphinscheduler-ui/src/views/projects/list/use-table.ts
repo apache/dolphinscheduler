@@ -148,7 +148,7 @@ export function useTable() {
       {
         title: t('project.list.operation'),
         key: 'actions',
-        ...COLUMN_WIDTH_CONFIG['operation'](2),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
