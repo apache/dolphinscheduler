@@ -18,7 +18,10 @@
 import { useI18n } from 'vue-i18n'
 import { reactive, ref, SetupContext } from 'vue'
 import { useUserStore } from '@/store/user/user'
-import type { UserInfoRes } from '@/service/modules/users/types'
+import { Option } from "naive-ui/es/transfer/src/interface"
+import { queryAllWorkerGroups } from "@/service/modules/worker-groups"
+import { queryWorkerGroupsByProjectCode, assignWorkerGroups } from "@/service/modules/projects-worker-group"
+import { UpdateProjectWorkerGroupsReq } from "@/service/modules/projects-worker-group/types"
 
 export function useWorkerGroup(
     props: any,
@@ -29,27 +32,46 @@ export function useWorkerGroup(
 
   const variables = reactive({
     model: {
-      projectName: '',
-      description: '',
-      userName: (userStore.getUserInfo as UserInfoRes).userName
+      workerGroupOptions: [] as Option[],
+      assignedWorkerGroups: ref([] as any)
     }
   })
 
-  const getAssignedWorkerGroups = (projectCode: number) => {
-
+  const initOptions = () => {
+    variables.model.workerGroupOptions = []
+    queryAllWorkerGroups().then((res: any) => {
+      for (const workerGroup of res) {
+        variables.model.workerGroupOptions.push({label: workerGroup, value: workerGroup, disabled: workerGroup==='default'})
+      }
+    })
   }
 
-  const handleValidate = (statusRef: number) => {
-
+  const initAssignedWorkerGroups = (projectCode: number) => {
+    variables.model.assignedWorkerGroups = ref([] as any)
+    queryWorkerGroupsByProjectCode(projectCode).then((res: any) =>{
+      res.data.forEach((item: any) => {
+        variables.model.assignedWorkerGroups.push(item.workerGroup)
+      })
+    })
   }
 
-  const submitProjectModal = async () => {
+  initOptions()
 
+  const handleValidate = () => {
+    if (variables.model?.assignedWorkerGroups.length>0) {
+      submitModal()
+      ctx.emit('confirmModal', props.showModalRef)
+    }
   }
 
-  const updateProjectModal = async () => {
-
+  const submitModal = async () => {
+    if (props.row.code) {
+      let data: UpdateProjectWorkerGroupsReq = {
+        workerGroups: variables.model.assignedWorkerGroups.length>0? variables.model.assignedWorkerGroups.join(','):''
+      }
+      assignWorkerGroups(data, props.row.code)
+    }
   }
 
-  return { variables, t, handleValidate, getAssignedWorkerGroups }
+  return { variables, t, handleValidate, initAssignedWorkerGroups }
 }

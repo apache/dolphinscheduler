@@ -23,14 +23,9 @@ import {
   watch
 } from 'vue'
 import { NTransfer} from 'naive-ui'
-import { reactive, ref, SetupContext } from 'vue'
 import Modal from '@/components/modal'
-import { useUserStore } from '@/store/user/user'
-import type { UserInfoRes } from '@/service/modules/users/types'
 import styles from "@/views/security/user-manage/index.module.scss";
 import {useWorkerGroup} from "@/views/projects/list/components/use-worker-group";
-import {queryAllWorkerGroups} from "@/service/modules/worker-groups";
-import {Option} from "naive-ui/es/transfer/src/interface";
 
 const props = {
   showModalRef: {
@@ -48,47 +43,28 @@ const WorkerGroupModal = defineComponent({
   props,
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
-    const { variables, t, handleValidate } = useWorkerGroup(props, ctx)
-
-    const userStore = useUserStore()
+    const { variables, t, handleValidate, initAssignedWorkerGroups } = useWorkerGroup(props, ctx)
 
     const cancelModal = () => {
       ctx.emit('cancelModal', props.showModalRef)
     }
 
-    const confirmModal = () => {
-
-    }
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
-    const workerGroupOptions:Option[]  = []
-
-    const createOptions = () => {
-      queryAllWorkerGroups().then((res: any) => {
-        for (const workerGroup of res) {
-          workerGroupOptions.push({label: workerGroup, value: workerGroup})
-        }
-      })
+    const confirmModal = () => {
+      handleValidate()
     }
 
-    const assignedWorkerGroups = ref([])
-
-
-    createOptions()
-
-    // variables.model.assignedWorkerGroups
-    // variables.model.workerGroupOptions = createWorkerGroupOptions()
-
     watch(
-        () => props.row,
+        () => props.showModalRef,
         () => {
-          variables.model.projectName = props.row.name
-          variables.model.userName = props.row.userName
-          variables.model.description = props.row.description
+          if (props.showModalRef) {
+            initAssignedWorkerGroups(props.row.code)
+          }
         }
     )
 
-    return { ...toRefs(variables), t, cancelModal, confirmModal, workerGroupOptions, assignedWorkerGroups, trim }
+    return { ...toRefs(variables), t, cancelModal, confirmModal, trim }
   },
   render() {
     const { t } = this
@@ -104,8 +80,8 @@ const WorkerGroupModal = defineComponent({
           <NTransfer
               virtualScroll
               class={styles.transfer}
-              options={this.workerGroupOptions}
-              v-model:value={this.assignedWorkerGroups}
+              options={this.model.workerGroupOptions}
+              v-model:value={this.model.assignedWorkerGroups}
           />
         </Modal>
     )

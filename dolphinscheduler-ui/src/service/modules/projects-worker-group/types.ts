@@ -25,7 +25,7 @@ interface ProjectWorkerGroup {
 
 
 interface UpdateProjectWorkerGroupsReq {
-  workerGroups: string[]
+  workerGroups: string
 }
 
 export {
