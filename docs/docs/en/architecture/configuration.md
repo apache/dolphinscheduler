@@ -164,7 +164,7 @@ Note that DolphinScheduler also supports database configuration through `bin/env
 
 ### Registry related configuration
 
-DolphinScheduler uses Zookeeper for cluster management by default, fault tolerance, event monitoring and other functions. Configuration file location:
+DolphinScheduler uses Zookeeper by default for cluster management, fault tolerance, event monitoring and other functions. Configuration file location:
 |Service| Configuration file  |
 |--|--|
 |Master Server | `master-server/conf/application.yaml`|
