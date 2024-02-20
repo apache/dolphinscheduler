@@ -40,7 +40,8 @@ export default {
     authorize_level: 'Authorize Level',
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
-    all_permission: 'All Permission'
+    all_permission: 'All Permission',
+    assign_worker_group: 'Worker Group',
   },
   workflow: {
     on_line: 'Online',

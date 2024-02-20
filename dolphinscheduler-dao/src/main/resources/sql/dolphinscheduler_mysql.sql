@@ -1095,6 +1095,22 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
+
+-- ----------------------------
+-- Table structure for t_ds_relation_project_worker_group
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_project_worker_group`;
+CREATE TABLE `t_ds_relation_project_worker_group` (
+    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+    `project_code` bigint(20) NOT NULL COMMENT 'project code',
+    `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group',
+    `create_time` datetime DEFAULT NULL COMMENT 'create time',
+    `update_time` datetime DEFAULT NULL COMMENT 'update time',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY unique_project_worker_group(project_code,worker_group)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --
@@ -1110,6 +1126,7 @@ CREATE TABLE `t_ds_dq_comparison_type` (
     `is_inner_source` tinyint(1) DEFAULT '0',
     PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
 
 INSERT IGNORE INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
