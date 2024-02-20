@@ -88,10 +88,11 @@ public class ProjectWorkerGroupRelationServiceTest {
         workerGroup.setName("test");
         Mockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject());
         Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(Lists.newArrayList(workerGroup));
+        Mockito.when(projectWorkerGroupMapper.insert(Mockito.any())).thenReturn(1);
 
         result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                 getWorkerGroups());
-        Assertions.assertEquals(Status.WORKER_GROUP_NOT_EXIST.getCode(), result.getCode());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
     @Test
