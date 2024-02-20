@@ -162,7 +162,7 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports database configuration through `bin/env/dolphinscheduler_env.sh`.
 
-### Registry related configuration
+### Registry Related configuration
 
 DolphinScheduler uses Zookeeper by default for cluster management, fault tolerance, event monitoring and other functions. Configuration file location:
 |Service| Configuration file  |
