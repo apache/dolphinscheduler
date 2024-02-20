@@ -402,6 +402,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'DAMENG',
     defaultPort: 5236
   },
+  XUGU: {
+    value: 'XUGU',
+    label: 'XUGU',
+    defaultPort: 5138
+  },
   OCEANBASE: {
     value: 'OCEANBASE',
     label: 'OCEANBASE',

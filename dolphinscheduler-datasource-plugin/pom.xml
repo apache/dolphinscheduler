@@ -55,6 +55,7 @@
         <module>dolphinscheduler-datasource-doris</module>
         <module>dolphinscheduler-datasource-sagemaker</module>
         <module>dolphinscheduler-datasource-hana</module>
+        <module>dolphinscheduler-datasource-xugu</module>
     </modules>
 
     <dependencyManagement>

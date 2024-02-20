@@ -41,6 +41,7 @@ type IDataBase =
   | 'KYUUBI'
   | 'ZEPPELIN'
   | 'SAGEMAKER'
+  | 'XUGU'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -63,6 +64,7 @@ type IDataBaseLabel =
   | 'KYUUBI'
   | 'ZEPPELIN'
   | 'SAGEMAKER'
+  | 'XUGU'
 
 interface IDataSource {
   id?: number

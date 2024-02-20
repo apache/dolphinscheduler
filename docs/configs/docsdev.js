@@ -344,6 +344,10 @@ export default {
                                 link: '/en-us/docs/3.2.1/user_doc/guide/datasource/dameng.html',
                             },
                             {
+                                title: 'XUGU',
+                                link: '/en-us/docs/3.2.1/user_doc/guide/datasource/xugu.html',
+                            },
+                            {
                                 title: 'OceanBase',
                                 link: '/en-us/docs/3.2.1/user_doc/guide/datasource/oceanbase.html',
                             },
@@ -1058,6 +1062,10 @@ export default {
                             {
                                 title: 'DAMENG',
                                 link: '/zh-cn/docs/3.2.1/user_doc/guide/datasource/dameng.html',
+                            },
+                            {
+                                title: 'XUGU',
+                                link: '/zh-cn/docs/3.2.1/user_doc/guide/datasource/xugu.html',
                             },
                             {
                                 title: 'OceanBase',
