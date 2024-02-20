@@ -416,7 +416,6 @@
                 <version>${xugu-jdbc.version}</version>
             </dependency>
 
-
             <dependency>
                 <groupId>com.vertica.jdbc</groupId>
                 <artifactId>vertica-jdbc</artifactId>
