@@ -816,6 +816,13 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     /**
+     * Check if there're any tasks that depend on the process
+     */
+    private void checkIfDependentTaskExists(ProcessDefinition processDefinition) {
+
+    }
+
+    /**
      * Task want to delete whether used in other task, should throw exception when have be used.
      *
      * This function avoid delete task already dependencies by other tasks by accident.

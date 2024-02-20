@@ -205,9 +205,6 @@
         join t_ds_process_task_relation ptr on ptr.post_task_code = td.code and td.version = ptr.post_task_version
         join t_ds_process_definition pd on pd.code = ptr.process_definition_code and pd.version = ptr.process_definition_version
         <where>
-            <if test="projectCode != 0">
-                and ptr.project_code = #{projectCode}
-            </if>
             <!-- ptr.process_definition_code != #{processDefinitionCode} query task not in current workflow -->
             <!-- For dependnet task type, using `like concat('%"definitionCode":', #{processDefinitionCode}, '%')` -->
             <if test="processDefinitionCode != 0">

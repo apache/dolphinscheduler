@@ -278,7 +278,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     public Set<TaskMainInfo> queryTaskDepOnProcess(long projectCode, long processDefinitionCode) {
         Set<TaskMainInfo> taskMainInfos = new HashSet<>();
         List<TaskMainInfo> taskDependents =
-                workFlowLineageMapper.queryTaskDependentDepOnProcess(projectCode, processDefinitionCode);
+                workFlowLineageMapper.queryTaskDependentDepOnProcess(processDefinitionCode);
         List<TaskMainInfo> taskSubProcess =
                 workFlowLineageMapper.queryTaskSubProcessDepOnProcess(projectCode, processDefinitionCode);
         taskMainInfos.addAll(taskDependents);
