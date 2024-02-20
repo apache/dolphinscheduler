@@ -50,7 +50,7 @@ public class XuguDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException{
+    public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) throws NumberFormatException {
         XuguConnectionParam connectionParams = (XuguConnectionParam) createConnectionParams(connectionJson);
         XuguDataSourceParamDTO xuguDataSourceParamDTO = new XuguDataSourceParamDTO();
 
