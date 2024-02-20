@@ -162,9 +162,9 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports database configuration through `bin/env/dolphinscheduler_env.sh`.
 
-### Zookeeper related configuration
+### Registry related configuration
 
-DolphinScheduler uses Zookeeper for cluster management, fault tolerance, event monitoring and other functions. Configuration file location:
+DolphinScheduler uses Zookeeper for cluster management by default, fault tolerance, event monitoring and other functions. Configuration file location:
 |Service| Configuration file  |
 |--|--|
 |Master Server | `master-server/conf/application.yaml`|
@@ -186,6 +186,9 @@ The default configuration is as follows:
 |registry.zookeeper.digest|{username}:{password}|digest of zookeeper to access znode, works only when acl is enabled, for more details please check [https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper doc) |
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
+
+For ETCD Registry, please see more details on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md).
+For JDBC Registry, please see more details on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md).
 
 ### common.properties [hadoop、s3、yarn config properties]
 
