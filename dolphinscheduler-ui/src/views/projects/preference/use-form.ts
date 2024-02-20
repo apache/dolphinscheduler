@@ -111,7 +111,7 @@ export function useForm() {
   const preferencesItems: IJsonItem[] = [
     Fields.useTaskPriority(),
     useTenant(),
-    Fields.useWorkerGroup(),
+    Fields.useWorkerGroup(projectCode),
     Fields.useEnvironmentName(data.model, true),
     ...Fields.useFailed(),
     useWarningType(),
