@@ -66,7 +66,7 @@ public class SwitchTaskUtils {
                                                        Map<String, Property> varParams) {
         String content = condition.replaceAll("'", "\"");
         if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(varParams)) {
-            throw new IllegalArgumentException("globalParams and varParams are both empty, please check it.");
+            return content;
         }
         Map<String, Property> params = Maps.newHashMap();
         if (MapUtils.isNotEmpty(globalParams)) {
