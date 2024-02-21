@@ -13,18 +13,44 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-DROP TABLE IF EXISTS t_ds_relation_project_worker_group;
-CREATE TABLE t_ds_relation_project_worker_group (
-    id int NOT NULL  ,
-    project_code bigint DEFAULT NULL ,
-    worker_group varchar(255) NOT NULL,
-    create_time timestamp DEFAULT NULL,
-    update_time timestamp DEFAULT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT t_ds_relation_project_worker_group_un UNIQUE (project_code, worker_group)
-);
+ */
+package org.apache.dolphinscheduler.dao.entity;
 
-DROP SEQUENCE IF EXISTS t_ds_relation_project_worker_group_sequence;
-CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
-ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
+import java.util.Date;
+
+import lombok.Data;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@Data
+@TableName("t_ds_relation_project_worker_group")
+public class ProjectWorkerGroup {
+
+    /**
+     * id
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    /**
+     * project code
+     */
+    private Long projectCode;
+
+    /**
+     * worker group
+     */
+    private String workerGroup;
+
+    /**
+     * create time
+     */
+    private Date createTime;
+
+    /**
+     * update time
+     */
+    private Date updateTime;
+}
