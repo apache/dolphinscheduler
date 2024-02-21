@@ -167,5 +167,4 @@ public class WorkerGroupController extends BaseController {
         Map<String, Object> result = workerGroupService.getWorkerAddressList();
         return returnDataList(result);
     }
-
 }
