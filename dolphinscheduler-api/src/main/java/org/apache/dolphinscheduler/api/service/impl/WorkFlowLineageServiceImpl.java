@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
+import java.util.Objects;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
@@ -284,5 +285,30 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         taskMainInfos.addAll(taskDependents);
         taskMainInfos.addAll(taskSubProcess);
         return taskMainInfos;
+    }
+
+    /**
+     * Query downstream tasks depend on a process definition or a task
+     *
+     * @param projectCode Project code want to query tasks dependence
+     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param taskCode Task code want to query tasks dependence
+     * @return downstream dependent tasks
+     */
+    @Override
+    public Map<String, Object> queryDownstreamDependentTasks(Long projectCode,
+        Long processDefinitionCode, Long taskCode) {
+        Map<String, Object> result = new HashMap<>();
+        List<TaskMainInfo> taskDependents =
+            workFlowLineageMapper.queryTaskDependentDepOnProcess(processDefinitionCode);
+        if (Objects.nonNull(taskCode) && taskCode.longValue()!=0) {
+            taskDependents = taskDependents.stream()
+                .filter(taskMainInfo -> taskMainInfo.getUpstreamTaskCode()==taskCode)
+                .collect(Collectors.toList());
+        }
+
+        result.put(Constants.DATA_LIST, taskDependents);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 }

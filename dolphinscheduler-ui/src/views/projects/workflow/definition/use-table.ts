@@ -43,6 +43,8 @@ import {
 import type { IDefinitionParam } from './types'
 import type { Router } from 'vue-router'
 import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
+import {queryDependentTasks} from "@/service/modules/lineages";
+import {DependentTaskReq} from "@/service/modules/lineages/types";
 
 export function useTable() {
   const { t } = useI18n()
@@ -360,6 +362,17 @@ export function useTable() {
       releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
         | 'OFFLINE'
         | 'ONLINE'
+    }
+
+    if (data.releaseState === 'OFFLINE') {
+      console.log(data.releaseState)
+
+      let dependentTaskReq = {workFlowCode: row.code} as DependentTaskReq
+      console.log(dependentTaskReq)
+
+      queryDependentTasks(variables.projectCode, dependentTaskReq).then((res: any) => {
+        console.log(res.data)
+      })
     }
 
     release(data, variables.projectCode, row.code).then(() => {
