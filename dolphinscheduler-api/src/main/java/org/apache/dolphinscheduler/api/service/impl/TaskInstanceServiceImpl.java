@@ -199,8 +199,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 taskInstance.setExecutorName(user.getUserName());
             }
         }
-        pageInfo.setTotal((int) taskInstanceIPage.getTotal());
-        pageInfo.setTotalList(CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
+        pageInfo.setPaginationInfo((int) taskInstanceIPage.getTotal(),
+                CollectionUtils.getListByExclusion(taskInstanceIPage.getRecords(), exclusionSet));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

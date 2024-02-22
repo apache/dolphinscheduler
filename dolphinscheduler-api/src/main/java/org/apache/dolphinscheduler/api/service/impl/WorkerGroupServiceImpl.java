@@ -309,8 +309,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         PageInfo<WorkerGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal(total);
-        pageInfo.setTotalList(resultDataList);
+        pageInfo.setPaginationInfo(total, resultDataList);
 
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);

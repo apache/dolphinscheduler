@@ -91,8 +91,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
 
         Integer count = (int) k8sNamespaceList.getTotal();
         PageInfo<K8sNamespace> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal(count);
-        pageInfo.setTotalList(k8sNamespaceList.getRecords());
+        pageInfo.setPaginationInfo(count, k8sNamespaceList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 

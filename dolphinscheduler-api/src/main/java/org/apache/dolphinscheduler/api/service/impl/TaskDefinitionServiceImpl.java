@@ -698,8 +698,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         PageInfo<TaskDefinition> pageInfo =
                 new PageInfo<>(taskFilterRequest.getPageNo(), taskFilterRequest.getPageSize());
-        pageInfo.setTotal((int) taskDefinitionIPage.getTotal());
-        pageInfo.setTotalList(taskDefinitionIPage.getRecords());
+        pageInfo.setPaginationInfo((int) taskDefinitionIPage.getTotal(), taskDefinitionIPage.getRecords());
         return pageInfo;
     }
 
@@ -1102,8 +1101,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(page, taskCode, projectCode);
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionVersionsPaging.getRecords();
 
-        pageInfo.setTotalList(taskDefinitionLogs);
-        pageInfo.setTotal((int) taskDefinitionVersionsPaging.getTotal());
+        pageInfo.setPaginationInfo((int) taskDefinitionVersionsPaging.getTotal(), taskDefinitionLogs);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -1201,8 +1199,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         // then, query task relevant info by task code
         fillRecords(projectCode, taskMainInfoIPage);
         PageInfo<TaskMainInfo> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) taskMainInfoIPage.getTotal());
-        pageInfo.setTotalList(taskMainInfoIPage.getRecords());
+        pageInfo.setPaginationInfo((int) taskMainInfoIPage.getTotal(), taskMainInfoIPage.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

@@ -124,8 +124,7 @@ public class DataQualityControllerTest {
         String end = "2020-01-02 00:00:00";
 
         PageInfo<DqRule> pageInfo = new PageInfo<>(1, 10);
-        pageInfo.setTotal(10);
-        pageInfo.setTotalList(getRuleList());
+        pageInfo.setPaginationInfo(10, getRuleList());
 
         when(dqRuleService.queryRuleListPaging(user, searchVal, ruleType, start, end, 1, 10)).thenReturn(pageInfo);
 

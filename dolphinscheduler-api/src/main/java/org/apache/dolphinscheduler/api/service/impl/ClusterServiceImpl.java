@@ -120,7 +120,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         IPage<Cluster> clusterIPage = clusterMapper.queryClusterListPaging(page, searchVal);
 
         PageInfo<ClusterDto> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) clusterIPage.getTotal());
 
         if (CollectionUtils.isEmpty(clusterIPage.getRecords())) {
             return pageInfo;
@@ -130,7 +129,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             BeanUtils.copyProperties(cluster, dto);
             return dto;
         }).collect(Collectors.toList());
-        pageInfo.setTotalList(dtoList);
+        pageInfo.setPaginationInfo((int) clusterIPage.getTotal(), dtoList);
         return pageInfo;
     }
 

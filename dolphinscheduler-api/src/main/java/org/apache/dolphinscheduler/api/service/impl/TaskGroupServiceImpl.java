@@ -257,8 +257,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
         int total = taskGroupPaging == null ? 0 : (int) taskGroupPaging.getTotal();
         List<TaskGroup> list = taskGroupPaging == null ? new ArrayList<TaskGroup>() : taskGroupPaging.getRecords();
-        pageInfo.setTotal(total);
-        pageInfo.setTotalList(list);
+        pageInfo.setPaginationInfo(total, list);
 
         result.put(Constants.DATA_LIST, pageInfo);
         putMsg(result, Status.SUCCESS);

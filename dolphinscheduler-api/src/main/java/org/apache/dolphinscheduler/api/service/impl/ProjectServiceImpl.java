@@ -393,8 +393,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
         }
-        pageInfo.setTotal((int) projectIPage.getTotal());
-        pageInfo.setTotalList(projectList);
+        pageInfo.setPaginationInfo((int) projectIPage.getTotal(), projectList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -444,8 +443,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
         }
 
-        pageInfo.setTotal((int) projectIPage.getTotal());
-        pageInfo.setTotalList(projectList);
+        pageInfo.setPaginationInfo((int) projectIPage.getTotal(), projectList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

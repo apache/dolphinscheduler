@@ -173,8 +173,7 @@ public class DqRuleServiceImpl extends BaseServiceImpl implements DqRuleService 
                 dqRule.setRuleJson(JSONUtils.toJsonString(ruleDefinition));
             });
 
-            pageInfo.setTotal((int) dqRulePage.getTotal());
-            pageInfo.setTotalList(dataList);
+            pageInfo.setPaginationInfo((int) dqRulePage.getTotal(), dataList);
         }
 
         return pageInfo;

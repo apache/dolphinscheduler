@@ -297,8 +297,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
         }
         PageInfo<UdfFunc> pageInfo = new PageInfo<>(pageNo, pageSize);
         IPage<UdfFunc> udfFuncList = getUdfFuncsPage(loginUser, searchVal, pageSize, pageNo);
-        pageInfo.setTotal((int) udfFuncList.getTotal());
-        pageInfo.setTotalList(udfFuncList.getRecords());
+        pageInfo.setPaginationInfo((int) udfFuncList.getTotal(), udfFuncList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

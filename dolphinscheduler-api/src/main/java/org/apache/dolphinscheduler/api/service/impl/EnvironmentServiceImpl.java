@@ -186,8 +186,6 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             environmentIPage = environmentMapper.queryEnvironmentListPagingByIds(page, new ArrayList<>(ids), searchVal);
         }
 
-        pageInfo.setTotal((int) environmentIPage.getTotal());
-
         if (CollectionUtils.isNotEmpty(environmentIPage.getRecords())) {
             Map<Long, List<String>> relationMap = relationMapper.selectList(null).stream()
                     .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,
@@ -201,9 +199,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                 return dto;
             }).collect(Collectors.toList());
 
-            pageInfo.setTotalList(dtoList);
+            pageInfo.setPaginationInfo((int) environmentIPage.getTotal(), dtoList);
         } else {
-            pageInfo.setTotalList(new ArrayList<>());
+            pageInfo.setPaginationInfo((int) environmentIPage.getTotal(), new ArrayList<>());
         }
 
         result.setData(pageInfo);

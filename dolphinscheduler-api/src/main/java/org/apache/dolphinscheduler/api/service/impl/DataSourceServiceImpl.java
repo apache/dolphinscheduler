@@ -246,8 +246,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
         handlePasswd(dataSources);
-        pageInfo.setTotal((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L));
-        pageInfo.setTotalList(dataSources);
+        pageInfo.setPaginationInfo((int) (dataSourceList != null ? dataSourceList.getTotal() : 0L), dataSources);
         return pageInfo;
     }
 

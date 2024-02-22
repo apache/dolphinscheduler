@@ -382,8 +382,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             }
         }
 
-        pageInfo.setTotal((int) processInstanceList.getTotal());
-        pageInfo.setTotalList(processInstances);
+        pageInfo.setPaginationInfo((int) processInstanceList.getTotal(), processInstances);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -445,8 +444,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             }
         }
 
-        pageInfo.setTotal((int) processInstanceList.getTotal());
-        pageInfo.setTotalList(processInstances);
+        pageInfo.setPaginationInfo((int) processInstanceList.getTotal(), processInstances);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

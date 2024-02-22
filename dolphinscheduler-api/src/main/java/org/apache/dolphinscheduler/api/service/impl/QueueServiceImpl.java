@@ -150,8 +150,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         Page<Queue> page = new Page<>(pageNo, pageSize);
         IPage<Queue> queueList = queueMapper.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
         Integer count = (int) queueList.getTotal();
-        pageInfo.setTotal(count);
-        pageInfo.setTotalList(queueList.getRecords());
+        pageInfo.setPaginationInfo(count, queueList.getRecords());
         return pageInfo;
     }
 

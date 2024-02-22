@@ -102,8 +102,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
                 logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
 
         PageInfo<AuditDto> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) auditDtos.size());
-        pageInfo.setTotalList(auditDtos);
+        pageInfo.setPaginationInfo(auditDtos.size(), auditDtos);
         return pageInfo;
     }
 

@@ -65,10 +65,17 @@ public class PageInfo<T> {
         this.currentPage = currentPage;
     }
 
+    public void setPaginationInfo(Integer total, List<T> totalList) {
+        setTotal(total);
+        setTotalList(totalList);
+        if (total != null && total > 0 && this.pageSize > 0) {
+            this.totalPage = (int) Math.ceil((double) total / this.pageSize);
+        }
+    }
+
     public static <T> PageInfo<T> of(IPage<T> iPage) {
         PageInfo<T> pageInfo = new PageInfo<>((int) iPage.getCurrent(), (int) iPage.getSize());
-        pageInfo.setTotalList(iPage.getRecords());
-        pageInfo.setTotal((int) iPage.getTotal());
+        pageInfo.setPaginationInfo((int) iPage.getTotal(), iPage.getRecords());
         return pageInfo;
     }
 

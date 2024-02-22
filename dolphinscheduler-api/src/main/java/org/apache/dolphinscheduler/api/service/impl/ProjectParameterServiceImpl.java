@@ -255,8 +255,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         List<ProjectParameter> projectParameterList = iPage.getRecords();
 
-        pageInfo.setTotal((int) iPage.getTotal());
-        pageInfo.setTotalList(projectParameterList);
+        pageInfo.setPaginationInfo((int) iPage.getTotal(), projectParameterList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;

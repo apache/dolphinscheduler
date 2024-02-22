@@ -340,8 +340,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         IPage<User> scheduleList = userMapper.queryUserPaging(page, searchVal);
 
         PageInfo<User> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) scheduleList.getTotal());
-        pageInfo.setTotalList(scheduleList.getRecords());
+        pageInfo.setPaginationInfo((int) scheduleList.getTotal(), scheduleList.getRecords());
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
 

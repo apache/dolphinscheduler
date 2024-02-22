@@ -248,8 +248,8 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                 alertPluginInstanceMapper.queryByInstanceNamePage(new Page<>(pageNo, pageSize), searchVal);
 
         PageInfo<AlertPluginInstanceVO> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotal((int) alertPluginInstanceIPage.getTotal());
-        pageInfo.setTotalList(buildPluginInstanceVOList(alertPluginInstanceIPage.getRecords()));
+        pageInfo.setPaginationInfo((int) alertPluginInstanceIPage.getTotal(),
+                buildPluginInstanceVOList(alertPluginInstanceIPage.getRecords()));
         return pageInfo;
     }
 
