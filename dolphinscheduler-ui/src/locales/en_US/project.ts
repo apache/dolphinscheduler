@@ -40,7 +40,8 @@ export default {
     authorize_level: 'Authorize Level',
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
-    all_permission: 'All Permission'
+    all_permission: 'All Permission',
+    assign_worker_group: 'Worker Group',
   },
   workflow: {
     on_line: 'Online',
@@ -498,6 +499,9 @@ export default {
     http_url_validator: 'The request address must contain HTTP or HTTPS',
     http_method: 'Http Method',
     http_parameters: 'Http Parameters',
+    http_body: 'Http Body',
+    http_body_tips:
+      'Please fill in the http body, if filled, http parameters in the body type will be ignored',
     http_check_condition: 'Http Check Condition',
     http_condition: 'Http Condition',
     http_condition_tips: 'Please Enter Http Condition',

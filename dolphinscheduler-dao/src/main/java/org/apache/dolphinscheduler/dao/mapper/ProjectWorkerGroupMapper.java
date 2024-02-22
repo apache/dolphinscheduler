@@ -15,27 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class TaskInstanceForceStartResponse {
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-    private boolean success;
-
-    private String message;
-
-    public static TaskInstanceForceStartResponse success() {
-        return new TaskInstanceForceStartResponse(true, "dispatch success");
-    }
-
-    public static TaskInstanceForceStartResponse failed(String message) {
-        return new TaskInstanceForceStartResponse(false, message);
-    }
+public interface ProjectWorkerGroupMapper extends BaseMapper<ProjectWorkerGroup> {
 
 }

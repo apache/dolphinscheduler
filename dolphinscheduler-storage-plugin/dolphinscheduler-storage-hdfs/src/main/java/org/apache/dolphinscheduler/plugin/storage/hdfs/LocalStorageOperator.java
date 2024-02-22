@@ -15,28 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.master.transportor;
+package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@Data
-@NoArgsConstructor
-public class TaskInstanceForceStartRequest {
+@Slf4j
+public class LocalStorageOperator extends HdfsStorageOperator {
 
-    private String key;
-
-    private int processInstanceId;
-
-    private int taskInstanceId;
-
-    public TaskInstanceForceStartRequest(
-                                         int processInstanceId,
-                                         int taskInstanceId) {
-        this.key = String.format("%d-%d", processInstanceId, taskInstanceId);
-
-        this.processInstanceId = processInstanceId;
-        this.taskInstanceId = taskInstanceId;
+    public LocalStorageOperator() {
+        super(new HdfsStorageProperties());
     }
 
+    public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
+        super(hdfsStorageProperties);
+    }
+
+    @Override
+    public String getResourceFileName(String tenantCode, String fullName) {
+        // prefix schema `file:/` should be remove in local file mode
+        String fullNameRemoveSchema = fullName.replaceFirst(hdfsProperties.getDefaultFS(), "");
+        return super.getResourceFileName(tenantCode, fullNameRemoveSchema);
+    }
 }

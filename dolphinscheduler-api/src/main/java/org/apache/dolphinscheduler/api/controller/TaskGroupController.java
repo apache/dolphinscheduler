@@ -298,7 +298,7 @@ public class TaskGroupController extends BaseController {
      * @param pageSize    page size
      * @return queue list
      */
-    @Operation(summary = "queryTasksByGroupId", description = "QUERY_ALL_TASKS_GROUP_NOTES")
+    @Operation(summary = "queryTaskGroupQueuesByGroupId", description = "QUERY_TASKS_GROUP_GROUP_QUEUES")
     @Parameters({
             @Parameter(name = "groupId", description = "GROUP_ID", required = false, schema = @Schema(implementation = int.class, example = "1", defaultValue = "-1")),
             @Parameter(name = "taskInstanceName", description = "TASK_INSTANCE_NAME", required = false, schema = @Schema(implementation = String.class, example = "taskName")),
@@ -310,15 +310,21 @@ public class TaskGroupController extends BaseController {
     @GetMapping(value = "/query-list-by-group-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
-    public Result queryTasksByGroupId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
-                                      @RequestParam(value = "taskInstanceName", required = false) String taskName,
-                                      @RequestParam(value = "processInstanceName", required = false) String processName,
-                                      @RequestParam(value = "status", required = false) Integer status,
-                                      @RequestParam("pageNo") Integer pageNo,
-                                      @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(loginUser, taskName, processName, status,
-                groupId, pageNo, pageSize);
+    public Result queryTaskGroupQueues(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
+                                       @RequestParam(value = "taskInstanceName", required = false) String taskName,
+                                       @RequestParam(value = "processInstanceName", required = false) String processName,
+                                       @RequestParam(value = "status", required = false) Integer status,
+                                       @RequestParam("pageNo") Integer pageNo,
+                                       @RequestParam("pageSize") Integer pageSize) {
+        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(
+                loginUser,
+                taskName,
+                processName,
+                status,
+                groupId,
+                pageNo,
+                pageSize);
         return returnDataList(result);
     }
 
