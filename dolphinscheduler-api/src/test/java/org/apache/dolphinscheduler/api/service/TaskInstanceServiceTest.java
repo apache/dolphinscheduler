@@ -21,6 +21,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.ApiApplicationServer;
@@ -108,9 +110,8 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
-        when(projectMapper.queryByCode(projectCode)).thenReturn(null);
-        Mockito.doThrow(new ServiceException()).when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
-                Mockito.any(), Mockito.any());
+        doThrow(new ServiceException()).when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode,
+                TASK_INSTANCE);
         Assertions.assertThrows(ServiceException.class, () -> taskInstanceService.queryTaskListPaging(loginUser,
                 projectCode,
                 0,
@@ -159,9 +160,7 @@ public class TaskInstanceServiceTest {
         Page<TaskInstance> pageReturn = new Page<>(1, 10);
         taskInstanceList.add(taskInstance);
         pageReturn.setRecords(taskInstanceList);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(), Mockito.any(),
-                Mockito.any());
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(taskInstanceMapper.queryTaskInstanceListPaging(
@@ -183,9 +182,22 @@ public class TaskInstanceServiceTest {
         when(processService.findProcessInstanceDetailById(taskInstance.getProcessInstanceId()))
                 .thenReturn(Optional.of(processInstance));
 
-        Result successRes = taskInstanceService.queryTaskListPaging(loginUser, projectCode, 1, "", "", "",
-                null, "test_user", "2020-01-01 00:00:00", "2020-01-02 00:00:00", "", TaskExecutionStatus.SUCCESS,
-                "192.168.xx.xx", TaskExecuteType.BATCH, 1, 20);
+        Result successRes = taskInstanceService.queryTaskListPaging(loginUser,
+                projectCode,
+                1,
+                "",
+                "",
+                "",
+                null,
+                "test_user",
+                "2020-01-01 00:00:00",
+                "2020-01-02 00:00:00",
+                "",
+                TaskExecutionStatus.SUCCESS,
+                "192.168.xx.xx",
+                TaskExecuteType.BATCH,
+                1,
+                20);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         // executor name empty
@@ -331,7 +343,7 @@ public class TaskInstanceServiceTest {
     }
 
     @Test
-    public void forceTaskSuccess() {
+    public void testForceTaskSuccess() {
         User user = getAdminUser();
         long projectCode = 1L;
         Project project = getProject(projectCode);
@@ -380,12 +392,14 @@ public class TaskInstanceServiceTest {
 
         // test success
         task.setState(TaskExecutionStatus.FAILURE);
+        task.setEndTime(null);
         when(taskInstanceMapper.updateById(task)).thenReturn(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
         Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assertions.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
+        Assertions.assertNotNull(task.getEndTime());
 
     }
 

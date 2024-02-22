@@ -19,16 +19,11 @@ package org.apache.dolphinscheduler.alert.plugin;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
-import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.Validate;
-import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
 import java.util.ArrayList;
@@ -76,22 +71,19 @@ public final class AlertPluginManager {
     }
 
     private void installAlertPlugin() {
-        final PluginParams warningTypeParams = getWarningTypeParams();
-
         PrioritySPIFactory<AlertChannelFactory> prioritySPIFactory =
                 new PrioritySPIFactory<>(AlertChannelFactory.class);
         for (Map.Entry<String, AlertChannelFactory> entry : prioritySPIFactory.getSPIMap().entrySet()) {
             String name = entry.getKey();
             AlertChannelFactory factory = entry.getValue();
 
-            log.info("Registering alert plugin: {} - {}", name, factory.getClass());
+            log.info("Registering alert plugin: {} - {}", name, factory.getClass().getSimpleName());
 
             final AlertChannel alertChannel = factory.create();
 
-            log.info("Registered alert plugin: {} - {}", name, factory.getClass());
+            log.info("Registered alert plugin: {} - {}", name, factory.getClass().getSimpleName());
 
             final List<PluginParams> params = new ArrayList<>(factory.params());
-            params.add(0, warningTypeParams);
 
             final String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
 
@@ -102,15 +94,4 @@ public final class AlertPluginManager {
         }
     }
 
-    private PluginParams getWarningTypeParams() {
-        return RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                .addParamsOptions(
-                        new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                .addParamsOptions(
-                        new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                .setValue(WarningType.ALL.getDescp())
-                .addValidate(Validate.newBuilder().setRequired(true).build())
-                .build();
-    }
 }

@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
 import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.runner.execute.TaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
 
 /**
  * Used to do task dispatcher.

@@ -76,6 +76,12 @@ public class JdbcRegistry implements Registry {
     }
 
     @Override
+    public boolean isConnected() {
+        jdbcOperator.healthCheck();
+        return true;
+    }
+
+    @Override
     public void connectUntilTimeout(@NonNull Duration timeout) throws RegistryException {
         long beginTimeMillis = System.currentTimeMillis();
         long endTimeMills = timeout.getSeconds() <= 0 ? Long.MAX_VALUE : beginTimeMillis + timeout.toMillis();

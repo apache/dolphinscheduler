@@ -20,17 +20,11 @@ package org.apache.dolphinscheduler.plugin.task.api;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
-import org.slf4j.Logger;
-
-/**
- * shell command executor
- */
 public class ShellCommandExecutor extends AbstractCommandExecutor {
 
     public ShellCommandExecutor(Consumer<LinkedBlockingQueue<String>> logHandler,
-                                TaskExecutionContext taskRequest,
-                                Logger logger) {
-        super(logHandler, taskRequest, logger);
+                                TaskExecutionContext taskRequest) {
+        super(logHandler, taskRequest);
     }
 
 }

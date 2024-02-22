@@ -18,10 +18,12 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.BATCH_EXECUTE_PROCESS_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.BATCH_START_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CHECK_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.EXECUTE_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKFLOW_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_INSTANCE_ERROR;
 
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -226,7 +228,7 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @ApiException(BATCH_START_PROCESS_INSTANCE_ERROR)
     public Result batchStartProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
@@ -292,7 +294,7 @@ public class ExecutorController extends BaseController {
         }
 
         if (!startFailedProcessDefinitionCodeList.isEmpty()) {
-            putMsg(result, Status.BATCH_START_PROCESS_INSTANCE_ERROR,
+            putMsg(result, BATCH_START_PROCESS_INSTANCE_ERROR,
                     String.join(Constants.COMMA, startFailedProcessDefinitionCodeList));
         }
 
@@ -437,17 +439,17 @@ public class ExecutorController extends BaseController {
     })
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(START_PROCESS_INSTANCE_ERROR)
-    public Result startStreamTaskInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                          @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
-                                          @RequestParam(value = "version", required = true) int version,
-                                          @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
-                                          @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
-                                          @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
-                                          @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
-                                          @RequestParam(value = "startParams", required = false) String startParams,
-                                          @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
+    @ApiException(START_TASK_INSTANCE_ERROR)
+    public Result<Boolean> startStreamTaskInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                   @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
+                                                   @RequestParam(value = "version", required = true) int version,
+                                                   @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
+                                                   @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                   @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
+                                                   @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
+                                                   @RequestParam(value = "startParams", required = false) String startParams,
+                                                   @RequestParam(value = "dryRun", defaultValue = "0", required = false) int dryRun) {
 
         Map<String, String> startParamMap = null;
         if (startParams != null) {
@@ -456,9 +458,9 @@ public class ExecutorController extends BaseController {
 
         log.info("Start to execute stream task instance, projectCode:{}, taskDefinitionCode:{}, taskVersion:{}.",
                 projectCode, code, version);
-        Map<String, Object> result = execService.execStreamTaskInstance(loginUser, projectCode, code, version,
-                warningGroupId, workerGroup, tenantCode, environmentCode, startParamMap, dryRun);
-        return returnDataList(result);
+        execService.execStreamTaskInstance(loginUser, projectCode, code, version, warningGroupId, workerGroup,
+                tenantCode, environmentCode, startParamMap, dryRun);
+        return Result.success(true);
     }
 
     /**

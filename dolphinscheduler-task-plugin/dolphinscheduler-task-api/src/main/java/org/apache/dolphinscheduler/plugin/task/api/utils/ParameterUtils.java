@@ -301,7 +301,6 @@ public class ParameterUtils {
                 continue;
             }
             String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);
-            assert value != null;
             matcher.appendReplacement(newValue, value);
         }
 

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.extract.alert;
 
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendRequest;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
+import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 
@@ -27,5 +28,8 @@ public interface IAlertOperator {
 
     @RpcMethod
     AlertSendResponse sendAlert(AlertSendRequest alertSendRequest);
+
+    @RpcMethod
+    AlertSendResponse sendTestAlert(AlertTestSendRequest alertSendRequest);
 
 }
