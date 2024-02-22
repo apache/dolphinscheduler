@@ -1285,9 +1285,10 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         || state == TaskExecutionStatus.SUBMITTED_SUCCESS
                         || state == TaskExecutionStatus.DELAY_EXECUTION) {
                     // try to take over task instance
-                    if (state != TaskExecutionStatus.SUBMITTED_SUCCESS
-                            && state != TaskExecutionStatus.DELAY_EXECUTION
-                            && tryToTakeOverTaskInstance(existTaskInstance)) {
+                    if (state == TaskExecutionStatus.SUBMITTED_SUCCESS || state == TaskExecutionStatus.DELAY_EXECUTION
+                            || state == TaskExecutionStatus.DISPATCH) {
+                        // The taskInstance is not in running, directly takeover it
+                    } else if (tryToTakeOverTaskInstance(existTaskInstance)) {
                         log.info("Success take over task {}", existTaskInstance.getName());
                         continue;
                     } else {
