@@ -82,10 +82,8 @@ public class PageInfo<T> {
         if (pageSize == null || pageSize == 0) {
             pageSize = 7;
         }
-        this.totalPage =
-                (this.total % this.pageSize) == 0
-                        ? ((this.total / this.pageSize) == 0 ? 1 : (this.total / this.pageSize))
-                        : (this.total / this.pageSize + 1);
+        
+        this.totalPage = Math.ceil(this.total / this.pageSize);
         return this.totalPage;
     }
 }
