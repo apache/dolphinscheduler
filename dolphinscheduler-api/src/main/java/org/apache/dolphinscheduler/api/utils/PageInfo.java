@@ -83,7 +83,7 @@ public class PageInfo<T> {
             pageSize = 7;
         }
         
-        this.totalPage = (int)Math.ceil((double)this.total / (double)this.pageSize);
+        this.totalPage = (int) Math.ceil((double) this.total / (double) this.pageSize);
         return this.totalPage;
     }
 }
