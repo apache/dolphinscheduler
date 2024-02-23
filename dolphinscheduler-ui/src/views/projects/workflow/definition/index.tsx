@@ -24,11 +24,12 @@ import {
   NSpace,
   NTooltip,
   NPopconfirm,
-  NModal
+  NModal,
+  NEllipsis
 } from 'naive-ui'
 import {
   defineComponent,
-  getCurrentInstance,
+  getCurrentInstance, h,
   onMounted,
   toRefs,
   watch
@@ -45,6 +46,7 @@ import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
 import Search from '@/components/input-search'
+import ButtonLink from "@/components/button-link";
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -82,6 +84,11 @@ export default defineComponent({
 
     const confirmToSetWorkflowTiming = () => {
       variables.timingShowRef = true
+    }
+
+
+    const confirmToOfflineWorkflow = () => {
+      variables.dependentTaskConfirmShowRef = false
     }
 
     const handleSearch = () => {
@@ -142,6 +149,7 @@ export default defineComponent({
       batchCopyWorkflow,
       handleCopyUpdateList,
       confirmToSetWorkflowTiming,
+      confirmToOfflineWorkflow,
       ...toRefs(variables),
       uiSettingStore,
       trim
@@ -318,6 +326,45 @@ export default defineComponent({
           maskClosable={false}
           onPositiveClick={this.confirmToSetWorkflowTiming}
         />
+        <NModal
+            v-model:show={this.dependentTaskConfirmShowRef}
+            preset={'dialog'}
+            title={t('project.workflow.warning_dependent_tasks_title')}
+            content={t('project.workflow.warning_dependent_tasks_desc')}
+            positiveText={t('project.workflow.confirm')}
+            negativeText={t('project.workflow.cancel')}
+            maskClosable={false}
+            onPositiveClick={this.confirmToOfflineWorkflow}
+        >
+          {{
+            default: () => (
+                <NSpace vertical>
+                  <div>{t('project.workflow.warning_dependent_tasks_desc')}</div>
+                  <div>Dependences:</div>
+                  <NSpace>
+                    {this.dependentTaskLinks.map((item: any) =>{
+                      return (
+                        <ButtonLink
+                            onClick={item.action}
+                            disabled={false}
+                        >
+                          {{
+                            default: () =>
+                              h(NEllipsis,
+                                  {
+                                    style: 'max-width: 350px;line-height: 1.5'
+                                  },
+                                  () => item.text
+                              )
+                          }}
+                        </ButtonLink>
+                      )
+                    })}
+                  </NSpace>
+                </NSpace>
+            )
+          }}
+        </NModal>
       </NSpace>
     )
   }

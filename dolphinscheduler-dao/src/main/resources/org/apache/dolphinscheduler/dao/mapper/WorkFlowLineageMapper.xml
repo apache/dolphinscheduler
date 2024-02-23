@@ -197,6 +197,7 @@
         , td.code as taskCode
         , td.version as taskVersion
         , td.task_type as taskType
+        , pd.project_code as projectCode
         , ptr.process_definition_code as processDefinitionCode
         , pd.name as processDefinitionName
         , pd.version as processDefinitionVersion

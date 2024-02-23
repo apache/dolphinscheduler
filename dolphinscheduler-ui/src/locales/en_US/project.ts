@@ -238,6 +238,8 @@ export default {
     confirm_to_offline: 'Confirm to make the workflow offline?',
     time_to_online: 'Confirm to make the Scheduler online?',
     time_to_offline: 'Confirm to make the Scheduler offline?',
+    warning_dependent_tasks_title: 'Warning',
+    warning_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the workflow offline?',
   },
   task: {
     on_line: 'Online',

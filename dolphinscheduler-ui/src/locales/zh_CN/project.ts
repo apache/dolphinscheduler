@@ -236,6 +236,8 @@ export default {
     confirm_to_offline: '是否确定下线该工作流?',
     time_to_online: '是否确定上线该定时?',
     time_to_offline: '是否确定下线该定时?',
+    warning_dependent_tasks_title: '警告',
+    warning_dependent_tasks_desc: '下游存在依赖, 可能会对下游任务存在影响. 你确定要下线该工作流嘛?',
   },
   task: {
     on_line: '线上',

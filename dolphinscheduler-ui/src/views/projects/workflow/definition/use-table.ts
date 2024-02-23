@@ -45,6 +45,8 @@ import type { Router } from 'vue-router'
 import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
 import {queryDependentTasks} from "@/service/modules/lineages";
 import {DependentTaskReq} from "@/service/modules/lineages/types";
+import {TASK_TYPES_MAP} from "@/store/project";
+import {LinkOption} from "@/components/modal/types";
 
 export function useTable() {
   const { t } = useI18n()
@@ -69,7 +71,9 @@ export function useTable() {
     versionShowRef: ref(false),
     copyShowRef: ref(false),
     loadingRef: ref(false),
-    setTimingDialogShowRef: ref(false)
+    setTimingDialogShowRef: ref(false),
+    dependentTaskConfirmShowRef: ref(false),
+    dependentTaskLinks: [] as LinkOption[],
   })
 
   const createColumns = (variables: any) => {
@@ -365,29 +369,41 @@ export function useTable() {
     }
 
     if (data.releaseState === 'OFFLINE') {
-      console.log(data.releaseState)
-
       let dependentTaskReq = {workFlowCode: row.code} as DependentTaskReq
-      console.log(dependentTaskReq)
 
+      variables.dependentTaskLinks = []
       queryDependentTasks(variables.projectCode, dependentTaskReq).then((res: any) => {
-        console.log(res.data)
+        res.filter((item: any) => item.processDefinitionCode!==row.code && item.taskType===TASK_TYPES_MAP.DEPENDENT.alias).forEach((item: any) => {
+          variables.dependentTaskLinks.push(
+              {
+                text: item.processDefinitionName+'->'+item.taskName,
+                show: true,
+                action: () => {
+                  router.push({ path: `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`})
+                },
+              }
+          )
+
+        })
+        if (variables.dependentTaskLinks.length > 0) {
+          variables.dependentTaskConfirmShowRef = true
+        }
+      })
+    } else {
+      release(data, variables.projectCode, row.code).then(() => {
+        if (data.releaseState === 'ONLINE') {
+          variables.setTimingDialogShowRef = true
+          variables.row = row
+        } else {
+          window.$message.success(t('project.workflow.success'))
+        }
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
       })
     }
-
-    release(data, variables.projectCode, row.code).then(() => {
-      if (data.releaseState === 'ONLINE') {
-        variables.setTimingDialogShowRef = true
-        variables.row = row
-      } else {
-        window.$message.success(t('project.workflow.success'))
-      }
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
-    })
   }
 
   const releaseScheduler = (row: any) => {
