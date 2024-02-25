@@ -156,7 +156,6 @@ public class RemoteExecutor implements AutoCloseable {
         String pid = getTaskPid(taskId);
         String killCommand = String.format(COMMAND.KILL_COMMAND, pid);
         runRemote(killCommand);
-        cleanData(taskId);
     }
 
     public String getTaskPid(String taskId) throws IOException {
