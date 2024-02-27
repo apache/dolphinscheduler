@@ -68,8 +68,8 @@ DolphinScheduler 的主要特性如下：
 
 <p align="center">
 <br/><br/>
-<img src="https://landscape.cncf.io/images/left-logo.svg" width="150"/>&nbsp;&nbsp;<img src="https://landscape.cncf.io/images/right-logo.svg" width="200"/>
+<img src="./images/cncf-landscape-white-bg.jpg" width="175" alt="cncf-landscape"/>&nbsp;&nbsp;<img src="./images/cncf-white-bg.jpg" width="200" alt="cncf-logo"/>
 <br/><br/>
-DolphinScheduler enriches the <a href="https://landscape.cncf.io/?landscape=observability-and-analysis&license=apache-license-2-0">CNCF CLOUD NATIVE Landscape.</a >
+DolphinScheduler enriches the <a href="https://landscape.cncf.io/?item=orchestration-management--scheduling-orchestration--dolphinscheduler">CNCF CLOUD NATIVE Landscape.</a >
 
 </p >
