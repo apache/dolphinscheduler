@@ -40,7 +40,8 @@ export default {
     authorize_level: '权限等级',
     no_permission: '无权限',
     read_permission: '读权限',
-    all_permission: '所有权限'
+    all_permission: '所有权限',
+    assign_worker_group: '分配WorkerGroup',
   },
   workflow: {
     on_line: '线上',

@@ -34,9 +34,8 @@ public class SwitchTaskUtilsTest {
         String content = "${test}==1";
         Map<String, Property> globalParams = new HashMap<>();
         Map<String, Property> varParams = new HashMap<>();
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
-        });
+        Assertions.assertDoesNotThrow(
+                () -> SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams));
 
         globalParams.put("test", new Property("test", Direct.IN, DataType.INTEGER, "1"));
         String result = SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);

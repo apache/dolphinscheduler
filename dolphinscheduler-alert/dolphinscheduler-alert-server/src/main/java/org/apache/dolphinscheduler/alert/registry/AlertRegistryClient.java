@@ -58,4 +58,8 @@ public class AlertRegistryClient implements AutoCloseable {
         registryClient.releaseLock(RegistryNodeType.ALERT_LOCK.getRegistryPath());
         log.info("AlertRegistryClient closed...");
     }
+
+    public boolean isAvailable() {
+        return registryClient.isConnected();
+    }
 }

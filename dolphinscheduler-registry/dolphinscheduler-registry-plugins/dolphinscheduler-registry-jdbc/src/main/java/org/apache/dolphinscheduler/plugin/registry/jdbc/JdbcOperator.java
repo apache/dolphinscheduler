@@ -44,7 +44,6 @@ public class JdbcOperator {
     private JdbcRegistryDataMapper jdbcRegistryDataMapper;
     @Autowired
     private JdbcRegistryLockMapper jdbcRegistryLockMapper;
-
     private final long expireTimeWindow;
 
     public JdbcOperator(JdbcRegistryProperties registryProperties) {

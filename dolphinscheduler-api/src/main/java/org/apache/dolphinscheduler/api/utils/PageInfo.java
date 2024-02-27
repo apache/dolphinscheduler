@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.Data;
+import lombok.Setter;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -38,6 +39,7 @@ public class PageInfo<T> {
     /**
      * total Page
      */
+    @Setter
     private Integer totalPage;
     /**
      * page size
@@ -74,5 +76,16 @@ public class PageInfo<T> {
 
     public static <T> PageInfo<T> of(Integer currentPage, Integer pageSize) {
         return new PageInfo<>(currentPage, pageSize);
+    }
+
+    public Integer getTotalPage() {
+        if (pageSize == null || pageSize == 0) {
+            pageSize = 10;
+        }
+        this.totalPage =
+                (this.total % this.pageSize) == 0
+                        ? ((this.total / this.pageSize) == 0 ? 1 : (this.total / this.pageSize))
+                        : (this.total / this.pageSize + 1);
+        return this.totalPage;
     }
 }

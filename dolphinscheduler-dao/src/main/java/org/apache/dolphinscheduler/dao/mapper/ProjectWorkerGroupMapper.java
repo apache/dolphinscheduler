@@ -13,6 +13,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', current_timestamp, current_timestamp);
+ */
+
+package org.apache.dolphinscheduler.dao.mapper;
+
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+public interface ProjectWorkerGroupMapper extends BaseMapper<ProjectWorkerGroup> {
+
+}
