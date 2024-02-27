@@ -90,7 +90,7 @@ public class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
                 channel.writeAndFlush(response);
                 return;
             }
-            nettyRemotingServer.getDefaultExecutor().submit(() -> {
+            nettyRemotingServer.getDefaultExecutor().execute(() -> {
                 StandardRpcResponse iRpcResponse;
                 try {
                     StandardRpcRequest standardRpcRequest =

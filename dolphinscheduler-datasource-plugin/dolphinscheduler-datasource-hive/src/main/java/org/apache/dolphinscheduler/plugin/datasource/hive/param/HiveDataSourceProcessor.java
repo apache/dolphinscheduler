@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -124,7 +125,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         String jdbcUrl = hiveConnectionParam.getJdbcUrl();
         if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
-            return jdbcUrl + "?" + transformOther(hiveConnectionParam.getOther());
+            return jdbcUrl + ";" + transformOther(hiveConnectionParam.getOther());
         }
         return jdbcUrl;
     }
@@ -147,6 +148,11 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new HiveDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.hive);
     }
 
     private String transformOther(Map<String, String> otherMap) {

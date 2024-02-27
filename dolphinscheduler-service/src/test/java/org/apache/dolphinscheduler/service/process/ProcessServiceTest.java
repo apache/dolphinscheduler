@@ -59,7 +59,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -150,8 +149,6 @@ public class ProcessServiceTest {
     private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
     private ProcessDefinitionLogMapper processDefineLogMapper;
-    @Mock
-    private ResourceMapper resourceMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
     @Mock
@@ -736,12 +733,10 @@ public class ProcessServiceTest {
 
         // test normal situation
         ResourceInfo resourceInfoNormal = new ResourceInfo();
-        resourceInfoNormal.setId(1);
         resourceInfoNormal.setResourceName("/test.txt");
 
         ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
-        Assertions.assertEquals(-1, updatedResourceInfo3.getId().intValue());
         Assertions.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
     }
@@ -752,22 +747,6 @@ public class ProcessServiceTest {
         TaskGroupQueue taskGroupQueue =
                 processService.insertIntoTaskGroupQueue(1, "task name", 1, 1, 1, TaskGroupQueueStatus.WAIT_QUEUE);
         Assertions.assertNotNull(taskGroupQueue);
-    }
-
-    @Test
-    public void testDoRelease() {
-
-        TaskGroupQueue taskGroupQueue = getTaskGroupQueue();
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setProcessInstanceId(1);
-        taskInstance.setTaskGroupId(taskGroupQueue.getGroupId());
-
-        when(taskGroupQueueMapper.queryByTaskId(1)).thenReturn(taskGroupQueue);
-        when(taskGroupQueueMapper.updateById(taskGroupQueue)).thenReturn(1);
-
-        processService.releaseTaskGroup(taskInstance);
-
     }
 
     private TaskGroupQueue getTaskGroupQueue() {

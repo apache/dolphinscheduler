@@ -25,9 +25,9 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.worker.IWorkerLogService;
-import org.apache.dolphinscheduler.extract.worker.transportor.GetAppIdRequest;
-import org.apache.dolphinscheduler.extract.worker.transportor.GetAppIdResponse;
+import org.apache.dolphinscheduler.extract.common.ILogService;
+import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -274,10 +274,10 @@ public class WorkerFailoverService {
                     .create();
             // only kill yarn/k8s job if exists , the local thread has exited
             log.info("TaskInstance failover begin kill the task related yarn or k8s job");
-            IWorkerLogService iWorkerLogService = SingletonJdkDynamicRpcClientProxyFactory
-                    .getProxyClient(taskInstance.getHost(), IWorkerLogService.class);
+            ILogService iLogService =
+                    SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
             GetAppIdResponse getAppIdResponse =
-                    iWorkerLogService.getAppId(new GetAppIdRequest(taskInstance.getId(), taskInstance.getLogPath()));
+                    iLogService.getAppId(new GetAppIdRequest(taskInstance.getId(), taskInstance.getLogPath()));
             ProcessUtils.killApplication(getAppIdResponse.getAppIds(), taskExecutionContext);
         } catch (Exception ex) {
             log.error("Kill yarn task error", ex);

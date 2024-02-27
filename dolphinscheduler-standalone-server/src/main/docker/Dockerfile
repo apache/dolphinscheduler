@@ -15,11 +15,12 @@
 # limitations under the License.
 #
 
-FROM eclipse-temurin:8-jre
+FROM eclipse-temurin:8-jdk
 
 ENV DOCKER true
 ENV TZ Asia/Shanghai
 ENV DOLPHINSCHEDULER_HOME /opt/dolphinscheduler
+ENV DATA_QUALITY_JAR_DIR /opt/dolphinscheduler/libs/worker-server
 
 RUN apt update ; \
     apt install -y sudo ; \

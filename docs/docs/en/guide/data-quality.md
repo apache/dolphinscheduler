@@ -12,15 +12,7 @@ The execution logic of the data quality task is as follows:
 - The current data quality task result is stored in the `t_ds_dq_execute_result` table of `dolphinscheduler`
   `Worker` sends the task result to `Master`, after `Master` receives `TaskResponse`, it will judge whether the task type is `DataQualityTask`, if so, it will read the corresponding result from `t_ds_dq_execute_result` according to `taskInstanceId`, and then The result is judged according to the check mode, operator and threshold configured by the user.
 - If the result is a failure, the corresponding operation, alarm or interruption will be performed according to the failure policy configured by the user.
-- Add config : `<server-name>/conf/common.properties`
-
-```properties
-# Change to specific version if you not use dev branch
-data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
-```
-
-- Please fill in `data-quality.jar.name` according to the actual package name.
-- If you package `data-quality` separately, remember to modify the package name to be consistent with `data-quality.jar.name`.
+- If you package `data-quality` separately, remember to modify the package name to be consistent with `data-quality.jar.dir` in `common.properties` with attribute name `data-quality.jar.dir`
 - If the old version is upgraded and used, you need to execute the `sql` update script to initialize the database before running.
 - `dolphinscheduler-data-quality-dev-SNAPSHOT.jar` was built with no dependencies. If a `JDBC` driver is required, you can set the `-jars` parameter in the `node settings` `Option Parameters`, e.g. `--jars /lib/jars/mysql-connector-java-8.0.16.jar`.
 - Currently only `MySQL`, `PostgreSQL` and `HIVE` data sources have been tested, other data sources have not been tested yet.

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import static org.apache.dolphinscheduler.plugin.task.http.HttpTaskConstants.APPLICATION_JSON;
-
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
@@ -32,7 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
@@ -40,6 +37,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -52,8 +50,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+@Slf4j
 public class HttpTask extends AbstractTask {
 
     /**
@@ -145,7 +146,9 @@ public class HttpTask extends AbstractTask {
                 httpPropertyList.add(JSONUtils.parseObject(params, HttpProperty.class));
             }
         }
-        addRequestParams(builder, httpPropertyList);
+        String httpBody = ParameterUtils.convertParameterPlaceholders(httpParameters.getHttpBody(),
+                ParameterUtils.convert(paramsMap));
+        addRequestParams(builder, httpPropertyList, httpBody);
         String requestUrl =
                 ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(), ParameterUtils.convert(paramsMap));
         HttpUriRequest request = builder.setUri(requestUrl).build();
@@ -247,7 +250,14 @@ public class HttpTask extends AbstractTask {
      * @param builder buidler
      * @param httpPropertyList http property list
      */
-    protected void addRequestParams(RequestBuilder builder, List<HttpProperty> httpPropertyList) {
+    protected void addRequestParams(RequestBuilder builder, List<HttpProperty> httpPropertyList, String httpBody) {
+        if (StringUtils.isNotEmpty(httpBody)) {
+            builder.setEntity(new StringEntity(
+                    httpBody,
+                    ContentType.create(ContentType.APPLICATION_JSON.getMimeType(),
+                            StandardCharsets.UTF_8)));
+        }
+
         if (CollectionUtils.isNotEmpty(httpPropertyList)) {
             ObjectNode jsonParam = JSONUtils.createObjectNode();
             for (HttpProperty property : httpPropertyList) {
@@ -259,10 +269,12 @@ public class HttpTask extends AbstractTask {
                     }
                 }
             }
-            StringEntity postingString = new StringEntity(jsonParam.toString(), Charsets.UTF_8);
-            postingString.setContentEncoding(StandardCharsets.UTF_8.name());
-            postingString.setContentType(APPLICATION_JSON);
-            builder.setEntity(postingString);
+            if (builder.getEntity() == null) {
+                builder.setEntity(new StringEntity(
+                        jsonParam.toString(),
+                        ContentType.create(ContentType.APPLICATION_JSON.getMimeType(),
+                                StandardCharsets.UTF_8)));
+            }
         }
     }
 

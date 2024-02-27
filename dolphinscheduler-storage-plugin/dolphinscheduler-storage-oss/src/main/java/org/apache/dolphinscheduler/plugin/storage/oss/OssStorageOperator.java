@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
+import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
@@ -182,12 +183,6 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public String getResourceFileName(String tenantCode, String fullName) {
-        String resDir = getResDir(tenantCode);
-        return fullName.replaceFirst(resDir, "");
-    }
-
-    @Override
     public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
         if (fileName.startsWith(FOLDER_SEPARATOR)) {
             fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
@@ -213,13 +208,13 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public void download(String tenantCode, String srcFilePath, String dstFilePath,
+    public void download(String srcFilePath, String dstFilePath,
                          boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            Files.createDirectories(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
         }
         OSSObject ossObject = ossClient.getObject(bucketName, srcFilePath);
         try (

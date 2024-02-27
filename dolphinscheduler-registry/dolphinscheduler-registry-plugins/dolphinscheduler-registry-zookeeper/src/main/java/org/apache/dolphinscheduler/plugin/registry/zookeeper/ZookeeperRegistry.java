@@ -254,6 +254,11 @@ public final class ZookeeperRegistry implements Registry {
     }
 
     @Override
+    public boolean isConnected() {
+        return client.getZookeeperClient().isConnected();
+    }
+
+    @Override
     public void close() {
         treeCacheMap.values().forEach(CloseableUtils::closeQuietly);
         CloseableUtils.closeQuietly(client);

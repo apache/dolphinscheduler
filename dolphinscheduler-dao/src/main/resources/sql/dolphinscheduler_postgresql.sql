@@ -332,7 +332,7 @@ CREATE TABLE t_ds_process_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT 1,
   description text ,
   project_code bigint DEFAULT NULL ,
   release_state int DEFAULT NULL ,
@@ -360,7 +360,7 @@ CREATE TABLE t_ds_process_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   release_state int DEFAULT NULL ,
@@ -389,7 +389,7 @@ CREATE TABLE t_ds_task_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
@@ -428,7 +428,7 @@ CREATE TABLE t_ds_task_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
@@ -522,7 +522,7 @@ CREATE TABLE t_ds_process_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int DEFAULT NULL ,
+  process_definition_version int NOT NULL DEFAULT 1 ,
   project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
@@ -594,7 +594,7 @@ DROP TABLE IF EXISTS t_ds_project_parameter;
 CREATE TABLE t_ds_project_parameter (
   id int NOT NULL  ,
   param_name varchar(255) NOT NULL ,
-  param_value varchar(255) NOT NULL ,
+  param_value text NOT NULL ,
   code bigint NOT NULL,
   project_code bigint NOT NULL,
   user_id int DEFAULT NULL ,
@@ -695,7 +695,7 @@ create index relation_project_user_id_index on t_ds_relation_project_user (user_
 --
 -- Table structure for table t_ds_relation_resources_user
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_relation_resources_user;
 CREATE TABLE t_ds_relation_resources_user (
   id int NOT NULL ,
@@ -726,7 +726,7 @@ CREATE TABLE t_ds_relation_udfs_user (
 --
 -- Table structure for table t_ds_resources
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_resources;
 CREATE TABLE t_ds_resources (
   id int NOT NULL  ,
@@ -795,7 +795,7 @@ CREATE TABLE t_ds_task_instance (
   task_type varchar(50) DEFAULT NULL ,
   task_execute_type int DEFAULT '0',
   task_code bigint NOT NULL,
-  task_definition_version int DEFAULT NULL ,
+  task_definition_version int NOT NULL DEFAULT '1' ,
   process_instance_id int DEFAULT NULL ,
   process_instance_name varchar(255) DEFAULT NULL,
   project_code bigint DEFAULT NULL,
@@ -927,6 +927,21 @@ CREATE TABLE t_ds_worker_group (
   CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
+--
+-- Table structure for table t_ds_relation_project_worker_group
+--
+
+DROP TABLE IF EXISTS t_ds_relation_project_worker_group;
+CREATE TABLE t_ds_relation_project_worker_group (
+    id int NOT NULL  ,
+    project_code bigint DEFAULT NULL ,
+    worker_group varchar(255) NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_relation_project_worker_group_un UNIQUE (project_code, worker_group)
+);
+
 DROP SEQUENCE IF EXISTS t_ds_access_token_id_sequence;
 CREATE SEQUENCE  t_ds_access_token_id_sequence;
 ALTER TABLE t_ds_access_token ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_access_token_id_sequence');
@@ -1023,6 +1038,10 @@ ALTER TABLE t_ds_project_parameter ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_pro
 DROP SEQUENCE IF EXISTS t_ds_project_preference_id_sequence;
 CREATE SEQUENCE t_ds_project_preference_id_sequence;
 ALTER TABLE t_ds_project_preference ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_preference_id_sequence');
+
+DROP SEQUENCE IF EXISTS t_ds_relation_project_worker_group_sequence;
+CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
+ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
@@ -1945,6 +1964,8 @@ CREATE TABLE t_ds_task_group_queue (
    update_time  timestamp DEFAULT NULL ,
    PRIMARY KEY (id)
 );
+
+create index idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue(in_queue);
 
 --
 -- Table structure for table t_ds_task_group

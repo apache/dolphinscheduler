@@ -24,12 +24,12 @@ import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.StrategyType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
-import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceDispatchQueue;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
 
 import java.time.Duration;
 
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,16 +48,20 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     private RegistryClient registryClient;
 
     @Autowired
-    private WorkerRpcServer workerRpcServer;
-
-    @Autowired
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private WorkerManagerThread workerManagerThread;
+    private WorkerTaskExecutorThreadPool workerManagerThread;
 
-    @Autowired
-    private GlobalTaskInstanceDispatchQueue globalTaskInstanceDispatchQueue;
+    public WorkerWaitingStrategy(@NonNull WorkerConfig workerConfig,
+                                 @NonNull RegistryClient registryClient,
+                                 @NonNull MessageRetryRunner messageRetryRunner,
+                                 @NonNull WorkerTaskExecutorThreadPool workerManagerThread) {
+        this.workerConfig = workerConfig;
+        this.registryClient = registryClient;
+        this.messageRetryRunner = messageRetryRunner;
+        this.workerManagerThread = workerManagerThread;
+    }
 
     @Override
     public void disconnect() {
@@ -73,6 +77,7 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
                 throw new ServerLifeCycleException(
                         String.format("Waiting to reconnect to registry in %s failed", maxWaitingTime), ex);
             }
+
         } catch (ServerLifeCycleException e) {
             String errorMessage = String.format(
                     "Disconnect from registry and change the current status to waiting error, the current server state is %s, will stop the current server",
@@ -97,7 +102,6 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
         } else {
             try {
                 ServerLifeCycleManager.recoverFromWaiting();
-                reStartWorkerResource();
                 log.info("Recover from waiting success, the current server status is {}",
                         ServerLifeCycleManager.getServerStatus());
             } catch (Exception e) {
@@ -117,20 +121,11 @@ public class WorkerWaitingStrategy implements WorkerConnectStrategy {
     }
 
     private void clearWorkerResource() {
-        // close the worker resource, if close failed should stop the worker server
-        workerRpcServer.close();
-        log.warn("Worker server close the RPC server due to lost connection from registry");
         workerManagerThread.clearTask();
-        globalTaskInstanceDispatchQueue.clearTask();
+        WorkerTaskExecutorHolder.clear();
         log.warn("Worker server clear the tasks due to lost connection from registry");
         messageRetryRunner.clearMessage();
         log.warn("Worker server clear the retry message due to lost connection from registry");
-
     }
 
-    private void reStartWorkerResource() {
-        // reopen the resource, if reopen failed should stop the worker server
-        workerRpcServer.start();
-        log.warn("Worker server restart PRC server due to reconnect to registry");
-    }
 }
