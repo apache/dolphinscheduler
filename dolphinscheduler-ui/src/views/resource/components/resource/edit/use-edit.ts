@@ -24,10 +24,12 @@ import {
   viewResource
 } from '@/service/modules/resources'
 import { defineStore } from 'pinia'
+import { useDetailPageStore } from '../table/use-table'
 
 export function useEdit(state: any) {
   const { t } = useI18n()
   const router: Router = useRouter()
+  const detailPageStore = useDetailPageStore()
 
   const getResourceView = (fullName: string, tenantCode: string) => {
     const params = {
@@ -43,6 +45,10 @@ export function useEdit(state: any) {
   }
 
   const handleUpdateContent = (fullName: string, tenantCode: string) => {
+    const pathSplit = fullName.split('/')
+    pathSplit.pop()
+    detailPageStore.fullName = pathSplit.join('/')
+    detailPageStore.tenantCode = tenantCode
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
         await updateResourceContent({
@@ -63,10 +69,10 @@ export function useEdit(state: any) {
   }
 }
 
-export const useIsDetailPageStore = defineStore("isDetailPage", {
-  state:() => {
+export const useIsDetailPageStore = defineStore('isDetailPage', {
+  state: () => {
     return {
-      isDetailPage:false
+      isDetailPage: false
     }
   },
   getters: {
@@ -82,9 +88,9 @@ export const useIsDetailPageStore = defineStore("isDetailPage", {
 })
 
 export const isEmpty = (string: any): boolean => {
-    if(string === '' || string === undefined || string === null){
-        return true
-    }else{
-        return false
-    }
+  if (string === '' || string === undefined || string === null) {
+    return true
+  } else {
+    return false
+  }
 }
