@@ -80,7 +80,7 @@ public class PageInfo<T> {
 
     public Integer getTotalPage() {
         if (pageSize == null || pageSize == 0) {
-            pageSize = 7;
+            pageSize = 10;
         }
         
         this.totalPage = (int) Math.ceil((double) this.total / (double) this.pageSize);
