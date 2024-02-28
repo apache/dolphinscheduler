@@ -86,11 +86,6 @@ export default defineComponent({
       variables.timingShowRef = true
     }
 
-
-    const confirmToOfflineWorkflow = () => {
-      variables.dependentTaskConfirmShowRef = false
-    }
-
     const handleSearch = () => {
       variables.page = 1
       requestData()
@@ -149,7 +144,6 @@ export default defineComponent({
       batchCopyWorkflow,
       handleCopyUpdateList,
       confirmToSetWorkflowTiming,
-      confirmToOfflineWorkflow,
       ...toRefs(variables),
       uiSettingStore,
       trim
@@ -326,45 +320,6 @@ export default defineComponent({
           maskClosable={false}
           onPositiveClick={this.confirmToSetWorkflowTiming}
         />
-        <NModal
-            v-model:show={this.dependentTaskConfirmShowRef}
-            preset={'dialog'}
-            title={t('project.workflow.warning_dependent_tasks_title')}
-            content={t('project.workflow.warning_dependent_tasks_desc')}
-            positiveText={t('project.workflow.confirm')}
-            negativeText={t('project.workflow.cancel')}
-            maskClosable={false}
-            onPositiveClick={this.confirmToOfflineWorkflow}
-        >
-          {{
-            default: () => (
-                <NSpace vertical>
-                  <div>{t('project.workflow.warning_dependent_tasks_desc')}</div>
-                  <div>Dependences:</div>
-                  <NSpace>
-                    {this.dependentTaskLinks.map((item: any) =>{
-                      return (
-                        <ButtonLink
-                            onClick={item.action}
-                            disabled={false}
-                        >
-                          {{
-                            default: () =>
-                              h(NEllipsis,
-                                  {
-                                    style: 'max-width: 350px;line-height: 1.5'
-                                  },
-                                  () => item.text
-                              )
-                          }}
-                        </ButtonLink>
-                      )
-                    })}
-                  </NSpace>
-                </NSpace>
-            )
-          }}
-        </NModal>
       </NSpace>
     )
   }

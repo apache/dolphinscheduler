@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, toRefs } from 'vue'
-import { NSpace, NTooltip, NButton, NIcon, NPopconfirm } from 'naive-ui'
+import {defineComponent, PropType, toRefs, h, computed, watch, ref} from 'vue'
+import {NSpace, NTooltip, NButton, NIcon, NPopconfirm, NEllipsis, darkTheme} from 'naive-ui'
 import {
   DeleteOutlined,
   DownloadOutlined,
@@ -33,6 +33,11 @@ import {
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
+import {queryDependentTasks} from "@/service/modules/lineages";
+import {TASK_TYPES_MAP} from "@/store/project";
+import {DependentTaskReq} from "@/service/modules/lineages/types";
+import {Router, useRouter} from "vue-router";
+import ButtonLink from "@/components/button-link";
 const props = {
   row: {
     type: Object as PropType<IDefinitionData>
@@ -95,6 +100,7 @@ export default defineComponent({
     const handleReleaseScheduler = () => {
       ctx.emit('releaseScheduler')
     }
+
     return {
       handleEditWorkflow,
       handleStartWorkflow,
@@ -114,6 +120,62 @@ export default defineComponent({
     const releaseState = this.row?.releaseState
     const scheduleReleaseState = this.row?.scheduleReleaseState
     const schedule = this.row?.schedule
+    const dependentTaskLinks = [] as any[]
+    const router: Router = useRouter()
+
+    const confirmPositiveText = ref()
+
+    const queryDependentTaskLinks = () => {
+      if (this.row?.code) {
+        let dependentTaskReq = {workFlowCode: this.row.code} as DependentTaskReq
+        queryDependentTasks(this.row?.projectCode, dependentTaskReq).then((res: any) => {
+          res.filter((item: any) => item.processDefinitionCode !== this.row?.code && item.taskType === TASK_TYPES_MAP.DEPENDENT.alias)
+          .forEach((item: any) => {
+            dependentTaskLinks.push(
+                {
+                  text: item.processDefinitionName + '->' + item.taskName,
+                  show: true,
+                  action: () => {
+                    router.push({path: `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`})
+                  },
+                }
+            )
+            confirmPositiveText.value = dependentTaskLinks.length > 0 ? null : t('project.workflow.confirm')
+          })
+        })
+      }
+    }
+
+    queryDependentTaskLinks()
+
+    const renderDownstreamDependencies = () => {
+      if (dependentTaskLinks.length > 0) {
+        return h(
+            <NSpace vertical>
+              <div>{t('project.workflow.warning_dependencies')}</div>
+              {dependentTaskLinks.map((item: any) => {
+                return (
+                    <ButtonLink
+                        onClick={item.action}
+                        disabled={false}
+                    >
+                      {{
+                        default: () =>
+                            h(NEllipsis,
+                                {
+                                  style: 'max-width: 350px;line-height: 1.5'
+                                },
+                                () => item.text
+                            )
+                      }}
+                    </ButtonLink>
+                )
+              })}
+            </NSpace>
+        )
+      }
+    }
+
     return (
       <NSpace>
         <NTooltip trigger={'hover'}>
@@ -164,12 +226,18 @@ export default defineComponent({
                 ? t('project.workflow.down_line')
                 : t('project.workflow.up_line'),
             trigger: () => (
-              <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
+              <NPopconfirm onPositiveClick={this.handleReleaseWorkflow} showIcon={false}>
                 {{
-                  default: () =>
-                    releaseState === 'ONLINE'
-                      ? t('project.workflow.confirm_to_offline')
-                      : t('project.workflow.confirm_to_online'),
+                  default: () => releaseState === 'OFFLINE' ? t('project.workflow.confirm_to_online')
+                          : h(
+                          dependentTaskLinks.length>0?  (
+                                <NSpace vertical>
+                                  <div>{t('project.workflow.warning_dependent_tasks_desc')}</div>
+                                  {renderDownstreamDependencies()}
+                                </NSpace>
+                              )
+                              : <div>{t('project.workflow.confirm_to_offline')}</div>
+                      ),
                   trigger: () => (
                     <NButton
                       size='small'
@@ -217,12 +285,19 @@ export default defineComponent({
                 ? t('project.workflow.time_down_line')
                 : t('project.workflow.time_up_line'),
             trigger: () => (
-              <NPopconfirm onPositiveClick={this.handleReleaseScheduler}>
+              <NPopconfirm onPositiveClick={this.handleReleaseScheduler} showIcon={false}>
                 {{
                   default: () =>
-                    scheduleReleaseState === 'ONLINE'
-                      ? t('project.workflow.time_to_offline')
-                      : t('project.workflow.time_to_online'),
+                      scheduleReleaseState === 'OFFLINE' ? t('project.workflow.time_to_online')
+                          : h(
+                              dependentTaskLinks.length>0?  (
+                                      <NSpace vertical>
+                                        <div>{t('project.workflow.warning_offline_scheduler_dependent_tasks_desc')}</div>
+                                        {renderDownstreamDependencies()}
+                                      </NSpace>
+                                  )
+                                  : <div>{t('project.workflow.time_to_offline')}</div>
+                          ),
                   trigger: () => (
                     <NButton
                       size='small'
@@ -272,10 +347,18 @@ export default defineComponent({
             trigger: () => (
               <NPopconfirm
                 disabled={releaseState === 'ONLINE'}
+                showIcon={false}
+                positiveText={confirmPositiveText.value}
                 onPositiveClick={this.handleDeleteWorkflow}
               >
                 {{
-                  default: () => t('project.workflow.delete_confirm'),
+                  default: () => dependentTaskLinks.length>0?  (
+                          <NSpace vertical>
+                            <div>{t('project.workflow.delete_validate_dependent_tasks_desc')}</div>
+                            {renderDownstreamDependencies()}
+                          </NSpace>
+                      )
+                      : <div>{t('project.workflow.delete_confirm')}</div>,
                   trigger: () => (
                     <NButton
                       size='small'

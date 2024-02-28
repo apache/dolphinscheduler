@@ -240,6 +240,10 @@ export default {
     time_to_offline: 'Confirm to make the Scheduler offline?',
     warning_dependent_tasks_title: 'Warning',
     warning_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the workflow offline?',
+    warning_dependencies: 'Dependencies:',
+    delete_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the workflow.',
+    warning_offline_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the scheduler offline?',
+    delete_task_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the task. Dependencies:',
   },
   task: {
     on_line: 'Online',

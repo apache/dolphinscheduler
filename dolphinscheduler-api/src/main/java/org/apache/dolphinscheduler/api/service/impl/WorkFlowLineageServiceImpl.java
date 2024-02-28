@@ -279,7 +279,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     public Set<TaskMainInfo> queryTaskDepOnProcess(long projectCode, long processDefinitionCode) {
         Set<TaskMainInfo> taskMainInfos = new HashSet<>();
         List<TaskMainInfo> taskDependents =
-                workFlowLineageMapper.queryTaskDependentDepOnProcess(processDefinitionCode);
+                workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode, 0);
         List<TaskMainInfo> taskSubProcess =
                 workFlowLineageMapper.queryTaskSubProcessDepOnProcess(projectCode, processDefinitionCode);
         taskMainInfos.addAll(taskDependents);
@@ -300,13 +300,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         Long processDefinitionCode, Long taskCode) {
         Map<String, Object> result = new HashMap<>();
         List<TaskMainInfo> taskDependents =
-            workFlowLineageMapper.queryTaskDependentDepOnProcess(processDefinitionCode);
-        if (Objects.nonNull(taskCode) && taskCode.longValue()!=0) {
-            taskDependents = taskDependents.stream()
-                .filter(taskMainInfo -> taskMainInfo.getUpstreamTaskCode()==taskCode)
-                .collect(Collectors.toList());
-        }
-
+            workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode, Objects.isNull(taskCode)? 0:taskCode.longValue());
         result.put(Constants.DATA_LIST, taskDependents);
         putMsg(result, Status.SUCCESS);
         return result;

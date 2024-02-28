@@ -191,7 +191,7 @@
         </where>
     </select>
 
-    <select id="queryTaskDependentDepOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
+    <select id="queryTaskDependentOnProcess" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
         select td.id
         , td.name as taskName
         , td.code as taskCode
@@ -212,6 +212,9 @@
                 and td.task_type = 'DEPENDENT'
                 and ptr.process_definition_code != #{processDefinitionCode}
                 and td.task_params like concat('%"definitionCode":', #{processDefinitionCode}, '%')
+            </if>
+            <if test="taskCode != 0">
+                and (td.task_params like concat('%"depTaskCode":', #{taskCode}, '%') or td.task_params like concat('%"depTaskCode":-1%'))
             </if>
         </where>
     </select>
