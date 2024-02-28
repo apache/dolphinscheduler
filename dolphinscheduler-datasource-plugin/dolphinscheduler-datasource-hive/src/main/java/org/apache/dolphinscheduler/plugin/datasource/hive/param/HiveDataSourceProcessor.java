@@ -125,7 +125,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
         String jdbcUrl = hiveConnectionParam.getJdbcUrl();
         if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
-            return jdbcUrl + "?" + transformOther(hiveConnectionParam.getOther());
+            return jdbcUrl + ";" + transformOther(hiveConnectionParam.getOther());
         }
         return jdbcUrl;
     }
