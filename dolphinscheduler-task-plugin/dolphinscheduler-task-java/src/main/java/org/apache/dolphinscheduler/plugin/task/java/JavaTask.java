@@ -49,9 +49,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -185,8 +183,9 @@ public class JavaTask extends AbstractTask {
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(" ")
-                .append(buildExtDirs()).append(" ")
+                .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
+                .append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
                 .append(mainJarName).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
@@ -291,29 +290,10 @@ public class JavaTask extends AbstractTask {
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
             builder
+                    .append(taskRequest.getExecutePath())
+                    .append(FOLDER_SEPARATOR)
                     .append(resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal());
         }
-        return builder.toString();
-    }
-
-    protected String buildExtDirs() {
-        StringBuilder builder = new StringBuilder();
-        if (javaParameters.isModulePath()) {
-            builder.append("--module-path");
-        } else {
-            builder.append("-Djava.ext.dirs=\"$JAVA_HOME/jre/lib/ext");
-        }
-        ResourceContext resourceContext = taskRequest.getResourceContext();
-        Set<String> set = new HashSet<>();
-        for (ResourceInfo info : javaParameters.getResourceFilesList()) {
-            String absolutePathInLocal = resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal();
-            String extdir = absolutePathInLocal.substring(0, absolutePathInLocal.lastIndexOf(File.separator));
-            if (set.add(extdir)) {
-                builder.append(JavaConstants.PATH_SEPARATOR);
-                builder.append(extdir);
-            }
-        }
-        builder.append("\"");
         return builder.toString();
     }
 
