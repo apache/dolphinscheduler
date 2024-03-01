@@ -167,12 +167,11 @@ public class ResourcesControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testOnlineCreateResource() throws Exception {
+    public void testCreateResourceFile() throws Exception {
         Result mockResult = new Result<>();
         mockResult.setCode(Status.TENANT_NOT_EXIST.getCode());
-        Mockito.when(resourcesService
-                .onlineCreateResource(Mockito.any(), Mockito.any(), Mockito.anyString(),
-                        Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(resourcesService.createResourceFile(Mockito.any(), Mockito.any(), Mockito.anyString(),
+                Mockito.anyString(), Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
@@ -388,50 +387,6 @@ public class ResourcesControllerTest extends AbstractControllerTest {
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testAuthorizedUDFFunction() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(resourcesService.authorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "2");
-
-        MvcResult mvcResult = mockMvc.perform(get("/resources/authed-udf-func")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void testUnauthUDFFunc() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(resourcesService.unauthorizedUDFFunction(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "2");
-
-        MvcResult mvcResult = mockMvc.perform(get("/resources/unauth-udf-func")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
