@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
@@ -306,7 +305,8 @@ public class JavaTask extends AbstractTask {
         ResourceContext resourceContext = taskRequest.getResourceContext();
         Set<String> set = new HashSet<>();
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
-            String absolutePathInLocal = resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal();
+            String absolutePathInLocal =
+                    resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal();
             String extdir = absolutePathInLocal.substring(0, absolutePathInLocal.lastIndexOf(File.separator));
             if (set.add(extdir)) {
                 builder.append(JavaConstants.PATH_SEPARATOR);
