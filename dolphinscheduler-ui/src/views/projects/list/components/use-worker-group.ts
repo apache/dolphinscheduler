@@ -28,7 +28,6 @@ export function useWorkerGroup(
     ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
 ) {
   const { t } = useI18n()
-  const userStore = useUserStore()
 
   const variables = reactive({
     model: {
