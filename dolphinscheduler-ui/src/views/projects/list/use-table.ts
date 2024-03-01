@@ -25,7 +25,7 @@ import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import {
-  NButton, NDropdown,
+  NButton,
   NEllipsis,
   NIcon,
   NPopconfirm,
