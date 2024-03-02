@@ -48,11 +48,14 @@ import type {
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
 import type { IRecord } from './types'
+import {useDependencies} from "@/views/projects/use-dependencies";
 
 export function useTable(onEdit: Function) {
   const { t } = useI18n()
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
+
+  const {getDependentTaskLinksByTask} = useDependencies()
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -260,22 +263,32 @@ export function useTable(onEdit: Function) {
     totalPage: ref(1),
     taskType: ref(null),
     showVersionModalRef: ref(false),
+    dependentTasksShowRef: ref(false),
+    dependentTaskLinksRef: ref([]),
     row: {},
     loadingRef: ref(false)
   })
 
   const handleDelete = (row: any) => {
-    deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(() => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo:
-          variables.tableData.length === 1 && variables.page > 1
-            ? variables.page - 1
-            : variables.page,
-        searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
-        taskType: variables.taskType
-      })
+    variables.row = row
+    getDependentTaskLinksByTask(projectCode, row.processDefinitionCode, row.taskCode).then((res: any) =>{
+      if (res && res.length > 0) {
+        variables.dependentTaskLinksRef = res
+        variables.dependentTasksShowRef = true
+      } else {
+        deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(() => {
+          getTableData({
+            pageSize: variables.pageSize,
+            pageNo:
+                variables.tableData.length === 1 && variables.page > 1
+                    ? variables.page - 1
+                    : variables.page,
+            searchTaskName: variables.searchTaskName,
+            searchWorkflowName: variables.searchWorkflowName,
+            taskType: variables.taskType
+          })
+        })
+      }
     })
   }
 

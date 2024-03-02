@@ -49,6 +49,7 @@ import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 import { WorkflowDefinition, WorkflowInstance } from './types'
+import {useDependencies} from "@/views/projects/use-dependencies";
 
 const props = {
   layoutToggle: {
@@ -79,6 +80,9 @@ export default defineComponent({
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
     const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+    const workflowCode = Number(route.params.code)
+    const { getDependentTasksByMultipleTasks } = useDependencies()
 
     /**
      * Node search and navigate
@@ -164,15 +168,20 @@ export default defineComponent({
     /**
      * Delete selected edges and nodes
      */
-    const removeCells = () => {
+    const removeCells = async () => {
       if (graph.value) {
         const cells = graph.value.getSelectedCells()
         if (cells) {
           const codes = cells
             .filter((cell) => cell.isNode())
             .map((cell) => +cell.id)
-          context.emit('removeTasks', codes, cells)
-          graph.value?.removeCells(cells)
+          const dependentTasks = await getDependentTasksByMultipleTasks(projectCode, workflowCode, codes)
+          if (dependentTasks.length > 0) {
+            window.$message.error(t('project.workflow.delete_task_validate_dependent_tasks_desc') + dependentTasks, { duration: 5000 })
+          } else {
+            context.emit('removeTasks', codes, cells)
+            graph.value?.removeCells(cells)
+          }
         }
       }
     }

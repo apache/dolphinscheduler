@@ -27,6 +27,7 @@ import {NButton} from 'naive-ui'
 import {DependentTaskReq} from "@/service/modules/lineages/types";
 import {queryDependentTasks} from "@/service/modules/lineages";
 import {TASK_TYPES_MAP} from "@/store/project";
+import {useDependencies} from "@/views/projects/use-dependencies";
 
 const props = {
   startDisplay: {
@@ -83,6 +84,8 @@ export default defineComponent({
     const projectCode = Number(route.params.projectCode)
     const workflowCode = Number(route.params.code)
     const { t } = useI18n()
+
+    const { getDependentTasksBySingleTask } = useDependencies()
 
     const hide = () => {
       ctx.emit('hide', false)
@@ -142,30 +145,13 @@ export default defineComponent({
 
     const handleDelete = async () => {
       let taskCode = props.cell?.id
-      let dependentTasks = [] as any[]
-      if (workflowCode && taskCode) {
-        dependentTasks = await queryDependentTaskLinks(taskCode)
-      }
+      let dependentTasks = await getDependentTasksBySingleTask(projectCode, workflowCode, taskCode)
       if (dependentTasks.length > 0) {
         window.$message.error(t('project.workflow.delete_task_validate_dependent_tasks_desc') + dependentTasks, { duration: 5000 })
       } else {
         graph.value?.removeCell(props.cell)
         ctx.emit('removeTasks', [Number(props.cell?.id)])
       }
-    }
-
-    const queryDependentTaskLinks = async (taskCode: any) => {
-      let tasks = [] as any
-      if (workflowCode && taskCode) {
-        let dependentTaskReq = {workFlowCode: workflowCode, taskCode: taskCode} as DependentTaskReq
-        const res = await queryDependentTasks(projectCode, dependentTaskReq)
-        console.log(res)
-        res.filter((item: any) => item.processDefinitionCode !== workflowCode && item.taskType === TASK_TYPES_MAP.DEPENDENT.alias)
-        .forEach((item: any) => {
-          tasks.push(item.processDefinitionName + '->' + item.taskName)
-        })
-      }
-      return tasks
     }
 
     onMounted(() => {

@@ -39,15 +39,19 @@ import {
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
 import type { Router } from 'vue-router'
+import {useDependencies} from "@/views/projects/use-dependencies";
+import {deleteTaskDefinition} from "@/service/modules/task-definition";
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
+  const {getDependentTaskLinks} = useDependencies()
+
   const variables = reactive({
     columns: [],
     tableWidth: DefaultTableWidth,
-    row: {},
+    row: {} as any,
     tableData: [],
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
     page: ref(1),
@@ -58,7 +62,9 @@ export function useTable() {
     loadingRef: ref(false),
     processDefinitionCode: router.currentRoute.value.params.definitionCode
       ? ref(Number(router.currentRoute.value.params.definitionCode))
-      : ref()
+      : ref(),
+    dependentTasksShowRef: ref(false),
+    dependentTaskLinksRef: ref([]),
   })
 
   const renderTime = (time: string, timeZone: string) => {
@@ -329,7 +335,7 @@ export function useTable() {
                 NPopconfirm,
                 {
                   onPositiveClick: () => {
-                    handleDelete(row.id)
+                    handleDelete(row)
                   }
                 },
                 {
@@ -404,20 +410,28 @@ export function useTable() {
     })
   }
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (row: any) => {
     /* after deleting data from the current page, you need to jump forward when the page is empty. */
     if (variables.tableData.length === 1 && variables.page > 1) {
       variables.page -= 1
     }
-    deleteScheduleById(id, variables.projectCode).then(() => {
-      window.$message.success(t('project.workflow.success'))
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal,
-        projectCode: variables.projectCode,
-        processDefinitionCode: variables.processDefinitionCode
-      })
+    variables.row = row
+    getDependentTaskLinks(variables.projectCode, row.processDefinitionCode).then((res: any) =>{
+      if (res && res.length > 0) {
+        variables.dependentTaskLinksRef = res
+        variables.dependentTasksShowRef = true
+      } else {
+        deleteScheduleById(row.id, variables.projectCode).then(() => {
+          window.$message.success(t('project.workflow.success'))
+          getTableData({
+            pageSize: variables.pageSize,
+            pageNo: variables.page,
+            searchVal: variables.searchVal,
+            projectCode: variables.projectCode,
+            processDefinitionCode: variables.processDefinitionCode
+          })
+        })
+      }
     })
   }
 

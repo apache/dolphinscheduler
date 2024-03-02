@@ -242,6 +242,7 @@ export default {
     delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该工作流',
     warning_offline_scheduler_dependent_tasks_desc: '下游存在依赖, 下线操作可能会对下游任务产生影响. 你确定要下线该定时嘛?',
     delete_task_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务. 依赖如下:',
+    warning_delete_scheduler_dependent_tasks_desc: '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
   },
   task: {
     on_line: '线上',
@@ -310,7 +311,8 @@ export default {
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
     please_choose: '请选择',
-    remove_task_cache: '清除缓存'
+    remove_task_cache: '清除缓存',
+    delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务定义',
   },
   dag: {
     create: '创建工作流',

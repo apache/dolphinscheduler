@@ -17,9 +17,10 @@
 
 import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { NTabPane, NTabs } from 'naive-ui'
+import {NModal, NSpace, NTabPane, NTabs} from 'naive-ui'
 import BatchTaskDefinition from './batch-task'
 import StreamTaskDefinition from './stream-task'
+import {useTable} from "@/views/projects/task/definition/use-stream-table";
 
 const TaskDefinition = defineComponent({
   name: 'task-definition',

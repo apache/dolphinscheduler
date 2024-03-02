@@ -43,11 +43,14 @@ import {
 import type { IDefinitionParam } from './types'
 import type { Router } from 'vue-router'
 import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
+import {useDependencies} from "@/views/projects/use-dependencies";
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
   const { copy } = useTextCopy()
+  const { getDependentTasksByWorkflow, getDependentTaskLinks } = useDependencies()
+
   const variables = reactive({
     columns: [],
     tableWidth: DefaultTableWidth,
@@ -68,6 +71,9 @@ export function useTable() {
     copyShowRef: ref(false),
     loadingRef: ref(false),
     setTimingDialogShowRef: ref(false),
+    dependenciesShowRef: ref(false),
+    dependentTaskLinksRef: ref([]),
+    offlineSchedulerDependenciesShowRef: ref(false),
   })
 
   const createColumns = (variables: any) => {
@@ -305,13 +311,19 @@ export function useTable() {
   }
 
   const deleteWorkflow = (row: any) => {
-    deleteByCode(variables.projectCode, row.code).then(() => {
-      window.$message.success(t('project.workflow.success'))
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
+    getDependentTasksByWorkflow(variables.projectCode, row.code).then((res: any) => {
+      if (res) {
+        window.$message.error(t('project.workflow.delete_task_validate_dependent_tasks_desc') + res, { duration: 5000 })
+      } else {
+        deleteByCode(variables.projectCode, row.code).then(() => {
+          window.$message.success(t('project.workflow.success'))
+          getTableData({
+            pageSize: variables.pageSize,
+            pageNo: variables.page,
+            searchVal: variables.searchVal
+          })
+        })
+      }
     })
   }
 
@@ -354,6 +366,7 @@ export function useTable() {
 
   const batchCopyWorkflow = () => {}
 
+
   const releaseWorkflow = (row: any) => {
     const data = {
       name: row.name,
@@ -361,35 +374,61 @@ export function useTable() {
           | 'OFFLINE'
           | 'ONLINE'
     }
-    release(data, variables.projectCode, row.code).then(() => {
-      if (data.releaseState === 'ONLINE') {
+    variables.row = row
+    if (data.releaseState === 'ONLINE') {
+      release(data, variables.projectCode, row.code).then(() => {
         variables.setTimingDialogShowRef = true
-        variables.row = row
-      } else {
-        window.$message.success(t('project.workflow.success'))
-      }
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
-    })
-  }
-
-  const releaseScheduler = (row: any) => {
-    if (row.schedule) {
-      let handle = online
-      if (row.schedule.releaseState === 'ONLINE') {
-        handle = offline
-      }
-      handle(variables.projectCode, row.schedule.id).then(() => {
-        window.$message.success(t('project.workflow.success'))
         getTableData({
           pageSize: variables.pageSize,
           pageNo: variables.page,
           searchVal: variables.searchVal
         })
       })
+    } else {
+      getDependentTaskLinks(variables.projectCode, row.code).then((res: any) => {
+        if (res && res.length > 0) {
+          variables.dependentTaskLinksRef = res
+          variables.dependenciesShowRef = true
+        } else {
+          release(data, variables.projectCode, row.code).then(() => {
+            getTableData({
+              pageSize: variables.pageSize,
+              pageNo: variables.page,
+              searchVal: variables.searchVal
+            })
+          })
+        }
+      })
+    }
+  }
+
+  const releaseScheduler = (row: any) => {
+    if (row.schedule) {
+      if (row.schedule.releaseState === 'ONLINE') {
+        getDependentTaskLinks(variables.projectCode, row.code).then((res: any) => {
+          if (res && res.length > 0) {
+            variables.dependentTaskLinksRef = res
+            variables.offlineSchedulerDependenciesShowRef = true
+          } else {
+            offline(variables.projectCode, row.schedule.id).then(() => {
+              window.$message.success(t('project.workflow.success'))
+              getTableData({
+                pageSize: variables.pageSize,
+                pageNo: variables.page,
+                searchVal: variables.searchVal
+              })
+            })
+          }})
+      } else {
+        online(variables.projectCode, row.schedule.id).then(() => {
+          window.$message.success(t('project.workflow.success'))
+          getTableData({
+            pageSize: variables.pageSize,
+            pageNo: variables.page,
+            searchVal: variables.searchVal
+          })
+        })
+      }
     }
   }
 
