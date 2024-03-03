@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -38,12 +39,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -56,9 +54,6 @@ public class RemoteExecutor implements AutoCloseable {
     static final int TRACK_INTERVAL = 5000;
 
     protected Map<String, String> taskOutputParams = new HashMap<>();
-
-    Pattern pattern = Pattern.compile("\\w+\\((\\d+)\\)");
-
     private SshClient sshClient;
     private ClientSession session;
     private SSHConnectionParam sshConnectionParam;
@@ -189,7 +184,7 @@ public class RemoteExecutor implements AutoCloseable {
 
         try {
             String rawPidStr = runRemote(cmd);
-            remoteProcessIdStr = parsePidStr(rawPidStr);
+            remoteProcessIdStr = ProcessUtils.parsePidStr(rawPidStr);
             if (!remoteProcessIdStr.startsWith(pid)) {
                 log.error("query remote process id error, [{}] first pid not equal [{}]", remoteProcessIdStr, pid);
                 remoteProcessIdStr = pid;
@@ -199,19 +194,6 @@ public class RemoteExecutor implements AutoCloseable {
             remoteProcessIdStr = pid;
         }
         return remoteProcessIdStr;
-    }
-
-    private String parsePidStr(String rawPidStr) {
-
-        log.info("prepare to parse pid, raw pid string: {}", rawPidStr);
-        ArrayList<String> allPidList = new ArrayList<>();
-        Matcher mat = pattern.matcher(rawPidStr);
-        if (null != mat) {
-            while (mat.find()) {
-                allPidList.add(mat.group(1));
-            }
-        }
-        return String.join(" ", allPidList).trim();
     }
 
     public String getTaskPid(String taskId) throws IOException {

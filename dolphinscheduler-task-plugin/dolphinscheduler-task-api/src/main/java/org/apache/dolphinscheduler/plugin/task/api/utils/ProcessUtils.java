@@ -39,6 +39,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +145,32 @@ public final class ProcessUtils {
         }
 
         return sb.toString().trim();
+    }
+
+    public static String parsePidStr(String rawPidStr) {
+
+        log.info("prepare to parse pid, raw pid string: {}", rawPidStr);
+        ArrayList<String> allPidList = new ArrayList<>();
+        Matcher mat = null;
+        if (SystemUtils.IS_OS_MAC) {
+            if (StringUtils.isNotEmpty(rawPidStr)) {
+                mat = MACPATTERN.matcher(rawPidStr);
+            }
+        } else if (SystemUtils.IS_OS_LINUX) {
+            if (StringUtils.isNotEmpty(rawPidStr)) {
+                mat = LINUXPATTERN.matcher(rawPidStr);
+            }
+        } else {
+            if (StringUtils.isNotEmpty(rawPidStr)) {
+                mat = WINDOWSPATTERN.matcher(rawPidStr);
+            }
+        }
+        if (null != mat) {
+            while (mat.find()) {
+                allPidList.add(mat.group(1));
+            }
+        }
+        return String.join(" ", allPidList).trim();
     }
 
     /**
