@@ -45,6 +45,7 @@ export function useSpark({
     timeout: 30,
     programType: 'SCALA',
     rawScript: '',
+    master: '',
     deployMode: 'local',
     driverCores: 1,
     driverMemory: '512M',
