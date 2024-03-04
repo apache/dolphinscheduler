@@ -59,7 +59,6 @@ jobs:
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
       - run: |
-#          for file in $(find . -name "*.md" -not \( -path ./deploy/terraform/aws/README.md -prune \)); do
           for file in $(locate "./*.md" -i ./deploy/terraform/aws/README.md -prune); do
             markdown-link-check -c .dlc.json -q "$file"
           done
