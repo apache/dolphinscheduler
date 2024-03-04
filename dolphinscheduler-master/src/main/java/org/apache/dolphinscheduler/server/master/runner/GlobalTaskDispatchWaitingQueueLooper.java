@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 
@@ -65,14 +66,15 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
     public void run() {
         DefaultTaskExecuteRunnable defaultTaskExecuteRunnable;
         while (RUNNING_FLAG.get()) {
+            defaultTaskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
             try {
-                defaultTaskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
-            } catch (InterruptedException e) {
-                log.warn("Get waiting dispatch task failed, the current thread has been interrupted, will stop loop");
-                Thread.currentThread().interrupt();
-                break;
-            }
-            try {
+                TaskExecutionStatus status = defaultTaskExecuteRunnable.getTaskInstance().getState();
+                if (status != TaskExecutionStatus.SUBMITTED_SUCCESS) {
+                    log.warn("The TaskInstance {} state is : {}, will not dispatch",
+                            defaultTaskExecuteRunnable.getTaskInstance().getName(), status);
+                    continue;
+                }
+
                 TaskDispatcher taskDispatcher =
                         taskDispatchFactory.getTaskDispatcher(defaultTaskExecuteRunnable.getTaskInstance());
                 taskDispatcher.dispatchTask(defaultTaskExecuteRunnable);
@@ -86,7 +88,6 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
                 log.error("Dispatch Task: {} failed", defaultTaskExecuteRunnable.getTaskInstance().getName(), e);
             }
         }
-        log.info("GlobalTaskDispatchWaitingQueueLooper started...");
     }
 
     @Override
@@ -94,6 +95,8 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
         if (RUNNING_FLAG.compareAndSet(true, false)) {
             log.info("GlobalTaskDispatchWaitingQueueLooper stopping...");
             log.info("GlobalTaskDispatchWaitingQueueLooper stopped...");
+        } else {
+            log.error("GlobalTaskDispatchWaitingQueueLooper is not started");
         }
     }
 }
