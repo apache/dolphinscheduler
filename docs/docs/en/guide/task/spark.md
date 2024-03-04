@@ -20,10 +20,11 @@ Spark task type for executing Spark application. When executing the Spark task, 
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|       **Parameter**        |                                                          **Description**                                                           |
+| **Parameter**              | **Description**                                                                                                                    |
 |----------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | Program type               | Supports Java, Scala, Python, and SQL.                                                                                             |
 | The class of main function | The **full path** of Main Class, the entry point of the Spark program.                                                             |
+| Master                     | The The master URL for the cluster.                                                                                                |
 | Main jar package           | The Spark jar package (upload by Resource Center).                                                                                 |
 | SQL scripts                | SQL statements in .sql files that Spark sql runs.                                                                                  |
 | Deployment mode            | <ul><li>spark submit supports three modes: cluster, client and local.</li><li>spark sql supports client and local modes.</li></ul> |

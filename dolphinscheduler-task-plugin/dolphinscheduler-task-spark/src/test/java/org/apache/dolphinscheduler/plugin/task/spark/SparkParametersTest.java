@@ -54,6 +54,5 @@ public class SparkParametersTest {
         resourceFilesList = sparkParameters.getResourceFilesList();
         Assertions.assertNotNull(resourceFilesList);
         Assertions.assertEquals(3, resourceFilesList.size());
-
     }
 }
