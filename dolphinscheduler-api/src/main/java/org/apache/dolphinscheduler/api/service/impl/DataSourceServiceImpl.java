@@ -450,8 +450,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
 
             tables = metaData.getTables(
-                    database,
-                    getDbSchemaPattern(dataSource.getType(), schema, connectionParam),
+                    getCatalog(dataSource.getType(), database),
+                    getDbSchemaPattern(dataSource.getType(), database, schema, connectionParam),
                     "%", TABLE_TYPES);
             if (null == tables) {
                 log.error("Get datasource tables error, datasourceId:{}.", datasourceId);
@@ -499,11 +499,18 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
 
             DatabaseMetaData metaData = connection.getMetaData();
-
-            if (dataSource.getType() == DbType.ORACLE) {
-                database = null;
+            String schema = null;
+            try {
+                schema = metaData.getConnection().getSchema();
+            } catch (SQLException e) {
+                log.error("Cant not get the schema, datasourceId:{}.", datasourceId, e);
+                throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
             }
-            rs = metaData.getColumns(database, null, tableName, "%");
+
+            rs = metaData.getColumns(
+                    getCatalog(dataSource.getType(), database),
+                    getDbSchemaPattern(dataSource.getType(), database, schema, connectionParam),
+                    tableName, "%");
             if (rs == null) {
                 throw new ServiceException(Status.DATASOURCE_CONNECT_FAILED);
             }
@@ -585,7 +592,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return options;
     }
 
-    private String getDbSchemaPattern(DbType dbType, String schema, BaseConnectionParam connectionParam) {
+    private String getDbSchemaPattern(DbType dbType, String database, String schema,
+                                      BaseConnectionParam connectionParam) {
         if (dbType == null) {
             return null;
         }
@@ -593,6 +601,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         switch (dbType) {
             case HIVE:
                 schemaPattern = connectionParam.getDatabase();
+                break;
+            case KYUUBI:
+                schemaPattern = database;
                 break;
             case ORACLE:
                 schemaPattern = connectionParam.getUser();
@@ -634,6 +645,18 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
                 log.error("ResultSet close error", e);
             }
         }
+    }
+
+    private String getCatalog(DbType dbType, String database) {
+        String catalog = null;
+        switch (dbType) {
+            case KYUUBI:
+                catalog = "spark_catalog";
+                break;
+            default:
+                catalog = database;
+        }
+        return catalog;
     }
 
 }

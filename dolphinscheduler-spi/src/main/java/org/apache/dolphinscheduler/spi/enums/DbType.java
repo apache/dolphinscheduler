@@ -88,7 +88,7 @@ public enum DbType {
     }
 
     public boolean isHive() {
-        return this == DbType.HIVE;
+        return this == DbType.HIVE || this == DbType.KYUUBI;
     }
 
     /**
