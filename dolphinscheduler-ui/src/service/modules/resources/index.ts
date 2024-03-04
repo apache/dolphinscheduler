@@ -53,26 +53,6 @@ export function queryBaseDir(params: ResourceTypeReq): any {
   })
 }
 
-export function queryCurrentResourceByFileName(
-  params: ResourceTypeReq & FileNameReq & TenantCodeReq
-): any {
-  return axios({
-    url: '/resources/query-file-name',
-    method: 'get',
-    params
-  })
-}
-
-export function queryCurrentResourceByFullName(
-  params: ResourceTypeReq & FullNameReq & TenantCodeReq
-): any {
-  return axios({
-    url: '/resources/query-full-name',
-    method: 'get',
-    params
-  })
-}
-
 export function createResource(
   data: CreateReq & FileNameReq & NameReq & ResourceTypeReq
 ): any {
