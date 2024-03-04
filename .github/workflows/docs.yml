@@ -61,8 +61,9 @@ jobs:
       # if you want to run check locally
       - run: |
           for file in $(locate "$PWD*/*.md" | grep -v ./deploy/terraform/aws/README.md); do
-            markdown-link-check -c .dlc.json -q "$file"
+            markdown-link-check -c .dlc.json -q "$file" &
           done
+          wait
   paths-filter:
     name: Helm-Doc-Path-Filter
     runs-on: ubuntu-latest
