@@ -229,7 +229,7 @@ public class OSUtils {
      */
     private static void createLinuxUser(String userName, String userGroup) throws IOException {
         log.info("create linux os user: {}", userName);
-        String cmd = String.format("sudo useradd -g %s %s", userGroup, userName);
+        String cmd = String.format("sudo useradd -m -g %s %s", userGroup, userName);
         log.info("execute cmd: {}", cmd);
         exeCmd(cmd);
     }
