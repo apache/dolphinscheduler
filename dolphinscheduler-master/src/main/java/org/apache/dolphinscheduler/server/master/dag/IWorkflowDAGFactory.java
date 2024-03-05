@@ -15,12 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.exception;
+package org.apache.dolphinscheduler.server.master.dag;
 
-public class TaskExecutionContextCreateException extends MasterException {
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 
-    public TaskExecutionContextCreateException(String message) {
-        super(message);
-    }
+/**
+ * The Factory used to create {@link IWorkflowDAG}
+ */
+public interface IWorkflowDAGFactory {
+
+    /**
+     * Create the WorkflowDAG
+     *
+     * @param workflowInstance workflowInstance.
+     * @return workflow DAG.
+     */
+    IWorkflowDAG createWorkflowDAG(ProcessInstance workflowInstance);
 
 }

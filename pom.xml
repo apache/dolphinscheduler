@@ -57,6 +57,7 @@
         <module>dolphinscheduler-storage-plugin</module>
         <module>dolphinscheduler-extract</module>
         <module>dolphinscheduler-dao-plugin</module>
+        <module>dolphinscheduler-workflow-engine</module>
     </modules>
 
     <properties>

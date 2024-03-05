@@ -27,6 +27,9 @@ public interface ProcessTaskRelationLogDao extends IDao<ProcessTaskRelationLog> 
 
     List<ProcessTaskRelationLog> queryByWorkflowDefinitionCode(long workflowDefinitionCode);
 
+    List<ProcessTaskRelationLog> queryByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode,
+                                                                         int workflowDefinitionVerison);
+
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     /**

@@ -60,7 +60,6 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -102,7 +101,7 @@ public class TaskExecutionContextFactory {
     @Autowired
     private HikariDataSource hikariDataSource;
 
-    public TaskExecutionContext createTaskExecutionContext(TaskInstance taskInstance) throws TaskExecutionContextCreateException {
+    public TaskExecutionContext createTaskExecutionContext(TaskInstance taskInstance) {
         ProcessInstance workflowInstance = taskInstance.getProcessInstance();
 
         ResourceParametersHelper resources =

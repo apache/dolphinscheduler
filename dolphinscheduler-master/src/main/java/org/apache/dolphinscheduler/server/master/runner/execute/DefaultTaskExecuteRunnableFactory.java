@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
-import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
 import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
@@ -46,17 +44,13 @@ public class DefaultTaskExecuteRunnableFactory implements TaskExecuteRunnableFac
     private TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 
     @Override
-    public DefaultTaskExecuteRunnable createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException {
+    public DefaultTaskExecuteRunnable createTaskExecuteRunnable(TaskInstance taskInstance) {
         WorkflowExecuteRunnable workflowExecuteRunnable =
                 processInstanceExecCacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
-        try {
-            return new DefaultTaskExecuteRunnable(
-                    workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance(),
-                    taskInstance,
-                    taskExecutionContextFactory.createTaskExecutionContext(taskInstance),
-                    taskExecuteRunnableOperatorManager);
-        } catch (TaskExecutionContextCreateException ex) {
-            throw new TaskExecuteRunnableCreateException("Create DefaultTaskExecuteRunnable failed", ex);
-        }
+        return new DefaultTaskExecuteRunnable(
+                workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance(),
+                taskInstance,
+                taskExecutionContextFactory.createTaskExecutionContext(taskInstance),
+                taskExecuteRunnableOperatorManager);
     }
 }

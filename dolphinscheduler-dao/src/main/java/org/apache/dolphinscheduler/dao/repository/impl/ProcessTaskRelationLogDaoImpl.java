@@ -45,6 +45,12 @@ public class ProcessTaskRelationLogDaoImpl extends BaseDao<ProcessTaskRelationLo
     }
 
     @Override
+    public List<ProcessTaskRelationLog> queryByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode,
+                                                                                int workflowDefinitionVerison) {
+        return mybatisMapper.queryByProcessCodeAndVersion(workflowDefinitionCode, workflowDefinitionVerison);
+    }
+
+    @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode) {
         mybatisMapper.deleteByWorkflowDefinitionCode(workflowDefinitionCode);
     }

@@ -28,8 +28,7 @@ public class DefaultTaskExecuteRunnable extends PriorityDelayTaskExecuteRunnable
 
     private final TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 
-    public DefaultTaskExecuteRunnable(ProcessInstance workflowInstance,
-                                      TaskInstance taskInstance,
+    public DefaultTaskExecuteRunnable(ProcessInstance workflowInstance, TaskInstance taskInstance,
                                       TaskExecutionContext taskExecutionContext,
                                       TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager) {
         super(workflowInstance, taskInstance, taskExecutionContext);

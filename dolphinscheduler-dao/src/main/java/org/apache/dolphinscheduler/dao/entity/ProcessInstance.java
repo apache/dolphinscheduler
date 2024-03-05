@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -44,11 +45,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.google.common.base.Strings;
 
-/**
- * process instance
- */
-@NoArgsConstructor
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @TableName("t_ds_process_instance")
 public class ProcessInstance {
 
