@@ -35,6 +35,15 @@ public class TaskInstanceExecutionEventAckListenFunctionManager {
     @Autowired
     private TaskInstanceExecutionInfoEventAckListenFunction taskInstanceExecutionInfoEventAckListenFunction;
 
+    public TaskInstanceExecutionEventAckListenFunctionManager(
+                                                              TaskInstanceExecutionRunningEventAckListenFunction taskInstanceExecutionRunningEventAckListenFunction,
+                                                              TaskInstanceExecutionFinishEventAckListenFunction taskInstanceExecutionFinishEventAckListenFunction,
+                                                              TaskInstanceExecutionInfoEventAckListenFunction taskInstanceExecutionInfoEventAckListenFunction) {
+        this.taskInstanceExecutionRunningEventAckListenFunction = taskInstanceExecutionRunningEventAckListenFunction;
+        this.taskInstanceExecutionFinishEventAckListenFunction = taskInstanceExecutionFinishEventAckListenFunction;
+        this.taskInstanceExecutionInfoEventAckListenFunction = taskInstanceExecutionInfoEventAckListenFunction;
+    }
+
     public TaskInstanceExecutionRunningEventAckListenFunction getTaskInstanceExecutionRunningEventAckListenFunction() {
         return taskInstanceExecutionRunningEventAckListenFunction;
     }

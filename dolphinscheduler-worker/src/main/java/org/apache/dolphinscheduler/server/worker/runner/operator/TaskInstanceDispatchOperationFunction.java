@@ -48,6 +48,15 @@ public class TaskInstanceDispatchOperationFunction
     @Autowired
     private WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool;
 
+    public TaskInstanceDispatchOperationFunction(
+                                                 WorkerConfig workerConfig,
+                                                 WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder,
+                                                 WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool) {
+        this.workerConfig = workerConfig;
+        this.workerTaskExecutorFactoryBuilder = workerTaskExecutorFactoryBuilder;
+        this.workerTaskExecutorThreadPool = workerTaskExecutorThreadPool;
+    }
+
     @Override
     public TaskInstanceDispatchResponse operate(TaskInstanceDispatchRequest taskInstanceDispatchRequest) {
         log.info("Receive TaskInstanceDispatchRequest: {}", taskInstanceDispatchRequest);

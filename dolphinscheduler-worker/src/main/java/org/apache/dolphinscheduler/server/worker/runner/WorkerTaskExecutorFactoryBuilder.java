@@ -48,6 +48,21 @@ public class WorkerTaskExecutorFactoryBuilder {
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
 
+    public WorkerTaskExecutorFactoryBuilder(
+                                            WorkerConfig workerConfig,
+                                            WorkerMessageSender workerMessageSender,
+                                            TaskPluginManager taskPluginManager,
+                                            WorkerTaskExecutorThreadPool workerManager,
+                                            StorageOperate storageOperate,
+                                            WorkerRegistryClient workerRegistryClient) {
+        this.workerConfig = workerConfig;
+        this.workerMessageSender = workerMessageSender;
+        this.taskPluginManager = taskPluginManager;
+        this.workerManager = workerManager;
+        this.storageOperate = storageOperate;
+        this.workerRegistryClient = workerRegistryClient;
+    }
+
     public WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(TaskExecutionContext taskExecutionContext) {
         return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
                 workerConfig,
