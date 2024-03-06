@@ -25,9 +25,9 @@ import {
 import { useRoute } from 'vue-router'
 import {
   NButton,
-  NDataTable, NEllipsis,
+  NDataTable,
   NIcon,
-  NInput, NModal,
+  NInput,
   NPagination,
   NSelect,
   NSpace
@@ -41,8 +41,7 @@ import Card from '@/components/card'
 import VersionModal from './components/version-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import type { INodeData } from './types'
-import {release} from "@/service/modules/process-definition";
-import ButtonLink from "@/components/button-link";
+import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
 
 const BatchTaskDefinition = defineComponent({
   name: 'batch-task-definition',
@@ -104,34 +103,6 @@ const BatchTaskDefinition = defineComponent({
       }
     }
 
-    const renderDownstreamDependencies = () => {
-      if (variables.dependentTaskLinksRef.length > 0) {
-        return h(
-            <NSpace vertical>
-              <div>{t('project.workflow.warning_dependencies')}</div>
-              {variables.dependentTaskLinksRef.map((item: any) => {
-                return (
-                    <ButtonLink
-                        onClick={item.action}
-                        disabled={false}
-                    >
-                      {{
-                        default: () =>
-                            h(NEllipsis,
-                                {
-                                  style: 'max-width: 350px;line-height: 1.5'
-                                },
-                                () => item.text
-                            )
-                      }}
-                    </ButtonLink>
-                )
-              })}
-            </NSpace>
-        )
-      }
-    }
-
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
     onMounted(() => {
       createColumns(variables)
@@ -155,7 +126,6 @@ const BatchTaskDefinition = defineComponent({
       onCreate,
       onTaskSubmit,
       onTaskCancel,
-      renderDownstreamDependencies,
       projectCode,
       trim
     }
@@ -244,24 +214,13 @@ const BatchTaskDefinition = defineComponent({
           readonly={this.taskReadonly}
           saving={this.taskSaving}
         />
-        <NModal
-            v-model:show={this.dependentTasksShowRef}
-            preset={'dialog'}
-            type={'error'}
-            title={t('project.workflow.warning_dependent_tasks_title')}
-            content={t('project.workflow.delete_validate_dependent_tasks_desc')}
-            negativeText={t('project.workflow.cancel')}
-            maskClosable={false}
-        >
-          {{
-            default: () => (
-                <NSpace vertical>
-                  <div>{t('project.workflow.delete_validate_dependent_tasks_desc')}</div>
-                  {this.renderDownstreamDependencies()}
-                </NSpace>
-            )
-          }}
-        </NModal>
+        <DependenciesModal
+            v-model:show={this.dependenciesData.showRef}
+            v-model:taskLinks={this.dependenciesData.taskLinks}
+            required={this.dependenciesData.required}
+            content={this.dependenciesData.tip}
+            onConfirm={this.dependenciesData.action}
+        />
       </NSpace>
     )
   }

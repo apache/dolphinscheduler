@@ -15,16 +15,15 @@
  * limitations under the License.
  */
 
-import {NDataTable, NEllipsis, NModal, NPagination, NSpace} from 'naive-ui'
-import {defineComponent, h, onMounted, toRefs, watch} from 'vue'
+import {NDataTable, NPagination, NSpace} from 'naive-ui'
+import {defineComponent, onMounted, toRefs, watch} from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from '../definition/timing/use-table'
 import Card from '@/components/card'
 import TimingModal from '../definition/components/timing-modal'
 import TimingCondition from '@/views/projects/workflow/timing/components/timing-condition'
 import { ITimingSearch } from '@/views/projects/workflow/timing/types'
-import ButtonLink from "@/components/button-link";
-import {deleteScheduleById, offline} from "@/service/modules/schedules";
+import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
 
 export default defineComponent({
   name: 'WorkflowTimingList',
@@ -62,48 +61,6 @@ export default defineComponent({
       requestData()
     })
 
-    const renderDownstreamDependencies = () => {
-      if (variables.dependentTaskLinksRef.length > 0) {
-        return h(
-            <NSpace vertical>
-              <div>{t('project.workflow.warning_dependencies')}</div>
-              {variables.dependentTaskLinksRef.map((item: any) => {
-                return (
-                    <ButtonLink
-                        onClick={item.action}
-                        disabled={false}
-                    >
-                      {{
-                        default: () =>
-                            h(NEllipsis,
-                                {
-                                  style: 'max-width: 350px;line-height: 1.5'
-                                },
-                                () => item.text
-                            )
-                      }}
-                    </ButtonLink>
-                )
-              })}
-            </NSpace>
-        )
-      }
-    }
-
-    const confirmToDeleteScheduler = () => {
-      deleteScheduleById(variables.row.id, variables.projectCode).then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal,
-          projectCode: variables.projectCode,
-          processDefinitionCode: variables.processDefinitionCode
-        })
-      })
-      variables.dependentTasksShowRef = false
-    }
-
     watch(useI18n().locale, () => {
       createColumns(variables)
     })
@@ -113,8 +70,6 @@ export default defineComponent({
       handleSearch,
       handleUpdateList,
       handleChangePageSize,
-      renderDownstreamDependencies,
-      confirmToDeleteScheduler,
       ...toRefs(variables)
     }
   },
@@ -157,26 +112,13 @@ export default defineComponent({
           v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}
         />
-        <NModal
-            v-model:show={this.dependentTasksShowRef}
-            preset={'dialog'}
-            type={'warning'}
-            title={t('project.workflow.warning_dependent_tasks_title')}
-            content={t('project.workflow.warning_delete_scheduler_dependent_tasks_desc')}
-            negativeText={t('project.workflow.cancel')}
-            positiveText={t('project.workflow.confirm')}
-            maskClosable={false}
-            onPositiveClick={this.confirmToDeleteScheduler}
-        >
-          {{
-            default: () => (
-                <NSpace vertical>
-                  <div>{t('project.workflow.warning_delete_scheduler_dependent_tasks_desc')}</div>
-                  {this.renderDownstreamDependencies()}
-                </NSpace>
-            )
-          }}
-        </NModal>
+        <DependenciesModal
+            v-model:show={this.dependenciesData.showRef}
+            v-model:taskLinks={this.dependenciesData.taskLinks}
+            required={this.dependenciesData.required}
+            content={this.dependenciesData.tip}
+            onConfirm={this.dependenciesData.action}
+        />
       </NSpace>
     )
   }

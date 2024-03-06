@@ -33,12 +33,7 @@ import {
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
-import {queryDependentTasks} from "@/service/modules/lineages";
-import {TASK_TYPES_MAP} from "@/store/project";
-import {DependentTaskReq} from "@/service/modules/lineages/types";
-import {Router, useRouter} from "vue-router";
-import ButtonLink from "@/components/button-link";
-import {useDependencies} from "@/views/projects/use-dependencies";
+
 const props = {
   row: {
     type: Object as PropType<IDefinitionData>

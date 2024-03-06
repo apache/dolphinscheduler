@@ -17,17 +17,14 @@
 
 import { genTaskCodeList } from '@/service/modules/task-definition'
 import type { Cell } from '@antv/x6'
-import { defineComponent, onMounted, PropType, inject, ref, h } from 'vue'
+import { defineComponent, onMounted, PropType, inject, ref, h, reactive } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {Router, useRoute, useRouter} from 'vue-router'
 import styles from './menu.module.scss'
 import { uuid } from '@/common/common'
 import { IWorkflowTaskInstance } from './types'
 import {NButton} from 'naive-ui'
-import {DependentTaskReq} from "@/service/modules/lineages/types";
-import {queryDependentTasks} from "@/service/modules/lineages";
-import {TASK_TYPES_MAP} from "@/store/project";
-import {useDependencies} from "@/views/projects/use-dependencies";
+import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies"
 
 const props = {
   startDisplay: {
@@ -61,6 +58,10 @@ const props = {
   top: {
     type: Number as PropType<number>,
     default: 0
+  },
+  dependenciesData: {
+    type: Object as PropType<any>,
+    require: false
   }
 }
 
@@ -85,7 +86,14 @@ export default defineComponent({
     const workflowCode = Number(route.params.code)
     const { t } = useI18n()
 
-    const { getDependentTasksBySingleTask } = useDependencies()
+    // const dependenciesData = reactive({
+    //       showRef: false,
+    //       taskLinks: ref([]),
+    //       required: ref(false),
+    //       tip: ref(''), action: () => {}
+    // })
+
+    const { getDependentTaskLinksByTask } = useDependencies()
 
     const hide = () => {
       ctx.emit('hide', false)
@@ -145,9 +153,13 @@ export default defineComponent({
 
     const handleDelete = async () => {
       let taskCode = props.cell?.id
-      let dependentTasks = await getDependentTasksBySingleTask(projectCode, workflowCode, taskCode)
-      if (dependentTasks.length > 0) {
-        window.$message.error(t('project.workflow.delete_task_validate_dependent_tasks_desc') + dependentTasks, { duration: 5000 })
+      let res = await getDependentTaskLinksByTask(projectCode, workflowCode, taskCode)
+      props.dependenciesData.showRef = false
+      if (res.length > 0) {
+        props.dependenciesData.showRef = true
+        props.dependenciesData.taskLinks = res
+        props.dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+        props.dependenciesData.required = true
       } else {
         graph.value?.removeCell(props.cell)
         ctx.emit('removeTasks', [Number(props.cell?.id)])

@@ -48,7 +48,7 @@ import type {
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
 import type { IRecord } from './types'
-import {useDependencies} from "@/views/projects/use-dependencies";
+import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies";
 
 export function useTable(onEdit: Function) {
   const { t } = useI18n()
@@ -266,15 +266,21 @@ export function useTable(onEdit: Function) {
     dependentTasksShowRef: ref(false),
     dependentTaskLinksRef: ref([]),
     row: {},
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    dependenciesData: ref({showRef: ref(false), taskLinks: ref([]), required: ref(false), tip: ref(''), action:() => {}}),
   })
 
   const handleDelete = (row: any) => {
     variables.row = row
     getDependentTaskLinksByTask(projectCode, row.processDefinitionCode, row.taskCode).then((res: any) =>{
       if (res && res.length > 0) {
-        variables.dependentTaskLinksRef = res
-        variables.dependentTasksShowRef = true
+        variables.dependenciesData = {
+          showRef: true,
+          taskLinks: res,
+          tip: t('project.workflow.delete_validate_dependent_tasks_desc'),
+          required: true,
+          action: () => {}
+        }
       } else {
         deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(() => {
           getTableData({

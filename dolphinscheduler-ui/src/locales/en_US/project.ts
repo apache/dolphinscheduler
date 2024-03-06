@@ -244,7 +244,7 @@ export default {
     delete_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the workflow.',
     warning_offline_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the scheduler offline?',
     delete_task_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the task. Dependencies:',
-    warning_delete_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to delete the scheduler.?',
+    warning_delete_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
   },
   task: {
     on_line: 'Online',

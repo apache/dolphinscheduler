@@ -63,6 +63,18 @@ export function useDependencies() {
     return tasks
   }
 
+  const getDependentTaskLinksByMultipleTasks = async (projectCode: any, workflowCode: any, taskCodes: any[]) => {
+    let dependentTaskLinks = [] as any
+    if (workflowCode && projectCode) {
+      for (const taskCode of taskCodes) {
+        await getDependentTaskLinksByTask(projectCode, workflowCode, taskCode).then((res: any) => {
+          dependentTaskLinks = dependentTaskLinks.concat(res)
+        })
+      }
+    }
+    return dependentTaskLinks
+  }
+
   const getDependentTaskLinks = async (projectCode: any, workflowCode: any) => {
     let dependentTaskReq = {workFlowCode: workflowCode} as DependentTaskReq
     let dependentTaskLinks = [] as any
@@ -107,5 +119,5 @@ export function useDependencies() {
     return dependentTaskLinks
   }
 
-  return { getDependentTasksBySingleTask, getDependentTasksByMultipleTasks, getDependentTaskLinks, getDependentTasksByWorkflow, getDependentTaskLinksByTask }
+  return { getDependentTasksBySingleTask, getDependentTasksByMultipleTasks, getDependentTaskLinks, getDependentTasksByWorkflow, getDependentTaskLinksByTask, getDependentTaskLinksByMultipleTasks }
 }

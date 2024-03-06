@@ -39,8 +39,7 @@ import {
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
 import type { Router } from 'vue-router'
-import {useDependencies} from "@/views/projects/use-dependencies";
-import {deleteTaskDefinition} from "@/service/modules/task-definition";
+import { useDependencies } from "@/views/projects/components/dependencies/use-dependencies"
 
 export function useTable() {
   const { t } = useI18n()
@@ -63,8 +62,7 @@ export function useTable() {
     processDefinitionCode: router.currentRoute.value.params.definitionCode
       ? ref(Number(router.currentRoute.value.params.definitionCode))
       : ref(),
-    dependentTasksShowRef: ref(false),
-    dependentTaskLinksRef: ref([]),
+    dependenciesData: ref({showRef: false, taskLinks: ref([]), required: ref(false), tip: ref(''), action:() => {}}),
   })
 
   const renderTime = (time: string, timeZone: string) => {
@@ -350,7 +348,8 @@ export function useTable() {
                             {
                               circle: true,
                               type: 'error',
-                              size: 'small'
+                              size: 'small',
+                              disabled: row.releaseState === 'ONLINE'
                             },
                             {
                               icon: () => h(DeleteOutlined)
@@ -393,12 +392,43 @@ export function useTable() {
   }
 
   const handleReleaseState = (row: any) => {
-    let handle = online
     if (row.releaseState === 'ONLINE') {
-      handle = offline
+      variables.row = row
+      getDependentTaskLinks(variables.projectCode, row.processDefinitionCode).then((res: any) =>{
+        if (res && res.length > 0) {
+          variables.dependenciesData.showRef = true
+          variables.dependenciesData.taskLinks = res
+          variables.dependenciesData.tip = t('project.workflow.warning_delete_scheduler_dependent_tasks_desc')
+          variables.dependenciesData.required = false
+          variables.dependenciesData.action = confirmToOfflineSchedule
+        } else {
+          offline(variables.projectCode, row.id).then(() => {
+            window.$message.success(t('project.workflow.success'))
+            getTableData({
+              pageSize: variables.pageSize,
+              pageNo: variables.page,
+              searchVal: variables.searchVal,
+              projectCode: variables.projectCode,
+              processDefinitionCode: variables.processDefinitionCode
+            })
+          })
+        }})
+    } else {
+      online(variables.projectCode, row.id).then(() => {
+        window.$message.success(t('project.workflow.success'))
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal,
+          projectCode: variables.projectCode,
+          processDefinitionCode: variables.processDefinitionCode
+        })
+      })
     }
+  }
 
-    handle(variables.projectCode, row.id).then(() => {
+  const confirmToOfflineSchedule = () => {
+    offline(variables.projectCode, variables.row.id).then(() => {
       window.$message.success(t('project.workflow.success'))
       getTableData({
         pageSize: variables.pageSize,
@@ -408,6 +438,21 @@ export function useTable() {
         processDefinitionCode: variables.processDefinitionCode
       })
     })
+    variables.dependenciesData.showRef = false
+  }
+
+  const confirmToDeleteSchedule = () => {
+    deleteScheduleById(variables.row.id, variables.projectCode).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal,
+        projectCode: variables.projectCode,
+        processDefinitionCode: variables.processDefinitionCode
+      })
+    })
+    variables.dependenciesData.showRef = false
   }
 
   const handleDelete = (row: any) => {
@@ -418,8 +463,11 @@ export function useTable() {
     variables.row = row
     getDependentTaskLinks(variables.projectCode, row.processDefinitionCode).then((res: any) =>{
       if (res && res.length > 0) {
-        variables.dependentTaskLinksRef = res
-        variables.dependentTasksShowRef = true
+        variables.dependenciesData.showRef = true
+        variables.dependenciesData.taskLinks = res
+        variables.dependenciesData.tip = t('project.workflow.warning_delete_scheduler_dependent_tasks_desc')
+        variables.dependenciesData.required = false
+        variables.dependenciesData.action = confirmToDeleteSchedule
       } else {
         deleteScheduleById(row.id, variables.projectCode).then(() => {
           window.$message.success(t('project.workflow.success'))

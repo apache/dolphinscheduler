@@ -49,6 +49,7 @@ import Search from '@/components/input-search'
 import ButtonLink from "@/components/button-link"
 import {release} from "@/service/modules/process-definition"
 import { offline } from '@/service/modules/schedules'
+import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -87,68 +88,6 @@ export default defineComponent({
 
     const confirmToSetWorkflowTiming = () => {
       variables.timingShowRef = true
-    }
-
-    const confirmToOfflineWorkflow = () => {
-      const row: any = variables.row
-      const data = {
-        name: row.name,
-        releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
-            | 'OFFLINE'
-            | 'ONLINE'
-      }
-      if (data.releaseState === 'OFFLINE') {
-        release(data, variables.projectCode, row.code).then(() => {
-          getTableData({
-            pageSize: variables.pageSize,
-            pageNo: variables.page,
-            searchVal: variables.searchVal
-          })
-          window.$message.success(t('project.workflow.success'))
-        })
-      }
-      variables.dependenciesShowRef = false
-    }
-
-    const confirmToOfflineScheduler = () => {
-      const row: any = variables.row
-      offline(variables.projectCode, row.schedule.id).then(() => {
-        window.$message.success(t('project.workflow.success'))
-        getTableData({
-          pageSize: variables.pageSize,
-          pageNo: variables.page,
-          searchVal: variables.searchVal
-        })
-      })
-      variables.offlineSchedulerDependenciesShowRef = false
-    }
-
-    const renderDownstreamDependencies = () => {
-      if (variables.dependentTaskLinksRef.length > 0) {
-        return h(
-            <NSpace vertical>
-              <div>{t('project.workflow.warning_dependencies')}</div>
-              {variables.dependentTaskLinksRef.map((item: any) => {
-                return (
-                    <ButtonLink
-                        onClick={item.action}
-                        disabled={false}
-                    >
-                      {{
-                        default: () =>
-                            h(NEllipsis,
-                                {
-                                  style: 'max-width: 350px;line-height: 1.5'
-                                },
-                                () => item.text
-                            )
-                      }}
-                    </ButtonLink>
-                )
-              })}
-            </NSpace>
-        )
-      }
     }
 
     const handleSearch = () => {
@@ -209,9 +148,6 @@ export default defineComponent({
       batchCopyWorkflow,
       handleCopyUpdateList,
       confirmToSetWorkflowTiming,
-      confirmToOfflineWorkflow,
-      confirmToOfflineScheduler,
-      renderDownstreamDependencies,
       ...toRefs(variables),
       uiSettingStore,
       trim
@@ -388,46 +324,14 @@ export default defineComponent({
           maskClosable={false}
           onPositiveClick={this.confirmToSetWorkflowTiming}
         />
-        <NModal
-            v-model:show={this.dependenciesShowRef}
-            preset={'dialog'}
-            type={'warning'}
-            title={t('project.workflow.warning_dependent_tasks_title')}
-            content={t('project.workflow.warning_dependent_tasks_desc')}
-            positiveText={t('project.workflow.confirm')}
-            negativeText={t('project.workflow.cancel')}
-            maskClosable={false}
-            onPositiveClick={this.confirmToOfflineWorkflow}
-        >
-          {{
-            default: () => (
-                <NSpace vertical>
-                  <div>{t('project.workflow.warning_dependent_tasks_desc')}</div>
-                  {this.renderDownstreamDependencies()}
-                </NSpace>
-            )
-          }}
-        </NModal>
-        <NModal
-            v-model:show={this.offlineSchedulerDependenciesShowRef}
-            preset={'dialog'}
-            type={'warning'}
-            title={t('project.workflow.warning_dependent_tasks_title')}
-            content={t('project.workflow.warning_offline_scheduler_dependent_tasks_desc')}
-            positiveText={t('project.workflow.confirm')}
-            negativeText={t('project.workflow.cancel')}
-            maskClosable={false}
-            onPositiveClick={this.confirmToOfflineScheduler}
-        >
-          {{
-            default: () => (
-                <NSpace vertical>
-                  <div>{t('project.workflow.warning_offline_scheduler_dependent_tasks_desc')}</div>
-                  {this.renderDownstreamDependencies()}
-                </NSpace>
-            )
-          }}
-        </NModal>
+        <DependenciesModal
+            v-model:row={this.row}
+            v-model:show={this.dependenciesData.showRef}
+            v-model:taskLinks={this.dependenciesData.taskLinks}
+            required={this.dependenciesData.required}
+            content={this.dependenciesData.tip}
+            onConfirm={this.dependenciesData.action}
+        />
       </NSpace>
     )
   }
