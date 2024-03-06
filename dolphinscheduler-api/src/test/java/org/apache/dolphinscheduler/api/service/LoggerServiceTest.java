@@ -49,6 +49,8 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,9 +91,17 @@ public class LoggerServiceTest {
 
     private NettyRemotingServer nettyRemotingServer;
 
+    private int nettyServerPort = 18080;
+
     @BeforeEach
     public void setUp() {
-        nettyRemotingServer = new NettyRemotingServer(NettyServerConfig.builder().listenPort(8080).build());
+        try (ServerSocket s = new ServerSocket(0)) {
+            nettyServerPort = s.getLocalPort();
+        } catch (IOException e) {
+            return;
+        }
+
+        nettyRemotingServer = new NettyRemotingServer(NettyServerConfig.builder().listenPort(nettyServerPort).build());
         nettyRemotingServer.start();
         SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery =
                 new SpringServerMethodInvokerDiscovery(nettyRemotingServer);
@@ -148,7 +158,7 @@ public class LoggerServiceTest {
         Assertions.assertEquals(Status.TASK_INSTANCE_HOST_IS_NULL.getCode(), result.getCode().intValue());
 
         // PROJECT_NOT_EXIST
-        taskInstance.setHost("127.0.0.1:8080");
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
         taskInstance.setLogPath("/temp/log");
         doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
@@ -198,7 +208,7 @@ public class LoggerServiceTest {
         }
 
         // PROJECT_NOT_EXIST
-        taskInstance.setHost("127.0.0.1:8080");
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
         taskInstance.setLogPath("/temp/log");
         doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
@@ -215,7 +225,7 @@ public class LoggerServiceTest {
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(),
                 DOWNLOAD_LOG);
         byte[] logBytes = loggerService.getLogBytes(loginUser, 1);
-        Assertions.assertEquals(47, logBytes.length);
+        Assertions.assertEquals(43, logBytes.length - String.valueOf(nettyServerPort).length());
     }
 
     @Test
@@ -233,7 +243,7 @@ public class LoggerServiceTest {
         // SUCCESS
         taskInstance.setTaskCode(1L);
         taskInstance.setId(1);
-        taskInstance.setHost("127.0.0.1:8080");
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
         taskInstance.setLogPath("/temp/log");
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
@@ -259,7 +269,7 @@ public class LoggerServiceTest {
         // SUCCESS
         taskInstance.setTaskCode(1L);
         taskInstance.setId(1);
-        taskInstance.setHost("127.0.0.1:8080");
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
         taskInstance.setLogPath("/temp/log");
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);

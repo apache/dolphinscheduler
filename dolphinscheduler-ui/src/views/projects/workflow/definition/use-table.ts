@@ -43,7 +43,7 @@ import {
 import type { IDefinitionParam } from './types'
 import type { Router } from 'vue-router'
 import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
-import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies";
+import {useDependencies} from '../../components/dependencies/use-dependencies'
 
 export function useTable() {
   const { t } = useI18n()
@@ -392,6 +392,11 @@ export function useTable() {
     if (data.releaseState === 'ONLINE') {
       release(data, variables.projectCode, row.code).then(() => {
         variables.setTimingDialogShowRef = true
+        if (row?.schedule) {
+          variables.row = row.schedule
+          variables.timingType = 'update'
+          variables.timingState = row.scheduleReleaseState
+        }
         getTableData({
           pageSize: variables.pageSize,
           pageNo: variables.page,
@@ -410,6 +415,7 @@ export function useTable() {
           }
         } else {
           release(data, variables.projectCode, row.code).then(() => {
+            window.$message.success(t('project.workflow.success'))
             getTableData({
               pageSize: variables.pageSize,
               pageNo: variables.page,

@@ -48,7 +48,8 @@ import type {
   TaskDefinitionRes
 } from '@/service/modules/task-definition/types'
 import type { IRecord } from './types'
-import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies";
+
+import { useDependencies } from '../../components/dependencies/use-dependencies'
 
 export function useTable(onEdit: Function) {
   const { t } = useI18n()
