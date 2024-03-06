@@ -18,11 +18,8 @@
 import {DependentTaskReq} from "@/service/modules/lineages/types";
 import {queryDependentTasks} from "@/service/modules/lineages";
 import {TASK_TYPES_MAP} from "@/store/project";
-import {Router, useRouter} from "vue-router";
 
 export function useDependencies() {
-
-  const router: Router = useRouter()
 
   const getDependentTasksBySingleTask = async (projectCode: any, workflowCode: any, taskCode: any) => {
     let tasks = [] as any
@@ -87,7 +84,8 @@ export function useDependencies() {
                 text: item.processDefinitionName + '->' + item.taskName,
                 show: true,
                 action: () => {
-                  router.push({path: `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`})
+                  const url =  `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
+                  window.open(url, '_blank')
                 },
               }
           )
@@ -109,7 +107,8 @@ export function useDependencies() {
                 text: item.processDefinitionName + '->' + item.taskName,
                 show: true,
                 action: () => {
-                  router.push({path: `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`})
+                  const url =  `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
+                  window.open(url, '_blank')
                 },
               }
           )

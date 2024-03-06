@@ -241,7 +241,7 @@ export default {
     warning_dependencies: '依赖如下:',
     delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该工作流',
     warning_offline_scheduler_dependent_tasks_desc: '下游存在依赖, 下线操作可能会对下游任务产生影响. 你确定要下线该定时嘛?',
-    delete_task_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务. 依赖如下:',
+    delete_task_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务.',
     warning_delete_scheduler_dependent_tasks_desc: '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
   },
   task: {

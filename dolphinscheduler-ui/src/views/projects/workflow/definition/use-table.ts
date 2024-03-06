@@ -427,7 +427,7 @@ export function useTable() {
         variables.dependenciesData = {
           showRef: true,
           taskLinks: res,
-          tip: t('project.workflow.delete_task_validate_dependent_tasks_desc'),
+          tip: t('project.workflow.delete_validate_dependent_tasks_desc'),
           required: true,
           action: () => {}
         }
