@@ -35,6 +35,17 @@ public class TaskInstanceOperationFunctionManager {
     @Autowired
     private TaskInstancePauseOperationFunction taskInstancePauseOperationFunction;
 
+    public TaskInstanceOperationFunctionManager(
+                                                TaskInstanceKillOperationFunction taskInstanceKillOperationFunction,
+                                                UpdateWorkflowHostOperationFunction updateWorkflowHostOperationFunction,
+                                                TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction,
+                                                TaskInstancePauseOperationFunction taskInstancePauseOperationFunction) {
+        this.taskInstanceKillOperationFunction = taskInstanceKillOperationFunction;
+        this.updateWorkflowHostOperationFunction = updateWorkflowHostOperationFunction;
+        this.taskInstanceDispatchOperationFunction = taskInstanceDispatchOperationFunction;
+        this.taskInstancePauseOperationFunction = taskInstancePauseOperationFunction;
+    }
+
     public TaskInstanceKillOperationFunction getTaskInstanceKillOperationFunction() {
         return taskInstanceKillOperationFunction;
     }
