@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
 
-import java.util.Objects;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
@@ -50,6 +49,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -297,10 +297,11 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
      */
     @Override
     public Map<String, Object> queryDownstreamDependentTasks(Long projectCode,
-        Long processDefinitionCode, Long taskCode) {
+                                                             Long processDefinitionCode, Long taskCode) {
         Map<String, Object> result = new HashMap<>();
         List<TaskMainInfo> taskDependents =
-            workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode, Objects.isNull(taskCode)? 0:taskCode.longValue());
+                workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode,
+                        Objects.isNull(taskCode) ? 0 : taskCode.longValue());
         result.put(Constants.DATA_LIST, taskDependents);
         putMsg(result, Status.SUCCESS);
         return result;

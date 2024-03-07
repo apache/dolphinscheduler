@@ -128,7 +128,8 @@ public interface WorkFlowLineageMapper {
      * @param taskCode Task code want to query tasks dependence
      * @return List of TaskMainInfo
      */
-    List<TaskMainInfo> queryTaskDependentOnProcess(@Param("processDefinitionCode") long processDefinitionCode, @Param("taskCode") long taskCode);
+    List<TaskMainInfo> queryTaskDependentOnProcess(@Param("processDefinitionCode") long processDefinitionCode,
+                                                   @Param("taskCode") long taskCode);
 
     /**
      * Query all tasks depend on task, only downstream task support currently(from dependent task type).
