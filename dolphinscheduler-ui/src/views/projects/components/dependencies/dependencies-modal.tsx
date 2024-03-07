@@ -18,7 +18,8 @@
 import {
   defineComponent,
   PropType,
-  h
+  h,
+  ref, watch
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {NEllipsis, NModal, NSpace} from 'naive-ui'
@@ -56,12 +57,14 @@ export default defineComponent({
   setup(props, ctx) {
     const { t } = useI18n()
 
+    const showRef = ref(props.show)
+
     const confirmToHandle = () => {
       ctx.emit('confirm')
     }
 
     const cancelToHandle = () => {
-      ctx.emit('update:show')
+      ctx.emit('update:show', showRef)
     }
 
     const renderDownstreamDependencies = () => {
@@ -91,7 +94,12 @@ export default defineComponent({
         )
     }
 
-    return {renderDownstreamDependencies, confirmToHandle, cancelToHandle}
+    watch(()=> props.show,
+        () => {
+          showRef.value = props.show
+        })
+
+    return {renderDownstreamDependencies, confirmToHandle, cancelToHandle, showRef}
   },
 
   render() {
@@ -99,7 +107,7 @@ export default defineComponent({
 
     return (
         <NModal
-            v-model:show={this.$props.show}
+            v-model:show={this.showRef}
             preset={'dialog'}
             type={this.$props.required? 'error':'warning'}
             title={t('project.workflow.warning_dependent_tasks_title')}
@@ -108,6 +116,7 @@ export default defineComponent({
             maskClosable={false}
             onNegativeClick={this.cancelToHandle}
             onPositiveClick={this.confirmToHandle}
+            onClose={this.cancelToHandle}
         >
           {{
             default: () => (
