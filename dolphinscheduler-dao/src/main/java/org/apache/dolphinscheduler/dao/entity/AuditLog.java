@@ -46,12 +46,12 @@ public class AuditLog {
     /**
      * object type
      */
-    private Integer objectType;
+    private String objectType;
 
     /**
      * operation type
      */
-    private Integer operationType;
+    private String operationType;
 
     /**
      * object id

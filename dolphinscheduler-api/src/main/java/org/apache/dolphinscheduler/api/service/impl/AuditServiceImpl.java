@@ -148,8 +148,8 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * query audit log paging
      *
-     * @param objectTypeCodes     object type codes
-     * @param operationTypeCodes  operation type codes
+     * @param objectTypes         object types
+     * @param operationTypes      operation types
      * @param startDate           start time
      * @param endDate             end time
      * @param userName            query user name
@@ -159,17 +159,16 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      * @return audit log string data
      */
     @Override
-    public PageInfo<AuditDto> queryLogListPaging(String objectTypeCodes,
-                                                 String operationTypeCodes,
+    public PageInfo<AuditDto> queryLogListPaging(String objectTypes,
+                                                 String operationTypes,
                                                  String startDate,
                                                  String endDate,
                                                  String userName,
                                                  String objectName,
                                                  Integer pageNo,
                                                  Integer pageSize) {
-
-        List<Integer> objectTypeCodeList = convertStringToIntList(objectTypeCodes);
-        List<Integer> operationTypeCodeList = convertStringToIntList(operationTypeCodes);
+        List<String> objectTypeCodeList = convertStringToList(objectTypes);
+        List<String> operationTypeCodeList = convertStringToList(operationTypes);
 
         Date start = checkAndParseDateParameters(startDate);
         Date end = checkAndParseDateParameters(endDate);
@@ -186,21 +185,12 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         return pageInfo;
     }
 
-    private List<Integer> convertStringToIntList(String codes) {
-        if (Strings.isNullOrEmpty(codes)) {
+    private List<String> convertStringToList(String string) {
+        if (Strings.isNullOrEmpty(string)) {
             return new ArrayList<>();
         }
 
-        return Arrays.stream(codes.split(","))
-                .map(code -> {
-                    try {
-                        return Integer.parseInt(code);
-                    } catch (NumberFormatException e) {
-                        log.error("codes are not all numbers");
-                        throw new IllegalArgumentException("illegal parameter codes " + codes);
-                    }
-                })
-                .collect(Collectors.toList());
+        return Arrays.stream(string.split(",")).collect(Collectors.toList());
     }
 
     /**
@@ -230,7 +220,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
                 ProcessInstance obj = processInstanceMapper.queryDetailById(objectId.intValue());
                 return obj == null ? "" : obj.getName();
             }
-            case UDP_FUNCTION: {
+            case UDF_FUNCTION: {
                 UdfFunc obj = udfFuncMapper.selectUdfById(objectId.intValue());
                 return obj == null ? "" : obj.getFuncName();
             }

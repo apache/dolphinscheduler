@@ -20,14 +20,13 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -176,8 +175,7 @@ public class ProcessInstanceController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.UPDATE_PROCESS_INSTANCE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.PROCESS_INSTANCE, operationType = AuditOperationType.UPDATE, returnObjectFieldName = {
-            "code"})
+    @OperatorLog(auditType = AuditType.PROCESS_INSTANCE_UPDATE)
     public Result updateProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
@@ -260,8 +258,7 @@ public class ProcessInstanceController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
-    @OperatorLog(objectType = AuditObjectType.PROCESS_INSTANCE, operationType = AuditOperationType.DELETE, requestParamName = {
-            "id"})
+    @OperatorLog(auditType = AuditType.PROCESS_INSTANCE_DELETE)
     public Result<Void> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                   @PathVariable("id") Integer id) {
@@ -395,8 +392,7 @@ public class ProcessInstanceController extends BaseController {
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
-    @OperatorLog(objectType = AuditObjectType.PROCESS_INSTANCE, operationType = AuditOperationType.DELETE, requestParamName = {
-            "processInstanceIds"})
+    @OperatorLog(auditType = AuditType.PROCESS_INSTANCE_BATCH_DELETE)
     public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                   @PathVariable long projectCode,
                                                   @RequestParam("processInstanceIds") String processInstanceIds) {

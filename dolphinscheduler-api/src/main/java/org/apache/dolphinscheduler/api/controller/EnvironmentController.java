@@ -25,12 +25,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ENVIRONMENT_ER
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_ENVIRONMENT_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -83,8 +82,7 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ENVIRONMENT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
-            "code"})
+    @OperatorLog(auditType = AuditType.ENVIRONMENT_CREATE)
     public Result<Long> createEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam("name") String name,
                                           @RequestParam("config") String config,
@@ -116,8 +114,7 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ENVIRONMENT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.UPDATE, requestParamName = {
-            "code"})
+    @OperatorLog(auditType = AuditType.ENVIRONMENT_UPDATE)
     public Result<Environment> updateEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @RequestParam("code") Long code,
                                                  @RequestParam("name") String name,
@@ -190,8 +187,7 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ENVIRONMENT_ERROR)
-    @OperatorLog(objectType = AuditObjectType.ENVIRONMENT, operationType = AuditOperationType.DELETE, requestParamName = {
-            "environmentCode"})
+    @OperatorLog(auditType = AuditType.ENVIRONMENT_DELETE)
     public Result deleteEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                     @RequestParam("environmentCode") Long environmentCode) {
 

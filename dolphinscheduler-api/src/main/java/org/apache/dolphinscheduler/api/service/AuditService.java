@@ -56,8 +56,8 @@ public interface AuditService {
      * @param pageSize            page size
      * @return                    audit log string
      */
-    PageInfo<AuditDto> queryLogListPaging(String objectTypeCodes,
-                                          String operationTypeCodes, String startTime,
+    PageInfo<AuditDto> queryLogListPaging(String objectTypes,
+                                          String operationTypes, String startTime,
                                           String endTime, String userName, String objectName,
                                           Integer pageNo, Integer pageSize);
 

@@ -29,58 +29,56 @@ import lombok.Getter;
 @Getter
 public enum AuditOperationType {
 
-    CREATE(0, "Create", false, false),
-    UPDATE(1, "Update", false, false),
-    DELETE(2, "Delete", false, true),
-    CLOSE(3, "Close", false, true),
+    CREATE("Create"),
+    UPDATE("Update"),
+    BATCH_DELETE("Batch Delete"),
+    BATCH_START("Batch Start"),
+    DELETE("Delete"),
+    CLOSE("Close"), // 多条日志
 
-    RELEASE(4, "Release", true, false),
-    ONLINE(5, "Online", false, false),
-    OFFLINE(6, "Offline", false, false),
+    RELEASE("Release"), // 中间状态
+    ONLINE("Online"),
+    OFFLINE("Offline"),
 
-    RESUME_PAUSE(7, "Resume pause", false, false),
-    RESUME_FAILURE(8, "Resume failure", false, false),
+    RESUME_PAUSE("Resume pause"),
+    RESUME_FAILURE("Resume failure"),
 
-    IMPORT(9, "Import", false, false),
-    EXPORT(10, "Export", false, false),
+    IMPORT("Import"),
+    EXPORT("Export"),
 
-    EXECUTE(11, "Execute", true, false),
-    START(12, "Start", false, false),
-    RUN(13, "Run", false, false),
-    RERUN(14, "Rerun", false, false),
-    STOP(15, "Stop", false, false),
-    KILL(16, "Kill", false, false),
-    PAUSE(17, "Pause", false, false),
-    MOVE(18, "Move", false, false),
+    EXECUTE("Execute"),
+    START("Start"),
+    MODIFY("Modify"),
+    RUN("Run"),
+    RERUN("Rerun"),
+    BATCH_RERUN("Batch Rerun"),
+    STOP("Stop"),
+    KILL("Kill"),
+    PAUSE("Pause"),
+    MOVE("Move"),
 
-    SWITCH_STATUS(19, "Switch status", false, false),
-    SWITCH_VERSION(20, "Switch version", false, false),
-    DELETE_VERSION(21, "Delete version", false, false),
-    FORCE_SUCCESS(22, "Force success", false, false),
-    RENAME(23, "Rename", false, false),
-    UPLOAD(24, "Upload", false, false),
-    AUTHORIZE(25, "Authorize", false, false),
-    UN_AUTHORIZE(26, "Un authorize", false, false),
-    COPY(27, "Copy", false, true),
+    SWITCH_STATUS("Switch status"),
+    SWITCH_VERSION("Switch version"),
+    DELETE_VERSION("Delete version"),
+    FORCE_SUCCESS("Force success"),
+    RENAME("Rename"),
+    UPLOAD("Upload"),
+    AUTHORIZE("Authorize"),
+    UN_AUTHORIZE("Un authorize"),
+    COPY("Copy"), // 多条日志
     ;
 
-    private final int code;
     private final String name;
-    private final boolean isIntermediateState;
-    private final boolean multiLog;
 
-    AuditOperationType(int code, String name, boolean isIntermediateState, boolean mutliLog) {
-        this.code = code;
+    AuditOperationType(String name) {
         this.name = name;
-        this.isIntermediateState = isIntermediateState;
-        this.multiLog = mutliLog;
     }
 
-    private static final HashMap<Integer, AuditOperationType> AUDIT_OPERATION_MAP = new HashMap<>();
+    private static final HashMap<String, AuditOperationType> AUDIT_OPERATION_MAP = new HashMap<>();
 
     static {
         for (AuditOperationType operationType : AuditOperationType.values()) {
-            AUDIT_OPERATION_MAP.put(operationType.code, operationType);
+            AUDIT_OPERATION_MAP.put(operationType.name, operationType);
         }
     }
 
@@ -88,15 +86,15 @@ public enum AuditOperationType {
         return new ArrayList<>(AUDIT_OPERATION_MAP.values());
     }
 
-    public static HashMap<Integer, AuditOperationType> getAuditOperationMap() {
+    public static HashMap<String, AuditOperationType> getAuditOperationMap() {
         return AUDIT_OPERATION_MAP;
     }
 
-    public static AuditOperationType of(int code) {
-        if (AUDIT_OPERATION_MAP.containsKey(code)) {
-            return AUDIT_OPERATION_MAP.get(code);
+    public static AuditOperationType of(String name) {
+        if (AUDIT_OPERATION_MAP.containsKey(name)) {
+            return AUDIT_OPERATION_MAP.get(name);
         }
 
-        throw new IllegalArgumentException("invalid audit operation type code " + code);
+        throw new IllegalArgumentException("invalid audit operation type code " + name);
     }
 }

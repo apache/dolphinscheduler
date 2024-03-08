@@ -27,8 +27,6 @@ import lombok.Data;
 @Data
 public class AuditObjectTypeDto {
 
-    private int code;
-
     private String name;
 
     private List<AuditObjectTypeDto> child = null;
@@ -51,7 +49,6 @@ public class AuditObjectTypeDto {
     public static AuditObjectTypeDto transFromEnumToDto(AuditObjectType operationType) {
         AuditObjectTypeDto dto = new AuditObjectTypeDto();
         dto.setName(operationType.getName());
-        dto.setCode(operationType.getCode());
 
         if (!operationType.getChild().isEmpty()) {
             dto.setChild(transFromEnumListToDto(new ArrayList<>(), operationType.getChild()));

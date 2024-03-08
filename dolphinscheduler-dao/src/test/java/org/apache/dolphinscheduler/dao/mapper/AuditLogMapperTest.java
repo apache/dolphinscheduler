@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -49,8 +50,8 @@ public class AuditLogMapperTest extends BaseDaoTest {
         auditLog.setDetail("detail");
         auditLog.setLatency(1L);
         auditLog.setTime(new Date());
-        auditLog.setObjectType(objectType.getCode());
-        auditLog.setOperationType(0);
+        auditLog.setObjectType(objectType.getName());
+        auditLog.setOperationType(AuditOperationType.CREATE.getName());
         auditLog.setObjectId(1L);
         auditLog.setDescription("description");
         logMapper.insert(auditLog);
@@ -75,11 +76,11 @@ public class AuditLogMapperTest extends BaseDaoTest {
         insertOne(AuditObjectType.USER);
         insertOne(AuditObjectType.PROJECT);
         Page<AuditLog> page = new Page<>(1, 3);
-        List<Integer> objectTypeCodeList = new ArrayList<>();
-        List<Integer> operationTypeCodeList = Lists.newArrayList(0);
+        List<String> objectTypeList = new ArrayList<>();
+        List<String> operationTypeList = Lists.newArrayList(AuditOperationType.CREATE.getName());
 
         IPage<AuditLog> logIPage =
-                logMapper.queryAuditLog(page, objectTypeCodeList, operationTypeCodeList, "", "", null, null);
+                logMapper.queryAuditLog(page, objectTypeList, operationTypeList, "", "", null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
     }
 }

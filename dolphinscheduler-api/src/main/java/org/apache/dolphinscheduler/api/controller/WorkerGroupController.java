@@ -23,12 +23,11 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FA
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -83,8 +82,7 @@ public class WorkerGroupController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SAVE_ERROR)
-    @OperatorLog(objectType = AuditObjectType.WORKER_GROUP, operationType = AuditOperationType.CREATE, returnObjectFieldName = {
-            "id"})
+    @OperatorLog(auditType = AuditType.WORKER_GROUP_CREATE)
     public Result saveWorkerGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
@@ -152,8 +150,7 @@ public class WorkerGroupController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
-    @OperatorLog(objectType = AuditObjectType.WORKER_GROUP, operationType = AuditOperationType.DELETE, requestParamName = {
-            "id"})
+    @OperatorLog(auditType = AuditType.WORKER_GROUP_DELETE)
     public Result deleteWorkerGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable("id") Integer id) {
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);

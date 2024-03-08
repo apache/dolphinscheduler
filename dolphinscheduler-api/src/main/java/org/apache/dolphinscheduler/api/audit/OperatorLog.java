@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
-import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -36,28 +35,5 @@ import java.lang.annotation.Target;
 @Documented
 public @interface OperatorLog {
 
-    /**
-     * Specifies the type of object involved in the audit operation (default: PROJECT).
-     * Possible values include PROJECT, USER, etc.
-     */
-    AuditObjectType objectType() default AuditObjectType.PROJECT;
-
-    /**
-     * Specifies the type of the audit operation (default: CREATE).
-     * Possible values include CREATE, UPDATE, DELETE, etc.
-     */
-    AuditOperationType operationType() default AuditOperationType.CREATE;
-
-    /**
-     * The names of the fields in the API request to be recorded.
-     * Represents an array of key-value pairs, e.g., ["id", "status"].
-     */
-    String[] requestParamName() default {};
-
-    /**
-     * The names of the fields in the returned object to be recorded.
-     * Represents an array of field names, e.g., ["id", "code"].
-     * Specify the field names to record from the returned object.
-     */
-    String[] returnObjectFieldName() default {};
+    AuditType auditType();
 }

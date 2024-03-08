@@ -84,16 +84,16 @@ public class AuditLogController extends BaseController {
     public Result<PageInfo<AuditDto>> queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam("pageNo") Integer pageNo,
                                                               @RequestParam("pageSize") Integer pageSize,
-                                                              @RequestParam(value = "objectTypeCodes", required = false) String objectTypeCodes,
-                                                              @RequestParam(value = "operationTypeCodes", required = false) String operationTypeCodes,
+                                                              @RequestParam(value = "objectTypes", required = false) String objectTypes,
+                                                              @RequestParam(value = "operationTypes", required = false) String operationTypes,
                                                               @RequestParam(value = "startDate", required = false) String startDate,
                                                               @RequestParam(value = "endDate", required = false) String endDate,
                                                               @RequestParam(value = "userName", required = false) String userName,
                                                               @RequestParam(value = "objectName", required = false) String objectName) {
         checkPageParams(pageNo, pageSize);
         PageInfo<AuditDto> auditDtoPageInfo = auditService.queryLogListPaging(
-                objectTypeCodes,
-                operationTypeCodes,
+                objectTypes,
+                operationTypes,
                 startDate,
                 endDate,
                 userName,
