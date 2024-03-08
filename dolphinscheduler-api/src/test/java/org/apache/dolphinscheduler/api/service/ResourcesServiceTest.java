@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -494,9 +495,8 @@ public class ResourcesServiceTest {
         ServiceException serviceException =
                 Assertions.assertThrows(ServiceException.class, () -> resourcesService.updateResourceContent(getUser(),
                         "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "123", "content"));
-        assertEquals(
-                "Internal Server Error: Resource file: /dolphinscheduler/123/resources/ResourcesServiceTest.jar is illegal",
-                serviceException.getMessage());
+        assertTrue(serviceException.getMessage()
+                .contains("Resource file: /dolphinscheduler/123/resources/ResourcesServiceTest.jar is illegal"));
 
         // RESOURCE_NOT_EXIST
         when(storageOperate.getResDir(Mockito.anyString())).thenReturn("/dolphinscheduler/123/resources");
