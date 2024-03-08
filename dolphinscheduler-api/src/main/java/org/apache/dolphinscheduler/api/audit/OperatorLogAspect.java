@@ -53,7 +53,7 @@ public class OperatorLogAspect {
 
         Operation operation = method.getAnnotation(Operation.class);
         if (operation == null) {
-            log.warn("Operation is null of method: {}", method.getName);
+            log.warn("Operation is null of method: {}", method.getName());
             return point.proceed();
         }
 
