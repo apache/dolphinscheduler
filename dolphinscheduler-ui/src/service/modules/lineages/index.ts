@@ -17,7 +17,6 @@
 
 import { axios } from '@/service/service'
 import {DependentTaskReq, ProjectCodeReq, WorkflowCodeReq} from './types'
-import {TaskCodeReq} from "@/service/modules/process-task-relation/types";
 
 export function queryWorkFlowList(projectCode: ProjectCodeReq): any {
   return axios({

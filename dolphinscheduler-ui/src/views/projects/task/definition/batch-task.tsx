@@ -17,7 +17,7 @@
 
 import {
   defineComponent,
-  getCurrentInstance, h,
+  getCurrentInstance,
   onMounted,
   toRefs,
   watch

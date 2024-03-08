@@ -290,14 +290,12 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     /**
      * Query downstream tasks depend on a process definition or a task
      *
-     * @param projectCode Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
      * @param taskCode Task code want to query tasks dependence
      * @return downstream dependent tasks
      */
     @Override
-    public Map<String, Object> queryDownstreamDependentTasks(Long projectCode,
-                                                             Long processDefinitionCode, Long taskCode) {
+    public Map<String, Object> queryDownstreamDependentTasks(Long processDefinitionCode, Long taskCode) {
         Map<String, Object> result = new HashMap<>();
         List<TaskMainInfo> taskDependents =
                 workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode,

@@ -86,13 +86,6 @@ export default defineComponent({
     const workflowCode = Number(route.params.code)
     const { t } = useI18n()
 
-    // const dependenciesData = reactive({
-    //       showRef: false,
-    //       taskLinks: ref([]),
-    //       required: ref(false),
-    //       tip: ref(''), action: () => {}
-    // })
-
     const { getDependentTaskLinksByTask } = useDependencies()
 
     const hide = () => {
