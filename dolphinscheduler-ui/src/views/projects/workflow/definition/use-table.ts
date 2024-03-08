@@ -366,6 +366,11 @@ export function useTable() {
       if (data.releaseState === 'ONLINE') {
         variables.setTimingDialogShowRef = true
         variables.row = row
+        if (row?.schedule) {
+          variables.row = row.schedule
+          variables.timingType = 'update'
+          variables.timingState = row.scheduleReleaseState
+        }
       } else {
         window.$message.success(t('project.workflow.success'))
       }
