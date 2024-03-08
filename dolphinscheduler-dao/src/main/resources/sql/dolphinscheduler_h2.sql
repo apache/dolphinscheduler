@@ -1039,6 +1039,21 @@ CREATE TABLE t_ds_worker_group
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_relation_project_worker_group
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_relation_project_worker_group CASCADE;
+CREATE TABLE t_ds_relation_project_worker_group
+(
+    id            int(11) NOT NULL AUTO_INCREMENT,
+    project_code  bigint(20) NOT NULL,
+    worker_group  varchar(255) DEFAULT NULL,
+    create_time   datetime DEFAULT NULL,
+    update_time   datetime DEFAULT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_project_worker_group(project_code,worker_group)
+);
+
+-- ----------------------------
 -- Table structure for t_ds_version
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_version CASCADE;
