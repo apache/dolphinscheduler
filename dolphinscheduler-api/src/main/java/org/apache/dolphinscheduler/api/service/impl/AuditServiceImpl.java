@@ -22,41 +22,8 @@ import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
-import org.apache.dolphinscheduler.dao.entity.AccessToken;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 
 import org.apache.parquet.Strings;
 
@@ -80,57 +47,6 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
     @Autowired
     private AuditLogMapper auditLogMapper;
-
-    @Autowired
-    private ProjectMapper projectMapper;
-
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-
-    @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
-
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
-    private ScheduleMapper scheduleMapper;
-
-    @Autowired
-    private UdfFuncMapper udfFuncMapper;
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
-
-    @Autowired
-    private TenantMapper tenantMapper;
-
-    @Autowired
-    private AlertGroupMapper alertGroupMapper;
-
-    @Autowired
-    private AlertPluginInstanceMapper alertPluginInstanceMapper;
-
-    @Autowired
-    private WorkerGroupMapper workerGroupMapper;
-
-    @Autowired
-    private QueueMapper queueMapper;
-
-    @Autowired
-    private EnvironmentMapper environmentMapper;
-
-    @Autowired
-    private ClusterMapper clusterMapper;
-
-    @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
-
-    @Autowired
-    private AccessTokenMapper accessTokenMapper;
 
     @Override
     public void addAudit(AuditLog auditLog) {
@@ -211,80 +127,5 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         auditDto.setDescription(auditLog.getDescription());
         auditDto.setTime(auditLog.getTime());
         return auditDto;
-    }
-
-    @Override
-    public String getObjectNameByObjectId(Long objectId, AuditObjectType objectType) {
-        switch (objectType) {
-            case PROCESS_INSTANCE: {
-                ProcessInstance obj = processInstanceMapper.queryDetailById(objectId.intValue());
-                return obj == null ? "" : obj.getName();
-            }
-            case UDF_FUNCTION: {
-                UdfFunc obj = udfFuncMapper.selectUdfById(objectId.intValue());
-                return obj == null ? "" : obj.getFuncName();
-            }
-            case DATASOURCE: {
-                DataSource obj = dataSourceMapper.selectById(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            case TENANT: {
-                Tenant obj = tenantMapper.selectById(objectId);
-                return obj == null ? "" : obj.getTenantCode();
-            }
-            case USER: {
-                User obj = userMapper.selectById(objectId);
-                return obj == null ? "" : obj.getUserName();
-            }
-            case ALARM_GROUP: {
-                AlertGroup obj = alertGroupMapper.selectById(objectId);
-                return obj == null ? "" : obj.getGroupName();
-            }
-            case ALARM_INSTANCE: {
-                AlertPluginInstance obj = alertPluginInstanceMapper.selectById(objectId);
-                return obj == null ? "" : obj.getInstanceName();
-            }
-            case WORKER_GROUP: {
-                WorkerGroup obj = workerGroupMapper.selectById(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            case YARN_QUEUE: {
-                Queue obj = queueMapper.selectById(objectId);
-                return obj == null ? "" : obj.getQueueName();
-            }
-            case K8S_NAMESPACE: {
-                K8sNamespace obj = k8sNamespaceMapper.selectById(objectId);
-                return obj == null ? "" : obj.getNamespace();
-            }
-            case TOKEN: {
-                AccessToken obj = accessTokenMapper.selectById(objectId);
-                if (obj == null)
-                    return "";
-                User user = userMapper.selectById(obj.getUserId());
-                return user == null ? "" : user.getUserName();
-            }
-            case PROJECT: {
-                Project obj = projectMapper.queryByCode(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            case PROCESS: {
-                ProcessDefinition obj = processDefinitionMapper.queryByCode(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            case TASK: {
-                TaskDefinition obj = taskDefinitionMapper.queryByCode(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            case ENVIRONMENT: {
-                Environment obj = environmentMapper.queryByEnvironmentCode(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            case CLUSTER: {
-                Cluster obj = clusterMapper.queryByClusterCode(objectId);
-                return obj == null ? "" : obj.getName();
-            }
-            default:
-                return "";
-        }
     }
 }
