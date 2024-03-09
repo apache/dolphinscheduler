@@ -19,7 +19,7 @@ import { genTaskCodeList } from '@/service/modules/task-definition'
 import type { Cell } from '@antv/x6'
 import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {Router, useRoute, useRouter} from 'vue-router'
+import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
 import { uuid } from '@/common/common'
 import { IWorkflowTaskInstance } from './types'
@@ -87,6 +87,8 @@ export default defineComponent({
 
     const { getDependentTaskLinksByTask } = useDependencies()
 
+    const dependenciesData = props.dependenciesData
+
     const hide = () => {
       ctx.emit('hide', false)
     }
@@ -146,12 +148,12 @@ export default defineComponent({
     const handleDelete = async () => {
       let taskCode = props.cell?.id
       let res = await getDependentTaskLinksByTask(projectCode, workflowCode, taskCode)
-      props.dependenciesData.showRef = false
+      dependenciesData.showRef = false
       if (res.length > 0) {
-        props.dependenciesData.showRef = true
-        props.dependenciesData.taskLinks = res
-        props.dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
-        props.dependenciesData.required = true
+        dependenciesData.showRef = true
+        dependenciesData.taskLinks = res
+        dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+        dependenciesData.required = true
       } else {
         graph.value?.removeCell(props.cell)
         ctx.emit('removeTasks', [Number(props.cell?.id)])

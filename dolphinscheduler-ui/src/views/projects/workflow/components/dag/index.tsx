@@ -381,7 +381,7 @@ export default defineComponent({
           onSaveModelToggle={saveModelToggle}
           onRemoveTasks={removeTasks}
           onRefresh={refreshTaskStatus}
-          dependenciesData={dependenciesData}
+          v-model:dependenciesData={dependenciesData}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -437,7 +437,7 @@ export default defineComponent({
           onViewLog={handleViewLog}
           onExecuteTask={handleExecuteTask}
           onRemoveTaskInstanceCache={handleRemoveTaskInstanceCache}
-          dependenciesData={dependenciesData}
+          v-model:dependenciesData={dependenciesData}
         />
         <DependenciesModal
             v-model:show={dependenciesData.showRef}

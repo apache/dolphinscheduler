@@ -88,6 +88,8 @@ export default defineComponent({
     const workflowCode = Number(route.params.code)
     const { getDependentTaskLinksByMultipleTasks } = useDependencies()
 
+    const dependenciesData = props.dependenciesData
+
     /**
      * Node search and navigate
      */
@@ -181,10 +183,10 @@ export default defineComponent({
             .map((cell) => +cell.id)
           const res = await getDependentTaskLinksByMultipleTasks(projectCode, workflowCode, codes)
           if (res.length > 0) {
-            props.dependenciesData.showRef = true
-            props.dependenciesData.taskLinks = res
-            props.dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
-            props.dependenciesData.required = true
+            dependenciesData.showRef = true
+            dependenciesData.taskLinks = res
+            dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+            dependenciesData.required = true
           } else {
             context.emit('removeTasks', codes, cells)
             graph.value?.removeCells(cells)
