@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import {defineComponent, PropType, toRefs, h, computed, watch, ref} from 'vue'
-import {NSpace, NTooltip, NButton, NIcon, NPopconfirm, NEllipsis, darkTheme} from 'naive-ui'
+import { defineComponent, PropType, toRefs } from 'vue'
+import { NSpace, NTooltip, NButton, NIcon, NPopconfirm } from 'naive-ui'
 import {
   DeleteOutlined,
   DownloadOutlined,

@@ -17,7 +17,7 @@
 
 import { genTaskCodeList } from '@/service/modules/task-definition'
 import type { Cell } from '@antv/x6'
-import { defineComponent, onMounted, PropType, inject, ref, h, reactive } from 'vue'
+import { defineComponent, onMounted, PropType, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {Router, useRoute, useRouter} from 'vue-router'
 import styles from './menu.module.scss'
@@ -81,7 +81,6 @@ export default defineComponent({
   setup(props, ctx) {
     const graph = inject('graph', ref())
     const route = useRoute()
-    const router: Router = useRouter()
     const projectCode = Number(route.params.projectCode)
     const workflowCode = Number(route.params.code)
     const { t } = useI18n()

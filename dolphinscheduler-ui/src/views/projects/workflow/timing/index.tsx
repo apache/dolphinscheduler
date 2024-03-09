@@ -29,7 +29,6 @@ export default defineComponent({
   name: 'WorkflowTimingList',
   setup() {
     const { variables, createColumns, getTableData } = useTable()
-    const { t } = useI18n()
 
     const requestData = () => {
       getTableData({

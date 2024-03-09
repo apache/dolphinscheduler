@@ -25,14 +25,13 @@ import {
   NTooltip,
   NPopconfirm,
   NModal,
-  NEllipsis
 } from 'naive-ui'
 import {
   defineComponent,
-  getCurrentInstance, h,
+  getCurrentInstance,
   onMounted,
   toRefs,
-  watch,
+  watch
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTable } from './use-table'
@@ -46,10 +45,7 @@ import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
 import Search from '@/components/input-search'
-import ButtonLink from "@/components/button-link"
-import {release} from "@/service/modules/process-definition"
-import { offline } from '@/service/modules/schedules'
-import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
+import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -58,7 +54,6 @@ export default defineComponent({
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
     const uiSettingStore = useUISettingStore()
-    const { t } = useI18n()
 
     const {
       variables,
@@ -325,12 +320,12 @@ export default defineComponent({
           onPositiveClick={this.confirmToSetWorkflowTiming}
         />
         <DependenciesModal
-            v-model:row={this.row}
-            v-model:show={this.dependenciesData.showRef}
-            v-model:taskLinks={this.dependenciesData.taskLinks}
-            required={this.dependenciesData.required}
-            content={this.dependenciesData.tip}
-            onConfirm={this.dependenciesData.action}
+          v-model:row={this.row}
+          v-model:show={this.dependenciesData.showRef}
+          v-model:taskLinks={this.dependenciesData.taskLinks}
+          required={this.dependenciesData.required}
+          content={this.dependenciesData.tip}
+          onConfirm={this.dependenciesData.action}
         />
       </NSpace>
     )

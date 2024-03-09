@@ -49,7 +49,7 @@ import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 import { WorkflowDefinition, WorkflowInstance } from './types'
-import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies"
+import { useDependencies } from "@/views/projects/components/dependencies/use-dependencies"
 
 const props = {
   layoutToggle: {
