@@ -38,6 +38,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
@@ -161,6 +162,19 @@ public class ShellTask extends AbstractTask {
     private String parseScript(String script) {
         // combining local and global parameters
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        return ParameterUtils.convertParameterPlaceholders(script, ParamUtils.convert(paramsMap));
+        Map<String, String> paramUtilsMap = ParamUtils.convert(paramsMap);
+        return ParameterUtils.convertParameterPlaceholders(script, returnShellTaskPlaceHolders(paramUtilsMap));
+    }
+
+    private Map<String, String> returnShellTaskPlaceHolders(Map<String, String> paramUtilsMap) {
+        Map<String, String> map = new HashMap<>();
+        if(paramUtilsMap != null) {
+            map.putAll(paramUtilsMap);
+        }
+        map.put("WORKFLOW_NAME", taskExecutionContext.getProcessDefinitionName());
+        map.put("WORKFLOW_INSTANCE_NAME", taskExecutionContext.getProcessInstanceName());
+        map.put("WORKFLOW_ID", String.valueOf(taskExecutionContext.getProcessDefineId()));
+        map.put("WORKFLOW_INSTANCE_ID", String.valueOf(taskExecutionContext.getProcessInstanceId()));
+        return map;
     }
 }

@@ -94,6 +94,7 @@ public class TaskExecutionContextBuilder {
      */
     public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(ProcessInstance processInstance) {
         taskExecutionContext.setProcessInstanceId(processInstance.getId());
+        taskExecutionContext.setProcessInstanceName(processInstance.getName());
         taskExecutionContext.setScheduleTime(processInstance.getScheduleTime());
         taskExecutionContext.setGlobalParams(processInstance.getGlobalParams());
         taskExecutionContext.setExecutorId(processInstance.getExecutorId());
@@ -111,6 +112,7 @@ public class TaskExecutionContextBuilder {
      */
     public TaskExecutionContextBuilder buildProcessDefinitionRelatedInfo(ProcessDefinition processDefinition) {
         taskExecutionContext.setProcessDefineCode(processDefinition.getCode());
+        taskExecutionContext.setProcessDefinitionName(processDefinition.getName());
         taskExecutionContext.setProcessDefineVersion(processDefinition.getVersion());
         taskExecutionContext.setProjectCode(processDefinition.getProjectCode());
         return this;
