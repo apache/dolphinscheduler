@@ -65,9 +65,6 @@ public class MasterRegistryClientTest {
     private MasterHeartBeatTask masterHeartBeatTask;
 
     @Mock
-    private FailoverService failoverService;
-
-    @Mock
     private MasterConfig masterConfig;
 
     @BeforeEach
