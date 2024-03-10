@@ -33,6 +33,7 @@ import {
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { IDefinitionData } from '../types'
+
 const props = {
   row: {
     type: Object as PropType<IDefinitionData>
@@ -95,6 +96,7 @@ export default defineComponent({
     const handleReleaseScheduler = () => {
       ctx.emit('releaseScheduler')
     }
+
     return {
       handleEditWorkflow,
       handleStartWorkflow,
@@ -114,6 +116,7 @@ export default defineComponent({
     const releaseState = this.row?.releaseState
     const scheduleReleaseState = this.row?.scheduleReleaseState
     const schedule = this.row?.schedule
+
     return (
       <NSpace>
         <NTooltip trigger={'hover'}>
@@ -166,10 +169,7 @@ export default defineComponent({
             trigger: () => (
               <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
                 {{
-                  default: () =>
-                    releaseState === 'ONLINE'
-                      ? t('project.workflow.confirm_to_offline')
-                      : t('project.workflow.confirm_to_online'),
+                  default: () => releaseState === 'OFFLINE' ? t('project.workflow.confirm_to_online'):t('project.workflow.confirm_to_offline'),
                   trigger: () => (
                     <NButton
                       size='small'
@@ -220,9 +220,7 @@ export default defineComponent({
               <NPopconfirm onPositiveClick={this.handleReleaseScheduler}>
                 {{
                   default: () =>
-                    scheduleReleaseState === 'ONLINE'
-                      ? t('project.workflow.time_to_offline')
-                      : t('project.workflow.time_to_online'),
+                      scheduleReleaseState === 'OFFLINE' ? t('project.workflow.time_to_online'):t('project.workflow.time_to_offline'),
                   trigger: () => (
                     <NButton
                       size='small'

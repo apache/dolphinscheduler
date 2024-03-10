@@ -124,12 +124,12 @@ public interface WorkFlowLineageMapper {
      * current method `queryTaskDepOnProcess`. Which mean with the same parameter processDefinitionCode, all tasks in
      * `queryTaskDepOnTask` are in the result of method `queryTaskDepOnProcess`.
      *
-     * @param projectCode Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param taskCode Task code want to query tasks dependence
      * @return List of TaskMainInfo
      */
-    List<TaskMainInfo> queryTaskDependentDepOnProcess(@Param("projectCode") long projectCode,
-                                                      @Param("processDefinitionCode") long processDefinitionCode);
+    List<TaskMainInfo> queryTaskDependentOnProcess(@Param("processDefinitionCode") long processDefinitionCode,
+                                                   @Param("taskCode") long taskCode);
 
     /**
      * Query all tasks depend on task, only downstream task support currently(from dependent task type).

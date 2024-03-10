@@ -24,7 +24,7 @@ import {
   toRef,
   watch,
   onBeforeUnmount,
-  computed
+  computed, reactive
 } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
@@ -57,6 +57,7 @@ import utils from '@/utils'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import { executeTask } from '@/service/modules/executors'
 import { removeTaskInstanceCache } from '@/service/modules/task-instances'
+import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
 
 const props = {
   // If this prop is passed, it means from definition detail
@@ -333,6 +334,13 @@ export default defineComponent({
       }
     }
 
+    const dependenciesData = reactive({
+      showRef: ref(false),
+      taskLinks: ref([]),
+      required: ref(false),
+      tip: ref(''), action: () => {}
+    })
+
     watch(
       () => props.definition,
       () => {
@@ -373,6 +381,7 @@ export default defineComponent({
           onSaveModelToggle={saveModelToggle}
           onRemoveTasks={removeTasks}
           onRefresh={refreshTaskStatus}
+          v-model:dependenciesData={dependenciesData}
         />
         <div class={Styles.content}>
           <DagSidebar onDragStart={onDragStart} />
@@ -428,6 +437,14 @@ export default defineComponent({
           onViewLog={handleViewLog}
           onExecuteTask={handleExecuteTask}
           onRemoveTaskInstanceCache={handleRemoveTaskInstanceCache}
+          v-model:dependenciesData={dependenciesData}
+        />
+        <DependenciesModal
+            v-model:show={dependenciesData.showRef}
+            v-model:taskLinks={dependenciesData.taskLinks}
+            required={dependenciesData.required}
+            content={dependenciesData.tip}
+            onConfirm={dependenciesData.action}
         />
         {!!props.definition && (
           <StartModal

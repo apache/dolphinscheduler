@@ -46,6 +46,15 @@ public interface WorkFlowLineageService {
     Set<TaskMainInfo> queryTaskDepOnProcess(long projectCode, long processDefinitionCode);
 
     /**
+     * Query downstream tasks depend on a process definition or a task
+     *
+     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param taskCode Task code want to query tasks dependence
+     * @return downstream dependent tasks
+     */
+    Map<String, Object> queryDownstreamDependentTasks(Long processDefinitionCode, Long taskCode);
+
+    /**
      * Query and return tasks dependence with string format, is a wrapper of queryTaskDepOnTask and task query method.
      *
      * @param projectCode Project code want to query tasks dependence
