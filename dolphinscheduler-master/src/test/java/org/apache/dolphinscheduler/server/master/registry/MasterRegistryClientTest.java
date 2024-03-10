@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.service.FailoverService;
 import org.apache.dolphinscheduler.server.master.task.MasterHeartBeatTask;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -62,6 +63,9 @@ public class MasterRegistryClientTest {
 
     @Mock
     private MasterHeartBeatTask masterHeartBeatTask;
+
+    @Mock
+    private FailoverService failoverService;
 
     @Mock
     private MasterConfig masterConfig;
@@ -102,5 +106,11 @@ public class MasterRegistryClientTest {
         masterRegistryClient.removeMasterNodePath("/path", RegistryNodeType.MASTER, true);
         // Cannot mock static methods
         masterRegistryClient.removeWorkerNodePath("/path", RegistryNodeType.WORKER, true);
+    }
+
+    @Test
+    public void removeWorkNodePathTest() {
+        masterRegistryClient.removeWorkerNodePath("", RegistryNodeType.WORKER, true);
+        masterRegistryClient.removeWorkerNodePath(null, RegistryNodeType.WORKER, true);
     }
 }
