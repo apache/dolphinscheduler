@@ -41,6 +41,7 @@ import Card from '@/components/card'
 import VersionModal from './components/version-modal'
 import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import type { INodeData } from './types'
+import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
 
 const BatchTaskDefinition = defineComponent({
   name: 'batch-task-definition',
@@ -212,6 +213,13 @@ const BatchTaskDefinition = defineComponent({
           from={1}
           readonly={this.taskReadonly}
           saving={this.taskSaving}
+        />
+        <DependenciesModal
+            v-model:show={this.dependenciesData.showRef}
+            v-model:taskLinks={this.dependenciesData.taskLinks}
+            required={this.dependenciesData.required}
+            content={this.dependenciesData.tip}
+            onConfirm={this.dependenciesData.action}
         />
       </NSpace>
     )

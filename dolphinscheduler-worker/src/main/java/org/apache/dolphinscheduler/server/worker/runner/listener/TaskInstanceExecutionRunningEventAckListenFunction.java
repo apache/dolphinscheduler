@@ -36,6 +36,9 @@ public class TaskInstanceExecutionRunningEventAckListenFunction
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    public TaskInstanceExecutionRunningEventAckListenFunction(MessageRetryRunner messageRetryRunner) {
+        this.messageRetryRunner = messageRetryRunner;
+    }
     @Override
     public void handleTaskInstanceExecutionEventAck(TaskInstanceExecutionRunningEventAck taskInstanceExecutionRunningEventAck) {
         try {
