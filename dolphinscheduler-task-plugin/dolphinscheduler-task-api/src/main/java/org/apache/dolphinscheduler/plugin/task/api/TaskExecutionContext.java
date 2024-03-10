@@ -98,6 +98,11 @@ public class TaskExecutionContext implements Serializable {
     private Long processDefineCode;
 
     /**
+     * processDefinitionName
+     */
+    private String processDefinitionName;
+
+    /**
      * processVersion
      */
     private int processDefineVersion;
@@ -111,6 +116,11 @@ public class TaskExecutionContext implements Serializable {
      * process instance id
      */
     private int processInstanceId;
+
+    /**
+     * process instance name
+     */
+    private String processInstanceName;
 
     /**
      * process instance schedule time
