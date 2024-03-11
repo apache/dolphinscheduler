@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
-import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
 import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -32,7 +31,7 @@ import org.springframework.stereotype.Service;
 public class ResourceOperatorImpl extends BaseOperator {
 
     @Override
-    public void modifyAuditObjectType(AuditType auditType, Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
+    public void modifyAuditObjectType(Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
         if (OperatorUtils.isUdfResource(paramsMap)) {
             auditLogList.forEach(auditLog -> auditLog.setObjectType(AuditObjectType.UDF_FOLDER.getName()));
         }

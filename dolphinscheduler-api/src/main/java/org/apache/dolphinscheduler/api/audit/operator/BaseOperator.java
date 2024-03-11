@@ -43,6 +43,7 @@ public abstract class BaseOperator implements Operator {
     @Autowired
     private AuditService auditService;
 
+    @Override
     public Object recordAudit(ProceedingJoinPoint point, String describe, AuditType auditType) throws Throwable {
         long beginTime = System.currentTimeMillis();
 
@@ -68,7 +69,7 @@ public abstract class BaseOperator implements Operator {
         setObjectIdentityFromReturnObject(auditType, result, auditLogList);
 
         modifyAuditOperationType(auditType, paramsMap, auditLogList);
-        modifyAuditObjectType(auditType, paramsMap, auditLogList);
+        modifyAuditObjectType(paramsMap, auditLogList);
 
         long latency = System.currentTimeMillis() - beginTime;
         auditService.addAudit(auditLogList, latency);
@@ -171,7 +172,7 @@ public abstract class BaseOperator implements Operator {
                                        List<AuditLog> auditLogList) {
     }
 
-    protected void modifyAuditObjectType(AuditType auditType, Map<String, Object> paramsMap,
+    protected void modifyAuditObjectType(Map<String, Object> paramsMap,
                                          List<AuditLog> auditLogList) {
 
     }
@@ -187,7 +188,18 @@ public abstract class BaseOperator implements Operator {
             return;
         }
 
-        auditLogList
-                .forEach(auditLog -> auditLog.setObjectId(Long.parseLong(returnObjectMap.get(params[0]).toString())));
+        Long objId = checkNum(returnObjectMap.get(params[0]).toString());
+
+        if (objId != -1) {
+            auditLogList.get(0).setObjectId(objId);
+        }
+    }
+
+    protected Long checkNum(String str) {
+        if (str.matches("\\d+")) {
+            return Long.parseLong(str);
+        }
+
+        return -1L;
     }
 }

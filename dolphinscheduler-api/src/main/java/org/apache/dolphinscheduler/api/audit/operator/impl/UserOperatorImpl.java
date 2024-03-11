@@ -32,7 +32,12 @@ public class UserOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        User obj = userMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        User obj = userMapper.selectById(objId);
         return obj == null ? "" : obj.getUserName();
     }
 }

@@ -32,7 +32,12 @@ public class AlertGroupOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        AlertGroup obj = alertGroupMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        AlertGroup obj = alertGroupMapper.selectById(objId);
         return obj == null ? "" : obj.getGroupName();
     }
 }

@@ -32,7 +32,12 @@ public class AlertInstanceOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        AlertPluginInstance obj = alertPluginInstanceMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        AlertPluginInstance obj = alertPluginInstanceMapper.selectById(objId);
         return obj == null ? "" : obj.getInstanceName();
     }
 }

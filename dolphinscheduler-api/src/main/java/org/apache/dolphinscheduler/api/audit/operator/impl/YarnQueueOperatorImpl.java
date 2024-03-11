@@ -32,7 +32,12 @@ public class YarnQueueOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Queue obj = queueMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        Queue obj = queueMapper.selectById(objId);
         return obj == null ? "" : obj.getQueueName();
     }
 }

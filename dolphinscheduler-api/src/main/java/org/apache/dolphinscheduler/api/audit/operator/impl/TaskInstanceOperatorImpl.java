@@ -32,7 +32,12 @@ public class TaskInstanceOperatorImpl extends BaseOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        TaskInstance obj = taskInstanceMapper.selectById(Integer.parseInt(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        TaskInstance obj = taskInstanceMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

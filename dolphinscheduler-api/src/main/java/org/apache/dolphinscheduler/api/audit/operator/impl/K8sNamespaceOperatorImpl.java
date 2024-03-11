@@ -32,7 +32,12 @@ public class K8sNamespaceOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        K8sNamespace obj = k8sNamespaceMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        K8sNamespace obj = k8sNamespaceMapper.selectById(objId);
         return obj == null ? "" : obj.getNamespace();
     }
 }

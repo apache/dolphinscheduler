@@ -59,8 +59,8 @@ public class AuditLogController extends BaseController {
      *
      * @param loginUser         login user
      * @param pageNo            page number
-     * @param objectTypeCodes       object type codes
-     * @param operationTypeCodes    operation type codes
+     * @param objectTypes       object types
+     * @param operationTypes    operation types
      * @param startDate         start time
      * @param endDate           end time
      * @param userName          user name
@@ -71,8 +71,8 @@ public class AuditLogController extends BaseController {
     @Parameters({
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "objectTypeCodes", description = "OBJECT_TYPE_CODES", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "operationTypeCodes", description = "OPERATION_TYPE_CODES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "objectTypes", description = "OBJECT_TYPES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "operationTypes", description = "OPERATION_TYPES", schema = @Schema(implementation = String.class)),
             @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "objectName", description = "OBJECT_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
