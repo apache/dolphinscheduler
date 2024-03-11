@@ -23,7 +23,8 @@ import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
 import { uuid } from '@/common/common'
 import { IWorkflowTaskInstance } from './types'
-import { NButton } from 'naive-ui'
+import {NButton} from 'naive-ui'
+import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies"
 
 const props = {
   startDisplay: {
@@ -57,6 +58,10 @@ const props = {
   top: {
     type: Number as PropType<number>,
     default: 0
+  },
+  dependenciesData: {
+    type: Object as PropType<any>,
+    require: false
   }
 }
 
@@ -77,6 +82,12 @@ export default defineComponent({
     const graph = inject('graph', ref())
     const route = useRoute()
     const projectCode = Number(route.params.projectCode)
+    const workflowCode = Number(route.params.code)
+    const { t } = useI18n()
+
+    const { getDependentTaskLinksByTask } = useDependencies()
+
+    const dependenciesData = props.dependenciesData
 
     const hide = () => {
       ctx.emit('hide', false)
@@ -134,9 +145,19 @@ export default defineComponent({
       })
     }
 
-    const handleDelete = () => {
-      graph.value?.removeCell(props.cell)
-      ctx.emit('removeTasks', [Number(props.cell?.id)])
+    const handleDelete = async () => {
+      let taskCode = props.cell?.id
+      let res = await getDependentTaskLinksByTask(projectCode, workflowCode, taskCode)
+      dependenciesData.showRef = false
+      if (res.length > 0) {
+        dependenciesData.showRef = true
+        dependenciesData.taskLinks = res
+        dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+        dependenciesData.required = true
+      } else {
+        graph.value?.removeCell(props.cell)
+        ctx.emit('removeTasks', [Number(props.cell?.id)])
+      }
     }
 
     onMounted(() => {
@@ -189,8 +210,8 @@ export default defineComponent({
                 {t('project.node.copy')}
               </NButton>
               <NButton
-                class={`${styles['menu-item']}`}
-                onClick={this.handleDelete}
+                  class={`${styles['menu-item']}`}
+                  onClick={this.handleDelete}
               >
                 {t('project.node.delete')}
               </NButton>
