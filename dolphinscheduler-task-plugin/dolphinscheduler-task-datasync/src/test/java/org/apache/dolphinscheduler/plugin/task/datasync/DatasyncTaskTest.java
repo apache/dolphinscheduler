@@ -179,7 +179,8 @@ public class DatasyncTaskTest {
         when(sdkMock.isSuccessful()).thenReturn(true);
         when(response.taskExecutionArn()).thenReturn(mockExeArn);
         when(describeTaskExecutionResponse.sdkHttpResponse()).thenReturn(sdkMock);
-        when(client.describeTaskExecution((DescribeTaskExecutionRequest) any())).thenReturn(describeTaskExecutionResponse);
+        when(client.describeTaskExecution((DescribeTaskExecutionRequest) any()))
+                .thenReturn(describeTaskExecutionResponse);
         when(describeTaskExecutionResponse.status()).thenReturn(TaskExecutionStatus.LAUNCHING);
         Boolean executionFlag = datasyncHook.startDatasyncTask();
 
@@ -207,13 +208,15 @@ public class DatasyncTaskTest {
         when(failed.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
         when(failed.status()).thenReturn(TaskStatus.UNKNOWN_TO_SDK_VERSION);
-        Assertions.assertEquals(false, datasyncHook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
+        Assertions.assertEquals(false,
+                datasyncHook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
 
         when(client.describeTask((DescribeTaskRequest) any())).thenReturn(available);
         when(available.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
         when(available.status()).thenReturn(TaskStatus.AVAILABLE);
-        Assertions.assertEquals(true, datasyncHook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
+        Assertions.assertEquals(true,
+                datasyncHook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
     }
 
     @Test
@@ -233,7 +236,8 @@ public class DatasyncTaskTest {
         when(success.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
         when(success.status()).thenReturn(TaskExecutionStatus.SUCCESS);
-        Assertions.assertEquals(true, datasyncHook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
+        Assertions.assertEquals(true,
+                datasyncHook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
     }
 
     private DatasyncTask initTask(String contextJson) {
