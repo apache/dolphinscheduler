@@ -21,6 +21,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.AuditServiceImpl;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
@@ -89,8 +91,8 @@ public class AuditServiceTest {
     private AuditLog getAuditLog() {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserName("testName");
-        auditLog.setOperationType(AuditOperationType.CREATE.getCode());
-        auditLog.setObjectType(AuditObjectType.PROJECT.getCode());
+        auditLog.setOperationType(AuditOperationType.CREATE.getName());
+        auditLog.setObjectType(AuditObjectType.PROJECT.getName());
         return auditLog;
     }
 }
