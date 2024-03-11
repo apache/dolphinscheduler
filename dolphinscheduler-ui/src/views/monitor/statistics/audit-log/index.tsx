@@ -125,7 +125,7 @@ const AuditLog = defineComponent({
               style={{ width: '180px' }}
               clearable
               filterable
-              value-field='code'
+              value-field='name'
               label-field='name'
               children-field='child'
               show-path={false}
@@ -139,7 +139,7 @@ const AuditLog = defineComponent({
               style={{ width: '180px' }}
               clearable
               filterable
-              value-field='code'
+              value-field='name'
               label-field='name'
             />
 
