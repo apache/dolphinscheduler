@@ -238,6 +238,13 @@ export default {
     confirm_to_offline: 'Confirm to make the workflow offline?',
     time_to_online: 'Confirm to make the Scheduler online?',
     time_to_offline: 'Confirm to make the Scheduler offline?',
+    warning_dependent_tasks_title: 'Warning',
+    warning_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the workflow offline?',
+    warning_dependencies: 'Dependencies:',
+    delete_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the workflow.',
+    warning_offline_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the scheduler offline?',
+    delete_task_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the task.',
+    warning_delete_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
   },
   task: {
     on_line: 'Online',
@@ -306,7 +313,8 @@ export default {
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
     please_choose: 'Please Choose',
-    remove_task_cache: 'Clear cache'
+    remove_task_cache: 'Clear cache',
+    delete_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the task.',
   },
   dag: {
     create: 'Create Workflow',
