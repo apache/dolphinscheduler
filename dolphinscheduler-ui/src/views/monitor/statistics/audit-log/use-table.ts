@@ -134,8 +134,8 @@ export function useTable() {
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
-      objectTypeCodes: params.objectType,
-      operationTypeCodes: params.operationType,
+      objectTypes: params.objectType,
+      operationTypes: params.operationType,
       userName: params.userName,
       objectName: params.objectName,
       startDate: params.datePickerRange
