@@ -2537,6 +2537,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // do nothing if the workflow is already offline
             return;
         }
+
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionDao.updateById(workflowDefinition);
 

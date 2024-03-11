@@ -86,4 +86,17 @@ public class WorkFlowLineageControllerTest {
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(new HashMap<>());
         assertDoesNotThrow(() -> workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code));
     }
+
+    @Test
+    public void testQueryDownstreamDependentTaskList() {
+        long code = 1L;
+        long taskCode = 1L;
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(workFlowLineageService.queryDownstreamDependentTasks(code, taskCode))
+                .thenReturn(result);
+
+        assertDoesNotThrow(
+                () -> workFlowLineageController.queryDownstreamDependentTaskList(user, code, taskCode));
+    }
 }
