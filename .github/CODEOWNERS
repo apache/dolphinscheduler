@@ -23,7 +23,7 @@
 /dolphinscheduler-registry/ @caishunfeng @ruanwenjun
 /dolphinscheduler-api/ @caishunfeng @SbloodyS
 /dolphinscheduler-dao/ @caishunfeng @SbloodyS
-/dolphinscheduler-dao/src/main/resources/sql/ @zhongjiajie
+/dolphinscheduler-dao/src/main/resources/sql/ @EricGao888
 /dolphinscheduler-common/ @caishunfeng
 /dolphinscheduler-standalone-server/ @caishunfeng
 /dolphinscheduler-datasource-plugin/ @caishunfeng
@@ -36,10 +36,10 @@
 /dolphinscheduler-extract/ @caishunfeng @ruanwenjun
 /dolphinscheduler-spi/ @caishunfeng
 /dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @zhuangchong
-/dolphinscheduler-tools/ @caishunfeng @SbloodyS @zhongjiajie @EricGao888
-/script/ @caishunfeng @SbloodyS @zhongjiajie @EricGao888
+/dolphinscheduler-tools/ @caishunfeng @SbloodyS @EricGao888
+/script/ @caishunfeng @SbloodyS @EricGao888
 /dolphinscheduler-ui/ @songjianet @Amy0104
-/docs/ @zhongjiajie @EricGao888
-/licenses/ @zhongjiajie
-/images/ @zhongjiajie @EricGao888
+/docs/ @EricGao888
+/licenses/ @EricGao888
+/images/ @EricGao888
 /style/ @caishunfeng

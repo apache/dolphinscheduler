@@ -50,6 +50,13 @@ public class TaskInstanceKillOperationFunction
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    public TaskInstanceKillOperationFunction(
+                                             WorkerTaskExecutorThreadPool workerManager,
+                                             MessageRetryRunner messageRetryRunner) {
+        this.workerManager = workerManager;
+        this.messageRetryRunner = messageRetryRunner;
+    }
+
     @Override
     public TaskInstanceKillResponse operate(TaskInstanceKillRequest taskInstanceKillRequest) {
         log.info("Receive TaskInstanceKillRequest: {}", taskInstanceKillRequest);

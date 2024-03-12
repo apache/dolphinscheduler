@@ -147,6 +147,7 @@ export function useTable(
               parseTime(item.updateTime),
               'yyyy-MM-dd HH:mm:ss'
             )
+            item.status = (item.status == 'YES') ? 1 : 0
             return {
               ...item
             }

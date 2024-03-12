@@ -14,3 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+DROP TABLE IF EXISTS t_ds_relation_project_worker_group;
+CREATE TABLE t_ds_relation_project_worker_group (
+    id int NOT NULL  ,
+    project_code bigint DEFAULT NULL ,
+    worker_group varchar(255) NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_relation_project_worker_group_un UNIQUE (project_code, worker_group)
+);
+
+DROP SEQUENCE IF EXISTS t_ds_relation_project_worker_group_sequence;
+CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
+ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
