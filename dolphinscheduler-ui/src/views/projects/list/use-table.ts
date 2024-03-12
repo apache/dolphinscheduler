@@ -25,7 +25,7 @@ import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import {
-  NButton, NDropdown,
+  NButton,
   NEllipsis,
   NIcon,
   NPopconfirm,
@@ -39,7 +39,7 @@ import {
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import {ControlOutlined, DeleteOutlined, EditOutlined, UserOutlined} from '@vicons/antd'
+import {ControlOutlined, DeleteOutlined, EditOutlined} from '@vicons/antd'
 import {useUserStore} from "@/store/user/user";
 import {UserInfoRes} from "@/service/modules/users/types";
 

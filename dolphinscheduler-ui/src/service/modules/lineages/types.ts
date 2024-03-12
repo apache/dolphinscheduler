@@ -47,10 +47,15 @@ interface WorkflowRes {
   workFlowRelationList: WorkFlowRelationList[]
 }
 
+interface DependentTaskReq extends WorkflowCodeReq {
+  taskCode?: number
+}
+
 export {
   ProjectCodeReq,
   WorkflowCodeReq,
   WorkFlowNameReq,
+  DependentTaskReq,
   WorkflowRes,
   WorkFlowListRes
 }

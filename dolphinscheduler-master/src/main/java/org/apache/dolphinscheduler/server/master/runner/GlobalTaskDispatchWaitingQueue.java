@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner;
 
 import java.util.concurrent.DelayQueue;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
@@ -37,7 +38,8 @@ public class GlobalTaskDispatchWaitingQueue {
         queue.put(priorityTaskExecuteRunnable);
     }
 
-    public DefaultTaskExecuteRunnable takeTaskExecuteRunnable() throws InterruptedException {
+    @SneakyThrows
+    public DefaultTaskExecuteRunnable takeTaskExecuteRunnable() {
         return queue.take();
     }
 

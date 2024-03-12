@@ -17,7 +17,6 @@
 
 import { useI18n } from 'vue-i18n'
 import { reactive, ref, SetupContext } from 'vue'
-import { useUserStore } from '@/store/user/user'
 import { Option } from "naive-ui/es/transfer/src/interface"
 import { queryAllWorkerGroups } from "@/service/modules/worker-groups"
 import { queryWorkerGroupsByProjectCode, assignWorkerGroups } from "@/service/modules/projects-worker-group"
@@ -28,7 +27,6 @@ export function useWorkerGroup(
     ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
 ) {
   const { t } = useI18n()
-  const userStore = useUserStore()
 
   const variables = reactive({
     model: {

@@ -49,6 +49,7 @@ import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 import { WorkflowDefinition, WorkflowInstance } from './types'
+import { useDependencies } from "@/views/projects/components/dependencies/use-dependencies"
 
 const props = {
   layoutToggle: {
@@ -64,6 +65,10 @@ const props = {
     // The same as the structure responsed by the queryProcessDefinitionByCode api
     type: Object as PropType<WorkflowDefinition>,
     default: null
+  },
+  dependenciesData: {
+    type: Object as PropType<any>,
+    require: false
   }
 }
 
@@ -79,6 +84,11 @@ export default defineComponent({
     const graph = inject<Ref<Graph | undefined>>('graph', ref())
     const router = useRouter()
     const route = useRoute()
+    const projectCode = Number(route.params.projectCode)
+    const workflowCode = Number(route.params.code)
+    const { getDependentTaskLinksByMultipleTasks } = useDependencies()
+
+    const dependenciesData = props.dependenciesData
 
     /**
      * Node search and navigate
@@ -164,15 +174,23 @@ export default defineComponent({
     /**
      * Delete selected edges and nodes
      */
-    const removeCells = () => {
+    const removeCells = async () => {
       if (graph.value) {
         const cells = graph.value.getSelectedCells()
         if (cells) {
           const codes = cells
             .filter((cell) => cell.isNode())
             .map((cell) => +cell.id)
-          context.emit('removeTasks', codes, cells)
-          graph.value?.removeCells(cells)
+          const res = await getDependentTaskLinksByMultipleTasks(projectCode, workflowCode, codes)
+          if (res.length > 0) {
+            dependenciesData.showRef = true
+            dependenciesData.taskLinks = res
+            dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+            dependenciesData.required = true
+          } else {
+            context.emit('removeTasks', codes, cells)
+            graph.value?.removeCells(cells)
+          }
         }
       }
     }
