@@ -25,10 +25,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import org.apache.dolphinscheduler.common.enums.ResourceManagerType;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.*;
 import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
 import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManager;
 import org.apache.dolphinscheduler.plugin.task.api.am.KubernetesApplicationManagerContext;
@@ -51,6 +48,7 @@ import java.util.regex.Pattern;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sOperation;
 
 @Slf4j
 public final class ProcessUtils {
@@ -229,5 +227,19 @@ public final class ProcessUtils {
         return applicationManager
                 .getPodLogWatcher(
                         new KubernetesApplicationManagerContext(k8sTaskExecutionContext, taskAppId, containerName));
+    }
+
+    /**
+     * get driver  logs
+     *
+     * @param k8sTaskExecutionContext
+     * @param taskAppId
+     * @return
+     */
+    public static LogWatch getLogWatcher(K8sTaskExecutionContext k8sTaskExecutionContext, String taskAppId,
+                                         String containerName, AbstractK8sOperation abstractK8sOperation) {
+        KubernetesApplicationManager applicationManager =
+                (KubernetesApplicationManager) applicationManagerMap.get(ResourceManagerType.KUBERNETES);
+        return abstractK8sOperation.getLogWatcher(containerName,k8sTaskExecutionContext.getNamespace());
     }
 }
