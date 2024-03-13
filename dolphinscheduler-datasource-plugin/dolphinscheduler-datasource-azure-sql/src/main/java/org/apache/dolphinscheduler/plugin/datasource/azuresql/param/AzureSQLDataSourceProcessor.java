@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -56,6 +55,12 @@ import com.microsoft.sqlserver.jdbc.SQLServerException;
 
 @AutoService(DataSourceProcessor.class)
 public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String JDBC_SQLSERVER = "jdbc:sqlserver://";
+    private static final String COM_SQLSERVER_JDBC_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+    private static final String SQLSERVER_VALIDATION_QUERY = "select 1";
+    private static final String AZURE_SQL_DATABASE_SPN = "https://database.windows.net/";
+    private static final String AZURE_SQL_DATABASE_TOKEN_SCOPE = "/.default";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -103,7 +108,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
         }
 
         String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_SQLSERVER, azureSQLParam.getHost(),
+                String.format("%s%s:%s", JDBC_SQLSERVER, azureSQLParam.getHost(),
                         azureSQLParam.getPort());
         String jdbcUrl = address + ";databaseName=" + azureSQLParam.getDatabase();
         AzureSQLConnectionParam azureSQLConnectionParam = new AzureSQLConnectionParam();
@@ -128,12 +133,12 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_SQLSERVER_JDBC_DRIVER;
+        return COM_SQLSERVER_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.SQLSERVER_VALIDATION_QUERY;
+        return SQLSERVER_VALIDATION_QUERY;
     }
 
     @Override
@@ -171,7 +176,7 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     private AzureSQLConnectionParam createTokenConnectionParams(AzureSQLDataSourceParamDTO azureSQLParam) {
         String address =
-                String.format("%s%s:%s", DataSourceConstants.JDBC_SQLSERVER, azureSQLParam.getHost(),
+                String.format("%s%s:%s", JDBC_SQLSERVER, azureSQLParam.getHost(),
                         azureSQLParam.getPort());
         AzureSQLConnectionParam azureSQLConnectionParam = new AzureSQLConnectionParam();
         azureSQLConnectionParam.setMode(azureSQLParam.getMode());
@@ -189,12 +194,12 @@ public class AzureSQLDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     public static Connection tokenGetConnection(AzureSQLConnectionParam param) {
-        String spn = DataSourceConstants.AZURE_SQL_DATABASE_SPN;
+        String spn = AZURE_SQL_DATABASE_SPN;
         String stsURL = param.getEndpoint(); // Replace with your STS URL.
         String clientId = param.getUser(); // Replace with your client ID.
         String clientSecret = PasswordUtils.decodePassword(param.getPassword()); // Replace with your client secret.
 
-        String scope = spn + DataSourceConstants.AZURE_SQL_DATABASE_TOKEN_SCOPE;
+        String scope = spn + AZURE_SQL_DATABASE_TOKEN_SCOPE;
         Set<String> scopes = new HashSet<>();
         scopes.add(scope);
 

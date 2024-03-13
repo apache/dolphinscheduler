@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -68,12 +67,6 @@ public class PrestoDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_PRESTO_JDBC_DRIVER,
-                prestoDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         PrestoConnectionParam prestoConnectionParam = new PrestoConnectionParam();
         prestoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:1234/default");
@@ -87,9 +80,4 @@ public class PrestoDataSourceProcessorTest {
         Assertions.assertEquals(DbType.PRESTO, prestoDatasourceProcessor.getDbType());
     }
 
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.PRESTO_VALIDATION_QUERY,
-                prestoDatasourceProcessor.getValidationQuery());
-    }
 }

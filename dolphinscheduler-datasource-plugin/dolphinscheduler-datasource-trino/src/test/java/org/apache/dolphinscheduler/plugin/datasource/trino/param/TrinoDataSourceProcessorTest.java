@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.trino.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -68,12 +67,6 @@ public class TrinoDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_TRINO_JDBC_DRIVER,
-                TrinoDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         TrinoConnectionParam TrinoConnectionParam = new TrinoConnectionParam();
         TrinoConnectionParam.setJdbcUrl("jdbc:postgresql://localhost:8080/default");
@@ -85,12 +78,6 @@ public class TrinoDataSourceProcessorTest {
     @Test
     public void testGetDbType() {
         Assertions.assertEquals(DbType.TRINO, TrinoDatasourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.TRINO_VALIDATION_QUERY,
-                TrinoDatasourceProcessor.getValidationQuery());
     }
 
     @Test

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.databend.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -40,6 +39,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class DatabendDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String DATABEND_VALIDATION_QUERY = "select 1";
+    private static final String JDBC_DATABEND = "jdbc:databend://";
+    private static final String COM_DATABEND_JDBC_DRIVER = "com.databend.jdbc.DatabendDriver";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -66,7 +69,7 @@ public class DatabendDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public ConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         DatabendDataSourceParamDTO databendParam = (DatabendDataSourceParamDTO) datasourceParam;
-        String address = String.format("%s%s:%s", DataSourceConstants.JDBC_DATABEND, databendParam.getHost(),
+        String address = String.format("%s%s:%s", JDBC_DATABEND, databendParam.getHost(),
                 databendParam.getPort());
         String jdbcUrl = address + "/" + databendParam.getDatabase();
 
@@ -89,12 +92,12 @@ public class DatabendDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_DATABEND_JDBC_DRIVER;
+        return COM_DATABEND_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.DATABEND_VALIDATION_QUERY;
+        return DATABEND_VALIDATION_QUERY;
     }
 
     @Override

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hana.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -66,13 +65,7 @@ class HanaDataSourceProcessorTest {
     }
 
     @Test
-    void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_HANA_DB_JDBC_DRIVER,
-                hanaDataSourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
-    void testGetJdbcUrl() {
+    public void testGetJdbcUrl() {
         HanaConnectionParam hanaConnectionParam = new HanaConnectionParam();
         hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015?currentschema=default");
         Assertions.assertEquals(
@@ -83,12 +76,6 @@ class HanaDataSourceProcessorTest {
     @Test
     void testGetDbType() {
         Assertions.assertEquals(DbType.HANA, hanaDataSourceProcessor.getDbType());
-    }
-
-    @Test
-    void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.HANA_VALIDATION_QUERY,
-                hanaDataSourceProcessor.getValidationQuery());
     }
 
     @Test

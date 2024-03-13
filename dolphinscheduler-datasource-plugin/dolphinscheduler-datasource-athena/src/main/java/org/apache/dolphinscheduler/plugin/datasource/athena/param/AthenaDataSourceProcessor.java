@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.athena.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -42,6 +41,10 @@ import com.google.auto.service.AutoService;
 @AutoService(DataSourceProcessor.class)
 public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
 
+    private static final String JDBC_ATHENA = "jdbc:awsathena://";
+    private static final String ATHENA_VALIDATION_QUERY = "select 1";
+    private static final String COM_ATHENA_JDBC_DRIVER = "com.simba.athena.jdbc.Driver";
+
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, AthenaDataSourceParamDTO.class);
@@ -64,7 +67,7 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         AthenaDataSourceParamDTO athenaParam = (AthenaDataSourceParamDTO) datasourceParam;
         String address =
-                String.format("%s%s=%s;", DataSourceConstants.JDBC_ATHENA, "AwsRegion", athenaParam.getAwsRegion());
+                String.format("%s%s=%s;", JDBC_ATHENA, "AwsRegion", athenaParam.getAwsRegion());
 
         AthenaConnectionParam athenaConnectionParam = new AthenaConnectionParam();
         athenaConnectionParam.setUser(athenaParam.getUserName());
@@ -87,12 +90,12 @@ public class AthenaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.COM_ATHENA_JDBC_DRIVER;
+        return COM_ATHENA_JDBC_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.ATHENA_VALIDATION_QUERY;
+        return ATHENA_VALIDATION_QUERY;
     }
 
     @Override

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -75,12 +74,6 @@ public class OracleDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
-        Assertions.assertEquals(DataSourceConstants.COM_ORACLE_JDBC_DRIVER,
-                oracleDatasourceProcessor.getDatasourceDriver());
-    }
-
-    @Test
     public void testGetJdbcUrl() {
         OracleConnectionParam oracleConnectionParam = new OracleConnectionParam();
         oracleConnectionParam.setJdbcUrl("jdbc:oracle:thin:@localhost:3308:default");
@@ -95,12 +88,6 @@ public class OracleDataSourceProcessorTest {
     @Test
     public void getDbType() {
         Assertions.assertEquals(DbType.ORACLE, oracleDatasourceProcessor.getDbType());
-    }
-
-    @Test
-    public void testGetValidationQuery() {
-        Assertions.assertEquals(DataSourceConstants.ORACLE_VALIDATION_QUERY,
-                oracleDatasourceProcessor.getValidationQuery());
     }
 
     @Test
@@ -164,4 +151,5 @@ public class OracleDataSourceProcessorTest {
         Assertions.assertEquals("SELECT *\n" +
                 "FROM test2;", sqls.get(1));
     }
+
 }

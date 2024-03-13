@@ -26,4 +26,5 @@ public class OceanBaseAdHocDataSourceClient extends BaseAdHocDataSourceClient {
     public OceanBaseAdHocDataSourceClient(BaseConnectionParam baseConnectionParam, DbType dbType) {
         super(baseConnectionParam, dbType);
     }
+
 }

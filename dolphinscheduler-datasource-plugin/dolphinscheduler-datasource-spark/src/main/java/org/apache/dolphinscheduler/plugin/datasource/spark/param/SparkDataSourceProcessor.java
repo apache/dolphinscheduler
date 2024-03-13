@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.datasource.spark.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -44,6 +43,10 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    private static final String SPARK_VALIDATION_QUERY = "select 1";
+    private static final String JDBC_HIVE_2 = "jdbc:hive2://";
+    private static final String ORG_APACHE_HIVE_JDBC_HIVE_DRIVER = "org.apache.hive.jdbc.HiveDriver";
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -79,7 +82,7 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO dataSourceParam) {
         StringBuilder address = new StringBuilder();
         SparkDataSourceParamDTO sparkDatasourceParam = (SparkDataSourceParamDTO) dataSourceParam;
-        address.append(DataSourceConstants.JDBC_HIVE_2);
+        address.append(JDBC_HIVE_2);
         for (String zkHost : sparkDatasourceParam.getHost().split(",")) {
             address.append(String.format("%s:%s,", zkHost, sparkDatasourceParam.getPort()));
         }
@@ -114,12 +117,12 @@ public class SparkDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getDatasourceDriver() {
-        return DataSourceConstants.ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
+        return ORG_APACHE_HIVE_JDBC_HIVE_DRIVER;
     }
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.HIVE_VALIDATION_QUERY;
+        return SPARK_VALIDATION_QUERY;
     }
 
     @Override
