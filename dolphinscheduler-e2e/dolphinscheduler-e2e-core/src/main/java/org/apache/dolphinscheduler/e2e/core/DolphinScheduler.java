@@ -37,5 +37,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @TestMethodOrder(OrderAnnotation.class)
 @ExtendWith(DolphinSchedulerExtension.class)
 public @interface DolphinScheduler {
+
     String[] composeFiles();
 }

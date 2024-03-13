@@ -19,8 +19,13 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
+
+import java.time.Duration;
+import java.util.List;
+
+import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -28,9 +33,6 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
-import java.util.List;
 
 @Getter
 public final class SwitchTaskForm extends TaskNodeForm {
@@ -50,14 +52,14 @@ public final class SwitchTaskForm extends TaskNodeForm {
     }
 
     public SwitchTaskForm elseBranch(String elseBranchName) {
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", inputElseBranch());
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", inputElseBranch());
 
         final By optionsLocator = By.className("option-else-branches");
 
         new WebDriverWait(parent().driver(), Duration.ofSeconds(10))
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
-        List<WebElement> webElements =  parent().driver().findElements(optionsLocator);
+        List<WebElement> webElements = parent().driver().findElements(optionsLocator);
         webElements.stream()
                 .filter(it -> it.getText().contains(elseBranchName))
                 .findFirst()
@@ -70,19 +72,20 @@ public final class SwitchTaskForm extends TaskNodeForm {
     }
 
     public SwitchTaskForm addIfBranch(String switchScript, String ifBranchName) {
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", buttonAddBranch);
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", buttonAddBranch);
 
         SwitchTaskIfBranch switchTaskIfBranch = new SwitchTaskIfBranch(this);
         switchTaskIfBranch.codeEditor().content(switchScript);
 
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", switchTaskIfBranch.inputIfBranch());
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();",
+                switchTaskIfBranch.inputIfBranch());
 
         final By optionsLocator = By.className("option-if-branches");
 
         new WebDriverWait(parent().driver(), Duration.ofSeconds(10))
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
-        List<WebElement> webElements =  parent().driver().findElements(optionsLocator);
+        List<WebElement> webElements = parent().driver().findElements(optionsLocator);
         webElements.stream()
                 .filter(it -> it.getText().contains(ifBranchName))
                 .findFirst()

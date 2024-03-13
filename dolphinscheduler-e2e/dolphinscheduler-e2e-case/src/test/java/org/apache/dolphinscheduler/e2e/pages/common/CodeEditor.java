@@ -19,27 +19,25 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.common;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.PageFactory;
+import java.time.Duration;
 
 import lombok.Getter;
 
-import java.time.Duration;
-
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class CodeEditor {
+
     @FindBys({
-        @FindBy(className = "monaco-editor"),
-        @FindBy(className = "view-line"),
+            @FindBy(className = "monaco-editor"),
+            @FindBy(className = "view-line"),
     })
     private WebElement editor;
 

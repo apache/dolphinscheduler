@@ -25,25 +25,26 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
-
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.support.pagefactory.ByChained;
 
 @Getter
 public final class WorkflowInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
+
     @FindBy(className = "items-workflow-instances")
     private List<WebElement> instanceList;
 
     @FindBys({
-        @FindBy(className = "btn-selected"),
-        @FindBy(className = "n-checkbox-box"),
+            @FindBy(className = "btn-selected"),
+            @FindBy(className = "n-checkbox-box"),
     })
     private WebElement checkBoxSelectAll;
 
@@ -62,10 +63,10 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
 
     public List<Row> instances() {
         return instanceList()
-            .stream()
-            .filter(WebElement::isDisplayed)
-            .map(Row::new)
-            .collect(Collectors.toList());
+                .stream()
+                .filter(WebElement::isDisplayed)
+                .map(Row::new)
+                .collect(Collectors.toList());
     }
 
     public WorkflowInstanceTab deleteAll() {
@@ -84,6 +85,7 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
 
     @RequiredArgsConstructor
     public static class Row {
+
         private final WebElement row;
 
         public WebElement rerunButton() {
@@ -100,11 +102,11 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
 
         public Row rerun() {
             row.findElements(new ByChained(By.className("btn-rerun"), By.className("n-button__content")))
-               .stream()
-               .filter(WebElement::isDisplayed)
-               .findFirst()
-               .orElseThrow(() -> new RuntimeException("Cannot find rerun button"))
-               .click();
+                    .stream()
+                    .filter(WebElement::isDisplayed)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Cannot find rerun button"))
+                    .click();
 
             return this;
         }

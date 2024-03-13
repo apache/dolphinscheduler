@@ -19,6 +19,8 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -35,19 +37,18 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskFor
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class WorkflowSwitchE2ETest {
+
     private static final String project = "test-workflow-1";
     private static final String workflow = "test-workflow-1";
     private static final String ifBranchName = "key==1";
@@ -60,31 +61,28 @@ class WorkflowSwitchE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .create(tenant)
-            .goToNav(ProjectPage.class)
-            .create(project)
-        ;
+                .login("admin", "dolphinscheduler123")
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class)
+                .create(tenant)
+                .goToNav(ProjectPage.class)
+                .create(project);
     }
 
     @AfterAll
     public static void cleanup() {
         new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .goTo(project)
-            .goToTab(WorkflowDefinitionTab.class)
-            .cancelPublishAll()
-            .deleteAll()
-        ;
+                .goToNav(ProjectPage.class)
+                .goTo(project)
+                .goToTab(WorkflowDefinitionTab.class)
+                .cancelPublishAll()
+                .deleteAll();
         new NavBarPage(browser)
-            .goToNav(ProjectPage.class)
-            .delete(project)
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-            .delete(tenant)
-        ;
+                .goToNav(ProjectPage.class)
+                .delete(project)
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class)
+                .delete(tenant);
     }
 
     @Test
@@ -92,33 +90,33 @@ class WorkflowSwitchE2ETest {
     void testCreateSwitchWorkflow() {
 
         final WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goTo(project)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goTo(project)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         WorkflowForm workflowForm = workflowDefinitionPage.createWorkflow();
 
-        workflowForm.<ShellTaskForm> addTask(TaskType.SHELL)
-            .script("echo ${today}\necho ${global_param}\n")
-            .name("pre-task")
-            .submit();
+        workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
+                .script("echo ${today}\necho ${global_param}\n")
+                .name("pre-task")
+                .submit();
 
         SwitchTaskForm switchTaskForm = workflowForm.addTask(TaskType.SWITCH);
         switchTaskForm.preTask("pre-task")
-            .name("switch")
-            .submit();
+                .name("switch")
+                .submit();
 
         workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
-            .script("echo ${key}")
-            .preTask("switch")
-            .name(ifBranchName)
-            .submit();
+                .script("echo ${key}")
+                .preTask("switch")
+                .name(ifBranchName)
+                .submit();
 
         workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
-            .script("echo ${key}")
-            .preTask("switch")
-            .name(elseBranchName)
-            .submit();
+                .script("echo ${key}")
+                .preTask("switch")
+                .name(elseBranchName)
+                .submit();
 
         // format dag
         workflowForm.formatDAG().confirm();
@@ -130,13 +128,12 @@ class WorkflowSwitchE2ETest {
         switchTaskForm.submit();
 
         workflowForm.submit()
-            .name(workflow)
-            .addGlobalParam("key", "1")
-            .submit();
+                .name(workflow)
+                .addGlobalParam("key", "1")
+                .submit();
 
         Awaitility.await().untilAsserted(() -> assertThat(
-            workflowDefinitionPage.workflowList()
-        ).anyMatch(it -> it.getText().contains(workflow)));
+                workflowDefinitionPage.workflowList()).anyMatch(it -> it.getText().contains(workflow)));
 
         workflowDefinitionPage.publish(workflow);
     }
