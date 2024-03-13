@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -223,7 +224,8 @@ public class PigeonTask extends AbstractRemoteTask {
     }
 
     private String getHost() {
-        final String host = taskExecutionContext.getDefinedParams().get(KEY_POOL_VAR_PIGEON_HOST);
+        final String host =
+                ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()).get(KEY_POOL_VAR_PIGEON_HOST);
         if (StringUtils.isEmpty(host)) {
             throw new IllegalStateException("global var '" + KEY_POOL_VAR_PIGEON_HOST + "' can not be empty");
         }

@@ -23,6 +23,7 @@ import static com.github.dreamhead.moco.Runner.running;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.io.IOUtils;
 
@@ -67,7 +68,7 @@ public class PigeonTaskTest {
         // "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
         Map<String, String> gloabParams =
                 Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, "127.0.0.1:8080");
-        Mockito.when(taskExecutionContext.getDefinedParams()).thenReturn(gloabParams);
+        Mockito.when(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap())).thenReturn(gloabParams);
 
         pigeonTask = new PigeonTask(taskExecutionContext);
         pigeonTask.init();

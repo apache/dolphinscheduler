@@ -173,12 +173,6 @@ public class TaskExecutionContext implements Serializable {
     private String environmentConfig;
 
     /**
-     * definedParams
-     * // todo: we need to rename definedParams, prepareParamsMap, paramsMap, this is confusing
-     */
-    private Map<String, String> definedParams;
-
-    /**
      * prepare params map
      */
     private Map<String, Property> prepareParamsMap;
