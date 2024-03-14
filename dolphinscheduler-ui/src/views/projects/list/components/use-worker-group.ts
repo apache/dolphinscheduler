@@ -51,7 +51,6 @@ export function useWorkerGroup(
         variables.model.assignedWorkerGroups.push(item.workerGroup)
       })
     })
-    console.log(variables.model.assignedWorkerGroups)
   }
 
   initOptions()
