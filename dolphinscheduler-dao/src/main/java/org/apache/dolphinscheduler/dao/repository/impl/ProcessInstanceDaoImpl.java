@@ -82,13 +82,15 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * find last manual process instance interval
      *
      * @param definitionCode process definition code
+     * @param taskCode taskCode
      * @param dateInterval   dateInterval
      * @return process instance
      */
     @Override
-    public ProcessInstance queryLastManualProcessInterval(Long definitionCode, DateInterval dateInterval,
+    public ProcessInstance queryLastManualProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
                                                           int testFlag) {
         return mybatisMapper.queryLastManualProcess(definitionCode,
+                taskCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime(),
                 testFlag);
