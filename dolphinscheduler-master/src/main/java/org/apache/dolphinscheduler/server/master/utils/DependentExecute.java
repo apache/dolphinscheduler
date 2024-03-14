@@ -149,8 +149,9 @@ public class DependentExecute {
 
         DependResult result = DependResult.FAILED;
         for (DateInterval dateInterval : dateIntervals) {
-            ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(),
-                    dateInterval, testFlag);
+            ProcessInstance processInstance =
+                    findLastProcessInterval(dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(),
+                            dateInterval, testFlag);
             if (processInstance == null) {
                 return DependResult.WAITING;
             }
@@ -315,7 +316,8 @@ public class DependentExecute {
      * @param dateInterval   date interval
      * @return ProcessInstance
      */
-    private ProcessInstance findLastProcessInterval(Long definitionCode,Long taskCode, DateInterval dateInterval, int testFlag) {
+    private ProcessInstance findLastProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
+                                                    int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
                 processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);

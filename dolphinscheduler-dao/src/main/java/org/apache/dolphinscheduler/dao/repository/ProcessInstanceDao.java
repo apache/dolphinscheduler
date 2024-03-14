@@ -55,7 +55,8 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
      * @param dateInterval   dateInterval
      * @return process instance
      */
-    ProcessInstance queryLastManualProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval, int testFlag);
+    ProcessInstance queryLastManualProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
+                                                   int testFlag);
 
     /**
      * query first schedule process instance
