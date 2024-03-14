@@ -22,8 +22,10 @@ import static com.github.dreamhead.moco.MocoJsonRunner.jsonHttpServer;
 import static com.github.dreamhead.moco.Runner.running;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.io.IOUtils;
 
@@ -66,9 +68,11 @@ public class PigeonTaskTest {
         // Mockito.when(taskExecutionContext.getVarPool())
         // .thenReturn("[{\"direct\":\"IN\",\"prop\":\"" + TISTask.KEY_POOL_VAR_TIS_HOST +
         // "\",\"type\":\"VARCHAR\",\"value\":\"127.0.0.1:8080\"}]");
-        Map<String, String> gloabParams =
-                Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, "127.0.0.1:8080");
-        Mockito.when(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap())).thenReturn(gloabParams);
+
+        Map<String, Property> prepareParamsMap =
+                Collections.singletonMap(PigeonTask.KEY_POOL_VAR_PIGEON_HOST, new Property(
+                        PigeonTask.KEY_POOL_VAR_PIGEON_HOST, Direct.IN, DataType.VARCHAR, "127.0.0.1:8080"));
+        Mockito.when(taskExecutionContext.getPrepareParamsMap()).thenReturn(prepareParamsMap);
 
         pigeonTask = new PigeonTask(taskExecutionContext);
         pigeonTask.init();
