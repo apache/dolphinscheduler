@@ -51,11 +51,13 @@ export function useWorkerGroup(
         variables.model.assignedWorkerGroups.push(item.workerGroup)
       })
     })
+    console.log(variables.model.assignedWorkerGroups)
   }
 
   initOptions()
 
   const handleValidate = () => {
+    console.log(variables.model?.assignedWorkerGroups)
     if (variables.model?.assignedWorkerGroups.length>0) {
       submitModal()
       ctx.emit('confirmModal', props.showModalRef)
