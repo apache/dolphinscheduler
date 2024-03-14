@@ -301,13 +301,15 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end,
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), null, start,
+                        end,
                         processInstance.getTestFlag());
         Assertions.assertEquals(processInstance1.getId(), processInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
         processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end,
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), null, start,
+                        end,
                         processInstance.getTestFlag());
         Assertions.assertNull(processInstance1);
 
