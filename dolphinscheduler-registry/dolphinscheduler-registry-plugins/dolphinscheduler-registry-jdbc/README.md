@@ -12,7 +12,7 @@ This module is the jdbc registry plugin module, this plugin will use jdbc as the
 
 2. Change the config
 
-You need to set the registry properties in master/worker/api's appplication.yml
+You need to set the registry properties in master/worker/api's application.yml
 
 ```yaml
 registry:
@@ -39,7 +39,7 @@ registry:
 
 ## Use different database configuration for jdbc registry center
 
-You need to set the registry properties in master/worker/api's appplication.yml
+You need to set the registry properties in master/worker/api's application.yml
 
 ### Use Mysql as registry center
 
