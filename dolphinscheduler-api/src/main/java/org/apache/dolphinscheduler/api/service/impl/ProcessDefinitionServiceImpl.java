@@ -58,10 +58,7 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
-import org.apache.dolphinscheduler.api.utils.CheckUtils;
-import org.apache.dolphinscheduler.api.utils.FileUtils;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.*;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -248,6 +245,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private ListenerEventAlertManager listenerEventAlertManager;
+
+    private final int THRESHOLD_ENTRIES = 10000;
+    private final int THRESHOLD_SIZE = 1000000000; // 1 GB
+    private final double THRESHOLD_RATIO = 10;
+
+    private final Map<String, DataSource> dataSourceCache = new HashMap<>(1);
+    private final Map<String, Long> taskNameToCode = new HashMap<>(16);
+    private final Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
 
     /**
      * create process definition
@@ -1205,127 +1210,20 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         if (result.get(Constants.STATUS) != Status.SUCCESS) {
             return result;
         }
-        String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
-        int index = processDefinitionName.lastIndexOf(".");
-        if (index > 0) {
-            processDefinitionName = processDefinitionName.substring(0, index);
-        }
-        processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+        String processDefinitionName = getProcessDefinitionName(file);
 
         ProcessDefinition processDefinition;
         List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
         List<ProcessTaskRelationLog> processTaskRelationList = new ArrayList<>();
 
         // for Zip Bomb Attack
-        final int THRESHOLD_ENTRIES = 10000;
-        final int THRESHOLD_SIZE = 1000000000; // 1 GB
-        final double THRESHOLD_RATIO = 10;
-        int totalEntryArchive = 0;
-        int totalSizeEntry = 0;
         // In most cases, there will be only one data source
-        Map<String, DataSource> dataSourceCache = new HashMap<>(1);
-        Map<String, Long> taskNameToCode = new HashMap<>(16);
-        Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
-        try (
+               try (
                 ZipInputStream zIn = new ZipInputStream(file.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
             // build process definition
-            processDefinition = new ProcessDefinition(projectCode,
-                    processDefinitionName,
-                    CodeGenerateUtils.getInstance().genCode(),
-                    "",
-                    "[]", null,
-                    0, loginUser.getId());
-
-            ZipEntry entry;
-            while ((entry = zIn.getNextEntry()) != null) {
-                totalEntryArchive++;
-                int totalSizeArchive = 0;
-                if (!entry.isDirectory()) {
-                    StringBuilder sql = new StringBuilder();
-                    String taskName = null;
-                    String datasourceName = null;
-                    List<String> upstreams = Collections.emptyList();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        int nBytes = line.getBytes(StandardCharsets.UTF_8).length;
-                        totalSizeEntry += nBytes;
-                        totalSizeArchive += nBytes;
-                        long compressionRatio = totalSizeEntry / entry.getCompressedSize();
-                        if (compressionRatio > THRESHOLD_RATIO) {
-                            throw new IllegalStateException(
-                                    "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
-                        }
-                        int commentIndex = line.indexOf("-- ");
-                        if (commentIndex >= 0) {
-                            int colonIndex = line.indexOf(":", commentIndex);
-                            if (colonIndex > 0) {
-                                String key = line.substring(commentIndex + 3, colonIndex).trim().toLowerCase();
-                                String value = line.substring(colonIndex + 1).trim();
-                                switch (key) {
-                                    case "name":
-                                        taskName = value;
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    case "upstream":
-                                        upstreams = Arrays.stream(value.split(",")).map(String::trim)
-                                                .filter(s -> !"".equals(s)).collect(Collectors.toList());
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    case "datasource":
-                                        datasourceName = value;
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
-                        if (!"".equals(line)) {
-                            sql.append(line).append("\n");
-                        }
-                    }
-                    // import/sql1.sql -> sql1
-                    if (taskName == null) {
-                        taskName = entry.getName();
-                        index = taskName.indexOf("/");
-                        if (index > 0) {
-                            taskName = taskName.substring(index + 1);
-                        }
-                        index = taskName.lastIndexOf(".");
-                        if (index > 0) {
-                            taskName = taskName.substring(0, index);
-                        }
-                    }
-                    DataSource dataSource = dataSourceCache.get(datasourceName);
-                    if (dataSource == null) {
-                        dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
-                    }
-                    if (dataSource == null) {
-                        log.error("Datasource does not found, may be its name is illegal.");
-                        putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
-                        return result;
-                    }
-                    dataSourceCache.put(datasourceName, dataSource);
-
-                    TaskDefinitionLog taskDefinition =
-                            buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
-
-                    taskDefinitionList.add(taskDefinition);
-                    taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
-                    taskNameToUpstream.put(taskDefinition.getName(), upstreams);
-                }
-
-                if (totalSizeArchive > THRESHOLD_SIZE) {
-                    throw new IllegalStateException(
-                            "the uncompressed data size is too much for the application resource capacity");
-                }
-
-                if (totalEntryArchive > THRESHOLD_ENTRIES) {
-                    throw new IllegalStateException(
-                            "too much entries in this archive, can lead to inodes exhaustion of the system");
-                }
-            }
+                   processDefinition = buildProcessDefinition(loginUser, projectCode, processDefinitionName);
+                   processTasksFromZip(zIn, bufferedReader, taskDefinitionList, loginUser, result);
         } catch (Exception e) {
             log.error("Import process definition error.", e);
             putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
@@ -2070,18 +1968,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                         taskDefinitionLogDao.queryTaskDefineLogList(processTaskRelations);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                    try {
-                        long taskCode = CodeGenerateUtils.getInstance().genCode();
-                        taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
-                        taskDefinitionLog.setCode(taskCode);
-                    } catch (CodeGenerateException e) {
-                        log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
-                        putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-                        throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-                    }
-                    taskDefinitionLog.setProjectCode(targetProjectCode);
-                    taskDefinitionLog.setVersion(0);
-                    taskDefinitionLog.setName(taskDefinitionLog.getName());
+                    setTaskDefinitionLog(targetProjectCode, result, taskDefinitionLog, taskCodeMap);
                 }
                 for (ProcessTaskRelationLog processTaskRelationLog : taskRelationList) {
                     if (processTaskRelationLog.getPreTaskCode() > 0) {
@@ -2093,13 +1980,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     }
                 }
                 final long oldProcessDefinitionCode = processDefinition.getCode();
-                try {
-                    processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
-                } catch (CodeGenerateException e) {
-                    log.error("Generate process definition code error, projectCode:{}.", targetProjectCode, e);
-                    putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
-                    throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
-                }
+                setProcessDefinitionCode(targetProjectCode, result, processDefinition);
                 processDefinition.setId(null);
                 processDefinition.setUserId(loginUser.getId());
                 processDefinition.setName(getNewName(processDefinition.getName(), COPY_SUFFIX));
@@ -2118,39 +1999,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 // copy timing configuration
                 Schedule scheduleObj = scheduleMapper.queryByProcessDefinitionCode(oldProcessDefinitionCode);
-                if (scheduleObj != null) {
-                    scheduleObj.setId(null);
-                    scheduleObj.setUserId(loginUser.getId());
-                    scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
-                    scheduleObj.setReleaseState(ReleaseState.OFFLINE);
-                    scheduleObj.setCreateTime(date);
-                    scheduleObj.setUpdateTime(date);
+                if (Objects.nonNull(scheduleObj)) {
+                    setScheduledObject(loginUser, processDefinition, scheduleObj, date);
                     int insertResult = scheduleMapper.insert(scheduleObj);
-                    if (insertResult != 1) {
-                        log.error("Schedule create error, processDefinitionCode:{}.", processDefinition.getCode());
-                        putMsg(result, Status.CREATE_SCHEDULE_ERROR);
-                        throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
-                    }
+                    checkInsertResult(result, processDefinition, insertResult);
                 }
-                try {
-                    result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs));
-                } catch (Exception e) {
-                    log.error("Copy process definition error, processDefinitionCode from {} to {}.",
-                            oldProcessDefinitionCode, processDefinition.getCode(), e);
-                    putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
-                    throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
-                }
+                copyProcessDefinition(loginUser, result, processDefinition, taskRelationList, taskDefinitionLogs, oldProcessDefinitionCode);
             } else {
                 log.info("Move process definition...");
-                try {
-                    result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null,
-                            Lists.newArrayList()));
-                } catch (Exception e) {
-                    log.error("Move process definition error, processDefinitionCode:{}.",
-                            processDefinition.getCode(), e);
-                    putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR);
-                    throw new ServiceException(Status.MOVE_PROCESS_DEFINITION_ERROR);
-                }
+                moveProcessDefinition(loginUser, result, processDefinition, taskRelationList);
             }
             if (result.get(Constants.STATUS) != Status.SUCCESS) {
                 failedProcessList.add(processDefinition.getCode() + "[" + processDefinition.getName() + "]");
@@ -2650,6 +2507,199 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 throw new ServiceException(
                         "SubWorkflowDefinition " + subWorkflowDefinition.getName() + " is not online");
             }
+        }
+    }
+
+    private String getProcessDefinitionName(MultipartFile file) {
+        String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
+        int index = processDefinitionName.lastIndexOf(".");
+        if (index > 0) {
+            processDefinitionName = processDefinitionName.substring(0, index);
+        }
+        processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+        return processDefinitionName;
+    }
+
+    private static ProcessDefinition buildProcessDefinition(User loginUser, long projectCode, String processDefinitionName) {
+        ProcessDefinition processDefinition;
+        processDefinition = new ProcessDefinition(projectCode,
+                processDefinitionName,
+                CodeGenerateUtils.getInstance().genCode(),
+                "",
+                "[]", null,
+                0, loginUser.getId());
+        return processDefinition;
+    }
+    private static String getTaskName(String taskName, ZipEntry entry) {
+        int index;
+        if (taskName == null) {
+            taskName = entry.getName();
+            index = taskName.indexOf("/");
+            if (index > 0) {
+                taskName = taskName.substring(index + 1);
+            }
+            index = taskName.lastIndexOf(".");
+            if (index > 0) {
+                taskName = taskName.substring(0, index);
+            }
+        }
+        return taskName;
+    }
+
+    private void processTasksFromZip(ZipInputStream zIn, BufferedReader bufferedReader, List<TaskDefinitionLog> taskDefinitionList,
+                                     User loginUser, Map<String, Object> result) throws IOException {
+        // for Zip Bomb Attack
+        int totalEntryArchive = 0;
+        int totalSizeEntry = 0;
+        // In most cases, there will be only one data source
+
+        ZipEntry entry;
+        while ((entry = zIn.getNextEntry()) != null) {
+            totalEntryArchive++;
+            int totalSizeArchive = 0;
+            if (!entry.isDirectory()) {
+                StringBuilder sql = new StringBuilder();
+                String taskName;
+                String line;
+                TaskDependencyUtility taskDependencyUtilty = new TaskDependencyUtility();
+                while ((line = bufferedReader.readLine()) != null) {
+                    int nBytes = line.getBytes(StandardCharsets.UTF_8).length;
+                    totalSizeEntry += nBytes;
+                    totalSizeArchive += nBytes;
+                    long compressionRatio = totalSizeEntry / entry.getCompressedSize();
+                    if (compressionRatio > THRESHOLD_RATIO) {
+                        throw new IllegalStateException(
+                                "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
+                    }
+                    int commentIndex = line.indexOf("-- ");
+                    if (commentIndex >= 0) {
+                        int colonIndex = line.indexOf(":", commentIndex);
+                        if (colonIndex > 0) {
+                            String key = line.substring(commentIndex + 3, colonIndex).trim().toLowerCase();
+                            String value = line.substring(colonIndex + 1).trim();
+                            taskDependencyUtilty = getTaskDependencyUtility(key, value);
+                            line = line.substring(0, commentIndex);
+                        }
+                    }
+                    if (!line.isEmpty()) {
+                        sql.append(line).append("\n");
+                    }
+                }
+                // import/sql1.sql -> sql1
+                taskName = getTaskName(taskDependencyUtilty.getTaskName(), entry);
+                DataSource dataSource = dataSourceCache.get(taskDependencyUtilty.getDataSource());
+                if (Objects.isNull(dataSource)) {
+                    dataSource = queryDatasourceByNameAndUser(taskDependencyUtilty.getDataSource(), loginUser);
+                }
+                if (Objects.isNull(dataSource)) {
+                    log.error("Datasource does not found, may be its name is illegal.");
+                    putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
+                    return;
+                }
+                dataSourceCache.put(taskDependencyUtilty.getDataSource(), dataSource);
+
+                TaskDefinitionLog taskDefinition =
+                        buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
+
+                taskDefinitionList.add(taskDefinition);
+                taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
+                taskNameToUpstream.put(taskDefinition.getName(), taskDependencyUtilty.getUpStreams());
+            }
+
+            if (totalSizeArchive > THRESHOLD_SIZE) {
+                throw new IllegalStateException(
+                        "the uncompressed data size is too much for the application resource capacity");
+            }
+
+            if (totalEntryArchive > THRESHOLD_ENTRIES) {
+                throw new IllegalStateException(
+                        "too much entries in this archive, can lead to inodes exhaustion of the system");
+            }
+        }
+    }
+
+    public TaskDependencyUtility getTaskDependencyUtility(String key, String value) {
+        TaskDependencyUtility taskDependencyUtilty = new TaskDependencyUtility();
+        switch (key) {
+            case "name":
+                taskDependencyUtilty.setTaskName(value);
+                break;
+            case "upstream":
+                List<String> upstreams = Arrays.stream(value.split(",")).map(String::trim)
+                        .filter(s -> !s.isEmpty()).collect(Collectors.toList());
+                taskDependencyUtilty.setUpStreams(upstreams);
+                break;
+            case "datasource":
+                taskDependencyUtilty.setDataSource(value);
+                break;
+            default:
+                break;
+        }
+        return taskDependencyUtilty;
+    }
+
+    private static void setScheduledObject(User loginUser, ProcessDefinition processDefinition, Schedule scheduleObj, Date date) {
+        scheduleObj.setId(null);
+        scheduleObj.setUserId(loginUser.getId());
+        scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
+        scheduleObj.setReleaseState(ReleaseState.OFFLINE);
+        scheduleObj.setCreateTime(date);
+        scheduleObj.setUpdateTime(date);
+    }
+
+    private void checkInsertResult(Map<String, Object> result, ProcessDefinition processDefinition, int insertResult) {
+        if (insertResult != 1) {
+            log.error("Schedule create error, processDefinitionCode:{}.", processDefinition.getCode());
+            putMsg(result, Status.CREATE_SCHEDULE_ERROR);
+            throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
+        }
+    }
+
+    private void setTaskDefinitionLog(long targetProjectCode, Map<String, Object> result, TaskDefinitionLog taskDefinitionLog, Map<Long, Long> taskCodeMap) {
+        try {
+            long taskCode = CodeGenerateUtils.getInstance().genCode();
+            taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
+            taskDefinitionLog.setCode(taskCode);
+        } catch (CodeGenerateException e) {
+            log.error("Generate task definition code error, projectCode:{}.", targetProjectCode, e);
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
+            throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
+        }
+        taskDefinitionLog.setProjectCode(targetProjectCode);
+        taskDefinitionLog.setVersion(0);
+        taskDefinitionLog.setName(taskDefinitionLog.getName());
+    }
+
+    private void setProcessDefinitionCode(long targetProjectCode, Map<String, Object> result, ProcessDefinition processDefinition) {
+        try {
+            processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+        } catch (CodeGenerateException e) {
+            log.error("Generate process definition code error, projectCode:{}.", targetProjectCode, e);
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);
+            throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
+        }
+    }
+
+    private void copyProcessDefinition(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition, List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs, long oldProcessDefinitionCode) {
+        try {
+            result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs));
+        } catch (Exception e) {
+            log.error("Copy process definition error, processDefinitionCode from {} to {}.",
+                    oldProcessDefinitionCode, processDefinition.getCode(), e);
+            putMsg(result, Status.COPY_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(Status.COPY_PROCESS_DEFINITION_ERROR);
+        }
+    }
+
+    private void moveProcessDefinition(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition, List<ProcessTaskRelationLog> taskRelationList) {
+        try {
+            result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null,
+                    Lists.newArrayList()));
+        } catch (Exception e) {
+            log.error("Move process definition error, processDefinitionCode:{}.",
+                    processDefinition.getCode(), e);
+            putMsg(result, Status.MOVE_PROCESS_DEFINITION_ERROR);
+            throw new ServiceException(Status.MOVE_PROCESS_DEFINITION_ERROR);
         }
     }
 }
