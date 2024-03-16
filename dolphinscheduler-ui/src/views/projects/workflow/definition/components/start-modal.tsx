@@ -240,6 +240,16 @@ export default defineComponent({
           form.environmentCode = projectPreferences.value.environmentCode
         }
       }
+      if (projectPreferences.value?.alertGroups && variables?.alertGroups) {
+        if (
+          containValueInOptions(
+            variables.alertGroups,
+            projectPreferences.value.alertGroups
+          )
+        ) {
+          form.warningGroupId = projectPreferences.value.alertGroups
+        }
+      }
     }
 
     const updateWorkerGroup = () => {
