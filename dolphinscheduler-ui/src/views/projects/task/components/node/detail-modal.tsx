@@ -131,8 +131,8 @@ const NodeDetailModal = defineComponent({
     const restructureNodeData = (data: INodeData) => {
       if (!data?.id) {
         for (let item in projectPreferences.value) {
-          if (projectPreferences.value[item]!==null && item in data) {
-            Object.assign(data, {item: projectPreferences.value[item]})
+          if (projectPreferences.value[item] !== null && item in data) {
+            Object.assign(data, { item: projectPreferences.value[item] })
           }
         }
       }

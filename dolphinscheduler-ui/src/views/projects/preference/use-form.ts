@@ -126,7 +126,9 @@ export function useForm() {
         item.span = 12
       }
       if (item.type === 'select') {
-        Object.assign(item, { props: { style: 'width: 250px', clearable: true } })
+        Object.assign(item, {
+          props: { style: 'width: 250px', clearable: true }
+        })
       } else {
         Object.assign(item, { props: { style: 'width: 250px' } })
       }
