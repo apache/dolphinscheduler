@@ -44,7 +44,7 @@ export default defineComponent({
     const executorNameRef = ref('')
     const hostRef = ref('')
     const stateTypeRef = ref('')
-    const startEndTimeRef = ref()
+    const startEndTimeRef = ref([Date.parse(format(new Date(), 'yyyy-MM-dd') + ' 00:00:00'), Date.now()])
     const projectCode = ref(
       Number(router.currentRoute.value.params.projectCode)
     )

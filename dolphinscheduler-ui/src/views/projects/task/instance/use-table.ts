@@ -61,7 +61,7 @@ export function useTable() {
     processInstanceId: ref(processInstanceId ? processInstanceId : null),
     host: ref(null),
     stateType: ref(null),
-    datePickerRange: ref(null),
+    datePickerRange: ref([Date.parse(format(new Date(), 'yyyy-MM-dd') + ' 00:00:00'), Date.now()]),
     executorName: ref(null),
     processInstanceName: ref(null),
     totalPage: ref(1),

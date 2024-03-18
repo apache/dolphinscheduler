@@ -28,6 +28,7 @@ import {
   batchDeleteProcessInstanceByIds
 } from '@/service/modules/process-instances'
 import { execute } from '@/service/modules/executors'
+import { format } from 'date-fns'
 import TableAction from './components/table-action'
 import {
   renderTableTime,
@@ -61,8 +62,8 @@ export function useTable() {
     executorName: ref(),
     host: ref(),
     stateType: ref(),
-    startDate: ref(),
-    endDate: ref(),
+    startDate: ref(format(new Date(), 'yyyy-MM-dd') + ' 00:00:00'),
+    endDate: ref(format(new Date(), 'yyyy-MM-dd HH:mm:ss')),
     projectCode: ref(Number(router.currentRoute.value.params.projectCode)),
     processDefineCode: router.currentRoute.value.query.processDefineCode
       ? ref(Number(router.currentRoute.value.query.processDefineCode))
