@@ -27,6 +27,6 @@ export function useYarnQueue(): IJsonItem {
     span: 12,
     props: {
       placeholder: t('project.node.yarn_queue_tips')
-    },
+    }
   }
 }

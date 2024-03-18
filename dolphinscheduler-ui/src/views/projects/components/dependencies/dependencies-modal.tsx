@@ -15,16 +15,11 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  PropType,
-  h,
-  ref, watch
-} from 'vue'
+import { defineComponent, PropType, h, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import {NEllipsis, NModal, NSpace} from 'naive-ui'
-import {IDefinitionData} from "@/views/projects/workflow/definition/types";
-import ButtonLink from "@/components/button-link";
+import { NEllipsis, NModal, NSpace } from 'naive-ui'
+import { IDefinitionData } from '@/views/projects/workflow/definition/types'
+import ButtonLink from '@/components/button-link'
 
 const props = {
   row: {
@@ -68,62 +63,65 @@ export default defineComponent({
     }
 
     const renderDownstreamDependencies = () => {
-        return h(
-            <NSpace vertical>
-              <div>{props.content}</div>
-              <div>{t('project.workflow.warning_dependencies')}</div>
-              {props.taskLinks.map((item: any) => {
-                return (
-                    <ButtonLink
-                        onClick={item.action}
-                        disabled={false}
-                    >
-                      {{
-                        default: () =>
-                            h(NEllipsis,
-                                {
-                                  style: 'max-width: 350px;line-height: 1.5'
-                                },
-                                () => item.text
-                            )
-                      }}
-                    </ButtonLink>
-                )
-              })}
-            </NSpace>
-        )
+      return h(
+        <NSpace vertical>
+          <div>{props.content}</div>
+          <div>{t('project.workflow.warning_dependencies')}</div>
+          {props.taskLinks.map((item: any) => {
+            return (
+              <ButtonLink onClick={item.action} disabled={false}>
+                {{
+                  default: () =>
+                    h(
+                      NEllipsis,
+                      {
+                        style: 'max-width: 350px;line-height: 1.5'
+                      },
+                      () => item.text
+                    )
+                }}
+              </ButtonLink>
+            )
+          })}
+        </NSpace>
+      )
     }
 
-    watch(()=> props.show,
-        () => {
-          showRef.value = props.show
-        })
+    watch(
+      () => props.show,
+      () => {
+        showRef.value = props.show
+      }
+    )
 
-    return {renderDownstreamDependencies, confirmToHandle, cancelToHandle, showRef}
+    return {
+      renderDownstreamDependencies,
+      confirmToHandle,
+      cancelToHandle,
+      showRef
+    }
   },
 
   render() {
     const { t } = useI18n()
 
     return (
-        <NModal
-            v-model:show={this.showRef}
-            preset={'dialog'}
-            type={this.$props.required? 'error':'warning'}
-            title={t('project.workflow.warning_dependent_tasks_title')}
-            positiveText={this.$props.required? '':t('project.workflow.confirm')}
-            negativeText={t('project.workflow.cancel')}
-            maskClosable={false}
-            onNegativeClick={this.cancelToHandle}
-            onPositiveClick={this.confirmToHandle}
-            onClose={this.cancelToHandle}
-        >
-          {{
-            default: () => (
-                  this.renderDownstreamDependencies()
-            )
-          }}
-        </NModal>
+      <NModal
+        v-model:show={this.showRef}
+        preset={'dialog'}
+        type={this.$props.required ? 'error' : 'warning'}
+        title={t('project.workflow.warning_dependent_tasks_title')}
+        positiveText={this.$props.required ? '' : t('project.workflow.confirm')}
+        negativeText={t('project.workflow.cancel')}
+        maskClosable={false}
+        onNegativeClick={this.cancelToHandle}
+        onPositiveClick={this.confirmToHandle}
+        onClose={this.cancelToHandle}
+      >
+        {{
+          default: () => this.renderDownstreamDependencies()
+        }}
+      </NModal>
     )
   }
 })
