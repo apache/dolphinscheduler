@@ -20,14 +20,20 @@ package org.apache.dolphinscheduler.api.exceptions;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -46,13 +52,31 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public String exceptionHandler(AccessDeniedException e, HandlerMethod hm) {
-        throw e;
+    public ResponseEntity<Object> exceptionHandler(AccessDeniedException e, WebRequest request) {
+
+        return new ResponseEntity<>(
+                e.getMessage(),
+                HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public String exceptionHandler(ResponseStatusException e, HandlerMethod hm) {
-        throw e;
+    public ResponseEntity<Object> exceptionHandler(ResponseStatusException e, WebRequest request) {
+        return new ResponseEntity<>(
+                e.getReason(),
+                e.getStatus());
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> exceptionHandler(MethodArgumentNotValidException e, WebRequest request) {
+        List<String> errors = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .collect(Collectors.toList());
+
+        return new ResponseEntity<>(
+                errors,
+                HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(Throwable.class)
@@ -65,5 +89,4 @@ public class ApiExceptionHandler {
         Status st = ce.value();
         return Result.error(st);
     }
-
 }

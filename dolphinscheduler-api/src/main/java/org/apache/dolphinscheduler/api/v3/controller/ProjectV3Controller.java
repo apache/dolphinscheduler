@@ -17,14 +17,17 @@
 
 package org.apache.dolphinscheduler.api.v3.controller;
 
-import org.apache.dolphinscheduler.api.controller.BaseController;
+import org.apache.dolphinscheduler.api.v3.request.CreateProject;
+import org.apache.dolphinscheduler.api.v3.request.UpdateProject;
+import org.apache.dolphinscheduler.api.v3.service.ProjectV3Service;
 import org.apache.dolphinscheduler.api.v3.utils.IdObfuscator;
 import org.apache.dolphinscheduler.api.v3.utils.QueryResult;
-import org.apache.dolphinscheduler.api.v3.service.ProjectV3Service;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
+
+import javax.validation.Valid;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,7 +35,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * project controller
@@ -40,7 +52,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v3/projects")
 @Slf4j
-public class ProjectV3Controller extends BaseController {
+public class ProjectV3Controller {
 
     @Autowired
     private ProjectV3Service projectV3Service;
@@ -72,7 +84,7 @@ public class ProjectV3Controller extends BaseController {
                 searchVal);
 
         if (!projects.isEmpty()) {
-            queryResult.setNextToken(IdObfuscator.encode(projects.getLast().getId()));
+            queryResult.setNextToken(IdObfuscator.encode(projects.get(projects.size() - 1).getId()));
         }
 
         queryResult.setData(projects);
@@ -83,17 +95,18 @@ public class ProjectV3Controller extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     public Project createProject(
                                  Authentication authentication,
-                                 @RequestParam("projectName") String projectName,
-                                 @RequestParam(value = "description", required = false) String description) {
-        return projectV3Service.createProject((User) authentication.getPrincipal(), projectName, description);
+                                 @Valid @RequestBody CreateProject createProject) {
+        return projectV3Service.createProject(
+                (User) authentication.getPrincipal(),
+                createProject.getName(),
+                createProject.getDescription());
     }
 
     /**
      * update project
      *
-     * @param code        project code
-     * @param projectName project name
-     * @param description description
+     * @param code          project code
+     * @param updateProject UpdateProject
      * @return update result code
      */
     @PutMapping(value = "/{code}")
@@ -102,11 +115,10 @@ public class ProjectV3Controller extends BaseController {
     public Project updateProject(
                                  Authentication authentication,
                                  @PathVariable("code") Long code,
-                                 @RequestParam(value = "projectName", required = false) String projectName,
-                                 @RequestParam(value = "description", required = false) String description) {
+                                 @Valid @RequestBody UpdateProject updateProject) {
         User loginUser = (User) authentication.getPrincipal();
         Project project = projectV3Service.queryProjectForUpdate(loginUser, code);
-        return projectV3Service.updateProject(project, projectName, description);
+        return projectV3Service.updateProject(project, updateProject.getName(), updateProject.getDescription());
     }
 
     @DeleteMapping(value = "/{code}")

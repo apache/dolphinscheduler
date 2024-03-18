@@ -37,8 +37,7 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
+        http.authorizeHttpRequests(
                         authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
                                 .regexMatchers("/v3/(.*)")
                                 .authenticated())

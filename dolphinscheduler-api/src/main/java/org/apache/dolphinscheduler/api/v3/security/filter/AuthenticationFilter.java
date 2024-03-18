@@ -49,7 +49,6 @@ public class AuthenticationFilter extends GenericFilterBean {
                 httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 httpResponse.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 PrintWriter writer = httpResponse.getWriter();
-                writer.print(exp.getMessage());
                 writer.flush();
                 writer.close();
             }

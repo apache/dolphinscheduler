@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.v3.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -26,13 +25,16 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.v3.ProjectV3Mapper;
+
+import java.util.Date;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
 
 /**
  * project service impl
@@ -70,16 +72,17 @@ public class ProjectV3ServiceImpl extends BaseServiceImpl implements ProjectV3Se
      * @param maxResults max result
      * @return project list which the login user have permission to see
      */
+    @Override
     @PostFilter("hasAuthority('ADMIN_USER') or filterObject.perm > 0 or filterObject.userId == authentication.getUserId()")
     public List<Project> listAuthorizedProject(User user, int offset, int maxResults, String searchVal) {
         return projectMapper.listProjects(
                 user.getId(),
                 offset,
                 maxResults,
-                searchVal
-        );
+                searchVal);
     }
 
+    @Override
     public Project createProject(User user, String projectName, String desc) {
         Project existProject = projectMapper.queryProjectByName(projectName);
 
@@ -115,13 +118,14 @@ public class ProjectV3ServiceImpl extends BaseServiceImpl implements ProjectV3Se
         return project;
     }
 
+    @Override
     public void deleteProject(Project project) {
-        if (projectMapper.deleteById(project.getId()) <= 0); {
+        if (projectMapper.deleteById(project.getId()) <= 0) {
             throw new ServiceException(Status.DELETE_PROJECT_ERROR);
         }
     }
 
-
+    @Override
     public Project updateProject(Project project, String name, String description) {
         if (name != null) {
             Project existingProject = projectMapper.queryProjectByName(name);
