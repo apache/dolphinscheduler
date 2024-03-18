@@ -15,28 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper.v3;
+package org.apache.dolphinscheduler.api.v3.request;
 
-import org.apache.dolphinscheduler.dao.entity.Project;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-import org.apache.ibatis.annotations.Param;
+import lombok.Data;
 
-import java.util.List;
+@Data
+public class CreateProject {
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+    @NotBlank(message = "project name is required")
+    @Size(min = 1, max = 16, message = "project size between 1 and 16")
+    private String name;
 
-/**
- * project mapper interface
- */
-public interface ProjectV3Mapper extends BaseMapper<Project> {
-
-    Project queryProjectByCodeForUpdate(@Param("userId") int userId, @Param("projectCode") long projectCode);
-
-    Project queryProjectByName(@Param("projectName") String projectName);
-
-    List<Project> listProjects(
-                               @Param("userId") int userId,
-                               @Param("offset") int offset,
-                               @Param("maxResults") int maxResults,
-                               @Param("searchVal") String searchVal);
+    @Size(max = 255)
+    private String description;
 }
