@@ -65,5 +65,15 @@ public class SwitchTaskUtilsTest {
             SwitchTaskUtils.generateContentWithTaskParams(contentWithUnicode, globalParams, varParams);
         });
 
+        String contentWithSpecify1 = "cmd.abc";
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            SwitchTaskUtils.generateContentWithTaskParams(contentWithSpecify1, globalParams, varParams);
+        });
+
+        String contentWithSpecify2 = "cmd()";
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            SwitchTaskUtils.generateContentWithTaskParams(contentWithSpecify2, globalParams, varParams);
+        });
+
     }
 }
