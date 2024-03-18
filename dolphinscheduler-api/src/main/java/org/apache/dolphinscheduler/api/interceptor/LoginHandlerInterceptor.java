@@ -64,6 +64,10 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         ApiServerMetrics.incApiRequestCount();
 
+        if (request.getRequestURI().contains("/v3/")) {
+            return true;
+        }
+
         // get token
         String token = request.getHeader("token");
         User user;
@@ -98,6 +102,10 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
                            ModelAndView modelAndView) throws Exception {
+        if (request.getRequestURI().contains("/v3/")) {
+            return;
+        }
+
         ThreadLocalContext.getTimezoneThreadLocal().remove();
 
         int code = response.getStatus();
