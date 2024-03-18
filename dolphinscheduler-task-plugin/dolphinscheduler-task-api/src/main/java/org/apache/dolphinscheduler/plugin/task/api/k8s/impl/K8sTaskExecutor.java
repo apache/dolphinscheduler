@@ -77,6 +77,8 @@ import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 import io.fabric8.kubernetes.client.WatcherException;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 
 /**
  * K8sTaskExecutor used to submit k8s task to K8S
@@ -197,7 +199,59 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 .build();
 
     }
+    public void registerBatchJobFormer(Job job, String taskInstanceId, TaskResponse taskResponse) {
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+        ResourceEventHandler resourceEventHandler = new ResourceEventHandler<Job>() {
 
+            @Override
+            public void onAdd(Job job) {
+                log.info("[K8sJobExecutor-{}] job got added", job.getMetadata().getName());
+            }
+
+            @Override
+            public void onUpdate(Job job, Job t1) {
+                try {
+                    LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
+                    log.info("[K8sJobExecutor-{}] job got updated", job.getMetadata().getName());
+                    int jobStatus = getK8sJobStatus(job);
+                    if (jobStatus == TaskConstants.RUNNING_CODE) {
+                        return;
+                    }
+                    setTaskStatus(jobStatus, taskInstanceId, taskResponse);
+                    countDownLatch.countDown();
+                } finally {
+                    LogUtils.removeTaskInstanceLogFullPathMDC();
+                }
+
+            }
+
+            @Override
+            public void onDelete(Job job, boolean b) {
+                log.info("[K8sJobExecutor-{}] job got deleted", job.getMetadata().getName());
+
+            }
+        };
+
+        try (SharedIndexInformer sharedIndexInformer = k8sUtils.createBatchJobInformer(job, resourceEventHandler)) {
+            boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
+                    || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
+            if (timeoutFlag) {
+                Boolean timeout = !(countDownLatch.await(taskRequest.getTaskTimeout(), TimeUnit.SECONDS));
+                waitTimeout(timeout);
+            } else {
+                countDownLatch.await();
+            }
+        } catch (InterruptedException e) {
+            log.error("job failed in k8s: {}", e.getMessage(), e);
+            Thread.currentThread().interrupt();
+            taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+        } catch (Exception e) {
+            log.error("job failed in k8s: {}", e.getMessage(), e);
+            taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+        }
+    }
+    
+    @Deprecated
     public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
         CountDownLatch countDownLatch = new CountDownLatch(1);
         Watcher<Job> watcher = new Watcher<Job>() {
@@ -304,8 +358,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
-            registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result);
-
+            registerBatchJobFormer(job, Integer.toString(taskInstanceId), result);
             if (podLogOutputFuture != null) {
                 try {
                     // Wait kubernetes pod log collection finished
