@@ -125,7 +125,13 @@ export function useForm() {
         item.validate.required = false
         item.span = 12
       }
-      Object.assign(item, { props: { style: 'width: 250px' } })
+      if (item.type === 'select') {
+        Object.assign(item, {
+          props: { style: 'width: 250px', clearable: true }
+        })
+      } else {
+        Object.assign(item, { props: { style: 'width: 250px' } })
+      }
     }
     return preferencesItems
   }
