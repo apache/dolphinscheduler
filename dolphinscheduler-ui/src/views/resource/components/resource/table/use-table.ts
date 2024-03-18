@@ -213,7 +213,7 @@ export function useTable() {
 
   const { getResourceListState } = useFileState(setPagination)
   const detailPageStore = useDetailPageStore()
-  
+
   const requestData = () => {
     variables.resourceList = getResourceListState(
       variables.resourceType!,
@@ -245,56 +245,56 @@ export function useTable() {
     handleCreateFile: createFile
   }
 }
-export const useDetailPageStore = defineStore("detailPage", { 
-  state:() => {
-	var resourceTypeInitValue:ResourceType
+export const useDetailPageStore = defineStore('detailPage', {
+  state: () => {
+    let resourceTypeInitValue: ResourceType
     return {
-      resourceType:resourceTypeInitValue!,
-	  fullName:'',
-	  tenantCode:'',
-	  searchValue:'',
-	  page:1,
-	  pageSize:10
+      resourceType: resourceTypeInitValue!,
+      fullName: '',
+      tenantCode: '',
+      searchValue: '',
+      page: 1,
+      pageSize: 10
     }
   },
   getters: {
     getResourceType(): ResourceType {
       return this.resourceType
     },
-	getFullName(): string {
-	  return this.fullName
-	},
-	getTenantCode(): string {
-	  return this.tenantCode
-	},
-	getSearchValue(): string {
-	  return this.searchValue
-	},
-	getPage(): number {
-	  return this.page
-	},
-	getPageSize(): number {
-	  return this.pageSize
-	}
+    getFullName(): string {
+      return this.fullName
+    },
+    getTenantCode(): string {
+      return this.tenantCode
+    },
+    getSearchValue(): string {
+      return this.searchValue
+    },
+    getPage(): number {
+      return this.page
+    },
+    getPageSize(): number {
+      return this.pageSize
+    }
   },
   actions: {
     setResourceType(resourceTypeValue: ResourceType) {
       this.resourceType = resourceTypeValue
     },
-	setFullName(fullName: string) {
-	  this.fullName = fullName
-	},
-	setTenantCode(fullName: string) {
-	  this.fullName = fullName
-	},
-	setSearchValue(searchValue: string) {
-	  this.searchValue = searchValue
-	},
-	setPage(page: number) {
-	  this.page = page
-	},
-	setPageSize(pageSize: number) {
-	  this.pageSize = pageSize
-	}
+    setFullName(fullName: string) {
+      this.fullName = fullName
+    },
+    setTenantCode(fullName: string) {
+      this.fullName = fullName
+    },
+    setSearchValue(searchValue: string) {
+      this.searchValue = searchValue
+    },
+    setPage(page: number) {
+      this.page = page
+    },
+    setPageSize(pageSize: number) {
+      this.pageSize = pageSize
+    }
   }
 })

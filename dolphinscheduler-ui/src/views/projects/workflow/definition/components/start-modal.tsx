@@ -191,7 +191,7 @@ export default defineComponent({
       options: Array<any>,
       findingValue: string
     ): boolean => {
-      for (let { value } of options) {
+      for (const { value } of options) {
         if (findingValue === value) {
           return true
         }
