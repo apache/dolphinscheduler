@@ -25,6 +25,8 @@ import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
+import java.util.List;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -82,7 +84,7 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
      * find last manual process instance interval
      *
      * @param definitionCode process definition code
-     * @param taskCode taskCode
+     * @param taskCode       taskCode
      * @param dateInterval   dateInterval
      * @return process instance
      */
@@ -128,5 +130,13 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
         }
         processInstance = queryById(processInstanceMap.getProcessInstanceId());
         return processInstance;
+    }
+
+    @Override
+    public List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                  int workflowDefinitionVersion,
+                                                                  int[] states) {
+        return mybatisMapper.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
+                states);
     }
 }
