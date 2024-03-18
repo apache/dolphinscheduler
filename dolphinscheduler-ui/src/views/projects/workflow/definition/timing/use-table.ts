@@ -39,13 +39,13 @@ import {
 import { format } from 'date-fns-tz'
 import { ISearchParam } from './types'
 import type { Router } from 'vue-router'
-import { useDependencies } from "@/views/projects/components/dependencies/use-dependencies"
+import { useDependencies } from '@/views/projects/components/dependencies/use-dependencies'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
 
-  const {getDependentTaskLinks} = useDependencies()
+  const { getDependentTaskLinks } = useDependencies()
 
   const variables = reactive({
     columns: [],
@@ -62,7 +62,13 @@ export function useTable() {
     processDefinitionCode: router.currentRoute.value.params.definitionCode
       ? ref(Number(router.currentRoute.value.params.definitionCode))
       : ref(),
-    dependenciesData: ref({showRef: false, taskLinks: ref([]), required: ref(false), tip: ref(''), action:() => {}}),
+    dependenciesData: ref({
+      showRef: false,
+      taskLinks: ref([]),
+      required: ref(false),
+      tip: ref(''),
+      action: () => {}
+    })
   })
 
   const renderTime = (time: string, timeZone: string) => {
@@ -111,19 +117,19 @@ export function useTable() {
         render: (row: any) => {
           if (row.releaseState === 'ONLINE') {
             return h(
-                NTag,
-                { type: 'success', size: 'small' },
-                {
-                  default: () => t('project.workflow.up_line')
-                }
+              NTag,
+              { type: 'success', size: 'small' },
+              {
+                default: () => t('project.workflow.up_line')
+              }
             )
           } else {
             return h(
-                NTag,
-                { type: 'warning', size: 'small' },
-                {
-                  default: () => t('project.workflow.down_line')
-                }
+              NTag,
+              { type: 'warning', size: 'small' },
+              {
+                default: () => t('project.workflow.down_line')
+              }
             )
           }
         }
@@ -136,36 +142,36 @@ export function useTable() {
           return h(NSpace, null, {
             default: () => [
               h(
-                  NTooltip,
-                  {},
-                  {
-                    trigger: () =>
-                        h(
-                            NButton,
-                            {
-                              circle: true,
-                              type:
-                                  row.releaseState === 'ONLINE' ? 'error' : 'warning',
-                              size: 'small',
-                              onClick: () => {
-                                handleReleaseState(row)
-                              }
-                            },
-                            {
-                              icon: () =>
-                                  h(
-                                      row.releaseState === 'ONLINE'
-                                          ? ArrowDownOutlined
-                                          : ArrowUpOutlined
-                                  )
-                            }
-                        ),
-                    default: () =>
-                        row.releaseState === 'ONLINE'
-                            ? t('project.workflow.down_line')
-                            : t('project.workflow.up_line')
-                  }
-              ),
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type:
+                          row.releaseState === 'ONLINE' ? 'error' : 'warning',
+                        size: 'small',
+                        onClick: () => {
+                          handleReleaseState(row)
+                        }
+                      },
+                      {
+                        icon: () =>
+                          h(
+                            row.releaseState === 'ONLINE'
+                              ? ArrowDownOutlined
+                              : ArrowUpOutlined
+                          )
+                      }
+                    ),
+                  default: () =>
+                    row.releaseState === 'ONLINE'
+                      ? t('project.workflow.down_line')
+                      : t('project.workflow.up_line')
+                }
+              )
             ]
           })
         }
@@ -175,7 +181,6 @@ export function useTable() {
       variables.tableWidth = calculateTableWidth(variables.columns)
     }
   }
-
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -394,11 +399,16 @@ export function useTable() {
   const handleReleaseState = (row: any) => {
     if (row.releaseState === 'ONLINE') {
       variables.row = row
-      getDependentTaskLinks(variables.projectCode, row.processDefinitionCode).then((res: any) =>{
+      getDependentTaskLinks(
+        variables.projectCode,
+        row.processDefinitionCode
+      ).then((res: any) => {
         if (res && res.length > 0) {
           variables.dependenciesData.showRef = true
           variables.dependenciesData.taskLinks = res
-          variables.dependenciesData.tip = t('project.workflow.warning_delete_scheduler_dependent_tasks_desc')
+          variables.dependenciesData.tip = t(
+            'project.workflow.warning_delete_scheduler_dependent_tasks_desc'
+          )
           variables.dependenciesData.required = false
           variables.dependenciesData.action = confirmToOfflineSchedule
         } else {
@@ -412,7 +422,8 @@ export function useTable() {
               processDefinitionCode: variables.processDefinitionCode
             })
           })
-        }})
+        }
+      })
     } else {
       online(variables.projectCode, row.id).then(() => {
         window.$message.success(t('project.workflow.success'))
@@ -461,11 +472,16 @@ export function useTable() {
       variables.page -= 1
     }
     variables.row = row
-    getDependentTaskLinks(variables.projectCode, row.processDefinitionCode).then((res: any) =>{
+    getDependentTaskLinks(
+      variables.projectCode,
+      row.processDefinitionCode
+    ).then((res: any) => {
       if (res && res.length > 0) {
         variables.dependenciesData.showRef = true
         variables.dependenciesData.taskLinks = res
-        variables.dependenciesData.tip = t('project.workflow.warning_delete_scheduler_dependent_tasks_desc')
+        variables.dependenciesData.tip = t(
+          'project.workflow.warning_delete_scheduler_dependent_tasks_desc'
+        )
         variables.dependenciesData.required = false
         variables.dependenciesData.action = confirmToDeleteSchedule
       } else {
