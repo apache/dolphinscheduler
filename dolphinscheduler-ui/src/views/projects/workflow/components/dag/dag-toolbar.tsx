@@ -49,7 +49,7 @@ import type { Graph } from '@antv/x6'
 import StartupParam from './dag-startup-param'
 import VariablesView from '@/views/projects/workflow/instance/components/variables-view'
 import { WorkflowDefinition, WorkflowInstance } from './types'
-import { useDependencies } from "@/views/projects/components/dependencies/use-dependencies"
+import { useDependencies } from '@/views/projects/components/dependencies/use-dependencies'
 
 const props = {
   layoutToggle: {
@@ -181,11 +181,17 @@ export default defineComponent({
           const codes = cells
             .filter((cell) => cell.isNode())
             .map((cell) => +cell.id)
-          const res = await getDependentTaskLinksByMultipleTasks(projectCode, workflowCode, codes)
+          const res = await getDependentTaskLinksByMultipleTasks(
+            projectCode,
+            workflowCode,
+            codes
+          )
           if (res.length > 0) {
             dependenciesData.showRef = true
             dependenciesData.taskLinks = res
-            dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+            dependenciesData.tip = t(
+              'project.task.delete_validate_dependent_tasks_desc'
+            )
             dependenciesData.required = true
           } else {
             context.emit('removeTasks', codes, cells)

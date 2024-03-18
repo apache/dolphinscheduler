@@ -24,7 +24,7 @@ import { useTable } from './use-table'
 import Card from '@/components/card'
 import TimingModal from '../components/timing-modal'
 import type { Router } from 'vue-router'
-import DependenciesModal from "@/views/projects/components/dependencies/dependencies-modal";
+import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
 
 export default defineComponent({
   name: 'WorkflowDefinitionTiming',
@@ -117,11 +117,11 @@ export default defineComponent({
           onUpdateList={this.handleUpdateList}
         />
         <DependenciesModal
-            v-model:show={this.dependenciesData.showRef}
-            v-model:taskLinks={this.dependenciesData.taskLinks}
-            required={this.dependenciesData.required}
-            content={this.dependenciesData.tip}
-            onConfirm={this.dependenciesData.action}
+          v-model:show={this.dependenciesData.showRef}
+          v-model:taskLinks={this.dependenciesData.taskLinks}
+          required={this.dependenciesData.required}
+          content={this.dependenciesData.tip}
+          onConfirm={this.dependenciesData.action}
         />
       </NSpace>
     )
