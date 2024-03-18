@@ -17,14 +17,17 @@
 
 import { useI18n } from 'vue-i18n'
 import { reactive, ref, SetupContext } from 'vue'
-import { Option } from "naive-ui/es/transfer/src/interface"
-import { queryAllWorkerGroups } from "@/service/modules/worker-groups"
-import { queryWorkerGroupsByProjectCode, assignWorkerGroups } from "@/service/modules/projects-worker-group"
-import { UpdateProjectWorkerGroupsReq } from "@/service/modules/projects-worker-group/types"
+import { Option } from 'naive-ui/es/transfer/src/interface'
+import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import {
+  queryWorkerGroupsByProjectCode,
+  assignWorkerGroups
+} from '@/service/modules/projects-worker-group'
+import { UpdateProjectWorkerGroupsReq } from '@/service/modules/projects-worker-group/types'
 
 export function useWorkerGroup(
-    props: any,
-    ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
+  props: any,
+  ctx: SetupContext<('cancelModal' | 'confirmModal')[]>
 ) {
   const { t } = useI18n()
 
@@ -39,14 +42,18 @@ export function useWorkerGroup(
     variables.model.workerGroupOptions = []
     queryAllWorkerGroups().then((res: any) => {
       for (const workerGroup of res) {
-        variables.model.workerGroupOptions.push({label: workerGroup, value: workerGroup, disabled: workerGroup==='default'})
+        variables.model.workerGroupOptions.push({
+          label: workerGroup,
+          value: workerGroup,
+          disabled: workerGroup === 'default'
+        })
       }
     })
   }
 
   const initAssignedWorkerGroups = (projectCode: number) => {
     variables.model.assignedWorkerGroups = ref([] as any)
-    queryWorkerGroupsByProjectCode(projectCode).then((res: any) =>{
+    queryWorkerGroupsByProjectCode(projectCode).then((res: any) => {
       res.data.forEach((item: any) => {
         variables.model.assignedWorkerGroups.push(item.workerGroup)
       })
@@ -56,7 +63,7 @@ export function useWorkerGroup(
   initOptions()
 
   const handleValidate = () => {
-    if (variables.model?.assignedWorkerGroups.length>0) {
+    if (variables.model?.assignedWorkerGroups.length > 0) {
       submitModal()
       ctx.emit('confirmModal', props.showModalRef)
     }
@@ -64,8 +71,11 @@ export function useWorkerGroup(
 
   const submitModal = async () => {
     if (props.row.code) {
-      let data: UpdateProjectWorkerGroupsReq = {
-        workerGroups: variables.model.assignedWorkerGroups.length>0? variables.model.assignedWorkerGroups.join(','):''
+      const data: UpdateProjectWorkerGroupsReq = {
+        workerGroups:
+          variables.model.assignedWorkerGroups.length > 0
+            ? variables.model.assignedWorkerGroups.join(',')
+            : ''
       }
       assignWorkerGroups(data, props.row.code)
     }

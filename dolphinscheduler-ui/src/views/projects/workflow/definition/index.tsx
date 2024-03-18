@@ -24,7 +24,7 @@ import {
   NSpace,
   NTooltip,
   NPopconfirm,
-  NModal,
+  NModal
 } from 'naive-ui'
 import {
   defineComponent,

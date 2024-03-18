@@ -15,44 +15,73 @@
  * limitations under the License.
  */
 
-import {DependentTaskReq} from "@/service/modules/lineages/types";
-import {queryDependentTasks} from "@/service/modules/lineages";
-import {TASK_TYPES_MAP} from "@/store/project";
+import { DependentTaskReq } from '@/service/modules/lineages/types'
+import { queryDependentTasks } from '@/service/modules/lineages'
+import { TASK_TYPES_MAP } from '@/store/project'
 
 export function useDependencies() {
-
-  const getDependentTasksBySingleTask = async (projectCode: any, workflowCode: any, taskCode: any) => {
-    let tasks = [] as any
+  const getDependentTasksBySingleTask = async (
+    projectCode: any,
+    workflowCode: any,
+    taskCode: any
+  ) => {
+    const tasks = [] as any
     if (workflowCode && taskCode) {
-      let dependentTaskReq = {workFlowCode: workflowCode, taskCode: taskCode} as DependentTaskReq
+      const dependentTaskReq = {
+        workFlowCode: workflowCode,
+        taskCode: taskCode
+      } as DependentTaskReq
       const res = await queryDependentTasks(projectCode, dependentTaskReq)
-      res.filter((item: any) => item.processDefinitionCode !== workflowCode && item.taskType === TASK_TYPES_MAP.DEPENDENT.alias)
-      .forEach((item: any) => {
-        tasks.push(item.processDefinitionName + '->' + item.taskName)
-      })
+      res
+        .filter(
+          (item: any) =>
+            item.processDefinitionCode !== workflowCode &&
+            item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
+        )
+        .forEach((item: any) => {
+          tasks.push(item.processDefinitionName + '->' + item.taskName)
+        })
     }
     return tasks
   }
 
-  const getDependentTasksByWorkflow = async (projectCode: any, workflowCode: any) => {
-    let tasks = [] as any
+  const getDependentTasksByWorkflow = async (
+    projectCode: any,
+    workflowCode: any
+  ) => {
+    const tasks = [] as any
     if (workflowCode) {
-      let dependentTaskReq = {workFlowCode: workflowCode} as DependentTaskReq
+      const dependentTaskReq = {
+        workFlowCode: workflowCode
+      } as DependentTaskReq
       const res = await queryDependentTasks(projectCode, dependentTaskReq)
-      res.filter((item: any) => item.processDefinitionCode !== workflowCode && item.taskType === TASK_TYPES_MAP.DEPENDENT.alias)
-      .forEach((item: any) => {
-        tasks.push(item.processDefinitionName + '->' + item.taskName)
-      })
+      res
+        .filter(
+          (item: any) =>
+            item.processDefinitionCode !== workflowCode &&
+            item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
+        )
+        .forEach((item: any) => {
+          tasks.push(item.processDefinitionName + '->' + item.taskName)
+        })
     }
     return tasks
   }
 
-  const getDependentTasksByMultipleTasks = async (projectCode: any, workflowCode: any, taskCodes: any[]) => {
+  const getDependentTasksByMultipleTasks = async (
+    projectCode: any,
+    workflowCode: any,
+    taskCodes: any[]
+  ) => {
     let tasks = [] as any
-    if (workflowCode && taskCodes?.length>0) {
-      for(const taskCode of taskCodes) {
-        const res = await getDependentTasksBySingleTask(projectCode, workflowCode, taskCode)
-        if (res?.length >0) {
+    if (workflowCode && taskCodes?.length > 0) {
+      for (const taskCode of taskCodes) {
+        const res = await getDependentTasksBySingleTask(
+          projectCode,
+          workflowCode,
+          taskCode
+        )
+        if (res?.length > 0) {
           tasks = tasks.concat(res)
         }
       }
@@ -60,11 +89,19 @@ export function useDependencies() {
     return tasks
   }
 
-  const getDependentTaskLinksByMultipleTasks = async (projectCode: any, workflowCode: any, taskCodes: any[]) => {
+  const getDependentTaskLinksByMultipleTasks = async (
+    projectCode: any,
+    workflowCode: any,
+    taskCodes: any[]
+  ) => {
     let dependentTaskLinks = [] as any
     if (workflowCode && projectCode) {
       for (const taskCode of taskCodes) {
-        await getDependentTaskLinksByTask(projectCode, workflowCode, taskCode).then((res: any) => {
+        await getDependentTaskLinksByTask(
+          projectCode,
+          workflowCode,
+          taskCode
+        ).then((res: any) => {
           dependentTaskLinks = dependentTaskLinks.concat(res)
         })
       }
@@ -73,50 +110,74 @@ export function useDependencies() {
   }
 
   const getDependentTaskLinks = async (projectCode: any, workflowCode: any) => {
-    let dependentTaskReq = {workFlowCode: workflowCode} as DependentTaskReq
-    let dependentTaskLinks = [] as any
+    const dependentTaskReq = { workFlowCode: workflowCode } as DependentTaskReq
+    const dependentTaskLinks = [] as any
     if (workflowCode && projectCode) {
-      await queryDependentTasks(projectCode, dependentTaskReq).then((res: any) => {
-        res.filter((item: any) => item.processDefinitionCode !== workflowCode && item.taskType === TASK_TYPES_MAP.DEPENDENT.alias)
-        .forEach((item: any) => {
-          dependentTaskLinks.push(
-              {
+      await queryDependentTasks(projectCode, dependentTaskReq).then(
+        (res: any) => {
+          res
+            .filter(
+              (item: any) =>
+                item.processDefinitionCode !== workflowCode &&
+                item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
+            )
+            .forEach((item: any) => {
+              dependentTaskLinks.push({
                 text: item.processDefinitionName + '->' + item.taskName,
                 show: true,
                 action: () => {
-                  const url =  `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
+                  const url = `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
                   window.open(url, '_blank')
-                },
-              }
-          )
-        })
-      })
+                }
+              })
+            })
+        }
+      )
     }
     return dependentTaskLinks
   }
 
-  const getDependentTaskLinksByTask = async (projectCode: any, workflowCode: any, taskCode: any) => {
-    let dependentTaskReq = {workFlowCode: workflowCode, taskCode: taskCode} as DependentTaskReq
-    let dependentTaskLinks = [] as any
+  const getDependentTaskLinksByTask = async (
+    projectCode: any,
+    workflowCode: any,
+    taskCode: any
+  ) => {
+    const dependentTaskReq = {
+      workFlowCode: workflowCode,
+      taskCode: taskCode
+    } as DependentTaskReq
+    const dependentTaskLinks = [] as any
     if (workflowCode && projectCode) {
-      await queryDependentTasks(projectCode, dependentTaskReq).then((res: any) => {
-        res.filter((item: any) => item.processDefinitionCode !== workflowCode && item.taskType === TASK_TYPES_MAP.DEPENDENT.alias)
-        .forEach((item: any) => {
-          dependentTaskLinks.push(
-              {
+      await queryDependentTasks(projectCode, dependentTaskReq).then(
+        (res: any) => {
+          res
+            .filter(
+              (item: any) =>
+                item.processDefinitionCode !== workflowCode &&
+                item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
+            )
+            .forEach((item: any) => {
+              dependentTaskLinks.push({
                 text: item.processDefinitionName + '->' + item.taskName,
                 show: true,
                 action: () => {
-                  const url =  `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
+                  const url = `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
                   window.open(url, '_blank')
-                },
-              }
-          )
-        })
-      })
+                }
+              })
+            })
+        }
+      )
     }
     return dependentTaskLinks
   }
 
-  return { getDependentTasksBySingleTask, getDependentTasksByMultipleTasks, getDependentTaskLinks, getDependentTasksByWorkflow, getDependentTaskLinksByTask, getDependentTaskLinksByMultipleTasks }
+  return {
+    getDependentTasksBySingleTask,
+    getDependentTasksByMultipleTasks,
+    getDependentTaskLinks,
+    getDependentTasksByWorkflow,
+    getDependentTaskLinksByTask,
+    getDependentTaskLinksByMultipleTasks
+  }
 }

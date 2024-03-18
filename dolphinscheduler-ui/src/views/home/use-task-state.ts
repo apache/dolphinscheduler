@@ -20,7 +20,7 @@ import { format } from 'date-fns'
 import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { countTaskState } from '@/service/modules/projects-analysis'
-import type {TaskInstanceCountVo} from '@/service/modules/projects-analysis/types'
+import type { TaskInstanceCountVo } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 import { reactive, ref } from 'vue'
 
@@ -36,7 +36,7 @@ export function useTaskState() {
     const { state } = useAsyncState(
       countTaskState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss')
       }).then((res: TaskInstanceCountVo): StateData => {
         const table = res.taskInstanceStatusCounts.map((item, unused) => {
           return {

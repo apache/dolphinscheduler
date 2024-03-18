@@ -39,7 +39,9 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
 
   const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
 
-  const rawScriptSpan = computed(() => (model.programType === 'SQL' && model.sqlExecutionType === 'SCRIPT' ? 24 : 0))
+  const rawScriptSpan = computed(() =>
+    model.programType === 'SQL' && model.sqlExecutionType === 'SCRIPT' ? 24 : 0
+  )
 
   const showCluster = computed(() => model.programType !== 'SQL')
 
@@ -51,7 +53,9 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE' ? 1 : -1
   )
 
-  const sqlExecutionTypeSpan = computed(() => (model.programType === 'SQL' ? 12 : 0))
+  const sqlExecutionTypeSpan = computed(() =>
+    model.programType === 'SQL' ? 12 : 0
+  )
 
   const SQL_EXECUTION_TYPES = [
     {

@@ -282,8 +282,7 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
             if (!dependItem.dependentType) {
               if (dependItem.depTaskCode == 0)
                 dependItem.dependentType = 'DEPENDENT_ON_WORKFLOW'
-              else
-                dependItem.dependentType = 'DEPENDENT_ON_TASK'
+              else dependItem.dependentType = 'DEPENDENT_ON_TASK'
             }
             if (dependItem.projectCode) {
               itemListOptions.value[itemIndex].definitionCodeOptions =
@@ -326,7 +325,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
               onUpdateValue: (dependentType: string) => {
                 const item = model.dependTaskList[i].dependItemList[j]
                 if (item.definitionCode)
-                  item.depTaskCode = dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
+                  item.depTaskCode =
+                    dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
               }
             },
             options: DependentTypeOptions,
@@ -388,7 +388,8 @@ export function useDependent(model: { [field: string]: any }): IJsonItem[] {
                 const item = model.dependTaskList[i].dependItemList[j]
                 selectOptions.value[i].dependItemList[j].depTaskCodeOptions =
                   await getTaskList(item.projectCode, processCode)
-                item.depTaskCode = item.dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
+                item.depTaskCode =
+                  item.dependentType === 'DEPENDENT_ON_WORKFLOW' ? 0 : -1
               }
             },
             options:

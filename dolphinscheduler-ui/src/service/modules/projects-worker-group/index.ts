@@ -16,11 +16,9 @@
  */
 
 import { axios } from '@/service/service'
-import { UpdateProjectWorkerGroupsReq } from "@/service/modules/projects-worker-group/types";
+import { UpdateProjectWorkerGroupsReq } from '@/service/modules/projects-worker-group/types'
 
-export function queryWorkerGroupsByProjectCode(
-  projectCode: number
-): any {
+export function queryWorkerGroupsByProjectCode(projectCode: number): any {
   return axios({
     url: `/projects/${projectCode}/worker-group`,
     method: 'get'

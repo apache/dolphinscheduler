@@ -30,7 +30,10 @@ export function useWorkerGroup(projectCode: number): IJsonItem {
     if (loading.value) return
     loading.value = true
     await queryWorkerGroupsByProjectCode(projectCode).then((res: any) => {
-      options.value = res.data.map((item: any) =>({label: item.workerGroup, value: item.workerGroup }))
+      options.value = res.data.map((item: any) => ({
+        label: item.workerGroup,
+        value: item.workerGroup
+      }))
     })
     loading.value = false
   }

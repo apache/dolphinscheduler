@@ -59,7 +59,7 @@ export function useSqoop({
     targetHdfsDeleteTargetDir: true,
     targetHdfsCompressionCodec: 'snappy',
     targetHdfsFileType: '--as-avrodatafile',
-    targetMysqlType:  'MYSQL',
+    targetMysqlType: 'MYSQL',
     targetMysqlUpdateMode: 'allowinsert',
     targetHiveCreateTable: false,
     targetHiveDropDelimiter: false,

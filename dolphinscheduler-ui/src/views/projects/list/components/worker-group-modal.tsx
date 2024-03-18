@@ -22,10 +22,10 @@ import {
   toRefs,
   watch
 } from 'vue'
-import { NTransfer} from 'naive-ui'
+import { NTransfer } from 'naive-ui'
 import Modal from '@/components/modal'
-import styles from "@/views/security/user-manage/index.module.scss";
-import {useWorkerGroup} from "@/views/projects/list/components/use-worker-group";
+import styles from '@/views/security/user-manage/index.module.scss'
+import { useWorkerGroup } from '@/views/projects/list/components/use-worker-group'
 
 const props = {
   showModalRef: {
@@ -43,7 +43,8 @@ const WorkerGroupModal = defineComponent({
   props,
   emits: ['cancelModal', 'confirmModal'],
   setup(props, ctx) {
-    const { variables, t, handleValidate, initAssignedWorkerGroups } = useWorkerGroup(props, ctx)
+    const { variables, t, handleValidate, initAssignedWorkerGroups } =
+      useWorkerGroup(props, ctx)
 
     const cancelModal = () => {
       ctx.emit('cancelModal', props.showModalRef)
@@ -56,12 +57,12 @@ const WorkerGroupModal = defineComponent({
     }
 
     watch(
-        () => props.showModalRef,
-        () => {
-          if (props.showModalRef) {
-            initAssignedWorkerGroups(props.row.code)
-          }
+      () => props.showModalRef,
+      () => {
+        if (props.showModalRef) {
+          initAssignedWorkerGroups(props.row.code)
         }
+      }
     )
 
     return { ...toRefs(variables), t, cancelModal, confirmModal, trim }
@@ -69,21 +70,21 @@ const WorkerGroupModal = defineComponent({
   render() {
     const { t } = this
     return (
-        <Modal
-            title={t('project.list.assign_worker_group')}
-            show={this.showModalRef}
-            onConfirm={this.confirmModal}
-            onCancel={this.cancelModal}
-            confirmClassName='btn-submit'
-            cancelClassName='btn-cancel'
-        >
-          <NTransfer
-              virtualScroll
-              class={styles.transfer}
-              options={this.model.workerGroupOptions}
-              v-model:value={this.model.assignedWorkerGroups}
-          />
-        </Modal>
+      <Modal
+        title={t('project.list.assign_worker_group')}
+        show={this.showModalRef}
+        onConfirm={this.confirmModal}
+        onCancel={this.cancelModal}
+        confirmClassName='btn-submit'
+        cancelClassName='btn-cancel'
+      >
+        <NTransfer
+          virtualScroll
+          class={styles.transfer}
+          options={this.model.workerGroupOptions}
+          v-model:value={this.model.assignedWorkerGroups}
+        />
+      </Modal>
     )
   }
 })

@@ -70,7 +70,7 @@ export function useEnvironmentName(
       )
       if (model?.environmentCode) {
         if (options.value) {
-          let elementExists =
+          const elementExists =
             options.value.find(
               (item) => item.value === model.environmentCode
             ) !== undefined

@@ -43,7 +43,7 @@ import {
 import type { IDefinitionParam } from './types'
 import type { Router } from 'vue-router'
 import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
-import {useDependencies} from '../../components/dependencies/use-dependencies'
+import { useDependencies } from '../../components/dependencies/use-dependencies'
 
 export function useTable() {
   const { t } = useI18n()
@@ -71,7 +71,13 @@ export function useTable() {
     copyShowRef: ref(false),
     loadingRef: ref(false),
     setTimingDialogShowRef: ref(false),
-    dependenciesData: ref({showRef: false, taskLinks: ref([]), required: ref(false), tip: ref(''), action:() => {}}),
+    dependenciesData: ref({
+      showRef: false,
+      taskLinks: ref([]),
+      required: ref(false),
+      tip: ref(''),
+      action: () => {}
+    })
   })
 
   const createColumns = (variables: any) => {
@@ -352,8 +358,8 @@ export function useTable() {
     const data = {
       name: row.name,
       releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
-          | 'OFFLINE'
-          | 'ONLINE'
+        | 'OFFLINE'
+        | 'ONLINE'
     }
     if (data.releaseState === 'OFFLINE') {
       release(data, variables.projectCode, row.code).then(() => {
@@ -385,8 +391,8 @@ export function useTable() {
     const data = {
       name: row.name,
       releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
-          | 'OFFLINE'
-          | 'ONLINE'
+        | 'OFFLINE'
+        | 'ONLINE'
     }
     variables.row = row
     if (data.releaseState === 'ONLINE') {
@@ -404,26 +410,28 @@ export function useTable() {
         })
       })
     } else {
-      getDependentTaskLinks(variables.projectCode, row.code).then((res: any) => {
-        if (res && res.length > 0) {
-          variables.dependenciesData = {
-            showRef: true,
-            taskLinks: res,
-            tip: t('project.workflow.warning_dependent_tasks_desc'),
-            required: false,
-            action: confirmToOfflineWorkflow
-          }
-        } else {
-          release(data, variables.projectCode, row.code).then(() => {
-            window.$message.success(t('project.workflow.success'))
-            getTableData({
-              pageSize: variables.pageSize,
-              pageNo: variables.page,
-              searchVal: variables.searchVal
+      getDependentTaskLinks(variables.projectCode, row.code).then(
+        (res: any) => {
+          if (res && res.length > 0) {
+            variables.dependenciesData = {
+              showRef: true,
+              taskLinks: res,
+              tip: t('project.workflow.warning_dependent_tasks_desc'),
+              required: false,
+              action: confirmToOfflineWorkflow
+            }
+          } else {
+            release(data, variables.projectCode, row.code).then(() => {
+              window.$message.success(t('project.workflow.success'))
+              getTableData({
+                pageSize: variables.pageSize,
+                pageNo: variables.page,
+                searchVal: variables.searchVal
+              })
             })
-          })
+          }
         }
-      })
+      )
     }
   }
 
@@ -454,25 +462,30 @@ export function useTable() {
     variables.row = row
     if (row.schedule) {
       if (row.schedule.releaseState === 'ONLINE') {
-        getDependentTaskLinks(variables.projectCode, row.code).then((res: any) => {
-          if (res && res.length > 0) {
-            variables.dependenciesData = {
-              showRef: true,
-              taskLinks: res,
-              tip: t('project.workflow.warning_offline_scheduler_dependent_tasks_desc'),
-              required: false,
-              action: confirmToOfflineScheduler
-            }
-          } else {
-            offline(variables.projectCode, row.schedule.id).then(() => {
-              window.$message.success(t('project.workflow.success'))
-              getTableData({
-                pageSize: variables.pageSize,
-                pageNo: variables.page,
-                searchVal: variables.searchVal
+        getDependentTaskLinks(variables.projectCode, row.code).then(
+          (res: any) => {
+            if (res && res.length > 0) {
+              variables.dependenciesData = {
+                showRef: true,
+                taskLinks: res,
+                tip: t(
+                  'project.workflow.warning_offline_scheduler_dependent_tasks_desc'
+                ),
+                required: false,
+                action: confirmToOfflineScheduler
+              }
+            } else {
+              offline(variables.projectCode, row.schedule.id).then(() => {
+                window.$message.success(t('project.workflow.success'))
+                getTableData({
+                  pageSize: variables.pageSize,
+                  pageNo: variables.page,
+                  searchVal: variables.searchVal
+                })
               })
-            })
-          }})
+            }
+          }
+        )
       } else {
         online(variables.projectCode, row.schedule.id).then(() => {
           window.$message.success(t('project.workflow.success'))
@@ -566,6 +579,6 @@ export function useTable() {
     getTableData,
     batchDeleteWorkflow,
     batchExportWorkflow,
-    batchCopyWorkflow,
+    batchCopyWorkflow
   }
 }
