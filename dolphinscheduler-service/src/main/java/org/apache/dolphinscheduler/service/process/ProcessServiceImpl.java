@@ -601,9 +601,12 @@ public class ProcessServiceImpl implements ProcessService {
         if (MapUtils.isNotEmpty(startParamMap) && globalMap != null) {
             // start param to overwrite global param
             for (Map.Entry<String, String> param : globalMap.entrySet()) {
-                String val = startParamMap.get(param.getKey()).getValue();
-                if (val != null) {
-                    param.setValue(val);
+                String globalKey = param.getKey();
+                if (startParamMap.containsKey(globalKey)) {
+                    String val = startParamMap.get(globalKey).getValue();
+                    if (val != null) {
+                        param.setValue(val);
+                    }
                 }
             }
             // start param to create new global param if global not exist

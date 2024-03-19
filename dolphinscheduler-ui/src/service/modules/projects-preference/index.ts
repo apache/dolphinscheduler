@@ -22,9 +22,7 @@ import {
   UpdateProjectPreferenceStateReq
 } from './types'
 
-export function queryProjectPreferenceByProjectCode(
-  projectCode: number
-): any {
+export function queryProjectPreferenceByProjectCode(projectCode: number): any {
   return axios({
     url: `/projects/${projectCode}/project-preference`,
     method: 'get'
@@ -43,8 +41,8 @@ export function updateProjectPreference(
 }
 
 export function updateProjectPreferenceState(
-    data: UpdateProjectPreferenceStateReq,
-    projectCode: number,
+  data: UpdateProjectPreferenceStateReq,
+  projectCode: number
 ): any {
   return axios({
     url: `/projects/${projectCode}/project-preference`,

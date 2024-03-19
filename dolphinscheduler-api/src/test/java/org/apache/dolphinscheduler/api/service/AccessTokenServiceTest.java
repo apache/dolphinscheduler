@@ -98,6 +98,10 @@ public class AccessTokenServiceTest {
     @Test
     public void testQueryAccessTokenByUser() {
         User user = this.getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> accessTokenService.queryAccessTokenByUser(user, 2));
+
         user.setUserType(UserType.ADMIN_USER);
         List<AccessToken> accessTokenList = Lists.newArrayList(this.getEntity());
         when(this.accessTokenMapper.queryAccessTokenByUser(Mockito.anyInt())).thenReturn(accessTokenList);
@@ -106,14 +110,34 @@ public class AccessTokenServiceTest {
 
     @Test
     public void testCreateToken() {
+        User user = getLoginUser();
+
+        // Throw ServiceException when user has no permission
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> accessTokenService.createToken(user, 2, getDate(), "AccessTokenServiceTest"));
+
+        user.setId(0);
+
+        // Throw ServiceException when user is invalid
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> accessTokenService.createToken(user, 0, getDate(), "AccessTokenServiceTest"));
+
+        user.setId(1);
+
         // Given Token
         when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
         assertDoesNotThrow(() -> {
-            accessTokenService.createToken(getLoginUser(), 1, getDate(), "AccessTokenServiceTest");
+            accessTokenService.createToken(user, 1, getDate(), "AccessTokenServiceTest");
         });
 
         // Token is absent
-        assertDoesNotThrow(() -> accessTokenService.createToken(getLoginUser(), 1, getDate(), null));
+        assertDoesNotThrow(
+                () -> accessTokenService.createToken(user, 1, getDate(), null));
+
+        // Throw Service Exception when insert failed
+        when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(0);
+        assertThrowsServiceException(Status.CREATE_ACCESS_TOKEN_ERROR,
+                () -> accessTokenService.createToken(user, 1, getDate(), "AccessTokenServiceTest"));
     }
 
     @Test
@@ -127,8 +151,9 @@ public class AccessTokenServiceTest {
 
     @Test
     public void testDelAccessTokenById() {
+        AccessToken accessToken = getEntity();
 
-        when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
+        when(accessTokenMapper.selectById(1)).thenReturn(accessToken);
         User userLogin = new User();
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
@@ -139,10 +164,19 @@ public class AccessTokenServiceTest {
         // not exist
         assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
                 () -> accessTokenService.deleteAccessTokenById(userLogin, 0));
+
         // no operate
         userLogin.setId(2);
+        userLogin.setUserType(UserType.GENERAL_USER);
+
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 2,
+                ACCESS_TOKEN_DELETE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null,
+                2, baseServiceLogger)).thenReturn(true);
+
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> accessTokenService.deleteAccessTokenById(userLogin, 1));
+
         // success
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
@@ -153,9 +187,12 @@ public class AccessTokenServiceTest {
 
     @Test
     public void testUpdateToken() {
-        User user = new User();
-        user.setId(1);
-        user.setUserType(UserType.ADMIN_USER);
+        // operation perm check
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
+                ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(false);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> accessTokenService.updateToken(getLoginUser(), 1, 1, getDate(), "token"));
+
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
                 ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
@@ -176,6 +213,23 @@ public class AccessTokenServiceTest {
                 baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
                 () -> accessTokenService.updateToken(getLoginUser(), 2, Integer.MAX_VALUE, getDate(), "token"));
+
+        // resource perm check
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(2);
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 2,
+                ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 2,
+                baseServiceLogger)).thenReturn(true);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> accessTokenService.updateToken(user, 1, Integer.MAX_VALUE, getDate(), "token"));
+
+        // Throw Service Exception when update failed
+        when(accessTokenMapper.updateById(any(AccessToken.class))).thenReturn(0);
+        assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
+                () -> accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE, getDate(), "token"));
     }
 
     private User getLoginUser() {
