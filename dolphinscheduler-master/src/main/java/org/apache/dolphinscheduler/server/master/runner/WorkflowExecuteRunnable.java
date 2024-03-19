@@ -908,7 +908,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             // todo: remove this method
             if (!processService.submitTask(workflowInstance, taskInstance)) {
                 log.error("Submit standby task: {} failed", taskInstance.getName());
-                return true;
+                return false;
             }
             // 2. create task execute runnable
             // in a dag, only one taskInstance is valid per taskCode, so need to set the old taskInstance invalid
