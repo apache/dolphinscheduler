@@ -56,7 +56,7 @@ export function useTable(onEdit: Function) {
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
 
-  const {getDependentTaskLinksByTask} = useDependencies()
+  const { getDependentTaskLinksByTask } = useDependencies()
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -268,12 +268,22 @@ export function useTable(onEdit: Function) {
     dependentTaskLinksRef: ref([]),
     row: {},
     loadingRef: ref(false),
-    dependenciesData: ref({showRef: ref(false), taskLinks: ref([]), required: ref(false), tip: ref(''), action:() => {}}),
+    dependenciesData: ref({
+      showRef: ref(false),
+      taskLinks: ref([]),
+      required: ref(false),
+      tip: ref(''),
+      action: () => {}
+    })
   })
 
   const handleDelete = (row: any) => {
     variables.row = row
-    getDependentTaskLinksByTask(projectCode, row.processDefinitionCode, row.taskCode).then((res: any) =>{
+    getDependentTaskLinksByTask(
+      projectCode,
+      row.processDefinitionCode,
+      row.taskCode
+    ).then((res: any) => {
       if (res && res.length > 0) {
         variables.dependenciesData = {
           showRef: true,
@@ -283,18 +293,20 @@ export function useTable(onEdit: Function) {
           action: () => {}
         }
       } else {
-        deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(() => {
-          getTableData({
-            pageSize: variables.pageSize,
-            pageNo:
+        deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(
+          () => {
+            getTableData({
+              pageSize: variables.pageSize,
+              pageNo:
                 variables.tableData.length === 1 && variables.page > 1
-                    ? variables.page - 1
-                    : variables.page,
-            searchTaskName: variables.searchTaskName,
-            searchWorkflowName: variables.searchWorkflowName,
-            taskType: variables.taskType
-          })
-        })
+                  ? variables.page - 1
+                  : variables.page,
+              searchTaskName: variables.searchTaskName,
+              searchWorkflowName: variables.searchWorkflowName,
+              taskType: variables.taskType
+            })
+          }
+        )
       }
     })
   }
