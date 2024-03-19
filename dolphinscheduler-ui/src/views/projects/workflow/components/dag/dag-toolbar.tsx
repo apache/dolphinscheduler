@@ -148,17 +148,18 @@ export default defineComponent({
      * Back to the entrance
      */
     const onClose = () => {
-      if (history.state.back !== '/login') {
+      const { back, current } = history.state
+      if (back && back !== '/login') {
         router.go(-1)
         return
       }
-      if (history.state.current.includes('workflow/definitions')) {
+      if (!back || current.includes('workflow/definitions')) {
         router.push({
           path: `/projects/${route.params.projectCode}/workflow-definition`
         })
         return
       }
-      if (history.state.current.includes('workflow/instances')) {
+      if (current.includes('workflow/instances')) {
         router.push({
           path: `/projects/${route.params.projectCode}/workflow/instances`
         })
