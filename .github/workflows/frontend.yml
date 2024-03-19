@@ -43,7 +43,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
-      db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
       - uses: actions/checkout@v2
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
@@ -79,7 +78,6 @@ jobs:
           pnpm install
           pnpm run lint
           pnpm run build:prod
-
   result:
     name: Frontend Build
     runs-on: ubuntu-latest
@@ -87,6 +85,7 @@ jobs:
     needs: [ build, paths-filter ]
     if: always()
     steps:
+      - uses: actions/checkout@v2
       - name: Status
         run: |
           if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
