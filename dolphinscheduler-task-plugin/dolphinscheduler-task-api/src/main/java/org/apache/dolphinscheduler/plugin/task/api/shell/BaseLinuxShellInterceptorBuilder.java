@@ -125,7 +125,8 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
     }
 
     private List<String> bootstrapCommandInSudoMode() {
-        if (PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE, false)) {
+        if (PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE, false)
+                && (memoryQuota != -1 || cpuQuota != -1)) {
             return bootstrapCommandInResourceLimitMode();
         }
         List<String> bootstrapCommand = new ArrayList<>();
@@ -164,13 +165,15 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         // use `man systemd.resource-control` to find available parameter
         if (memoryQuota == -1) {
             bootstrapCommand.add("-p");
-            bootstrapCommand.add(String.format("MemoryLimit=%s", "infinity"));
+            // Some systems do not support infinity. Consider replacing it with a very large value.
+            bootstrapCommand.add(String.format("MemoryLimit=%s", "104857600M"));
         } else {
             bootstrapCommand.add("-p");
             bootstrapCommand.add(String.format("MemoryLimit=%sM", memoryQuota));
         }
 
         bootstrapCommand.add(String.format("--uid=%s", runUser));
+        bootstrapCommand.add(shellAbsolutePath().toString());
         return bootstrapCommand;
     }
 }
