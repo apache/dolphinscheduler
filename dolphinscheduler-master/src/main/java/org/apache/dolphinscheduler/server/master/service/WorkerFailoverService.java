@@ -34,13 +34,13 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
@@ -71,7 +71,7 @@ public class WorkerFailoverService {
     private final MasterConfig masterConfig;
     private final ProcessService processService;
     private final WorkflowExecuteThreadPool workflowExecuteThreadPool;
-    private final ProcessInstanceExecCacheManager cacheManager;
+    private final IWorkflowExecuteRunnableRepository cacheManager;
     private final String localAddress;
 
     private final TaskInstanceDao taskInstanceDao;
@@ -80,7 +80,7 @@ public class WorkerFailoverService {
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
                                  @NonNull WorkflowExecuteThreadPool workflowExecuteThreadPool,
-                                 @NonNull ProcessInstanceExecCacheManager cacheManager,
+                                 @NonNull IWorkflowExecuteRunnableRepository cacheManager,
                                  @NonNull TaskInstanceDao taskInstanceDao) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
@@ -123,8 +123,9 @@ public class WorkerFailoverService {
                 LogUtils.setWorkflowAndTaskInstanceIDMDC(taskInstance.getProcessInstanceId(), taskInstance.getId());
                 ProcessInstance processInstance = processInstanceCacheMap.computeIfAbsent(
                         taskInstance.getProcessInstanceId(), k -> {
-                            WorkflowExecuteRunnable workflowExecuteRunnable = cacheManager.getByProcessInstanceId(
-                                    taskInstance.getProcessInstanceId());
+                            WorkflowExecutionRunnable workflowExecuteRunnable =
+                                    cacheManager.getByProcessInstanceId(
+                                            taskInstance.getProcessInstanceId());
                             if (workflowExecuteRunnable == null) {
                                 return null;
                             }

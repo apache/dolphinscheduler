@@ -33,12 +33,12 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
-import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -81,10 +81,10 @@ public class FailoverServiceTest {
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
 
     @Mock
-    private ProcessInstanceExecCacheManager cacheManager;
+    private IWorkflowExecuteRunnableRepository cacheManager;
 
     @Mock
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     private static int masterPort = 5678;
     private static int workerPort = 1234;
@@ -106,7 +106,7 @@ public class FailoverServiceTest {
         given(masterConfig.getMasterAddress()).willReturn(testMasterHost);
         MasterFailoverService masterFailoverService =
                 new MasterFailoverService(registryClient, masterConfig, processService,
-                        processInstanceExecCacheManager);
+                        IWorkflowExecuteRunnableRepository);
         WorkerFailoverService workerFailoverService = new WorkerFailoverService(registryClient,
                 masterConfig,
                 processService,
@@ -193,10 +193,10 @@ public class FailoverServiceTest {
     @Test
     public void failoverWorkTest() {
         workerTaskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
-        WorkflowExecuteRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecuteRunnable.class);
+        WorkflowExecutionRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecutionRunnable.class);
         Mockito.when(workflowExecuteRunnable.getAllTaskInstances()).thenReturn(Lists.newArrayList(workerTaskInstance));
 
-        IWorkflowExecuteContext workflowExecuteRunnableContext = Mockito.mock(IWorkflowExecuteContext.class);
+        IWorkflowExecutionContext workflowExecuteRunnableContext = Mockito.mock(IWorkflowExecutionContext.class);
         Mockito.when(workflowExecuteRunnable.getWorkflowExecuteContext()).thenReturn(workflowExecuteRunnableContext);
         Mockito.when(workflowExecuteRunnableContext.getWorkflowInstance()).thenReturn(processInstance);
 

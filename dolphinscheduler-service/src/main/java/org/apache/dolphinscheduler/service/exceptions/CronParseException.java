@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.service.exceptions;
 
-public class CronParseException extends Exception {
+public class CronParseException extends RuntimeException {
 
     public CronParseException(String message) {
         super(message);

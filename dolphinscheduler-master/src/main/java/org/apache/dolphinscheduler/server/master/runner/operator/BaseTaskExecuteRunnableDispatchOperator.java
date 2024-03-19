@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.server.master.runner.operator;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.GlobalTaskDispatchWaitingQueue;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -42,14 +42,13 @@ public abstract class BaseTaskExecuteRunnableDispatchOperator implements TaskExe
     }
 
     @Override
-    public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
+    public void operate(TaskExecutionRunnable taskExecuteRunnable) {
         long remainTime = taskExecuteRunnable.getDelay(TimeUnit.SECONDS);
-        TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
+        TaskInstance taskInstance = taskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance();
         if (remainTime > 0) {
             taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
             taskInstanceDao.updateById(taskInstance);
-            log.info("Current taskInstance: {} is choose delay execution, delay time: {}/s, remainTime: {}/s",
-                    taskInstance.getName(),
+            log.info("TaskInstance: {} delayTime is: {}, remainTime:: {}/s", taskInstance.getName(),
                     taskInstance.getDelayTime(), remainTime);
         }
         globalTaskDispatchWaitingQueue.submitTaskExecuteRunnable(taskExecuteRunnable);

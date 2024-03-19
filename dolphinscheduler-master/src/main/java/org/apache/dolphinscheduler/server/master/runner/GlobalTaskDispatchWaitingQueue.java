@@ -25,21 +25,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * The class is used to store {@link TaskExecuteRunnable} which needs to be dispatched. The {@link TaskExecuteRunnable} will be stored in a {@link DelayQueue},
- * if the {@link TaskExecuteRunnable}'s delay time is 0, then it will be consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
+ * The class is used to store {@link ITaskExecutionRunnable} which needs to be dispatched. The {@link ITaskExecutionRunnable} will be stored in a {@link DelayQueue},
+ * if the {@link ITaskExecutionRunnable}'s delay time is 0, then it will be consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
  */
 @Slf4j
 @Component
 public class GlobalTaskDispatchWaitingQueue {
 
-    private final DelayQueue<DefaultTaskExecuteRunnable> queue = new DelayQueue<>();
+    private final DelayQueue<TaskExecutionRunnable> queue = new DelayQueue<>();
 
-    public void submitTaskExecuteRunnable(DefaultTaskExecuteRunnable priorityTaskExecuteRunnable) {
+    public void submitTaskExecuteRunnable(TaskExecutionRunnable priorityTaskExecuteRunnable) {
         queue.put(priorityTaskExecuteRunnable);
     }
 
     @SneakyThrows
-    public DefaultTaskExecuteRunnable takeTaskExecuteRunnable() {
+    public TaskExecutionRunnable takeTaskExecuteRunnable() {
         return queue.take();
     }
 

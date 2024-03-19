@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,29 +50,33 @@ public class TaskExecuteRunnableOperatorManager {
     @Autowired
     private LogicTaskExecuteRunnableTimeoutOperator logicTaskTimeoutOperator;
 
-    public TaskExecuteRunnableOperator getTaskKillOperator(DefaultTaskExecuteRunnable defaultTaskExecuteRunnable) {
-        if (TaskUtils.isMasterTask(defaultTaskExecuteRunnable.getTaskInstance().getTaskType())) {
+    public TaskExecuteRunnableOperator getTaskKillOperator(TaskExecutionRunnable defaultTaskExecuteRunnable) {
+        if (TaskUtils.isMasterTask(
+                defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance().getTaskType())) {
             return logicTaskKillOperator;
         }
         return taskKillOperator;
     }
 
-    public TaskExecuteRunnableOperator getTaskPauseOperator(DefaultTaskExecuteRunnable defaultTaskExecuteRunnable) {
-        if (TaskUtils.isMasterTask(defaultTaskExecuteRunnable.getTaskInstance().getTaskType())) {
+    public TaskExecuteRunnableOperator getTaskPauseOperator(TaskExecutionRunnable defaultTaskExecuteRunnable) {
+        if (TaskUtils.isMasterTask(
+                defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance().getTaskType())) {
             return logicTaskPauseOperator;
         }
         return taskPauseOperator;
     }
 
-    public TaskExecuteRunnableOperator getTaskDispatchOperator(DefaultTaskExecuteRunnable defaultTaskExecuteRunnable) {
-        if (TaskUtils.isMasterTask(defaultTaskExecuteRunnable.getTaskInstance().getTaskType())) {
+    public TaskExecuteRunnableOperator getTaskDispatchOperator(TaskExecutionRunnable defaultTaskExecuteRunnable) {
+        if (TaskUtils.isMasterTask(
+                defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance().getTaskType())) {
             return logicTaskDispatchOperator;
         }
         return taskDispatchOperator;
     }
 
-    public TaskExecuteRunnableOperator getTaskTimeoutOperator(DefaultTaskExecuteRunnable defaultTaskExecuteRunnable) {
-        if (TaskUtils.isMasterTask(defaultTaskExecuteRunnable.getTaskInstance().getTaskType())) {
+    public TaskExecuteRunnableOperator getTaskTimeoutOperator(TaskExecutionRunnable defaultTaskExecuteRunnable) {
+        if (TaskUtils.isMasterTask(
+                defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance().getTaskType())) {
             return logicTaskTimeoutOperator;
         }
         return taskTimeoutOperator;

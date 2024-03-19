@@ -18,13 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner.execute;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecuteRunnableCreateException;
-import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnableFactory;
-import org.apache.dolphinscheduler.server.master.runner.TaskExecutionContextFactory;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnableContext;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnableContextFactory;
 import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,31 +30,40 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * The implementation of {@link TaskExecuteRunnableFactory} used to create {@link TaskExecutionRunnable}.
+ */
 @Slf4j
 @Component
-public class DefaultTaskExecuteRunnableFactory implements TaskExecuteRunnableFactory<DefaultTaskExecuteRunnable> {
-
-    @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
-
-    @Autowired
-    private TaskExecutionContextFactory taskExecutionContextFactory;
+public class DefaultTaskExecuteRunnableFactory implements TaskExecuteRunnableFactory<TaskExecutionRunnable> {
 
     @Autowired
     private TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 
+    @Autowired
+    private TaskExecutionRunnableContextFactory taskExecutionRunnableContextFactory;
+
+    /**
+     * Create DefaultTaskExecuteRunnable
+     *
+     * @param taskInstance task instance
+     * @return DefaultTaskExecuteRunnable
+     * @throws TaskExecuteRunnableCreateException If create DefaultTaskExecuteRunnable failed
+     */
     @Override
-    public DefaultTaskExecuteRunnable createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException {
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskInstance.getProcessInstanceId());
+    public TaskExecutionRunnable createTaskExecuteRunnable(TaskInstance taskInstance) throws TaskExecuteRunnableCreateException {
+
+        if (taskInstance == null) {
+            throw new TaskExecuteRunnableCreateException("TaskInstance is null");
+        }
+
         try {
-            return new DefaultTaskExecuteRunnable(
-                    workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance(),
-                    taskInstance,
-                    taskExecutionContextFactory.createTaskExecutionContext(taskInstance),
-                    taskExecuteRunnableOperatorManager);
-        } catch (TaskExecutionContextCreateException ex) {
-            throw new TaskExecuteRunnableCreateException("Create DefaultTaskExecuteRunnable failed", ex);
+            TaskExecutionRunnableContext taskExecutionRunnableContext =
+                    taskExecutionRunnableContextFactory.createTaskExecutionRunnableContext(taskInstance);
+            return new TaskExecutionRunnable(taskExecutionRunnableContext, taskExecuteRunnableOperatorManager);
+        } catch (Exception ex) {
+            throw new TaskExecuteRunnableCreateException(
+                    "Create DefaultTaskExecuteRunnable for taskInstance: " + taskInstance.getName() + " failed", ex);
         }
     }
 }

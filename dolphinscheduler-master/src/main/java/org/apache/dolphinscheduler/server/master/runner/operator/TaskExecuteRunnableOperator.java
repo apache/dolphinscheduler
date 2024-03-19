@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.runner.operator;
 
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 
 public interface TaskExecuteRunnableOperator {
 
-    void operate(DefaultTaskExecuteRunnable taskExecuteRunnable);
+    void operate(TaskExecutionRunnable taskExecuteRunnable);
 
 }

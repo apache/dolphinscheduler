@@ -122,7 +122,7 @@ public class ListenerEventAlertManager {
         ProcessStartListenerEvent event = new ProcessStartListenerEvent();
         event.setProjectCode(projectUser.getProjectCode());
         event.setProjectName(projectUser.getProjectName());
-        event.setOwner(projectUser.getUserName());
+        event.setOwner(processInstance.getExecutorName());
         event.setProcessId(processInstance.getId());
         event.setProcessDefinitionCode(processInstance.getProcessDefinitionCode());
         event.setProcessName(processInstance.getName());

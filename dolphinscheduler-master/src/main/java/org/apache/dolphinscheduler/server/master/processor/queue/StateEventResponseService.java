@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.server.master.processor.queue;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class StateEventResponseService {
     private Thread responseWorker;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
@@ -130,14 +130,14 @@ public class StateEventResponseService {
 
     private void persist(StateEvent stateEvent) {
         try {
-            if (!this.processInstanceExecCacheManager.contains(stateEvent.getProcessInstanceId())) {
+            if (!this.IWorkflowExecuteRunnableRepository.contains(stateEvent.getProcessInstanceId())) {
                 log.warn("Persist event into workflow execute thread error, "
                         + "cannot find the workflow instance from cache manager, event: {}", stateEvent);
                 return;
             }
 
-            WorkflowExecuteRunnable workflowExecuteThread =
-                    this.processInstanceExecCacheManager.getByProcessInstanceId(stateEvent.getProcessInstanceId());
+            WorkflowExecutionRunnable workflowExecuteThread =
+                    this.IWorkflowExecuteRunnableRepository.getByProcessInstanceId(stateEvent.getProcessInstanceId());
             // We will refresh the task instance status first, if the refresh failed the event will not be removed
             switch (stateEvent.getType()) {
                 case TASK_STATE_CHANGE:

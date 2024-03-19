@@ -90,6 +90,18 @@ public class ProcessInstanceMetrics {
                 .increment();
     }
 
+    public void incProcessInstanceByStateAndProcessDefinitionCode(final String state,
+                                                                  final Long processDefinitionCode) {
+        // When tags need to be determined from local context,
+        // you have no choice but to construct or lookup the Meter inside your method body.
+        // The lookup cost is just a single hash lookup, so it is acceptable for most use cases.
+        Metrics.globalRegistry.counter(
+                "ds.workflow.instance.count",
+                "state", state,
+                "process.definition.code", processDefinitionCode.toString())
+                .increment();
+    }
+
     public void cleanUpProcessInstanceCountMetricsByDefinitionCode(final Long processDefinitionCode) {
         for (final String state : processInstanceStates) {
             final Counter counter = Metrics.globalRegistry.counter(

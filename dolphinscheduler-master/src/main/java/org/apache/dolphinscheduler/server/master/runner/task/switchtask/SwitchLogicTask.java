@@ -26,12 +26,12 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
+import org.apache.dolphinscheduler.server.master.workflow.IWorkflowExecutionRunnable;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,20 +51,19 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
     private final TaskInstance taskInstance;
 
     public SwitchLogicTask(TaskExecutionContext taskExecutionContext,
-                           ProcessInstanceExecCacheManager processInstanceExecCacheManager) throws LogicTaskInitializeException {
+                           IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository) throws LogicTaskInitializeException {
         super(taskExecutionContext,
                 // todo: we need to refactor the logic task parameter........
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
-                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                        .orElseThrow(() -> new LogicTaskInitializeException(
-                                "Cannot find the task instance in workflow execute runnable"))
+                IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
+                        .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                        .getTaskExecutionRunnableContext().getTaskInstance()
                         .getSwitchDependency());
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        this.processInstance = workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
-        this.taskInstance = workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                .orElseThrow(() -> new LogicTaskInitializeException(
-                        "Cannot find the task instance in workflow execute runnable"));
+        IWorkflowExecutionRunnable workflowExecuteRunnable =
+                IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
+        this.processInstance = workflowExecuteRunnable.getWorkflowExecutionContext().getWorkflowInstance();
+        this.taskInstance =
+                workflowExecuteRunnable.getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                        .getTaskExecutionRunnableContext().getTaskInstance();
     }
 
     @Override

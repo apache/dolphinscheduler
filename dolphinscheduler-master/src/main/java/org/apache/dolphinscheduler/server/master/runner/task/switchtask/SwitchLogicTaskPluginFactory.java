@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task.switchtask;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
@@ -32,11 +32,11 @@ import org.springframework.stereotype.Component;
 public class SwitchLogicTaskPluginFactory implements ILogicTaskPluginFactory<SwitchLogicTask> {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Override
     public SwitchLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        return new SwitchLogicTask(taskExecutionContext, processInstanceExecCacheManager);
+        return new SwitchLogicTask(taskExecutionContext, IWorkflowExecuteRunnableRepository);
     }
 
     @Override

@@ -49,31 +49,36 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
     }
 
     @Override
-    public void dispatchTask(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
+    public void dispatchTask(ITaskExecutionRunnable iTaskExecutionRunnable) throws TaskDispatchException {
         Host taskInstanceDispatchHost;
         try {
-            taskInstanceDispatchHost = getTaskInstanceDispatchHost(taskExecuteRunnable)
+            taskInstanceDispatchHost = getTaskInstanceDispatchHost(iTaskExecutionRunnable)
                     .orElseThrow(() -> new TaskDispatchException("Cannot find the host to execute task."));
         } catch (WorkerGroupNotFoundException workerGroupNotFoundException) {
             log.error("Dispatch task: {} failed, worker group not found.",
-                    taskExecuteRunnable.getTaskExecutionContext().getTaskName(), workerGroupNotFoundException);
-            addDispatchFailedEvent(taskExecuteRunnable);
+                    iTaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext().getTaskName(),
+                    workerGroupNotFoundException);
+            addDispatchFailedEvent(iTaskExecutionRunnable);
             return;
         }
-        taskExecuteRunnable.getTaskExecutionContext().setHost(taskInstanceDispatchHost.getAddress());
-        doDispatch(taskExecuteRunnable);
-        taskExecuteRunnable.getTaskInstance().setHost(taskInstanceDispatchHost.getAddress());
-        log.info("Success dispatch task {} to {}.", taskExecuteRunnable.getTaskExecutionContext().getTaskName(),
+        iTaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext()
+                .setHost(taskInstanceDispatchHost.getAddress());
+        doDispatch(iTaskExecutionRunnable);
+        iTaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskInstance()
+                .setHost(taskInstanceDispatchHost.getAddress());
+        log.info("Success dispatch task {} to {}.",
+                iTaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext().getTaskName(),
                 taskInstanceDispatchHost.getAddress());
-        addDispatchEvent(taskExecuteRunnable);
+        addDispatchEvent(iTaskExecutionRunnable);
     }
 
-    protected abstract void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException;
+    protected abstract void doDispatch(ITaskExecutionRunnable ITaskExecutionRunnable) throws TaskDispatchException;
 
-    protected abstract Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
+    protected abstract Optional<Host> getTaskInstanceDispatchHost(ITaskExecutionRunnable taskExecutionContext) throws TaskDispatchException, WorkerGroupNotFoundException;
 
-    protected void addDispatchEvent(TaskExecuteRunnable taskExecuteRunnable) {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+    protected void addDispatchEvent(ITaskExecutionRunnable ITaskExecutionRunnable) {
+        TaskExecutionContext taskExecutionContext =
+                ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext();
         TaskEvent taskEvent = TaskEvent.newDispatchEvent(
                 taskExecutionContext.getProcessInstanceId(),
                 taskExecutionContext.getTaskInstanceId(),
@@ -81,8 +86,9 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
         taskEventService.addEvent(taskEvent);
     }
 
-    private void addDispatchFailedEvent(TaskExecuteRunnable taskExecuteRunnable) {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+    private void addDispatchFailedEvent(ITaskExecutionRunnable ITaskExecutionRunnable) {
+        TaskExecutionContext taskExecutionContext =
+                ITaskExecutionRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext();
         TaskEvent taskEvent = TaskEvent.builder()
                 .processInstanceId(taskExecutionContext.getProcessInstanceId())
                 .taskInstanceId(taskExecutionContext.getTaskInstanceId())

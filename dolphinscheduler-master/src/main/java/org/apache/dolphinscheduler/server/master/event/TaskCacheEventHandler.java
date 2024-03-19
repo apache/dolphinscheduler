@@ -23,11 +23,11 @@ import org.apache.dolphinscheduler.common.enums.TaskEventType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -40,7 +40,7 @@ import org.springframework.stereotype.Component;
 public class TaskCacheEventHandler implements TaskEventHandler {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
@@ -64,8 +64,9 @@ public class TaskCacheEventHandler implements TaskEventHandler {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
-        WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
-                processInstanceId);
+        WorkflowExecutionRunnable workflowExecuteRunnable =
+                IWorkflowExecuteRunnableRepository.getByProcessInstanceId(
+                        processInstanceId);
         Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
         if (!taskInstanceOptional.isPresent()) {
             return;

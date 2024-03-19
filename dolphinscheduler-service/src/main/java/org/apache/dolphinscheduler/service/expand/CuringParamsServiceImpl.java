@@ -67,33 +67,19 @@ import org.springframework.stereotype.Component;
 public class CuringParamsServiceImpl implements CuringParamsService {
 
     @Autowired
-    private TimePlaceholderResolverExpandService timePlaceholderResolverExpandService;
-
-    @Autowired
     private ProjectParameterMapper projectParameterMapper;
 
     @Override
     public String convertParameterPlaceholders(String val, Map<String, Property> allParamMap) {
-        Map<String, String> paramMap = allParamMap
-                .entrySet()
-                .stream()
-                .filter(entry -> nonNull(entry.getValue().getValue()))
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getValue()));
+        Map<String, String> paramMap =
+                allParamMap.entrySet().stream().filter(entry -> nonNull(entry.getValue().getValue()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getValue()));
         return ParameterUtils.convertParameterPlaceholders(val, paramMap);
-    }
-
-    @Override
-    public boolean timeFunctionNeedExpand(String placeholderName) {
-        return timePlaceholderResolverExpandService.timeFunctionNeedExpand(placeholderName);
-    }
-
-    @Override
-    public String timeFunctionExtension(Integer processInstanceId, String timezone, String placeholderName) {
-        return timePlaceholderResolverExpandService.timeFunctionExtension(processInstanceId, timezone, placeholderName);
     }
 
     /**
      * here it is judged whether external expansion calculation is required and the calculation result is obtained
+     *
      * @param processInstanceId
      * @param globalParamMap
      * @param globalParamList
@@ -126,12 +112,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         for (Map.Entry<String, String> entry : entries) {
             String val = entry.getValue();
             if (val.contains(Constants.FUNCTION_START_WITH)) {
-                String str = val;
-                // whether external scaling calculation is required
-                if (timeFunctionNeedExpand(val)) {
-                    str = timeFunctionExtension(processInstanceId, timezone, val);
-                }
-                resolveMap.put(entry.getKey(), str);
+                resolveMap.put(entry.getKey(), val);
             }
         }
         globalMap.putAll(resolveMap);
@@ -240,14 +221,9 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                  *  and there are no variables in them.
                  */
                 String val = property.getValue();
-                // whether external scaling calculation is required
-                if (timeFunctionNeedExpand(val)) {
-                    val = timeFunctionExtension(taskInstance.getProcessInstanceId(), timeZone, val);
-                } else {
-                    // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to
-                    // `{"var1": 1, "var2": 1}`
-                    val = convertParameterPlaceholders(val, prepareParamsMap);
-                }
+                // handle some chain parameter assign, such as `{"var1": "${var2}", "var2": 1}` should be convert to
+                // `{"var1": 1, "var2": 1}`
+                val = convertParameterPlaceholders(val, prepareParamsMap);
                 property.setValue(val);
             }
         }
@@ -262,6 +238,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
 
     /**
      * build all built-in parameters
+     *
      * @param taskInstance
      * @param timeZone
      */
@@ -287,6 +264,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getProjectCode()));
         return params;
     }
+
     private Map<String, String> setGlobalParamsMap(ProcessInstance processInstance) {
         Map<String, String> globalParamsMap = new HashMap<>(16);
 
@@ -321,9 +299,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         List<ProjectParameter> projectParameterList = projectParameterMapper.queryByProjectCode(projectCode);
 
         projectParameterList.forEach(projectParameter -> {
-            Property property = new Property(projectParameter.getParamName(),
-                    Direct.IN,
-                    DataType.VARCHAR,
+            Property property = new Property(projectParameter.getParamName(), Direct.IN, DataType.VARCHAR,
                     projectParameter.getParamValue());
             result.put(projectParameter.getParamName(), property);
         });

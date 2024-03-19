@@ -23,11 +23,11 @@ import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
 import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.Date;
@@ -49,7 +49,7 @@ class TaskCacheEventHandlerTest {
     private TaskCacheEventHandler taskCacheEventHandler;
 
     @Mock
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Mock
     private WorkflowExecuteThreadPool workflowExecuteThreadPool;
@@ -82,8 +82,8 @@ class TaskCacheEventHandlerTest {
 
         Mockito.when(taskInstanceDao.queryById(cacheTaskInstanceId)).thenReturn(cacheTaskInstance);
 
-        WorkflowExecuteRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecuteRunnable.class);
-        Mockito.when(processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId))
+        WorkflowExecutionRunnable workflowExecuteRunnable = Mockito.mock(WorkflowExecutionRunnable.class);
+        Mockito.when(IWorkflowExecuteRunnableRepository.getByProcessInstanceId(processInstanceId))
                 .thenReturn(workflowExecuteRunnable);
         Optional<TaskInstance> taskInstanceOptional = Mockito.mock(Optional.class);
         Mockito.when(workflowExecuteRunnable.getTaskInstance(taskInstanceId)).thenReturn(taskInstanceOptional);

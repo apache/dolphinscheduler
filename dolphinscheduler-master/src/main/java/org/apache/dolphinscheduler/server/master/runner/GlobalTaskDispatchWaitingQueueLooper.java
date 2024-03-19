@@ -64,7 +64,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     @Override
     public void run() {
-        DefaultTaskExecuteRunnable defaultTaskExecuteRunnable;
+        TaskExecutionRunnable defaultTaskExecuteRunnable;
         while (RUNNING_FLAG.get()) {
             defaultTaskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
             try {
@@ -76,16 +76,19 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
                 }
 
                 TaskDispatcher taskDispatcher =
-                        taskDispatchFactory.getTaskDispatcher(defaultTaskExecuteRunnable.getTaskInstance());
+                        taskDispatchFactory.getTaskDispatcher(
+                                defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance());
                 taskDispatcher.dispatchTask(defaultTaskExecuteRunnable);
                 DISPATCHED_CONSECUTIVE_FAILURE_TIMES.set(0);
             } catch (Exception e) {
-                defaultTaskExecuteRunnable.getTaskExecutionContext().increaseDispatchFailTimes();
+                defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskExecutionContext()
+                        .increaseDispatchFailTimes();
                 globalTaskDispatchWaitingQueue.submitTaskExecuteRunnable(defaultTaskExecuteRunnable);
                 if (DISPATCHED_CONSECUTIVE_FAILURE_TIMES.incrementAndGet() > MAX_DISPATCHED_FAILED_TIMES) {
                     ThreadUtils.sleep(10 * 1000L);
                 }
-                log.error("Dispatch Task: {} failed", defaultTaskExecuteRunnable.getTaskInstance().getName(), e);
+                log.error("Dispatch Task: {} failed",
+                        defaultTaskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance().getName(), e);
             }
         }
     }

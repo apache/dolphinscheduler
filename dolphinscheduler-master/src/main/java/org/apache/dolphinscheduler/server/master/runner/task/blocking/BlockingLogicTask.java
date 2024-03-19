@@ -33,7 +33,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 
@@ -52,20 +52,20 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
 
     public static final String TASK_TYPE = "BLOCKING";
 
-    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     private final ProcessInstanceDao processInstanceDao;
 
     private final TaskInstanceDao taskInstanceDao;
 
     public BlockingLogicTask(TaskExecutionContext taskExecutionContext,
-                             ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                             IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository,
                              ProcessInstanceDao processInstanceDao,
                              TaskInstanceDao taskInstanceDao) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<BlockingParameters>() {
                 }));
-        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.IWorkflowExecuteRunnableRepository = IWorkflowExecuteRunnableRepository;
         this.processInstanceDao = processInstanceDao;
         this.taskInstanceDao = taskInstanceDao;
     }
@@ -79,8 +79,8 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
                         : DependResult.FAILED;
         boolean isBlocked = (expected == conditionResult);
         log.info("blocking opportunity: expected-->{}, actual-->{}", expected, conditionResult);
-        ProcessInstance workflowInstance = processInstanceExecCacheManager
-                .getByProcessInstanceId(taskExecutionContext.getProcessInstanceId()).getWorkflowExecuteContext()
+        ProcessInstance workflowInstance = IWorkflowExecuteRunnableRepository
+                .getByProcessInstanceId(taskExecutionContext.getProcessInstanceId()).getWorkflowExecutionContext()
                 .getWorkflowInstance();
         workflowInstance.setBlocked(isBlocked);
         if (isBlocked) {
@@ -99,9 +99,9 @@ public class BlockingLogicTask extends BaseSyncLogicTask<BlockingParameters> {
 
         // todo: we need to parse the task parameter from TaskExecutionContext
         TaskInstance taskInstance =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
-                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                        .orElseThrow(() -> new MasterTaskExecuteException("Task instance not found"));
+                IWorkflowExecuteRunnableRepository.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
+                        .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                        .getTaskExecutionRunnableContext().getTaskInstance();
         DependentParameters dependentParameters = taskInstance.getDependency();
 
         List<DependResult> tempResultList = new ArrayList<>();

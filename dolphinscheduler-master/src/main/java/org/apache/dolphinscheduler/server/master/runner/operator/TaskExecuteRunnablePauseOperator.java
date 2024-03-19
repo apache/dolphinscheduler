@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseResponse;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,9 +35,10 @@ import org.springframework.stereotype.Component;
 public class TaskExecuteRunnablePauseOperator implements TaskExecuteRunnableOperator {
 
     @Override
-    public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
+    public void operate(TaskExecutionRunnable taskExecuteRunnable) {
         try {
-            pauseRemoteTaskInstanceInThreadPool(taskExecuteRunnable.getTaskInstance());
+            pauseRemoteTaskInstanceInThreadPool(
+                    taskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance());
         } catch (Exception e) {
             log.error("Pause DefaultTaskExecuteRunnable failed", e);
         }

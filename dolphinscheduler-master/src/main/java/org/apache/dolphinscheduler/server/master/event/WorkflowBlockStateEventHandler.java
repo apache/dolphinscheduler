@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.StateEventType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.BlockingParameters;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import java.util.Optional;
 
@@ -34,7 +34,7 @@ import com.google.auto.service.AutoService;
 public class WorkflowBlockStateEventHandler implements StateEventHandler {
 
     @Override
-    public boolean handleStateEvent(WorkflowExecuteRunnable workflowExecuteRunnable,
+    public boolean handleStateEvent(WorkflowExecutionRunnable workflowExecuteRunnable,
                                     StateEvent stateEvent) throws StateEventHandleError {
         log.info("Handle workflow instance state block event");
         Optional<TaskInstance> taskInstanceOptional =

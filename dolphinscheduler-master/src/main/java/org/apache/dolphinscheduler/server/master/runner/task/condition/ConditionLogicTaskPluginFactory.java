@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task.condition;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
@@ -39,11 +39,11 @@ public class ConditionLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Override
     public ConditionLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        return new ConditionLogicTask(taskExecutionContext, processInstanceExecCacheManager, taskInstanceDao,
+        return new ConditionLogicTask(taskExecutionContext, IWorkflowExecuteRunnableRepository, taskInstanceDao,
                 processInstanceDao);
     }
 

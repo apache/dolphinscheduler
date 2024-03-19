@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.operator;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.runner.DefaultTaskExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.runner.TaskExecutionRunnable;
 
 import java.util.Date;
 
@@ -36,8 +36,8 @@ public abstract class BaseTaskExecuteRunnableKillOperator implements TaskExecute
     }
 
     @Override
-    public void operate(DefaultTaskExecuteRunnable taskExecuteRunnable) {
-        TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
+    public void operate(TaskExecutionRunnable taskExecuteRunnable) {
+        TaskInstance taskInstance = taskExecuteRunnable.getTaskExecutionRunnableContext().getTaskInstance();
         log.info("Begin to kill task instance: {}", taskInstance.getName());
         if (taskInstance.getState().isFinished()) {
             log.info("The task stance {} is finished, no need to kill", taskInstance.getName());

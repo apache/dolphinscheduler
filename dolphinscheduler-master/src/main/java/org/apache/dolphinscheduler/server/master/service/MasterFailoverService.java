@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -54,17 +54,17 @@ public class MasterFailoverService {
     private final ProcessService processService;
     private final String localAddress;
 
-    private final ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private final IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     public MasterFailoverService(@NonNull RegistryClient registryClient,
                                  @NonNull MasterConfig masterConfig,
                                  @NonNull ProcessService processService,
-                                 @NonNull ProcessInstanceExecCacheManager processInstanceExecCacheManager) {
+                                 @NonNull IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository) {
         this.registryClient = registryClient;
         this.masterConfig = masterConfig;
         this.processService = processService;
         this.localAddress = masterConfig.getMasterAddress();
-        this.processInstanceExecCacheManager = processInstanceExecCacheManager;
+        this.IWorkflowExecuteRunnableRepository = IWorkflowExecuteRunnableRepository;
     }
 
     /**
@@ -192,7 +192,7 @@ public class MasterFailoverService {
             return false;
         }
 
-        if (processInstanceExecCacheManager.contains(processInstance.getId())) {
+        if (IWorkflowExecuteRunnableRepository.contains(processInstance.getId())) {
             // the processInstance is a running process instance in the current master
             log.info("The workflowInstance is running in the current master, no need to failover");
             return false;

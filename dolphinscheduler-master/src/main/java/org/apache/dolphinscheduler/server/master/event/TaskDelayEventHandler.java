@@ -25,11 +25,11 @@ import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionRunningEventAck;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
+import org.apache.dolphinscheduler.server.master.workflow.WorkflowExecutionRunnable;
 
 import java.util.Optional;
 
@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 public class TaskDelayEventHandler implements TaskEventHandler {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -59,8 +59,8 @@ public class TaskDelayEventHandler implements TaskEventHandler {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        WorkflowExecutionRunnable workflowExecuteRunnable =
+                this.IWorkflowExecuteRunnableRepository.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
             throw new TaskEventHandleError("Cannot find related workflow instance from cache");

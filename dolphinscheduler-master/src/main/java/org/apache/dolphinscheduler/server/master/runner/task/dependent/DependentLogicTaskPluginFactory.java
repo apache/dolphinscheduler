@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
@@ -48,7 +48,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     private ProcessInstanceDao processInstanceDao;
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Override
     public DependentLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
@@ -59,7 +59,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
                 taskDefinitionDao,
                 taskInstanceDao,
                 processInstanceDao,
-                processInstanceExecCacheManager);
+                IWorkflowExecuteRunnableRepository);
     }
 
     @Override

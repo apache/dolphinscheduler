@@ -92,8 +92,7 @@ public class TaskExecuteRunnable implements Runnable {
 
     public boolean addEvent(TaskEvent event) {
         if (event.getProcessInstanceId() != this.processInstanceId) {
-            log.warn(
-                    "event would be abounded, task instance id:{}, process instance id:{}, this.processInstanceId:{}",
+            log.warn("event would be abounded, task instance id:{}, process instance id:{}, this.processInstanceId:{}",
                     event.getTaskInstanceId(), event.getProcessInstanceId(), this.processInstanceId);
             return false;
         }

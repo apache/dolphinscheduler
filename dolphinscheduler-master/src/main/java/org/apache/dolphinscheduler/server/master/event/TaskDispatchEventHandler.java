@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskInstanceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.cache.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskEvent;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
+import org.apache.dolphinscheduler.server.master.workflow.IWorkflowExecutionRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class TaskDispatchEventHandler implements TaskEventHandler {
 
     @Autowired
-    private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
+    private IWorkflowExecuteRunnableRepository IWorkflowExecuteRunnableRepository;
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
@@ -46,13 +46,13 @@ public class TaskDispatchEventHandler implements TaskEventHandler {
         int taskInstanceId = taskEvent.getTaskInstanceId();
         int processInstanceId = taskEvent.getProcessInstanceId();
 
-        WorkflowExecuteRunnable workflowExecuteRunnable =
-                this.processInstanceExecCacheManager.getByProcessInstanceId(processInstanceId);
+        IWorkflowExecutionRunnable workflowExecuteRunnable =
+                this.IWorkflowExecuteRunnableRepository.getByProcessInstanceId(processInstanceId);
         if (workflowExecuteRunnable == null) {
             throw new TaskEventHandleError("Cannot find related workflow instance from cache");
         }
-        TaskInstance taskInstance = workflowExecuteRunnable.getTaskInstance(taskInstanceId)
-                .orElseThrow(() -> new TaskEventHandleError("Cannot find related taskInstance from cache"));
+        TaskInstance taskInstance = workflowExecuteRunnable.getTaskExecutionRunnableById(taskInstanceId)
+                .getTaskExecutionRunnableContext().getTaskInstance();
         if (taskInstance.getState() != TaskExecutionStatus.SUBMITTED_SUCCESS) {
             log.warn(
                     "The current taskInstance status is not SUBMITTED_SUCCESS, so the dispatch event will be discarded, the current is a delay event, event: {}",
