@@ -50,6 +50,10 @@ public class SwitchTaskUtils {
             "eval",
             "function",
             "import",
+            ".",
+            "()",
+            "[",
+            "]",
             "\\\\");
 
     static {

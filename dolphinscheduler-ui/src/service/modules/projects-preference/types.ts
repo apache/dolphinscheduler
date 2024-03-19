@@ -15,7 +15,6 @@
  * limitations under the License.
  */
 
-
 interface ProjectPreferenceReq {
   projectPreferences: string
 }

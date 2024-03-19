@@ -229,7 +229,10 @@ export function useModal(
 
   const getWorkerGroups = () => {
     queryWorkerGroupsByProjectCode(variables.projectCode).then((res: any) => {
-      variables.workerGroups = res.data.map((item: any) =>({label: item.workerGroup, value: item.workerGroup }))
+      variables.workerGroups = res.data.map((item: any) => ({
+        label: item.workerGroup,
+        value: item.workerGroup
+      }))
     })
   }
 
