@@ -29,7 +29,7 @@ import { useTable } from './use-table'
 import Card from '@/components/card'
 import Search from '@/components/input-search'
 import ProjectModal from './components/project-modal'
-import WorkerGroupModal from "@/views/projects/list/components/worker-group-modal";
+import WorkerGroupModal from '@/views/projects/list/components/worker-group-modal'
 
 const list = defineComponent({
   name: 'list',
@@ -173,10 +173,10 @@ const list = defineComponent({
           onConfirmModal={this.onConfirmModal}
         />
         <WorkerGroupModal
-            showModalRef={this.showWorkerGroupModalRef}
-            row={this.row}
-            onCancelModal={this.onCancelWorkerGroupModal}
-            onConfirmModal={this.onConfirmWorkerGroupModal}
+          showModalRef={this.showWorkerGroupModalRef}
+          row={this.row}
+          onCancelModal={this.onCancelWorkerGroupModal}
+          onConfirmModal={this.onConfirmWorkerGroupModal}
         />
       </NSpace>
     )

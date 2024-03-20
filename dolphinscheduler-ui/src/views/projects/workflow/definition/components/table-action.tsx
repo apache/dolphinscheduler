@@ -169,7 +169,10 @@ export default defineComponent({
             trigger: () => (
               <NPopconfirm onPositiveClick={this.handleReleaseWorkflow}>
                 {{
-                  default: () => releaseState === 'OFFLINE' ? t('project.workflow.confirm_to_online'):t('project.workflow.confirm_to_offline'),
+                  default: () =>
+                    releaseState === 'OFFLINE'
+                      ? t('project.workflow.confirm_to_online')
+                      : t('project.workflow.confirm_to_offline'),
                   trigger: () => (
                     <NButton
                       size='small'
@@ -220,7 +223,9 @@ export default defineComponent({
               <NPopconfirm onPositiveClick={this.handleReleaseScheduler}>
                 {{
                   default: () =>
-                      scheduleReleaseState === 'OFFLINE' ? t('project.workflow.time_to_online'):t('project.workflow.time_to_offline'),
+                    scheduleReleaseState === 'OFFLINE'
+                      ? t('project.workflow.time_to_online')
+                      : t('project.workflow.time_to_offline'),
                   trigger: () => (
                     <NButton
                       size='small'

@@ -49,7 +49,13 @@ const login = defineComponent({
     window.$message = useMessage()
     const { state, t, locale } = useForm()
     const { handleChange } = useTranslate(locale)
-    const { handleLogin, handleGetOAuth2Provider, oauth2Providers, gotoOAuth2Page, handleRedirect } = useLogin(state)
+    const {
+      handleLogin,
+      handleGetOAuth2Provider,
+      oauth2Providers,
+      gotoOAuth2Page,
+      handleRedirect
+    } = useLogin(state)
     const localesStore = useLocalesStore()
     const themeStore = useThemeStore()
 
@@ -177,15 +183,23 @@ const login = defineComponent({
               </NButton>
             </a>
           </div>
-            {this.oauth2Providers.length > 0 && <NDivider >
-              {this.t('login.loginWithOAuth2')}
-            </NDivider>}
+          {this.oauth2Providers.length > 0 && (
+            <NDivider>{this.t('login.loginWithOAuth2')}</NDivider>
+          )}
 
-            <NSpace class={styles['oauth2-provider']} justify="center">
-              {this.oauth2Providers?.map((e: OAuth2Provider) => {
-                return (e.iconUri ? <div onClick={() => this.gotoOAuth2Page(e)}><NImage preview-disabled width="30" src={e.iconUri}></NImage> </div> : <NButton onClick={() => this.gotoOAuth2Page(e)}>{e.provider}</NButton>)
-              })}
-            </NSpace>
+          <NSpace class={styles['oauth2-provider']} justify='center'>
+            {this.oauth2Providers?.map((e: OAuth2Provider) => {
+              return e.iconUri ? (
+                <div onClick={() => this.gotoOAuth2Page(e)}>
+                  <NImage preview-disabled width='30' src={e.iconUri}></NImage>{' '}
+                </div>
+              ) : (
+                <NButton onClick={() => this.gotoOAuth2Page(e)}>
+                  {e.provider}
+                </NButton>
+              )
+            })}
+          </NSpace>
         </div>
       </div>
     )

@@ -26,10 +26,10 @@ interface LoginRes {
 }
 
 interface OAuth2Provider {
-  clientId: string,
-  redirectUri: string,
-  provider: string,
-  authorizationUri: string,
+  clientId: string
+  redirectUri: string
+  provider: string
+  authorizationUri: string
   iconUri: string
 }
 

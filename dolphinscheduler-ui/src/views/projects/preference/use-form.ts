@@ -120,7 +120,7 @@ export function useForm() {
   ]
 
   const restructurePreferencesItems = (preferencesItems: any) => {
-    for (let item of preferencesItems) {
+    for (const item of preferencesItems) {
       if (item.validate?.required) {
         item.validate.required = false
         item.span = 12

@@ -23,8 +23,8 @@ import { useRoute } from 'vue-router'
 import styles from './menu.module.scss'
 import { uuid } from '@/common/common'
 import { IWorkflowTaskInstance } from './types'
-import {NButton} from 'naive-ui'
-import {useDependencies} from "@/views/projects/components/dependencies/use-dependencies"
+import { NButton } from 'naive-ui'
+import { useDependencies } from '@/views/projects/components/dependencies/use-dependencies'
 
 const props = {
   startDisplay: {
@@ -146,13 +146,19 @@ export default defineComponent({
     }
 
     const handleDelete = async () => {
-      let taskCode = props.cell?.id
-      let res = await getDependentTaskLinksByTask(projectCode, workflowCode, taskCode)
+      const taskCode = props.cell?.id
+      const res = await getDependentTaskLinksByTask(
+        projectCode,
+        workflowCode,
+        taskCode
+      )
       dependenciesData.showRef = false
       if (res.length > 0) {
         dependenciesData.showRef = true
         dependenciesData.taskLinks = res
-        dependenciesData.tip = t('project.task.delete_validate_dependent_tasks_desc')
+        dependenciesData.tip = t(
+          'project.task.delete_validate_dependent_tasks_desc'
+        )
         dependenciesData.required = true
       } else {
         graph.value?.removeCell(props.cell)
@@ -210,8 +216,8 @@ export default defineComponent({
                 {t('project.node.copy')}
               </NButton>
               <NButton
-                  class={`${styles['menu-item']}`}
-                  onClick={this.handleDelete}
+                class={`${styles['menu-item']}`}
+                onClick={this.handleDelete}
               >
                 {t('project.node.delete')}
               </NButton>

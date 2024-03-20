@@ -21,7 +21,7 @@ import { countProcessInstanceState } from '@/service/modules/projects-analysis'
 import { format } from 'date-fns'
 import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
-import type {WorkflowInstanceCountVo} from '@/service/modules/projects-analysis/types'
+import type { WorkflowInstanceCountVo } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 import { reactive, ref } from 'vue'
 

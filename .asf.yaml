@@ -45,6 +45,7 @@ github:
           - Unit Test
           - E2E
           - Docs
+          - Frontend Build
           - "Mergeable: milestone-label-check"
       required_pull_request_reviews:
         dismiss_stale_reviews: true
