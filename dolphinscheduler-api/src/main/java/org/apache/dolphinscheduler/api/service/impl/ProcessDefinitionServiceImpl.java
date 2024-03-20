@@ -58,7 +58,6 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
-import org.apache.dolphinscheduler.api.utils.*;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -1218,12 +1217,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         // for Zip Bomb Attack
         // In most cases, there will be only one data source
-               try (
+        try (
                 ZipInputStream zIn = new ZipInputStream(file.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
             // build process definition
-                   processDefinition = buildProcessDefinition(loginUser, projectCode, processDefinitionName);
-                   processTasksFromZip(zIn, bufferedReader, taskDefinitionList, loginUser, result);
+            processDefinition = buildProcessDefinition(loginUser, projectCode, processDefinitionName);
+            processTasksFromZip(zIn, bufferedReader, taskDefinitionList, loginUser, result);
         } catch (Exception e) {
             log.error("Import process definition error.", e);
             putMsg(result, Status.IMPORT_PROCESS_DEFINE_ERROR);
@@ -2004,7 +2003,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     int insertResult = scheduleMapper.insert(scheduleObj);
                     checkInsertResult(result, processDefinition, insertResult);
                 }
-                copyProcessDefinition(loginUser, result, processDefinition, taskRelationList, taskDefinitionLogs, oldProcessDefinitionCode);
+                copyProcessDefinition(loginUser, result, processDefinition, taskRelationList, taskDefinitionLogs,
+                        oldProcessDefinitionCode);
             } else {
                 log.info("Move process definition...");
                 moveProcessDefinition(loginUser, result, processDefinition, taskRelationList);
@@ -2520,7 +2520,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return processDefinitionName;
     }
 
-    private static ProcessDefinition buildProcessDefinition(User loginUser, long projectCode, String processDefinitionName) {
+    private static ProcessDefinition buildProcessDefinition(User loginUser, long projectCode,
+                                                            String processDefinitionName) {
         ProcessDefinition processDefinition;
         processDefinition = new ProcessDefinition(projectCode,
                 processDefinitionName,
@@ -2546,7 +2547,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return taskName;
     }
 
-    private void processTasksFromZip(ZipInputStream zIn, BufferedReader bufferedReader, List<TaskDefinitionLog> taskDefinitionList,
+    private void processTasksFromZip(ZipInputStream zIn, BufferedReader bufferedReader,
+                                     List<TaskDefinitionLog> taskDefinitionList,
                                      User loginUser, Map<String, Object> result) throws IOException {
         // for Zip Bomb Attack
         int totalEntryArchive = 0;
@@ -2638,7 +2640,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return taskDependencyUtilty;
     }
 
-    private static void setScheduledObject(User loginUser, ProcessDefinition processDefinition, Schedule scheduleObj, Date date) {
+    private static void setScheduledObject(User loginUser, ProcessDefinition processDefinition, Schedule scheduleObj,
+                                           Date date) {
         scheduleObj.setId(null);
         scheduleObj.setUserId(loginUser.getId());
         scheduleObj.setProcessDefinitionCode(processDefinition.getCode());
@@ -2655,7 +2658,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
-    private void setTaskDefinitionLog(long targetProjectCode, Map<String, Object> result, TaskDefinitionLog taskDefinitionLog, Map<Long, Long> taskCodeMap) {
+    private void setTaskDefinitionLog(long targetProjectCode, Map<String, Object> result,
+                                      TaskDefinitionLog taskDefinitionLog, Map<Long, Long> taskCodeMap) {
         try {
             long taskCode = CodeGenerateUtils.getInstance().genCode();
             taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
@@ -2670,7 +2674,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         taskDefinitionLog.setName(taskDefinitionLog.getName());
     }
 
-    private void setProcessDefinitionCode(long targetProjectCode, Map<String, Object> result, ProcessDefinition processDefinition) {
+    private void setProcessDefinitionCode(long targetProjectCode, Map<String, Object> result,
+                                          ProcessDefinition processDefinition) {
         try {
             processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
         } catch (CodeGenerateException e) {
@@ -2680,7 +2685,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
-    private void copyProcessDefinition(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition, List<ProcessTaskRelationLog> taskRelationList, List<TaskDefinitionLog> taskDefinitionLogs, long oldProcessDefinitionCode) {
+    private void copyProcessDefinition(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition,
+                                       List<ProcessTaskRelationLog> taskRelationList,
+                                       List<TaskDefinitionLog> taskDefinitionLogs, long oldProcessDefinitionCode) {
         try {
             result.putAll(createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs));
         } catch (Exception e) {
@@ -2691,7 +2698,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
-    private void moveProcessDefinition(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition, List<ProcessTaskRelationLog> taskRelationList) {
+    private void moveProcessDefinition(User loginUser, Map<String, Object> result, ProcessDefinition processDefinition,
+                                       List<ProcessTaskRelationLog> taskRelationList) {
         try {
             result.putAll(updateDagDefine(loginUser, taskRelationList, processDefinition, null,
                     Lists.newArrayList()));
