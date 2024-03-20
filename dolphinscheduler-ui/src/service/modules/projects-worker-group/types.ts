@@ -23,12 +23,8 @@ interface ProjectWorkerGroup {
   updateTime: string
 }
 
-
 interface UpdateProjectWorkerGroupsReq {
   workerGroups: string
 }
 
-export {
-  ProjectWorkerGroup,
-  UpdateProjectWorkerGroupsReq
-}
+export { ProjectWorkerGroup, UpdateProjectWorkerGroupsReq }
