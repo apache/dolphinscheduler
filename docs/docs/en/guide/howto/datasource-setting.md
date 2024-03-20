@@ -92,9 +92,9 @@ For PostgreSQL:
 # for postgresql
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler?stringtype=unspecified"
 export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
+export SPRING_DATASOURCE_PASSWORD={password}  # password cannot be empty for data quality tasks
 ```
 
 After the above steps done you would create a new database for DolphinScheduler, then run the Shell script to init database:

@@ -91,9 +91,9 @@ export SPRING_DATASOURCE_PASSWORD={password}
 # for postgresql
 export DATABASE=${DATABASE:-postgresql}
 export SPRING_PROFILES_ACTIVE=${DATABASE}
-export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler"
+export SPRING_DATASOURCE_URL="jdbc:postgresql://127.0.0.1:5432/dolphinscheduler?stringtype=unspecified"
 export SPRING_DATASOURCE_USERNAME={user}
-export SPRING_DATASOURCE_PASSWORD={password}
+export SPRING_DATASOURCE_PASSWORD={password}  # 数据质量任务需要有长度的密码
 ```
 
 完成上述步骤后，您已经为 DolphinScheduler 创建一个新数据库，现在你可以通过快速的 Shell 脚本来初始化数据库
