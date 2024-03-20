@@ -191,7 +191,7 @@ export default defineComponent({
       options: Array<any>,
       findingValue: string
     ): boolean => {
-      for (let { value } of options) {
+      for (const { value } of options) {
         if (findingValue === value) {
           return true
         }
@@ -238,6 +238,16 @@ export default defineComponent({
           )
         ) {
           form.environmentCode = projectPreferences.value.environmentCode
+        }
+      }
+      if (projectPreferences.value?.alertGroups && variables?.alertGroups) {
+        if (
+          containValueInOptions(
+            variables.alertGroups,
+            projectPreferences.value.alertGroups
+          )
+        ) {
+          form.warningGroupId = projectPreferences.value.alertGroups
         }
       }
     }
