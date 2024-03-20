@@ -23,6 +23,7 @@ import Card from '@/components/card'
 import TimingModal from '../definition/components/timing-modal'
 import TimingCondition from '@/views/projects/workflow/timing/components/timing-condition'
 import { ITimingSearch } from '@/views/projects/workflow/timing/types'
+import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
 
 export default defineComponent({
   name: 'WorkflowTimingList',
@@ -109,6 +110,13 @@ export default defineComponent({
           v-model:row={this.row}
           v-model:show={this.showRef}
           onUpdateList={this.handleUpdateList}
+        />
+        <DependenciesModal
+          v-model:show={this.dependenciesData.showRef}
+          v-model:taskLinks={this.dependenciesData.taskLinks}
+          required={this.dependenciesData.required}
+          content={this.dependenciesData.tip}
+          onConfirm={this.dependenciesData.action}
         />
       </NSpace>
     )
