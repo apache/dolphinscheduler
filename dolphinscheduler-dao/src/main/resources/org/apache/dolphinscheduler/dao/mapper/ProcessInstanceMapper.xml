@@ -259,6 +259,21 @@
         </if>
         order by id asc
     </select>
+
+    <select id="queryByWorkflowCodeVersionStatus" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
+        select
+        <include refid="baseSql"/>
+        from t_ds_process_instance
+        where process_definition_code=#{workflowDefinitionCode}
+        and process_definition_version = #{workflowDefinitionVersion}
+        <if test="states != null and states.length != 0">
+            and state in
+            <foreach collection="states" item="i" open="(" close=")" separator=",">
+                #{i}
+            </foreach>
+        </if>
+    </select>
+
     <select id="queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId"
             resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select
