@@ -200,31 +200,17 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                               @Param("testFlag") int testFlag);
 
     /**
-     * query last running process instance
-     *
-     * @param definitionCode definitionCode
-     * @param startTime      startTime
-     * @param endTime        endTime
-     * @param testFlag       testFlag
-     * @param stateArray     stateArray
-     * @return process instance
-     */
-    ProcessInstance queryLastRunningProcess(@Param("processDefinitionCode") Long definitionCode,
-                                            @Param("startTime") Date startTime,
-                                            @Param("endTime") Date endTime,
-                                            @Param("testFlag") int testFlag,
-                                            @Param("states") int[] stateArray);
-
-    /**
      * query last manual process instance
      *
      * @param definitionCode definitionCode
+     * @param taskCode taskCode
      * @param startTime      startTime
      * @param endTime        endTime
      * @param testFlag       testFlag
      * @return process instance
      */
     ProcessInstance queryLastManualProcess(@Param("processDefinitionCode") Long definitionCode,
+                                           @Param("taskCode") Long taskCode,
                                            @Param("startTime") Date startTime,
                                            @Param("endTime") Date endTime,
                                            @Param("testFlag") int testFlag);

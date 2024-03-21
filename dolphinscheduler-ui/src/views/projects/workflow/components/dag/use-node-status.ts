@@ -81,7 +81,10 @@ export function useNodeStatus(options: Options) {
         taskList.value.forEach((taskInstance: any) => {
           setNodeStatus(taskInstance.taskCode, taskInstance.state, taskInstance)
           if (taskInstance.dependentResult) {
-            Object.assign(allDependentResult, JSON.parse(taskInstance.dependentResult))
+            Object.assign(
+              allDependentResult,
+              JSON.parse(taskInstance.dependentResult)
+            )
           }
         })
         nodeStore.updateDependentResult(allDependentResult)
