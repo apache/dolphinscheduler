@@ -206,23 +206,6 @@
         </if>
         order by end_time desc limit 1
     </select>
-    <select id="queryLastRunningProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
-        select
-        <include refid="baseSql"/>
-        from t_ds_process_instance
-        where process_definition_code=#{processDefinitionCode} and test_flag=#{testFlag}
-        <if test="states !=null and states.length != 0">
-            and state in
-            <foreach collection="states" item="i" index="index" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
-        <if test="startTime!=null and endTime != null ">
-            and ((schedule_time <![CDATA[ >= ]]> #{startTime} and schedule_time <![CDATA[ <= ]]> #{endTime})
-            or (start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}))
-        </if>
-        order by start_time desc limit 1
-    </select>
     <select id="queryLastManualProcess" resultType="org.apache.dolphinscheduler.dao.entity.ProcessInstance">
         select t1.*
         from
