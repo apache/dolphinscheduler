@@ -42,6 +42,8 @@ public class ProjectParameter {
     @TableField("user_id")
     private Integer userId;
 
+    private Integer operator;
+
     private long code;
 
     @TableField("project_code")

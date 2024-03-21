@@ -156,7 +156,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         projectParameter.setParamName(projectParameterName);
         projectParameter.setParamValue(projectParameterValue);
         projectParameter.setUpdateTime(new Date());
-        projectParameter.setUserId(loginUser.getId());
+        projectParameter.setOperator(loginUser.getId());
 
         if (projectParameterMapper.updateById(projectParameter) > 0) {
             log.info("Project parameter is updated and id is :{}", projectParameter.getId());
