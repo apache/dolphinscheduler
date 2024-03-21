@@ -1064,6 +1064,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         return processInstanceMapper.queryByProcessDefineCodeAndStatus(processDefinitionCode, states);
     }
 
+    @Override
+    public List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                  int workflowDefinitionVersion, int[] states) {
+        return processInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
+                states);
+    }
+
     /**
      * query process instance by processDefinitionCode
      *
