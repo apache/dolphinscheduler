@@ -25,9 +25,6 @@ on:
       - '.github/workflows/frontend.yml'
       - 'dolphinscheduler-ui/**'
   pull_request:
-    paths:
-      - '.github/workflows/frontend.yml'
-      - 'dolphinscheduler-ui/**'
 
 defaults:
   run:
