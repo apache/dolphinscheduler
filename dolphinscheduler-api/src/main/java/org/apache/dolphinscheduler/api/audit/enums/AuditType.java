@@ -74,7 +74,7 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.ProjectOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ResourceOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.ScheduleOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TaskGroupOperatorImpl;
-import org.apache.dolphinscheduler.api.audit.operator.impl.TaskInstanceOperatorImpl;
+import org.apache.dolphinscheduler.api.audit.operator.impl.TaskInstancesOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TaskOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TenantOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TokenOperatorImpl;
@@ -134,7 +134,7 @@ public enum AuditType {
     TASK_START(TASK, START, TaskOperatorImpl.class, new String[]{"code"}, new String[]{}),
 
     // todo need test
-    TASK_INSTANCE_FORCE_SUCCESS(TASK_INSTANCE, FORCE_SUCCESS, TaskInstanceOperatorImpl.class, new String[]{"id"},
+    TASK_INSTANCE_FORCE_SUCCESS(TASK_INSTANCE, FORCE_SUCCESS, TaskInstancesOperatorImpl.class, new String[]{"id"},
             new String[]{}),
 
     SCHEDULE_CREATE(SCHEDULE, CREATE, ScheduleOperatorImpl.class, new String[]{"processDefinitionCode"},

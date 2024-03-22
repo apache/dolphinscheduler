@@ -25,7 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaskInstanceOperatorImpl extends BaseOperator {
+public class TaskInstancesOperatorImpl extends BaseOperator {
 
     @Autowired
     private TaskInstanceMapper taskInstanceMapper;
