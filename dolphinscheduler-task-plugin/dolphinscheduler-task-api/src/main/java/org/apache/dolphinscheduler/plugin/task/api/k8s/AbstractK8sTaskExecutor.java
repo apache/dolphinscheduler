@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 public abstract class AbstractK8sTaskExecutor {
 
@@ -36,7 +37,7 @@ public abstract class AbstractK8sTaskExecutor {
     protected AbstractK8sTaskExecutor(TaskExecutionContext taskRequest) {
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
-        this.yaml = new Yaml();
+        this.yaml = new Yaml(new SafeConstructor());
         this.taskOutputParams = new HashMap<>();
     }
     public Map<String, String> getTaskOutputParams() {
