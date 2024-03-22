@@ -32,7 +32,7 @@ import java.io.IOException;
 import lombok.NonNull;
 
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 import com.google.common.base.Preconditions;
 
@@ -60,7 +60,7 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
     }
 
     protected @NonNull LoopTaskYamlDefinition parseYamlConfigFile(@NonNull String yamlConfigFile) throws IOException {
-        Yaml yaml = new Yaml(new Constructor(LoopTaskYamlDefinition.class));
+        Yaml yaml = new Yaml(new SafeConstructor());
         try (FileReader fileReader = new FileReader(yamlConfigFile)) {
             return yaml.load(fileReader);
         }
