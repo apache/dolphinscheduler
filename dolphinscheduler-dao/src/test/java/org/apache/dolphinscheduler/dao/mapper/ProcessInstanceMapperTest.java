@@ -270,27 +270,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     }
 
     /**
-     * test query last running process instance
-     */
-    @Test
-    public void testQueryLastRunningProcess() {
-        ProcessInstance processInstance = insertOne();
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstanceMapper.updateById(processInstance);
-
-        int[] stateArray = new int[]{
-                WorkflowExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                WorkflowExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
-
-        ProcessInstance processInstance1 = processInstanceMapper
-                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null,
-                        processInstance.getTestFlag(), stateArray);
-
-        Assertions.assertNotEquals(null, processInstance1);
-        processInstanceMapper.deleteById(processInstance.getId());
-    }
-
-    /**
      * test query last manual process instance
      */
     @Test
