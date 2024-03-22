@@ -123,6 +123,7 @@
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
+        <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
     </properties>
 
     <dependencyManagement>
@@ -965,6 +966,12 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>dyvmsapi20170525</artifactId>
                 <version>${aliyun-voice.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javadelight</groupId>
+                <artifactId>delight-nashorn-sandbox</artifactId>
+                <version>${nashorn-sandbox.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
