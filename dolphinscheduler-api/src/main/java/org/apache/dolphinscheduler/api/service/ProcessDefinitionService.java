@@ -43,16 +43,16 @@ public interface ProcessDefinitionService {
     /**
      * create process definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param name process definition name
-     * @param description description
-     * @param globalParams global params
-     * @param locations locations for nodes
-     * @param timeout timeout
-     * @param taskRelationJson relation json for nodes
+     * @param loginUser          login user
+     * @param projectCode        project code
+     * @param name               process definition name
+     * @param description        description
+     * @param globalParams       global params
+     * @param locations          locations for nodes
+     * @param timeout            timeout
+     * @param taskRelationJson   relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param otherParamsJson    otherParamsJson handle other params
      * @return create result code
      */
     Map<String, Object> createProcessDefinition(User loginUser,
@@ -70,7 +70,7 @@ public interface ProcessDefinitionService {
     /**
      * create process definition V2
      *
-     * @param loginUser login user
+     * @param loginUser             login user
      * @param workflowCreateRequest the new workflow object will be created
      * @return New ProcessDefinition object created just now
      */
@@ -79,7 +79,7 @@ public interface ProcessDefinitionService {
     /**
      * query process definition list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return definition list
      */
@@ -89,7 +89,7 @@ public interface ProcessDefinitionService {
     /**
      * query process definition simple list
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @return definition simple list
      */
@@ -99,13 +99,13 @@ public interface ProcessDefinitionService {
     /**
      * query process definition list paging
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param searchVal search value
+     * @param loginUser       login user
+     * @param projectCode     project code
+     * @param searchVal       search value
      * @param otherParamsJson otherParamsJson handle other params
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param userId user id
+     * @param pageNo          page number
+     * @param pageSize        page size
+     * @param userId          user id
      * @return process definition page
      */
     PageInfo<ProcessDefinition> queryProcessDefinitionListPaging(User loginUser,
@@ -119,7 +119,7 @@ public interface ProcessDefinitionService {
     /**
      * Filter resource process definitions
      *
-     * @param loginUser login user
+     * @param loginUser             login user
      * @param workflowFilterRequest workflow filter requests
      * @return List process definition
      */
@@ -129,9 +129,9 @@ public interface ProcessDefinitionService {
     /**
      * query detail of process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param code process definition code
+     * @param code        process definition code
      * @return process definition detail
      */
 
@@ -150,6 +150,7 @@ public interface ProcessDefinitionService {
                                            long code);
 
     Optional<ProcessDefinition> queryWorkflowDefinition(long workflowDefinitionCode, int workflowDefinitionVersion);
+
     ProcessDefinition queryWorkflowDefinitionThrowExceptionIfNotFound(long workflowDefinitionCode,
                                                                       int workflowDefinitionVersion);
 
@@ -169,9 +170,9 @@ public interface ProcessDefinitionService {
     /**
      * batch copy process definition
      *
-     * @param loginUser loginUser
-     * @param projectCode projectCode
-     * @param codes processDefinitionCodes
+     * @param loginUser         loginUser
+     * @param projectCode       projectCode
+     * @param codes             processDefinitionCodes
      * @param targetProjectCode targetProjectCode
      */
     Map<String, Object> batchCopyProcessDefinition(User loginUser,
@@ -182,9 +183,9 @@ public interface ProcessDefinitionService {
     /**
      * batch move process definition
      *
-     * @param loginUser loginUser
-     * @param projectCode projectCode
-     * @param codes processDefinitionCodes
+     * @param loginUser         loginUser
+     * @param projectCode       projectCode
+     * @param codes             processDefinitionCodes
      * @param targetProjectCode targetProjectCode
      */
     Map<String, Object> batchMoveProcessDefinition(User loginUser,
@@ -195,15 +196,15 @@ public interface ProcessDefinitionService {
     /**
      * update process definition, with whole process definition object including task definition, task relation and location.
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param name process definition name
-     * @param code process definition code
-     * @param description description
-     * @param globalParams global params
-     * @param locations locations for nodes
-     * @param timeout timeout
-     * @param taskRelationJson relation json for nodes
+     * @param loginUser          login user
+     * @param projectCode        project code
+     * @param name               process definition name
+     * @param code               process definition code
+     * @param description        description
+     * @param globalParams       global params
+     * @param locations          locations for nodes
+     * @param timeout            timeout
+     * @param taskRelationJson   relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
      * @return update result code
      */
@@ -222,9 +223,9 @@ public interface ProcessDefinitionService {
     /**
      * verify process definition name unique
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param name name
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param name                  name
      * @param processDefinitionCode processDefinitionCode
      * @return true if process definition name not exists, otherwise false
      */
@@ -236,9 +237,9 @@ public interface ProcessDefinitionService {
     /**
      * batch delete process definition by code
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param codes process definition codes
+     * @param codes       process definition codes
      * @return delete result code
      */
     Map<String, Object> batchDeleteProcessDefinitionByCodes(User loginUser,
@@ -250,10 +251,10 @@ public interface ProcessDefinitionService {
     /**
      * batch export process definition by codes
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param codes process definition codes
-     * @param response http servlet response
+     * @param codes       process definition codes
+     * @param response    http servlet response
      */
     void batchExportProcessDefinitionByCodes(User loginUser,
                                              long projectCode,
@@ -263,9 +264,9 @@ public interface ProcessDefinitionService {
     /**
      * import process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param file process metadata json file
+     * @param file        process metadata json file
      * @return import process
      */
     Map<String, Object> importProcessDefinition(User loginUser,
@@ -275,9 +276,9 @@ public interface ProcessDefinitionService {
     /**
      * import sql process definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param file sql file, zip
+     * @param file        sql file, zip
      * @return import process
      */
     Map<String, Object> importSqlProcessDefinition(User loginUser,
@@ -296,9 +297,9 @@ public interface ProcessDefinitionService {
     /**
      * get task node details based on process definition
      *
-     * @param loginUser loginUser
+     * @param loginUser   loginUser
      * @param projectCode project code
-     * @param code processDefinition code
+     * @param code        processDefinition code
      * @return task node list
      */
     Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser,
@@ -308,9 +309,9 @@ public interface ProcessDefinitionService {
     /**
      * get task node details map based on process definition
      *
-     * @param loginUser loginUser
+     * @param loginUser   loginUser
      * @param projectCode project code
-     * @param codes define code list
+     * @param codes       define code list
      * @return task node list
      */
     Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser,
@@ -336,7 +337,7 @@ public interface ProcessDefinitionService {
     /**
      * query process definition list by project code
      *
-     * @param projectCode project code
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
      * @return process definitions in the project
      */
@@ -346,8 +347,8 @@ public interface ProcessDefinitionService {
      * Encapsulates the TreeView structure
      *
      * @param projectCode project code
-     * @param code process definition code
-     * @param limit limit
+     * @param code        process definition code
+     * @param limit       limit
      * @return tree view json data
      */
     Map<String, Object> viewTree(User loginUser, long projectCode, long code, Integer limit);
@@ -355,10 +356,10 @@ public interface ProcessDefinitionService {
     /**
      * switch the defined process definition version
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param code process definition code
-     * @param version the version user want to switch
+     * @param code        process definition code
+     * @param version     the version user want to switch
      * @return switch process definition version result code
      */
     Map<String, Object> switchProcessDefinitionVersion(User loginUser,
@@ -369,11 +370,11 @@ public interface ProcessDefinitionService {
     /**
      * query the pagination versions info by one certain process definition code
      *
-     * @param loginUser login user info to check auth
+     * @param loginUser   login user info to check auth
      * @param projectCode project code
-     * @param pageNo page number
-     * @param pageSize page size
-     * @param code process definition code
+     * @param pageNo      page number
+     * @param pageSize    page size
+     * @param code        process definition code
      * @return the pagination process definition versions info of the certain process definition
      */
     Result queryProcessDefinitionVersions(User loginUser,
@@ -385,22 +386,21 @@ public interface ProcessDefinitionService {
     /**
      * delete one certain process definition by version number and process definition code
      *
-     * @param loginUser login user info to check auth
-     * @param projectCode project code
-     * @param code process definition code
-     * @param version version number
-     * @return delele result code
+     * @param loginUser                 login user info to check auth
+     * @param projectCode               project code
+     * @param workflowDefinitionCode    process definition code
+     * @param workflowDefinitionVersion version number
      */
-    Map<String, Object> deleteProcessDefinitionVersion(User loginUser,
-                                                       long projectCode,
-                                                       long code,
-                                                       int version);
+    void deleteProcessDefinitionVersion(User loginUser,
+                                        long projectCode,
+                                        long workflowDefinitionCode,
+                                        int workflowDefinitionVersion);
 
     /**
      * update process definition basic info, not including task definition, task relation and location.
      *
-     * @param loginUser login user
-     * @param workflowCode workflow resource code you want to update
+     * @param loginUser             login user
+     * @param workflowCode          workflow resource code you want to update
      * @param workflowUpdateRequest workflow update requests
      * @return ProcessDefinition instance
      */
@@ -420,9 +420,10 @@ public interface ProcessDefinitionService {
 
     /**
      * view process variables
-     * @param loginUser    login user
+     *
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param code process definition code
+     * @param code        process definition code
      * @return variables data
      */
     Map<String, Object> viewVariables(User loginUser, long projectCode, long code);

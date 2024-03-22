@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.dao.repository;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
 
-import org.apache.ibatis.annotations.Param;
+import java.util.List;
 
 public interface ProcessInstanceDao extends IDao<ProcessInstance> {
 
@@ -64,7 +64,7 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
      * @param definitionCode definitionCode
      * @return process instance
      */
-    ProcessInstance queryFirstScheduleProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+    ProcessInstance queryFirstScheduleProcessInstance(Long definitionCode);
 
     /**
      * query first manual process instance
@@ -72,7 +72,11 @@ public interface ProcessInstanceDao extends IDao<ProcessInstance> {
      * @param definitionCode definitionCode
      * @return process instance
      */
-    ProcessInstance queryFirstStartProcessInstance(@Param("processDefinitionCode") Long definitionCode);
+    ProcessInstance queryFirstStartProcessInstance(Long definitionCode);
 
     ProcessInstance querySubProcessInstanceByParentId(Integer processInstanceId, Integer taskInstanceId);
+
+    List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                           int workflowDefinitionVersion,
+                                                           int[] states);
 }
