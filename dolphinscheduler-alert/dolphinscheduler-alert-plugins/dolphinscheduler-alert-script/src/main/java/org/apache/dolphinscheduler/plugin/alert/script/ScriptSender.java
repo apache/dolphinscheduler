@@ -69,6 +69,11 @@ public final class ScriptSender {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
+        if (!scriptPath.endsWith(".sh")) {
+            alertResult.setMessage("shell script is invalid, only support .sh file");
+            return alertResult;
+        }
+
         // validate script path in case of injections
         File shellScriptFile = new File(scriptPath);
         // validate existence

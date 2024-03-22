@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.script.ScriptException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -53,16 +55,19 @@ public class SwitchTaskUtilsTest {
         });
 
         String cmd = "bash /tmp/shell";
-        String cmdContent = "java.lang.Runtime.getRuntime().exec(\"${cmd}\")";
+        String cmdContent = "java.lang.Runtime.getRuntime().exec(${cmd})";
         globalParams.put("cmd", new Property("cmd", Direct.IN, DataType.VARCHAR, cmd));
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(cmdContent, globalParams, varParams);
+
+        Assertions.assertThrowsExactly(RuntimeException.class, () -> {
+            String script = SwitchTaskUtils.generateContentWithTaskParams(cmdContent, globalParams, varParams);
+            SwitchTaskUtils.evaluate(script);
         });
 
         String contentWithUnicode =
-                "\\\\u006a\\\\u0061\\\\u0076\\\\u0061\\\\u002e\\\\u006c\\\\u0061\\\\u006e\\\\u0067\\\\u002e\\\\u0052\\\\u0075\\\\u006e\\\\u0074\\\\u0069\\\\u006d\\\\u0065.getRuntime().exec(\\\"open -a Calculator.app\\";
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(contentWithUnicode, globalParams, varParams);
+                "\\\\u006a\\\\u0061\\\\u0076\\\\u0061\\\\u002e\\\\u006c\\\\u0061\\\\u006e\\\\u0067\\\\u002e\\\\u0052\\\\u0075\\\\u006e\\\\u0074\\\\u0069\\\\u006d\\\\u0065.getRuntime().exec(${cmd})";
+        Assertions.assertThrowsExactly(ScriptException.class, () -> {
+            String script = SwitchTaskUtils.generateContentWithTaskParams(contentWithUnicode, globalParams, varParams);
+            SwitchTaskUtils.evaluate(script);
         });
 
         String contentWithSpecify1 = "cmd.abc";
