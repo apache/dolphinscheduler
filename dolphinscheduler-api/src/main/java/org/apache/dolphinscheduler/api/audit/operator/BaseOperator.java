@@ -109,7 +109,13 @@ public abstract class BaseOperator implements Operator {
             return;
         }
 
-        auditLogList.get(0).setObjectId(Long.parseLong(value.toString()));
+        try {
+            long objectId = Long.parseLong(value.toString());
+            auditLogList.get(0).setObjectId(objectId);
+        } catch (NumberFormatException e) {
+            log.error("value is not long, value: {}", value);
+        }
+
         auditLogList.get(0).setObjectName(objName);
     }
 
@@ -196,10 +202,10 @@ public abstract class BaseOperator implements Operator {
     }
 
     protected Long checkNum(String str) {
-        if (str.matches("\\d+")) {
+        try {
             return Long.parseLong(str);
+        } catch (NumberFormatException e) {
+            return -1L;
         }
-
-        return -1L;
     }
 }

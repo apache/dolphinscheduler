@@ -32,7 +32,12 @@ public class TenantOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Tenant obj = tenantMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        Tenant obj = tenantMapper.selectById(objId);
         return obj == null ? "" : obj.getTenantCode();
     }
 }

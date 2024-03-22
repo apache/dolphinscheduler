@@ -54,7 +54,12 @@ public class TokenOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        AccessToken obj = accessTokenMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        AccessToken obj = accessTokenMapper.selectById(objId);
         return obj == null ? "" : obj.getUserName();
     }
 }

@@ -341,9 +341,9 @@ public class ProcessDefinitionController extends BaseController {
     @ApiException(DELETE_PROCESS_DEFINITION_VERSION_ERROR)
     @OperatorLog(auditType = AuditType.PROCESS_DELETE_VERSION)
     public Result<Void> deleteProcessDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                 @PathVariable(value = "code") long code,
-                                                 @PathVariable(value = "version") int version) {
+                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                       @PathVariable(value = "code") long code,
+                                                       @PathVariable(value = "version") int version) {
         processDefinitionService.deleteProcessDefinitionVersion(loginUser, projectCode, code, version);
         return Result.success();
     }

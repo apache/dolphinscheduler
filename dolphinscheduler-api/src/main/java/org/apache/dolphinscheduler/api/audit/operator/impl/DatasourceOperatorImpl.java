@@ -32,7 +32,12 @@ public class DatasourceOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        DataSource obj = dataSourceMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        DataSource obj = dataSourceMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

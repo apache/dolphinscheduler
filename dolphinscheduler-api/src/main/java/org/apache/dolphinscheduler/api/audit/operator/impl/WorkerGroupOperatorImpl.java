@@ -48,7 +48,12 @@ public class WorkerGroupOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        WorkerGroup obj = workerGroupMapper.selectById(Long.parseLong(identity.toString()));
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        WorkerGroup obj = workerGroupMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }
