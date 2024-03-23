@@ -15,57 +15,59 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.workflow.engine.event;
+package org.apache.dolphinscheduler.workflow.engine.engine;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionContext;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnableRepository;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import java.util.Collection;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.slf4j.MDC;
 
 @Slf4j
-public class EventEngine extends BaseDaemonThread {
+public class EventEngine extends BaseDaemonThread implements IEventEngine {
 
-    private final IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository;
+    private final IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository;
 
-    private final EventFirer eventFirer;
+    private final IEventFirer eventFirer;
 
-    private final Set<Integer> firingWorkflowInstanceIds;
+    private volatile boolean stop = false;
 
-    public EventEngine(IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository,
-                       EventFirer eventFirer) {
+    public EventEngine(IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository,
+                       IEventFirer eventFirer) {
         super("EventEngine");
         this.workflowExecuteRunnableRepository = workflowExecuteRunnableRepository;
         this.eventFirer = eventFirer;
-        this.firingWorkflowInstanceIds = ConcurrentHashMap.newKeySet();
     }
 
     @Override
     public synchronized void start() {
+        this.stop = false;
         super.start();
         log.info(getClass().getName() + " started");
     }
 
     @Override
     public void run() {
-        for (;;) {
+        while (!stop) {
             try {
-                StopWatch stopWatch = StopWatch.createStarted();
-                fireAllActiveEvents();
-                stopWatch.stop();
-                log.info("Fire all active events cost: {} ms", stopWatch.getTime());
-                this.wait(5_000);
+                Collection<IWorkflowExecutionRunnable> workflowExecutionRunnableCollection =
+                        workflowExecuteRunnableRepository.getActiveWorkflowExecutionRunnable();
+                if (CollectionUtils.isEmpty(workflowExecutionRunnableCollection)) {
+                    log.debug("There is no active WorkflowExecutionRunnable");
+                    this.wait(3_000);
+                    continue;
+                }
+                fireAllActiveEvents(workflowExecutionRunnableCollection);
             } catch (Throwable throwable) {
                 log.error("Fire active event error", throwable);
                 ThreadUtils.sleep(3_000);
@@ -73,25 +75,25 @@ public class EventEngine extends BaseDaemonThread {
         }
     }
 
-    public void fireAllActiveEvents() {
-        Collection<IWorkflowExecutionRunnable> workflowExecutionRunnableCollection =
-                workflowExecuteRunnableRepository.getActiveWorkflowExecutionRunnable();
-        for (IWorkflowExecutionRunnable workflowExecutionRunnable : workflowExecutionRunnableCollection) {
+    public void fireAllActiveEvents(Collection<IWorkflowExecutionRunnable> workflowExecutionRunnableList) {
+        StopWatch stopWatch = StopWatch.createStarted();
+
+        log.info("Fire all active events cost: {} ms", stopWatch.getTime());
+        stopWatch.stop();
+        for (IWorkflowExecutionRunnable workflowExecutionRunnable : workflowExecutionRunnableList) {
             IWorkflowExecutionContext workflowExecutionContext =
                     workflowExecutionRunnable.getWorkflowExecutionContext();
             final Integer workflowInstanceId = workflowExecutionContext.getWorkflowInstanceId();
             final String workflowInstanceName = workflowExecutionContext.getWorkflowInstanceName();
             try {
                 MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
-                if (firingWorkflowInstanceIds.contains(workflowInstanceId)) {
+                if (workflowExecutionRunnable.isEventFiring()) {
                     log.debug("WorkflowExecutionRunnable: {} is already in firing", workflowInstanceName);
-                    return;
+                    continue;
                 }
-                IEventRepository workflowEventRepository = workflowExecutionRunnable.getEventRepository();
-                firingWorkflowInstanceIds.add(workflowInstanceId);
-                eventFirer.fireActiveEvents(workflowEventRepository)
+                eventFirer.fireActiveEvents(workflowExecutionRunnable)
                         .whenComplete((fireCount, ex) -> {
-                            firingWorkflowInstanceIds.remove(workflowInstanceId);
+                            workflowExecutionRunnable.setEventFiring(false);
                             if (ex != null) {
                                 log.error("Fire event for WorkflowExecutionRunnable: {} error", workflowInstanceName,
                                         ex);
@@ -106,6 +108,16 @@ public class EventEngine extends BaseDaemonThread {
                 MDC.remove(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY);
             }
         }
+    }
+
+    @Override
+    public synchronized void shutdown() {
+        if (stop) {
+            log.warn("EventEngine has already stopped");
+            return;
+        }
+        this.stop = true;
+        eventFirer.shutdown();
     }
 
 }

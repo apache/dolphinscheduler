@@ -48,4 +48,8 @@ public class WorkflowOperationEvent implements IWorkflowEvent, ISyncEvent {
         return of(workflowInstanceId, WorkflowOperationType.KILL);
     }
 
+    @Override
+    public Class getEventOperatorClass() {
+        return WorkflowOperationEventOperator.class;
+    }
 }

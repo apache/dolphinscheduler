@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.workflow.engine.event;
 
-import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecuteRunnableRepository;
+import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnableRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,9 +26,9 @@ public class WorkflowFinalizeEventOperator
         implements
             IWorkflowEventOperator<WorkflowFinalizeEvent> {
 
-    private final IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository;
+    private final IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository;
 
-    public WorkflowFinalizeEventOperator(IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository) {
+    public WorkflowFinalizeEventOperator(IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository) {
         this.workflowExecuteRunnableRepository = workflowExecuteRunnableRepository;
     }
 

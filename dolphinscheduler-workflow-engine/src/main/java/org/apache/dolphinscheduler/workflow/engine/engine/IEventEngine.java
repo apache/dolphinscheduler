@@ -15,19 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dag;
+package org.apache.dolphinscheduler.workflow.engine.engine;
 
-import java.util.Collection;
+public interface IEventEngine {
 
-public interface ITaskExecutionRunnableRepository {
+    /**
+     * Start the event engine.
+     */
+    void start();
 
-    void storeTaskExecutionRunnable(TaskExecutionRunnable taskExecutionRunnable);
+    /**
+     * Shutdown the event engine. The event engine cannot be restarted after shutdown. This method will block until the event engine is completely shutdown.
+     */
+    void shutdown();
 
-    TaskExecutionRunnable getTaskExecutionRunnableById(Integer taskInstanceId);
-
-    TaskExecutionRunnable getTaskExecutionRunnableByName(String taskInstanceName);
-
-    Collection<TaskExecutionRunnable> getActiveTaskExecutionRunnable();
-
-    void removeTaskExecutionRunnable(Integer taskInstanceId);
 }

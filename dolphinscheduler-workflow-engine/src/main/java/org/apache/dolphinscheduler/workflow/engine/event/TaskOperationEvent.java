@@ -34,4 +34,8 @@ public class TaskOperationEvent implements ITaskEvent, ISyncEvent {
 
     private TaskOperationType taskOperationType;
 
+    @Override
+    public Class getEventOperatorClass() {
+        return TaskOperationEventOperator.class;
+    }
 }

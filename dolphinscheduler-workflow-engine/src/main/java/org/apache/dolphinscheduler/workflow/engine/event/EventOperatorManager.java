@@ -17,20 +17,41 @@
 
 package org.apache.dolphinscheduler.workflow.engine.event;
 
-import lombok.extern.slf4j.Slf4j;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The event operator manager interface used to get {@link ITaskEventOperator}.
  */
 @Slf4j
-@Component
 public class EventOperatorManager implements IEventOperatorManager<IEvent> {
+
+    private static final Map<String, IEventOperator<IEvent>> EVENT_OPERATOR_MAP = new HashMap<>();
+
+    private static final EventOperatorManager INSTANCE = new EventOperatorManager();
+
+    private EventOperatorManager() {
+    }
+
+    public static EventOperatorManager getInstance() {
+        return INSTANCE;
+    }
+
+    public void registerEventOperator(IEventOperator<IEvent> eventOperator) {
+        EVENT_OPERATOR_MAP.put(eventOperator.getClass().getSimpleName(), eventOperator);
+    }
 
     @Override
     public IEventOperator<IEvent> getEventOperator(IEvent event) {
-        return null;
+        if (event == null) {
+            throw new IllegalArgumentException("event cannot be null");
+        }
+        if (event.getEventOperatorClass() == null) {
+            throw new IllegalArgumentException("event operator class cannot be null");
+        }
+        return EVENT_OPERATOR_MAP.get(event.getEventOperatorClass().getSimpleName());
     }
 
 }

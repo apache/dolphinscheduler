@@ -15,10 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dag;
+package org.apache.dolphinscheduler.workflow.engine.engine;
 
-public interface IDAGEngineFactory {
+import org.apache.dolphinscheduler.workflow.engine.workflow.IEventfulExecutionRunnable;
 
-    IDAGEngine createDAGEngine(IWorkflowExecutionContext workflowExecutionContext);
+import java.util.concurrent.CompletableFuture;
+
+/**
+ * The event firer interface used to fire event for {@link IEventfulExecutionRunnable}.
+ *
+ */
+public interface IEventFirer {
+
+    /**
+     * Fire all active events in the event repository
+     *
+     * @return the count of fired success events
+     */
+    CompletableFuture<Integer> fireActiveEvents(IEventfulExecutionRunnable eventfulExecutionRunnable);
+
+    /**
+     * Shutdown the event firer, this method will block until all firing task has been completed.
+     */
+    void shutdown();
 
 }

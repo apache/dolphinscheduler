@@ -19,4 +19,6 @@ package org.apache.dolphinscheduler.workflow.engine.event;
 
 public interface IEvent {
 
+    Class getEventOperatorClass();
+
 }

@@ -9,7 +9,7 @@ import org.apache.dolphinscheduler.workflow.engine.event.WorkflowOperationEvent;
 import org.apache.dolphinscheduler.workflow.engine.exception.WorkflowExecuteRunnableNotFoundException;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.workflow.engine.workflow.MockWorkflowExecutionRunnableFactory;
-import org.apache.dolphinscheduler.workflow.engine.workflow.SingletonWorkflowExecuteRunnableRepository;
+import org.apache.dolphinscheduler.workflow.engine.workflow.SingletonWorkflowExecutionRunnableRepository;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,16 +17,21 @@ import org.junit.jupiter.api.Test;
 
 class WorkflowEngineTest {
 
-    private WorkflowEngine workflowEngine;
+    private IWorkflowEngine workflowEngine;
 
     @BeforeEach
     public void before() {
-        workflowEngine = new WorkflowEngine(SingletonWorkflowExecuteRunnableRepository.getInstance());
+        workflowEngine =
+                new WorkflowEngine(
+                        SingletonWorkflowExecutionRunnableRepository.getInstance(),
+                        EventEngineFactory.newEventEngineFactory().createEventEngine());
+        workflowEngine.start();
     }
 
     @AfterEach
     public void after() {
-        SingletonWorkflowExecuteRunnableRepository.getInstance().clear();
+        SingletonWorkflowExecutionRunnableRepository.getInstance().clear();
+        workflowEngine.shutdown();
     }
 
     @Test
@@ -53,7 +58,7 @@ class WorkflowEngineTest {
                 MockWorkflowExecutionRunnableFactory.createWorkflowExecutionRunnable();
         Integer workflowInstanceId =
                 mockWorkflowExecuteRunnable.getWorkflowExecutionContext().getWorkflowInstanceId();
-        SingletonWorkflowExecuteRunnableRepository.getInstance()
+        SingletonWorkflowExecutionRunnableRepository.getInstance()
                 .storeWorkflowExecutionRunnable(mockWorkflowExecuteRunnable);
 
         workflowEngine.pauseWorkflow(workflowInstanceId);
@@ -75,7 +80,7 @@ class WorkflowEngineTest {
                 MockWorkflowExecutionRunnableFactory.createWorkflowExecutionRunnable();
         Integer workflowInstanceId =
                 mockWorkflowExecuteRunnable.getWorkflowExecutionContext().getWorkflowInstanceId();
-        SingletonWorkflowExecuteRunnableRepository.getInstance()
+        SingletonWorkflowExecutionRunnableRepository.getInstance()
                 .storeWorkflowExecutionRunnable(mockWorkflowExecuteRunnable);
 
         workflowEngine.killWorkflow(workflowInstanceId);
@@ -94,7 +99,7 @@ class WorkflowEngineTest {
                 MockWorkflowExecutionRunnableFactory.createWorkflowExecutionRunnable();
         Integer workflowInstanceId =
                 emptyWorkflowExecuteRunnable.getWorkflowExecutionContext().getWorkflowInstanceId();
-        SingletonWorkflowExecuteRunnableRepository.getInstance()
+        SingletonWorkflowExecutionRunnableRepository.getInstance()
                 .storeWorkflowExecutionRunnable(emptyWorkflowExecuteRunnable);
         SingletonWorkflowExecuteRunnableRepositoryAssertions.existWorkflowExecutionRunnable(workflowInstanceId);
 

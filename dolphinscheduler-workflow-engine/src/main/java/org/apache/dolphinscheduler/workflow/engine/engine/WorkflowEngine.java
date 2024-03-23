@@ -19,19 +19,28 @@ package org.apache.dolphinscheduler.workflow.engine.engine;
 
 import org.apache.dolphinscheduler.workflow.engine.event.WorkflowOperationEvent;
 import org.apache.dolphinscheduler.workflow.engine.exception.WorkflowExecuteRunnableNotFoundException;
-import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionContext;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnableRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WorkflowEngine implements IWorkflowEngine {
 
-    private final IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository;
+    private final IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository;
 
-    public WorkflowEngine(IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository) {
+    private final IEventEngine eventEngine;
+
+    public WorkflowEngine(IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository,
+                          IEventEngine eventEngine) {
         this.workflowExecuteRunnableRepository = workflowExecuteRunnableRepository;
+        this.eventEngine = eventEngine;
+    }
+
+    @Override
+    public void start() {
+        eventEngine.start();
     }
 
     @Override
@@ -74,9 +83,15 @@ public class WorkflowEngine implements IWorkflowEngine {
         if (workflowExecutionRunnable == null) {
             return;
         }
+        // todo: If the workflowExecutionRunnable is not finished, we cannot finalize it.
         log.info("Finalizing WorkflowExecutionRunnable: {}",
                 workflowExecutionRunnable.getWorkflowExecutionContext().getWorkflowInstanceName());
         workflowExecuteRunnableRepository.removeWorkflowExecutionRunnable(workflowInstanceId);
+    }
+
+    @Override
+    public void shutdown() {
+        eventEngine.shutdown();
     }
 
 }

@@ -29,4 +29,9 @@ import lombok.NoArgsConstructor;
 public class WorkflowFinalizeEvent implements IWorkflowEvent, ISyncEvent {
 
     private Integer workflowInstanceId;
+
+    @Override
+    public Class getEventOperatorClass() {
+        return WorkflowOperationEventOperator.class;
+    }
 }

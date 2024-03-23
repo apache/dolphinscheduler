@@ -20,17 +20,17 @@ package org.apache.dolphinscheduler.workflow.engine.assertions;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.apache.dolphinscheduler.workflow.engine.workflow.SingletonWorkflowExecuteRunnableRepository;
+import org.apache.dolphinscheduler.workflow.engine.workflow.SingletonWorkflowExecutionRunnableRepository;
 
 public class SingletonWorkflowExecuteRunnableRepositoryAssertions {
 
     public static void existWorkflowExecutionRunnable(Integer workflowInstanceId) {
-        assertNotNull(SingletonWorkflowExecuteRunnableRepository.getInstance()
+        assertNotNull(SingletonWorkflowExecutionRunnableRepository.getInstance()
                 .getWorkflowExecutionRunnableById(workflowInstanceId));
     }
 
     public static void notExistWorkflowExecutionRunnable(Integer workflowInstanceId) {
-        assertNull(SingletonWorkflowExecuteRunnableRepository.getInstance()
+        assertNull(SingletonWorkflowExecutionRunnableRepository.getInstance()
                 .getWorkflowExecutionRunnableById(workflowInstanceId));
     }
 

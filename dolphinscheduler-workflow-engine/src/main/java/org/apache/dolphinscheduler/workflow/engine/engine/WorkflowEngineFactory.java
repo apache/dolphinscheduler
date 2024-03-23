@@ -17,12 +17,38 @@
 
 package org.apache.dolphinscheduler.workflow.engine.engine;
 
-import org.apache.dolphinscheduler.workflow.engine.workflow.SingletonWorkflowExecuteRunnableRepository;
+import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnableRepository;
+import org.apache.dolphinscheduler.workflow.engine.workflow.SingletonWorkflowExecutionRunnableRepository;
 
 public class WorkflowEngineFactory implements IWorkflowEngineFactory {
 
+    private static final IWorkflowExecutionRunnableRepository DEFAULT_WORKFLOW_EXECUTION_RUNNABLE_FACTORY =
+            SingletonWorkflowExecutionRunnableRepository.getInstance();
+
+    private IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository =
+            DEFAULT_WORKFLOW_EXECUTION_RUNNABLE_FACTORY;
+
+    private IEventEngine eventEngine;
+
+    private WorkflowEngineFactory() {
+    }
+
+    public static WorkflowEngineFactory newWorkflowEngineFactory() {
+        return new WorkflowEngineFactory();
+    }
+
+    public WorkflowEngineFactory withWorkflowExecuteRunnableRepository(IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository) {
+        this.workflowExecuteRunnableRepository = workflowExecuteRunnableRepository;
+        return this;
+    }
+
+    public WorkflowEngineFactory withEventEngine(IEventEngine eventEngine) {
+        this.eventEngine = eventEngine;
+        return this;
+    }
+
     @Override
     public IWorkflowEngine createWorkflowEngine() {
-        return new WorkflowEngine(SingletonWorkflowExecuteRunnableRepository.getInstance());
+        return new WorkflowEngine(workflowExecuteRunnableRepository, eventEngine);
     }
 }

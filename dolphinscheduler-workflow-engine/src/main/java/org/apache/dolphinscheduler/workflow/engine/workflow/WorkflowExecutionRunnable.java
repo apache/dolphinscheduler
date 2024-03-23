@@ -33,6 +33,8 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
 
     private final IDAGEngine dagEngine;
 
+    private volatile boolean eventFiring = false;
+
     public WorkflowExecutionRunnable(IWorkflowExecutionContext workflowExecutionContext, IDAGEngine dagEngine) {
         this.workflowExecutionContext = workflowExecutionContext;
         this.dagEngine = dagEngine;
@@ -60,5 +62,15 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Override
     public IEventRepository getEventRepository() {
         return workflowExecutionContext.getEventRepository();
+    }
+
+    @Override
+    public boolean isEventFiring() {
+        return eventFiring;
+    }
+
+    @Override
+    public void setEventFiring(boolean eventFiring) {
+        this.eventFiring = eventFiring;
     }
 }

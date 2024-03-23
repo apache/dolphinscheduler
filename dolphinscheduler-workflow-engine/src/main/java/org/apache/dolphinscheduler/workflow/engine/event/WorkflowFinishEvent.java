@@ -34,4 +34,8 @@ public class WorkflowFinishEvent implements IWorkflowEvent, ISyncEvent {
 
     private WorkflowExecutionStatus workflowExecutionStatus;
 
+    @Override
+    public Class getEventOperatorClass() {
+        return null;
+    }
 }

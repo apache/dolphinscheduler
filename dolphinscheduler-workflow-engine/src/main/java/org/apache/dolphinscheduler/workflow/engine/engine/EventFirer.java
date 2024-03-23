@@ -15,10 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.workflow.engine.event;
+package org.apache.dolphinscheduler.workflow.engine.engine;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.workflow.engine.event.IAsyncEvent;
+import org.apache.dolphinscheduler.workflow.engine.event.IEvent;
+import org.apache.dolphinscheduler.workflow.engine.event.IEventOperatorManager;
+import org.apache.dolphinscheduler.workflow.engine.event.IEventRepository;
 import org.apache.dolphinscheduler.workflow.engine.utils.ExceptionUtils;
+import org.apache.dolphinscheduler.workflow.engine.workflow.IEventfulExecutionRunnable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -39,7 +44,9 @@ public class EventFirer implements IEventFirer {
     }
 
     @Override
-    public CompletableFuture<Integer> fireActiveEvents(IEventRepository eventRepository) {
+    public CompletableFuture<Integer> fireActiveEvents(IEventfulExecutionRunnable eventfulExecutionRunnable) {
+        // todo: add MDC key
+        IEventRepository eventRepository = eventfulExecutionRunnable.getEventRepository();
         if (eventRepository.getEventSize() == 0) {
             return CompletableFuture.completedFuture(0);
         }
@@ -69,6 +76,11 @@ public class EventFirer implements IEventFirer {
             }
             return fireCount;
         }, eventFireThreadPool);
+    }
+
+    @Override
+    public void shutdown() {
+        eventFireThreadPool.shutdown();
     }
 
     private void fireAsyncEvent(IEvent event) {

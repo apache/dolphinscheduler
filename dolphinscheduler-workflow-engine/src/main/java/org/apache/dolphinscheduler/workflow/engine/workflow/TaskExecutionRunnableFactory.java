@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.workflow.engine.workflow;
 
 public class TaskExecutionRunnableFactory implements ITaskExecutionRunnableFactory {
 
-    private ITaskExecutionContextFactory taskExecutionContextFactory;
+    private final ITaskExecutionContextFactory taskExecutionContextFactory;
 
     public TaskExecutionRunnableFactory(ITaskExecutionContextFactory taskExecutionContextFactory) {
         this.taskExecutionContextFactory = taskExecutionContextFactory;
@@ -31,5 +31,17 @@ public class TaskExecutionRunnableFactory implements ITaskExecutionRunnableFacto
         ITaskExecutionContext taskExecutionContext =
                 taskExecutionContextFactory.createTaskExecutionContext(taskName, workflowExecutionContext);
         return new TaskExecutionRunnable(taskExecutionContext);
+    }
+
+    @Override
+    public ITaskExecutionRunnable createFailoverTaskExecutionRunnable(ITaskExecutionRunnable taskExecutionRunnable,
+                                                                      IWorkflowExecutionContext workflowExecutionContext) {
+        return null;
+    }
+
+    @Override
+    public ITaskExecutionRunnable createRetryTaskExecutionRunnable(ITaskExecutionRunnable taskExecutionRunnable,
+                                                                   IWorkflowExecutionContext workflowExecutionContext) {
+        return null;
     }
 }

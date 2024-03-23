@@ -21,17 +21,18 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SingletonWorkflowExecuteRunnableRepository implements IWorkflowExecuteRunnableRepository {
+public class SingletonWorkflowExecutionRunnableRepository implements IWorkflowExecutionRunnableRepository {
 
-    private static final IWorkflowExecuteRunnableRepository INSTANCE = new SingletonWorkflowExecuteRunnableRepository();
+    private static final IWorkflowExecutionRunnableRepository INSTANCE =
+            new SingletonWorkflowExecutionRunnableRepository();
 
     private final Map<Integer, IWorkflowExecutionRunnable> workflowExecutionRunnableMap;
 
-    private SingletonWorkflowExecuteRunnableRepository() {
+    private SingletonWorkflowExecutionRunnableRepository() {
         this.workflowExecutionRunnableMap = new ConcurrentHashMap<>();
     }
 
-    public static IWorkflowExecuteRunnableRepository getInstance() {
+    public static IWorkflowExecutionRunnableRepository getInstance() {
         return INSTANCE;
     }
 

@@ -22,6 +22,8 @@ package org.apache.dolphinscheduler.workflow.engine.event;
  */
 public interface IEventOperatorManager<E> {
 
+    void registerEventOperator(IEventOperator<E> eventOperator);
+
     /**
      * Get the {@link IEventOperator} for the given event.
      *

@@ -24,6 +24,10 @@ public interface IEventfulExecutionRunnable {
 
     IEventRepository getEventRepository();
 
+    boolean isEventFiring();
+
+    void setEventFiring(boolean eventFiring);
+
     default void storeEventToTail(IEvent event) {
         getEventRepository().storeEventToTail(event);
     }

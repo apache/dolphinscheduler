@@ -15,8 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.events;
+package org.apache.dolphinscheduler.workflow.engine.workflow;
 
-public interface IEvent {
+import java.util.Collection;
 
+public interface IWorkflowExecutionRunnableRepository {
+
+    void storeWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable);
+
+    IWorkflowExecutionRunnable getWorkflowExecutionRunnableById(Integer workflowInstanceId);
+
+    Collection<IWorkflowExecutionRunnable> getActiveWorkflowExecutionRunnable();
+
+    void removeWorkflowExecutionRunnable(Integer workflowInstanceId);
+
+    void clear();
 }

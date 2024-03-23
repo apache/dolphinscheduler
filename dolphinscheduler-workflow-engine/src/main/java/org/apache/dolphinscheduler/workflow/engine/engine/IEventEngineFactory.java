@@ -15,21 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.dag;
+package org.apache.dolphinscheduler.workflow.engine.engine;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+public interface IEventEngineFactory {
 
-/**
- * The Factory used to create {@link IWorkflowDAG}
- */
-public interface IWorkflowDAGFactory {
-
-    /**
-     * Create the WorkflowDAG
-     *
-     * @param workflowInstance workflowInstance.
-     * @return workflow DAG.
-     */
-    IWorkflowDAG createWorkflowDAG(ProcessInstance workflowInstance);
+    IEventEngine createEventEngine();
 
 }

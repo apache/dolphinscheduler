@@ -26,6 +26,11 @@ import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRu
 public interface IWorkflowEngine {
 
     /**
+     * Start the workflow engine.
+     */
+    void start();
+
+    /**
      * Trigger a workflow to start.
      *
      * @param workflowExecuteRunnable the workflow to start
@@ -54,5 +59,10 @@ public interface IWorkflowEngine {
      * @param workflowInstanceId the ID of the workflow to finalize
      */
     void finalizeWorkflow(Integer workflowInstanceId);
+
+    /**
+     * Shutdown the workflow engine. The workflow engine cannot be restarted after shutdown. This method will block until the workflow engine is completely shutdown.
+     */
+    void shutdown();
 
 }

@@ -18,18 +18,18 @@
 package org.apache.dolphinscheduler.workflow.engine.event;
 
 import org.apache.dolphinscheduler.workflow.engine.utils.ExceptionUtils;
-import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecuteRunnableRepository;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionContext;
 import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.workflow.engine.workflow.IWorkflowExecutionRunnableRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WorkflowOperationEventOperator implements IWorkflowEventOperator<WorkflowOperationEvent> {
 
-    private final IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository;
+    private final IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository;
 
-    public WorkflowOperationEventOperator(IWorkflowExecuteRunnableRepository workflowExecuteRunnableRepository) {
+    public WorkflowOperationEventOperator(IWorkflowExecutionRunnableRepository workflowExecuteRunnableRepository) {
         this.workflowExecuteRunnableRepository = workflowExecuteRunnableRepository;
     }
 

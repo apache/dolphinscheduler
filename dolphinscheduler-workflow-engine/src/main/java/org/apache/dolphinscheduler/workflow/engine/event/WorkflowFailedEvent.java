@@ -32,4 +32,8 @@ public class WorkflowFailedEvent implements IWorkflowEvent {
 
     private String failedReason;
 
+    @Override
+    public Class getEventOperatorClass() {
+        return null;
+    }
 }

@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.workflow.engine.dag.WorkflowDAG;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.Getter;
@@ -40,16 +39,16 @@ public class WorkflowExecutionDAG implements IWorkflowExecutionDAG {
     private final WorkflowDAG workflowDAG;
 
     @Getter
-    private final Set<String> startNodeNames;
+    private final List<String> startNodeNames;
 
     public WorkflowExecutionDAG(ITaskExecutionRunnableRepository taskExecutionRunnableRepository,
                                 WorkflowDAG workflowDAG) {
-        this(taskExecutionRunnableRepository, workflowDAG, Collections.emptySet());
+        this(taskExecutionRunnableRepository, workflowDAG, Collections.emptyList());
     }
 
     public WorkflowExecutionDAG(ITaskExecutionRunnableRepository taskExecutionRunnableRepository,
                                 WorkflowDAG workflowDAG,
-                                Set<String> startNodeNames) {
+                                List<String> startNodeNames) {
         this.taskExecutionRunnableRepository = taskExecutionRunnableRepository;
         this.workflowDAG = workflowDAG;
         this.startNodeNames = startNodeNames;
