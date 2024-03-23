@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
@@ -33,12 +34,17 @@ public class SubWorkflowLogicTaskPluginFactory implements ILogicTaskPluginFactor
 
     @Autowired
     private ProcessInstanceDao processInstanceDao;
+
+    @Autowired
+    private ProcessInstanceMapDao processInstanceMapDao;
+
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @Override
     public SubWorkflowLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
-        return new SubWorkflowLogicTask(taskExecutionContext, processInstanceExecCacheManager, processInstanceDao);
+        return new SubWorkflowLogicTask(taskExecutionContext, processInstanceExecCacheManager, processInstanceDao,
+                processInstanceMapDao);
     }
 
     @Override
