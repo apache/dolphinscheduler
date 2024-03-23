@@ -51,8 +51,12 @@
 
     <select id="queryProjectParameterListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProjectParameter">
         select
-        <include refid="baseSql"/>
-        from t_ds_project_parameter
+        pp.id, param_name, param_value, code, project_code, user_id, operator, pp.create_time, pp.update_time,
+        u.user_name as create_user,
+        u2.user_name as modify_user
+        from t_ds_project_parameter pp
+        left join t_ds_user u on pp.user_id = u.id
+        left join t_ds_user u2 on pp.operator = u2.id
         where project_code = #{projectCode}
         <if test="projectParameterIds != null and projectParameterIds.size() > 0">
             and id  in
