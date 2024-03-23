@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.parser;
 
+import org.apache.dolphinscheduler.common.utils.ClassFilterConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.LoopTaskYamlDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.TaskDefinitionParser;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.http.HttpLoopTaskDefinition;
@@ -60,9 +61,9 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
     }
 
     protected @NonNull LoopTaskYamlDefinition parseYamlConfigFile(@NonNull String yamlConfigFile) throws IOException {
-        Yaml yaml = new Yaml(new Constructor(LoopTaskYamlDefinition.class));
         try (FileReader fileReader = new FileReader(yamlConfigFile)) {
-            return yaml.load(fileReader);
+            return new Yaml(new ClassFilterConstructor(new Class[] {LoopTaskYamlDefinition.class}))
+                .loadAs(fileReader, LoopTaskYamlDefinition.class);
         }
     }
 
