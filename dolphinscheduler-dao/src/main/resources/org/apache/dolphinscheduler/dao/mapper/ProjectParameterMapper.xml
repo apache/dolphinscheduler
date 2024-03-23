@@ -59,7 +59,7 @@
         left join t_ds_user u2 on pp.operator = u2.id
         where project_code = #{projectCode}
         <if test="projectParameterIds != null and projectParameterIds.size() > 0">
-            and id  in
+            and pp.id  in
             <foreach item="id" index="index" collection="projectParameterIds" open="(" separator="," close=")">
                 #{id}
             </foreach>
