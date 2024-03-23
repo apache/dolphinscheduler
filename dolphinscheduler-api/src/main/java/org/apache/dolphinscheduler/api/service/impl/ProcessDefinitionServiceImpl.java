@@ -251,9 +251,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private ListenerEventAlertManager listenerEventAlertManager;
 
-    private final int THRESHOLD_ENTRIES = 10000;
-    private final int THRESHOLD_SIZE = 1000000000; // 1 GB
-    private final double THRESHOLD_RATIO = 10;
+    private static final int thresholdEntries = 10000;
+    private static final int thresholdSize = 1000000000; // 1 GB
+    private static final double thresholdRatio = 10;
 
     private final Map<String, DataSource> dataSourceCache = new HashMap<>(1);
     private final Map<String, Long> taskNameToCode = new HashMap<>(16);
@@ -2511,12 +2511,15 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     private String getProcessDefinitionName(MultipartFile file) {
         String processDefinitionName = file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
-        int index = processDefinitionName.lastIndexOf(".");
-        if (index > 0) {
-            processDefinitionName = processDefinitionName.substring(0, index);
+        if (Objects.nonNull(processDefinitionName)) {
+            int index = processDefinitionName.lastIndexOf(".");
+            if (index > 0) {
+                processDefinitionName = processDefinitionName.substring(0, index);
+            }
+            processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
+            return processDefinitionName;
         }
-        processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
-        return processDefinitionName;
+        return "";
     }
 
     private static ProcessDefinition buildProcessDefinition(User loginUser, long projectCode,
@@ -2568,7 +2571,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     totalSizeEntry += nBytes;
                     totalSizeArchive += nBytes;
                     long compressionRatio = totalSizeEntry / entry.getCompressedSize();
-                    if (compressionRatio > THRESHOLD_RATIO) {
+                    if (compressionRatio > thresholdRatio) {
                         throw new IllegalStateException(
                                 "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
                     }
@@ -2607,12 +2610,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 taskNameToUpstream.put(taskDefinition.getName(), taskDependencyUtilty.getUpStreams());
             }
 
-            if (totalSizeArchive > THRESHOLD_SIZE) {
+            if (totalSizeArchive > thresholdSize) {
                 throw new IllegalStateException(
                         "the uncompressed data size is too much for the application resource capacity");
             }
 
-            if (totalEntryArchive > THRESHOLD_ENTRIES) {
+            if (totalEntryArchive > thresholdEntries) {
                 throw new IllegalStateException(
                         "too much entries in this archive, can lead to inodes exhaustion of the system");
             }
