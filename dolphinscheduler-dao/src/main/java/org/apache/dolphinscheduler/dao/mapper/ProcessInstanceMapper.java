@@ -200,22 +200,6 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                               @Param("testFlag") int testFlag);
 
     /**
-     * query last running process instance
-     *
-     * @param definitionCode definitionCode
-     * @param startTime      startTime
-     * @param endTime        endTime
-     * @param testFlag       testFlag
-     * @param stateArray     stateArray
-     * @return process instance
-     */
-    ProcessInstance queryLastRunningProcess(@Param("processDefinitionCode") Long definitionCode,
-                                            @Param("startTime") Date startTime,
-                                            @Param("endTime") Date endTime,
-                                            @Param("testFlag") int testFlag,
-                                            @Param("states") int[] stateArray);
-
-    /**
      * query last manual process instance
      *
      * @param definitionCode definitionCode
@@ -274,6 +258,10 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
 
     List<ProcessInstance> queryByProcessDefineCodeAndStatus(@Param("processDefinitionCode") Long processDefinitionCode,
                                                             @Param("states") int[] states);
+
+    List<ProcessInstance> queryByWorkflowCodeVersionStatus(@Param("workflowDefinitionCode") long workflowDefinitionCode,
+                                                           @Param("workflowDefinitionVersion") int workflowDefinitionVersion,
+                                                           @Param("states") int[] states);
 
     List<ProcessInstance> queryByProcessDefineCodeAndProcessDefinitionVersionAndStatusAndNextId(@Param("processDefinitionCode") Long processDefinitionCode,
                                                                                                 @Param("processDefinitionVersion") int processDefinitionVersion,

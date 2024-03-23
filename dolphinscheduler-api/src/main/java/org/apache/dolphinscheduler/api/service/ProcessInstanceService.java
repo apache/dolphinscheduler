@@ -49,9 +49,9 @@ public interface ProcessInstanceService {
     /**
      * query process instance by id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param processId process instance id
+     * @param processId   process instance id
      * @return process instance detail
      */
     Map<String, Object> queryProcessInstanceById(User loginUser,
@@ -73,17 +73,17 @@ public interface ProcessInstanceService {
     /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param pageNo page number
-     * @param pageSize page size
+     * @param loginUser         login user
+     * @param projectCode       project code
+     * @param pageNo            page number
+     * @param pageSize          page size
      * @param processDefineCode process definition code
-     * @param searchVal search value
-     * @param stateType state type
-     * @param host host
-     * @param startDate start time
-     * @param endDate end time
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param searchVal         search value
+     * @param stateType         state type
+     * @param host              host
+     * @param startDate         start time
+     * @param endDate           end time
+     * @param otherParamsJson   otherParamsJson handle other params
      * @return process instance list
      */
     Result<PageInfo<ProcessInstance>> queryProcessInstanceList(User loginUser,
@@ -102,7 +102,7 @@ public interface ProcessInstanceService {
     /**
      * paging query process instance list, filtering according to project, process definition, time range, keyword, process status
      *
-     * @param loginUser login user
+     * @param loginUser                    login user
      * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
      * @return process instance list
      */
@@ -112,9 +112,9 @@ public interface ProcessInstanceService {
     /**
      * query task list by process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param processId process instance id
+     * @param processId   process instance id
      * @return task list for the process instance
      * @throws IOException io exception
      */
@@ -127,9 +127,9 @@ public interface ProcessInstanceService {
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskId task id
+     * @param taskId      task id
      * @return sub process instance detail
      */
     Map<String, Object> querySubProcessInstanceByTaskId(User loginUser,
@@ -142,16 +142,16 @@ public interface ProcessInstanceService {
     /**
      * update process instance
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskRelationJson process task relation json
+     * @param loginUser          login user
+     * @param projectCode        project code
+     * @param taskRelationJson   process task relation json
      * @param taskDefinitionJson taskDefinitionJson
-     * @param processInstanceId process instance id
-     * @param scheduleTime schedule time
-     * @param syncDefine sync define
-     * @param globalParams global params
-     * @param locations locations for nodes
-     * @param timeout timeout
+     * @param processInstanceId  process instance id
+     * @param scheduleTime       schedule time
+     * @param syncDefine         sync define
+     * @param globalParams       global params
+     * @param locations          locations for nodes
+     * @param timeout            timeout
      * @return update result code
      */
     Map<String, Object> updateProcessInstance(User loginUser,
@@ -168,9 +168,9 @@ public interface ProcessInstanceService {
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param subId sub process id
+     * @param subId       sub process id
      * @return parent instance detail
      */
     Map<String, Object> queryParentInstanceBySubId(User loginUser,
@@ -190,7 +190,7 @@ public interface ProcessInstanceService {
     /**
      * view process instance variables
      *
-     * @param projectCode project code
+     * @param projectCode       project code
      * @param processInstanceId process instance id
      * @return variables data
      */
@@ -199,7 +199,7 @@ public interface ProcessInstanceService {
     /**
      * encapsulation gantt structure
      *
-     * @param projectCode project code
+     * @param projectCode       project code
      * @param processInstanceId process instance id
      * @return gantt tree data
      * @throws Exception exception when json parse
@@ -210,17 +210,29 @@ public interface ProcessInstanceService {
      * query process instance by processDefinitionCode and stateArray
      *
      * @param processDefinitionCode processDefinitionCode
-     * @param states states array
+     * @param states                states array
      * @return process instance list
      */
     List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode,
                                                             int[] states);
 
     /**
+     * query process instance by processDefinitionCode and stateArray
+     *
+     * @param workflowDefinitionCode    workflowDefinitionCode
+     * @param workflowDefinitionVersion workflowDefinitionVersion
+     * @param states                    states array
+     * @return process instance list
+     */
+    List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                           int workflowDefinitionVersion,
+                                                           int[] states);
+
+    /**
      * query process instance by processDefinitionCode
      *
      * @param processDefinitionCode processDefinitionCode
-     * @param size size
+     * @param size                  size
      * @return process instance list
      */
     List<ProcessInstance> queryByProcessDefineCode(Long processDefinitionCode,
