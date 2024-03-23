@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import org.apache.dolphinscheduler.common.utils.ClassFilterConstructor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.yaml.snakeyaml.Yaml;
@@ -37,7 +39,9 @@ public abstract class AbstractK8sTaskExecutor {
     protected AbstractK8sTaskExecutor(TaskExecutionContext taskRequest) {
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
-        this.yaml = new Yaml(new SafeConstructor());
+        this.yaml = new Yaml(new ClassFilterConstructor(new Class[] {
+            List.class
+        }));
         this.taskOutputParams = new HashMap<>();
     }
     public Map<String, String> getTaskOutputParams() {
