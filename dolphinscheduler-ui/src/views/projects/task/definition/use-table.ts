@@ -49,10 +49,14 @@ import type {
 } from '@/service/modules/task-definition/types'
 import type { IRecord } from './types'
 
+import { useDependencies } from '../../components/dependencies/use-dependencies'
+
 export function useTable(onEdit: Function) {
   const { t } = useI18n()
   const route = useRoute()
   const projectCode = Number(route.params.projectCode)
+
+  const { getDependentTaskLinksByTask } = useDependencies()
 
   const createColumns = (variables: any) => {
     variables.columns = [
@@ -260,22 +264,50 @@ export function useTable(onEdit: Function) {
     totalPage: ref(1),
     taskType: ref(null),
     showVersionModalRef: ref(false),
+    dependentTasksShowRef: ref(false),
+    dependentTaskLinksRef: ref([]),
     row: {},
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    dependenciesData: ref({
+      showRef: ref(false),
+      taskLinks: ref([]),
+      required: ref(false),
+      tip: ref(''),
+      action: () => {}
+    })
   })
 
   const handleDelete = (row: any) => {
-    deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(() => {
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo:
-          variables.tableData.length === 1 && variables.page > 1
-            ? variables.page - 1
-            : variables.page,
-        searchTaskName: variables.searchTaskName,
-        searchWorkflowName: variables.searchWorkflowName,
-        taskType: variables.taskType
-      })
+    variables.row = row
+    getDependentTaskLinksByTask(
+      projectCode,
+      row.processDefinitionCode,
+      row.taskCode
+    ).then((res: any) => {
+      if (res && res.length > 0) {
+        variables.dependenciesData = {
+          showRef: true,
+          taskLinks: res,
+          tip: t('project.workflow.delete_validate_dependent_tasks_desc'),
+          required: true,
+          action: () => {}
+        }
+      } else {
+        deleteTaskDefinition({ code: row.taskCode }, { projectCode }).then(
+          () => {
+            getTableData({
+              pageSize: variables.pageSize,
+              pageNo:
+                variables.tableData.length === 1 && variables.page > 1
+                  ? variables.page - 1
+                  : variables.page,
+              searchTaskName: variables.searchTaskName,
+              searchWorkflowName: variables.searchWorkflowName,
+              taskType: variables.taskType
+            })
+          }
+        )
+      }
     })
   }
 

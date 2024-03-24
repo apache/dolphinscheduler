@@ -15,13 +15,7 @@
  * limitations under the License.
  */
 
-import {
-  defineComponent,
-  onMounted,
-  onBeforeUnmount,
-  PropType,
-  ref
-} from 'vue'
+import { defineComponent, onMounted, onBeforeUnmount, PropType, ref } from 'vue'
 import initChart from '@/components/chart'
 import type { Ref } from 'vue'
 

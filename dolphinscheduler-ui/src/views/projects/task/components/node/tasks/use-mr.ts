@@ -45,7 +45,7 @@ export function useMr({
     timeout: 30,
     programType: 'SCALA',
     timeoutNotifyStrategy: ['WARN'],
-    yarnQueue: '',
+    yarnQueue: ''
   } as INodeData)
 
   return {

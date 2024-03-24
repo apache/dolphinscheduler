@@ -68,7 +68,7 @@ public class ProjectWorkerGroupController extends BaseController {
      @ @RequestParam(value = "workerGroups", required = false) String workerGroups
      * @return create result code
      */
-    @Operation(summary = "assignWorkerGroups", description = "CREATE_PROCESS_DEFINITION_NOTES")
+    @Operation(summary = "assignWorkerGroups", description = "ASSIGN_WORKER_GROUPS_NOTES")
     @Parameters({
             @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class, example = "123456")),
             @Parameter(name = "workerGroups", description = "WORKER_GROUP_LIST", schema = @Schema(implementation = List.class))

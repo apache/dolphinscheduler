@@ -39,6 +39,10 @@ public class UpdateWorkflowHostOperationFunction
     @Autowired
     private MessageRetryRunner messageRetryRunner;
 
+    public UpdateWorkflowHostOperationFunction(MessageRetryRunner messageRetryRunner) {
+        this.messageRetryRunner = messageRetryRunner;
+    }
+
     @Override
     public UpdateWorkflowHostResponse operate(UpdateWorkflowHostRequest updateWorkflowHostRequest) {
         try {
