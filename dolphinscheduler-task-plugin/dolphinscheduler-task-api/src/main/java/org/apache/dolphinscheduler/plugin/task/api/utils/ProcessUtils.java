@@ -118,33 +118,19 @@ public final class ProcessUtils {
      * @throws Exception exception
      */
     public static String getPidsStr(int processId) throws Exception {
-        StringBuilder sb = new StringBuilder();
-        Matcher mat = null;
+
+        String rawPidStr;
+
         // pstree pid get sub pids
         if (SystemUtils.IS_OS_MAC) {
-            String pids = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
-            if (StringUtils.isNotEmpty(pids)) {
-                mat = MACPATTERN.matcher(pids);
-            }
+            rawPidStr = OSUtils.exeCmd(String.format("%s -sp %d", TaskConstants.PSTREE, processId));
         } else if (SystemUtils.IS_OS_LINUX) {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            if (StringUtils.isNotEmpty(pids)) {
-                mat = LINUXPATTERN.matcher(pids);
-            }
+            rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
         } else {
-            String pids = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
-            if (StringUtils.isNotEmpty(pids)) {
-                mat = WINDOWSPATTERN.matcher(pids);
-            }
+            rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
         }
 
-        if (null != mat) {
-            while (mat.find()) {
-                sb.append(mat.group(1)).append(" ");
-            }
-        }
-
-        return sb.toString().trim();
+        return parsePidStr(rawPidStr);
     }
 
     public static String parsePidStr(String rawPidStr) {
