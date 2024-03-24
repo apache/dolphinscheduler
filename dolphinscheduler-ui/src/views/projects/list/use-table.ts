@@ -25,7 +25,7 @@ import { deleteProject } from '@/service/modules/projects'
 import { format } from 'date-fns'
 import { useRouter } from 'vue-router'
 import {
-  NButton, NDropdown,
+  NButton,
   NEllipsis,
   NIcon,
   NPopconfirm,
@@ -39,9 +39,9 @@ import {
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import {ControlOutlined, DeleteOutlined, EditOutlined, UserOutlined} from '@vicons/antd'
-import {useUserStore} from "@/store/user/user";
-import {UserInfoRes} from "@/service/modules/users/types";
+import { ControlOutlined, DeleteOutlined, EditOutlined } from '@vicons/antd'
+import { useUserStore } from '@/store/user/user'
+import { UserInfoRes } from '@/service/modules/users/types'
 
 export function useTable() {
   const { t } = useI18n()
@@ -177,31 +177,31 @@ export function useTable() {
                 }
               ),
               IS_ADMIN &&
-              h(
+                h(
                   NTooltip,
                   {
                     trigger: 'hover'
                   },
                   {
                     trigger: () =>
-                        h(
-                            NButton,
-                            {
-                              circle: true,
-                              type: 'info',
-                              size: 'small',
-                              class: 'edit',
-                              onClick: () => {
-                                handleAssign(row)
-                              }
-                            },
-                            {
-                              icon: () => h(NIcon, null, () => h(ControlOutlined))
-                            }
-                        ),
+                      h(
+                        NButton,
+                        {
+                          circle: true,
+                          type: 'info',
+                          size: 'small',
+                          class: 'edit',
+                          onClick: () => {
+                            handleAssign(row)
+                          }
+                        },
+                        {
+                          icon: () => h(NIcon, null, () => h(ControlOutlined))
+                        }
+                      ),
                     default: () => t('project.list.assign_worker_group')
                   }
-              ),
+                ),
               h(
                 NPopconfirm,
                 {

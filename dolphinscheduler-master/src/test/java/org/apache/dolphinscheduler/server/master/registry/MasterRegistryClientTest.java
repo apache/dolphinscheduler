@@ -103,4 +103,10 @@ public class MasterRegistryClientTest {
         // Cannot mock static methods
         masterRegistryClient.removeWorkerNodePath("/path", RegistryNodeType.WORKER, true);
     }
+
+    @Test
+    public void removeWorkNodePathTest() {
+        masterRegistryClient.removeWorkerNodePath("", RegistryNodeType.WORKER, true);
+        masterRegistryClient.removeWorkerNodePath(null, RegistryNodeType.WORKER, true);
+    }
 }
