@@ -546,7 +546,8 @@ const DetailModal = defineComponent({
                 <NFormItem
                   v-show={
                     (!showMode || detailForm.mode === 'password') &&
-                    detailForm.type != 'K8S'
+                    detailForm.type != 'K8S' &&
+                    detailForm.type != 'FLINK'
                   }
                   label={t('datasource.user_name')}
                   path='userName'
@@ -564,7 +565,8 @@ const DetailModal = defineComponent({
                 <NFormItem
                   v-show={
                     (!showMode || detailForm.mode === 'password') &&
-                    detailForm.type != 'K8S'
+                    detailForm.type != 'K8S' &&
+                    detailForm.type != 'FLINK'
                   }
                   label={t('datasource.user_password')}
                   path='password'
@@ -592,7 +594,10 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showDataBaseName}
+                  v-show={
+                    showDataBaseName &&
+                    detailForm.type != 'FLINK'
+                  }
                   label={t('datasource.database_name')}
                   path='database'
                   show-require-mark={requiredDataBase}
