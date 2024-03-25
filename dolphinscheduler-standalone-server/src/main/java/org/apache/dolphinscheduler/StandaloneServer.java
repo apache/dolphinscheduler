@@ -17,10 +17,17 @@
 
 package org.apache.dolphinscheduler;
 
-import org.apache.curator.test.TestingServer;
+import org.apache.dolphinscheduler.registry.StandaloneRegistry;
+
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -28,17 +35,32 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Slf4j
 public class StandaloneServer {
 
+    @Value("${registry.type}")
+    private String registryType;
+
+    private final List<StandaloneRegistry> registries;
+
+    @Autowired
+    public StandaloneServer(List<StandaloneRegistry> registries) {
+        this.registries = registries;
+    }
+
     public static void main(String[] args) throws Exception {
         try {
-            // We cannot use try-with-resources to close "TestingServer", since SpringApplication.run() will not block
-            // the main thread.
-            TestingServer zookeeperServer = new TestingServer(true);
-            System.setProperty("registry.zookeeper.connect-string", zookeeperServer.getConnectString());
             SpringApplication.run(StandaloneServer.class, args);
         } catch (Exception ex) {
             log.error("StandaloneServer start failed", ex);
             System.exit(1);
         }
+    }
+
+    @PostConstruct
+    private void initRegistry() {
+        Optional<StandaloneRegistry> registry = registries.stream()
+                .filter(r -> r.supports(registryType))
+                .findFirst();
+
+        registry.ifPresent(StandaloneRegistry::init);
     }
 
 }

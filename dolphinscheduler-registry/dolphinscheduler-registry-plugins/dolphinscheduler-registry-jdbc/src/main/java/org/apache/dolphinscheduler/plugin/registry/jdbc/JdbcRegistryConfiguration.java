@@ -34,7 +34,7 @@ import com.zaxxer.hikari.HikariDataSource;
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
 public class JdbcRegistryConfiguration {
 
-    @Bean
+    @Bean("sqlSessionFactory")
     @ConditionalOnProperty(prefix = "registry.hikari-config", name = "jdbc-url")
     public SqlSessionFactory jdbcRegistrySqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
