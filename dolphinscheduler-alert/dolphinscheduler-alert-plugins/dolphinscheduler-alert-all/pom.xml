@@ -84,6 +84,9 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-alert-webhook</artifactId>
+            <version>${project.version}</version>
+        </dependency>
             <artifactId>dolphinscheduler-alert-aliyunVoice</artifactId>
             <version>${project.version}</version>
         </dependency>
