@@ -127,12 +127,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String tenantCode = getTenantCode(user);
 
-        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
-            log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
                 : storageOperate.getResDir(tenantCode);
         String fullName = !currentDir.contains(userResRootPath) ? userResRootPath + name : currentDir + name;
@@ -177,12 +171,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
-
-        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
-            log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
 
         result = verifyFile(name, type, file);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -464,16 +452,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
-        String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
-                : storageOperate.getDir(type, tenantCode);
+        checkFullName(tenantCode, fullName);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-
-        checkFullName(baseDir, fullName);
 
         List<StorageEntity> resourcesList;
         try {
@@ -647,9 +632,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, fullName);
 
         String baseDir = storageOperate.getDir(type, tenantCode);
-        checkFullName(baseDir, fullName);
 
         List<StorageEntity> resourcesList = new ArrayList<>();
         if (StringUtils.isBlank(fullName)) {
@@ -750,6 +735,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, fullName);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -758,7 +744,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String baseDir = storageOperate.getResDir(tenantCode);
-        checkFullName(baseDir, fullName);
 
         StorageEntity resource;
         try {
@@ -891,15 +876,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, fullName);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-
-        String baseDir = storageOperate.getResDir(tenantCode);
-        checkFullName(baseDir, fullName);
 
         // check preview or not by file suffix
         String nameSuffix = Files.getFileExtension(fullName);
@@ -966,12 +949,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
-
-        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
-            log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
 
         if (FileUtils.directoryTraversal(fileName)) {
             log.warn("File name verify failed, fileName:{}.", RegexUtils.escapeNRT(fileName));
@@ -1050,14 +1027,13 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, fullName);
+
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
             putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
-
-        String baseDir = storageOperate.getResDir(resTenantCode);
-        checkFullName(baseDir, fullName);
 
         StorageEntity resource;
         try {
@@ -1162,8 +1138,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
-        String baseDir = storageOperate.getResDir(tenantCode);
-        checkFullName(baseDir, fullName);
+        checkFullName(tenantCode, fullName);
 
         String[] aliasArr = fullName.split("/");
         String alias = aliasArr[aliasArr.length - 1];
@@ -1266,12 +1241,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
 
         String tenantCode = getTenantCode(user);
 
-        if (!isUserTenantValid(isAdmin(loginUser), tenantCode, "")) {
-            log.error("current user does not have permission");
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         String baseDir = isAdmin(loginUser) ? storageOperate.getDir(ResourceType.ALL, tenantCode)
                 : storageOperate.getDir(type, tenantCode);
 
@@ -1296,6 +1265,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return true;
         }
         if (StringUtils.isEmpty(resTenantCode)) {
+            // TODO: resource tenant code will be empty when query resources list, need to be optimized
             return true;
         }
         return resTenantCode.equals(userTenantCode);
@@ -1309,7 +1279,8 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         return tenant.getTenantCode();
     }
 
-    private void checkFullName(String baseDir, String fullName) {
+    private void checkFullName(String userTenantCode, String fullName) {
+        String baseDir = storageOperate.getDir(ResourceType.ALL, userTenantCode);
         if (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir)) {
             throw new ServiceException("Resource file: " + fullName + " is illegal");
         }
