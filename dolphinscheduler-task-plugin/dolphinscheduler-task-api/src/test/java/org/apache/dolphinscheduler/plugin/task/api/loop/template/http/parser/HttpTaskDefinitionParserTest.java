@@ -36,6 +36,8 @@ public class HttpTaskDefinitionParserTest {
         Assertions.assertNotNull(loopTaskYamlDefinition.getService());
         LoopTaskYamlDefinition.LoopTaskServiceYamlDefinition service = loopTaskYamlDefinition.getService();
         Assertions.assertEquals("MockService", service.getName());
+        Assertions.assertEquals("Http", service.getType());
+        Assertions.assertEquals("/api/v1/submit", service.getApi().getSubmit().getUrl());
         Assertions.assertNotNull(service.getApi());
     }
 

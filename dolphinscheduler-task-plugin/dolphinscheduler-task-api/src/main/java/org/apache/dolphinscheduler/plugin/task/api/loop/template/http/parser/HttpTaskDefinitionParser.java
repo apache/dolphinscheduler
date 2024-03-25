@@ -61,7 +61,7 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
 
     protected @NonNull LoopTaskYamlDefinition parseYamlConfigFile(@NonNull String yamlConfigFile) throws IOException {
         try (FileReader fileReader = new FileReader(yamlConfigFile)) {
-            return new Yaml(new ClassFilterConstructor(new Class[]{LoopTaskYamlDefinition.class}))
+            return new Yaml(new ClassFilterConstructor(new Class[]{LoopTaskYamlDefinition.class, LoopTaskYamlDefinition.LoopTaskSubmitMethodYamlDefinition.class}))
                     .loadAs(fileReader, LoopTaskYamlDefinition.class);
         }
     }

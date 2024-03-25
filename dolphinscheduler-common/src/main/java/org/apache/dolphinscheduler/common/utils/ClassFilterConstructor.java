@@ -18,6 +18,8 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.constructor.Constructor;
 
@@ -25,6 +27,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
  * Whitelist constructor implementation for YAML snake.
  * Copied from Apache ShardingSphere and Apache Skywalking.
  */
+@Slf4j
 public final class ClassFilterConstructor extends Constructor {
 
     private final Class<?>[] acceptClasses;
@@ -38,6 +41,7 @@ public final class ClassFilterConstructor extends Constructor {
     protected Class<?> getClassForName(final String name) throws ClassNotFoundException {
         for (Class<? extends Object> each : acceptClasses) {
             if (name.equals(each.getName())) {
+                log.info("name - {} : class - {}", name, super.getClassForName(name));
                 return super.getClassForName(name);
             }
         }
