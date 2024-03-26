@@ -52,6 +52,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.dolphindb</groupId>
+            <artifactId>jdbc</artifactId>
+            <version>1.30.22.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
