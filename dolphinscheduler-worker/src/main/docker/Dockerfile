@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-FROM eclipse-temurin:8-jre
+FROM eclipse-temurin:8-jdk
 
 ENV DOCKER true
 ENV TZ Asia/Shanghai

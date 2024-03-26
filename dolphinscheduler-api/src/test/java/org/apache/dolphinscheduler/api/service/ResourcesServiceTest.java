@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
-import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -36,7 +35,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
@@ -56,11 +54,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -89,6 +85,8 @@ public class ResourcesServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ResourcesServiceTest.class);
 
+    private static final String tenantCode = "123";
+
     @InjectMocks
     private ResourcesServiceImpl resourcesService;
 
@@ -110,10 +108,6 @@ public class ResourcesServiceTest {
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
-    private static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
-
-    private static final Logger resourceLogger = LoggerFactory.getLogger(ResourcesServiceImpl.class);
-
     private MockedStatic<FileUtils> mockedStaticFileUtils;
 
     private MockedStatic<Files> mockedStaticFiles;
@@ -126,7 +120,7 @@ public class ResourcesServiceTest {
 
     private MockedStatic<java.nio.file.Files> filesMockedStatic;
 
-    private Throwable exception;
+    private Exception exception;
 
     @BeforeEach
     public void setUp() {
@@ -196,7 +190,7 @@ public class ResourcesServiceTest {
         mockMultipartFile = new MockMultipartFile(tooLongFileName, tooLongFileName, "pdf", "test".getBytes());
         when(Files.getFileExtension(tooLongFileName)).thenReturn("pdf");
         // '/databasePath/tenantCode/RESOURCE/'
-        when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getResDir(tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
         result = resourcesService.uploadResource(user, tooLongFileName, ResourceType.FILE, mockMultipartFile, "/");
         logger.info(result.toString());
         assertEquals(Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR.getMsg(), result.getMsg());
@@ -213,7 +207,7 @@ public class ResourcesServiceTest {
         user.setTenantId(1);
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
         when(userMapper.selectById(user.getId())).thenReturn(getUser());
-        when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getResDir(tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
         try {
             when(storageOperate.exists("/dolphinscheduler/123/resources/directoryTest")).thenReturn(true);
         } catch (IOException e) {
@@ -233,7 +227,7 @@ public class ResourcesServiceTest {
 
         when(userMapper.selectById(user.getId())).thenReturn(getUser());
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getResDir(tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
 
         // USER_NO_OPERATION_PERM
         user.setUserType(UserType.GENERAL_USER);
@@ -242,7 +236,7 @@ public class ResourcesServiceTest {
         tenantWNoPermission.setTenantCode("321");
         when(tenantMapper.queryById(1)).thenReturn(tenantWNoPermission);
         Result result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest",
-                "123", "ResourcesServiceTest", ResourceType.FILE, null);
+                tenantCode, "ResourcesServiceTest", ResourceType.FILE, null);
         logger.info(result.toString());
         assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), result.getMsg());
 
@@ -256,10 +250,10 @@ public class ResourcesServiceTest {
 
         try {
             when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest",
-                    "/dolphinscheduler/123/resources/", "123", ResourceType.FILE))
+                    "/dolphinscheduler/123/resources/", tenantCode, ResourceType.FILE))
                             .thenReturn(getStorageEntityResource());
             result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest",
-                    "123", "ResourcesServiceTest", ResourceType.FILE, null);
+                    tenantCode, "ResourcesServiceTest", ResourceType.FILE, null);
             logger.info(result.toString());
             assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         } catch (Exception e) {
@@ -278,14 +272,14 @@ public class ResourcesServiceTest {
 
         try {
             when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest1.jar",
-                    "/dolphinscheduler/123/resources/", "123", ResourceType.UDF))
+                    "/dolphinscheduler/123/resources/", tenantCode, ResourceType.UDF))
                             .thenReturn(getStorageEntityUdfResource());
         } catch (Exception e) {
             logger.error(e.getMessage() + " Resource path: {}",
                     "/dolphinscheduler/123/resources/ResourcesServiceTest1.jar", e);
         }
         result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest1.jar",
-                "123", "ResourcesServiceTest2.jar", ResourceType.UDF, null);
+                tenantCode, "ResourcesServiceTest2.jar", ResourceType.UDF, null);
         logger.info(result.toString());
         assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
 
@@ -298,7 +292,7 @@ public class ResourcesServiceTest {
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
 
         result = resourcesService.updateResource(user, "/dolphinscheduler/123/resources/ResourcesServiceTest1.jar",
-                "123", "ResourcesServiceTest1.jar", ResourceType.UDF, null);
+                tenantCode, "ResourcesServiceTest1.jar", ResourceType.UDF, null);
         logger.info(result.toString());
         assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
@@ -317,11 +311,11 @@ public class ResourcesServiceTest {
         when(userMapper.selectList(null)).thenReturn(mockUserList);
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         when(tenantMapper.queryById(getUser().getTenantId())).thenReturn(getTenant());
-        when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getResDir(tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
 
         try {
             when(storageOperate.listFilesStatus("/dolphinscheduler/123/resources/", "/dolphinscheduler/123/resources/",
-                    "123", ResourceType.FILE)).thenReturn(mockResList);
+                    tenantCode, ResourceType.FILE)).thenReturn(mockResList);
         } catch (Exception e) {
             logger.error("QueryResourceListPaging Error");
         }
@@ -335,30 +329,30 @@ public class ResourcesServiceTest {
 
     @Test
     public void testQueryResourceList() {
-        User loginUser = new User();
-        loginUser.setId(0);
-        loginUser.setUserType(UserType.ADMIN_USER);
+        User loginUser = getUser();
 
-        when(userMapper.selectList(null)).thenReturn(Arrays.asList(loginUser));
+        when(userMapper.selectList(null)).thenReturn(Collections.singletonList(loginUser));
         when(userMapper.selectById(loginUser.getId())).thenReturn(loginUser);
         when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(getTenant());
-        when(storageOperate.getResDir("123")).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getDir(ResourceType.ALL, tenantCode)).thenReturn("/dolphinscheduler");
+        when(storageOperate.getDir(ResourceType.FILE, tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getResDir(tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
         when(storageOperate.listFilesStatusRecursively("/dolphinscheduler/123/resources/",
-                "/dolphinscheduler/123/resources/", "123", ResourceType.FILE))
-                        .thenReturn(Arrays.asList(getStorageEntityResource()));
-        Map<String, Object> result = resourcesService.queryResourceList(loginUser, ResourceType.FILE, "");
-        logger.info(result.toString());
+                "/dolphinscheduler/123/resources/", tenantCode, ResourceType.FILE))
+                        .thenReturn(Collections.singletonList(getStorageEntityResource()));
+        Map<String, Object> result =
+                resourcesService.queryResourceList(loginUser, ResourceType.FILE, "/dolphinscheduler/123/resources/");
         assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         List<ResourceComponent> resourceList = (List<ResourceComponent>) result.get(Constants.DATA_LIST);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(resourceList));
 
         // test udf
-        when(storageOperate.getUdfDir("123")).thenReturn("/dolphinscheduler/123/udfs/");
+        when(storageOperate.getDir(ResourceType.UDF, tenantCode)).thenReturn("/dolphinscheduler/123/udfs/");
+        when(storageOperate.getUdfDir(tenantCode)).thenReturn("/dolphinscheduler/123/udfs/");
         when(storageOperate.listFilesStatusRecursively("/dolphinscheduler/123/udfs/", "/dolphinscheduler/123/udfs/",
-                "123", ResourceType.UDF)).thenReturn(Arrays.asList(getStorageEntityUdfResource()));
+                tenantCode, ResourceType.UDF)).thenReturn(Arrays.asList(getStorageEntityUdfResource()));
         loginUser.setUserType(UserType.GENERAL_USER);
-        result = resourcesService.queryResourceList(loginUser, ResourceType.UDF, "");
-        logger.info(result.toString());
+        result = resourcesService.queryResourceList(loginUser, ResourceType.UDF, "/dolphinscheduler/123/udfs/");
         assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
         resourceList = (List<ResourceComponent>) result.get(Constants.DATA_LIST);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(resourceList));
@@ -379,18 +373,18 @@ public class ResourcesServiceTest {
 
         // RESOURCE_NOT_EXIST
         when(tenantMapper.queryById(Mockito.anyInt())).thenReturn(getTenant());
-        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest", null, "123", null))
-                .thenReturn(getStorageEntityResource());
-        Result result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResNotExist", "123");
-        logger.info(result.toString());
+        when(storageOperate.getDir(ResourceType.ALL, tenantCode)).thenReturn("/dolphinscheduler");
+        when(storageOperate.getResDir(getTenant().getTenantCode())).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest",
+                "/dolphinscheduler/123/resources/", tenantCode, null))
+                        .thenReturn(getStorageEntityResource());
+        Result result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResNotExist", tenantCode);
         assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
         // SUCCESS
         loginUser.setTenantId(1);
-        result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResourcesServiceTest", "123");
-        logger.info(result.toString());
+        result = resourcesService.delete(loginUser, "/dolphinscheduler/123/resources/ResourcesServiceTest", tenantCode);
         assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
-
     }
 
     @Test
@@ -421,18 +415,16 @@ public class ResourcesServiceTest {
     }
 
     @Test
-    public void testReadResource() {
+    public void testReadResource() throws IOException {
         // RESOURCE_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         when(tenantMapper.queryById(getUser().getTenantId())).thenReturn(getTenant());
         Result result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        logger.info(result.toString());
         assertEquals(Status.RESOURCE_FILE_NOT_EXIST.getCode(), (int) result.getCode());
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        logger.info(result.toString());
         assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
 
         // USER_NOT_EXIST
@@ -440,7 +432,6 @@ public class ResourcesServiceTest {
         when(FileUtils.getResourceViewSuffixes()).thenReturn("jar");
         when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
         result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        logger.info(result.toString());
         assertEquals(Status.USER_NOT_EXIST.getCode(), (int) result.getCode());
 
         // TENANT_NOT_EXIST
@@ -449,17 +440,16 @@ public class ResourcesServiceTest {
         Assertions.assertThrows(ServiceException.class, () -> resourcesService.readResource(getUser(), "", "", 1, 10));
 
         // SUCCESS
+        when(FileUtils.getResourceViewSuffixes()).thenReturn("jar,sh");
+        when(storageOperate.getDir(ResourceType.ALL, tenantCode)).thenReturn("/dolphinscheduler");
+        when(storageOperate.getResDir(getTenant().getTenantCode())).thenReturn("/dolphinscheduler/123/resources/");
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         when(tenantMapper.queryById(getUser().getTenantId())).thenReturn(getTenant());
-        try {
-            when(storageOperate.exists(Mockito.any())).thenReturn(true);
-            when(storageOperate.vimFile(Mockito.any(), Mockito.any(), eq(1), eq(10))).thenReturn(getContent());
-        } catch (IOException e) {
-            logger.error("storage error", e);
-        }
-        when(Files.getFileExtension("test.jar")).thenReturn("jar");
-        result = resourcesService.readResource(getUser(), "test.jar", "", 1, 10);
-        logger.info(result.toString());
+        when(storageOperate.exists(Mockito.any())).thenReturn(true);
+        when(storageOperate.vimFile(Mockito.any(), Mockito.any(), eq(1), eq(10))).thenReturn(getContent());
+        when(Files.getFileExtension("/dolphinscheduler/123/resources/test.jar")).thenReturn("jar");
+        result = resourcesService.readResource(getUser(), "/dolphinscheduler/123/resources/test.jar", tenantCode, 1,
+                10);
         assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
@@ -494,29 +484,32 @@ public class ResourcesServiceTest {
         when(storageOperate.getResDir(Mockito.anyString())).thenReturn("/tmp");
         ServiceException serviceException =
                 Assertions.assertThrows(ServiceException.class, () -> resourcesService.updateResourceContent(getUser(),
-                        "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "123", "content"));
+                        "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", tenantCode, "content"));
         assertTrue(serviceException.getMessage()
                 .contains("Resource file: /dolphinscheduler/123/resources/ResourcesServiceTest.jar is illegal"));
 
         // RESOURCE_NOT_EXIST
+        when(storageOperate.getDir(ResourceType.ALL, tenantCode)).thenReturn("/dolphinscheduler");
         when(storageOperate.getResDir(Mockito.anyString())).thenReturn("/dolphinscheduler/123/resources");
-        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "", "123",
+        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "", tenantCode,
                 ResourceType.FILE)).thenReturn(null);
         Result result = resourcesService.updateResourceContent(getUser(),
-                "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "123", "content");
+                "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", tenantCode, "content");
         assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
-        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources", "", "123", ResourceType.FILE))
+        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources", "", tenantCode, ResourceType.FILE))
                 .thenReturn(getStorageEntityResource());
 
-        result = resourcesService.updateResourceContent(getUser(), "/dolphinscheduler/123/resources", "123", "content");
+        result = resourcesService.updateResourceContent(getUser(), "/dolphinscheduler/123/resources", tenantCode,
+                "content");
         assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
 
         // USER_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(null);
-        result = resourcesService.updateResourceContent(getUser(), "/dolphinscheduler/123/resources/123.class", "123",
+        result = resourcesService.updateResourceContent(getUser(), "/dolphinscheduler/123/resources/123.class",
+                tenantCode,
                 "content");
         Assertions.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
 
@@ -524,10 +517,10 @@ public class ResourcesServiceTest {
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         when(tenantMapper.queryById(1)).thenReturn(null);
         Assertions.assertThrows(ServiceException.class, () -> resourcesService.updateResourceContent(getUser(),
-                "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "123", "content"));
+                "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", tenantCode, "content"));
 
         // SUCCESS
-        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "", "123",
+        when(storageOperate.getFileStatus("/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "", tenantCode,
                 ResourceType.FILE)).thenReturn(getStorageEntityResource());
 
         when(Files.getFileExtension(Mockito.anyString())).thenReturn("jar");
@@ -537,7 +530,7 @@ public class ResourcesServiceTest {
         when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
         when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
         result = resourcesService.updateResourceContent(getUser(),
-                "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", "123", "content");
+                "/dolphinscheduler/123/resources/ResourcesServiceTest.jar", tenantCode, "content");
         logger.info(result.toString());
         assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
@@ -628,7 +621,7 @@ public class ResourcesServiceTest {
         User user = getUser();
         when(userMapper.selectById(user.getId())).thenReturn(getUser());
         when(tenantMapper.queryById(user.getTenantId())).thenReturn(getTenant());
-        when(storageOperate.getDir(ResourceType.FILE, "123")).thenReturn("/dolphinscheduler/123/resources/");
+        when(storageOperate.getDir(ResourceType.FILE, tenantCode)).thenReturn("/dolphinscheduler/123/resources/");
         try {
             when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
                     Mockito.any())).thenReturn(getStorageEntityResource());
@@ -640,17 +633,19 @@ public class ResourcesServiceTest {
         assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
-    private Set<Integer> getSetIds() {
-
-        Set<Integer> resources = new HashSet<>();
-        resources.add(1);
-        return resources;
-    }
-
     private Tenant getTenant() {
         Tenant tenant = new Tenant();
-        tenant.setTenantCode("123");
+        tenant.setTenantCode(tenantCode);
         return tenant;
+    }
+
+    private User getUser() {
+        User user = new User();
+        user.setId(1);
+        user.setUserType(UserType.GENERAL_USER);
+        user.setTenantId(1);
+        user.setTenantCode(tenantCode);
+        return user;
     }
 
     private StorageEntity getStorageEntityResource() {
@@ -658,10 +653,9 @@ public class ResourcesServiceTest {
         entity.setAlias("ResourcesServiceTest");
         entity.setFileName("ResourcesServiceTest");
         entity.setDirectory(false);
-        entity.setUserName("123");
+        entity.setUserName(tenantCode);
         entity.setType(ResourceType.FILE);
         entity.setFullName("/dolphinscheduler/123/resources/ResourcesServiceTest");
-
         return entity;
     }
 
@@ -670,47 +664,11 @@ public class ResourcesServiceTest {
         entity.setAlias("ResourcesServiceTest1.jar");
         entity.setFileName("ResourcesServiceTest1.jar");
         entity.setDirectory(false);
-        entity.setUserName("123");
+        entity.setUserName(tenantCode);
         entity.setType(ResourceType.UDF);
         entity.setFullName("/dolphinscheduler/123/resources/ResourcesServiceTest1.jar");
 
         return entity;
-    }
-
-    private UdfFunc getUdfFunc() {
-
-        UdfFunc udfFunc = new UdfFunc();
-        udfFunc.setId(1);
-        return udfFunc;
-    }
-
-    private UdfFunc getUdfFunc(int udfId) {
-
-        UdfFunc udfFunc = new UdfFunc();
-        udfFunc.setId(udfId);
-        return udfFunc;
-    }
-
-    private List<UdfFunc> getUdfFuncList() {
-
-        List<UdfFunc> udfFuncs = new ArrayList<>();
-        udfFuncs.add(getUdfFunc(1));
-        udfFuncs.add(getUdfFunc(2));
-        udfFuncs.add(getUdfFunc(3));
-        return udfFuncs;
-    }
-
-    private List<UdfFunc> getSingleUdfFuncList() {
-        return Collections.singletonList(getUdfFunc(3));
-    }
-
-    private User getUser() {
-        User user = new User();
-        user.setId(1);
-        user.setUserType(UserType.GENERAL_USER);
-        user.setTenantId(1);
-        user.setTenantCode("tenantCode");
-        return user;
     }
 
     private List<String> getContent() {
