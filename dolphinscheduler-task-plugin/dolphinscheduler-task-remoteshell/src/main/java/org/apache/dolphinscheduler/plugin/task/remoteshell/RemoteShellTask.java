@@ -90,7 +90,6 @@ public class RemoteShellTask extends AbstractTask {
             taskId = TASK_ID_PREFIX + taskExecutionContext.getTaskInstanceId();
         }
         setAppIds(taskId);
-        taskExecutionContext.setAppIds(taskId);
 
         initRemoteExecutor();
     }
