@@ -609,11 +609,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
+
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -663,6 +669,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             this.putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -769,6 +780,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         udfUserMapper.deleteByUserId(userId);
 
         if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
@@ -870,6 +886,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = userMapper.selectById(userId);
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
