@@ -672,11 +672,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return result;
         }
 
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
         // 2. check if project is existed
         Project project = this.projectMapper.queryByCode(projectCode);
         if (project == null) {
@@ -886,11 +881,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         User user = userMapper.selectById(userId);
         if (user == null) {
             putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
