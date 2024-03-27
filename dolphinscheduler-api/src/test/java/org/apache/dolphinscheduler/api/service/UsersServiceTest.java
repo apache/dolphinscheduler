@@ -397,6 +397,14 @@ public class UsersServiceTest {
         result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProject(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test
@@ -418,6 +426,14 @@ public class UsersServiceTest {
         result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test
@@ -527,11 +543,20 @@ public class UsersServiceTest {
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
         // success
         when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
         result = usersService.grantUDFFunction(loginUser, 1, udfIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(2);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(2)).thenReturn(loginUser);
+        result = this.usersService.grantUDFFunction(loginUser, 2, udfIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test

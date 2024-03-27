@@ -556,6 +556,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
@@ -603,11 +609,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
+
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -760,6 +772,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (user == null) {
             log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
