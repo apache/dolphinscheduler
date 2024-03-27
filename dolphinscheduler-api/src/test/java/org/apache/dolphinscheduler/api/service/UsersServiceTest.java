@@ -545,6 +545,13 @@ public class UsersServiceTest {
         Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setUserType(UserType.GENERAL_USER);
+        result = this.usersService.grantUDFFunction(loginUser, 2, udfIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
+
         // success
         when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
         result = usersService.grantUDFFunction(loginUser, 1, udfIds);
