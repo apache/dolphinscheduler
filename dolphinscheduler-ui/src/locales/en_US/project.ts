@@ -927,6 +927,8 @@ export default {
     code: 'Parameter Code',
     name: 'Parameter Name',
     value: 'Parameter Value',
+    create_user: 'Create User',
+    modify_user: 'Modify User',
     create_time: 'Create Time',
     update_time: 'Update Time',
     name_tips: 'Please enter your parameter name',

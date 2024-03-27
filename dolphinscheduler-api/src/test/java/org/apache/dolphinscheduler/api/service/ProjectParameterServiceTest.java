@@ -98,6 +98,9 @@ public class ProjectParameterServiceTest {
         Mockito.when(projectParameterMapper.updateById(Mockito.any())).thenReturn(1);
         result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key1", "value");
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        ProjectParameter projectParameter = (ProjectParameter) result.getData();
+        Assertions.assertNotNull(projectParameter.getOperator());
+        Assertions.assertNotNull(projectParameter.getUpdateTime());
     }
 
     @Test

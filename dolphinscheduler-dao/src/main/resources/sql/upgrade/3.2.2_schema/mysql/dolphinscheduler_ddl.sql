@@ -25,3 +25,4 @@ CREATE TABLE `t_ds_relation_project_worker_group` (
   UNIQUE KEY unique_project_worker_group(project_code,worker_group)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
+ALTER TABLE t_ds_project_parameter ADD  `operator` int(11) DEFAULT NULL COMMENT 'operator user id';
