@@ -437,6 +437,8 @@ export default {
     timeout_period_tips: '超时时长必须为正整数',
     script: '脚本',
     script_tips: '请输入脚本（必填）',
+    master: 'Master',
+    master_tips: '请输入master url（必填）',
     init_script: '初始化脚本',
     init_script_tips: '请输入初始化脚本',
     resources: '资源',
