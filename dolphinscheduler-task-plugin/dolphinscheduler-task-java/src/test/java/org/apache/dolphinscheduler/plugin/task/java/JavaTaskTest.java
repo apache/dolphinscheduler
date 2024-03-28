@@ -84,8 +84,9 @@ public class JavaTaskTest {
     public void buildJarCommand() {
         String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
         JavaTask javaTask = runJarType();
-        Assertions.assertEquals(javaTask.buildJarCommand(), homeBinPath
-                + "java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+        String buildJarCommand = javaTask.buildJarCommand();
+        Assertions.assertEquals(buildJarCommand, homeBinPath
+                + "java -Djava.ext.dirs=\"$JAVA_HOME/jre/lib/ext;opt/share/jar\" -jar /opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -284,7 +285,7 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskAppId("runJavaType");
         ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
         resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
-        resourceItem1.setResourceAbsolutePathInLocal("opt/share/jar/resource2.jar");
+        resourceItem1.setResourceAbsolutePathInLocal("/opt/share/jar/resource2.jar");
 
         ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
         resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
