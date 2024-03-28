@@ -366,6 +366,10 @@ export default {
                             {
                                 title: 'doris',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/doris.html',
+                            },
+                            {
+                                title: 'flink',
+                                link: '/en-us/docs/dev/user_doc/guide/datasource/flink.html',
                             }
                         ],
                     },
@@ -1086,6 +1090,10 @@ export default {
                             {
                                 title: 'Doris',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/doris.html',
+                            },
+                            {
+                                title: 'Flink',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/flink.html',
                             }
                         ],
                     },

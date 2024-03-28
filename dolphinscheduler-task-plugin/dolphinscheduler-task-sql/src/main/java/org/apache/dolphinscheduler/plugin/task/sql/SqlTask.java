@@ -188,6 +188,22 @@ public class SqlTask extends AbstractTask {
                 Connection connection =
                         DataSourceClientProvider.getAdHocConnection(DbType.valueOf(sqlParameters.getType()),
                                 baseConnectionParam)) {
+            // main execute
+            String result = null;
+            if (sqlParameters.getType().equals("FLINK")) {
+                // pre execute
+                executeFlinkSQLQuery(connection, preStatementsBinds, "pre");
+
+                // query statements need to be convert to JsonArray and inserted into Alert to send
+                result = executeFlinkSQLQuery(connection, mainStatementsBinds.get(0), "main");
+
+                sqlParameters.dealOutParam(result);
+
+                // post execute
+                executeFlinkSQLQuery(connection, postStatementsBinds, "post");
+
+                return;
+            }
 
             // create temp function
             if (CollectionUtils.isNotEmpty(createFuncs)) {
@@ -197,8 +213,6 @@ public class SqlTask extends AbstractTask {
             // pre execute
             executeUpdate(connection, preStatementsBinds, "pre");
 
-            // main execute
-            String result = null;
             // decide whether to executeQuery or executeUpdate based on sqlType
             if (sqlParameters.getSqlType() == SqlType.QUERY.ordinal()) {
                 // query statements need to be convert to JsonArray and inserted into Alert to send
@@ -208,6 +222,7 @@ public class SqlTask extends AbstractTask {
                 String updateResult = executeUpdate(connection, mainStatementsBinds, "main");
                 result = setNonQuerySqlReturn(updateResult, sqlParameters.getLocalParams());
             }
+
             // deal out params
             sqlParameters.dealOutParam(result);
 
@@ -317,6 +332,25 @@ public class SqlTask extends AbstractTask {
             ResultSet resultSet = statement.executeQuery();
             return resultProcess(resultSet);
         }
+    }
+
+    // see https://nightlies.apache.org/flink/flink-docs-master/docs/dev/table/jdbcdriver/#java
+    private String executeFlinkSQLQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
+        try (Statement statement = connection.createStatement()) {
+            log.info("{} statement execute flink sql query, for sql: {}", handlerType, sqlBinds.getSql());
+            ResultSet resultSet = statement.executeQuery(sqlBinds.getSql());
+            return resultProcess(resultSet);
+        }
+    }
+
+    private String executeFlinkSQLQuery(Connection connection, List<SqlBinds> statementsBinds, String handlerType) throws Exception {
+        String result = "";
+        for (SqlBinds sqlBind : statementsBinds) {
+            result = executeFlinkSQLQuery(connection, sqlBind, handlerType);
+            log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
+                    sqlBind.getSql());
+        }
+        return String.valueOf(result);
     }
 
     private String executeUpdate(Connection connection, List<SqlBinds> statementsBinds,

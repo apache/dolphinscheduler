@@ -124,6 +124,7 @@
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
+        <flink-jdbc.version>1.18.1</flink-jdbc.version>
     </properties>
 
     <dependencyManagement>
@@ -576,6 +577,12 @@
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
                 <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-sql-jdbc-driver-bundle</artifactId>
+                <version>${flink-jdbc.version}</version>
             </dependency>
 
             <dependency>
