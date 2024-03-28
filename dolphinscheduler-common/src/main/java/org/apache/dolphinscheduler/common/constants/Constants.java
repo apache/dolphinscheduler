@@ -726,6 +726,13 @@ public final class Constants {
     public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
 
     /**
+     * remote logging for ABS
+     */
+    public static final String REMOTE_LOGGING_ABS_ACCOUNT_NAME = "remote.logging.abs.account.name";
+    public static final String REMOTE_LOGGING_ABS_ACCOUNT_KEY = "remote.logging.abs.account.key";
+    public static final String REMOTE_LOGGING_ABS_CONTAINER_NAME = "remote.logging.abs.container.name";
+
+    /**
      * data quality
      */
     public static final String DATABASES_QUERY = "show databases";
