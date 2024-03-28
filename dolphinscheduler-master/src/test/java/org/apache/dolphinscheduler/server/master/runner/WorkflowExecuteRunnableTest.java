@@ -17,11 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVERY_START_NODE_STRING;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
-
+import com.google.common.collect.Sets;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -47,20 +43,6 @@ import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +52,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import com.google.common.collect.Sets;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -397,5 +386,16 @@ public class WorkflowExecuteRunnableTest {
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
         workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
         Mockito.verify(taskExecuteRunnable).dispatch();
+    }
+
+    @Test
+    void testExecuteTask() {
+        Mockito.doNothing().when(processService).packageTaskInstance(any(), any());
+        // simulate processService.submitTask() fail
+        Mockito.when(processService.submitTask(any(), any())).thenReturn(false);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setName("ds");
+        Boolean result = ReflectionTestUtils.invokeMethod(workflowExecuteThread, "executeTask", taskInstance);
+        Assertions.assertEquals(Boolean.FALSE, result);
     }
 }
