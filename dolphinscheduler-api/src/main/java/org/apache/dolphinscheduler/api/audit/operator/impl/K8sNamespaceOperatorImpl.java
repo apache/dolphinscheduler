@@ -15,28 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit;
+package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public class AuditSubscriberImpl implements AuditSubscriber {
+@Service
+public class K8sNamespaceOperatorImpl extends BaseOperator {
 
     @Autowired
-    private AuditLogMapper logMapper;
+    private K8sNamespaceMapper k8sNamespaceMapper;
 
     @Override
-    public void execute(AuditMessage message) {
-        AuditLog auditLog = new AuditLog();
-        auditLog.setUserId(message.getUser().getId());
-        auditLog.setResourceType(message.getResourceType().getCode());
-        auditLog.setOperation(message.getOperation().getCode());
-        auditLog.setTime(message.getAuditDate());
-        auditLog.setResourceId(message.getResourceId());
-        logMapper.insert(auditLog);
+    public String getObjectNameFromReturnIdentity(Object identity) {
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        K8sNamespace obj = k8sNamespaceMapper.selectById(objId);
+        return obj == null ? "" : obj.getNamespace();
     }
 }

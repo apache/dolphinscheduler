@@ -293,7 +293,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         // no master
         if (masterServers.isEmpty()) {
-            throw new ServiceException(Status.MASTER_NOT_EXISTS);
+            // throw new ServiceException(Status.MASTER_NOT_EXISTS);
         }
     }
 

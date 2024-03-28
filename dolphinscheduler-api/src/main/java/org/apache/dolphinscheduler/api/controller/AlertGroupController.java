@@ -24,6 +24,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALERT_GROUP_ERR
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERTGROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_GROUP_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
@@ -86,6 +88,7 @@ public class AlertGroupController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.ALARM_GROUP_CREATE)
     public Result<AlertGroup> createAlertGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "groupName") String groupName,
                                                @RequestParam(value = "description", required = false) String description,
@@ -195,6 +198,7 @@ public class AlertGroupController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.ALARM_GROUP_UPDATE)
     public Result<AlertGroup> updateAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @PathVariable(value = "id") int id,
                                                    @RequestParam(value = "groupName") String groupName,
@@ -219,6 +223,7 @@ public class AlertGroupController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_GROUP_ERROR)
+    @OperatorLog(auditType = AuditType.ALARM_GROUP_DELETE)
     public Result<Boolean> deleteAlertGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @PathVariable(value = "id") int id) {
         alertGroupService.deleteAlertGroupById(loginUser, id);

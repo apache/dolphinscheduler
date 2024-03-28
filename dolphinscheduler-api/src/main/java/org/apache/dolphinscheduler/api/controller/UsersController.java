@@ -32,6 +32,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -88,6 +90,7 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/create")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_USER_ERROR)
+    @OperatorLog(auditType = AuditType.USER_CREATE)
     public Result createUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                              @RequestParam(value = "userName") String userName,
                              @RequestParam(value = "userPassword") String userPassword,
@@ -159,6 +162,7 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/update")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_USER_ERROR)
+    @OperatorLog(auditType = AuditType.USER_UPDATE)
     public Result<User> updateUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id,
                                    @RequestParam(value = "userName") String userName,
@@ -196,6 +200,7 @@ public class UsersController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_USER_BY_ID_ERROR)
+    @OperatorLog(auditType = AuditType.USER_DELETE)
     public Result delUserById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @RequestParam(value = "id") int id) throws Exception {
         Map<String, Object> result = usersService.deleteUserById(loginUser, id);

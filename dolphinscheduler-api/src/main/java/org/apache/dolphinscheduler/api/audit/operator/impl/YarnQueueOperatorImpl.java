@@ -15,14 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit;
+package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-public interface AuditSubscriber {
+import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
+import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 
-    /**
-     * process the audit message
-     *
-     * @param message
-     */
-    void execute(AuditMessage message);
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class YarnQueueOperatorImpl extends BaseOperator {
+
+    @Autowired
+    private QueueMapper queueMapper;
+
+    @Override
+    public String getObjectNameFromReturnIdentity(Object identity) {
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        Queue obj = queueMapper.selectById(objId);
+        return obj == null ? "" : obj.getQueueName();
+    }
 }

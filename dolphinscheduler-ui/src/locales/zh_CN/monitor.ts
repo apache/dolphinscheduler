@@ -58,9 +58,11 @@ export default {
   },
   audit_log: {
     user_name: '用户名称',
-    resource_type: '资源类型',
-    project_name: '项目名称',
     operation_type: '操作类型',
+    object_type: '对象类型',
+    object_name: '对象名称',
+    latency: '耗时',
+    description: '描述',
     create_time: '创建时间',
     start_time: '开始时间',
     end_time: '结束时间',
