@@ -91,8 +91,7 @@ public class AccessTokenV2ControllerTest extends AbstractControllerTest {
                 .header("sessionId", sessionId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(paramsMap)))
-                // todo: bad request?
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

@@ -210,7 +210,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/1")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -224,7 +224,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/2")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -242,7 +242,7 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(put("/alert-groups/2")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

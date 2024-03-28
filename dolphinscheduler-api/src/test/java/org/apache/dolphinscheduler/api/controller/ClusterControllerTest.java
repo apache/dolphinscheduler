@@ -173,7 +173,7 @@ public class ClusterControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/cluster/verify-cluster")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 

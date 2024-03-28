@@ -59,7 +59,7 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
@@ -82,7 +82,7 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/update")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 

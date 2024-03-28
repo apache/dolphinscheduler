@@ -109,7 +109,7 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
         mvcResult = mockMvc.perform(post("/k8s-namespace/verify")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

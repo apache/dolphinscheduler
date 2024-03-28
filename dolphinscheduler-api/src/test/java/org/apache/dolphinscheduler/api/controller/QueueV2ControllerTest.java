@@ -134,7 +134,7 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueVerifyRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
@@ -149,7 +149,7 @@ public class QueueV2ControllerTest extends AbstractControllerTest {
                 .accept(MediaType.ALL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JSONUtils.toJsonString(queueVerifyRequest)))
-                .andExpect(status().isOk())
+                .andExpect(status().isInternalServerError())
                 .andReturn();
         result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
