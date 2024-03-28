@@ -53,6 +53,11 @@ public class TaskGroupQueueDaoImpl extends BaseDao<TaskGroupQueue, TaskGroupQueu
     }
 
     @Override
+    public List<TaskGroupQueue> queryInQueueTaskGroupQueue(int minTaskGroupQueueId, int limit) {
+        return mybatisMapper.queryInQueueTaskGroupQueue(Flag.YES.getCode(), minTaskGroupQueueId, limit);
+    }
+
+    @Override
     public List<TaskGroupQueue> queryAllInQueueTaskGroupQueueByGroupId(Integer taskGroupId) {
         return mybatisMapper.queryAllInQueueTaskGroupQueueByGroupId(taskGroupId, Flag.YES.getCode());
     }
@@ -69,5 +74,22 @@ public class TaskGroupQueueDaoImpl extends BaseDao<TaskGroupQueue, TaskGroupQueu
                 TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode(),
                 Flag.YES.getCode(),
                 Flag.NO.getCode());
+    }
+
+    @Override
+    public int countUsingTaskGroupQueueByGroupId(Integer taskGroupId) {
+        return mybatisMapper.countUsingTaskGroupQueueByGroupId(taskGroupId,
+                TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode(),
+                Flag.YES.ordinal(),
+                Flag.NO.getCode());
+    }
+
+    @Override
+    public List<TaskGroupQueue> queryWaitNotifyForceStartTaskGroupQueue(int minTaskGroupQueueId, int limit) {
+        return mybatisMapper.queryWaitNotifyForceStartTaskGroupQueue(
+                Flag.YES.getCode(),
+                Flag.YES.getCode(),
+                minTaskGroupQueueId,
+                limit);
     }
 }
