@@ -39,3 +39,5 @@ The main configuration parameters are as follows:
 ## Note
 
 When you run the task in JAVA execution mode, the public class must exist in the code, and you could omit writing a package statement.
+
+For security reasons, when executing JAVA tasks, please use the environment management module to configure the JDK environment, such as `JAVA_HOME` and other environment variables.
