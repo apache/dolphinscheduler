@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.remoteshell;
 
+import static org.apache.dolphinscheduler.plugin.task.remoteshell.RemoteExecutor.COMMAND.PSTREE_COMMAND;
+
 import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
@@ -50,7 +54,6 @@ public class RemoteExecutor implements AutoCloseable {
     static final int TRACK_INTERVAL = 5000;
 
     protected Map<String, String> taskOutputParams = new HashMap<>();
-
     private SshClient sshClient;
     private ClientSession session;
     private SSHConnectionParam sshConnectionParam;
@@ -154,9 +157,43 @@ public class RemoteExecutor implements AutoCloseable {
 
     public void kill(String taskId) throws IOException {
         String pid = getTaskPid(taskId);
-        String killCommand = String.format(COMMAND.KILL_COMMAND, pid);
+
+        if (StringUtils.isEmpty(pid)) {
+            log.warn("query remote-shell task remote process id with empty");
+            return;
+        }
+        if (!NumberUtils.isParsable(pid)) {
+            log.error("query remote-shell task remote process id error, pid {} can not parse to number", pid);
+            return;
+        }
+
+        // query all pid
+        String remotePidStr = getAllRemotePidStr(pid);
+        String killCommand = String.format(COMMAND.KILL_COMMAND, remotePidStr);
+        log.info("prepare to execute kill command in host: {}, kill cmd: {}", sshConnectionParam.getHost(),
+                killCommand);
         runRemote(killCommand);
         cleanData(taskId);
+    }
+
+    protected String getAllRemotePidStr(String pid) {
+
+        String remoteProcessIdStr = "";
+        String cmd = String.format(PSTREE_COMMAND, pid);
+        log.info("query all process id cmd: {}", cmd);
+
+        try {
+            String rawPidStr = runRemote(cmd);
+            remoteProcessIdStr = ProcessUtils.parsePidStr(rawPidStr);
+            if (!remoteProcessIdStr.startsWith(pid)) {
+                log.error("query remote process id error, [{}] first pid not equal [{}]", remoteProcessIdStr, pid);
+                remoteProcessIdStr = pid;
+            }
+        } catch (Exception e) {
+            log.error("query remote all process id error", e);
+            remoteProcessIdStr = pid;
+        }
+        return remoteProcessIdStr;
     }
 
     public String getTaskPid(String taskId) throws IOException {
@@ -238,6 +275,9 @@ public class RemoteExecutor implements AutoCloseable {
         static final String ADD_STATUS_COMMAND = "\necho %s$?";
 
         static final String CAT_FINAL_SCRIPT = "cat %s%s.sh";
+
+        static final String PSTREE_COMMAND = "pstree -p %s";
+
     }
 
 }
