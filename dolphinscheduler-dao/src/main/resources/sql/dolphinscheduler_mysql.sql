@@ -1066,8 +1066,6 @@ VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '',
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY','') into @new_sql_mode;
-SET sql_mode=@new_sql_mode;
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,
