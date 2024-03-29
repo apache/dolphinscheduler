@@ -50,6 +50,10 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
     @Override
     public void addAudit(AuditLog auditLog) {
+        if (auditLog.getObjectId() == null || auditLog.getObjectName() == null) {
+            return;
+        }
+
         auditLogMapper.insert(auditLog);
     }
 

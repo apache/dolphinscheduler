@@ -72,8 +72,12 @@ public class ScheduleOperatorImpl extends BaseOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
+        Long objId = checkNum(identity);
+        if (objId == -1) {
+            return "";
+        }
 
-        ProcessDefinition obj = processDefinitionMapper.queryByCode((long) identity);
+        ProcessDefinition obj = processDefinitionMapper.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

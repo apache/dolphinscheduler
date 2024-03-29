@@ -60,7 +60,7 @@ public class ProcessOperatorImpl extends BaseOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity.toString());
+        Long objId = checkNum(identity);
         if (objId == -1) {
             return "";
         }

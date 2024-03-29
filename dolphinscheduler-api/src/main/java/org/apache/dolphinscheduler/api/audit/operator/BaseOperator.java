@@ -194,6 +194,10 @@ public abstract class BaseOperator implements Operator {
             return;
         }
 
+        if (returnObjectMap.get(params[0]) == null) {
+            return;
+        }
+
         Long objId = checkNum(returnObjectMap.get(params[0]).toString());
 
         if (objId != -1) {
@@ -201,10 +205,10 @@ public abstract class BaseOperator implements Operator {
         }
     }
 
-    protected Long checkNum(String str) {
+    protected Long checkNum(Object str) {
         try {
-            return Long.parseLong(str);
-        } catch (NumberFormatException e) {
+            return Long.parseLong(str.toString());
+        } catch (Exception e) {
             return -1L;
         }
     }

@@ -32,7 +32,7 @@ public class K8sNamespaceOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity.toString());
+        Long objId = checkNum(identity);
         if (objId == -1) {
             return "";
         }
