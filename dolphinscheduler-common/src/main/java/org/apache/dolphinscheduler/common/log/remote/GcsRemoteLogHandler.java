@@ -49,19 +49,6 @@ public class GcsRemoteLogHandler implements RemoteLogHandler, Closeable {
     private static GcsRemoteLogHandler instance;
 
     private GcsRemoteLogHandler() {
-
-    }
-
-    public static synchronized GcsRemoteLogHandler getInstance() {
-        if (instance == null) {
-            instance = new GcsRemoteLogHandler();
-            instance.init();
-        }
-
-        return instance;
-    }
-
-    public void init() {
         try {
             credential = readCredentials();
             bucketName = readBucketName();
@@ -71,6 +58,14 @@ public class GcsRemoteLogHandler implements RemoteLogHandler, Closeable {
         } catch (IOException e) {
             log.error("GCS Remote Log Handler init failed", e);
         }
+    }
+
+    public static synchronized GcsRemoteLogHandler getInstance() {
+        if (instance == null) {
+            instance = new GcsRemoteLogHandler();
+        }
+
+        return instance;
     }
 
     @Override
