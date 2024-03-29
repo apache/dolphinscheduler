@@ -39,22 +39,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  */
 public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
-    List<Integer> queryTaskByProcessIdAndState(@Param("processInstanceId") Integer processInstanceId,
-                                               @Param("state") Integer state);
-
     List<TaskInstance> findValidTaskListByProcessId(@Param("processInstanceId") Integer processInstanceId,
                                                     @Param("flag") Flag flag,
                                                     @Param("testFlag") int testFlag);
-
-    List<TaskInstance> queryByHostAndStatus(@Param("host") String host,
-                                            @Param("states") int[] stateArray);
-
-    int setFailoverByHostAndStateArray(@Param("host") String host,
-                                       @Param("states") int[] stateArray,
-                                       @Param("destStatus") TaskExecutionStatus destStatus);
-
-    TaskInstance queryByInstanceIdAndName(@Param("processInstanceId") int processInstanceId,
-                                          @Param("name") String name);
 
     TaskInstance queryByInstanceIdAndCode(@Param("processInstanceId") int processInstanceId,
                                           @Param("taskCode") Long taskCode);
@@ -65,9 +52,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     List<TaskInstance> queryByProcessInstanceIdsAndTaskCodes(@Param("processInstanceIds") List<Integer> processInstanceIds,
                                                              @Param("taskCodes") List<Long> taskCodes);
-
-    Integer countTask(@Param("projectCodes") Long[] projectCodes,
-                      @Param("taskIds") int[] taskIds);
 
     /**
      * Statistics task instance group by given project codes list by start time
@@ -97,20 +81,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                                   @Param("endTime") Date endTime,
                                                                   @Param("projectIds") Set<Integer> projectIds);
 
-    /**
-     * Statistics task instance group by given project codes list by submit time
-     * <p>
-     * We only need project codes to determine whether the task instance belongs to the user or not.
-     *
-     * @param startTime    Statistics start time
-     * @param endTime      Statistics end time
-     * @param projectCodes Project codes list to filter
-     * @return List of ExecuteStatusCount
-     */
-    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStatesBySubmitTime(@Param("startTime") Date startTime,
-                                                                                       @Param("endTime") Date endTime,
-                                                                                       @Param("projectCodes") Long[] projectCodes,
-                                                                                       @Param("states") List<TaskExecutionStatus> states);
     /**
      * Statistics task instance group by given project codes list by submit time
      * <p>
@@ -158,9 +128,6 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                           @Param("taskExecuteType") TaskExecuteType taskExecuteType,
                                                           @Param("startTime") Date startTime,
                                                           @Param("endTime") Date endTime);
-
-    List<TaskInstance> loadAllInfosNoRelease(@Param("processInstanceId") int processInstanceId,
-                                             @Param("status") int status);
 
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 

@@ -52,6 +52,17 @@ public enum WorkflowExecutionStatus {
             READY_STOP.getCode()
     };
 
+    private static final int[] NOT_TERMINAL_STATUS = new int[]{
+            SUBMITTED_SUCCESS.getCode(),
+            RUNNING_EXECUTION.getCode(),
+            DELAY_EXECUTION.getCode(),
+            READY_PAUSE.getCode(),
+            READY_STOP.getCode(),
+            SERIAL_WAIT.getCode(),
+            READY_BLOCK.getCode(),
+            WAIT_TO_RUN.getCode()
+    };
+
     static {
         for (WorkflowExecutionStatus executionStatus : WorkflowExecutionStatus.values()) {
             CODE_MAP.put(executionStatus.getCode(), executionStatus);
@@ -114,6 +125,10 @@ public enum WorkflowExecutionStatus {
 
     public static int[] getNeedFailoverWorkflowInstanceState() {
         return NEED_FAILOVER_STATES;
+    }
+
+    public static int[] getNotTerminalStatus() {
+        return NOT_TERMINAL_STATUS;
     }
 
     @EnumValue

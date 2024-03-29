@@ -343,7 +343,7 @@ public class TaskInstanceServiceTest {
     }
 
     @Test
-    public void forceTaskSuccess() {
+    public void testForceTaskSuccess() {
         User user = getAdminUser();
         long projectCode = 1L;
         Project project = getProject(projectCode);
@@ -392,12 +392,14 @@ public class TaskInstanceServiceTest {
 
         // test success
         task.setState(TaskExecutionStatus.FAILURE);
+        task.setEndTime(null);
         when(taskInstanceMapper.updateById(task)).thenReturn(1);
         putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
         Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
         Assertions.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
+        Assertions.assertNotNull(task.getEndTime());
 
     }
 

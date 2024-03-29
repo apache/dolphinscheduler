@@ -111,7 +111,7 @@ public class WorkFlowLineageController extends BaseController {
      * @param projectCode project codes which taskCode belong
      * @param processDefinitionCode project code which taskCode belong
      * @param taskCode task definition code
-     * @return Result of task can be delete or not
+     * @return Result of task can be deleted or not
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
     @Parameters({
@@ -134,5 +134,21 @@ public class WorkFlowLineageController extends BaseController {
         }
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Operation(summary = "queryDownstreamDependentTaskList", description = "QUERY_DOWNSTREAM_DEPENDENT_TASK_NOTES")
+    @Parameters({
+            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class)),
+            @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = false, schema = @Schema(implementation = Long.class, example = "123456789")),
+    })
+    @GetMapping(value = "/query-dependent-tasks")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+    public Result<Map<String, Object>> queryDownstreamDependentTaskList(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                        @RequestParam(value = "workFlowCode") Long workFlowCode,
+                                                                        @RequestParam(value = "taskCode", required = false, defaultValue = "0") Long taskCode) {
+        Map<String, Object> result =
+                workFlowLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
+        return returnDataList(result);
     }
 }

@@ -26,28 +26,27 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.Maps;
 
+import delight.nashornsandbox.NashornSandbox;
+import delight.nashornsandbox.NashornSandboxes;
+
 @Slf4j
 public class SwitchTaskUtils {
 
-    private static final ScriptEngineManager manager;
-    private static final ScriptEngine engine;
+    private static final NashornSandbox sandbox;
     private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
 
     static {
-        manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("js");
+        sandbox = NashornSandboxes.create();
     }
 
     public static boolean evaluate(String expression) throws ScriptException {
-        Object result = engine.eval(expression);
+        Object result = sandbox.eval(expression);
         return Boolean.TRUE.equals(result);
     }
 
@@ -55,7 +54,7 @@ public class SwitchTaskUtils {
                                                        Map<String, Property> varParams) {
         String content = condition.replaceAll("'", "\"");
         if (MapUtils.isEmpty(globalParams) && MapUtils.isEmpty(varParams)) {
-            throw new IllegalArgumentException("globalParams and varParams are both empty, please check it.");
+            return content;
         }
         Map<String, Property> params = Maps.newHashMap();
         if (MapUtils.isNotEmpty(globalParams)) {

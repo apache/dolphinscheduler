@@ -32,7 +32,7 @@ public class LocalStorageOperatorFactory implements StorageOperateFactory {
     public StorageOperate createStorageOperate() {
         HdfsStorageProperties hdfsStorageProperties = new HdfsStorageProperties();
         hdfsStorageProperties.setDefaultFS(LOCAL_DEFAULT_FS);
-        return new HdfsStorageOperator(hdfsStorageProperties);
+        return new LocalStorageOperator(hdfsStorageProperties);
     }
 
     @Override

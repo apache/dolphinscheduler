@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.base;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
@@ -27,15 +28,11 @@ import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
-
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -55,8 +52,8 @@ public class NettyRemotingServer {
 
     private final ServerBootstrap serverBootstrap = new ServerBootstrap();
 
-    private final ExecutorService defaultExecutor =
-            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+    private final ExecutorService defaultExecutor = ThreadUtils
+            .newDaemonFixedThreadExecutor("NettyRemotingServerThread", Runtime.getRuntime().availableProcessors() * 2);
 
     private final EventLoopGroup bossGroup;
 
@@ -68,16 +65,12 @@ public class NettyRemotingServer {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    private static final String NETTY_BIND_FAILURE_MSG = "NettyRemotingServer bind %s fail";
-
     public NettyRemotingServer(final NettyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
         ThreadFactory bossThreadFactory =
-                new ThreadFactoryBuilder().setDaemon(true).setNameFormat(serverConfig.getServerName() + "BossThread_%s")
-                        .build();
+                ThreadUtils.newDaemonThreadFactory(serverConfig.getServerName() + "BossThread_%s");
         ThreadFactory workerThreadFactory =
-                new ThreadFactoryBuilder().setDaemon(true)
-                        .setNameFormat(serverConfig.getServerName() + "WorkerThread_%s").build();
+                ThreadUtils.newDaemonThreadFactory(serverConfig.getServerName() + "WorkerThread_%s");
         if (Epoll.isAvailable()) {
             this.bossGroup = new EpollEventLoopGroup(1, bossThreadFactory);
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);

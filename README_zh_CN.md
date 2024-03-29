@@ -62,14 +62,14 @@ DolphinScheduler 的主要特性如下：
 
 - 加入 [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack)
 - 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息 <!-- markdown-link-check-disable-line -->
-- 订阅 DolphinScheduler 邮件列表, 用户订阅 users@dolphinscheduler.apache.org 开发者请订阅 dev@dolphinscheduler.apache.org
+- 订阅 DolphinScheduler 邮件列表, 用户订阅 [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) 开发者请订阅 [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org)
 
 # Landscapes
 
 <p align="center">
 <br/><br/>
-<img src="https://landscape.cncf.io/images/left-logo.svg" width="150"/>&nbsp;&nbsp;<img src="https://landscape.cncf.io/images/right-logo.svg" width="200"/>
+<img src="./images/cncf-landscape-white-bg.jpg" width="175" alt="cncf-landscape"/>&nbsp;&nbsp;<img src="./images/cncf-white-bg.jpg" width="200" alt="cncf-logo"/>
 <br/><br/>
-DolphinScheduler enriches the <a href="https://landscape.cncf.io/?landscape=observability-and-analysis&license=apache-license-2-0">CNCF CLOUD NATIVE Landscape.</a >
+DolphinScheduler enriches the <a href="https://landscape.cncf.io/?item=orchestration-management--scheduling-orchestration--dolphinscheduler">CNCF CLOUD NATIVE Landscape.</a >
 
 </p >

@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.mockito.BDDMockito.given;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -65,8 +67,10 @@ public class MasterRegistryClientTest {
     private MasterConfig masterConfig;
 
     @BeforeEach
-    public void before() throws Exception {
+    public void before() {
         given(registryClient.getHostByEventDataPath(Mockito.anyString())).willReturn("127.0.0.1:8080");
+        given(masterHeartBeatTask.getHeartBeat())
+                .willReturn(MasterHeartBeat.builder().serverStatus(ServerStatus.NORMAL).build());
         ReflectionTestUtils.setField(masterRegistryClient, "registryClient", registryClient);
         ReflectionTestUtils.setField(masterRegistryClient, "masterHeartBeatTask", masterHeartBeatTask);
 
@@ -98,5 +102,11 @@ public class MasterRegistryClientTest {
         masterRegistryClient.removeMasterNodePath("/path", RegistryNodeType.MASTER, true);
         // Cannot mock static methods
         masterRegistryClient.removeWorkerNodePath("/path", RegistryNodeType.WORKER, true);
+    }
+
+    @Test
+    public void removeWorkNodePathTest() {
+        masterRegistryClient.removeWorkerNodePath("", RegistryNodeType.WORKER, true);
+        masterRegistryClient.removeWorkerNodePath(null, RegistryNodeType.WORKER, true);
     }
 }

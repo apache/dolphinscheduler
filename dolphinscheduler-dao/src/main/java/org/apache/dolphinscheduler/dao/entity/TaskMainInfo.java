@@ -63,6 +63,11 @@ public class TaskMainInfo {
     private Date taskUpdateTime;
 
     /**
+     * projectCode
+     */
+    private long projectCode;
+
+    /**
      * processDefinitionCode
      */
     private long processDefinitionCode;

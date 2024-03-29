@@ -131,7 +131,7 @@ public enum Status {
     VERIFY_USERNAME_ERROR(10100, "verify username error", "用户名验证错误"),
     UNAUTHORIZED_USER_ERROR(10101, "unauthorized user error", "查询未授权用户错误"),
     AUTHORIZED_USER_ERROR(10102, "authorized user error", "查询授权用户错误"),
-    QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error", "查询任务实例日志错误"),
+    QUERY_TASK_INSTANCE_LOG_ERROR(10103, "view task instance log error: {0}", "查询任务实例日志错误: {0}"),
     DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR(10104, "download task instance log file error", "下载任务日志文件错误"),
     CREATE_PROCESS_DEFINITION_ERROR(10105, "create process definition error", "创建工作流错误"),
     VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR(10106, "verify process definition name unique error", "工作流定义名称验证错误"),
@@ -585,6 +585,15 @@ public enum Status {
     WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS(1401002,
             "You can not modify or remove this worker group, cause it has [{0}] dependent environments.",
             "不能修改或删除该Worker组，有 [{0}] 个环境配置正在使用"),
+
+    WORKER_GROUP_NOT_EXIST(1402001, "The Worker group [{0}] not exists", "Worker组[{0}]不存在."),
+    ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR(1402002, "Failed to assign these worker groups to the project",
+            "给项目分配工作组失败"),
+    WORKER_GROUP_TO_PROJECT_IS_EMPTY(1402003, "Need to assign at least one worker group to the project",
+            "需要给项目至少分配一个Worker组"),
+    USED_WORKER_GROUP_EXISTS(1402004,
+            "You can not reassign worker groups to the project, cause these worker groups {0} are already used.",
+            "Worker组{0}被项目中任务或定时引用，无法重新分配"),
             ;
     private final int code;
     private final String enMsg;
