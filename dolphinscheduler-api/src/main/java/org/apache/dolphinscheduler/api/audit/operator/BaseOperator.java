@@ -69,7 +69,7 @@ public abstract class BaseOperator implements Operator {
         setObjectIdentityFromReturnObject(auditType, result, auditLogList);
 
         modifyAuditOperationType(auditType, paramsMap, auditLogList);
-        modifyAuditObjectType(paramsMap, auditLogList);
+        modifyAuditObjectType(auditType, paramsMap, auditLogList);
 
         long latency = System.currentTimeMillis() - beginTime;
         auditService.addAudit(auditLogList, latency);
@@ -178,7 +178,7 @@ public abstract class BaseOperator implements Operator {
                                        List<AuditLog> auditLogList) {
     }
 
-    protected void modifyAuditObjectType(Map<String, Object> paramsMap,
+    protected void modifyAuditObjectType(AuditType auditType, Map<String, Object> paramsMap,
                                          List<AuditLog> auditLogList) {
 
     }
@@ -206,6 +206,14 @@ public abstract class BaseOperator implements Operator {
             return Long.parseLong(str);
         } catch (NumberFormatException e) {
             return -1L;
+        }
+    }
+
+    protected int checkNumInt(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 }

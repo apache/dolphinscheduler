@@ -32,7 +32,12 @@ public class TaskGroupOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        TaskGroup obj = taskGroupMapper.selectById((Long) identity);
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        TaskGroup obj = taskGroupMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

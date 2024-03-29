@@ -34,9 +34,9 @@ public enum AuditOperationType {
     BATCH_DELETE("Batch Delete"),
     BATCH_START("Batch Start"),
     DELETE("Delete"),
-    CLOSE("Close"), // 多条日志
+    CLOSE("Close"),
 
-    RELEASE("Release"), // 中间状态
+    RELEASE("Release"),
     ONLINE("Online"),
     OFFLINE("Offline"),
 
@@ -65,7 +65,7 @@ public enum AuditOperationType {
     UPLOAD("Upload"),
     AUTHORIZE("Authorize"),
     UN_AUTHORIZE("Un authorize"),
-    COPY("Copy"), // 多条日志
+    COPY("Copy"),
     ;
 
     private final String name;
@@ -84,10 +84,6 @@ public enum AuditOperationType {
 
     public static List<AuditOperationType> getOperationList() {
         return new ArrayList<>(AUDIT_OPERATION_MAP.values());
-    }
-
-    public static HashMap<String, AuditOperationType> getAuditOperationMap() {
-        return AUDIT_OPERATION_MAP;
     }
 
     public static AuditOperationType of(String name) {

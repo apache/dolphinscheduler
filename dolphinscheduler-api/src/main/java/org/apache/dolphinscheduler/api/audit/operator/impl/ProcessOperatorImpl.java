@@ -60,7 +60,12 @@ public class ProcessOperatorImpl extends BaseOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        ProcessDefinition obj = processDefinitionMapper.queryByCode((long) identity);
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        ProcessDefinition obj = processDefinitionMapper.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

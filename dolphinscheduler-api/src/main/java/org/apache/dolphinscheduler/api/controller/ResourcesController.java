@@ -601,7 +601,7 @@ public class ResourcesController extends BaseController {
     @DeleteMapping(value = "/udf-func/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_UDF_FUNCTION_ERROR)
-    @OperatorLog(auditType = AuditType.UDF_FUNCTION_UPDATE)
+    @OperatorLog(auditType = AuditType.UDF_FUNCTION_DELETE)
     public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId) {
         return udfFuncService.delete(loginUser, udfFuncId);

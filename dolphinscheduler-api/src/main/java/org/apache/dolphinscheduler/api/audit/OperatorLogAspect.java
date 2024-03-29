@@ -29,11 +29,13 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.stereotype.Component;
 
 import io.swagger.v3.oas.annotations.Operation;
 
 @Aspect
 @Slf4j
+@Component
 public class OperatorLogAspect {
 
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.audit.OperatorLog)")

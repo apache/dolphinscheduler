@@ -38,7 +38,6 @@ import static org.apache.dolphinscheduler.common.enums.AuditObjectType.UDF_FUNCT
 import static org.apache.dolphinscheduler.common.enums.AuditObjectType.USER;
 import static org.apache.dolphinscheduler.common.enums.AuditObjectType.WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.enums.AuditObjectType.YARN_QUEUE;
-import static org.apache.dolphinscheduler.common.enums.AuditOperationType.AUTHORIZE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_DELETE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_RERUN;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_START;
@@ -55,10 +54,8 @@ import static org.apache.dolphinscheduler.common.enums.AuditOperationType.MODIFY
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.OFFLINE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.ONLINE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.RELEASE;
-import static org.apache.dolphinscheduler.common.enums.AuditOperationType.RERUN;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.START;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.SWITCH_VERSION;
-import static org.apache.dolphinscheduler.common.enums.AuditOperationType.UN_AUTHORIZE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.UPDATE;
 
 import org.apache.dolphinscheduler.api.audit.operator.Operator;
@@ -109,14 +106,11 @@ public enum AuditType {
     PROCESS_START(PROCESS, START, ProcessOperatorImpl.class, new String[]{"processDefinitionCode"}, new String[]{}),
     PROCESS_BATCH_START(PROCESS, BATCH_START, ProcessOperatorImpl.class, new String[]{"processDefinitionCodes"},
             new String[]{}),
-    PROCESS_RERUN(PROCESS, RERUN, ProcessOperatorImpl.class, new String[]{"processInstanceId"}, new String[]{}),
-    PROCESS_BATCH_RERUN(PROCESS, BATCH_RERUN, ProcessOperatorImpl.class, new String[]{"processInstanceIds"},
+    PROCESS_BATCH_RERUN(PROCESS, BATCH_RERUN, ProcessInstanceOperatorImpl.class, new String[]{"processInstanceIds"},
             new String[]{}),
-    PROCESS_EXECUTE(PROCESS, EXECUTE, ProcessOperatorImpl.class, new String[]{"processInstanceId"}, new String[]{}),
-
-    // todo
-    PROCESS_IMPORT(PROCESS, IMPORT, ProcessOperatorImpl.class, new String[]{}, new String[]{}),
-
+    PROCESS_EXECUTE(PROCESS, EXECUTE, ProcessInstanceOperatorImpl.class, new String[]{"processInstanceId"},
+            new String[]{}),
+    PROCESS_IMPORT(PROCESS, IMPORT, ProcessOperatorImpl.class, new String[]{}, new String[]{"code"}),
     PROCESS_INSTANCE_UPDATE(PROCESS_INSTANCE, UPDATE, ProcessInstanceOperatorImpl.class, new String[]{"id"},
             new String[]{}),
     PROCESS_INSTANCE_DELETE(PROCESS_INSTANCE, DELETE, ProcessInstanceOperatorImpl.class, new String[]{"id"},
@@ -129,11 +123,8 @@ public enum AuditType {
     TASK_SWITCH_VERSION(TASK, SWITCH_VERSION, TaskOperatorImpl.class, new String[]{"code", "version"}, new String[]{}),
     TASK_DELETE_VERSION(TASK, DELETE_VERSION, TaskOperatorImpl.class, new String[]{"code", "version"}, new String[]{}),
     TASK_DELETE(TASK, DELETE, TaskOperatorImpl.class, new String[]{"code"}, new String[]{}),
-    // todo need test
     TASK_RELEASE(TASK, RELEASE, TaskOperatorImpl.class, new String[]{"code"}, new String[]{}),
     TASK_START(TASK, START, TaskOperatorImpl.class, new String[]{"code"}, new String[]{}),
-
-    // todo need test
     TASK_INSTANCE_FORCE_SUCCESS(TASK_INSTANCE, FORCE_SUCCESS, TaskInstancesOperatorImpl.class, new String[]{"id"},
             new String[]{}),
 
@@ -142,27 +133,21 @@ public enum AuditType {
     SCHEDULE_UPDATE(SCHEDULE, UPDATE, ScheduleOperatorImpl.class, new String[]{"id"}, new String[]{}),
     SCHEDULE_ONLINE(SCHEDULE, ONLINE, ScheduleOperatorImpl.class, new String[]{"id"}, new String[]{}),
     SCHEDULE_OFFLINE(SCHEDULE, OFFLINE, ScheduleOperatorImpl.class, new String[]{"id"}, new String[]{}),
-    // todo need test
     SCHEDULE_DELETE(SCHEDULE, DELETE, ScheduleOperatorImpl.class, new String[]{"id"}, new String[]{}),
 
     FOLDER_CREATE(FOLDER, CREATE, ResourceOperatorImpl.class, new String[]{"type", "alias"}, new String[]{}),
-    FOLDER_UPDATE(FOLDER, UPDATE, ResourceOperatorImpl.class, new String[]{"type", "alias"}, new String[]{}),
-    FILE_CREATE(FILE, CREATE, ResourceOperatorImpl.class, new String[]{"type", "fileName"}, new String[]{}),
-    FILE_UPDATE(FILE, UPDATE, ResourceOperatorImpl.class, new String[]{"type", "fileName"}, new String[]{}),
-    FILE_DELETE(FILE, DELETE, ResourceOperatorImpl.class, new String[]{"fileName"}, new String[]{}),
-    // todo
+    FILE_CREATE(FILE, CREATE, ResourceOperatorImpl.class, new String[]{"type", "fileName", "alias"}, new String[]{}),
+    FILE_UPDATE(FILE, UPDATE, ResourceOperatorImpl.class, new String[]{"type", "fileName", "alias"}, new String[]{}),
+    FILE_DELETE(FILE, DELETE, ResourceOperatorImpl.class, new String[]{"fullName"}, new String[]{}),
+
     UDF_FUNCTION_CREATE(UDF_FUNCTION, CREATE, UdfFunctionOperatorImpl.class, new String[]{"funcName"}, new String[]{}),
     UDF_FUNCTION_UPDATE(UDF_FUNCTION, UPDATE, UdfFunctionOperatorImpl.class, new String[]{"funcName"}, new String[]{}),
     UDF_FUNCTION_DELETE(UDF_FUNCTION, DELETE, UdfFunctionOperatorImpl.class, new String[]{"udfFuncId"}, new String[]{}),
-    UDF_FUNCTION_UN_AUTHORIZE(UDF_FUNCTION, UN_AUTHORIZE, UserOperatorImpl.class, new String[]{"userId"},
-            new String[]{}),
-    UDF_FUNCTION_AUTHORIZE(UDF_FUNCTION, AUTHORIZE, UserOperatorImpl.class, new String[]{"userId"}, new String[]{}),
 
     TASK_GROUP_CREATE(TASK_GROUP, CREATE, TaskGroupOperatorImpl.class, new String[]{"name"}, new String[]{}),
     TASK_GROUP_UPDATE(TASK_GROUP, UPDATE, TaskGroupOperatorImpl.class, new String[]{}, new String[]{"id"}),
     TASK_GROUP_CLOSE(TASK_GROUP, CLOSE, TaskGroupOperatorImpl.class, new String[]{"id"}, new String[]{}),
     TASK_GROUP_START(TASK_GROUP, START, TaskGroupOperatorImpl.class, new String[]{"id"}, new String[]{}),
-    // todo test
     TASK_GROUP_MODIFY(TASK_GROUP, MODIFY, TaskGroupOperatorImpl.class, new String[]{"queueId", "priority"},
             new String[]{}),
 
@@ -187,7 +172,6 @@ public enum AuditType {
     ALARM_INSTANCE_DELETE(ALARM_INSTANCE, DELETE, AlertInstanceOperatorImpl.class, new String[]{"id"}, new String[]{}),
 
     WORKER_GROUP_CREATE(WORKER_GROUP, CREATE, WorkerGroupOperatorImpl.class, new String[]{}, new String[]{"id"}),
-    WORKER_GROUP_UPDATE(WORKER_GROUP, UPDATE, WorkerGroupOperatorImpl.class, new String[]{}, new String[]{"id"}),
     WORKER_GROUP_DELETE(WORKER_GROUP, DELETE, WorkerGroupOperatorImpl.class, new String[]{"id"}, new String[]{}),
 
     YARN_QUEUE_CREATE(YARN_QUEUE, CREATE, YarnQueueOperatorImpl.class, new String[]{}, new String[]{"id"}),

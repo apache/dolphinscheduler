@@ -32,7 +32,12 @@ public class ClusterOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Cluster obj = clusterMapper.queryByClusterCode((long) identity);
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        Cluster obj = clusterMapper.queryByClusterCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

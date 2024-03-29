@@ -32,7 +32,12 @@ public class EnvironmentOperatorImpl extends BaseOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Environment obj = environmentMapper.queryByEnvironmentCode((long) identity);
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        Environment obj = environmentMapper.queryByEnvironmentCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

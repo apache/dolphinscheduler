@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.audit;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.AuditObjectType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -190,6 +191,20 @@ public class OperatorUtils {
     public static boolean isUdfResource(Map<String, Object> paramsMap) {
         ResourceType resourceType = (ResourceType) paramsMap.get("type");
         return resourceType != null && resourceType.equals(ResourceType.UDF);
+    }
+
+    public static boolean isFolder(String name) {
+        return name.endsWith("/");
+    }
+
+    public static String getFileAuditObject(AuditType auditType, Map<String, Object> paramsMap, String name) {
+        boolean isUdfResource = isUdfResource(paramsMap);
+        boolean isFolder = auditType == AuditType.FOLDER_CREATE || isFolder(name);
+        if (isUdfResource) {
+            return isFolder ? AuditObjectType.UDF_FOLDER.getName() : AuditObjectType.UDF_FILE.getName();
+        } else {
+            return isFolder ? AuditObjectType.FOLDER.getName() : AuditObjectType.FILE.getName();
+        }
     }
 
 }

@@ -32,7 +32,12 @@ public class UdfFunctionOperatorImpl extends BaseOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        UdfFunc obj = udfFuncMapper.selectUdfById((int) identity);
+        int objId = checkNumInt(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        UdfFunc obj = udfFuncMapper.selectUdfById(objId);
         return obj == null ? "" : obj.getFuncName();
     }
 

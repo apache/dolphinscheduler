@@ -35,7 +35,12 @@ public class ProjectOperatorImpl extends BaseOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        Project obj = projectMapper.queryByCode((Long) identity);
+        Long objId = checkNum(identity.toString());
+        if (objId == -1) {
+            return "";
+        }
+
+        Project obj = projectMapper.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }
