@@ -53,7 +53,7 @@ public class ProcessOperatorImpl extends BaseOperator {
         } else {
             super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
         }
-        if (paramsMap.containsKey("version")) {
+        if (paramsMap.containsKey("version") && paramsMap.get("version") != null) {
             auditLogList.get(0).setDetail(paramsMap.get("version").toString());
         }
     }
