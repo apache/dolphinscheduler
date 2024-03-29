@@ -735,4 +735,16 @@ public final class Constants {
      * K8S sensitive param
      */
     public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
+
+
+    /**
+     * netty config
+     */
+    public static final String NETTY_SSL_ENABLE = "netty.ssl.enable";
+
+    public static final String NETTY_SSL_ROOT_PATH = "netty.ssl.root.path";
+
+    public static final String NETTY_SSL_KEY_PATH = "netty.ssl.key.path";
+
+    public static final String NETTY_SSL_CERT_PATH = "netty.ssl.cert.path";
 }

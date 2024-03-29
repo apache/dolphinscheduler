@@ -25,6 +25,9 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
 /**
  * NettyUtils
  */
@@ -47,4 +50,19 @@ public class NettyUtils {
         return NioSocketChannel.class;
     }
 
+    public static boolean isNettySSLEnable() {
+        return PropertyUtils.getBoolean(org.apache.dolphinscheduler.common.constants.Constants.NETTY_SSL_ENABLE, Boolean.FALSE);
+    }
+
+    public static String getNettyKeyPath() {
+        return PropertyUtils.getString(Constants.NETTY_SSL_KEY_PATH);
+    }
+
+    public static String getNettyRootPath() {
+        return PropertyUtils.getString(Constants.NETTY_SSL_ROOT_PATH);
+    }
+
+    public static String getNettyCertPath() {
+        return PropertyUtils.getString(Constants.NETTY_SSL_CERT_PATH);
+    }
 }

@@ -27,11 +27,14 @@ import org.apache.dolphinscheduler.extract.base.server.ServerMethodInvoker;
 import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -43,6 +46,8 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+
+import javax.net.ssl.SSLException;
 
 /**
  * remoting netty server
@@ -65,7 +70,16 @@ public class NettyRemotingServer {
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
+    private SslContext sslContext = null;
+
     public NettyRemotingServer(final NettyServerConfig serverConfig) {
+        if(NettyUtils.isNettySSLEnable()){
+            try {
+                sslContext = SslContextBuilder.forServer(new File(NettyUtils.getNettyCertPath()), new File(NettyUtils.getNettyKeyPath())).build();
+            } catch (SSLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         this.serverConfig = serverConfig;
         ThreadFactory bossThreadFactory =
                 ThreadUtils.newDaemonThreadFactory(serverConfig.getServerName() + "BossThread_%s");
@@ -136,6 +150,10 @@ public class NettyRemotingServer {
                 .addLast("server-idle-handle",
                         new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
                 .addLast("handler", serverHandler);
+        if(NettyUtils.isNettySSLEnable()){
+            ch.pipeline().addLast("ssl",sslContext.newHandler(ch.alloc()));
+
+        }
     }
 
     public ExecutorService getDefaultExecutor() {
