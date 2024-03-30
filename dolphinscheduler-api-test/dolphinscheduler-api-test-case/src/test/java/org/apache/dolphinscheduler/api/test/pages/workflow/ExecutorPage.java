@@ -48,7 +48,6 @@ public class ExecutorPage {
         params.put("scheduleTime", scheduleTime);
         params.put("failureStrategy", failureStrategy);
         params.put("warningType", warningType);
-        params.put("version", 1);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
