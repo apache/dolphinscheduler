@@ -39,6 +39,17 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
     List<TaskGroupQueue> queryAllInQueueTaskGroupQueue();
 
     /**
+     * Query all {@link TaskGroupQueue} which
+     * in_queue is {@link org.apache.dolphinscheduler.common.enums.Flag#YES}
+     * and id > minTaskGroupQueueId
+     * ordered by id asc
+     * limit #{limit}
+     *
+     * @return TaskGroupQueue ordered by id asc
+     */
+    List<TaskGroupQueue> queryInQueueTaskGroupQueue(int minTaskGroupQueueId, int limit);
+
+    /**
      * Query all {@link TaskGroupQueue} which in_queue is {@link org.apache.dolphinscheduler.common.enums.Flag#YES} and taskGroupId is taskGroupId
      *
      * @param taskGroupId taskGroupId
@@ -61,4 +72,24 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
      * @return TaskGroupQueue
      */
     List<TaskGroupQueue> queryAcquiredTaskGroupQueueByGroupId(Integer taskGroupId);
+
+    /**
+     * Count all {@link TaskGroupQueue} which status is TaskGroupQueueStatus.ACQUIRE_SUCCESS and forceStart is {@link org.apache.dolphinscheduler.common.enums.Flag#NO}.
+     *
+     * @param taskGroupId taskGroupId
+     * @return TaskGroupQueue
+     */
+    int countUsingTaskGroupQueueByGroupId(Integer taskGroupId);
+
+    /**
+     * Query all {@link TaskGroupQueue} which
+     * in_queue is {@link org.apache.dolphinscheduler.common.enums.Flag#YES}
+     * and forceStart is {@link org.apache.dolphinscheduler.common.enums.Flag#YES}
+     * and id > minTaskGroupQueueId
+     * order by id asc
+     * limit #{limit}
+     *
+     * @return TaskGroupQueue ordered by priority desc
+     */
+    List<TaskGroupQueue> queryWaitNotifyForceStartTaskGroupQueue(int minTaskGroupQueueId, int limit);
 }

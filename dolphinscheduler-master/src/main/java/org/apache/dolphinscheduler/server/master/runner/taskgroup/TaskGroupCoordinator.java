@@ -96,6 +96,8 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
     @Autowired
     private ProcessInstanceDao processInstanceDao;
 
+    private static int DEFAULT_LIMIT = 1000;
+
     public TaskGroupCoordinator() {
         super("TaskGroupCoordinator");
     }
@@ -147,10 +149,10 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
         if (CollectionUtils.isEmpty(taskGroups)) {
             return;
         }
+        StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
+
         for (TaskGroup taskGroup : taskGroups) {
-            List<TaskGroupQueue> taskGroupQueues =
-                    taskGroupQueueDao.queryAcquiredTaskGroupQueueByGroupId(taskGroup.getId());
-            int actualUseSize = taskGroupQueues.size();
+            int actualUseSize = taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(taskGroup.getId());
             if (taskGroup.getUseSize() == actualUseSize) {
                 continue;
             }
@@ -160,13 +162,35 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
             taskGroup.setUseSize(actualUseSize);
             taskGroupDao.updateById(taskGroup);
         }
+        log.info("Success amend TaskGroup useSize cost: {}/ms", taskGroupCoordinatorRoundTimeCost.getTime());
     }
 
     /**
      * Make sure the TaskGroupQueue status is {@link TaskGroupQueueStatus#RELEASE} when the related {@link TaskInstance} is not exist or status is finished.
      */
     private void amendTaskGroupQueueStatus() {
-        List<TaskGroupQueue> taskGroupQueues = taskGroupQueueDao.queryAllInQueueTaskGroupQueue();
+        int minTaskGroupQueueId = -1;
+        int limit = DEFAULT_LIMIT;
+        StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
+        while (true) {
+            List<TaskGroupQueue> taskGroupQueues =
+                    taskGroupQueueDao.queryInQueueTaskGroupQueue(minTaskGroupQueueId, limit);
+            if (CollectionUtils.isEmpty(taskGroupQueues)) {
+                break;
+            }
+            amendTaskGroupQueueStatus(taskGroupQueues);
+            if (taskGroupQueues.size() < limit) {
+                break;
+            }
+            minTaskGroupQueueId = taskGroupQueues.get(taskGroupQueues.size() - 1).getId();
+        }
+        log.info("Success amend TaskGroupQueue status cost: {}/ms", taskGroupCoordinatorRoundTimeCost.getTime());
+    }
+
+    /**
+     * Make sure the TaskGroupQueue status is {@link TaskGroupQueueStatus#RELEASE} when the related {@link TaskInstance} is not exist or status is finished.
+     */
+    private void amendTaskGroupQueueStatus(List<TaskGroupQueue> taskGroupQueues) {
         List<Integer> taskInstanceIds = taskGroupQueues.stream()
                 .map(TaskGroupQueue::getTaskId)
                 .collect(Collectors.toList());
@@ -198,10 +222,30 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
         // Find the force start task group queue(Which is inQueue and forceStart is YES)
         // Notify the related waiting task instance
         // Set the taskGroupQueue status to RELEASE and remove it from queue
-        List<TaskGroupQueue> taskGroupQueues = taskGroupQueueDao.queryAllInQueueTaskGroupQueue()
-                .stream()
-                .filter(taskGroupQueue -> Flag.YES.getCode() == taskGroupQueue.getForceStart())
-                .collect(Collectors.toList());
+        // We use limit here to avoid OOM, and we will retry to notify force start queue at next time
+        int minTaskGroupQueueId = -1;
+        int limit = DEFAULT_LIMIT;
+        StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
+        while (true) {
+            List<TaskGroupQueue> taskGroupQueues =
+                    taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(minTaskGroupQueueId, limit);
+            if (CollectionUtils.isEmpty(taskGroupQueues)) {
+                break;
+            }
+            dealWithForceStartTaskGroupQueue(taskGroupQueues);
+            if (taskGroupQueues.size() < limit) {
+                break;
+            }
+            minTaskGroupQueueId = taskGroupQueues.get(taskGroupQueues.size() - 1).getId();
+        }
+        log.info("Success deal with force start TaskGroupQueue cost: {}/ms",
+                taskGroupCoordinatorRoundTimeCost.getTime());
+    }
+
+    private void dealWithForceStartTaskGroupQueue(List<TaskGroupQueue> taskGroupQueues) {
+        // Find the force start task group queue(Which is inQueue and forceStart is YES)
+        // Notify the related waiting task instance
+        // Set the taskGroupQueue status to RELEASE and remove it from queue
         for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
             try {
                 LogUtils.setTaskInstanceIdMDC(taskGroupQueue.getTaskId());
