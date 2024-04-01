@@ -323,6 +323,8 @@ public enum Status {
 
     REMOVE_TASK_INSTANCE_CACHE_ERROR(20019, "remove task instance cache error", "删除任务实例缓存错误"),
 
+    ILLEGAL_RESOURCE_PATH(20020, "Resource file [{0}] is illegal", "非法的资源路径[{0}]"),
+
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
     USER_NO_WRITE_PROJECT_PERM(30003, "user [{0}] does not have write permission for project [{1}]",
