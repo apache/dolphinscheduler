@@ -30,6 +30,21 @@ public final class Constants {
     public static final Path HOST_TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
 
     /**
+     * DS resource base path
+     */
+    public static final Path DS_RESOURCE_BASE_PATH = Paths.get("/dolphinscheduler");
+
+    /**
+     * DS resource file path
+     */
+    public static final Path DS_RESOURCE_FILE_PATH = DS_RESOURCE_BASE_PATH.resolve("resources");
+
+    /**
+     * DS resource udf path
+     */
+    public static final Path DS_RESOURCE_UDF_PATH = DS_RESOURCE_BASE_PATH.resolve("udfs");
+
+    /**
      * chrome download path in host
      */
     public static final Path HOST_CHROME_DOWNLOAD_PATH = HOST_TMP_PATH.resolve("download");

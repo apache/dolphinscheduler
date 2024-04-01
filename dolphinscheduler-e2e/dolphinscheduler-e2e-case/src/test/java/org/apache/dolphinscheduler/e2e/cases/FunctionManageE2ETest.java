@@ -78,7 +78,7 @@ public class FunctionManageE2ETest {
 
     private static final String testDescription = "test_description";
 
-    private static final Path testUploadUdfFilePath = Constants.HOST_TMP_PATH.resolve(testUploadUdfFileName);
+    private static final Path testUploadUdfFilePath = Constants.DS_RESOURCE_UDF_PATH.resolve(testUploadUdfFileName);
 
     @BeforeAll
     @SneakyThrows

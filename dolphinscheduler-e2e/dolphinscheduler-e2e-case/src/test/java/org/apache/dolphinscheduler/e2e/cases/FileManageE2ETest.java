@@ -78,9 +78,9 @@ public class FileManageE2ETest {
 
     private static final String testUnder1GBFileName = "test_file_0.01G";
 
-    private static final Path testOver1GBFilePath = Constants.HOST_TMP_PATH.resolve("test_file_1.5G");
+    private static final Path testOver1GBFilePath = Constants.DS_RESOURCE_FILE_PATH.resolve("test_file_1.5G");
 
-    private static final Path testUnder1GBFilePath = Constants.HOST_TMP_PATH.resolve(testUnder1GBFileName);
+    private static final Path testUnder1GBFilePath = Constants.DS_RESOURCE_FILE_PATH.resolve(testUnder1GBFileName);
 
     @BeforeAll
     public static void setup() {
