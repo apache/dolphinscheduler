@@ -1287,6 +1287,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (StringUtils.isEmpty(fullName)) {
             return;
         }
+        if (FOLDER_SEPARATOR.equalsIgnoreCase(fullName)) {
+            return;
+        }
         // Avoid returning to the parent directory
         if (fullName.contains("../")) {
             throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH, fullName);
