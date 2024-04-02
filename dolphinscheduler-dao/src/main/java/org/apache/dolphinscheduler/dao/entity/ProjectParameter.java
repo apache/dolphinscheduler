@@ -42,6 +42,8 @@ public class ProjectParameter {
     @TableField("user_id")
     private Integer userId;
 
+    private Integer operator;
+
     private long code;
 
     @TableField("project_code")
@@ -56,4 +58,10 @@ public class ProjectParameter {
     private Date createTime;
 
     private Date updateTime;
+
+    @TableField(exist = false)
+    private String createUser;
+
+    @TableField(exist = false)
+    private String modifyUser;
 }

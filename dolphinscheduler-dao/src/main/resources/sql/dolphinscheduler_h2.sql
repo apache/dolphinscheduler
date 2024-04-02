@@ -670,6 +670,7 @@ CREATE TABLE t_ds_project_parameter
     code            bigint(20) NOT NULL,
     project_code    bigint(20) NOT NULL,
     user_id         int(11) DEFAULT NULL,
+    operator        int(11) DEFAULT NULL,
     create_time     datetime NOT NULL,
     update_time     datetime     DEFAULT NULL,
     PRIMARY KEY (id),

@@ -673,6 +673,7 @@ CREATE TABLE `t_ds_project_parameter` (
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
