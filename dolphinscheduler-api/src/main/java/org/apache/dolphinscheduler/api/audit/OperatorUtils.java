@@ -190,7 +190,7 @@ public class OperatorUtils {
     }
 
     public static boolean isFolder(String name) {
-        return name.endsWith("/");
+        return name != null && name.endsWith("/");
     }
 
     public static String getFileAuditObject(AuditType auditType, Map<String, Object> paramsMap, String name) {
