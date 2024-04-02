@@ -17,22 +17,9 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.quartz.CronTrigger;
 
-import org.quartz.Scheduler;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+public interface QuartzTriggerBuilder {
 
-@AutoConfiguration(after = {QuartzAutoConfiguration.class})
-@ConditionalOnClass(value = Scheduler.class)
-public class QuartzSchedulerConfiguration {
-
-    @Bean
-    @ConditionalOnMissingBean
-    public SchedulerApi schedulerApi(Scheduler scheduler) {
-        return new QuartzScheduler(scheduler);
-    }
+    CronTrigger build();
 }

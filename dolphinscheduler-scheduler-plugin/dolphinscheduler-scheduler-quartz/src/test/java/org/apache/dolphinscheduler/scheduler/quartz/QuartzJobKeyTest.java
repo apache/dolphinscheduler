@@ -17,22 +17,25 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.quartz.Scheduler;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.junit.jupiter.api.Test;
+import org.quartz.JobKey;
 
-@AutoConfiguration(after = {QuartzAutoConfiguration.class})
-@ConditionalOnClass(value = Scheduler.class)
-public class QuartzSchedulerConfiguration {
+class QuartzJobKeyTest {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public SchedulerApi schedulerApi(Scheduler scheduler) {
-        return new QuartzScheduler(scheduler);
+    @Test
+    void of() {
+        QuartzJobKey quartzJobKey = QuartzJobKey.of(1, 2);
+        assertEquals(1, quartzJobKey.getProjectId());
+        assertEquals(2, quartzJobKey.getSchedulerId());
+    }
+
+    @Test
+    void toJobKey() {
+        QuartzJobKey quartzJobKey = QuartzJobKey.of(1, 2);
+        JobKey jobKey = quartzJobKey.toJobKey();
+        assertEquals("job_2", jobKey.getName());
+        assertEquals("jobgroup_1", jobKey.getGroup());
     }
 }
