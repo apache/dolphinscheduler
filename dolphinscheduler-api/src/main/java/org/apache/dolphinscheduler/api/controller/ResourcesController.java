@@ -260,7 +260,6 @@ public class ResourcesController extends BaseController {
     @DeleteMapping(value = "/data-transfer")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
-    // todo @OperatorLog(auditType = AuditType.FILE_DELETE)
     public DeleteDataTransferResponse deleteDataTransferData(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                              @RequestParam(value = "days") Integer days) {
         return resourceService.deleteDataTransferData(loginUser, days);

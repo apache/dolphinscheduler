@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -132,13 +132,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
 
             String[] identityArr = ((String) paramsMap.get(param)).split(",");
             for (String identityString : identityArr) {
-                long identity;
-                try {
-                    identity = Long.parseLong(identityString);
-                } catch (Exception e) {
-                    log.error("code is not long, code: {}", identityString);
-                    continue;
-                }
+                long identity = toLong(identityString);
 
                 String value = getObjectNameFromReturnIdentity(identity);
 
@@ -155,7 +149,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
         auditLogList.remove(0);
     }
 
-    protected void setObjectIdentityFromReturnObject(AuditType auditType, Result result,
+    protected void setObjectIdentityFromReturnObject(AuditType auditType, Result<?> result,
                                                      List<AuditLog> auditLogList) {
         String[] returnObjectFieldNameArr = auditType.getReturnObjectFieldName();
         if (returnObjectFieldNameArr.length == 0) {
@@ -172,12 +166,34 @@ public abstract class BaseAuditOperator implements AuditOperator {
                 .forEach(auditLog -> auditLog.setObjectName(getObjectNameFromReturnIdentity(auditLog.getObjectId())));
     }
 
+    protected void modifyObjectFromReturnObject(String[] params, Map<String, Object> returnObjectMap,
+                                                List<AuditLog> auditLogList) {
+        if (returnObjectMap.isEmpty() || returnObjectMap.get(params[0]) == null) {
+            return;
+        }
+
+        Long objId = toLong(returnObjectMap.get(params[0]));
+
+        if (objId != -1) {
+            auditLogList.get(0).setObjectId(objId);
+        }
+    }
+
+    protected Long toLong(Object str) {
+        if (str == null) {
+            return -1L;
+        }
+
+        return NumberUtils.toLong(str.toString(), -1);
+    }
+
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        return "";
+        return identity.toString();
     }
 
     protected void modifyRequestParams(String[] paramNameArr, Map<String, Object> paramsMap,
                                        List<AuditLog> auditLogList) {
+
     }
 
     protected void modifyAuditObjectType(AuditType auditType, Map<String, Object> paramsMap,
@@ -188,38 +204,5 @@ public abstract class BaseAuditOperator implements AuditOperator {
     protected void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
                                             List<AuditLog> auditLogList) {
 
-    }
-
-    protected void modifyObjectFromReturnObject(String[] params, Map<String, Object> returnObjectMap,
-                                                List<AuditLog> auditLogList) {
-        if (returnObjectMap.isEmpty()) {
-            return;
-        }
-
-        if (returnObjectMap.get(params[0]) == null) {
-            return;
-        }
-
-        Long objId = NumberUtils.toLong(returnObjectMap.get(params[0]).toString(), -1);
-
-        if (objId != -1) {
-            auditLogList.get(0).setObjectId(objId);
-        }
-    }
-
-    protected Long checkNum(Object str) {
-        if (str == null) {
-            return -1L;
-        }
-
-        return NumberUtils.toLong(str.toString(), -1);
-    }
-
-    protected int checkNumInt(String str) {
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException e) {
-            return -1;
-        }
     }
 }

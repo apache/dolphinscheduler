@@ -32,7 +32,7 @@ public class AlertInstanceAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+        Long objId = toLong(identity);
         if (objId == -1) {
             return "";
         }

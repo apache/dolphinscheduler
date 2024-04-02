@@ -35,7 +35,7 @@ public class ProjectAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+        Long objId = toLong(identity);
         if (objId == -1) {
             return "";
         }

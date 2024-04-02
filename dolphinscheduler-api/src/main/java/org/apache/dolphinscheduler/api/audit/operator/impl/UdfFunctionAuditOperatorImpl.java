@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 
+import org.apache.commons.lang3.math.NumberUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +34,7 @@ public class UdfFunctionAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        int objId = checkNumInt(identity.toString());
+        int objId = NumberUtils.toInt(identity.toString(), -1);
         if (objId == -1) {
             return "";
         }

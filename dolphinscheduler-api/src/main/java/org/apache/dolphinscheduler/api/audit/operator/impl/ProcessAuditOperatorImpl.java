@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
+import org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
@@ -47,15 +48,16 @@ public class ProcessAuditOperatorImpl extends BaseAuditOperator {
     @Override
     protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
-        if (paramNameArr[0].equals("codes") || paramNameArr[0].equals("processDefinitionCodes")
-                || paramNameArr[0].equals("processInstanceIds")) {
+        if (paramNameArr[0].equals(AuditLogConstants.CODES)
+                || paramNameArr[0].equals(AuditLogConstants.PROCESS_DEFINITION_CODES)
+                || paramNameArr[0].equals(AuditLogConstants.PROCESS_INSTANCE_IDS)) {
             super.setObjectByParmaArr(paramNameArr, paramsMap, auditLogList);
         } else {
             super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
         }
-        if (paramsMap.containsKey("version")) {
-            if (paramsMap.get("version") != null) {
-                auditLogList.get(0).setDetail(paramsMap.get("version").toString());
+        if (paramsMap.containsKey(AuditLogConstants.VERSION)) {
+            if (paramsMap.get(AuditLogConstants.VERSION) != null) {
+                auditLogList.get(0).setDetail(paramsMap.get(AuditLogConstants.VERSION).toString());
             } else {
                 auditLogList.get(0).setDetail("latest");
             }
@@ -64,7 +66,7 @@ public class ProcessAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+        Long objId = toLong(identity);
         if (objId == -1) {
             return "";
         }

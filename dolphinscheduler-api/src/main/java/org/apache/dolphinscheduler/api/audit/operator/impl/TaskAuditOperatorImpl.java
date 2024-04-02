@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
+import org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
@@ -49,14 +50,14 @@ public class TaskAuditOperatorImpl extends BaseAuditOperator {
                                     List<AuditLog> auditLogList) {
 
         super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
-        if (paramsMap.containsKey("version")) {
-            auditLogList.get(0).setDetail(paramsMap.get("version").toString());
-        } ;
+        if (paramsMap.containsKey(AuditLogConstants.VERSION)) {
+            auditLogList.get(0).setDetail(paramsMap.get(AuditLogConstants.VERSION).toString());
+        }
     }
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+        Long objId = toLong(identity);
         if (objId == -1) {
             return "";
         }

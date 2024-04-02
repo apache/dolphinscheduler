@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
+import org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -44,20 +45,20 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     public void modifyRequestParams(String[] paramNameArr, Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
-        if (!paramNameArr[0].equals("id")) {
+        if (!paramNameArr[0].equals(AuditLogConstants.ID)) {
             return;
         }
         int id = (int) paramsMap.get(paramNameArr[0]);
         Schedule schedule = scheduleMapper.selectById(id);
         if (schedule != null) {
-            paramsMap.put("code", schedule.getProcessDefinitionCode());
-            paramNameArr[0] = "code";
+            paramsMap.put(AuditLogConstants.CODE, schedule.getProcessDefinitionCode());
+            paramNameArr[0] = AuditLogConstants.CODE;
             auditLogList.forEach(auditLog -> auditLog.setDetail(String.valueOf(id)));
         }
     }
 
     @Override
-    protected void setObjectIdentityFromReturnObject(AuditType auditType, Result result,
+    protected void setObjectIdentityFromReturnObject(AuditType auditType, Result<?> result,
                                                      List<AuditLog> auditLogList) {
         String[] returnObjectFieldNameArr = auditType.getReturnObjectFieldName();
         if (returnObjectFieldNameArr.length == 0) {
@@ -72,7 +73,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+        Long objId = toLong(identity);
         if (objId == -1) {
             return "";
         }

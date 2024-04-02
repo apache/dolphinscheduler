@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
+import org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
@@ -40,15 +41,15 @@ public class WorkerGroupAuditOperatorImpl extends BaseAuditOperator {
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
                                          List<AuditLog> auditLogList) {
         if (auditType.getAuditOperationType() == AuditOperationType.CREATE
-                && paramsMap.get("id") != null &&
-                !paramsMap.get("id").toString().equals("0")) {
+                && paramsMap.get(AuditLogConstants.ID) != null &&
+                !paramsMap.get(AuditLogConstants.ID).toString().equals("0")) {
             auditLogList.forEach(auditLog -> auditLog.setOperationType(AuditOperationType.UPDATE.getName()));
         }
     }
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+        Long objId = toLong(identity);
         if (objId == -1) {
             return "";
         }

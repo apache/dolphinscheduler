@@ -18,12 +18,15 @@
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
+import org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+
+import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +50,7 @@ public class ProcessInstanceAuditOperatorImpl extends BaseAuditOperator {
     @Override
     protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
-        if (paramNameArr[0].equals("processInstanceIds")) {
+        if (paramNameArr[0].equals(AuditLogConstants.PROCESS_INSTANCE_IDS)) {
             super.setObjectByParmaArr(paramNameArr, paramsMap, auditLogList);
         } else {
             super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
@@ -56,7 +59,7 @@ public class ProcessInstanceAuditOperatorImpl extends BaseAuditOperator {
 
     @Override
     protected String getObjectNameFromReturnIdentity(Object identity) {
-        int objId = checkNumInt(identity.toString());
+        int objId = NumberUtils.toInt(identity.toString(), -1);
         if (objId == -1) {
             return "";
         }
