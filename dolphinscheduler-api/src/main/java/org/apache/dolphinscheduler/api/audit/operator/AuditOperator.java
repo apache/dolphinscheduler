@@ -15,29 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.api.audit.operator;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.aspectj.lang.ProceedingJoinPoint;
 
-@Service
-public class DatasourceOperatorImpl extends BaseOperator {
+public interface AuditOperator {
 
-    @Autowired
-    private DataSourceMapper dataSourceMapper;
-
-    @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
-        if (objId == -1) {
-            return "";
-        }
-
-        DataSource obj = dataSourceMapper.selectById(objId);
-        return obj == null ? "" : obj.getName();
-    }
+    Object recordAudit(ProceedingJoinPoint point, String describe, AuditType auditType) throws Throwable;
 }

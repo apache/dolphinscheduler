@@ -126,7 +126,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         auditDto.setObjectName(auditLog.getObjectName());
         auditDto.setOperation(AuditOperationType.of(auditLog.getOperationType()).getName());
         auditDto.setUserName(auditLog.getUserName());
-        auditDto.setLatency(String.format("%.2f", (double) auditLog.getLatency() / 1000));
+        auditDto.setLatency(String.valueOf(auditLog.getLatency()));
         auditDto.setDetail(auditLog.getDetail());
         auditDto.setDescription(auditLog.getDescription());
         auditDto.setTime(auditLog.getTime());

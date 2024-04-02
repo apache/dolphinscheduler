@@ -17,28 +17,27 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
+import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UdfFunctionOperatorImpl extends BaseOperator {
+public class ClusterAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private UdfFuncMapper udfFuncMapper;
+    private ClusterMapper clusterMapper;
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
-        int objId = checkNumInt(identity.toString());
+    public String getObjectNameFromReturnIdentity(Object identity) {
+        Long objId = checkNum(identity);
         if (objId == -1) {
             return "";
         }
 
-        UdfFunc obj = udfFuncMapper.selectUdfById(objId);
-        return obj == null ? "" : obj.getFuncName();
+        Cluster obj = clusterMapper.queryByClusterCode(objId);
+        return obj == null ? "" : obj.getName();
     }
-
 }

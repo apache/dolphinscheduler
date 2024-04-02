@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.TaskGroup;
+import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class K8sNamespaceOperatorImpl extends BaseOperator {
+public class TaskGroupAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private TaskGroupMapper taskGroupMapper;
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class K8sNamespaceOperatorImpl extends BaseOperator {
             return "";
         }
 
-        K8sNamespace obj = k8sNamespaceMapper.selectById(objId);
-        return obj == null ? "" : obj.getNamespace();
+        TaskGroup obj = taskGroupMapper.selectById(objId);
+        return obj == null ? "" : obj.getName();
     }
 }

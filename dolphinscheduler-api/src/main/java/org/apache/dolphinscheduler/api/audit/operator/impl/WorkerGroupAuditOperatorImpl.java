@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.OperatorUtils;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -32,36 +31,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProcessInstanceOperatorImpl extends BaseOperator {
+public class WorkerGroupAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkerGroupMapper workerGroupMapper;
 
     @Override
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
                                          List<AuditLog> auditLogList) {
-        AuditOperationType auditOperationType = OperatorUtils.modifyReleaseOperationType(auditType, paramsMap);
-        auditLogList.forEach(auditLog -> auditLog.setOperationType(auditOperationType.getName()));
-    }
-
-    @Override
-    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
-                                    List<AuditLog> auditLogList) {
-        if (paramNameArr[0].equals("processInstanceIds")) {
-            super.setObjectByParmaArr(paramNameArr, paramsMap, auditLogList);
-        } else {
-            super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
+        if (auditType.getAuditOperationType() == AuditOperationType.CREATE
+                && paramsMap.get("id") != null &&
+                !paramsMap.get("id").toString().equals("0")) {
+            auditLogList.forEach(auditLog -> auditLog.setOperationType(AuditOperationType.UPDATE.getName()));
         }
     }
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
-        int objId = checkNumInt(identity.toString());
+    public String getObjectNameFromReturnIdentity(Object identity) {
+        Long objId = checkNum(identity);
         if (objId == -1) {
             return "";
         }
 
-        ProcessInstance obj = processInstanceMapper.queryDetailById(objId);
+        WorkerGroup obj = workerGroupMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

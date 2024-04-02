@@ -54,12 +54,8 @@ public class OperatorUtils {
         }
     }
 
-    public static boolean resultFail(Result result) {
-        if (result != null && result.isFailed()) {
-            return true;
-        }
-
-        return false;
+    public static boolean resultFail(Result<?> result) {
+        return result != null && result.isFailed();
     }
 
     public static List<AuditLog> buildAuditLogList(String apiDescription, AuditType auditType, User user) {

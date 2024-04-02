@@ -31,8 +31,8 @@ public enum AuditOperationType {
 
     CREATE("Create"),
     UPDATE("Update"),
-    BATCH_DELETE("Batch Delete"),
-    BATCH_START("Batch Start"),
+    BATCH_DELETE("BatchDelete"),
+    BATCH_START("BatchStart"),
     DELETE("Delete"),
     CLOSE("Close"),
 
@@ -40,8 +40,8 @@ public enum AuditOperationType {
     ONLINE("Online"),
     OFFLINE("Offline"),
 
-    RESUME_PAUSE("Resume pause"),
-    RESUME_FAILURE("Resume failure"),
+    RESUME_PAUSE("ResumePause"),
+    RESUME_FAILURE("ResumeFailure"),
 
     IMPORT("Import"),
     EXPORT("Export"),
@@ -51,20 +51,20 @@ public enum AuditOperationType {
     MODIFY("Modify"),
     RUN("Run"),
     RERUN("Rerun"),
-    BATCH_RERUN("Batch Rerun"),
+    BATCH_RERUN("BatchRerun"),
     STOP("Stop"),
     KILL("Kill"),
     PAUSE("Pause"),
     MOVE("Move"),
 
-    SWITCH_STATUS("Switch status"),
-    SWITCH_VERSION("Switch version"),
-    DELETE_VERSION("Delete version"),
-    FORCE_SUCCESS("Force success"),
+    SWITCH_STATUS("SwitchStatus"),
+    SWITCH_VERSION("SwitchVersion"),
+    DELETE_VERSION("DeleteVersion"),
+    FORCE_SUCCESS("ForceSuccess"),
     RENAME("Rename"),
     UPLOAD("Upload"),
     AUTHORIZE("Authorize"),
-    UN_AUTHORIZE("Un authorize"),
+    UN_AUTHORIZE("UnAuthorize"),
     COPY("Copy"),
     ;
 

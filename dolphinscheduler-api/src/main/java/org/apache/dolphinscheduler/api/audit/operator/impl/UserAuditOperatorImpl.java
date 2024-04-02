@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaskGroupOperatorImpl extends BaseOperator {
+public class UserAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private TaskGroupMapper taskGroupMapper;
+    private UserMapper userMapper;
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class TaskGroupOperatorImpl extends BaseOperator {
             return "";
         }
 
-        TaskGroup obj = taskGroupMapper.selectById(objId);
-        return obj == null ? "" : obj.getName();
+        User obj = userMapper.selectById(objId);
+        return obj == null ? "" : obj.getUserName();
     }
 }

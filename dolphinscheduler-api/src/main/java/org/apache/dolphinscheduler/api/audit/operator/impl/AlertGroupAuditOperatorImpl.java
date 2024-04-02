@@ -17,27 +17,27 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
+import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class TaskInstancesOperatorImpl extends BaseOperator {
+public class AlertGroupAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private AlertGroupMapper alertGroupMapper;
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    public String getObjectNameFromReturnIdentity(Object identity) {
         Long objId = checkNum(identity);
         if (objId == -1) {
             return "";
         }
 
-        TaskInstance obj = taskInstanceMapper.selectById(objId);
-        return obj == null ? "" : obj.getName();
+        AlertGroup obj = alertGroupMapper.selectById(objId);
+        return obj == null ? "" : obj.getGroupName();
     }
 }

@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
-import org.apache.dolphinscheduler.api.audit.operator.Operator;
+import org.apache.dolphinscheduler.api.audit.operator.AuditOperator;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.lang.reflect.Method;
@@ -48,10 +48,6 @@ public class OperatorLogAspect {
         Method method = signature.getMethod();
 
         OperatorLog operatorLog = method.getAnnotation(OperatorLog.class);
-        // Api don't need record log
-        if (operatorLog == null) {
-            return point.proceed();
-        }
 
         Operation operation = method.getAnnotation(Operation.class);
         if (operation == null) {
@@ -59,7 +55,7 @@ public class OperatorLogAspect {
             return point.proceed();
         }
 
-        Operator operator = SpringApplicationContext.getBean(operatorLog.auditType().getOperatorClass());
+        AuditOperator operator = SpringApplicationContext.getBean(operatorLog.auditType().getOperatorClass());
         return operator.recordAudit(point, operation.description(), operatorLog.auditType());
     }
 }

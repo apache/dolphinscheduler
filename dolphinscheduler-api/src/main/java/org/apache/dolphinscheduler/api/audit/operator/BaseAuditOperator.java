@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.apache.commons.lang.math.NumberUtils;
+
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +40,7 @@ import com.google.common.base.Strings;
 
 @Service
 @Slf4j
-public abstract class BaseOperator implements Operator {
+public abstract class BaseAuditOperator implements AuditOperator {
 
     @Autowired
     private AuditService auditService;
@@ -60,7 +62,7 @@ public abstract class BaseOperator implements Operator {
         List<AuditLog> auditLogList = OperatorUtils.buildAuditLogList(describe, auditType, user);
         setRequestParam(auditType, auditLogList, paramsMap);
 
-        Result result = (Result) point.proceed();
+        Result<?> result = (Result<?>) point.proceed();
         if (OperatorUtils.resultFail(result)) {
             log.error("request fail, code {}", result.getCode());
             return result;
@@ -198,7 +200,7 @@ public abstract class BaseOperator implements Operator {
             return;
         }
 
-        Long objId = checkNum(returnObjectMap.get(params[0]).toString());
+        Long objId = NumberUtils.toLong(returnObjectMap.get(params[0]).toString(), -1);
 
         if (objId != -1) {
             auditLogList.get(0).setObjectId(objId);
@@ -206,11 +208,11 @@ public abstract class BaseOperator implements Operator {
     }
 
     protected Long checkNum(Object str) {
-        try {
-            return Long.parseLong(str.toString());
-        } catch (Exception e) {
+        if (str == null) {
             return -1L;
         }
+
+        return NumberUtils.toLong(str.toString(), -1);
     }
 
     protected int checkNumInt(String str) {

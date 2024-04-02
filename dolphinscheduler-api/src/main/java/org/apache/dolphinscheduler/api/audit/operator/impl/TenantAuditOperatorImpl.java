@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
-import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AlertInstanceOperatorImpl extends BaseOperator {
+public class TenantAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private AlertPluginInstanceMapper alertPluginInstanceMapper;
+    private TenantMapper tenantMapper;
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class AlertInstanceOperatorImpl extends BaseOperator {
             return "";
         }
 
-        AlertPluginInstance obj = alertPluginInstanceMapper.selectById(objId);
-        return obj == null ? "" : obj.getInstanceName();
+        Tenant obj = tenantMapper.selectById(objId);
+        return obj == null ? "" : obj.getTenantCode();
     }
 }

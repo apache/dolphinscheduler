@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClusterOperatorImpl extends BaseOperator {
+public class DatasourceAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private ClusterMapper clusterMapper;
+    private DataSourceMapper dataSourceMapper;
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class ClusterOperatorImpl extends BaseOperator {
             return "";
         }
 
-        Cluster obj = clusterMapper.queryByClusterCode(objId);
+        DataSource obj = dataSourceMapper.selectById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

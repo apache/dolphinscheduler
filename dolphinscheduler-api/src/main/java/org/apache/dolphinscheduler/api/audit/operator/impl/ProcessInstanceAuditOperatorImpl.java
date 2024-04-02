@@ -17,12 +17,13 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
+import org.apache.dolphinscheduler.api.audit.OperatorUtils;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -31,29 +32,36 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class WorkerGroupOperatorImpl extends BaseOperator {
+public class ProcessInstanceAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private WorkerGroupMapper workerGroupMapper;
+    private ProcessInstanceMapper processInstanceMapper;
 
     @Override
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
                                          List<AuditLog> auditLogList) {
-        if (auditType.getAuditOperationType() == AuditOperationType.CREATE
-                && paramsMap.get("id") != null &&
-                !paramsMap.get("id").toString().equals("0")) {
-            auditLogList.forEach(auditLog -> auditLog.setOperationType(AuditOperationType.UPDATE.getName()));
+        AuditOperationType auditOperationType = OperatorUtils.modifyReleaseOperationType(auditType, paramsMap);
+        auditLogList.forEach(auditLog -> auditLog.setOperationType(auditOperationType.getName()));
+    }
+
+    @Override
+    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
+                                    List<AuditLog> auditLogList) {
+        if (paramNameArr[0].equals("processInstanceIds")) {
+            super.setObjectByParmaArr(paramNameArr, paramsMap, auditLogList);
+        } else {
+            super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
         }
     }
 
     @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
-        Long objId = checkNum(identity);
+    protected String getObjectNameFromReturnIdentity(Object identity) {
+        int objId = checkNumInt(identity.toString());
         if (objId == -1) {
             return "";
         }
 
-        WorkerGroup obj = workerGroupMapper.selectById(objId);
+        ProcessInstance obj = processInstanceMapper.queryDetailById(objId);
         return obj == null ? "" : obj.getName();
     }
 }

@@ -19,13 +19,11 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -34,40 +32,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ScheduleOperatorImpl extends BaseOperator {
-
-    @Autowired
-    private ScheduleMapper scheduleMapper;
+public class ProcessAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
     @Override
-    public void modifyRequestParams(String[] paramNameArr, Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
-        if (!paramNameArr[0].equals("id")) {
-            return;
-        }
-        int id = (int) paramsMap.get(paramNameArr[0]);
-        Schedule schedule = scheduleMapper.selectById(id);
-        if (schedule != null) {
-            paramsMap.put("code", schedule.getProcessDefinitionCode());
-            paramNameArr[0] = "code";
-            auditLogList.forEach(auditLog -> auditLog.setDetail(String.valueOf(id)));
-        }
+    public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
+                                         List<AuditLog> auditLogList) {
+        AuditOperationType auditOperationType = OperatorUtils.modifyReleaseOperationType(auditType, paramsMap);
+        auditLogList.forEach(auditLog -> auditLog.setOperationType(auditOperationType.getName()));
     }
 
     @Override
-    protected void setObjectIdentityFromReturnObject(AuditType auditType, Result result,
-                                                     List<AuditLog> auditLogList) {
-        String[] returnObjectFieldNameArr = auditType.getReturnObjectFieldName();
-        if (returnObjectFieldNameArr.length == 0) {
-            return;
+    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
+                                    List<AuditLog> auditLogList) {
+        if (paramNameArr[0].equals("codes") || paramNameArr[0].equals("processDefinitionCodes")
+                || paramNameArr[0].equals("processInstanceIds")) {
+            super.setObjectByParmaArr(paramNameArr, paramsMap, auditLogList);
+        } else {
+            super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
         }
-
-        Map<String, Object> returnObjectMap =
-                OperatorUtils.getObjectIfFromReturnObject(result.getData(), returnObjectFieldNameArr);
-        auditLogList
-                .forEach(auditLog -> auditLog.setDetail(returnObjectMap.get(returnObjectFieldNameArr[0]).toString()));
+        if (paramsMap.containsKey("version")) {
+            if (paramsMap.get("version") != null) {
+                auditLogList.get(0).setDetail(paramsMap.get("version").toString());
+            } else {
+                auditLogList.get(0).setDetail("latest");
+            }
+        }
     }
 
     @Override

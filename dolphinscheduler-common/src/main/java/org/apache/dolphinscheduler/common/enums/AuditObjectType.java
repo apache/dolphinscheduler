@@ -31,31 +31,31 @@ public enum AuditObjectType {
 
     PROJECT("Project", null), // 1
     PROCESS("Process", PROJECT),
-    PROCESS_INSTANCE("Process instance", PROCESS),
+    PROCESS_INSTANCE("ProcessInstance", PROCESS),
     TASK("Task", PROCESS),
-    TASK_INSTANCE("Task instance", TASK),
+    TASK_INSTANCE("TaskInstance", TASK),
     SCHEDULE("Schedule", PROCESS),
 
     RESOURCE("Resource", null),
     FOLDER("Folder", RESOURCE),
     FILE("File", FOLDER),
-    UDF_FOLDER("UDF folder", RESOURCE),
-    UDF_FILE("UDF file", UDF_FOLDER),
-    UDF_FUNCTION("UDF function", RESOURCE),
-    TASK_GROUP("Task group", RESOURCE),
+    UDF_FOLDER("UDFFolder", RESOURCE),
+    UDF_FILE("UDFFile", UDF_FOLDER),
+    UDF_FUNCTION("UDFFunction", RESOURCE),
+    TASK_GROUP("TaskGroup", RESOURCE),
 
     DATASOURCE("Datasource", null),
 
     SECURITY("Security", null),
     TENANT("Tenant", SECURITY),
     USER("User", SECURITY),
-    ALARM_GROUP("Alarm group", SECURITY),
-    ALARM_INSTANCE("Alarm instance", SECURITY),
-    WORKER_GROUP("Worker group", SECURITY),
-    YARN_QUEUE("Yarn queue", SECURITY),
+    ALARM_GROUP("AlarmGroup", SECURITY),
+    ALARM_INSTANCE("AlarmInstance", SECURITY),
+    WORKER_GROUP("WorkerGroup", SECURITY),
+    YARN_QUEUE("YarnQueue", SECURITY),
     ENVIRONMENT("Environment", SECURITY),
     CLUSTER("Cluster", SECURITY),
-    K8S_NAMESPACE("K8s namespace", SECURITY),
+    K8S_NAMESPACE("K8sNamespace", SECURITY),
     TOKEN("Token", SECURITY),
     ;
     private final String name;
@@ -94,9 +94,5 @@ public enum AuditObjectType {
     AuditObjectType(String name, AuditObjectType parentType) {
         this.name = name;
         this.parentType = parentType;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(222);
     }
 }

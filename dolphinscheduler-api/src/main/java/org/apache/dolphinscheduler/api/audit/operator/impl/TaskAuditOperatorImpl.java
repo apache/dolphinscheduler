@@ -19,43 +19,49 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ResourceOperatorImpl extends BaseOperator {
+public class TaskAuditOperatorImpl extends BaseAuditOperator {
+
+    @Autowired
+    private TaskDefinitionMapper taskDefinitionMapper;
 
     @Override
-    public void modifyAuditObjectType(AuditType auditType, Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
-        auditLogList.forEach(auditLog -> auditLog
-                .setObjectType(OperatorUtils.getFileAuditObject(auditType, paramsMap, auditLog.getObjectName())));
+    public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
+                                         List<AuditLog> auditLogList) {
+        AuditOperationType auditOperationType = OperatorUtils.modifyReleaseOperationType(auditType, paramsMap);
+        auditLogList.forEach(auditLog -> auditLog.setOperationType(auditOperationType.getName()));
     }
 
     @Override
     protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
 
-        Object objName = getFileNameFromParam(paramNameArr, paramsMap);
-
-        if (objName == null) {
-            return;
-        }
-
-        auditLogList.get(0).setObjectName(objName.toString());
+        super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
+        if (paramsMap.containsKey("version")) {
+            auditLogList.get(0).setDetail(paramsMap.get("version").toString());
+        } ;
     }
 
-    private String getFileNameFromParam(String[] paramNameArr, Map<String, Object> paramsMap) {
-        for (String param : paramNameArr) {
-            if (!param.equals("type") && paramsMap.containsKey(param)) {
-                return paramsMap.get(param).toString();
-            }
+    @Override
+    protected String getObjectNameFromReturnIdentity(Object identity) {
+        Long objId = checkNum(identity);
+        if (objId == -1) {
+            return "";
         }
 
-        return null;
+        TaskDefinition obj = taskDefinitionMapper.queryByCode(objId);
+        return obj == null ? "" : obj.getName();
     }
 }

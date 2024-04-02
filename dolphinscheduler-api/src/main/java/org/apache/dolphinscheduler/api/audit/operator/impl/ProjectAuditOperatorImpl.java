@@ -17,27 +17,30 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserOperatorImpl extends BaseOperator {
+@Slf4j
+public class ProjectAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private UserMapper userMapper;
+    private ProjectMapper projectMapper;
 
     @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromReturnIdentity(Object identity) {
         Long objId = checkNum(identity);
         if (objId == -1) {
             return "";
         }
 
-        User obj = userMapper.selectById(objId);
-        return obj == null ? "" : obj.getUserName();
+        Project obj = projectMapper.queryByCode(objId);
+        return obj == null ? "" : obj.getName();
     }
 }

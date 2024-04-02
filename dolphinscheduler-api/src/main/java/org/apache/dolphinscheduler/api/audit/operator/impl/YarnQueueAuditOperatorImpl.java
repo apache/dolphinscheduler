@@ -17,18 +17,18 @@
 
 package org.apache.dolphinscheduler.api.audit.operator.impl;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseOperator;
-import org.apache.dolphinscheduler.dao.entity.Environment;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
+import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
+import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EnvironmentOperatorImpl extends BaseOperator {
+public class YarnQueueAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private EnvironmentMapper environmentMapper;
+    private QueueMapper queueMapper;
 
     @Override
     public String getObjectNameFromReturnIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class EnvironmentOperatorImpl extends BaseOperator {
             return "";
         }
 
-        Environment obj = environmentMapper.queryByEnvironmentCode(objId);
-        return obj == null ? "" : obj.getName();
+        Queue obj = queueMapper.selectById(objId);
+        return obj == null ? "" : obj.getQueueName();
     }
 }
