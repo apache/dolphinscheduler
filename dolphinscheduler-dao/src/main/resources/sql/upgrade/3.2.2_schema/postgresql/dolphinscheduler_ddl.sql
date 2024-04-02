@@ -28,3 +28,5 @@ CREATE TABLE t_ds_relation_project_worker_group (
 DROP SEQUENCE IF EXISTS t_ds_relation_project_worker_group_sequence;
 CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
 ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
+
+ALTER TABLE t_ds_project_parameter ADD COLUMN IF NOT EXISTS operator int;

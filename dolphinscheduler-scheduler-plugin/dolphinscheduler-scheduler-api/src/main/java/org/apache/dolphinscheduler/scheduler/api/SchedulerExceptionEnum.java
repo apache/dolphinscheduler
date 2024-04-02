@@ -17,14 +17,10 @@
 
 package org.apache.dolphinscheduler.scheduler.api;
 
-public class SchedulerException extends RuntimeException {
+public interface SchedulerExceptionEnum {
 
-    public SchedulerException(SchedulerExceptionEnum schedulerExceptionEnum) {
-        super("Scheduler[" + schedulerExceptionEnum.getCode() + "] " + schedulerExceptionEnum.getMessage());
-    }
+    String getCode();
 
-    public SchedulerException(SchedulerExceptionEnum schedulerExceptionEnum, Throwable cause) {
-        super("Scheduler[" + schedulerExceptionEnum.getCode() + "] " + schedulerExceptionEnum.getMessage(), cause);
-    }
+    String getMessage();
 
 }
