@@ -263,7 +263,8 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.updateById(processInstance);
 
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null,
+                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), 0L, null,
+                        null,
                         processInstance.getTestFlag());
         Assertions.assertNotEquals(null, processInstance1);
         processInstanceMapper.deleteById(processInstance.getId());
