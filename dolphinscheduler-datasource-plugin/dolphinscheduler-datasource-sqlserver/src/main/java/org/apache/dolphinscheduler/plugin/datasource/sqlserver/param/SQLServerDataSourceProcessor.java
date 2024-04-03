@@ -128,7 +128,8 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.sqlserver);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.sqlserver);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.sqlserver);
     }
 
     private String transformOther(Map<String, String> otherMap) {

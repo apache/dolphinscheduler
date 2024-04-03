@@ -152,7 +152,8 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.hive);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.hive);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.hive);
     }
 
     private String transformOther(Map<String, String> otherMap) {

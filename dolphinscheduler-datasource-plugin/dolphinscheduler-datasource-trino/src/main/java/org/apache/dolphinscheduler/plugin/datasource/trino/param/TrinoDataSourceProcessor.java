@@ -131,7 +131,8 @@ public class TrinoDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.trino);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.trino);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.trino);
     }
 
     private String transformOther(Map<String, String> otherMap) {

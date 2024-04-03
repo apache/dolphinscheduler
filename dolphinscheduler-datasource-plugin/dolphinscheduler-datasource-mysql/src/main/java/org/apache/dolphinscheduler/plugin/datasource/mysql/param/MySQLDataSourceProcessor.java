@@ -177,7 +177,8 @@ public class MySQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.mysql);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.mysql);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.mysql);
     }
 
     private static boolean checkKeyIsLegitimate(String key) {
