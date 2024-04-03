@@ -15,24 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.scheduler.quartz;
+package org.apache.dolphinscheduler.scheduler.quartz.exception;
 
-import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.quartz.Scheduler;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
-import org.springframework.context.annotation.Bean;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerException;
 
-@AutoConfiguration(after = {QuartzAutoConfiguration.class})
-@ConditionalOnClass(value = Scheduler.class)
-public class QuartzSchedulerConfiguration {
+import org.junit.jupiter.api.Test;
 
-    @Bean
-    @ConditionalOnMissingBean
-    public SchedulerApi schedulerApi(Scheduler scheduler) {
-        return new QuartzScheduler(scheduler);
+class QuartzSchedulerExceptionEnumTest {
+
+    @Test
+    void testException() {
+        SchedulerException schedulerException =
+                new SchedulerException(QuartzSchedulerExceptionEnum.QUARTZ_SCHEDULER_START_ERROR);
+        assertEquals("Scheduler[QUARTZ-001] Quartz Scheduler start error", schedulerException.getMessage());
     }
+
 }

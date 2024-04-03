@@ -69,7 +69,7 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
             defaultTaskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
             try {
                 TaskExecutionStatus status = defaultTaskExecuteRunnable.getTaskInstance().getState();
-                if (status != TaskExecutionStatus.SUBMITTED_SUCCESS) {
+                if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
                     log.warn("The TaskInstance {} state is : {}, will not dispatch",
                             defaultTaskExecuteRunnable.getTaskInstance().getName(), status);
                     continue;
