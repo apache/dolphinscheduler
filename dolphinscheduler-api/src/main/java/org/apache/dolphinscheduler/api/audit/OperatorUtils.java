@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.audit;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -47,7 +47,7 @@ public class OperatorUtils {
         switch (auditOperationType) {
             case SWITCH_VERSION:
             case DELETE_VERSION:
-                auditLogList.get(0).setObjectName(paramsMap.get("version").toString());
+                auditLogList.get(0).setModelName(paramsMap.get("version").toString());
                 break;
             default:
                 break;
@@ -62,7 +62,7 @@ public class OperatorUtils {
         List<AuditLog> auditLogList = new ArrayList<>();
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(user.getId());
-        auditLog.setObjectType(auditType.getAuditObjectType().getName());
+        auditLog.setModelType(auditType.getAuditModelType().getName());
         auditLog.setOperationType(auditType.getAuditOperationType().getName());
         auditLog.setDescription(apiDescription);
         auditLog.setTime(new Date());
@@ -197,9 +197,9 @@ public class OperatorUtils {
         boolean isUdfResource = isUdfResource(paramsMap);
         boolean isFolder = auditType == AuditType.FOLDER_CREATE || isFolder(name);
         if (isUdfResource) {
-            return isFolder ? AuditObjectType.UDF_FOLDER.getName() : AuditObjectType.UDF_FILE.getName();
+            return isFolder ? AuditModelType.UDF_FOLDER.getName() : AuditModelType.UDF_FILE.getName();
         } else {
-            return isFolder ? AuditObjectType.FOLDER.getName() : AuditObjectType.FILE.getName();
+            return isFolder ? AuditModelType.FOLDER.getName() : AuditModelType.FILE.getName();
         }
     }
 

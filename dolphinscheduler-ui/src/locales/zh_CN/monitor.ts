@@ -59,8 +59,8 @@ export default {
   audit_log: {
     user_name: '用户名称',
     operation_type: '操作类型',
-    object_type: '对象类型',
-    object_name: '对象名称',
+    model_type: '模型类型',
+    model_name: '模型名称',
     latency: '耗时',
     description: '描述',
     create_time: '创建时间',

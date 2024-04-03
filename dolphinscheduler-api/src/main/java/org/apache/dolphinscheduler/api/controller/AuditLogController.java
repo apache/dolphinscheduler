@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUDIT_LOG_LIST_PAGING;
 
 import org.apache.dolphinscheduler.api.dto.AuditDto;
-import org.apache.dolphinscheduler.api.dto.auditLog.AuditObjectTypeDto;
+import org.apache.dolphinscheduler.api.dto.auditLog.AuditModelTypeDto;
 import org.apache.dolphinscheduler.api.dto.auditLog.AuditOperationTypeDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AuditService;
@@ -59,22 +59,23 @@ public class AuditLogController extends BaseController {
      *
      * @param loginUser         login user
      * @param pageNo            page number
-     * @param objectTypes       object types
+     * @param pageSize          page size
+     * @param modelTypes        model types
      * @param operationTypes    operation types
+     * @param userName          user name
+     * @param modelName         model name
      * @param startDate         start time
      * @param endDate           end time
-     * @param userName          user name
-     * @param pageSize          page size
      * @return      audit log content
      */
     @Operation(summary = "queryAuditLogListPaging", description = "QUERY_AUDIT_LOG")
     @Parameters({
             @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
             @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "objectTypes", description = "OBJECT_TYPES", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "objectTypes", description = "MODEL_TYPES", schema = @Schema(implementation = String.class)),
             @Parameter(name = "operationTypes", description = "OPERATION_TYPES", schema = @Schema(implementation = String.class)),
             @Parameter(name = "userName", description = "USER_NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "objectName", description = "OBJECT_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "objectName", description = "MODEL_NAME", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
@@ -84,20 +85,20 @@ public class AuditLogController extends BaseController {
     public Result<PageInfo<AuditDto>> queryAuditLogListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                               @RequestParam("pageNo") Integer pageNo,
                                                               @RequestParam("pageSize") Integer pageSize,
-                                                              @RequestParam(value = "objectTypes", required = false) String objectTypes,
+                                                              @RequestParam(value = "modelTypes", required = false) String modelTypes,
                                                               @RequestParam(value = "operationTypes", required = false) String operationTypes,
                                                               @RequestParam(value = "startDate", required = false) String startDate,
                                                               @RequestParam(value = "endDate", required = false) String endDate,
                                                               @RequestParam(value = "userName", required = false) String userName,
-                                                              @RequestParam(value = "objectName", required = false) String objectName) {
+                                                              @RequestParam(value = "modelName", required = false) String modelName) {
         checkPageParams(pageNo, pageSize);
         PageInfo<AuditDto> auditDtoPageInfo = auditService.queryLogListPaging(
-                objectTypes,
+                modelTypes,
                 operationTypes,
                 startDate,
                 endDate,
                 userName,
-                objectName,
+                modelName,
                 pageNo,
                 pageSize);
         return Result.success(auditDtoPageInfo);
@@ -117,15 +118,15 @@ public class AuditLogController extends BaseController {
     }
 
     /**
-     * query audit log object type list
+     * query audit log model type list
      *
-     * @return object type list
+     * @return model type list
      */
-    @Operation(summary = "queryAuditObjectTypeList", description = "QUERY_AUDIT_OBJECT_TYPE_LIST")
-    @GetMapping(value = "/audit-log-object-type")
+    @Operation(summary = "queryAuditModelTypeList", description = "QUERY_AUDIT_MODEL_TYPE_LIST")
+    @GetMapping(value = "/audit-log-model-type")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUDIT_LOG_LIST_PAGING)
-    public Result<List<AuditObjectTypeDto>> queryAuditObjectTypeList() {
-        return Result.success(AuditObjectTypeDto.getObjectTypeDtoList());
+    public Result<List<AuditModelTypeDto>> queryAuditModelTypeList() {
+        return Result.success(AuditModelTypeDto.getModelTypeDtoList());
     }
 }

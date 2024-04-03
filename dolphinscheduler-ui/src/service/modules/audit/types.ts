@@ -45,10 +45,10 @@ interface AuditListRes {
   start: number
 }
 
-interface AuditObjectTypeItem {
+interface AuditModelTypeItem {
   code: number
   name: string
-  child: AuditObjectTypeItem[] | null
+  child: AuditModelTypeItem[] | null
 }
 
 interface AuditOperationTypeItem {
@@ -59,6 +59,6 @@ interface AuditOperationTypeItem {
 export {
   AuditListReq,
   AuditListRes,
-  AuditObjectTypeItem,
+  AuditModelTypeItem,
   AuditOperationTypeItem
 }

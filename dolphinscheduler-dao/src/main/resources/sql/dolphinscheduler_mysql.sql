@@ -2009,9 +2009,9 @@ DROP TABLE IF EXISTS `t_ds_audit_log`;
 CREATE TABLE `t_ds_audit_log` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
-  `object_id` bigint(20) DEFAULT NULL COMMENT 'object id',
-  `object_name` varchar(100) DEFAULT NULL COMMENT 'object id',
-  `object_type` varchar(100) NOT NULL COMMENT 'object type',
+  `model_id` bigint(20) DEFAULT NULL COMMENT 'model id',
+  `model_name` varchar(100) DEFAULT NULL COMMENT 'model name',
+  `model_type` varchar(100) NOT NULL COMMENT 'model type',
   `operation_type` varchar(100) NOT NULL COMMENT 'operation type',
   `description` varchar(100) DEFAULT NULL COMMENT 'api description',
   `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',

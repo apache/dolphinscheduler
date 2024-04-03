@@ -26,9 +26,9 @@ export function queryAuditLogListPaging(params: AuditListReq): any {
   })
 }
 
-export function queryAuditLogObjectType(): any {
+export function queryAuditModelType(): any {
   return axios({
-    url: '/projects/audit/audit-log-object-type',
+    url: '/projects/audit/audit-log-model-type',
     method: 'get'
   })
 }

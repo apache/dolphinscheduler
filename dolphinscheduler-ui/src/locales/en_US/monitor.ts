@@ -61,8 +61,8 @@ export default {
   audit_log: {
     user_name: 'User Name',
     operation_type: 'Operation Type',
-    object_type: 'Object Type',
-    object_name: 'Object Name',
+    model_type: 'Model Type',
+    model_name: 'Model Name',
     latency: 'Latency',
     description: 'Description',
     create_time: 'Create Time',

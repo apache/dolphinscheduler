@@ -27,9 +27,9 @@ BEGIN
    THEN
     ALTER TABLE `t_ds_audit_log`
     drop resource_type, drop operation, drop resource_id,
-      add `object_id` bigint(20) DEFAULT NULL COMMENT 'object id',
-      add `object_name` varchar(100) DEFAULT NULL COMMENT 'object id',
-      add `object_type` varchar(100) NOT NULL COMMENT 'object type',
+      add `model_id` bigint(20) DEFAULT NULL COMMENT 'model id',
+      add `model_name` varchar(100) DEFAULT NULL COMMENT 'model name',
+      add `model_type` varchar(100) NOT NULL COMMENT 'model type',
       add `operation_type` varchar(100) NOT NULL COMMENT 'operation type',
       add `description` varchar(100) DEFAULT NULL COMMENT 'api description',
       add `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',

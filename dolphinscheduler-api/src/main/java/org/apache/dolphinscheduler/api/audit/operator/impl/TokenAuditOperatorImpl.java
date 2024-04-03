@@ -47,8 +47,8 @@ public class TokenAuditOperatorImpl extends BaseAuditOperator {
         if (paramsMap.get(AuditLogConstants.USER_ID) != null) {
             User user = userMapper.selectById(paramsMap.get(AuditLogConstants.USER_ID).toString());
             auditLogList.forEach(auditLog -> {
-                auditLog.setObjectName(user.getUserName());
-                auditLog.setObjectId(Long.valueOf(user.getId()));
+                auditLog.setModelName(user.getUserName());
+                auditLog.setModelId(Long.valueOf(user.getId()));
             });
         }
     }

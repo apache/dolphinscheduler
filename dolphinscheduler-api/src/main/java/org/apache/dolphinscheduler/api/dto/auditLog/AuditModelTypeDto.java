@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.auditLog;
 
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,29 +25,29 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-public class AuditObjectTypeDto {
+public class AuditModelTypeDto {
 
     private String name;
 
-    private List<AuditObjectTypeDto> child = null;
+    private List<AuditModelTypeDto> child = null;
 
-    public static List<AuditObjectTypeDto> getObjectTypeDtoList() {
-        List<AuditObjectTypeDto> dtoList = new ArrayList<>();
-        transFromEnumListToDto(dtoList, AuditObjectType.getAuditObjectTreeList());
+    public static List<AuditModelTypeDto> getModelTypeDtoList() {
+        List<AuditModelTypeDto> dtoList = new ArrayList<>();
+        transFromEnumListToDto(dtoList, AuditModelType.getAuditModelTreeList());
         return dtoList;
     }
 
-    public static List<AuditObjectTypeDto> transFromEnumListToDto(List<AuditObjectTypeDto> dtoList,
-                                                                  List<AuditObjectType> objectTypeList) {
-        for (AuditObjectType operationType : objectTypeList) {
+    public static List<AuditModelTypeDto> transFromEnumListToDto(List<AuditModelTypeDto> dtoList,
+                                                                 List<AuditModelType> objectTypeList) {
+        for (AuditModelType operationType : objectTypeList) {
             dtoList.add(transFromEnumToDto(operationType));
         }
 
         return dtoList;
     }
 
-    public static AuditObjectTypeDto transFromEnumToDto(AuditObjectType operationType) {
-        AuditObjectTypeDto dto = new AuditObjectTypeDto();
+    public static AuditModelTypeDto transFromEnumToDto(AuditModelType operationType) {
+        AuditModelTypeDto dto = new AuditModelTypeDto();
         dto.setName(operationType.getName());
 
         if (!operationType.getChild().isEmpty()) {

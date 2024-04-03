@@ -46,7 +46,8 @@ public interface AuditService {
     /**
      * query audit log list
      *
-     * @param objectTypes         object types
+     * @param modelTypes          model types
+     * @param modelName           model name
      * @param operationTypes      operation types
      * @param startTime           start time
      * @param endTime             end time
@@ -55,9 +56,9 @@ public interface AuditService {
      * @param pageSize            page size
      * @return                    audit log string
      */
-    PageInfo<AuditDto> queryLogListPaging(String objectTypes,
+    PageInfo<AuditDto> queryLogListPaging(String modelTypes,
                                           String operationTypes, String startTime,
-                                          String endTime, String userName, String objectName,
+                                          String endTime, String userName, String modelName,
                                           Integer pageNo, Integer pageSize);
 
 }

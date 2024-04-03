@@ -20,14 +20,14 @@ import { reactive, ref } from 'vue'
 import { useAsyncState } from '@vueuse/core'
 import {
   queryAuditLogListPaging,
-  queryAuditLogObjectType,
+  queryAuditModelType,
   queryAuditLogOperationType
 } from '@/service/modules/audit'
 import { format } from 'date-fns'
 import { parseTime } from '@/common/common'
 import type {
   AuditListRes,
-  AuditObjectTypeItem,
+  AuditModelTypeItem,
   AuditOperationTypeItem
 } from '@/service/modules/audit/types'
 import {
@@ -46,12 +46,12 @@ export function useTable() {
     tableData: [],
     page: ref(1),
     pageSize: ref(10),
-    objectType: ref(null),
+    modelType: ref(null),
     operationType: ref(null),
-    ObjectTypeData: [],
+    ModelTypeData: [],
     OperationTypeData: [],
     userName: ref(null),
-    objectName: ref(null),
+    modelName: ref(null),
     datePickerRange: ref(null),
     totalPage: ref(1),
     loadingRef: ref(false)
@@ -71,13 +71,13 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['userName']
       },
       {
-        title: t('monitor.audit_log.object_type'),
-        key: 'objectType',
+        title: t('monitor.audit_log.model_type'),
+        key: 'modelType',
         ...COLUMN_WIDTH_CONFIG['type']
       },
       {
-        title: t('monitor.audit_log.object_name'),
-        key: 'objectName',
+        title: t('monitor.audit_log.model_name'),
+        key: 'modelName',
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
@@ -108,13 +108,13 @@ export function useTable() {
     }
   }
 
-  const getObjectTypeData = async () => {
+  const getModelTypeData = async () => {
     try {
-      variables.ObjectTypeData = await queryAuditLogObjectType().then(
-        (res: AuditObjectTypeItem[]) => res || []
+      variables.ModelTypeData = await queryAuditModelType().then(
+        (res: AuditModelTypeItem[]) => res || []
       )
     } catch {
-      variables.ObjectTypeData = []
+      variables.ModelTypeData = []
     }
   }
 
@@ -134,10 +134,10 @@ export function useTable() {
     const data = {
       pageSize: params.pageSize,
       pageNo: params.pageNo,
-      objectTypes: params.objectType,
+      modelTypes: params.modelType,
       operationTypes: params.operationType,
       userName: params.userName,
-      objectName: params.objectName,
+      modelName: params.modelName,
       startDate: params.datePickerRange
         ? format(parseTime(params.datePickerRange[0]), 'yyyy-MM-dd HH:mm:ss')
         : '',
@@ -167,7 +167,7 @@ export function useTable() {
     variables,
     getTableData,
     createColumns,
-    getObjectTypeData,
+    getModelTypeData: getModelTypeData,
     getOperationTypeData
   }
 }

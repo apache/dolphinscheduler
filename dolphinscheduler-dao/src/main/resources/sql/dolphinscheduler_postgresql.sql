@@ -1994,9 +1994,9 @@ DROP TABLE IF EXISTS t_ds_audit_log;
 CREATE TABLE t_ds_audit_log (
     id serial NOT NULL,
     user_id         int NOT NULL,
-    object_id       bigint NOT NULL,
-    object_name     VARCHAR(255) NOT NULL,
-    object_type     VARCHAR(255) NOT NULL,
+    model_id        bigint NOT NULL,
+    model_name      VARCHAR(255) NOT NULL,
+    model_type      VARCHAR(255) NOT NULL,
     operation_type  VARCHAR(255) NOT NULL,
     description     VARCHAR(255) NOT NULL,
     latency         int NOT NULL,

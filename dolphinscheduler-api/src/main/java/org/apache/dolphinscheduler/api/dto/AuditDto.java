@@ -28,9 +28,9 @@ public class AuditDto {
 
     private String userName;
 
-    private String objectType;
+    private String modelType;
 
-    private String objectName;
+    private String modelName;
 
     private String operation;
 

@@ -44,9 +44,9 @@ public class AuditLog {
     private Integer userId;
 
     /**
-     * object type
+     * model type
      */
-    private String objectType;
+    private String modelType;
 
     /**
      * operation type
@@ -54,9 +54,9 @@ public class AuditLog {
     private String operationType;
 
     /**
-     * object id
+     * model id
      */
-    private Long objectId;
+    private Long modelId;
 
     /**
      * user name
@@ -73,7 +73,7 @@ public class AuditLog {
 
     private String description;
 
-    private String objectName;
+    private String modelName;
 
     private long latency;
 

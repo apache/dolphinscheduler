@@ -25,9 +25,9 @@ BEGIN
       THEN
 ALTER TABLE t_ds_audit_log
     drop resource_type, drop operation, drop resource_id,
-    add object_id       bigint NOT NULL,
-    add object_name     VARCHAR(255) NOT NULL,
-    add object_type     VARCHAR(255) NOT NULL,
+    add model_id        bigint NOT NULL,
+    add model_name      VARCHAR(255) NOT NULL,
+    add model_type      VARCHAR(255) NOT NULL,
     add operation_type  VARCHAR(255) NOT NULL,
     add description     VARCHAR(255) NOT NULL,
     add latency         int NOT NULL,

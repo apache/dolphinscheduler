@@ -33,10 +33,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 public interface AuditLogMapper extends BaseMapper<AuditLog> {
 
     IPage<AuditLog> queryAuditLog(IPage<AuditLog> page,
-                                  @Param("objectTypeList") List<String> objectTypeList,
+                                  @Param("modelTypeList") List<String> modelTypeList,
                                   @Param("operationTypeList") List<String> operationTypeList,
                                   @Param("userName") String userName,
-                                  @Param("objectName") String objectName,
+                                  @Param("modelName") String modelName,
                                   @Param("startDate") Date startDate,
                                   @Param("endDate") Date endDate);
 

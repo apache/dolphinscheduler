@@ -46,7 +46,7 @@ const AuditLog = defineComponent({
       variables,
       getTableData,
       createColumns,
-      getObjectTypeData,
+      getModelTypeData,
       getOperationTypeData
     } = useTable()
 
@@ -54,10 +54,10 @@ const AuditLog = defineComponent({
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        objectType: variables.objectType,
+        modelType: variables.modelType,
         operationType: variables.operationType,
         userName: variables.userName,
-        objectName: variables.objectName,
+        modelName: variables.modelName,
         datePickerRange: variables.datePickerRange
       })
     }
@@ -76,7 +76,7 @@ const AuditLog = defineComponent({
 
     onMounted(() => {
       createColumns(variables)
-      getObjectTypeData()
+      getModelTypeData()
       getOperationTypeData()
       requestTableData()
     })
@@ -110,18 +110,18 @@ const AuditLog = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.objectName, 'value']}
+              v-model={[this.modelName, 'value']}
               size='small'
-              placeholder={t('monitor.audit_log.object_name')}
+              placeholder={t('monitor.audit_log.model_name')}
               clearable
             />
             <NCascader
-              v-model={[this.objectType, 'value']}
+              v-model={[this.modelType, 'value']}
               multiple
               cascade={false}
               size='small'
-              options={this.ObjectTypeData}
-              placeholder={t('monitor.audit_log.object_type')}
+              options={this.ModelTypeData}
+              placeholder={t('monitor.audit_log.model_type')}
               style={{ width: '180px' }}
               clearable
               filterable

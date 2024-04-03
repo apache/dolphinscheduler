@@ -2020,9 +2020,9 @@ CREATE TABLE t_ds_audit_log
 (
     id                  int(11) NOT NULL AUTO_INCREMENT,
     user_id             int(11) NOT NULL,
-    object_id           bigint(20) NOT NULL,
-    object_name         varchar(255) NOT NULL,
-    object_type         varchar(255) NOT NULL,
+    model_id            bigint(20) NOT NULL,
+    model_name          varchar(255) NOT NULL,
+    model_type          varchar(255) NOT NULL,
     operation_type      varchar(255) NOT NULL,
     description         varchar(255) NOT NULL,
     latency             int(11) NOT NULL,

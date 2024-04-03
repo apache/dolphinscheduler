@@ -33,7 +33,7 @@ public class ResourceAuditOperatorImpl extends BaseAuditOperator {
     @Override
     public void modifyAuditObjectType(AuditType auditType, Map<String, Object> paramsMap, List<AuditLog> auditLogList) {
         auditLogList.forEach(auditLog -> auditLog
-                .setObjectType(OperatorUtils.getFileAuditObject(auditType, paramsMap, auditLog.getObjectName())));
+                .setModelType(OperatorUtils.getFileAuditObject(auditType, paramsMap, auditLog.getModelName())));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class ResourceAuditOperatorImpl extends BaseAuditOperator {
             return;
         }
 
-        auditLogList.get(0).setObjectName(objName.toString());
+        auditLogList.get(0).setModelName(objName.toString());
     }
 
     private String getFileNameFromParam(String[] paramNameArr, Map<String, Object> paramsMap) {

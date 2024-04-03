@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
@@ -43,16 +43,16 @@ public class AuditLogMapperTest extends BaseDaoTest {
     @Autowired
     private ProjectMapper projectMapper;
 
-    private void insertOne(AuditObjectType objectType) {
+    private void insertOne(AuditModelType objectType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);
-        auditLog.setObjectName("name");
+        auditLog.setModelName("name");
         auditLog.setDetail("detail");
         auditLog.setLatency(1L);
         auditLog.setTime(new Date());
-        auditLog.setObjectType(objectType.getName());
+        auditLog.setModelType(objectType.getName());
         auditLog.setOperationType(AuditOperationType.CREATE.getName());
-        auditLog.setObjectId(1L);
+        auditLog.setModelId(1L);
         auditLog.setDescription("description");
         logMapper.insert(auditLog);
     }
@@ -73,8 +73,8 @@ public class AuditLogMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryAuditLog() {
-        insertOne(AuditObjectType.USER);
-        insertOne(AuditObjectType.PROJECT);
+        insertOne(AuditModelType.USER);
+        insertOne(AuditModelType.PROJECT);
         Page<AuditLog> page = new Page<>(1, 3);
         List<String> objectTypeList = new ArrayList<>();
         List<String> operationTypeList = Lists.newArrayList(AuditOperationType.CREATE.getName());

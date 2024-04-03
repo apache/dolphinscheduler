@@ -38,27 +38,27 @@ import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.USER_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.VERSION;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_DEFINITION_CODE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.ALARM_GROUP;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.ALARM_INSTANCE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.CLUSTER;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.DATASOURCE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.ENVIRONMENT;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.FILE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.FOLDER;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.K8S_NAMESPACE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.PROCESS;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.PROCESS_INSTANCE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.PROJECT;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.SCHEDULE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.TASK;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.TASK_GROUP;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.TASK_INSTANCE;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.TENANT;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.TOKEN;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.UDF_FUNCTION;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.USER;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.WORKER_GROUP;
-import static org.apache.dolphinscheduler.common.enums.AuditObjectType.YARN_QUEUE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.ALARM_GROUP;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.ALARM_INSTANCE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.CLUSTER;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.DATASOURCE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.ENVIRONMENT;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.FILE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.FOLDER;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.K8S_NAMESPACE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROCESS;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROCESS_INSTANCE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.PROJECT;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.SCHEDULE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK_GROUP;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK_INSTANCE;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.TENANT;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.TOKEN;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.UDF_FUNCTION;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.USER;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKER_GROUP;
+import static org.apache.dolphinscheduler.common.enums.AuditModelType.YARN_QUEUE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_DELETE;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_RERUN;
 import static org.apache.dolphinscheduler.common.enums.AuditOperationType.BATCH_START;
@@ -100,7 +100,7 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.UdfFunctionAuditOpera
 import org.apache.dolphinscheduler.api.audit.operator.impl.UserAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.WorkerGroupAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.YarnQueueAuditOperatorImpl;
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 
 import lombok.Getter;
@@ -225,7 +225,7 @@ public enum AuditType {
     ;
 
     private final Class<? extends AuditOperator> operatorClass;
-    private final AuditObjectType auditObjectType;
+    private final AuditModelType auditModelType;
     private final AuditOperationType auditOperationType;
 
     /**
@@ -241,9 +241,9 @@ public enum AuditType {
      */
     private final String[] returnObjectFieldName;
 
-    AuditType(AuditObjectType auditObjectType, AuditOperationType auditOperationType,
+    AuditType(AuditModelType auditModelType, AuditOperationType auditOperationType,
               Class<? extends AuditOperator> operatorClass, String[] requestParamName, String[] returnObjectFieldName) {
-        this.auditObjectType = auditObjectType;
+        this.auditModelType = auditModelType;
         this.auditOperationType = auditOperationType;
         this.operatorClass = operatorClass;
         this.requestParamName = requestParamName;

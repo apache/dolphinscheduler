@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.enums.AuditObjectType;
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
@@ -50,7 +50,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
     @Override
     public void addAudit(AuditLog auditLog) {
-        if (auditLog.getObjectId() == null || auditLog.getObjectName() == null) {
+        if (auditLog.getModelId() == null || auditLog.getModelName() == null) {
             return;
         }
 
@@ -68,26 +68,26 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * query audit log paging
      *
-     * @param objectTypes         object types
+     * @param modelTypes          object types
      * @param operationTypes      operation types
      * @param startDate           start time
      * @param endDate             end time
      * @param userName            query user name
-     * @param objectName          query object name
+     * @param modelName           query object name
      * @param pageNo              page number
      * @param pageSize            page size
      * @return audit log string data
      */
     @Override
-    public PageInfo<AuditDto> queryLogListPaging(String objectTypes,
+    public PageInfo<AuditDto> queryLogListPaging(String modelTypes,
                                                  String operationTypes,
                                                  String startDate,
                                                  String endDate,
                                                  String userName,
-                                                 String objectName,
+                                                 String modelName,
                                                  Integer pageNo,
                                                  Integer pageSize) {
-        List<String> objectTypeCodeList = convertStringToList(objectTypes);
+        List<String> objectTypeCodeList = convertStringToList(modelTypes);
         List<String> operationTypeCodeList = convertStringToList(operationTypes);
 
         Date start = checkAndParseDateParameters(startDate);
@@ -95,7 +95,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
         IPage<AuditLog> logIPage =
                 auditLogMapper.queryAuditLog(new Page<>(pageNo, pageSize), objectTypeCodeList, operationTypeCodeList,
-                        userName, objectName, start, end);
+                        userName, modelName, start, end);
         List<AuditDto> auditDtos =
                 logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
 
@@ -121,9 +121,9 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      */
     private AuditDto transformAuditLog(AuditLog auditLog) {
         AuditDto auditDto = new AuditDto();
-        AuditObjectType objectType = AuditObjectType.of(auditLog.getObjectType());
-        auditDto.setObjectType(objectType.getName());
-        auditDto.setObjectName(auditLog.getObjectName());
+        AuditModelType objectType = AuditModelType.of(auditLog.getModelType());
+        auditDto.setModelType(objectType.getName());
+        auditDto.setModelName(auditLog.getModelName());
         auditDto.setOperation(AuditOperationType.of(auditLog.getOperationType()).getName());
         auditDto.setUserName(auditLog.getUserName());
         auditDto.setLatency(String.valueOf(auditLog.getLatency()));

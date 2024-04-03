@@ -24,10 +24,10 @@ import java.util.List;
 import lombok.Getter;
 
 /**
- * Audit Object type
+ * Audit Model type
  */
 @Getter
-public enum AuditObjectType {
+public enum AuditModelType {
 
     PROJECT("Project", null), // 1
     PROCESS("Process", PROJECT),
@@ -59,39 +59,39 @@ public enum AuditObjectType {
     TOKEN("Token", SECURITY),
     ;
     private final String name;
-    private final AuditObjectType parentType;
-    private final List<AuditObjectType> child = new ArrayList<>();
+    private final AuditModelType parentType;
+    private final List<AuditModelType> child = new ArrayList<>();
 
-    private static final HashMap<String, AuditObjectType> AUDIT_OBJECT_MAP = new HashMap<>();
-    private static final List<AuditObjectType> AUDIT_OBJECT_TREE_LIST = new ArrayList<>();
+    private static final HashMap<String, AuditModelType> AUDIT_MODEL_MAP = new HashMap<>();
+    private static final List<AuditModelType> AUDIT_MODEL_TREE_LIST = new ArrayList<>();
 
     static {
-        for (AuditObjectType auditObjectType : values()) {
-            AUDIT_OBJECT_MAP.put(auditObjectType.name, auditObjectType);
+        for (AuditModelType auditModelType : values()) {
+            AUDIT_MODEL_MAP.put(auditModelType.name, auditModelType);
         }
 
-        for (AuditObjectType auditObjectType : values()) {
-            if (auditObjectType.parentType != null) {
-                of(auditObjectType.parentType.name).child.add(auditObjectType);
+        for (AuditModelType auditModelType : values()) {
+            if (auditModelType.parentType != null) {
+                of(auditModelType.parentType.name).child.add(auditModelType);
             } else {
-                AUDIT_OBJECT_TREE_LIST.add(auditObjectType);
+                AUDIT_MODEL_TREE_LIST.add(auditModelType);
             }
         }
     }
 
-    public static List<AuditObjectType> getAuditObjectTreeList() {
-        return AUDIT_OBJECT_TREE_LIST;
+    public static List<AuditModelType> getAuditModelTreeList() {
+        return AUDIT_MODEL_TREE_LIST;
     }
 
-    public static AuditObjectType of(String name) {
-        if (AUDIT_OBJECT_MAP.containsKey(name)) {
-            return AUDIT_OBJECT_MAP.get(name);
+    public static AuditModelType of(String name) {
+        if (AUDIT_MODEL_MAP.containsKey(name)) {
+            return AUDIT_MODEL_MAP.get(name);
         }
 
         throw new IllegalArgumentException("invalid audit operation type name " + name);
     }
 
-    AuditObjectType(String name, AuditObjectType parentType) {
+    AuditModelType(String name, AuditModelType parentType) {
         this.name = name;
         this.parentType = parentType;
     }
