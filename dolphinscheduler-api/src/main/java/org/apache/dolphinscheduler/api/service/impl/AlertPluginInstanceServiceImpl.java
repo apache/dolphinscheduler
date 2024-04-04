@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALART_INSTANCE_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_INSTANCE_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
@@ -108,7 +108,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
                                       WarningType warningType,
                                       String pluginInstanceParams) {
 
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALART_INSTANCE_CREATE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_INSTANCE_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
@@ -359,7 +359,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
             throw new ServiceException(Status.ALERT_TEST_SENDING_FAILED, e.getMessage());
         }
 
-        if (alertSendResponse.isSuccess()) {
+        if (!alertSendResponse.isSuccess()) {
             throw new ServiceException(Status.ALERT_TEST_SENDING_FAILED,
                     alertSendResponse.getResResults().get(0).getMessage());
         }
