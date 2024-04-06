@@ -129,7 +129,8 @@ public class Db2DataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.db2);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.db2);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.db2);
     }
 
     private String transformOther(Map<String, String> otherMap) {
