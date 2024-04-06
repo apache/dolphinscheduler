@@ -738,11 +738,9 @@ public final class Constants {
 
 
     /**
-     * netty config
+     * netty config enable
      */
     public static final String NETTY_SSL_ENABLE = "netty.ssl.enable";
-
-    public static final String NETTY_SSL_ROOT_PATH = "netty.ssl.root.path";
 
     public static final String NETTY_SSL_KEY_PATH = "netty.ssl.key.path";
 

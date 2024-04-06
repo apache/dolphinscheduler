@@ -57,11 +57,6 @@ public class NettyUtils {
     public static String getNettyKeyPath() {
         return PropertyUtils.getString(Constants.NETTY_SSL_KEY_PATH);
     }
-
-    public static String getNettyRootPath() {
-        return PropertyUtils.getString(Constants.NETTY_SSL_ROOT_PATH);
-    }
-
     public static String getNettyCertPath() {
         return PropertyUtils.getString(Constants.NETTY_SSL_CERT_PATH);
     }
