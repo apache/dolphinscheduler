@@ -144,16 +144,16 @@ public class NettyRemotingServer {
      * @param ch socket channel
      */
     private void initNettyChannel(SocketChannel ch) {
+        if(NettyUtils.isNettySSLEnable()){
+            ch.pipeline().addLast("ssl",sslContext.newHandler(ch.alloc()));
+
+        }
         ch.pipeline()
                 .addLast("encoder", new TransporterEncoder())
                 .addLast("decoder", new TransporterDecoder())
                 .addLast("server-idle-handle",
                         new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
                 .addLast("handler", serverHandler);
-        if(NettyUtils.isNettySSLEnable()){
-            ch.pipeline().addLast("ssl",sslContext.newHandler(ch.alloc()));
-
-        }
     }
 
     public ExecutorService getDefaultExecutor() {

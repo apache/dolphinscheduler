@@ -46,8 +46,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
@@ -59,6 +57,8 @@ import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.timeout.IdleStateHandler;
 
 import javax.net.ssl.SSLException;
@@ -90,7 +90,7 @@ public class NettyRemotingClient implements AutoCloseable {
         this.clientConfig = clientConfig;
         if(NettyUtils.isNettySSLEnable()){
             try {
-                sslContext = SslContextBuilder.forServer(new File(NettyUtils.getNettyCertPath()), new File(NettyUtils.getNettyKeyPath())).build();
+                sslContext = SslContextBuilder.forClient().trustManager(new File(NettyUtils.getNettyCertPath())).build();
             } catch (SSLException e) {
                 throw new RuntimeException(e);
             }
@@ -131,6 +131,9 @@ public class NettyRemotingClient implements AutoCloseable {
 
                     @Override
                     public void initChannel(SocketChannel ch) {
+                        if(NettyUtils.isNettySSLEnable()){
+                            ch.pipeline().addLast(sslContext.newHandler(ch.alloc()));
+                        }
                         ch.pipeline()
                                 .addLast("client-idle-handler",
                                         new IdleStateHandler(
@@ -138,8 +141,7 @@ public class NettyRemotingClient implements AutoCloseable {
                                                 0,
                                                 0,
                                                 TimeUnit.MILLISECONDS))
-                                .addLast(new TransporterDecoder(), clientHandler, new TransporterEncoder())
-                            .addLast("ssl",sslContext.newHandler(ch.alloc()));
+                                .addLast(new TransporterDecoder(), clientHandler, new TransporterEncoder());
                     }
                 });
         this.responseFutureExecutor.scheduleWithFixedDelay(ResponseFuture::scanFutureTable, 0, 1, TimeUnit.SECONDS);
