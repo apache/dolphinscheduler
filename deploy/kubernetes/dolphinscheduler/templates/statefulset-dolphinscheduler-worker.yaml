@@ -113,7 +113,7 @@ spec:
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}

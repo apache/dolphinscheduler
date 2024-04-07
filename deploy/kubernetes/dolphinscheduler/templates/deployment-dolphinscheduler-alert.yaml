@@ -114,7 +114,7 @@ spec:
               name: {{ include "dolphinscheduler.fullname" . }}-alert
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.alert.persistentVolumeClaim.enabled }}
