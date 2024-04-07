@@ -230,7 +230,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public PageInfo<DataSource> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo,
                                                           Integer pageSize) {
-        IPage<DataSource> dataSourceList = null;
+        IPage<DataSource> dataSourceList;
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
@@ -282,7 +282,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public List<DataSource> queryDataSourceList(User loginUser, Integer type) {
 
-        List<DataSource> datasourceList = null;
+        List<DataSource> datasourceList;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
         } else {
@@ -420,7 +420,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     public List<ParamsOptions> getTables(Integer datasourceId, String database) {
         DataSource dataSource = dataSourceMapper.selectById(datasourceId);
 
-        List<String> tableList = null;
+        List<String> tableList;
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                         dataSource.getType(),

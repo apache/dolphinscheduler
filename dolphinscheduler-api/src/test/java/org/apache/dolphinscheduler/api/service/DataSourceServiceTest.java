@@ -52,15 +52,15 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Assertions;
@@ -73,6 +73,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DuplicateKeyException;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /**
  * data source service test
@@ -95,6 +98,15 @@ public class DataSourceServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Mock
+    private IPage<DataSource> dataSourceList;
+
+    private String randomStringWithLengthN(int n) {
+        byte[] bitArray = new byte[n];
+        new Random().nextBytes(bitArray);
+        return new String(bitArray, StandardCharsets.UTF_8);
+    }
 
     private void passResourcePermissionCheckService() {
         when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
@@ -131,6 +143,7 @@ public class DataSourceServiceTest {
         when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(dataSourceList);
         passResourcePermissionCheckService();
 
+        // DATASOURCE_EXIST
         assertThrowsServiceException(Status.DATASOURCE_EXIST,
                 () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
 
@@ -140,13 +153,24 @@ public class DataSourceServiceTest {
 
             when(dataSourceMapper.queryDataSourceByName(dataSourceName.trim())).thenReturn(null);
 
+            // DESCRIPTION TOO LONG
+            postgreSqlDatasourceParam.setNote(randomStringWithLengthN(512));
+            assertThrowsServiceException(Status.DESCRIPTION_TOO_LONG_ERROR,
+                    () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+            postgreSqlDatasourceParam.setNote(dataSourceDesc);
+
             // SUCCESS
             assertDoesNotThrow(() -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+
+            // Duplicated Key Exception
+            when(dataSourceMapper.insert(Mockito.any(DataSource.class))).thenThrow(DuplicateKeyException.class);
+            assertThrowsServiceException(Status.DATASOURCE_EXIST,
+                    () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
         }
     }
 
     @Test
-    public void updateDataSourceTest() throws ExecutionException {
+    public void updateDataSourceTest() {
         User loginUser = getAdminUser();
 
         int dataSourceId = 12;
@@ -200,32 +224,74 @@ public class DataSourceServiceTest {
             // DATASOURCE_CONNECT_FAILED
             when(dataSourceMapper.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
 
+            // DESCRIPTION TOO LONG
+            postgreSqlDatasourceParam.setNote(randomStringWithLengthN(512));
+            assertThrowsServiceException(Status.DESCRIPTION_TOO_LONG_ERROR,
+                    () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
+            postgreSqlDatasourceParam.setNote(dataSourceDesc);
+
             // SUCCESS
             assertDoesNotThrow(() -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
+
+            // Duplicated Key Exception
+            when(dataSourceMapper.updateById(Mockito.any(DataSource.class))).thenThrow(DuplicateKeyException.class);
+            assertThrowsServiceException(Status.DATASOURCE_EXIST,
+                    () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
         }
     }
 
     @Test
-    public void queryDataSourceListPagingTest() {
-        User loginUser = getAdminUser();
+    public void testQueryDataSourceListPaging() {
+
+        User adminUser = getAdminUser();
+        User generalUser = getGeneralUser();
         String searchVal = "";
         int pageNo = 1;
         int pageSize = 10;
 
         PageInfo<DataSource> pageInfo =
-                dataSourceService.queryDataSourceListPaging(loginUser, searchVal, pageNo, pageSize);
+                dataSourceService.queryDataSourceListPaging(adminUser, searchVal, pageNo, pageSize);
         Assertions.assertNotNull(pageInfo);
+
+        // test query datasource as general user with no datasource authed
+        when(dataSourceList.getRecords()).thenReturn(getSingleDataSourceList());
+        when(dataSourceMapper.selectPagingByIds(Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(dataSourceList);
+        assertDoesNotThrow(() -> dataSourceService.queryDataSourceListPaging(generalUser, searchVal, pageNo, pageSize));
+
+        // test query datasource as general user with datasource authed
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE,
+                generalUser.getId(), dataSourceServiceLogger)).thenReturn(Collections.singleton(1));
+
+        assertDoesNotThrow(() -> dataSourceService.queryDataSourceListPaging(generalUser, searchVal, pageNo, pageSize));
     }
 
     @Test
-    public void connectionTest() {
+    public void testConnectionTest() {
         int dataSourceId = -1;
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
         assertThrowsServiceException(Status.RESOURCE_NOT_EXIST, () -> dataSourceService.connectionTest(dataSourceId));
+
+        try (
+                MockedStatic<DataSourceUtils> ignored =
+                        Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSource dataSource = getOracleDataSource(999);
+            when(dataSourceMapper.selectById(dataSource.getId())).thenReturn(dataSource);
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+            assertDoesNotThrow(() -> dataSourceService.connectionTest(dataSource.getId()));
+
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
+            assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
+                    () -> dataSourceService.connectionTest(dataSource.getId()));
+        }
+
     }
 
     @Test
-    public void deleteTest() {
+    public void testDelete() {
         User loginUser = getAdminUser();
         int dataSourceId = 1;
         // resource not exist
@@ -252,7 +318,7 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void unauthDatasourceTest() {
+    public void testUnAuthDatasource() {
         User loginUser = getAdminUser();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -279,7 +345,7 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void authedDatasourceTest() {
+    public void testAuthedDatasource() {
         User loginUser = getAdminUser();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
@@ -300,19 +366,28 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void queryDataSourceListTest() {
-        User loginUser = new User();
-        loginUser.setUserType(UserType.GENERAL_USER);
-        Set<Integer> dataSourceIds = new HashSet<>();
-        dataSourceIds.add(1);
+    public void testQueryDataSourceList() {
+        User adminUser = getAdminUser();
+        assertDoesNotThrow(() -> dataSourceService.queryDataSourceList(adminUser, DbType.MYSQL.ordinal()));
+
+        User generalUser = getGeneralUser();
+
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE,
-                loginUser.getId(), dataSourceServiceLogger)).thenReturn(dataSourceIds);
+                generalUser.getId(), dataSourceServiceLogger)).thenReturn(Collections.emptySet());
+        List<DataSource> emptyList = dataSourceService.queryDataSourceList(generalUser, DbType.MYSQL.ordinal());
+        Assertions.assertEquals(emptyList.size(), 0);
+
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE,
+                generalUser.getId(), dataSourceServiceLogger)).thenReturn(Collections.singleton(1));
 
         DataSource dataSource = new DataSource();
+        dataSource.setId(1);
         dataSource.setType(DbType.MYSQL);
-        when(dataSourceMapper.selectBatchIds(dataSourceIds)).thenReturn(Collections.singletonList(dataSource));
+        when(dataSourceMapper.selectBatchIds(Collections.singleton(1)))
+                .thenReturn(Collections.singletonList(dataSource));
+
         List<DataSource> list =
-                dataSourceService.queryDataSourceList(loginUser, DbType.MYSQL.ordinal());
+                dataSourceService.queryDataSourceList(generalUser, DbType.MYSQL.ordinal());
         Assertions.assertNotNull(list);
     }
 
@@ -327,21 +402,28 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void queryDataSourceTest() {
-        when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(null);
+    public void testQueryDataSource() {
+        // datasource not exists
+        when(dataSourceMapper.selectById(999)).thenReturn(null);
         User loginUser = new User();
         loginUser.setUserType(UserType.GENERAL_USER);
         loginUser.setId(2);
-        try {
-            dataSourceService.queryDataSource(Mockito.anyInt(), loginUser);
-        } catch (Exception e) {
-            Assertions.assertTrue(e.getMessage().contains(Status.RESOURCE_NOT_EXIST.getMsg()));
-        }
+
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST,
+                () -> dataSourceService.queryDataSource(999, loginUser));
 
         DataSource dataSource = getOracleDataSource(1);
-        when(dataSourceMapper.selectById(Mockito.anyInt())).thenReturn(dataSource);
+        when(dataSourceMapper.selectById(dataSource.getId())).thenReturn(dataSource);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE,
                 loginUser.getId(), DATASOURCE, baseServiceLogger)).thenReturn(true);
+
+        // no perm
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,
+                new Object[]{dataSource.getId()}, loginUser.getId(), baseServiceLogger)).thenReturn(false);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> dataSourceService.queryDataSource(dataSource.getId(), loginUser));
+
+        // success
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE,
                 new Object[]{dataSource.getId()}, loginUser.getId(), baseServiceLogger)).thenReturn(true);
         BaseDataSourceParamDTO paramDTO = dataSourceService.queryDataSource(dataSource.getId(), loginUser);
@@ -472,8 +554,16 @@ public class DataSourceServiceTest {
      */
     private User getAdminUser() {
         User loginUser = new User();
-        loginUser.setId(-1);
+        loginUser.setId(1);
         loginUser.setUserName("admin");
+        loginUser.setUserType(UserType.ADMIN_USER);
+        return loginUser;
+    }
+
+    private User getGeneralUser() {
+        User loginUser = new User();
+        loginUser.setId(2);
+        loginUser.setUserName("user");
         loginUser.setUserType(UserType.GENERAL_USER);
         return loginUser;
     }
