@@ -15,13 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.config;
+package org.apache.dolphinscheduler.meter.metrics;
 
-import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
+public interface ServerLoadProtection {
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
-public class WorkerServerLoadProtection extends BaseServerLoadProtection {
+    boolean isOverload(SystemMetrics systemMetrics);
 
 }
