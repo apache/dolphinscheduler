@@ -32,7 +32,7 @@ data:
       {{- end }}
     {{- end }}
   {{- end }}
-  common_properties: |-
+  common.properties: |-
   {{- if index .Values.conf "common" }}
   {{- range $key, $value := index .Values.conf "common" }}
     {{- if and $.Values.minio.enabled }}
