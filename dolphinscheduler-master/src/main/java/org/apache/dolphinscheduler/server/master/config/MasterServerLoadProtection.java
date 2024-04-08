@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
@@ -86,17 +87,21 @@ public class MasterServerLoadProtection implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         MasterServerLoadProtection serverLoadProtection = (MasterServerLoadProtection) target;
-        if(serverLoadProtection.isEnabled()){
-            if (serverLoadProtection.getMaxCpuUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
+        if (serverLoadProtection.isEnabled()) {
+            if (serverLoadProtection.getMaxCpuUsagePercentageThresholds() <= 0
+                    || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
                 errors.rejectValue("max-cpu-usage-percentage-thresholds", null, "is invalidated");
             }
-            if (serverLoadProtection.getMaxJvmMemoryUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxJvmMemoryUsagePercentageThresholds() > 1) {
+            if (serverLoadProtection.getMaxJvmMemoryUsagePercentageThresholds() <= 0
+                    || serverLoadProtection.getMaxJvmMemoryUsagePercentageThresholds() > 1) {
                 errors.rejectValue("max-jvm-memory-usage-percentage-thresholds", null, "is invalidated");
             }
-            if (serverLoadProtection.getMaxDiskUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
+            if (serverLoadProtection.getMaxDiskUsagePercentageThresholds() <= 0
+                    || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
                 errors.rejectValue("max-disk-usage-percentage-thresholds", null, "is invalidated");
             }
-            if (serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
+            if (serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds() <= 0
+                    || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
                 errors.rejectValue("max-system-memory-usage-percentage-thresholds", null, "is invalidated");
             }
         }
@@ -105,12 +110,14 @@ public class MasterServerLoadProtection implements Validator {
 
     private void printConfig() {
         String config =
-                "\n****************************MasterServerLoadProtection Configuration**************************************" +
+                "\n****************************MasterServerLoadProtection Configuration**************************************"
+                        +
                         "\n  master-server-load-protection-enabled -> " + enabled +
                         "\n  max-cpu-usage-percentage-thresholds -> " + maxCpuUsagePercentageThresholds +
                         "\n  max-jvm-memory-usage-percentage-thresholds -> " + maxJvmMemoryUsagePercentageThresholds +
                         "\n  max-disk-usage-percentage-thresholds -> " + maxDiskUsagePercentageThresholds +
-                        "\n  max-system-memory-usage-percentage-thresholds -> " + maxSystemMemoryUsagePercentageThresholds +
+                        "\n  max-system-memory-usage-percentage-thresholds -> "
+                        + maxSystemMemoryUsagePercentageThresholds +
                         "\n****************************MasterServerLoadProtection Configuration**************************************";
         log.info(config);
     }
