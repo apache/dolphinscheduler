@@ -23,18 +23,26 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j
 @Data
+@Validated
 @NoArgsConstructor
 @AllArgsConstructor
-public class MasterServerLoadProtection {
+@Configuration
+@ConfigurationProperties(prefix = "master-server-load-protection")
+public class MasterServerLoadProtection implements Validator {
 
     private boolean enabled = true;
 
     private double maxCpuUsagePercentageThresholds = 0.7;
 
-    private double maxJVMMemoryUsagePercentageThresholds = 0.7;
+    private double maxJvmMemoryUsagePercentageThresholds = 0.7;
 
     private double maxSystemMemoryUsagePercentageThresholds = 0.7;
 
@@ -50,15 +58,15 @@ public class MasterServerLoadProtection {
                     systemMetrics.getTotalCpuUsedPercentage(), maxCpuUsagePercentageThresholds);
             return true;
         }
-        if (systemMetrics.getJvmMemoryUsedPercentage() > maxJVMMemoryUsagePercentageThresholds) {
+        if (systemMetrics.getJvmMemoryUsedPercentage() > maxJvmMemoryUsagePercentageThresholds) {
             log.info(
                     "Master OverLoad: the JvmMemoryUsedPercentage: {} is over then the MaxJVMMemoryUsagePercentageThresholds {}",
-                    systemMetrics.getJvmMemoryUsedPercentage(), maxCpuUsagePercentageThresholds);
+                    systemMetrics.getJvmMemoryUsedPercentage(), maxJvmMemoryUsagePercentageThresholds);
             return true;
         }
         if (systemMetrics.getDiskUsedPercentage() > maxDiskUsagePercentageThresholds) {
             log.info("Master OverLoad: the DiskUsedPercentage: {} is over then the MaxDiskUsagePercentageThresholds {}",
-                    systemMetrics.getDiskUsedPercentage(), maxCpuUsagePercentageThresholds);
+                    systemMetrics.getDiskUsedPercentage(), maxDiskUsagePercentageThresholds);
             return true;
         }
         if (systemMetrics.getSystemMemoryUsedPercentage() > maxSystemMemoryUsagePercentageThresholds) {
@@ -70,4 +78,40 @@ public class MasterServerLoadProtection {
         return false;
     }
 
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return MasterServerLoadProtection.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        MasterServerLoadProtection serverLoadProtection = (MasterServerLoadProtection) target;
+        if(serverLoadProtection.isEnabled()){
+            if (serverLoadProtection.getMaxCpuUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
+                errors.rejectValue("max-cpu-usage-percentage-thresholds", null, "is invalidated");
+            }
+            if (serverLoadProtection.getMaxJvmMemoryUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxJvmMemoryUsagePercentageThresholds() > 1) {
+                errors.rejectValue("max-jvm-memory-usage-percentage-thresholds", null, "is invalidated");
+            }
+            if (serverLoadProtection.getMaxDiskUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
+                errors.rejectValue("max-disk-usage-percentage-thresholds", null, "is invalidated");
+            }
+            if (serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds() <= 0 || serverLoadProtection.getMaxCpuUsagePercentageThresholds() > 1) {
+                errors.rejectValue("max-system-memory-usage-percentage-thresholds", null, "is invalidated");
+            }
+        }
+        printConfig();
+    }
+
+    private void printConfig() {
+        String config =
+                "\n****************************MasterServerLoadProtection Configuration**************************************" +
+                        "\n  master-server-load-protection-enabled -> " + enabled +
+                        "\n  max-cpu-usage-percentage-thresholds -> " + maxCpuUsagePercentageThresholds +
+                        "\n  max-jvm-memory-usage-percentage-thresholds -> " + maxJvmMemoryUsagePercentageThresholds +
+                        "\n  max-disk-usage-percentage-thresholds -> " + maxDiskUsagePercentageThresholds +
+                        "\n  max-system-memory-usage-percentage-thresholds -> " + maxSystemMemoryUsagePercentageThresholds +
+                        "\n****************************MasterServerLoadProtection Configuration**************************************";
+        log.info(config);
+    }
 }
