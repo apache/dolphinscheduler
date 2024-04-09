@@ -554,7 +554,7 @@ public class ResourcesController extends BaseController {
     @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
     public Result<Object> queryUdfFuncList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @RequestParam("type") UdfType type) {
-        return udfFuncService.queryUdfFuncList(loginUser, type.ordinal());
+        return udfFuncService.queryUdfFuncList(loginUser, type.getCode());
     }
 
     /**
