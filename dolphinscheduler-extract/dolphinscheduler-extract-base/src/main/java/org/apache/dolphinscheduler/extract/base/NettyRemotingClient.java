@@ -92,7 +92,7 @@ public class NettyRemotingClient implements AutoCloseable {
             try {
                 sslContext = SslContextBuilder.forClient().trustManager(new File(NettyUtils.getNettyCertPath())).build();
             } catch (SSLException e) {
-                throw new RuntimeException(e);
+                throw new IllegalArgumentException("Initialize SslContext error, please check the cert-file", e);
             }
         }
         ThreadFactory nettyClientThreadFactory = ThreadUtils.newDaemonThreadFactory("NettyClientThread-");
