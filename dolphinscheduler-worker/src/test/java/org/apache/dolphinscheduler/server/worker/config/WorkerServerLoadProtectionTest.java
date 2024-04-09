@@ -30,7 +30,8 @@ class WorkerServerLoadProtectionTest {
         SystemMetrics systemMetrics = SystemMetrics.builder()
                 .jvmMemoryUsedPercentage(0.71)
                 .systemMemoryUsedPercentage(0.71)
-                .totalCpuUsedPercentage(0.71)
+                .systemCpuUsagePercentage(0.71)
+                .jvmCpuUsagePercentage(0.71)
                 .diskUsedPercentage(0.71)
                 .build();
         workerServerLoadProtection.setEnabled(false);
