@@ -15,25 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.data.quality.utils;
+package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.quartz.CronTrigger;
 
-public class ParserUtilsTest {
+public interface QuartzTriggerBuilder {
 
-    @Test
-    public void testParserUtils() {
-        String testStr = "aaa$bbb$ccc%ddd^eee#fff";
-        String encode = ParserUtils.encode(testStr);
-        String decode = ParserUtils.decode(encode);
-        Assertions.assertEquals(testStr, decode);
-
-        String blank = "";
-        Assertions.assertEquals(ParserUtils.encode(blank), blank);
-        Assertions.assertEquals(ParserUtils.decode(blank), blank);
-
-        Assertions.assertNull(ParserUtils.encode(null));
-        Assertions.assertNull(ParserUtils.decode(null));
-    }
+    CronTrigger build();
 }
