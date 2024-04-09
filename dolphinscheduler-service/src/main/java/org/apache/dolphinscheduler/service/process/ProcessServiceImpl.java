@@ -798,7 +798,7 @@ public class ProcessServiceImpl implements ProcessService {
                 // recover tolerance fault process
                 // If the workflow instance is in ready state, we will change to running, this can avoid the workflow
                 // instance
-                // status is not correct with taskInsatnce status
+                // status is not correct with taskInstance status
                 if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE
                         || processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
                     // todo: If we handle the ready state in WorkflowExecuteRunnable then we can remove below code
