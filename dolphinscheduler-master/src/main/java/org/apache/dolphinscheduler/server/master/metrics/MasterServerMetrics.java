@@ -51,7 +51,7 @@ public class MasterServerMetrics {
 
     public void registerMasterCpuUsageGauge(Supplier<Number> supplier) {
         Gauge.builder("ds.master.cpu.usage", supplier)
-                .description("worker cpu usage")
+                .description("master cpu usage")
                 .register(Metrics.globalRegistry);
     }
 

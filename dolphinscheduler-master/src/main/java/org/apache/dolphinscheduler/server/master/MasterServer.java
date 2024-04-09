@@ -123,7 +123,7 @@ public class MasterServer implements IStoppable {
 
         MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-            return systemMetrics.getTotalCpuUsedPercentage();
+            return systemMetrics.getSystemCpuUsagePercentage();
         });
         MasterServerMetrics.registerMasterMemoryAvailableGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();

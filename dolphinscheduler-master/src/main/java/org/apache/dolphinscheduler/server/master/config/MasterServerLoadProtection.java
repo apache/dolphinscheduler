@@ -17,57 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class MasterServerLoadProtection {
-
-    private boolean enabled = true;
-
-    private double maxCpuUsagePercentageThresholds = 0.7;
-
-    private double maxJVMMemoryUsagePercentageThresholds = 0.7;
-
-    private double maxSystemMemoryUsagePercentageThresholds = 0.7;
-
-    private double maxDiskUsagePercentageThresholds = 0.7;
-
-    public boolean isOverload(SystemMetrics systemMetrics) {
-        if (!enabled) {
-            return false;
-        }
-        if (systemMetrics.getTotalCpuUsedPercentage() > maxCpuUsagePercentageThresholds) {
-            log.info(
-                    "Master OverLoad: the TotalCpuUsedPercentage: {} is over then the MaxCpuUsagePercentageThresholds {}",
-                    systemMetrics.getTotalCpuUsedPercentage(), maxCpuUsagePercentageThresholds);
-            return true;
-        }
-        if (systemMetrics.getJvmMemoryUsedPercentage() > maxJVMMemoryUsagePercentageThresholds) {
-            log.info(
-                    "Master OverLoad: the JvmMemoryUsedPercentage: {} is over then the MaxJVMMemoryUsagePercentageThresholds {}",
-                    systemMetrics.getJvmMemoryUsedPercentage(), maxCpuUsagePercentageThresholds);
-            return true;
-        }
-        if (systemMetrics.getDiskUsedPercentage() > maxDiskUsagePercentageThresholds) {
-            log.info("Master OverLoad: the DiskUsedPercentage: {} is over then the MaxDiskUsagePercentageThresholds {}",
-                    systemMetrics.getDiskUsedPercentage(), maxCpuUsagePercentageThresholds);
-            return true;
-        }
-        if (systemMetrics.getSystemMemoryUsedPercentage() > maxSystemMemoryUsagePercentageThresholds) {
-            log.info(
-                    "Master OverLoad: the SystemMemoryUsedPercentage: {} is over then the MaxSystemMemoryUsagePercentageThresholds {}",
-                    systemMetrics.getSystemMemoryUsedPercentage(), maxSystemMemoryUsagePercentageThresholds);
-            return true;
-        }
-        return false;
-    }
+public class MasterServerLoadProtection extends BaseServerLoadProtection {
 
 }
