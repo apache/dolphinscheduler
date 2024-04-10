@@ -1292,7 +1292,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         // abnormal characters check
         if (!checkFilePath(fullName)){
-            log.error("fullName contains illegal characters");
             throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH);
         }
         // Avoid returning to the parent directory
