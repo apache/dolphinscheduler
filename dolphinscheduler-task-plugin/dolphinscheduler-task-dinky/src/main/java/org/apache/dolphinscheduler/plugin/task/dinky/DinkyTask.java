@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -343,13 +344,28 @@ public class DinkyTask extends AbstractRemoteTask {
             }
         }
         List<Property> localParams = this.dinkyParameters.getLocalParams();
+        Map<String, Property> prepareParamsMap = taskExecutionContext.getPrepareParamsMap();
         if (localParams == null || localParams.isEmpty()) {
             return variables;
         }
+        Map<String, String> convertMap = convert(prepareParamsMap);
         for (Property property : localParams) {
-            variables.put(property.getProp(), property.getValue());
+            String propertyValue = property.getValue();
+            String value = PlaceholderUtils.replacePlaceholders(propertyValue, convertMap, true);
+            variables.put(property.getProp(), value);
         }
         return variables;
+    }
+
+    public static Map<String, String> convert(Map<String, Property> paramsMap) {
+        if (paramsMap == null) {
+            return null;
+        }
+        Map<String, String> map = new HashMap<>();
+        for (Map.Entry<String, Property> en : paramsMap.entrySet()) {
+            map.put(en.getKey(), en.getValue().getValue());
+        }
+        return map;
     }
 
     private String getDinkyVersion(String address) {
