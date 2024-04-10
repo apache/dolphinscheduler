@@ -1290,6 +1290,11 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         if (FOLDER_SEPARATOR.equalsIgnoreCase(fullName)) {
             return;
         }
+        // abnormal characters check
+        if (!checkFilePath(fullName)){
+            log.error("fullName contains illegal characters");
+            throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH);
+        }
         // Avoid returning to the parent directory
         if (fullName.contains("../")) {
             throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH, fullName);
