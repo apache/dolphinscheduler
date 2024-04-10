@@ -40,7 +40,8 @@ export default {
     authorize_level: '权限等级',
     no_permission: '无权限',
     read_permission: '读权限',
-    all_permission: '所有权限'
+    all_permission: '所有权限',
+    assign_worker_group: '分配WorkerGroup'
   },
   workflow: {
     on_line: '线上',
@@ -235,6 +236,17 @@ export default {
     confirm_to_offline: '是否确定下线该工作流?',
     time_to_online: '是否确定上线该定时?',
     time_to_offline: '是否确定下线该定时?',
+    warning_dependent_tasks_title: '警告',
+    warning_dependent_tasks_desc:
+      '下游存在依赖, 下线操作可能会对下游任务产生影响. 你确定要下线该工作流嘛?',
+    warning_dependencies: '依赖如下:',
+    delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该工作流',
+    warning_offline_scheduler_dependent_tasks_desc:
+      '下游存在依赖, 下线操作可能会对下游任务产生影响. 你确定要下线该定时嘛?',
+    delete_task_validate_dependent_tasks_desc:
+      '下游存在依赖，你不能删除该任务.',
+    warning_delete_scheduler_dependent_tasks_desc:
+      '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?'
   },
   task: {
     on_line: '线上',
@@ -303,7 +315,8 @@ export default {
     startup_parameter: '启动参数',
     whether_dry_run: '是否空跑',
     please_choose: '请选择',
-    remove_task_cache: '清除缓存'
+    remove_task_cache: '清除缓存',
+    delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务定义'
   },
   dag: {
     create: '创建工作流',
@@ -813,8 +826,10 @@ export default {
     please_select_target_database: '请选择目标数据库',
     please_enter_target_table: '请选择目标数据表',
     please_enter_target_filter_expression: '请输入目标表过滤条件',
-    please_enter_comparison_name_the_alias_in_comparison_execute_sql: '请输入期望值名',
-    please_enter_statistics_name_the_alias_in_statistics_execute_sql: '请输入实际值名',
+    please_enter_comparison_name_the_alias_in_comparison_execute_sql:
+      '请输入期望值名',
+    please_enter_statistics_name_the_alias_in_statistics_execute_sql:
+      '请输入实际值名',
     please_enter_comparison_execute_sql: '请输入期望值计算SQL',
     please_enter_statistics_execute_sql: '请输入实际值计算SQL',
     custom_config: '自定义配置',
@@ -863,7 +878,7 @@ export default {
     yarn_queue_tips: '请输入Yarn队列(选填)',
     dependent_type: '依赖类型',
     dependent_on_workflow: '依赖于工作流',
-    dependent_on_task: '依赖于任务',
+    dependent_on_task: '依赖于任务'
   },
   menu: {
     fav: '收藏组件',
@@ -882,6 +897,8 @@ export default {
     code: '参数编码',
     name: '参数名称',
     value: '参数值',
+    create_user: '创建用户',
+    modify_user: '修改用户',
     create_time: '创建时间',
     update_time: '更新时间',
     name_tips: '请输入参数名称',
@@ -890,15 +907,16 @@ export default {
     edit: '编辑',
     delete: '删除',
     delete_confirm: '确定删除吗?',
-    success: '成功',
+    success: '成功'
   },
   preference: {
     edit_preference: '修改项目偏好设置',
     preference_manage: '项目偏好管理',
-    instruction_tips: '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
+    instruction_tips:
+      '下面这些项目偏好配置将影响这个项目下的所有工作流和任务。当创建工作流和任务时，这些配置将影响组件中的默认选项',
     success: '成功',
     submit: '提交',
     enabled: '启用',
     disabled: '未启用'
-  },
+  }
 }

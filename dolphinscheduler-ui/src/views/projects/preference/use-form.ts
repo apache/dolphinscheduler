@@ -111,7 +111,7 @@ export function useForm() {
   const preferencesItems: IJsonItem[] = [
     Fields.useTaskPriority(),
     useTenant(),
-    Fields.useWorkerGroup(),
+    Fields.useWorkerGroup(projectCode),
     Fields.useEnvironmentName(data.model, true),
     ...Fields.useFailed(),
     useWarningType(),
@@ -120,12 +120,18 @@ export function useForm() {
   ]
 
   const restructurePreferencesItems = (preferencesItems: any) => {
-    for (let item of preferencesItems) {
+    for (const item of preferencesItems) {
       if (item.validate?.required) {
         item.validate.required = false
         item.span = 12
       }
-      Object.assign(item, { props: { style: 'width: 250px' } })
+      if (item.type === 'select') {
+        Object.assign(item, {
+          props: { style: 'width: 250px', clearable: true }
+        })
+      } else {
+        Object.assign(item, { props: { style: 'width: 250px' } })
+      }
     }
     return preferencesItems
   }

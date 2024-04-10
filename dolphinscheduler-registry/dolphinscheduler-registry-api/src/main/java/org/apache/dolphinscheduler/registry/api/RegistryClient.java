@@ -41,8 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,11 +59,14 @@ public class RegistryClient {
 
     public RegistryClient(Registry registry) {
         this.registry = registry;
+        registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
+        registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
+        registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
     }
 
-    @PostConstruct
-    public void afterConstruct() {
-        initNodes();
+    public boolean isConnected() {
+        return registry.isConnected();
+
     }
 
     public void connectUntilTimeout(@NonNull Duration duration) throws RegistryException {
@@ -227,12 +228,6 @@ public class RegistryClient {
         } catch (Exception e) {
             throw new RegistryException("Failed to get server node: " + nodeType, e);
         }
-    }
-
-    private void initNodes() {
-        registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
     }
 
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {

@@ -598,6 +598,7 @@ CREATE TABLE t_ds_project_parameter (
   code bigint NOT NULL,
   project_code bigint NOT NULL,
   user_id int DEFAULT NULL ,
+  operator int DEFAULT NULL ,
   create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (id)
@@ -927,6 +928,21 @@ CREATE TABLE t_ds_worker_group (
   CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
+--
+-- Table structure for table t_ds_relation_project_worker_group
+--
+
+DROP TABLE IF EXISTS t_ds_relation_project_worker_group;
+CREATE TABLE t_ds_relation_project_worker_group (
+    id int NOT NULL  ,
+    project_code bigint DEFAULT NULL ,
+    worker_group varchar(255) NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_relation_project_worker_group_un UNIQUE (project_code, worker_group)
+);
+
 DROP SEQUENCE IF EXISTS t_ds_access_token_id_sequence;
 CREATE SEQUENCE  t_ds_access_token_id_sequence;
 ALTER TABLE t_ds_access_token ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_access_token_id_sequence');
@@ -1023,6 +1039,10 @@ ALTER TABLE t_ds_project_parameter ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_pro
 DROP SEQUENCE IF EXISTS t_ds_project_preference_id_sequence;
 CREATE SEQUENCE t_ds_project_preference_id_sequence;
 ALTER TABLE t_ds_project_preference ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_preference_id_sequence');
+
+DROP SEQUENCE IF EXISTS t_ds_relation_project_worker_group_sequence;
+CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
+ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
 
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)

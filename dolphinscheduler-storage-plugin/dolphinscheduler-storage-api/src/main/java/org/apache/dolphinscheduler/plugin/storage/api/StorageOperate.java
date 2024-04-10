@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -72,7 +74,16 @@ public interface StorageOperate {
      */
     default String getResourceFileName(String tenantCode, String fullName) {
         String resDir = getResDir(tenantCode);
-        return fullName.replaceFirst(resDir, "");
+        String filenameReplaceResDir = fullName.replaceFirst(resDir, "");
+        if (!filenameReplaceResDir.equals(fullName)) {
+            return filenameReplaceResDir;
+        }
+
+        // Replace resource dir not effective in case of run workflow with different tenant from resource file's.
+        // this is backup solution to get related path, by split with RESOURCE_TYPE_FILE
+        return filenameReplaceResDir.contains(RESOURCE_TYPE_FILE)
+                ? filenameReplaceResDir.split(String.format("%s/", RESOURCE_TYPE_FILE))[1]
+                : filenameReplaceResDir;
     }
 
     /**

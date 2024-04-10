@@ -673,6 +673,7 @@ CREATE TABLE `t_ds_project_parameter` (
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
@@ -1065,8 +1066,6 @@ VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '',
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY','') into @new_sql_mode;
-SET sql_mode=@new_sql_mode;
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -1095,6 +1094,22 @@ CREATE TABLE `t_ds_alert_plugin_instance` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
+
+-- ----------------------------
+-- Table structure for t_ds_relation_project_worker_group
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_relation_project_worker_group`;
+CREATE TABLE `t_ds_relation_project_worker_group` (
+    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+    `project_code` bigint(20) NOT NULL COMMENT 'project code',
+    `worker_group` varchar(255) DEFAULT NULL COMMENT 'worker group',
+    `create_time` datetime DEFAULT NULL COMMENT 'create time',
+    `update_time` datetime DEFAULT NULL COMMENT 'update time',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY unique_project_worker_group(project_code,worker_group)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+
 --
 -- Table structure for table `t_ds_dq_comparison_type`
 --
@@ -1110,6 +1125,7 @@ CREATE TABLE `t_ds_dq_comparison_type` (
     `is_inner_source` tinyint(1) DEFAULT '0',
     PRIMARY KEY (`id`)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
 
 INSERT IGNORE INTO `t_ds_dq_comparison_type`
 (`id`, `type`, `execute_sql`, `output_table`, `name`, `create_time`, `update_time`, `is_inner_source`)
@@ -2092,6 +2108,10 @@ CREATE TABLE `t_ds_fav_task`
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8 COLLATE = utf8_bin;
 
+-- ----------------------------
+-- Table structure for t_ds_trigger_relation
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_trigger_relation`;
 CREATE TABLE `t_ds_trigger_relation` (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `trigger_type` int(11) NOT NULL DEFAULT '0' COMMENT '0 process 1 task',

@@ -131,17 +131,20 @@ public class MasterRegistryClient implements AutoCloseable {
     public void removeWorkerNodePath(String path, RegistryNodeType nodeType, boolean failover) {
         log.info("{} node deleted : {}", nodeType, path);
         try {
-            String serverHost = null;
-            if (!StringUtils.isEmpty(path)) {
-                serverHost = registryClient.getHostByEventDataPath(path);
-                if (StringUtils.isEmpty(serverHost)) {
-                    log.error("server down error: unknown path: {}", path);
-                    return;
-                }
-                if (!registryClient.exists(path)) {
-                    log.info("path: {} not exists", path);
-                }
+            if (StringUtils.isEmpty(path)) {
+                log.error("server down error: node empty path: {}, nodeType:{}", path, nodeType);
+                return;
             }
+
+            String serverHost = registryClient.getHostByEventDataPath(path);
+            if (StringUtils.isEmpty(serverHost)) {
+                log.error("server down error: unknown path: {}", path);
+                return;
+            }
+            if (!registryClient.exists(path)) {
+                log.info("path: {} not exists", path);
+            }
+
             // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
@@ -195,4 +198,7 @@ public class MasterRegistryClient implements AutoCloseable {
         }
     }
 
+    public boolean isAvailable() {
+        return registryClient.isConnected();
+    }
 }

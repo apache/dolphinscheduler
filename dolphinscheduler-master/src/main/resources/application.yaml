@@ -122,10 +122,10 @@ master:
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true
-    # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
-    max-cpu-usage-percentage-thresholds: 0.7
-    # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
-    max-jvm-memory-usage-percentage-thresholds: 0.7
+    # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
+    max-system-cpu-usage-percentage-thresholds: 0.7
+    # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
+    max-jvm-cpu-usage-percentage-thresholds: 0.7
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
     max-system-memory-usage-percentage-thresholds: 0.7
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.

@@ -323,6 +323,8 @@ public enum Status {
 
     REMOVE_TASK_INSTANCE_CACHE_ERROR(20019, "remove task instance cache error", "删除任务实例缓存错误"),
 
+    ILLEGAL_RESOURCE_PATH(20020, "Resource file [{0}] is illegal", "非法的资源路径[{0}]"),
+
     USER_NO_OPERATION_PERM(30001, "user has no operation privilege", "当前用户没有操作权限"),
     USER_NO_OPERATION_PROJECT_PERM(30002, "user {0} is not has project {1} permission", "当前用户[{0}]没有[{1}]项目的操作权限"),
     USER_NO_WRITE_PROJECT_PERM(30003, "user [{0}] does not have write permission for project [{1}]",
@@ -585,6 +587,15 @@ public enum Status {
     WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS(1401002,
             "You can not modify or remove this worker group, cause it has [{0}] dependent environments.",
             "不能修改或删除该Worker组，有 [{0}] 个环境配置正在使用"),
+
+    WORKER_GROUP_NOT_EXIST(1402001, "The Worker group [{0}] not exists", "Worker组[{0}]不存在."),
+    ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR(1402002, "Failed to assign these worker groups to the project",
+            "给项目分配工作组失败"),
+    WORKER_GROUP_TO_PROJECT_IS_EMPTY(1402003, "Need to assign at least one worker group to the project",
+            "需要给项目至少分配一个Worker组"),
+    USED_WORKER_GROUP_EXISTS(1402004,
+            "You can not reassign worker groups to the project, cause these worker groups {0} are already used.",
+            "Worker组{0}被项目中任务或定时引用，无法重新分配"),
             ;
     private final int code;
     private final String enMsg;

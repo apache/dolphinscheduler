@@ -13,6 +13,44 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-INSERT IGNORE INTO `t_ds_alertgroup`(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', current_timestamp, current_timestamp);
+ */
+package org.apache.dolphinscheduler.dao.entity;
+
+import java.util.Date;
+
+import lombok.Data;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@Data
+@TableName("t_ds_relation_project_worker_group")
+public class ProjectWorkerGroup {
+
+    /**
+     * id
+     */
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
+
+    /**
+     * project code
+     */
+    private Long projectCode;
+
+    /**
+     * worker group
+     */
+    private String workerGroup;
+
+    /**
+     * create time
+     */
+    private Date createTime;
+
+    /**
+     * update time
+     */
+    private Date updateTime;
+}

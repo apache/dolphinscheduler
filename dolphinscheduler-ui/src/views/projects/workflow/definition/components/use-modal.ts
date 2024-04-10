@@ -26,7 +26,6 @@ import {
   importProcessDefinition,
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
-import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listNormalAlertGroupById } from '@/service/modules/alert-group'
 import { startProcessInstance } from '@/service/modules/executors'
@@ -39,6 +38,7 @@ import { parseTime } from '@/common/common'
 import { EnvironmentItem } from '@/service/modules/environment/types'
 import { ITimingState, ProcessInstanceReq } from './types'
 import { queryTenantList } from '@/service/modules/tenants'
+import { queryWorkerGroupsByProjectCode } from '@/service/modules/projects-worker-group'
 
 export function useModal(
   state: any,
@@ -228,10 +228,10 @@ export function useModal(
   }
 
   const getWorkerGroups = () => {
-    queryAllWorkerGroups().then((res: any) => {
-      variables.workerGroups = res.map((item: string) => ({
-        label: item,
-        value: item
+    queryWorkerGroupsByProjectCode(variables.projectCode).then((res: any) => {
+      variables.workerGroups = res.data.map((item: any) => ({
+        label: item.workerGroup,
+        value: item.workerGroup
       }))
     })
   }

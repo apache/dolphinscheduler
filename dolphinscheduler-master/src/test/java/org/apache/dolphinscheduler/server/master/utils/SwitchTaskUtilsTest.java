@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.script.ScriptException;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +36,8 @@ public class SwitchTaskUtilsTest {
         String content = "${test}==1";
         Map<String, Property> globalParams = new HashMap<>();
         Map<String, Property> varParams = new HashMap<>();
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
-        });
+        Assertions.assertDoesNotThrow(
+                () -> SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams));
 
         globalParams.put("test", new Property("test", Direct.IN, DataType.INTEGER, "1"));
         String result = SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
@@ -52,5 +53,32 @@ public class SwitchTaskUtilsTest {
         Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
             SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
         });
+
+        String cmd = "bash /tmp/shell";
+        String cmdContent = "java.lang.Runtime.getRuntime().exec(${cmd})";
+        globalParams.put("cmd", new Property("cmd", Direct.IN, DataType.VARCHAR, cmd));
+
+        Assertions.assertThrowsExactly(RuntimeException.class, () -> {
+            String script = SwitchTaskUtils.generateContentWithTaskParams(cmdContent, globalParams, varParams);
+            SwitchTaskUtils.evaluate(script);
+        });
+
+        String contentWithUnicode =
+                "\\\\u006a\\\\u0061\\\\u0076\\\\u0061\\\\u002e\\\\u006c\\\\u0061\\\\u006e\\\\u0067\\\\u002e\\\\u0052\\\\u0075\\\\u006e\\\\u0074\\\\u0069\\\\u006d\\\\u0065.getRuntime().exec(${cmd})";
+        Assertions.assertThrowsExactly(ScriptException.class, () -> {
+            String script = SwitchTaskUtils.generateContentWithTaskParams(contentWithUnicode, globalParams, varParams);
+            SwitchTaskUtils.evaluate(script);
+        });
+
+        String contentWithSpecify1 = "cmd.abc";
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            SwitchTaskUtils.generateContentWithTaskParams(contentWithSpecify1, globalParams, varParams);
+        });
+
+        String contentWithSpecify2 = "cmd()";
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            SwitchTaskUtils.generateContentWithTaskParams(contentWithSpecify2, globalParams, varParams);
+        });
+
     }
 }

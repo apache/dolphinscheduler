@@ -56,19 +56,6 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
     private static S3RemoteLogHandler instance;
 
     private S3RemoteLogHandler() {
-
-    }
-
-    public static synchronized S3RemoteLogHandler getInstance() {
-        if (instance == null) {
-            instance = new S3RemoteLogHandler();
-            instance.init();
-        }
-
-        return instance;
-    }
-
-    public void init() {
         accessKeyId = readAccessKeyID();
         accessKeySecret = readAccessKeySecret();
         region = readRegion();
@@ -76,6 +63,14 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
         endPoint = readEndPoint();
         s3Client = buildS3Client();
         checkBucketNameExists(bucketName);
+    }
+
+    public static synchronized S3RemoteLogHandler getInstance() {
+        if (instance == null) {
+            instance = new S3RemoteLogHandler();
+        }
+
+        return instance;
     }
 
     protected AmazonS3 buildS3Client() {

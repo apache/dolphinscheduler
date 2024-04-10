@@ -13,6 +13,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
+ */
+
+package org.apache.dolphinscheduler.plugin.storage.hdfs;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class LocalStorageOperator extends HdfsStorageOperator {
+
+    public LocalStorageOperator() {
+        super(new HdfsStorageProperties());
+    }
+
+    public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
+        super(hdfsStorageProperties);
+    }
+
+    @Override
+    public String getResourceFileName(String tenantCode, String fullName) {
+        // prefix schema `file:/` should be remove in local file mode
+        String fullNameRemoveSchema = fullName.replaceFirst(hdfsProperties.getDefaultFS(), "");
+        return super.getResourceFileName(tenantCode, fullNameRemoveSchema);
+    }
+}
