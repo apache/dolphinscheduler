@@ -166,7 +166,7 @@ public class DataSourceController extends BaseController {
     @ApiException(QUERY_DATASOURCE_ERROR)
     public Result<Object> queryDataSourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam("type") DbType type) {
-        List<DataSource> datasourceList = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+        List<DataSource> datasourceList = dataSourceService.queryDataSourceList(loginUser, type.getCode());
         return Result.success(datasourceList);
     }
 
