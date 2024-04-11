@@ -23,17 +23,6 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
   banner:
     charset: UTF-8
-  cache:
-    # default enable cache, you can disable by `type: none`
-    type: none
-    cache-names:
-      - tenant
-      - user
-      - processDefinition
-      - processTaskRelation
-      - taskDefinition
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s,recordStats
   sql:
     init:
       schema-locations: classpath:sql/dolphinscheduler_h2.sql
