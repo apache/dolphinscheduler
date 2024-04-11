@@ -1291,7 +1291,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return;
         }
         // abnormal characters check
-        if (!checkFilePath(fullName)){
+        if (!checkFilePath(fullName)) {
             throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH);
         }
         // Avoid returning to the parent directory
