@@ -19,9 +19,11 @@ package org.apache.dolphinscheduler.extract.master.transportor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class StreamingTaskTriggerResponse {
 
     private boolean success;
