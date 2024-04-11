@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkFilePath;
 import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
