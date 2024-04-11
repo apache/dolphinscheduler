@@ -84,7 +84,7 @@ public class ApiConfig implements Validator {
         private int pythonPort = 25334;
         private int connectTimeout = 0;
         private int readTimeout = 0;
-        private String authToken = "";
+        private String authToken = "jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc";
     }
 
 }
