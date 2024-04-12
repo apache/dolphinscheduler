@@ -149,8 +149,8 @@ api:
       #tenant1: 11
       #tenant2: 20
   python-gateway:
-    # Weather enable python gateway server or not. The default value is true.
-    enabled: true
+    # Weather enable python gateway server or not. The default value is false.
+    enabled: false
     # Authentication token for connection from python api to python gateway server. Should be changed the default value
     # when you deploy in public network.
     auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
