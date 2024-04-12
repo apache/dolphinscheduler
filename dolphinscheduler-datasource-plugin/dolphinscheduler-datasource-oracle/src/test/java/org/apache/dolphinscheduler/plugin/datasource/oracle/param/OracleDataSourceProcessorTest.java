@@ -155,13 +155,16 @@ public class OracleDataSourceProcessorTest {
 
     @Test
     void splitAndRemoveComment_MultipleSql() {
-        String plSql = "select a,a-a as b from (select 1 as a,2 as b from dual) union all select 1 as a,2 as b from dual;select * from dual; -- this comment";
+        String plSql =
+                "select a,a-a as b from (select 1 as a,2 as b from dual) union all select 1 as a,2 as b from dual;select * from dual; -- this comment";
         List<String> sqls = oracleDatasourceProcessor.splitAndRemoveComment(plSql);
         // We will not split the plsql
         Assertions.assertEquals(2, sqls.size());
         System.out.println(sqls.get(0));
         System.out.println(sqls.get(1));
-        Assertions.assertEquals("select a,a-a as b from (select 1 as a,2 as b from dual) union all select 1 as a,2 as b from dual", sqls.get(0));
+        Assertions.assertEquals(
+                "select a,a-a as b from (select 1 as a,2 as b from dual) union all select 1 as a,2 as b from dual",
+                sqls.get(0));
         Assertions.assertEquals("select * from dual", sqls.get(1));
     }
 }

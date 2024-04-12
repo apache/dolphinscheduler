@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.oracle.param;
 
-import com.alibaba.druid.sql.parser.SQLParserUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -39,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
