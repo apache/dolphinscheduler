@@ -15,8 +15,6 @@
 # limitations under the License.
 #
 spring:
-  profiles:
-    active: postgresql
   banner:
     charset: UTF-8
   jackson:
@@ -98,7 +96,7 @@ master:
   # master execute thread number to limit process instances in parallel
   exec-threads: 100
   # master dispatch task number per batch, if all the tasks dispatch failed in a batch, will sleep 1s.
-  dispatch-task-number: 3
+  dispatch-task-number: 30
   # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
   host-selector: lower_weight
   # master heartbeat interval
@@ -112,13 +110,13 @@ master:
     # If set true, will open master overload protection
     enabled: true
     # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
-    max-system-cpu-usage-percentage-thresholds: 0.7
+    max-system-cpu-usage-percentage-thresholds: 0.77
     # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
-    max-jvm-cpu-usage-percentage-thresholds: 0.7
+    max-jvm-cpu-usage-percentage-thresholds: 0.77
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
-    max-system-memory-usage-percentage-thresholds: 0.7
+    max-system-memory-usage-percentage-thresholds: 0.77
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
-    max-disk-usage-percentage-thresholds: 0.7
+    max-disk-usage-percentage-thresholds: 0.77
   # failover interval, the unit is minute
   failover-interval: 10m
   # kill yarn / k8s application when failover taskInstance, default true
@@ -153,19 +151,3 @@ management:
 
 metrics:
   enabled: true
-
-# Override by profile
-
----
-spring:
-  config:
-    activate:
-      on-profile: mysql
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-    username: root
-    password: root
-  quartz:
-    properties:
-      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate

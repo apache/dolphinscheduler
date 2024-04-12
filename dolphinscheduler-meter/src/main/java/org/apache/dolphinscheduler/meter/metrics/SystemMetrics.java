@@ -30,8 +30,7 @@ public class SystemMetrics {
 
     // CPU
     private double systemCpuUsagePercentage;
-    private double processCpuUsagePercentage;
-    private double totalCpuUsedPercentage;
+    private double jvmCpuUsagePercentage;
 
     // JVM-Memory
     // todo: get pod memory usage

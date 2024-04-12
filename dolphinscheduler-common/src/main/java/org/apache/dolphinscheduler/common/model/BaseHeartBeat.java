@@ -15,13 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.worker.config;
+package org.apache.dolphinscheduler.common.model;
 
-import org.apache.dolphinscheduler.meter.metrics.BaseServerLoadProtection;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Slf4j
-public class WorkerServerLoadProtection extends BaseServerLoadProtection {
+@Data
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+public class BaseHeartBeat implements HeartBeat {
+
+    protected int processId;
+    protected long startupTime;
+    protected long reportTime;
+    protected double jvmCpuUsage;
+    protected double cpuUsage;
+    protected double jvmMemoryUsage;
+    protected double memoryUsage;
+    protected double diskUsage;
+    protected ServerStatus serverStatus;
+
+    protected String host;
+    protected int port;
 
 }
