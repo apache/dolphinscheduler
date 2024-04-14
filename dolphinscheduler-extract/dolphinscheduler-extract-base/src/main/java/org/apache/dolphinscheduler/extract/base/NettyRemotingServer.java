@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.extract.base;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
@@ -72,10 +73,12 @@ public class NettyRemotingServer {
 
     private SslContext sslContext = null;
 
-    public NettyRemotingServer(final NettyServerConfig serverConfig) {
-        if(NettyUtils.isNettySSLEnable()){
+    private NettySslConfig nettySslConfig;
+
+    public NettyRemotingServer(final NettyServerConfig serverConfig, final NettySslConfig nettySslConfig) {
+        if(nettySslConfig.isEnabled()){
             try {
-                sslContext = SslContextBuilder.forServer(new File(NettyUtils.getNettyCertPath()), new File(NettyUtils.getNettyKeyPath())).build();
+                sslContext = SslContextBuilder.forServer(new File(nettySslConfig.getCertFilePath()), new File(nettySslConfig.getKeyFilePath())).build();
             } catch (SSLException e) {
                 throw new RuntimeException(e);
             }
@@ -144,7 +147,7 @@ public class NettyRemotingServer {
      * @param ch socket channel
      */
     private void initNettyChannel(SocketChannel ch) {
-        if(NettyUtils.isNettySSLEnable()){
+        if(nettySslConfig.isEnabled()){
             ch.pipeline().addLast("ssl",sslContext.newHandler(ch.alloc()));
 
         }

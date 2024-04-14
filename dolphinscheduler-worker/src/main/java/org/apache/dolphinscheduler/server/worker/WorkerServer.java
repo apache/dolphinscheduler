@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -70,6 +72,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private MetricsProvider metricsProvider;
 
+    @Autowired
+    NettySslConfig nettySslConfig;
+
     /**
      * worker server startup, not use web service
      *
@@ -84,6 +89,7 @@ public class WorkerServer implements IStoppable {
 
     @PostConstruct
     public void run() {
+        SingletonJdkDynamicRpcClientProxyFactory.loadInstance(nettySslConfig);
         this.workerRpcServer.start();
         this.taskPluginManager.loadPlugin();
 

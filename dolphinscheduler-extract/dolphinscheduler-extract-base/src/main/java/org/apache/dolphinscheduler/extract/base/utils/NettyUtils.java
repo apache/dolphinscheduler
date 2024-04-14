@@ -50,14 +50,4 @@ public class NettyUtils {
         return NioSocketChannel.class;
     }
 
-    public static boolean isNettySSLEnable() {
-        return PropertyUtils.getBoolean(org.apache.dolphinscheduler.common.constants.Constants.NETTY_SSL_ENABLE, Boolean.FALSE);
-    }
-
-    public static String getNettyKeyPath() {
-        return PropertyUtils.getString(Constants.NETTY_SSL_KEY_PATH);
-    }
-    public static String getNettyCertPath() {
-        return PropertyUtils.getString(Constants.NETTY_SSL_CERT_PATH);
-    }
 }

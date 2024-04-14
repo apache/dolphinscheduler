@@ -95,3 +95,9 @@ management:
 
 metrics:
   enabled: true
+
+rpc:
+  ssl:
+    enabled: false
+    cert-file-path: /path/cert.crt
+    key-file-path: /path/private.pem

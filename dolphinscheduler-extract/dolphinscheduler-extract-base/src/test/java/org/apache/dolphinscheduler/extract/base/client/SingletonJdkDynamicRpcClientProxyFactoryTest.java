@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 
@@ -48,7 +49,7 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
                 .serverName("ApiServer")
                 .listenPort(listenPort)
                 .build();
-        nettyRemotingServer = new NettyRemotingServer(nettyServerConfig);
+        nettyRemotingServer = new NettyRemotingServer(nettyServerConfig,new NettySslConfig());
         nettyRemotingServer.start();
         serverAddress = "localhost:" + listenPort;
         new SpringServerMethodInvokerDiscovery(nettyRemotingServer)

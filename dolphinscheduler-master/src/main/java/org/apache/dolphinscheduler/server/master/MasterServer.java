@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -88,6 +90,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private TaskGroupCoordinator taskGroupCoordinator;
 
+    @Autowired
+    NettySslConfig nettySslConfig;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -101,6 +106,7 @@ public class MasterServer implements IStoppable {
      */
     @PostConstruct
     public void run() throws SchedulerException {
+        SingletonJdkDynamicRpcClientProxyFactory.loadInstance(nettySslConfig);
         // init rpc server
         this.masterRPCServer.start();
 

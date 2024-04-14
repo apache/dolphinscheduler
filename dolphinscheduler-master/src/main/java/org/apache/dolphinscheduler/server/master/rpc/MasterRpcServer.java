@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.extract.base.NettyRemotingServerFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
@@ -30,9 +31,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MasterRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
 
-    public MasterRpcServer(MasterConfig masterConfig) {
+    public MasterRpcServer(MasterConfig masterConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
-                .serverName("MasterRpcServer").listenPort(masterConfig.getListenPort()).build()));
+                .serverName("MasterRpcServer").listenPort(masterConfig.getListenPort()).build(),nettySslConfig));
     }
 
     public void start() {

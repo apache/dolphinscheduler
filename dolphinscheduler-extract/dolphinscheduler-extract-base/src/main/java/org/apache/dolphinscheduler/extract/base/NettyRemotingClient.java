@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.extract.base;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingException;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingTimeoutException;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingTooMuchRequestException;
@@ -86,11 +87,13 @@ public class NettyRemotingClient implements AutoCloseable {
 
     private SslContext sslContext = null;
 
-    public NettyRemotingClient(final NettyClientConfig clientConfig) {
+    private NettySslConfig nettySslConfig;
+
+    public NettyRemotingClient(final NettyClientConfig clientConfig, NettySslConfig nettySslConfig) {
         this.clientConfig = clientConfig;
-        if(NettyUtils.isNettySSLEnable()){
+        if(nettySslConfig.isEnabled()){
             try {
-                sslContext = SslContextBuilder.forClient().trustManager(new File(NettyUtils.getNettyCertPath())).build();
+                sslContext = SslContextBuilder.forClient().trustManager(new File(nettySslConfig.getCertFilePath())).build();
             } catch (SSLException e) {
                 throw new RuntimeException(e);
             }
@@ -131,7 +134,7 @@ public class NettyRemotingClient implements AutoCloseable {
 
                     @Override
                     public void initChannel(SocketChannel ch) {
-                        if(NettyUtils.isNettySSLEnable()){
+                        if(nettySslConfig.isEnabled()){
                             ch.pipeline().addLast(sslContext.newHandler(ch.alloc()));
                         }
                         ch.pipeline()

@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
@@ -52,6 +54,9 @@ public class ApiApplicationServer {
     @Autowired
     private PluginDao pluginDao;
 
+    @Autowired
+    NettySslConfig nettySslConfig;
+
     public static void main(String[] args) {
         ApiServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
         Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
@@ -60,6 +65,7 @@ public class ApiApplicationServer {
 
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
+        SingletonJdkDynamicRpcClientProxyFactory.loadInstance(nettySslConfig);
         log.info("Received spring application context ready event will load taskPlugin and write to DB");
         // install task plugin
         taskPluginManager.loadPlugin();

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.extract.base.NettyRemotingServerFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
@@ -32,9 +33,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkerRpcServer extends SpringServerMethodInvokerDiscovery implements Closeable {
 
-    public WorkerRpcServer(WorkerConfig workerConfig) {
+    public WorkerRpcServer(WorkerConfig workerConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
-                .serverName("WorkerRpcServer").listenPort(workerConfig.getListenPort()).build()));
+                .serverName("WorkerRpcServer").listenPort(workerConfig.getListenPort()).build(),nettySslConfig));
     }
 
     public void start() {
