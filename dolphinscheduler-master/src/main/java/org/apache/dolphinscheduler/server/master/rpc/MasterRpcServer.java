@@ -33,7 +33,7 @@ public class MasterRpcServer extends SpringServerMethodInvokerDiscovery implemen
 
     public MasterRpcServer(MasterConfig masterConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
-                .serverName("MasterRpcServer").listenPort(masterConfig.getListenPort()).build(),nettySslConfig));
+                .serverName("MasterRpcServer").listenPort(masterConfig.getListenPort()).build(), nettySslConfig));
     }
 
     public void start() {

@@ -34,8 +34,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import io.netty.handler.ssl.SslContext;
-import io.netty.handler.ssl.SslContextBuilder;
+import javax.net.ssl.SSLException;
+
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -46,9 +46,9 @@ import io.netty.channel.epoll.Epoll;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.timeout.IdleStateHandler;
-
-import javax.net.ssl.SSLException;
 
 /**
  * remoting netty server
@@ -76,9 +76,10 @@ public class NettyRemotingServer {
     private NettySslConfig nettySslConfig;
 
     public NettyRemotingServer(final NettyServerConfig serverConfig, final NettySslConfig nettySslConfig) {
-        if(nettySslConfig.isEnabled()){
+        if (nettySslConfig.isEnabled()) {
             try {
-                sslContext = SslContextBuilder.forServer(new File(nettySslConfig.getCertFilePath()), new File(nettySslConfig.getKeyFilePath())).build();
+                sslContext = SslContextBuilder.forServer(new File(nettySslConfig.getCertFilePath()),
+                        new File(nettySslConfig.getKeyFilePath())).build();
             } catch (SSLException e) {
                 throw new RuntimeException(e);
             }
@@ -147,8 +148,8 @@ public class NettyRemotingServer {
      * @param ch socket channel
      */
     private void initNettyChannel(SocketChannel ch) {
-        if(nettySslConfig.isEnabled()){
-            ch.pipeline().addLast("ssl",sslContext.newHandler(ch.alloc()));
+        if (nettySslConfig.isEnabled()) {
+            ch.pipeline().addLast("ssl", sslContext.newHandler(ch.alloc()));
 
         }
         ch.pipeline()

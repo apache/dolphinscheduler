@@ -35,7 +35,7 @@ public class WorkerRpcServer extends SpringServerMethodInvokerDiscovery implemen
 
     public WorkerRpcServer(WorkerConfig workerConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
-                .serverName("WorkerRpcServer").listenPort(workerConfig.getListenPort()).build(),nettySslConfig));
+                .serverName("WorkerRpcServer").listenPort(workerConfig.getListenPort()).build(), nettySslConfig));
     }
 
     public void start() {

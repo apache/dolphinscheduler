@@ -736,7 +736,6 @@ public final class Constants {
      */
     public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 
-
     /**
      * netty config enable
      */

@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvoker
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -34,9 +33,10 @@ import org.springframework.stereotype.Service;
 public class AlertRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
 
     private NettySslConfig nettySslConfig;
-    public AlertRpcServer(AlertConfig alertConfig,NettySslConfig nettySslConfig) {
+    public AlertRpcServer(AlertConfig alertConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(
-                NettyServerConfig.builder().serverName("AlertRpcServer").listenPort(alertConfig.getPort()).build(),nettySslConfig));
+                NettyServerConfig.builder().serverName("AlertRpcServer").listenPort(alertConfig.getPort()).build(),
+                nettySslConfig));
         this.nettySslConfig = nettySslConfig;
     }
 

@@ -49,7 +49,7 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
                 .serverName("ApiServer")
                 .listenPort(listenPort)
                 .build();
-        nettyRemotingServer = new NettyRemotingServer(nettyServerConfig,new NettySslConfig());
+        nettyRemotingServer = new NettyRemotingServer(nettyServerConfig, new NettySslConfig());
         nettyRemotingServer.start();
         serverAddress = "localhost:" + listenPort;
         new SpringServerMethodInvokerDiscovery(nettyRemotingServer)

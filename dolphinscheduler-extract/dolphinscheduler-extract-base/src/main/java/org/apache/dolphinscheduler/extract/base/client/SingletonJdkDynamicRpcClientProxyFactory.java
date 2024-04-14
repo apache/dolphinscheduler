@@ -23,12 +23,12 @@ import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 
 public class SingletonJdkDynamicRpcClientProxyFactory {
 
-    private static  JdkDynamicRpcClientProxyFactory INSTANCE =null;
+    private static JdkDynamicRpcClientProxyFactory INSTANCE = null;
 
-    public static void  loadInstance(NettySslConfig nettySslConfig){
-        if(null == INSTANCE){
-            INSTANCE =  new JdkDynamicRpcClientProxyFactory(
-                    NettyRemotingClientFactory.buildNettyRemotingClient(new NettyClientConfig(),nettySslConfig));
+    public static void loadInstance(NettySslConfig nettySslConfig) {
+        if (null == INSTANCE) {
+            INSTANCE = new JdkDynamicRpcClientProxyFactory(
+                    NettyRemotingClientFactory.buildNettyRemotingClient(new NettyClientConfig(), nettySslConfig));
         }
     }
     public static <T> T getProxyClient(String serverAddress, Class<T> clazz) {

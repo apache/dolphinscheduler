@@ -102,7 +102,8 @@ public class LoggerServiceTest {
             return;
         }
 
-        nettyRemotingServer = new NettyRemotingServer(NettyServerConfig.builder().listenPort(nettyServerPort).build(),new NettySslConfig());
+        nettyRemotingServer = new NettyRemotingServer(NettyServerConfig.builder().listenPort(nettyServerPort).build(),
+                new NettySslConfig());
         nettyRemotingServer.start();
         SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery =
                 new SpringServerMethodInvokerDiscovery(nettyRemotingServer);
