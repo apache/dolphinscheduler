@@ -100,7 +100,7 @@ public class WorkerServer implements IStoppable {
 
         WorkerServerMetrics.registerWorkerCpuUsageGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-            return systemMetrics.getTotalCpuUsedPercentage();
+            return systemMetrics.getSystemCpuUsagePercentage();
         });
         WorkerServerMetrics.registerWorkerMemoryAvailableGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();

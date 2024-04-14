@@ -194,13 +194,13 @@ public interface ResourcesService {
     org.springframework.core.io.Resource downloadResource(User loginUser, String fullName) throws IOException;
 
     /**
-     * Get resource by given resource type and full name.
+     * Get resource by given resource type and file name.
      * Useful in Python API create task which need processDefinition information.
      *
      * @param userName user who query resource
-     * @param fullName full name of the resource
+     * @param fileName file name of the resource
      */
-    StorageEntity queryFileStatus(String userName, String fullName) throws Exception;
+    StorageEntity queryFileStatus(String userName, String fileName) throws Exception;
 
     /**
      * delete DATA_TRANSFER data in resource center

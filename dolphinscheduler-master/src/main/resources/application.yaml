@@ -22,17 +22,6 @@ spring:
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
-  cache:
-    # default enable cache, you can disable by `type: none`
-    type: none
-    cache-names:
-      - tenant
-      - user
-      - processDefinition
-      - processTaskRelation
-      - taskDefinition
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s,recordStats
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
@@ -122,10 +111,10 @@ master:
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true
-    # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
-    max-cpu-usage-percentage-thresholds: 0.7
-    # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
-    max-jvm-memory-usage-percentage-thresholds: 0.7
+    # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
+    max-system-cpu-usage-percentage-thresholds: 0.7
+    # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
+    max-jvm-cpu-usage-percentage-thresholds: 0.7
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
     max-system-memory-usage-percentage-thresholds: 0.7
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.

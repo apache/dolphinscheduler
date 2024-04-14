@@ -67,14 +67,18 @@ public class ProcessInstanceDaoImpl extends BaseDao<ProcessInstance, ProcessInst
     /**
      * find last scheduler process instance in the date interval
      *
-     * @param definitionCode definitionCode
+     * @param processDefinitionCode definitionCode
+     * @param taskDefinitionCode definitionCode
      * @param dateInterval   dateInterval
      * @return process instance
      */
     @Override
-    public ProcessInstance queryLastSchedulerProcessInterval(Long definitionCode, DateInterval dateInterval,
+    public ProcessInstance queryLastSchedulerProcessInterval(Long processDefinitionCode, Long taskDefinitionCode,
+                                                             DateInterval dateInterval,
                                                              int testFlag) {
-        return mybatisMapper.queryLastSchedulerProcess(definitionCode,
+        return mybatisMapper.queryLastSchedulerProcess(
+                processDefinitionCode,
+                taskDefinitionCode,
                 dateInterval.getStartTime(),
                 dateInterval.getEndTime(),
                 testFlag);
