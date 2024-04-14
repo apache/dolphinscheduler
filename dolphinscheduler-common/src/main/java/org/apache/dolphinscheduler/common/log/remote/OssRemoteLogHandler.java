@@ -44,19 +44,6 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
     private static OssRemoteLogHandler instance;
 
     private OssRemoteLogHandler() {
-
-    }
-
-    public static synchronized OssRemoteLogHandler getInstance() {
-        if (instance == null) {
-            instance = new OssRemoteLogHandler();
-            instance.init();
-        }
-
-        return instance;
-    }
-
-    public void init() {
         String accessKeyId = readOssAccessKeyId();
         String accessKeySecret = readOssAccessKeySecret();
         String endpoint = readOssEndpoint();
@@ -64,6 +51,14 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
 
         bucketName = readOssBucketName();
         checkBucketNameExists(bucketName);
+    }
+
+    public static synchronized OssRemoteLogHandler getInstance() {
+        if (instance == null) {
+            instance = new OssRemoteLogHandler();
+        }
+
+        return instance;
     }
 
     @Override
