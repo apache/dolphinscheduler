@@ -17,11 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.commons.collections4.CollectionUtils;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_DELETE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_UPDATE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -37,6 +41,16 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,23 +64,11 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cglib.core.CodeGenerationException;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ENVIRONMENT_UPDATE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * environment service test
@@ -129,15 +131,14 @@ public class EnvironmentServiceTest {
         when(relationMapper.insert(any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
 
         assertThrowsServiceException(Status.DESCRIPTION_TOO_LONG_ERROR,
-                () -> environmentService.createEnvironment(adminUser, "testName", "test", ServiceTestUtil.randomStringWithLengthN(512), workerGroups));
+                () -> environmentService.createEnvironment(adminUser, "testName", "test",
+                        ServiceTestUtil.randomStringWithLengthN(512), workerGroups));
         assertDoesNotThrow(
                 () -> environmentService.createEnvironment(adminUser, "testName", "test", "test", workerGroups));
-
 
         when(environmentMapper.insert(any(Environment.class))).thenReturn(-1);
         assertThrowsServiceException(Status.CREATE_ENVIRONMENT_ERROR,
                 () -> environmentService.createEnvironment(adminUser, "testName", "test", "test", workerGroups));
-
 
         try (MockedStatic<CodeGenerateUtils> ignored = Mockito.mockStatic(CodeGenerateUtils.class)) {
             when(CodeGenerateUtils.getInstance()).thenReturn(codeGenerateUtils);
@@ -179,14 +180,15 @@ public class EnvironmentServiceTest {
                 .updateEnvironmentByCode(adminUser, 2L, environmentName, getConfig(), getDesc(), workerGroups));
 
         when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(-1);
-        assertThrowsServiceException(Status.UPDATE_ENVIRONMENT_ERROR, () -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
-                workerGroups));
+        assertThrowsServiceException(Status.UPDATE_ENVIRONMENT_ERROR,
+                () -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
+                        workerGroups));
 
         when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(1);
 
         assertThrowsServiceException(Status.DESCRIPTION_TOO_LONG_ERROR,
-                () -> environmentService.updateEnvironmentByCode(adminUser, 2L, environmentName, getConfig(), ServiceTestUtil.randomStringWithLengthN(512), workerGroups)
-        );
+                () -> environmentService.updateEnvironmentByCode(adminUser, 2L, environmentName, getConfig(),
+                        ServiceTestUtil.randomStringWithLengthN(512), workerGroups));
 
         assertDoesNotThrow(() -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
                 workerGroups));
@@ -194,7 +196,8 @@ public class EnvironmentServiceTest {
         assertDoesNotThrow(() -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
                 ""));
 
-        when(relationMapper.queryByEnvironmentCode(any())).thenReturn(Collections.singletonList(getEnvironmentWorkerGroup()));
+        when(relationMapper.queryByEnvironmentCode(any()))
+                .thenReturn(Collections.singletonList(getEnvironmentWorkerGroup()));
         assertDoesNotThrow(() -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
                 ""));
     }
@@ -204,7 +207,7 @@ public class EnvironmentServiceTest {
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
                 1, environmentServiceLogger)).thenReturn(Collections.emptySet());
         Map<String, Object> result = environmentService.queryAllEnvironmentList(getAdminUser());
-        assertEquals(((List<Environment>) result.get(Constants.DATA_LIST)).size(), 0);
+        assertEquals(0, ((List<Environment>) result.get(Constants.DATA_LIST)).size());
 
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
@@ -238,23 +241,24 @@ public class EnvironmentServiceTest {
         PageInfo<Environment> pageInfo = (PageInfo<Environment>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
 
-        assertDoesNotThrow(() -> environmentService.queryEnvironmentListPaging(getGeneralUser(), 1, 10, environmentName));
+        assertDoesNotThrow(
+                () -> environmentService.queryEnvironmentListPaging(getGeneralUser(), 1, 10, environmentName));
 
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(
                 AuthorizationType.ENVIRONMENT,
                 1,
-                environmentServiceLogger)
-        ).thenReturn(Collections.singleton(10));
-        when(environmentMapper.queryEnvironmentListPagingByIds(any(Page.class), any(List.class), any(String.class))).thenReturn(page);
+                environmentServiceLogger)).thenReturn(Collections.singleton(10));
+        when(environmentMapper.queryEnvironmentListPagingByIds(any(Page.class), any(List.class), any(String.class)))
+                .thenReturn(page);
         result = environmentService.queryEnvironmentListPaging(getGeneralUser(), 1, 10, environmentName);
-        assertEquals(result.getCode(), 0);
-        assertEquals(((PageInfo<?>) result.getData()).getTotalList().size(), 1);
+        assertEquals(0, result.getCode());
+        assertEquals(1, ((PageInfo<?>) result.getData()).getTotalList().size());
 
         page.setRecords(Collections.emptyList());
         page.setTotal(0);
         result = environmentService.queryEnvironmentListPaging(getGeneralUser(), 1, 10, environmentName);
-        assertEquals(result.getCode(), 0);
-        assertEquals(((PageInfo<?>) result.getData()).getTotalList().size(), 0);
+        assertEquals(0, result.getCode());
+        assertEquals(0, ((PageInfo<?>) result.getData()).getTotalList().size());
     }
 
     @Test
