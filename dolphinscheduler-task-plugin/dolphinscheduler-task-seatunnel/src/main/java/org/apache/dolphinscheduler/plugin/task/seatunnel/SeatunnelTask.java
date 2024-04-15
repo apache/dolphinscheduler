@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.CONFIG_OPTIONS;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonSyntaxException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
@@ -184,8 +187,17 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+        return String.format("%s/seatunnel_%s.%s", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(), formatDetector());
+    }
+
+    private String formatDetector() {
+        try {
+            new Gson().fromJson(seatunnelParameters.getRawScript(), JsonElement.class);
+            return "json";
+        } catch (JsonSyntaxException e) {
+            return "conf";
+        }
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
