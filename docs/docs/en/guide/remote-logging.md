@@ -10,7 +10,7 @@ If you deploy DolphinScheduler in `Standalone` mode, you only need to configure 
 ```properties
 # Whether to enable remote logging
 remote.logging.enable=false
-# if remote.logging.enable = true, set the target of remote logging
+# if remote.logging.enable = true, set the target of remote logging, currently support OSS, S3, GCS, ABS
 remote.logging.target=OSS
 # if remote.logging.enable = true, set the log base directory
 remote.logging.base.dir=logs
@@ -66,12 +66,12 @@ remote.logging.google.cloud.storage.bucket.name=<your-bucket>
 Configure `common.properties` as follows:
 
 ```properties
-# abs container name, required if you set resource.storage.type=ABS
-resource.azure.blob.storage.container.name=<your-container>
 # abs account name, required if you set resource.storage.type=ABS
-resource.azure.blob.storage.account.name=<your-account-name>
-# abs connection string, required if you set resource.storage.type=ABS
-resource.azure.blob.storage.connection.string=<your-connection-string>
+remote.logging.abs.account.name=<your-account-name>
+# abs account key, required if you set resource.storage.type=ABS
+remote.logging.abs.account.key=<your-account-key>
+# abs container name, required if you set resource.storage.type=ABS
+remote.logging.abs.container.name=<your-container-name>
 ```
 
 ### Notice

@@ -129,7 +129,8 @@ public class ClickHouseDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.clickhouse);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.clickhouse);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.clickhouse);
     }
 
     private String transformOther(Map<String, String> otherMap) {

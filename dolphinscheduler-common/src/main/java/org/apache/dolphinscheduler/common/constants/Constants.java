@@ -253,6 +253,11 @@ public final class Constants {
     public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
 
     /**
+     * file path regex 
+     */
+    public static final Pattern REGEX_FILE_PATH = Pattern.compile("^[a-zA-Z0-9_./-]+$");
+
+    /**
      * read permission
      */
     public static final int READ_PERMISSION = 2;
@@ -724,6 +729,13 @@ public final class Constants {
     public static final String REMOTE_LOGGING_GCS_CREDENTIAL = "remote.logging.google.cloud.storage.credential";
 
     public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
+
+    /**
+     * remote logging for ABS
+     */
+    public static final String REMOTE_LOGGING_ABS_ACCOUNT_NAME = "remote.logging.abs.account.name";
+    public static final String REMOTE_LOGGING_ABS_ACCOUNT_KEY = "remote.logging.abs.account.key";
+    public static final String REMOTE_LOGGING_ABS_CONTAINER_NAME = "remote.logging.abs.container.name";
 
     /**
      * data quality

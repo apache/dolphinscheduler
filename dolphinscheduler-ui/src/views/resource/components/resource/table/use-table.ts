@@ -284,8 +284,8 @@ export const useDetailPageStore = defineStore('detailPage', {
     setFullName(fullName: string) {
       this.fullName = fullName
     },
-    setTenantCode(fullName: string) {
-      this.fullName = fullName
+    setTenantCode(tenantCode: string) {
+      this.tenantCode = tenantCode
     },
     setSearchValue(searchValue: string) {
       this.searchValue = searchValue

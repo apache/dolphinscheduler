@@ -37,8 +37,7 @@ public class ApiFuncIdentificationConstant {
     public static final String TENANT_CREATE = "security:tenant:create";
     public static final String TENANT_UPDATE = "security:tenant:update";
     public static final String TENANT_DELETE = "security:tenant:delete";
-    public static final String ALART_LIST = "monitor:alert:view";
-    public static final String ALART_INSTANCE_CREATE = "security:alert-plugin:create";
+    public static final String ALERT_INSTANCE_CREATE = "security:alert-plugin:create";
     public static final String ALERT_PLUGIN_UPDATE = "security:alert-plugin:update";
     public static final String ALERT_PLUGIN_DELETE = "security:alert-plugin:delete";
     public static final String WORKER_GROUP_CREATE = "security:worker-group:create";

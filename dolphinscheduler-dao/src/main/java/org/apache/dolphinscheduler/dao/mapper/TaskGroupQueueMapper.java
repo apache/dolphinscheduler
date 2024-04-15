@@ -122,4 +122,18 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
                                                            @Param("status") int status,
                                                            @Param("inQueue") int inQueue,
                                                            @Param("forceStart") int forceStart);
+
+    int countUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
+                                          @Param("status") int status,
+                                          @Param("inQueue") int inQueue,
+                                          @Param("forceStart") int forceStart);
+
+    List<TaskGroupQueue> queryInQueueTaskGroupQueue(@Param("inQueue") int inQueue,
+                                                    @Param("minTaskGroupQueueId") int minTaskGroupQueueId,
+                                                    @Param("limit") int limit);
+
+    List<TaskGroupQueue> queryWaitNotifyForceStartTaskGroupQueue(@Param("inQueue") int inQueue,
+                                                                 @Param("forceStart") int forceStart,
+                                                                 @Param("minTaskGroupQueueId") int minTaskGroupQueueId,
+                                                                 @Param("limit") int limit);
 }
