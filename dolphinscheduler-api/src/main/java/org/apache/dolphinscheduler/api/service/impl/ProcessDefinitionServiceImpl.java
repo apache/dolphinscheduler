@@ -1537,6 +1537,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
         }
 
+        result.put(Constants.DATA_LIST, processDefinition);
         log.info("Import process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
                 processDefinition.getCode());
         return true;
