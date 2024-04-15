@@ -80,7 +80,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
     final int dryRun = 7;
     final int testFlag = 0;
     final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
-    final Integer version = null;
+    final Integer version = 1;
     final boolean allLevelDependent = false;
     final JsonObject expectResponseContent = gson
             .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}",
@@ -115,6 +115,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
         paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
@@ -162,6 +163,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
         paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
@@ -209,6 +211,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
         paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
@@ -241,6 +244,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("scheduleTime", scheduleTime);
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),

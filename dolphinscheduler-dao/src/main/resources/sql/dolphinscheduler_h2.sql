@@ -2020,10 +2020,14 @@ CREATE TABLE t_ds_audit_log
 (
     id                  int(11) NOT NULL AUTO_INCREMENT,
     user_id             int(11) NOT NULL,
-    resource_type       int(11) NOT NULL,
-    operation           int(11) NOT NULL,
+    model_id            bigint(20) NOT NULL,
+    model_name          varchar(255) NOT NULL,
+    model_type          varchar(255) NOT NULL,
+    operation_type      varchar(255) NOT NULL,
+    description         varchar(255) NOT NULL,
+    latency             int(11) NOT NULL,
+    detail              varchar(255) DEFAULT NULL,
     time                timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-    resource_id         int(11) NOT NULL,
     PRIMARY KEY (id)
 );
 

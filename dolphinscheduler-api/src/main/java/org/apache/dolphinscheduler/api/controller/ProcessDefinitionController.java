@@ -36,6 +36,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_PROCESS_DEFINI
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_PROCESS_DEFINITION_NAME_UNIQUE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
@@ -112,6 +114,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_PROCESS_DEFINITION_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_CREATE)
     public Result createProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "name", required = true) String name,
@@ -146,6 +149,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/batch-copy")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_COPY_PROCESS_DEFINITION_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_COPY)
     public Result copyProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                         @RequestParam(value = "codes", required = true) String codes,
@@ -232,6 +236,7 @@ public class ProcessDefinitionController extends BaseController {
     @PutMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_PROCESS_DEFINITION_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_UPDATE)
     public Result updateProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam(value = "name", required = true) String name,
@@ -307,6 +312,7 @@ public class ProcessDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_PROCESS_DEFINITION_VERSION_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_SWITCH_VERSION)
     public Result switchProcessDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                  @PathVariable(value = "code") long code,
@@ -333,12 +339,12 @@ public class ProcessDefinitionController extends BaseController {
     @DeleteMapping(value = "/{code}/versions/{version}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINITION_VERSION_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_DELETE_VERSION)
     public Result<Void> deleteProcessDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                       @PathVariable(value = "code") long workflowDefinitionCode,
-                                                       @PathVariable(value = "version") int workflowDefinitionVersion) {
-        processDefinitionService.deleteProcessDefinitionVersion(loginUser, projectCode, workflowDefinitionCode,
-                workflowDefinitionVersion);
+                                                       @PathVariable(value = "code") long code,
+                                                       @PathVariable(value = "version") int version) {
+        processDefinitionService.deleteProcessDefinitionVersion(loginUser, projectCode, code, version);
         return Result.success();
     }
 
@@ -351,6 +357,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/{code}/release")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RELEASE_PROCESS_DEFINITION_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_RELEASE)
     public Result<Boolean> releaseProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                     @PathVariable(value = "code", required = true) long workflowDefinitionCode,
@@ -611,10 +618,11 @@ public class ProcessDefinitionController extends BaseController {
     @DeleteMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_PROCESS_DEFINE_BY_CODE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_DELETE)
     public Result deleteProcessDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @PathVariable("code") long workflowDefinitionCode) {
-        processDefinitionService.deleteProcessDefinitionByCode(loginUser, workflowDefinitionCode);
+                                                @PathVariable("code") long code) {
+        processDefinitionService.deleteProcessDefinitionByCode(loginUser, code);
         return new Result(Status.SUCCESS);
     }
 
@@ -633,6 +641,7 @@ public class ProcessDefinitionController extends BaseController {
     @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_PROCESS_DEFINE_BY_CODES_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_BATCH_DELETE)
     public Result batchDeleteProcessDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                       @RequestParam("codes") String codes) {
@@ -656,6 +665,7 @@ public class ProcessDefinitionController extends BaseController {
     })
     @PostMapping(value = "/batch-export")
     @ResponseBody
+    @OperatorLog(auditType = AuditType.PROCESS_EXPORT)
     public void batchExportProcessDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                     @RequestParam("codes") String codes,
@@ -699,6 +709,7 @@ public class ProcessDefinitionController extends BaseController {
     })
     @PostMapping(value = "/import")
     @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_IMPORT)
     public Result importProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam("file") MultipartFile file) {

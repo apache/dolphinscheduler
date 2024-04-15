@@ -47,7 +47,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "4");
+        paramsMap.add("userId", "1");
         paramsMap.add("expireTime", "2019-12-18 00:00:00");
         paramsMap.add("token", "607f5aeaaa2093dbdff5d5522ce00510");
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
@@ -64,7 +64,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     @Test
     public void testCreateTokenIfAbsent() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "4");
+        paramsMap.add("userId", "1");
         paramsMap.add("expireTime", "2019-12-18 00:00:00");
         paramsMap.add("token", null);
 
@@ -101,7 +101,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     @Test
     public void testGenerateToken() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "4");
+        paramsMap.add("userId", "1");
         paramsMap.add("expireTime", "2019-12-28 00:00:00");
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens/generate")
                 .header("sessionId", sessionId)
@@ -161,7 +161,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
     public void testUpdateToken() throws Exception {
         testCreateToken();
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "4");
+        paramsMap.add("userId", "1");
         paramsMap.add("expireTime", "2019-12-20 00:00:00");
         paramsMap.add("token", "cxctoken123update");
         MvcResult mvcResult = mockMvc.perform(put("/access-tokens/1")
@@ -180,7 +180,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         this.testCreateTokenIfAbsent();
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "4");
+        paramsMap.add("userId", "1");
         paramsMap.add("expireTime", "2019-12-20 00:00:00");
         paramsMap.add("token", null);
 

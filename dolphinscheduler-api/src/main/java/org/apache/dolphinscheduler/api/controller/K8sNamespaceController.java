@@ -25,6 +25,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_K8S_NAMESPACE_L
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -107,6 +109,7 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_K8S_NAMESPACE_ERROR)
+    @OperatorLog(auditType = AuditType.K8S_NAMESPACE_CREATE)
     public Result createNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode) {
@@ -152,6 +155,7 @@ public class K8sNamespaceController extends BaseController {
     @PostMapping(value = "/delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_K8S_NAMESPACE_BY_ID_ERROR)
+    @OperatorLog(auditType = AuditType.K8S_NAMESPACE_DELETE)
     public Result delNamespaceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                    @RequestParam(value = "id") int id) {
         Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(loginUser, id);

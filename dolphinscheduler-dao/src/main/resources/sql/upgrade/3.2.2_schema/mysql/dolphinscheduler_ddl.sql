@@ -26,3 +26,31 @@ CREATE TABLE `t_ds_relation_project_worker_group` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 ALTER TABLE t_ds_project_parameter ADD  `operator` int(11) DEFAULT NULL COMMENT 'operator user id';
+
+-- modify_data_t_ds_audit_log_input_entry behavior change
+--DROP PROCEDURE if EXISTS modify_data_t_ds_audit_log_input_entry;
+DROP PROCEDURE if EXISTS modify_data_t_ds_audit_log_input_entry;
+delimiter d//
+CREATE PROCEDURE modify_data_t_ds_audit_log_input_entry()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_audit_log'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='resource_type')
+   THEN
+ALTER TABLE `t_ds_audit_log`
+drop resource_type, drop operation, drop resource_id,
+      add `model_id` bigint(20) DEFAULT NULL COMMENT 'model id',
+      add `model_name` varchar(100) DEFAULT NULL COMMENT 'model name',
+      add `model_type` varchar(100) NOT NULL COMMENT 'model type',
+      add `operation_type` varchar(100) NOT NULL COMMENT 'operation type',
+      add `description` varchar(100) DEFAULT NULL COMMENT 'api description',
+      add `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',
+      add `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail',
+      MODIFY COLUMN `time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT "operation time";
+END IF;
+END;
+d//
+delimiter ;
+CALL modify_data_t_ds_audit_log_input_entry;
+DROP PROCEDURE modify_data_t_ds_audit_log_input_entry;

@@ -157,6 +157,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
         log.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, workerGroup);
         return result;
     }
 

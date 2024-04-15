@@ -808,6 +808,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         log.info("Schedule update complete, projectCode:{}, processDefinitionCode:{}, scheduleId:{}.",
                 processDefinition.getProjectCode(), processDefinition.getCode(), schedule.getId());
+        result.put(Constants.DATA_LIST, schedule);
         putMsg(result, Status.SUCCESS);
     }
 

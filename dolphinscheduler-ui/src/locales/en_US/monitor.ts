@@ -60,9 +60,11 @@ export default {
   },
   audit_log: {
     user_name: 'User Name',
-    resource_type: 'Resource Type',
-    project_name: 'Project Name',
     operation_type: 'Operation Type',
+    model_type: 'Model Type',
+    model_name: 'Model Name',
+    latency: 'Latency',
+    description: 'Description',
     create_time: 'Create Time',
     start_time: 'Start Time',
     end_time: 'End Time',
