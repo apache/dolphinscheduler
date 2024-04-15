@@ -299,7 +299,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<ProcessTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
-        long processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+        long processDefinitionCode = CodeGenerateUtils.genCode();
         ProcessDefinition processDefinition =
                 new ProcessDefinition(projectCode, name, processDefinitionCode, description,
                         globalParams, locations, timeout, loginUser.getId());
@@ -360,7 +360,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
         long processDefinitionCode;
         try {
-            processDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+            processDefinitionCode = CodeGenerateUtils.genCode();
         } catch (CodeGenerateException e) {
             throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
         }
@@ -1233,7 +1233,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             // build process definition
             processDefinition = new ProcessDefinition(projectCode,
                     processDefinitionName,
-                    CodeGenerateUtils.getInstance().genCode(),
+                    CodeGenerateUtils.genCode(),
                     "",
                     "[]", null,
                     0, loginUser.getId());
@@ -1388,7 +1388,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
         sqlParameters.setLocalParams(Collections.emptyList());
         taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
-        taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+        taskDefinition.setCode(CodeGenerateUtils.genCode());
         taskDefinition.setTaskType(TASK_TYPE_SQL);
         taskDefinition.setFailRetryTimes(0);
         taskDefinition.setFailRetryInterval(0);
@@ -1433,7 +1433,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setProjectCode(projectCode);
         processDefinition.setUserId(loginUser.getId());
         try {
-            processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+            processDefinition.setCode(CodeGenerateUtils.genCode());
         } catch (CodeGenerateException e) {
             log.error(
                     "Save process definition error because generate process definition code error, projectCode:{}.",
@@ -1456,7 +1456,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             taskDefinitionLog.setOperator(loginUser.getId());
             taskDefinitionLog.setOperateTime(now);
             try {
-                long code = CodeGenerateUtils.getInstance().genCode();
+                long code = CodeGenerateUtils.genCode();
                 taskCodeMap.put(taskDefinitionLog.getCode(), code);
                 taskDefinitionLog.setCode(code);
             } catch (CodeGenerateException e) {
@@ -2074,7 +2074,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                     try {
-                        long taskCode = CodeGenerateUtils.getInstance().genCode();
+                        long taskCode = CodeGenerateUtils.genCode();
                         taskCodeMap.put(taskDefinitionLog.getCode(), taskCode);
                         taskDefinitionLog.setCode(taskCode);
                     } catch (CodeGenerateException e) {
@@ -2097,7 +2097,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 }
                 final long oldProcessDefinitionCode = processDefinition.getCode();
                 try {
-                    processDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+                    processDefinition.setCode(CodeGenerateUtils.genCode());
                 } catch (CodeGenerateException e) {
                     log.error("Generate process definition code error, projectCode:{}.", targetProjectCode, e);
                     putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS);

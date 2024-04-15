@@ -184,7 +184,7 @@ public class PythonGateway {
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
         if (project == null) {
-            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
             return result;
         }
@@ -194,7 +194,7 @@ public class PythonGateway {
         // In the case project exists, but current workflow still not created, we should also return the init
         // version of it
         if (processDefinition == null) {
-            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
             return result;
         }
@@ -202,7 +202,7 @@ public class PythonGateway {
         TaskDefinition taskDefinition =
                 taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
         if (taskDefinition == null) {
-            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
         } else {
             result.put("code", taskDefinition.getCode());
