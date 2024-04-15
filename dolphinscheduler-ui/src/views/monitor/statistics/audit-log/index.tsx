@@ -30,7 +30,8 @@ import {
   NButton,
   NIcon,
   NDataTable,
-  NPagination
+  NPagination,
+  NCascader
 } from 'naive-ui'
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
@@ -40,15 +41,23 @@ import Card from '@/components/card'
 const AuditLog = defineComponent({
   name: 'audit-log',
   setup() {
-    const { t, variables, getTableData, createColumns } = useTable()
+    const {
+      t,
+      variables,
+      getTableData,
+      createColumns,
+      getModelTypeData,
+      getOperationTypeData
+    } = useTable()
 
     const requestTableData = () => {
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        resourceType: variables.resourceType,
+        modelType: variables.modelType,
         operationType: variables.operationType,
         userName: variables.userName,
+        modelName: variables.modelName,
         datePickerRange: variables.datePickerRange
       })
     }
@@ -67,6 +76,8 @@ const AuditLog = defineComponent({
 
     onMounted(() => {
       createColumns(variables)
+      getModelTypeData()
+      getOperationTypeData()
       requestTableData()
     })
 
@@ -97,36 +108,41 @@ const AuditLog = defineComponent({
               placeholder={t('monitor.audit_log.user_name')}
               clearable
             />
+            <NInput
+              allowInput={this.trim}
+              v-model={[this.modelName, 'value']}
+              size='small'
+              placeholder={t('monitor.audit_log.model_name')}
+              clearable
+            />
+            <NCascader
+              v-model={[this.modelType, 'value']}
+              multiple
+              cascade={false}
+              size='small'
+              options={this.ModelTypeData}
+              placeholder={t('monitor.audit_log.model_type')}
+              style={{ width: '180px' }}
+              clearable
+              filterable
+              value-field='name'
+              label-field='name'
+              children-field='child'
+              show-path={false}
+              maxTagCount={1}
+            />
             <NSelect
               v-model={[this.operationType, 'value']}
               size='small'
-              options={[
-                { value: 'CREATE', label: t('monitor.audit_log.create') },
-                { value: 'UPDATE', label: t('monitor.audit_log.update') },
-                { value: 'DELETE', label: t('monitor.audit_log.delete') },
-                { value: 'READ', label: t('monitor.audit_log.read') }
-              ]}
+              options={this.OperationTypeData}
               placeholder={t('monitor.audit_log.operation_type')}
               style={{ width: '180px' }}
               clearable
+              filterable
+              value-field='name'
+              label-field='name'
             />
-            <NSelect
-              v-model={[this.resourceType, 'value']}
-              size='small'
-              options={[
-                {
-                  value: 'USER_MODULE',
-                  label: t('monitor.audit_log.user_audit')
-                },
-                {
-                  value: 'PROJECT_MODULE',
-                  label: t('monitor.audit_log.project_audit')
-                }
-              ]}
-              placeholder={t('monitor.audit_log.resource_type')}
-              style={{ width: '180px' }}
-              clearable
-            />
+
             <NDatePicker
               v-model={[this.datePickerRange, 'value']}
               type='datetimerange'
@@ -147,6 +163,7 @@ const AuditLog = defineComponent({
             <NDataTable
               loading={loadingRef}
               columns={this.columns}
+              scrollX={this.tableWidth}
               data={this.tableData}
             />
             <NSpace justify='center'>

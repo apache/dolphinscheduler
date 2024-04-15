@@ -129,6 +129,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
         if (taskGroupMapper.insert(taskGroup) > 0) {
             log.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
+            result.put(Constants.DATA_LIST, taskGroup);
             putMsg(result, Status.SUCCESS);
         } else {
             log.error("Create task group error, taskGroupName:{}.", taskGroup.getName());
@@ -194,6 +195,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         int i = taskGroupMapper.updateById(taskGroup);
         if (i > 0) {
             log.info("Update task group complete, taskGroupId:{}.", id);
+            result.put(Constants.DATA_LIST, taskGroup);
             putMsg(result, Status.SUCCESS);
         } else {
             log.error("Update task group error, taskGroupId:{}.", id);
