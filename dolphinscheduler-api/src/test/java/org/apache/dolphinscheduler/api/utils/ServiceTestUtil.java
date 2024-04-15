@@ -15,14 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit;
+package org.apache.dolphinscheduler.api.utils;
 
-public interface AuditSubscriber {
+import java.nio.charset.StandardCharsets;
+import java.util.Random;
 
-    /**
-     * process the audit message
-     *
-     * @param message
-     */
-    void execute(AuditMessage message);
+public class ServiceTestUtil {
+
+    public static String randomStringWithLengthN(int n) {
+        byte[] bitArray = new byte[n];
+        new Random().nextBytes(bitArray);
+        return new String(bitArray, StandardCharsets.UTF_8);
+    }
 }
