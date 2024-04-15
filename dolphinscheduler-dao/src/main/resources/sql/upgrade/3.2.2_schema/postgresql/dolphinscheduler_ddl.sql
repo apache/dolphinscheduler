@@ -49,7 +49,7 @@ drop resource_type, drop operation, drop resource_id,
     add description     VARCHAR(255) NOT NULL,
     add latency         int NOT NULL,
     add detail          VARCHAR(255) DEFAULT NULL,
-    RENAME COLUMN time TO create_time;
+    RENAME COLUMN "time" TO "create_time";
 END IF;
 END;
 $$ LANGUAGE plpgsql;
