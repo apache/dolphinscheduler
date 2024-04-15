@@ -40,16 +40,16 @@ BEGIN
                   WHERE table_name = 't_ds_audit_log'
                   AND column_name = 'resource_type')
       THEN
-ALTER TABLE t_ds_audit_log
-drop resource_type, drop operation, drop resource_id,
-    add model_id        bigint NOT NULL,
-    add model_name      VARCHAR(255) NOT NULL,
-    add model_type      VARCHAR(255) NOT NULL,
-    add operation_type  VARCHAR(255) NOT NULL,
-    add description     VARCHAR(255) NOT NULL,
-    add latency         int NOT NULL,
-    add detail          VARCHAR(255) DEFAULT NULL,
-    RENAME COLUMN "time" TO "create_time";
+            ALTER TABLE t_ds_audit_log
+            drop resource_type, drop operation, drop resource_id,
+                add model_id        bigint NOT NULL,
+                add model_name      VARCHAR(255) NOT NULL,
+                add model_type      VARCHAR(255) NOT NULL,
+                add operation_type  VARCHAR(255) NOT NULL,
+                add description     VARCHAR(255) NOT NULL,
+                add latency         int NOT NULL,
+                add detail          VARCHAR(255) DEFAULT NULL;
+            ALTER TABLE t_ds_audit_log RENAME COLUMN "time" TO "create_time";
 END IF;
 END;
 $$ LANGUAGE plpgsql;
