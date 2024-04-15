@@ -2001,7 +2001,7 @@ CREATE TABLE t_ds_audit_log (
     description     VARCHAR(255) NOT NULL,
     latency         int NOT NULL,
     detail          VARCHAR(255) DEFAULT NULL,
-    time            timestamp DEFAULT NULL ,
+    create_time     timestamp DEFAULT NULL ,
     PRIMARY KEY (id)
 );
 
