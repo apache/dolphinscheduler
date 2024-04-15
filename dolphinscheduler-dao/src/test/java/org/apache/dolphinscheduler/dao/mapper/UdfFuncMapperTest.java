@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -277,17 +276,5 @@ public class UdfFuncMapperTest extends BaseDaoTest {
         authorizedUdfFunc = udfFuncMapper.listAuthorizedUdfFunc(generalUser1.getId(), udfFuncIds);
         Assertions.assertTrue(authorizedUdfFunc.stream().map(t -> t.getId()).collect(toList())
                 .containsAll(Arrays.asList(udfFuncIds)));
-    }
-
-    @Test
-    public void batchUpdateUdfFuncTest() {
-        // create general user
-        User generalUser1 = createGeneralUser("user1");
-        UdfFunc udfFunc = insertOne(generalUser1);
-        udfFunc.setResourceName("/updateTest");
-        List<UdfFunc> udfFuncList = new ArrayList<>();
-        udfFuncList.add(udfFunc);
-        Assertions.assertTrue(udfFuncMapper.batchUpdateUdfFunc(udfFuncList) > 0);
-
     }
 }
