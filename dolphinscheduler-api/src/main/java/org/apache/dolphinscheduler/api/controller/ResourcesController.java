@@ -37,6 +37,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_N
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
@@ -111,6 +113,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))})
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
+    @OperatorLog(auditType = AuditType.FOLDER_CREATE)
     public Result<Object> createDirectory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "type") ResourceType type,
                                           @RequestParam(value = "name") String alias,
@@ -133,6 +136,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "currentDir", description = "RESOURCE_CURRENT_DIR", required = true, schema = @Schema(implementation = String.class))})
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
+    @OperatorLog(auditType = AuditType.FILE_CREATE)
     public Result<Object> createResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "type") ResourceType type,
                                          @RequestParam(value = "name") String alias,
@@ -160,6 +164,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))})
     @PutMapping()
     @ApiException(UPDATE_RESOURCE_ERROR)
+    @OperatorLog(auditType = AuditType.FILE_UPDATE)
     public Result<Object> updateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "fullName") String fullName,
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode,
@@ -236,6 +241,7 @@ public class ResourcesController extends BaseController {
     @DeleteMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
+    @OperatorLog(auditType = AuditType.FILE_DELETE)
     public Result<Object> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "fullName") String fullName,
                                          @RequestParam(value = "tenantCode", required = false) String tenantCode) throws Exception {
@@ -358,6 +364,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "currentDir", description = "RESOURCE_CURRENTDIR", required = true, schema = @Schema(implementation = String.class))})
     @PostMapping(value = "/online-create")
     @ApiException(CREATE_RESOURCE_FILE_ON_LINE_ERROR)
+    @OperatorLog(auditType = AuditType.FILE_CREATE)
     public Result createResourceFile(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "type") ResourceType type,
                                      @RequestParam(value = "fileName") String fileName,
@@ -385,6 +392,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "tenantCode", description = "TENANT_CODE", required = true, schema = @Schema(implementation = String.class))})
     @PutMapping(value = "/update-content")
     @ApiException(EDIT_RESOURCE_FILE_ON_LINE_ERROR)
+    @OperatorLog(auditType = AuditType.FILE_UPDATE)
     public Result updateResourceContent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @RequestParam(value = "fullName") String fullName,
                                         @RequestParam(value = "tenantCode") String tenantCode,
@@ -445,6 +453,7 @@ public class ResourcesController extends BaseController {
     @PostMapping(value = "/udf-func")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_UDF_FUNCTION_ERROR)
+    @OperatorLog(auditType = AuditType.UDF_FUNCTION_CREATE)
     public Result createUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @RequestParam(value = "type") UdfType type,
                                 @RequestParam(value = "funcName") String funcName,
@@ -502,6 +511,7 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class))})
     @PutMapping(value = "/udf-func/{id}")
     @ApiException(UPDATE_UDF_FUNCTION_ERROR)
+    @OperatorLog(auditType = AuditType.UDF_FUNCTION_UPDATE)
     public Result updateUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId, @RequestParam(value = "type") UdfType type,
                                 @RequestParam(value = "funcName") String funcName,
@@ -590,6 +600,7 @@ public class ResourcesController extends BaseController {
     @DeleteMapping(value = "/udf-func/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_UDF_FUNCTION_ERROR)
+    @OperatorLog(auditType = AuditType.UDF_FUNCTION_DELETE)
     public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @PathVariable(value = "id") int udfFuncId) {
         return udfFuncService.delete(loginUser, udfFuncId);
