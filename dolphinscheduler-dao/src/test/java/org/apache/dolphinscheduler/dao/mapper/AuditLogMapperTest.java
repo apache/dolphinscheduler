@@ -49,7 +49,7 @@ public class AuditLogMapperTest extends BaseDaoTest {
         auditLog.setModelName("name");
         auditLog.setDetail("detail");
         auditLog.setLatency(1L);
-        auditLog.setTime(new Date());
+        auditLog.setCreateTime(new Date());
         auditLog.setModelType(objectType.getName());
         auditLog.setOperationType(AuditOperationType.CREATE.getName());
         auditLog.setModelId(1L);
