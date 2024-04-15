@@ -30,3 +30,29 @@ CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
 ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
 
 ALTER TABLE t_ds_project_parameter ADD COLUMN IF NOT EXISTS operator int;
+
+-- modify_data_t_ds_audit_log_input_entry
+delimiter d//
+CREATE OR REPLACE FUNCTION modify_data_t_ds_audit_log_input_entry() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_audit_log'
+                  AND column_name = 'resource_type')
+      THEN
+ALTER TABLE t_ds_audit_log
+drop resource_type, drop operation, drop resource_id,
+    add model_id        bigint NOT NULL,
+    add model_name      VARCHAR(255) NOT NULL,
+    add model_type      VARCHAR(255) NOT NULL,
+    add operation_type  VARCHAR(255) NOT NULL,
+    add description     VARCHAR(255) NOT NULL,
+    add latency         int NOT NULL,
+    add detail          VARCHAR(255) DEFAULT NULL;
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select modify_data_t_ds_audit_log_input_entry();
+DROP FUNCTION IF EXISTS modify_data_t_ds_audit_log_input_entry();
