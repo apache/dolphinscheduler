@@ -15,14 +15,28 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit;
+package org.apache.dolphinscheduler.api.dto.auditLog;
 
-public interface AuditSubscriber {
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 
-    /**
-     * process the audit message
-     *
-     * @param message
-     */
-    void execute(AuditMessage message);
+import java.util.ArrayList;
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class AuditOperationTypeDto {
+
+    private String name;
+
+    public static List<AuditOperationTypeDto> getOperationTypeDtoList() {
+        List<AuditOperationTypeDto> dtoList = new ArrayList<>();
+        for (AuditOperationType operationType : AuditOperationType.getOperationList()) {
+            AuditOperationTypeDto dto = new AuditOperationTypeDto();
+            dto.setName(operationType.getName());
+            dtoList.add(dto);
+        }
+
+        return dtoList;
+    }
 }
