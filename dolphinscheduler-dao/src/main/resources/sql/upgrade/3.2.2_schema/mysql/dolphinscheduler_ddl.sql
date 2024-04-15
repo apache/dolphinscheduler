@@ -47,7 +47,7 @@ drop resource_type, drop operation, drop resource_id,
       add `description` varchar(100) DEFAULT NULL COMMENT 'api description',
       add `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',
       add `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail',
-      MODIFY COLUMN `time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT "operation time";
+      CHANGE COLUMN `time` `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT "operation time";
 END IF;
 END;
 d//

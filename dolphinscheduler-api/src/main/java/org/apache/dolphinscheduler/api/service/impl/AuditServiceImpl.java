@@ -129,7 +129,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         auditDto.setLatency(String.valueOf(auditLog.getLatency()));
         auditDto.setDetail(auditLog.getDetail());
         auditDto.setDescription(auditLog.getDescription());
-        auditDto.setTime(auditLog.getTime());
+        auditDto.setCreateTime(auditLog.getCreateTime());
         return auditDto;
     }
 }

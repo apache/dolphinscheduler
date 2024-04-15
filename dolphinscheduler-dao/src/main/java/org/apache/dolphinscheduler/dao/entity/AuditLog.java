@@ -67,7 +67,7 @@ public class AuditLog {
     /**
      * operation time
      */
-    private Date time;
+    private Date createTime;
 
     private String detail;
 

@@ -2016,7 +2016,7 @@ CREATE TABLE `t_ds_audit_log` (
   `description` varchar(100) DEFAULT NULL COMMENT 'api description',
   `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',
   `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail',
-  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'operation time',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'operation time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 

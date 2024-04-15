@@ -98,7 +98,7 @@ export function useTable() {
       },
       {
         title: t('monitor.audit_log.create_time'),
-        key: 'time',
+        key: 'createTime',
         ...COLUMN_WIDTH_CONFIG['time']
       }
     ]

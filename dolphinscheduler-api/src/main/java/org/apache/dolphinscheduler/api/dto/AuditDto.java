@@ -34,7 +34,7 @@ public class AuditDto {
 
     private String operation;
 
-    private Date time;
+    private Date createTime;
 
     private String description;
 
