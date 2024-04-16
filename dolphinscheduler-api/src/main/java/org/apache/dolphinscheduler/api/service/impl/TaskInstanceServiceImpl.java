@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -33,14 +34,15 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.CollectionUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.DqExecuteResultDao;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
@@ -106,6 +108,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
+
+    @Autowired
+    private ProcessInstanceDao workflowInstanceDao;
 
     /**
      * query task list by project, process instance, task name, task start time, task end time, task status, keyword paging
@@ -216,58 +221,39 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      */
     @Transactional
     @Override
-    public Result forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
-        Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+    public void forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, FORCED_SUCCESS);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            putMsg(result, status);
-            return result;
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, FORCED_SUCCESS);
+
+        TaskInstance task = taskInstanceDao.queryOptionalById(taskInstanceId)
+                .orElseThrow(() -> new ServiceException(Status.TASK_INSTANCE_NOT_FOUND));
+
+        if (task.getProjectCode() != projectCode) {
+            throw new ServiceException("The task instance is not under the project: " + projectCode);
         }
 
-        // check whether the task instance can be found
-        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
-        if (task == null) {
-            log.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
-                    taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
-            return result;
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            log.error("Task definition can not be found, projectCode:{}, taskDefinitionCode:{}.", projectCode,
-                    task.getTaskCode());
-            putMsg(result, Status.TASK_INSTANCE_NOT_FOUND, taskInstanceId);
-            return result;
+        ProcessInstance processInstance = workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())
+                .orElseThrow(
+                        () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, task.getProcessInstanceId()));
+        if (!processInstance.getState().isFinished()) {
+            throw new ServiceException("The workflow instance is not finished: " + processInstance.getState()
+                    + " cannot force start task instance");
         }
 
         // check whether the task instance state type is failure or cancel
         if (!task.getState().isFailure() && !task.getState().isKill()) {
-            log.warn("{} type task instance can not perform force success, projectCode:{}, taskInstanceId:{}.",
-                    task.getState().getDesc(), projectCode, taskInstanceId);
-            putMsg(result, Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState().toString());
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_STATE_OPERATION_ERROR, taskInstanceId, task.getState());
         }
 
         // change the state of the task instance
         task.setState(TaskExecutionStatus.FORCED_SUCCESS);
         task.setEndTime(new Date());
         int changedNum = taskInstanceMapper.updateById(task);
-        if (changedNum > 0) {
-            processService.forceProcessInstanceSuccessByTaskInstanceId(taskInstanceId);
-            log.info("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}", projectCode,
-                    taskInstanceId);
-            putMsg(result, Status.SUCCESS);
-        } else {
-            log.error("Task instance performs force success complete, projectCode:{}, taskInstanceId:{}",
-                    projectCode, taskInstanceId);
-            putMsg(result, Status.FORCE_TASK_SUCCESS_ERROR);
+        if (changedNum <= 0) {
+            throw new ServiceException(Status.FORCE_TASK_SUCCESS_ERROR);
         }
-        return result;
+        processService.forceProcessInstanceSuccessByTaskInstanceId(task);
+        log.info("Force success task instance:{} success", taskInstanceId);
     }
 
     @Override

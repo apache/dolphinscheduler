@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceQueryRequest;
+import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceSuccessResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -85,12 +86,9 @@ public class TaskInstanceV2ControllerTest extends AbstractControllerTest {
     @Test
     public void testForceTaskSuccess() {
 
-        Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
+        Mockito.doNothing().when(taskInstanceService).forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt());
 
-        when(taskInstanceService.forceTaskSuccess(any(), Mockito.anyLong(), Mockito.anyInt())).thenReturn(mockResult);
-
-        Result taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
+        TaskInstanceSuccessResponse taskResult = taskInstanceV2Controller.forceTaskSuccess(null, 1L, 1);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
 
     }

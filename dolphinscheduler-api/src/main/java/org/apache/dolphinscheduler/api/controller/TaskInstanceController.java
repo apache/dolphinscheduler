@@ -153,10 +153,11 @@ public class TaskInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
     @OperatorLog(auditType = AuditType.TASK_INSTANCE_FORCE_SUCCESS)
-    public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
-                                   @PathVariable(value = "id") Integer id) {
-        return taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+    public Result<Void> forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
+                                         @PathVariable(value = "id") Integer id) {
+        taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+        return Result.success();
     }
 
     /**
