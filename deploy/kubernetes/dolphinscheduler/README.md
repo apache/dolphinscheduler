@@ -174,7 +174,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | image.master | string | `"dolphinscheduler-master"` | master image |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy. Options: Always, Never, IfNotPresent |
 | image.pullSecret | string | `""` | Specify a imagePullSecrets |
-| image.registry | string | `"apache/dolphinscheduler"` | Docker image repository for the DolphinScheduler |
+| image.registry | string | `"apache"` | Docker image repository for the DolphinScheduler |
 | image.tag | string | `"latest"` | Docker image version for the DolphinScheduler |
 | image.tools | string | `"dolphinscheduler-tools"` | tools image |
 | image.worker | string | `"dolphinscheduler-worker"` | worker image |
