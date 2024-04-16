@@ -126,7 +126,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             project = Project
                     .builder()
                     .name(name)
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .description(desc)
                     .userId(loginUser.getId())
                     .userName(loginUser.getUserName())

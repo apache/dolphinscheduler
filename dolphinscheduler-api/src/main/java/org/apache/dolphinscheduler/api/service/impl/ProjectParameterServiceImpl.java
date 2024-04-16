@@ -97,7 +97,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
                     .builder()
                     .paramName(projectParameterName)
                     .paramValue(projectParameterValue)
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .projectCode(projectCode)
                     .userId(loginUser.getId())
                     .createTime(now)

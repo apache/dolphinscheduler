@@ -47,7 +47,7 @@ public class ProjectDao {
                 Integer id = rs.getInt(1);
                 long code = rs.getLong(2);
                 if (code == 0L) {
-                    code = CodeGenerateUtils.getInstance().genCode();
+                    code = CodeGenerateUtils.genCode();
                 }
                 projectMap.put(id, code);
             }

@@ -206,7 +206,7 @@ public class V200DolphinSchedulerUpgrader implements DolphinSchedulerUpgrader {
                 taskDefinitionLog.setName(name);
                 taskDefinitionLog
                         .setWorkerGroup(task.get("workerGroup") == null ? "default" : task.get("workerGroup").asText());
-                long taskCode = CodeGenerateUtils.getInstance().genCode();
+                long taskCode = CodeGenerateUtils.genCode();
                 taskDefinitionLog.setCode(taskCode);
                 taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
                 taskDefinitionLog.setProjectCode(processDefinition.getProjectCode());

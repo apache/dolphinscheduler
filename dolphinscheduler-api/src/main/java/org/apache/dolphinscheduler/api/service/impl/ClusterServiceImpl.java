@@ -96,7 +96,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         cluster.setOperator(loginUser.getId());
         cluster.setCreateTime(new Date());
         cluster.setUpdateTime(new Date());
-        cluster.setCode(CodeGenerateUtils.getInstance().genCode());
+        cluster.setCode(CodeGenerateUtils.genCode());
 
         if (clusterMapper.insert(cluster) > 0) {
             return cluster.getCode();
