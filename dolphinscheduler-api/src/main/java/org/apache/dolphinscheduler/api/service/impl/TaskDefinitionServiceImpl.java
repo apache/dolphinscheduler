@@ -265,7 +265,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         long taskDefinitionCode;
         try {
-            taskDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+            taskDefinitionCode = CodeGenerateUtils.genCode();
         } catch (CodeGenerateException e) {
             throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
         }
@@ -338,7 +338,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         long taskCode = taskDefinition.getCode();
         if (taskCode == 0) {
-            taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+            taskDefinition.setCode(CodeGenerateUtils.genCode());
         }
         List<ProcessTaskRelationLog> processTaskRelationLogList =
                 processTaskRelationMapper.queryByProcessCode(processDefinitionCode)
@@ -1264,7 +1264,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < genNum; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateException e) {
             log.error("Generate task definition code error.", e);

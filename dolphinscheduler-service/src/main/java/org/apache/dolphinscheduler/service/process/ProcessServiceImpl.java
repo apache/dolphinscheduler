@@ -1679,7 +1679,7 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLog.setOperator(operator.getId());
             if (taskDefinitionLog.getCode() == 0) {
-                taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
+                taskDefinitionLog.setCode(CodeGenerateUtils.genCode());
             }
             if (taskDefinitionLog.getVersion() == 0) {
                 // init first version
@@ -1774,6 +1774,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (Boolean.TRUE.equals(syncDefine)) {
             if (processDefinition.getId() == null) {
                 result = processDefineMapper.insert(processDefinitionLog);
+                processDefinition.setId(processDefinitionLog.getId());
             } else {
                 processDefinitionLog.setId(processDefinition.getId());
                 result = processDefineMapper.updateById(processDefinitionLog);
