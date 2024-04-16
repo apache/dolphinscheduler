@@ -59,7 +59,7 @@ public class SSHUtils {
                 throw new Exception("Failed to add public key identity", e);
             }
         }
-        session.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.RESERVED, Duration.ofSeconds(3));
+        session.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(3));
         return session;
     }
 }
