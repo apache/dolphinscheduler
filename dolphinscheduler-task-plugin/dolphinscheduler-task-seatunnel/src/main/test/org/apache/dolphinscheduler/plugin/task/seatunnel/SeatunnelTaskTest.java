@@ -16,7 +16,6 @@
  */
 package org.apache.dolphinscheduler.plugin.task.seatunnel;
 
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.junit.Test;
@@ -43,13 +42,7 @@ public class SeatunnelTaskTest {
         seatunnelParameters.setRawScript(RAW_SCRIPT_2);
         seatunnelTask.setSeatunnelParameters(seatunnelParameters);
         Assertions.assertEquals("/home/seatunnel_9527.json", seatunnelTask.buildCustomConfigCommand());
-
-
-
-
-
     }
-
     private static final String RAW_SCRIPT = "env {\n" +
             "  execution.parallelism = 2\n" +
             "  job.mode = \"BATCH\"\n" +
@@ -74,8 +67,6 @@ public class SeatunnelTaskTest {
             "  Console {\n" +
             "  }\n" +
             "}";
-
-
     private static final String RAW_SCRIPT_2 = "{\n" +
             "  \"env\": {\n" +
             "    \"execution.parallelism\": 2,\n" +
@@ -99,5 +90,4 @@ public class SeatunnelTaskTest {
             "    \"Console\": {}\n" +
             "  }\n" +
             "}";
-
 }
