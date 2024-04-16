@@ -189,7 +189,8 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String formatDetector() {
-        return JSONUtils.checkJsonValid(seatunnelParameters.getRawScript(), false) ? "json" : "conf";
+        return JSONUtils.checkJsonValid(seatunnelParameters.getRawScript(), false) ? Constants.JSON_SUFFIX
+                : Constants.CONF_SUFFIX;
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
