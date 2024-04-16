@@ -49,10 +49,6 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSyntaxException;
-
 @Slf4j
 public class SeatunnelTask extends AbstractRemoteTask {
 
@@ -193,12 +189,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String formatDetector() {
-        try {
-            new Gson().fromJson(seatunnelParameters.getRawScript(), JsonElement.class);
-            return "json";
-        } catch (JsonSyntaxException e) {
-            return "conf";
-        }
+        return JSONUtils.checkJsonValid(seatunnelParameters.getRawScript(), false) ? "json" : "conf";
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {
