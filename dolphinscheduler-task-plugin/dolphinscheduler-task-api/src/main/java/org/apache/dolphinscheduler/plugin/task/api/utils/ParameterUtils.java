@@ -52,6 +52,8 @@ public class ParameterUtils {
 
     private static final char PARAM_REPLACE_CHAR = '?';
 
+    private static final String UNIQUE_QUESTION_MARK = "@@QUESTION_UNIQUE_MARK@@";
+
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
     }
@@ -342,4 +344,21 @@ public class ParameterUtils {
         return userDefParamsMaps;
     }
 
+    /**
+     * use unique mark replace "?" before process
+     * @param sql sql
+     * @return sql without "?"
+     */
+    public static String replaceSqlQuestionMark(String sql){
+        return sql.replaceAll("\\?", UNIQUE_QUESTION_MARK);
+    }
+
+    /**
+     * use "?" replace unique mark after process
+     * @param sql sql
+     * @return recovered sql
+     */
+    public static String recoverSqlQuestionMark(String sql){
+        return sql.replaceAll(UNIQUE_QUESTION_MARK, "?");
+    }
 }

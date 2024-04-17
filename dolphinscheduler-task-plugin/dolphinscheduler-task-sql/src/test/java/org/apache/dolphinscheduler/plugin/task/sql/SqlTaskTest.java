@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
@@ -141,5 +142,31 @@ class SqlTaskTest {
 
     @Test
     void splitSql() {
+    }
+
+    @Test
+    void testReplacingSqlHasQuestionMarkAndParams(){
+        String querySql = "select id, concat('?', year) from student where year=${year} and month=${month} and gender=1";
+        String expected = "select id, concat('@@QUESTION_UNIQUE_MARK@@', year) from student where year=? and month=? and gender=1";
+        Assertions.assertEquals(expected, ParameterUtils.replaceSqlQuestionMark(querySql).replaceAll(sqlTask.rgex, "?"));
+
+        Map<Integer, Property> sqlParamsMap = new HashMap<>();
+        Map<Integer, Property> expectedSQLParamsMap = new HashMap<>();
+        expectedSQLParamsMap.put(1, new Property("year", Direct.IN, DataType.VARCHAR, "1970"));
+        expectedSQLParamsMap.put(2, new Property("month", Direct.IN, DataType.VARCHAR, "12"));
+        Map<String, Property> paramsMap = new HashMap<>();
+        paramsMap.put("year", new Property("year", Direct.IN, DataType.VARCHAR, "1970"));
+        paramsMap.put("month", new Property("month", Direct.IN, DataType.VARCHAR, "12"));
+        sqlTask.setSqlParamsMap(ParameterUtils.replaceSqlQuestionMark(querySql), sqlTask.rgex, sqlParamsMap, paramsMap, 1);
+        Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
+
+        String formatSql = ParameterUtils.replaceSqlQuestionMark(querySql).replaceAll(sqlTask.rgex, "?");
+        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
+        expected = "select id, concat('@@QUESTION_UNIQUE_MARK@@', year) from student where year=? and month=? and gender=1";
+        Assertions.assertEquals(expected, formatSql);
+
+        formatSql = ParameterUtils.recoverSqlQuestionMark(formatSql);
+        expected = "select id, concat('?', year) from student where year=? and month=? and gender=1";
+        Assertions.assertEquals(expected, formatSql);
     }
 }

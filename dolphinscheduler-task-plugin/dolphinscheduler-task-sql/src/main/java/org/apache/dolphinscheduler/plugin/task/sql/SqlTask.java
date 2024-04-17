@@ -454,9 +454,10 @@ public class SqlTask extends AbstractTask {
         String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
-        String formatSql = sql.replaceAll(rgex, "?");
+        // Convert the original question mark to another symbol in advance, and restore the question mark later
+        String formatSql = ParameterUtils.replaceSqlQuestionMark(sql).replaceAll(rgex, "?");
         // Convert the list parameter
-        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
+        formatSql = ParameterUtils.recoverSqlQuestionMark(ParameterUtils.expandListParameter(sqlParamsMap, formatSql));
         sqlBuilder.append(formatSql);
         // print replace sql
         printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
