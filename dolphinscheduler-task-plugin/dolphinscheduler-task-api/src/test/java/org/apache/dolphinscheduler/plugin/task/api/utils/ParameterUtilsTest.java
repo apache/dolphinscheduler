@@ -115,7 +115,7 @@ public class ParameterUtilsTest {
     }
 
     @Test
-    public void testProcessSqlQuestionMark(){
+    public void testProcessSqlQuestionMark() {
         String querySql = "select id, concat('?', name) from test";
         String expected = "select id, concat('@@QUESTION_UNIQUE_MARK@@', name) from test";
         Assertions.assertEquals(ParameterUtils.replaceSqlQuestionMark(querySql), expected);

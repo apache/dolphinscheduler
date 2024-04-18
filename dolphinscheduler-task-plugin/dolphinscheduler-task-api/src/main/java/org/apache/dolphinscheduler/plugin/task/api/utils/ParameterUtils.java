@@ -349,7 +349,7 @@ public class ParameterUtils {
      * @param sql sql
      * @return sql without "?"
      */
-    public static String replaceSqlQuestionMark(String sql){
+    public static String replaceSqlQuestionMark(String sql) {
         return sql.replaceAll("\\?", UNIQUE_QUESTION_MARK);
     }
 
@@ -358,7 +358,7 @@ public class ParameterUtils {
      * @param sql sql
      * @return recovered sql
      */
-    public static String recoverSqlQuestionMark(String sql){
+    public static String recoverSqlQuestionMark(String sql) {
         return sql.replaceAll(UNIQUE_QUESTION_MARK, "?");
     }
 }
