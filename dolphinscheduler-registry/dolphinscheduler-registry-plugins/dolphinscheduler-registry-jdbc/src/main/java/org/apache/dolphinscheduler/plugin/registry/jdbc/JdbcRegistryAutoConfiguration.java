@@ -22,40 +22,56 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockM
 
 import org.apache.ibatis.session.SqlSessionFactory;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.zaxxer.hikari.HikariDataSource;
 
-@Configuration
+@Slf4j
+@Configuration(proxyBeanMethods = false)
+@MapperScan("org.apache.dolphinscheduler.plugin.registry.jdbc.mapper")
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
-public class JdbcRegistryConfiguration {
+@AutoConfigureAfter(MybatisPlusAutoConfiguration.class)
+public class JdbcRegistryAutoConfiguration {
+
+    public JdbcRegistryAutoConfiguration() {
+        log.info("Load JdbcRegistryAutoConfiguration");
+    }
 
     @Bean
-    @ConditionalOnProperty(prefix = "registry.hikari-config", name = "jdbc-url")
-    public SqlSessionFactory jdbcRegistrySqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
+    @ConditionalOnMissingBean
+    public SqlSessionFactory sqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
+        log.info("Initialize jdbcRegistrySqlSessionFactory");
         MybatisSqlSessionFactoryBean sqlSessionFactoryBean = new MybatisSqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(new HikariDataSource(jdbcRegistryProperties.getHikariConfig()));
         return sqlSessionFactoryBean.getObject();
     }
 
     @Bean
-    public SqlSessionTemplate jdbcRegistrySqlSessionTemplate(SqlSessionFactory jdbcRegistrySqlSessionFactory) {
-        jdbcRegistrySqlSessionFactory.getConfiguration().addMapper(JdbcRegistryDataMapper.class);
-        jdbcRegistrySqlSessionFactory.getConfiguration().addMapper(JdbcRegistryLockMapper.class);
+    @ConditionalOnMissingBean
+    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory jdbcRegistrySqlSessionFactory) {
+        log.info("Initialize jdbcRegistrySqlSessionTemplate");
         return new SqlSessionTemplate(jdbcRegistrySqlSessionFactory);
     }
 
     @Bean
     public JdbcRegistryDataMapper jdbcRegistryDataMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryDataMapper.class);
         return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataMapper.class);
     }
 
     @Bean
     public JdbcRegistryLockMapper jdbcRegistryLockMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryLockMapper.class);
         return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryLockMapper.class);
     }
 

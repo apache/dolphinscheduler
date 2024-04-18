@@ -28,12 +28,12 @@ RUN mv /root/apache-dolphinscheduler-*-SNAPSHOT-bin /root/apache-dolphinschedule
 ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
 #Setting install.sh
-COPY .github/workflows/cluster-test/postgresql/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
+COPY .github/workflows/cluster-test/postgresql_with_zookeeper_registry/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
 
 #Setting dolphinscheduler_env.sh
-COPY .github/workflows/cluster-test/postgresql/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
+COPY .github/workflows/cluster-test/postgresql_with_zookeeper_registry/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
 #Deploy
-COPY .github/workflows/cluster-test/postgresql/deploy.sh /root/deploy.sh
+COPY .github/workflows/cluster-test/postgresql_with_zookeeper_registry/deploy.sh /root/deploy.sh
 
 CMD [ "/bin/bash", "/root/deploy.sh" ]
