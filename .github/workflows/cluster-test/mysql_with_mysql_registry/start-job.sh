@@ -18,16 +18,16 @@
 set -euox pipefail
 
 #Start base service containers
-docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-base.yaml up -d
+docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docker-compose-base.yaml up -d
 
-#Build ds postgresql cluster image
-docker build -t jdk8:ds_postgresql_cluster -f .github/workflows/cluster-test/postgresql/Dockerfile .
+#Build ds mysql cluster image
+docker build -t jdk8:ds_mysql_cluster -f .github/workflows/cluster-test/mysql_with_mysql_registry/Dockerfile .
 
-#Start ds postgresql cluster container
-docker-compose -f .github/workflows/cluster-test/postgresql/docker-compose-cluster.yaml up -d
+#Start ds mysql cluster container
+docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docker-compose-cluster.yaml up -d
 
 #Running tests
-/bin/bash .github/workflows/cluster-test/postgresql/running_test.sh
+/bin/bash .github/workflows/cluster-test/mysql_with_mysql_registry/running_test.sh
 
 #Cleanup
 docker rm -f $(docker ps -aq)
