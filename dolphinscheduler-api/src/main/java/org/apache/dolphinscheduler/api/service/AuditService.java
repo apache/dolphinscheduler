@@ -21,8 +21,6 @@ import org.apache.dolphinscheduler.api.dto.AuditDto;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 
-import java.util.List;
-
 /**
  * audit information service
  */
@@ -34,14 +32,6 @@ public interface AuditService {
      * @param auditLog         auditLog
      */
     void addAudit(AuditLog auditLog);
-
-    /**
-     * add audit by list
-     *
-     * @param auditLogList         auditLog list
-     * @param latency             api latency milliseconds
-     */
-    void addAudit(List<AuditLog> auditLogList, long latency);
 
     /**
      * query audit log list
