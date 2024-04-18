@@ -1,6 +1,7 @@
 # Introduction
 
-This module is the jdbc registry plugin module, this plugin will use jdbc as the registry center. Will use the database configuration same as DolphinScheduler in api'yaml default.
+This module is the jdbc registry plugin module, this plugin will use jdbc as the registry center. Will use the database
+configuration same as DolphinScheduler in api'yaml default.
 
 # How to use
 
@@ -22,8 +23,11 @@ registry:
 After do this two steps, you can start your DolphinScheduler cluster, your cluster will use mysql as registry center to
 store server metadata.
 
-NOTE: You need to add `mysql-connector-java.jar` into DS classpath if you use mysql database, since this plugin will not bundle this driver in distribution.
-You can get the detail about <a href="https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/installation/pseudo-cluster">Initialize the Database</a>.
+NOTE: You need to add `mysql-connector-java.jar` into DS classpath if you use mysql database, since this plugin will not
+bundle this driver in distribution.
+You can get the detail
+about <a href="https://dolphinscheduler.apache.org/en-us/docs/3.1.2/guide/installation/pseudo-cluster">Initialize the
+Database</a>.
 
 ## Optional configuration
 

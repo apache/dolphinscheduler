@@ -57,14 +57,6 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
         auditLogMapper.insert(auditLog);
     }
 
-    @Override
-    public void addAudit(List<AuditLog> auditLogList, long latency) {
-        auditLogList.forEach(auditLog -> {
-            auditLog.setLatency(latency);
-            addAudit(auditLog);
-        });
-    }
-
     /**
      * query audit log paging
      *

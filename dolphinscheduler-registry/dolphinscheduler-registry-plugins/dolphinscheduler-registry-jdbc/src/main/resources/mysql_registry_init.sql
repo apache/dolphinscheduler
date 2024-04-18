@@ -15,7 +15,6 @@
  * limitations under the License.
 */
 
-SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `t_ds_jdbc_registry_data`;
 CREATE TABLE `t_ds_jdbc_registry_data`
