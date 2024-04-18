@@ -29,7 +29,7 @@
 useradd dolphinscheduler
 
 # 添加密码
-echo "dolphinscheduler" | passwd --stdin dolphinscheduler
+PASSWORD=$(openssl rand -base64 16) && echo $PASSWORD | passwd --stdin dolphinscheduler && echo -e "\nPassword for dolphinscheduler is: $PASSWORD"
 
 # 配置 sudo 免密
 sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers

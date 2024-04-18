@@ -29,7 +29,7 @@ Create a deployment user, and make sure to configure `sudo` without password. He
 useradd dolphinscheduler
 
 # Add password
-echo "dolphinscheduler" | passwd --stdin dolphinscheduler
+PASSWORD=$(openssl rand -base64 16) && echo $PASSWORD | passwd --stdin dolphinscheduler && echo -e "\nPassword for dolphinscheduler is: $PASSWORD"
 
 # Configure sudo without password
 sed -i '$adolphinscheduler  ALL=(ALL)  NOPASSWD: NOPASSWD: ALL' /etc/sudoers
