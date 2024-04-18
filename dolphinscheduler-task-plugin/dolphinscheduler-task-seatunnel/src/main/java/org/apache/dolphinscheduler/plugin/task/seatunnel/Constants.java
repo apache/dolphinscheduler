@@ -29,5 +29,7 @@ public class Constants {
     public static final String STARTUP_SCRIPT_SPARK = "spark";
     public static final String STARTUP_SCRIPT_FLINK = "flink";
     public static final String STARTUP_SCRIPT_SEATUNNEL = "seatunnel";
+    public static final String JSON_SUFFIX = "json";
+    public static final String CONF_SUFFIX = "conf";
 
 }
