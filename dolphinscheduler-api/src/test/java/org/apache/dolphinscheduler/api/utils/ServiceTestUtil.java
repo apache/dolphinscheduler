@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
+import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.User;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 
@@ -26,5 +29,20 @@ public class ServiceTestUtil {
         byte[] bitArray = new byte[n];
         new Random().nextBytes(bitArray);
         return new String(bitArray, StandardCharsets.UTF_8);
+    }
+
+    private static User getUser(Integer userId, String userName, UserType userType) {
+        User user = new User();
+        user.setUserType(userType);
+        user.setId(userId);
+        user.setUserName(userName);
+        return user;
+    }
+
+    public static User getAdminUser() {
+        return getUser(1, "admin", UserType.ADMIN_USER);
+    }
+    public static User getGeneralUser() {
+        return getUser(10, "user", UserType.GENERAL_USER);
     }
 }
