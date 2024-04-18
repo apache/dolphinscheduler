@@ -459,11 +459,11 @@ A: 1, cd dolphinscheduler-ui and delete node_modules directory
 sudo rm -rf node_modules
 ```
 
-​ 2, install node-sass through npm.taobao.org
+​ 2, install node-sass through npmmirror.com
 
 ```
 sudo npm uninstall node-sass
-sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+sudo npm i node-sass --sass_binary_site=https://npmmirror.com/mirrors/node-sass/
 ```
 
 3, if the 2nd step failure, please, [referer url](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/frontend-development.md)

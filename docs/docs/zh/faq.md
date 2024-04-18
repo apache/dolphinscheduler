@@ -430,11 +430,11 @@ A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录
 sudo rm -rf node_modules
 ```
 
-​ 2，通过 npm.taobao.org 下载 node-sass
+​ 2，通过 npmmirror.com 下载 node-sass
 
 ```
 sudo npm uninstall node-sass
-sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+sudo npm i node-sass --sass_binary_site=https://npmmirror.com/mirrors/node-sass/
 ```
 
 3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/zh/contribute/frontend-development.md)

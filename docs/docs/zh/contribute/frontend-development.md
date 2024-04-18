@@ -33,7 +33,7 @@ Node包下载 (注意版本 v12.20.2) `https://nodejs.org/download/release/v12.2
 > 如果 `npm install` 速度非常慢，你可以设置淘宝镜像
 
 ```
-npm config set registry http://registry.npm.taobao.org/
+npm config set registry http://registry.npmmirror.com/
 ```
 
 - 修改 `dolphinscheduler-ui/.env` 文件中的 `API_BASE`，用于跟后端交互：
