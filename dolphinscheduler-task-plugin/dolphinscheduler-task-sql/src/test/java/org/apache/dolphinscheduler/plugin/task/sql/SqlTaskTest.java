@@ -149,7 +149,8 @@ class SqlTaskTest {
         String querySql =
                 "select id, concat('?', year) from student where year=${year} and month=${month} and gender=1";
         String expected =
-                "select id, concat('@@QUESTION_UNIQUE_MARK@@', year) from student where year=? and month=? and gender=1";
+                "select id, concat('" + ParameterUtils.UNIQUE_QUESTION_MARK
+                        + "', year) from student where year=? and month=? and gender=1";
         Assertions.assertEquals(expected,
                 ParameterUtils.replaceSqlQuestionMark(querySql).replaceAll(sqlTask.rgex, "?"));
 
@@ -167,7 +168,8 @@ class SqlTaskTest {
         String formatSql = ParameterUtils.replaceSqlQuestionMark(querySql).replaceAll(sqlTask.rgex, "?");
         formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
         expected =
-                "select id, concat('@@QUESTION_UNIQUE_MARK@@', year) from student where year=? and month=? and gender=1";
+                "select id, concat('" + ParameterUtils.UNIQUE_QUESTION_MARK
+                        + "', year) from student where year=? and month=? and gender=1";
         Assertions.assertEquals(expected, formatSql);
 
         formatSql = ParameterUtils.recoverSqlQuestionMark(formatSql);

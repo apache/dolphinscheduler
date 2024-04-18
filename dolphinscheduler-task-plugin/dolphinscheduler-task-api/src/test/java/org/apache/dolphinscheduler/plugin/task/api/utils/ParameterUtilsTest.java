@@ -117,10 +117,10 @@ public class ParameterUtilsTest {
     @Test
     public void testProcessSqlQuestionMark() {
         String querySql = "select id, concat('?', name) from test";
-        String expected = "select id, concat('@@QUESTION_UNIQUE_MARK@@', name) from test";
+        String expected = "select id, concat('" + ParameterUtils.UNIQUE_QUESTION_MARK + "', name) from test";
         Assertions.assertEquals(ParameterUtils.replaceSqlQuestionMark(querySql), expected);
 
-        querySql = "select id, concat('@@QUESTION_UNIQUE_MARK@@', name) from test";
+        querySql = "select id, concat('" + ParameterUtils.UNIQUE_QUESTION_MARK + "', name) from test";
         expected = "select id, concat('?', name) from test";
         Assertions.assertEquals(ParameterUtils.recoverSqlQuestionMark(querySql), expected);
     }

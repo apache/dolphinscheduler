@@ -52,7 +52,7 @@ public class ParameterUtils {
 
     private static final char PARAM_REPLACE_CHAR = '?';
 
-    private static final String UNIQUE_QUESTION_MARK = "@@QUESTION_UNIQUE_MARK@@";
+    public static final String UNIQUE_QUESTION_MARK = "@@QUESTION_UNIQUE_MARK@@";
 
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
