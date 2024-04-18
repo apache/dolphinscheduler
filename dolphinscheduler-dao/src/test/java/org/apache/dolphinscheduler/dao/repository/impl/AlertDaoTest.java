@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
+import org.apache.dolphinscheduler.dao.AlertDao;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 
 import java.util.List;
