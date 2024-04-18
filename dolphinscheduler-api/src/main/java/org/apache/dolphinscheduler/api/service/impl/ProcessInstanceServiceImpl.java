@@ -70,11 +70,9 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -178,16 +176,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     UsersService usersService;
 
     @Autowired
-    private TenantMapper tenantMapper;
-
-    @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
-    private TaskPluginManager taskPluginManager;
-
-    @Autowired
-    private ScheduleMapper scheduleMapper;
 
     @Autowired
     private RelationSubWorkflowMapper relationSubWorkflowMapper;
@@ -725,7 +714,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-            if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+            if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                     .taskType(taskDefinitionLog.getTaskType())
                     .taskParams(taskDefinitionLog.getTaskParams())
                     .dependence(taskDefinitionLog.getDependence())

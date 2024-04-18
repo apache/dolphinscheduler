@@ -18,41 +18,42 @@
  *
  */
 
-package org.apache.dolphinscheduler.dao.plugin.postgresql;
+package org.apache.dolphinscheduler.dao.plugin.h2;
 
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
-import org.apache.dolphinscheduler.dao.plugin.postgresql.dialect.PostgresqlDialect;
-import org.apache.dolphinscheduler.dao.plugin.postgresql.monitor.PostgresqlMonitor;
+import org.apache.dolphinscheduler.dao.plugin.h2.dialect.H2Dialect;
+import org.apache.dolphinscheduler.dao.plugin.h2.monitor.H2Monitor;
 
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 
-@Profile("postgresql")
-@Configuration
-public class PostgresqlDaoPluginConfiguration implements DaoPluginConfiguration {
+@Conditional(H2DatabaseEnvironmentCondition.class)
+@Configuration(proxyBeanMethods = false)
+public class H2DaoPluginAutoConfiguration implements DaoPluginConfiguration {
 
     @Autowired
     private DataSource dataSource;
 
     @Override
     public DbType dbType() {
-        return DbType.POSTGRE_SQL;
+        return DbType.H2;
     }
 
     @Override
     public DatabaseMonitor databaseMonitor() {
-        return new PostgresqlMonitor(dataSource);
+        return new H2Monitor(dataSource);
     }
 
     @Override
     public DatabaseDialect databaseDialect() {
-        return new PostgresqlDialect(dataSource);
+        return new H2Dialect();
     }
+
 }
