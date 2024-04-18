@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.audit.operator;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.service.AuditService;
@@ -31,12 +32,11 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
+import io.swagger.v3.oas.annotations.Operation;
 
 @Service
 @Slf4j
@@ -46,26 +46,27 @@ public abstract class BaseAuditOperator implements AuditOperator {
     private AuditService auditService;
 
     @Override
-    public Object recordAudit(ProceedingJoinPoint point, String describe, AuditType auditType) throws Throwable {
-        long beginTime = System.currentTimeMillis();
+    public void recordAudit(Map<String, Object> paramsMap,
+                            Result<?> result,
+                            long latency,
+                            Operation operation,
+                            OperatorLog operatorLog) {
 
-        MethodSignature signature = (MethodSignature) point.getSignature();
-        Map<String, Object> paramsMap = OperatorUtils.getParamsMap(point, signature);
+        AuditType auditType = operatorLog.auditType();
 
         User user = OperatorUtils.getUser(paramsMap);
 
         if (user == null) {
             log.error("user is null");
-            return point.proceed();
+            return;
         }
 
-        List<AuditLog> auditLogList = OperatorUtils.buildAuditLogList(describe, auditType, user);
+        List<AuditLog> auditLogList = OperatorUtils.buildAuditLogList(operation.description(), auditType, user);
         setRequestParam(auditType, auditLogList, paramsMap);
 
-        Result<?> result = (Result<?>) point.proceed();
         if (OperatorUtils.resultFail(result)) {
             log.error("request fail, code {}", result.getCode());
-            return result;
+            return;
         }
 
         setObjectIdentityFromReturnObject(auditType, result, auditLogList);
@@ -73,10 +74,9 @@ public abstract class BaseAuditOperator implements AuditOperator {
         modifyAuditOperationType(auditType, paramsMap, auditLogList);
         modifyAuditObjectType(auditType, paramsMap, auditLogList);
 
-        long latency = System.currentTimeMillis() - beginTime;
-        auditService.addAudit(auditLogList, latency);
+        auditLogList.forEach(auditLog -> auditLog.setLatency(latency));
+        auditLogList.forEach(auditLog -> auditService.addAudit(auditLog));
 
-        return result;
     }
 
     protected void setRequestParam(AuditType auditType, List<AuditLog> auditLogList, Map<String, Object> paramsMap) {

@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.api.audit;
 
 import org.apache.dolphinscheduler.api.audit.operator.AuditOperator;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,8 +56,18 @@ public class OperatorLogAspect {
             log.warn("Operation is null of method: {}", method.getName());
             return point.proceed();
         }
+        long beginTime = System.currentTimeMillis();
 
-        AuditOperator operator = SpringApplicationContext.getBean(operatorLog.auditType().getOperatorClass());
-        return operator.recordAudit(point, operation.description(), operatorLog.auditType());
+        Map<String, Object> paramsMap = OperatorUtils.getParamsMap(point, signature);
+        Result<?> result = (Result<?>) point.proceed();
+        try {
+            AuditOperator operator = SpringApplicationContext.getBean(operatorLog.auditType().getOperatorClass());
+            long latency = System.currentTimeMillis() - beginTime;
+            operator.recordAudit(paramsMap, result, latency, operation, operatorLog);
+        } catch (Throwable throwable) {
+            log.error("Record audit log error", throwable);
+        }
+
+        return result;
     }
 }

@@ -17,11 +17,18 @@
 
 package org.apache.dolphinscheduler.api.audit.operator;
 
-import org.apache.dolphinscheduler.api.audit.enums.AuditType;
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.utils.Result;
 
-import org.aspectj.lang.ProceedingJoinPoint;
+import java.util.Map;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 public interface AuditOperator {
 
-    Object recordAudit(ProceedingJoinPoint point, String describe, AuditType auditType) throws Throwable;
+    void recordAudit(Map<String, Object> paramsMap,
+                     Result<?> result,
+                     long latency,
+                     Operation operation,
+                     OperatorLog operatorLog) throws Throwable;
 }

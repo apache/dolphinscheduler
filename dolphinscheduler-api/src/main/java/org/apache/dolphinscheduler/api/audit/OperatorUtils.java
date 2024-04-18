@@ -66,7 +66,6 @@ public class OperatorUtils {
         auditLog.setOperationType(auditType.getAuditOperationType().getName());
         auditLog.setDescription(apiDescription);
         auditLog.setCreateTime(new Date());
-        auditLogList.add(auditLog);
 
         return auditLogList;
     }
