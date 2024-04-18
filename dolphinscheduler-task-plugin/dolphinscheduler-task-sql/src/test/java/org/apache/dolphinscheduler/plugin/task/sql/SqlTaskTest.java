@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -33,6 +34,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.google.common.collect.Lists;
 
 class SqlTaskTest {
 
@@ -147,33 +150,26 @@ class SqlTaskTest {
     @Test
     void testReplacingSqlHasQuestionMarkAndParams() {
         String querySql =
-                "select id, concat('?', year) from student where year=${year} and month=${month} and gender=1";
+                "select id, concat('?', year) from student where year=${year} and month=${month} and gender in ('${gender}')";
         String expected =
-                "select id, concat('" + ParameterUtils.UNIQUE_QUESTION_MARK
-                        + "', year) from student where year=? and month=? and gender=1";
-        Assertions.assertEquals(expected,
-                ParameterUtils.replaceSqlQuestionMark(querySql).replaceAll(sqlTask.rgex, "?"));
+                "select id, concat('?', year) from student where year=? and month=? and gender in (?,?)";
 
         Map<Integer, Property> sqlParamsMap = new HashMap<>();
         Map<Integer, Property> expectedSQLParamsMap = new HashMap<>();
         expectedSQLParamsMap.put(1, new Property("year", Direct.IN, DataType.VARCHAR, "1970"));
         expectedSQLParamsMap.put(2, new Property("month", Direct.IN, DataType.VARCHAR, "12"));
+        expectedSQLParamsMap.put(3,
+                new Property("gender", Direct.IN, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList(1, 2))));
         Map<String, Property> paramsMap = new HashMap<>();
         paramsMap.put("year", new Property("year", Direct.IN, DataType.VARCHAR, "1970"));
         paramsMap.put("month", new Property("month", Direct.IN, DataType.VARCHAR, "12"));
-        sqlTask.setSqlParamsMap(ParameterUtils.replaceSqlQuestionMark(querySql), sqlTask.rgex, sqlParamsMap, paramsMap,
-                1);
+        paramsMap.put("gender",
+                new Property("gender", Direct.IN, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList(1, 2))));
+        sqlTask.setSqlParamsMap(querySql, sqlTask.rgex, sqlParamsMap, paramsMap, 1);
         Assertions.assertEquals(sqlParamsMap, expectedSQLParamsMap);
 
-        String formatSql = ParameterUtils.replaceSqlQuestionMark(querySql).replaceAll(sqlTask.rgex, "?");
-        formatSql = ParameterUtils.expandListParameter(sqlParamsMap, formatSql);
-        expected =
-                "select id, concat('" + ParameterUtils.UNIQUE_QUESTION_MARK
-                        + "', year) from student where year=? and month=? and gender=1";
-        Assertions.assertEquals(expected, formatSql);
-
-        formatSql = ParameterUtils.recoverSqlQuestionMark(formatSql);
-        expected = "select id, concat('?', year) from student where year=? and month=? and gender=1";
+        String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, querySql, sqlTask.rgex);
+        Assertions.assertEquals(4, sqlParamsMap.size());
         Assertions.assertEquals(expected, formatSql);
     }
 }

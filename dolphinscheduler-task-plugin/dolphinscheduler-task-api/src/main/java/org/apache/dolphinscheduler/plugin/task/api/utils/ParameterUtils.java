@@ -52,8 +52,6 @@ public class ParameterUtils {
 
     private static final char PARAM_REPLACE_CHAR = '?';
 
-    public static final String UNIQUE_QUESTION_MARK = "@@QUESTION_UNIQUE_MARK@@";
-
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
     }
@@ -189,29 +187,33 @@ public class ParameterUtils {
         return property != null && DataType.BOOLEAN.equals(property.getType());
     }
 
-    public static String expandListParameter(Map<Integer, Property> params, String sql) {
+    public static String expandListParameter(Map<Integer, Property> params, String sql, String regex) {
         Map<Integer, Property> expandMap = new HashMap<>();
         if (params == null || params.isEmpty()) {
             return sql;
         }
-        String[] split = sql.split("\\?");
-        if (split.length == 0) {
-            return sql;
-        }
-        StringBuilder ret = new StringBuilder(split[0]);
+        StringBuilder ret = new StringBuilder(sql);
+        Pattern pattern = Pattern.compile(regex);
+        Matcher m = pattern.matcher(sql);
         int index = 1;
-        for (int i = 1; i < split.length; i++) {
-            Property property = params.get(i);
+        int paramsIndex = 1;
+        // When matching with a regex, determine whether the corresponding property is a list.
+        while (m.find()) {
+            Property property = params.get(paramsIndex++);
+            if (property == null) {
+                continue;
+            }
             String value = property.getValue();
+            StringBuilder tempReplace = new StringBuilder();
             if (DataType.LIST.equals(property.getType())) {
                 List<Object> valueList = JSONUtils.toList(value, Object.class);
                 if (valueList.isEmpty() && StringUtils.isNotBlank(value)) {
                     valueList.add(value);
                 }
                 for (int j = 0; j < valueList.size(); j++) {
-                    ret.append(PARAM_REPLACE_CHAR);
+                    tempReplace.append(PARAM_REPLACE_CHAR);
                     if (j != valueList.size() - 1) {
-                        ret.append(",");
+                        tempReplace.append(",");
                     }
                 }
                 for (Object v : valueList) {
@@ -233,14 +235,12 @@ public class ParameterUtils {
                     expandMap.put(index++, newProperty);
                 }
             } else {
-                ret.append(PARAM_REPLACE_CHAR);
+                tempReplace.append(PARAM_REPLACE_CHAR);
                 expandMap.put(index++, property);
             }
-            ret.append(split[i]);
-        }
-        if (PARAM_REPLACE_CHAR == sql.charAt(sql.length() - 1)) {
-            ret.append(PARAM_REPLACE_CHAR);
-            expandMap.put(index, params.get(split.length));
+            ret.replace(m.start(), m.end(), tempReplace.toString());
+            // After replacement, the string length will change, so a reset is required
+            m.reset(ret.toString());
         }
         params.clear();
         params.putAll(expandMap);
@@ -342,23 +342,5 @@ public class ParameterUtils {
             }
         }
         return userDefParamsMaps;
-    }
-
-    /**
-     * use unique mark replace "?" before process
-     * @param sql sql
-     * @return sql without "?"
-     */
-    public static String replaceSqlQuestionMark(String sql) {
-        return sql.replaceAll("\\?", UNIQUE_QUESTION_MARK);
-    }
-
-    /**
-     * use "?" replace unique mark after process
-     * @param sql sql
-     * @return recovered sql
-     */
-    public static String recoverSqlQuestionMark(String sql) {
-        return sql.replaceAll(UNIQUE_QUESTION_MARK, "?");
     }
 }
