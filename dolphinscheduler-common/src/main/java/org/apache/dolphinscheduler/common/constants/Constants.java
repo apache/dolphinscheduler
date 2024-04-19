@@ -747,4 +747,8 @@ public final class Constants {
      * K8S sensitive param
      */
     public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
+
+    public static final String RELEASE_STATE = "releaseState";
+    public static final String EXECUTE_TYPE = "executeType";
+
 }
