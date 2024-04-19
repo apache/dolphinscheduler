@@ -14,16 +14,15 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ## Install DolphinScheduler
 
-Please download the source code package `apache-dolphinscheduler-<version>-src.tar.gz`, download address: [download address](https://dolphinscheduler.apache.org/en-us/download)
-
-To publish the release name `dolphinscheduler` version, please execute the following commands:
-
-```
-$ tar -zxvf apache-dolphinscheduler-<version>-src.tar.gz
-$ cd apache-dolphinscheduler-<version>-src/deploy/kubernetes/dolphinscheduler
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm dependency update .
-$ helm install dolphinscheduler . --set image.tag=<version>
+```bash
+# Choose the corresponding version yourself
+export VERSION=3.2.1
+helm pull oci://registry-1.docker.io/apache/dolphinscheduler-helm --version ${VERSION}
+tar -xvf dolphinscheduler-helm-${VERSION}.tgz
+cd dolphinscheduler-helm
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm dependency update .
+helm install dolphinscheduler .
 ```
 
 To publish the release name `dolphinscheduler` version to `test` namespace:
