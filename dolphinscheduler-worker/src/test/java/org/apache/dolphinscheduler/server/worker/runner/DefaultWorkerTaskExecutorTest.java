@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.server.worker.runner;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -40,8 +39,6 @@ public class DefaultWorkerTaskExecutorTest {
 
     private WorkerMessageSender workerMessageSender = Mockito.mock(WorkerMessageSender.class);
 
-    private TaskPluginManager taskPluginManager = Mockito.mock(TaskPluginManager.class);
-
     private StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
 
     private WorkerRegistryClient workerRegistryClient = Mockito.mock(WorkerRegistryClient.class);
@@ -58,7 +55,6 @@ public class DefaultWorkerTaskExecutorTest {
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                taskPluginManager,
                 storageOperate,
                 workerRegistryClient);
 
@@ -82,7 +78,6 @@ public class DefaultWorkerTaskExecutorTest {
                 taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                taskPluginManager,
                 storageOperate,
                 workerRegistryClient);
 
