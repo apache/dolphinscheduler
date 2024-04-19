@@ -70,7 +70,6 @@ public abstract class BaseAuditOperator implements AuditOperator {
 
         auditLogList.forEach(auditLog -> auditLog.setLatency(latency));
         auditLogList.forEach(auditLog -> auditService.addAudit(auditLog));
-        OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
     }
 
     @Override

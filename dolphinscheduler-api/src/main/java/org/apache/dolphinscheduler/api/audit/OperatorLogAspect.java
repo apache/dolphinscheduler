@@ -86,21 +86,22 @@ public class OperatorLogAspect {
 
     @AfterReturning(value = "logPointCut()", returning = "returnValue")
     public void afterReturn(JoinPoint jp, Object returnValue) {
-        AuditContext auditContext = AuditLocalContent.getAuditThreadLocal().get();
-        if (auditContext == null) {
-            return;
-        }
-
         try {
+            AuditContext auditContext = AuditLocalContent.getAuditThreadLocal().get();
+            if (auditContext == null) {
+                return;
+            }
             auditContext.getOperator().recordAudit(returnValue);
         } catch (Throwable throwable) {
             log.error("Record audit log error", throwable);
+        } finally {
+            OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
         }
     }
 
     public static final class AuditLocalContent {
 
-        public static final ThreadLocal<AuditContext> auditThreadLocal = new ThreadLocal<>();
+        private static final ThreadLocal<AuditContext> auditThreadLocal = new ThreadLocal<>();
 
         public static ThreadLocal<AuditContext> getAuditThreadLocal() {
             return auditThreadLocal;
