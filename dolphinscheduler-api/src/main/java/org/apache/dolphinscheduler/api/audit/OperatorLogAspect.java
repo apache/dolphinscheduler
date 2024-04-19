@@ -85,7 +85,7 @@ public class OperatorLogAspect {
     }
 
     @AfterReturning(value = "logPointCut()", returning = "returnValue")
-    public void around(JoinPoint jp, Object returnValue) {
+    public void afterReturn(JoinPoint jp, Object returnValue) {
         AuditContext auditContext = AuditLocalContent.getAuditThreadLocal().get();
         if (auditContext == null) {
             return;
