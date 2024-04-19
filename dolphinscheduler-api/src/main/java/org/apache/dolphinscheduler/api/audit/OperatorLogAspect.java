@@ -52,7 +52,7 @@ public class OperatorLogAspect {
     }
 
     @Before("logPointCut()")
-    public void Before(JoinPoint point) {
+    public void before(JoinPoint point) {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
         OperatorLog operatorLog = method.getAnnotation(OperatorLog.class);
