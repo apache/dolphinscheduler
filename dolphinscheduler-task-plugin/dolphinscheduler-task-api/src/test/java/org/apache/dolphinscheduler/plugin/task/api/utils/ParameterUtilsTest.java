@@ -39,10 +39,6 @@ import com.google.common.collect.Lists;
 
 public class ParameterUtilsTest {
 
-    private String groupName1 = "paramName1";
-    private String groupName2 = "paramName2";
-    private String rgex = String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", groupName1, groupName2);
-
     @Test
     public void expandListParameter() {
 
@@ -54,7 +50,7 @@ public class ParameterUtilsTest {
         params.put(3, new Property("col2", Direct.IN, DataType.LIST,
                 JSONUtils.toJsonString(Lists.newArrayList(3.1415, 2.44, 3.44))));
         String sql = ParameterUtils.expandListParameter(params,
-                "select * from test where col1 in ('${col1}') and date='${date}' and col2 in ('${col2}')", rgex);
+                "select * from test where col1 in ('${col1}') and date='${date}' and col2 in ('${col2}')");
         Assertions.assertEquals("select * from test where col1 in (?,?,?) and date=? and col2 in (?,?,?)", sql);
         Assertions.assertEquals(7, params.size());
 
@@ -63,7 +59,7 @@ public class ParameterUtilsTest {
                 new Property("col1", Direct.IN, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1"))));
         params2.put(2, new Property("date", Direct.IN, DataType.DATE, "2020-06-30"));
         String sql2 = ParameterUtils.expandListParameter(params2,
-                "select * from test where col1 in ('${col}') and date='${date}'", rgex);
+                "select * from test where col1 in ('${col}') and date='${date}'");
         Assertions.assertEquals("select * from test where col1 in (?) and date=?", sql2);
         Assertions.assertEquals(2, params2.size());
 

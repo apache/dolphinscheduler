@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.constants.DateConstants;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
 
@@ -438,5 +439,14 @@ public class TaskConstants {
 
     // Loop task constants
     public static final Duration DEFAULT_LOOP_STATUS_INTERVAL = Duration.ofSeconds(5L);
+
+    /**
+     * sql params regex
+     */
+    public static final String GROUP_NAME1 = "paramName1";
+    public static final String GROUP_NAME2 = "paramName2";
+    public static final String SQL_PARAMS_REGEX =
+            String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", GROUP_NAME1, GROUP_NAME2);
+    public static final Pattern SQL_PARAMS_PATTERN = Pattern.compile(SQL_PARAMS_REGEX);
 
 }

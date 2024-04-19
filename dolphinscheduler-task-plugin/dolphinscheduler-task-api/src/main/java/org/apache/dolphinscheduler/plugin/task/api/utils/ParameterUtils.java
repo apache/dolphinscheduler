@@ -52,6 +52,11 @@ public class ParameterUtils {
 
     private static final char PARAM_REPLACE_CHAR = '?';
 
+    private static final String PARAM_REGEX =
+            String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", "paramName1", "paramName2");
+
+    private static final Pattern PARAM_REGEX_PATTERN = Pattern.compile(PARAM_REGEX);
+
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
     }
@@ -187,14 +192,13 @@ public class ParameterUtils {
         return property != null && DataType.BOOLEAN.equals(property.getType());
     }
 
-    public static String expandListParameter(Map<Integer, Property> params, String sql, String regex) {
+    public static String expandListParameter(Map<Integer, Property> params, String sql) {
         Map<Integer, Property> expandMap = new HashMap<>();
         if (params == null || params.isEmpty()) {
             return sql;
         }
         StringBuilder ret = new StringBuilder(sql);
-        Pattern pattern = Pattern.compile(regex);
-        Matcher m = pattern.matcher(sql);
+        Matcher m = PARAM_REGEX_PATTERN.matcher(sql);
         int index = 1;
         int paramsIndex = 1;
         // When matching with a regex, determine whether the corresponding property is a list.

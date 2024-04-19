@@ -449,17 +449,16 @@ public class SqlTask extends AbstractTask {
         }
 
         // special characters need to be escaped, ${} needs to be escaped
-        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
+        setSqlParamsMap(sql, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
         // Replace the original value in sql ！{...} ，Does not participate in precompilation
         String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
         sql = replaceOriginalValue(sql, rgexo, paramsMap);
         // replace the ${} of the SQL statement with the Placeholder
-        // String formatSql = sql.replaceAll(rgex, "?");
         // Convert the list parameter
-        String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql, rgex);
+        String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql);
         sqlBuilder.append(formatSql);
         // print replace sql
-        printReplacedSql(sql, formatSql, rgex, sqlParamsMap);
+        printReplacedSql(sql, formatSql, TaskConstants.SQL_PARAMS_REGEX, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 
