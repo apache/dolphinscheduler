@@ -30,6 +30,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
@@ -37,6 +38,7 @@ import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Slf4j
+@ComponentScan
 @Configuration(proxyBeanMethods = false)
 @MapperScan("org.apache.dolphinscheduler.plugin.registry.jdbc.mapper")
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")

@@ -15,24 +15,34 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.scheduler.quartz;
+package org.apache.dolphinscheduler.plugin.registry.etcd;
 
-import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.registry.api.Registry;
 
-import org.quartz.Scheduler;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import javax.net.ssl.SSLException;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-@AutoConfiguration(after = {QuartzAutoConfiguration.class})
-@ConditionalOnClass(value = Scheduler.class)
-public class QuartzSchedulerConfiguration {
+@Slf4j
+@ComponentScan
+@Configuration(proxyBeanMethods = false)
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "etcd")
+public class EtcdRegistryAutoConfiguration {
+
+    public EtcdRegistryAutoConfiguration() {
+        log.info("Load EtcdRegistryAutoConfiguration");
+    }
 
     @Bean
-    @ConditionalOnMissingBean
-    public SchedulerApi schedulerApi(Scheduler scheduler) {
-        return new QuartzScheduler(scheduler);
+    @ConditionalOnMissingBean(value = Registry.class)
+    public EtcdRegistry etcdRegistry(EtcdRegistryProperties etcdRegistryProperties) throws SSLException {
+        return new EtcdRegistry(etcdRegistryProperties);
     }
+
 }
