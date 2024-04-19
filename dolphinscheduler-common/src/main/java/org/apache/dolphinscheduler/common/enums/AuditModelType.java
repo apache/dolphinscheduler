@@ -29,7 +29,7 @@ import lombok.Getter;
 @Getter
 public enum AuditModelType {
 
-    PROJECT("Project", null), // 1
+    PROJECT("Project", null),
     PROCESS("Process", PROJECT),
     PROCESS_INSTANCE("ProcessInstance", PROCESS),
     TASK("Task", PROCESS),

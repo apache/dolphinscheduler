@@ -105,8 +105,6 @@ import com.google.common.collect.Lists;
 @Slf4j
 public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
 
-    private static final String RELEASESTATE = "releaseState";
-
     @Autowired
     private ProjectMapper projectMapper;
 
@@ -1297,7 +1295,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         if (null == releaseState) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(code);
@@ -1337,7 +1335,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 break;
             default:
                 log.warn("Parameter releaseState is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
                 return result;
         }
         int update = taskDefinitionMapper.updateById(taskDefinition);
