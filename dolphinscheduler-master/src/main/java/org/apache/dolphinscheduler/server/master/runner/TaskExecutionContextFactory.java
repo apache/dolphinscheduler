@@ -91,9 +91,6 @@ public class TaskExecutionContextFactory {
     private ProcessService processService;
 
     @Autowired
-    private TaskPluginManager taskPluginManager;
-
-    @Autowired
     private CuringParamsService curingParamsService;
 
     @Autowired
@@ -106,14 +103,14 @@ public class TaskExecutionContextFactory {
         ProcessInstance workflowInstance = taskInstance.getProcessInstance();
 
         ResourceParametersHelper resources =
-                Optional.ofNullable(taskPluginManager.getTaskChannel(taskInstance.getTaskType()))
+                Optional.ofNullable(TaskPluginManager.getTaskChannel(taskInstance.getTaskType()))
                         .map(taskChannel -> taskChannel.getResources(taskInstance.getTaskParams()))
                         .orElse(null);
         setTaskResourceInfo(resources);
 
         Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(workflowInstance);
 
-        AbstractParameters baseParam = taskPluginManager.getParameters(ParametersNode.builder()
+        AbstractParameters baseParam = TaskPluginManager.getParameters(ParametersNode.builder()
                 .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
         Map<String, Property> propertyMap =
                 curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance);

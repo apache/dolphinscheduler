@@ -20,7 +20,8 @@
 
 package org.apache.dolphinscheduler.meter;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.apache.dolphinscheduler.meter.metrics.DefaultMetricsProvider;
+
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,11 +43,15 @@ import io.micrometer.core.instrument.MeterRegistry;
  *     }
  * </pre>
  */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 @EnableAspectJAutoProxy
-@EnableAutoConfiguration
 @ConditionalOnProperty(prefix = "metrics", name = "enabled", havingValue = "true")
-public class MeterConfiguration {
+public class MeterAutoConfiguration {
+
+    @Bean
+    public DefaultMetricsProvider metricsProvider(MeterRegistry meterRegistry) {
+        return new DefaultMetricsProvider(meterRegistry);
+    }
 
     @Bean
     public TimedAspect timedAspect(MeterRegistry registry) {

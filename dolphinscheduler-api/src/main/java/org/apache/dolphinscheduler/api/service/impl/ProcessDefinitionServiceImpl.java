@@ -239,9 +239,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     private DataSourceMapper dataSourceMapper;
 
     @Autowired
-    private TaskPluginManager taskPluginManager;
-
-    @Autowired
     private WorkFlowLineageService workFlowLineageService;
 
     @Autowired
@@ -424,7 +421,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             }
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                         .taskType(taskDefinitionLog.getTaskType())
                         .taskParams(taskDefinitionLog.getTaskParams())
                         .dependence(taskDefinitionLog.getDependence())
@@ -1618,7 +1615,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             // check whether the process definition json is normal
             for (TaskNode taskNode : taskNodes) {
-                if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+                if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                         .taskType(taskNode.getType())
                         .taskParams(taskNode.getTaskParams())
                         .dependence(taskNode.getDependence())

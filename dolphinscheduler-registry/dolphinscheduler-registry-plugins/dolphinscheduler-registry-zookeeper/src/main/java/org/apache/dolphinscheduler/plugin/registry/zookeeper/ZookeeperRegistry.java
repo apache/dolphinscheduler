@@ -50,14 +50,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.base.Strings;
 
-@Component
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
+@Slf4j
 public final class ZookeeperRegistry implements Registry {
 
     private final ZookeeperRegistryProperties.ZookeeperProperties properties;

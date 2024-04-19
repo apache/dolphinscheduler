@@ -19,11 +19,8 @@ package org.apache.dolphinscheduler.meter.metrics;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
-import org.springframework.stereotype.Component;
-
 import io.micrometer.core.instrument.MeterRegistry;
 
-@Component
 public class DefaultMetricsProvider implements MetricsProvider {
 
     private final MeterRegistry meterRegistry;

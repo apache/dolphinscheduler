@@ -111,7 +111,6 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -261,9 +260,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
-
-    @Autowired
-    private TaskPluginManager taskPluginManager;
 
     @Autowired
     private ClusterMapper clusterMapper;
