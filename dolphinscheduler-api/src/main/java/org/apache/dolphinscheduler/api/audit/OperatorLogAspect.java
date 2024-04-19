@@ -34,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
@@ -85,7 +86,7 @@ public class OperatorLogAspect {
     }
 
     @AfterReturning(value = "logPointCut()", returning = "returnValue")
-    public void afterReturn(JoinPoint jp, Object returnValue) {
+    public void afterReturning(Object returnValue) {
         try {
             AuditContext auditContext = AuditLocalContent.getAuditThreadLocal().get();
             if (auditContext == null) {
@@ -97,6 +98,11 @@ public class OperatorLogAspect {
         } finally {
             OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
         }
+    }
+
+    @AfterThrowing("logPointCut()")
+    public void afterThrowing() {
+        OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
     }
 
     public static final class AuditLocalContent {
