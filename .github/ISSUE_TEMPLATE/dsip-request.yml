@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-name: Feature request
+name: DSIP
 description: Suggest an idea for this project
 title: "[DSIP-][Module Name] DSIP title"
 labels: [ "DSIP", "Waiting for reply" ]
