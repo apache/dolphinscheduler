@@ -14,16 +14,15 @@ Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务
 
 ## 安装 dolphinscheduler
 
-请下载源码包 apache-dolphinscheduler-<version>-src.tar.gz，下载地址: [下载](https://dolphinscheduler.apache.org/zh-cn/download)
-
-发布一个名为 `dolphinscheduler` 的版本(release)，请执行以下命令：
-
-```
-$ tar -zxvf apache-dolphinscheduler-<version>-src.tar.gz
-$ cd apache-dolphinscheduler-<version>-src/deploy/kubernetes/dolphinscheduler
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm dependency update .
-$ helm install dolphinscheduler . --set image.tag=<version>
+```bash
+# 自行选择对应的版本
+export VERSION=3.2.1
+helm pull oci://registry-1.docker.io/apache/dolphinscheduler-helm --version ${VERSION}
+tar -xvf dolphinscheduler-helm-${VERSION}.tgz
+cd dolphinscheduler-helm
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm dependency update .
+helm install dolphinscheduler .
 ```
 
 将名为 `dolphinscheduler` 的版本(release) 发布到 `test` 的命名空间中：
