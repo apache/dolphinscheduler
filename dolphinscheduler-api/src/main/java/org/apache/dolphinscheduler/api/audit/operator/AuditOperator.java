@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.audit.operator;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLogAspect;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 
@@ -25,7 +26,7 @@ import java.util.Map;
 
 public interface AuditOperator {
 
-    void recordAudit(Object returnValue) throws Throwable;
+    void recordAudit(OperatorLogAspect.AuditContext auditContext, Object returnValue);
 
     void setRequestParam(AuditType auditType, List<AuditLog> auditLogList, Map<String, Object> paramsMap);
 }

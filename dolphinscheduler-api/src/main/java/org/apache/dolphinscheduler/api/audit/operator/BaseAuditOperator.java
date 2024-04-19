@@ -45,7 +45,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
     private AuditService auditService;
 
     @Override
-    public void recordAudit(Object returnValue) {
+    public void recordAudit(OperatorLogAspect.AuditContext auditContext, Object returnValue) {
         Result<?> result = new Result<>();
 
         if (returnValue instanceof Result) {
@@ -56,7 +56,6 @@ public abstract class BaseAuditOperator implements AuditOperator {
             }
         }
 
-        OperatorLogAspect.AuditContext auditContext = OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().get();
         long latency = System.currentTimeMillis() - auditContext.getBeginTime();
         List<AuditLog> auditLogList = auditContext.getAuditLogList();
 

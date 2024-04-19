@@ -48,6 +48,8 @@ import io.swagger.v3.oas.annotations.Operation;
 @Component
 public class OperatorLogAspect {
 
+    private static final ThreadLocal<AuditContext> auditThreadLocal = new ThreadLocal<>();
+
     @Pointcut("@annotation(org.apache.dolphinscheduler.api.audit.OperatorLog)")
     public void logPointCut() {
     }
@@ -79,7 +81,7 @@ public class OperatorLogAspect {
             operator.setRequestParam(auditType, auditLogList, paramsMap);
             AuditContext auditContext =
                     new AuditContext(auditLogList, paramsMap, operatorLog, System.currentTimeMillis(), operator);
-            AuditLocalContent.getAuditThreadLocal().set(auditContext);
+            auditThreadLocal.set(auditContext);
         } catch (Throwable throwable) {
             log.error("Record audit log error", throwable);
         }
@@ -88,30 +90,21 @@ public class OperatorLogAspect {
     @AfterReturning(value = "logPointCut()", returning = "returnValue")
     public void afterReturning(Object returnValue) {
         try {
-            AuditContext auditContext = AuditLocalContent.getAuditThreadLocal().get();
+            AuditContext auditContext = auditThreadLocal.get();
             if (auditContext == null) {
                 return;
             }
-            auditContext.getOperator().recordAudit(returnValue);
+            auditContext.getOperator().recordAudit(auditContext, returnValue);
         } catch (Throwable throwable) {
             log.error("Record audit log error", throwable);
         } finally {
-            OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
+            auditThreadLocal.remove();
         }
     }
 
     @AfterThrowing("logPointCut()")
     public void afterThrowing() {
-        OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
-    }
-
-    public static final class AuditLocalContent {
-
-        private static final ThreadLocal<AuditContext> auditThreadLocal = new ThreadLocal<>();
-
-        public static ThreadLocal<AuditContext> getAuditThreadLocal() {
-            return auditThreadLocal;
-        }
+        auditThreadLocal.remove();
     }
 
     @Getter
