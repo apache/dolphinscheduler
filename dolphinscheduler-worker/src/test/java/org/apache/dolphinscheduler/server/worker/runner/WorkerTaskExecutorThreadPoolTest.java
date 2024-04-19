@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -68,7 +67,7 @@ class WorkerTaskExecutorThreadPoolTest {
 
         protected MockWorkerTaskExecutor(Runnable runnable) {
             super(TaskExecutionContext.builder().taskInstanceId((int) System.nanoTime()).build(), new WorkerConfig(),
-                    new WorkerMessageSender(), new TaskPluginManager(), new StorageOperate() {
+                    new WorkerMessageSender(), new StorageOperate() {
 
                         @Override
                         public void createTenantDirIfNotExists(String tenantCode) {

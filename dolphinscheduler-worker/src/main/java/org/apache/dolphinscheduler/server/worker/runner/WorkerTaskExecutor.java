@@ -75,7 +75,6 @@ public abstract class WorkerTaskExecutor implements Runnable {
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
     protected final WorkerMessageSender workerMessageSender;
-    protected final TaskPluginManager taskPluginManager;
     protected final @Nullable StorageOperate storageOperate;
     protected final WorkerRegistryClient workerRegistryClient;
 
@@ -85,13 +84,11 @@ public abstract class WorkerTaskExecutor implements Runnable {
                                  @NonNull TaskExecutionContext taskExecutionContext,
                                  @NonNull WorkerConfig workerConfig,
                                  @NonNull WorkerMessageSender workerMessageSender,
-                                 @NonNull TaskPluginManager taskPluginManager,
                                  @Nullable StorageOperate storageOperate,
                                  @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.taskPluginManager = taskPluginManager;
         this.storageOperate = storageOperate;
         this.workerRegistryClient = workerRegistryClient;
         SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
@@ -220,7 +217,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         log.info("WorkflowInstanceExecDir: {} check successfully", taskExecutionContext.getExecutePath());
 
         TaskChannel taskChannel =
-                Optional.ofNullable(taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
+                Optional.ofNullable(TaskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
                         .orElseThrow(() -> new TaskPluginException(taskExecutionContext.getTaskType()
                                 + " task plugin not found, please check the task type is correct."));
 
