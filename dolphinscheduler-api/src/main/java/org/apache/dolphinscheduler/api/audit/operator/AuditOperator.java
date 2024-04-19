@@ -17,18 +17,15 @@
 
 package org.apache.dolphinscheduler.api.audit.operator;
 
-import org.apache.dolphinscheduler.api.audit.OperatorLog;
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
+import org.apache.dolphinscheduler.dao.entity.AuditLog;
 
+import java.util.List;
 import java.util.Map;
-
-import io.swagger.v3.oas.annotations.Operation;
 
 public interface AuditOperator {
 
-    void recordAudit(Map<String, Object> paramsMap,
-                     Result<?> result,
-                     long latency,
-                     Operation operation,
-                     OperatorLog operatorLog) throws Throwable;
+    void recordAudit(Object returnValue) throws Throwable;
+
+    void setRequestParam(AuditType auditType, List<AuditLog> auditLogList, Map<String, Object> paramsMap);
 }

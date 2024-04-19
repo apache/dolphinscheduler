@@ -18,12 +18,12 @@
 package org.apache.dolphinscheduler.api.audit.operator;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.OperatorLogAspect;
 import org.apache.dolphinscheduler.api.audit.OperatorUtils;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -36,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.common.base.Strings;
-import io.swagger.v3.oas.annotations.Operation;
 
 @Service
 @Slf4j
@@ -46,40 +45,36 @@ public abstract class BaseAuditOperator implements AuditOperator {
     private AuditService auditService;
 
     @Override
-    public void recordAudit(Map<String, Object> paramsMap,
-                            Result<?> result,
-                            long latency,
-                            Operation operation,
-                            OperatorLog operatorLog) {
+    public void recordAudit(Object returnValue) {
+        Result<?> result = new Result<>();
 
+        if (returnValue instanceof Result) {
+            result = (Result<?>) returnValue;
+            if (OperatorUtils.resultFail(result)) {
+                log.error("request fail, code {}", result.getCode());
+                return;
+            }
+        }
+
+        OperatorLogAspect.AuditContext auditContext = OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().get();
+        long latency = System.currentTimeMillis() - auditContext.getBeginTime();
+        List<AuditLog> auditLogList = auditContext.getAuditLogList();
+
+        Map<String, Object> paramsMap = auditContext.getParamsMap();
+        OperatorLog operatorLog = auditContext.getOperatorLog();
         AuditType auditType = operatorLog.auditType();
 
-        User user = OperatorUtils.getUser(paramsMap);
-
-        if (user == null) {
-            log.error("user is null");
-            return;
-        }
-
-        List<AuditLog> auditLogList = OperatorUtils.buildAuditLogList(operation.description(), auditType, user);
-        setRequestParam(auditType, auditLogList, paramsMap);
-
-        if (OperatorUtils.resultFail(result)) {
-            log.error("request fail, code {}", result.getCode());
-            return;
-        }
-
         setObjectIdentityFromReturnObject(auditType, result, auditLogList);
-
         modifyAuditOperationType(auditType, paramsMap, auditLogList);
         modifyAuditObjectType(auditType, paramsMap, auditLogList);
 
         auditLogList.forEach(auditLog -> auditLog.setLatency(latency));
         auditLogList.forEach(auditLog -> auditService.addAudit(auditLog));
-
+        OperatorLogAspect.AuditLocalContent.getAuditThreadLocal().remove();
     }
 
-    protected void setRequestParam(AuditType auditType, List<AuditLog> auditLogList, Map<String, Object> paramsMap) {
+    @Override
+    public void setRequestParam(AuditType auditType, List<AuditLog> auditLogList, Map<String, Object> paramsMap) {
         String[] paramNameArr = auditType.getRequestParamName();
 
         if (paramNameArr.length == 0) {

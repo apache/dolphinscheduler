@@ -17,18 +17,25 @@
 
 package org.apache.dolphinscheduler.api.audit;
 
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.audit.operator.AuditOperator;
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
@@ -44,30 +51,71 @@ public class OperatorLogAspect {
     public void logPointCut() {
     }
 
-    @Around("logPointCut()")
-    public Object around(ProceedingJoinPoint point) throws Throwable {
+    @Before("logPointCut()")
+    public void Before(JoinPoint point) {
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
-
         OperatorLog operatorLog = method.getAnnotation(OperatorLog.class);
-
         Operation operation = method.getAnnotation(Operation.class);
+
         if (operation == null) {
             log.warn("Operation is null of method: {}", method.getName());
-            return point.proceed();
+            return;
         }
-        long beginTime = System.currentTimeMillis();
 
         Map<String, Object> paramsMap = OperatorUtils.getParamsMap(point, signature);
-        Result<?> result = (Result<?>) point.proceed();
+        User user = OperatorUtils.getUser(paramsMap);
+        if (user == null) {
+            log.error("user is null");
+            return;
+        }
+
+        AuditType auditType = operatorLog.auditType();
+
         try {
             AuditOperator operator = SpringApplicationContext.getBean(operatorLog.auditType().getOperatorClass());
-            long latency = System.currentTimeMillis() - beginTime;
-            operator.recordAudit(paramsMap, result, latency, operation, operatorLog);
+            List<AuditLog> auditLogList = OperatorUtils.buildAuditLogList(operation.description(), auditType, user);
+            operator.setRequestParam(auditType, auditLogList, paramsMap);
+            AuditContext auditContext =
+                    new AuditContext(auditLogList, paramsMap, operatorLog, System.currentTimeMillis(), operator);
+            AuditLocalContent.getAuditThreadLocal().set(auditContext);
         } catch (Throwable throwable) {
             log.error("Record audit log error", throwable);
         }
+    }
 
-        return result;
+    @AfterReturning(value = "logPointCut()", returning = "returnValue")
+    public void around(JoinPoint jp, Object returnValue) {
+        AuditContext auditContext = AuditLocalContent.getAuditThreadLocal().get();
+        if (auditContext == null) {
+            return;
+        }
+
+        try {
+            auditContext.getOperator().recordAudit(returnValue);
+        } catch (Throwable throwable) {
+            log.error("Record audit log error", throwable);
+        }
+    }
+
+    public static final class AuditLocalContent {
+
+        public static final ThreadLocal<AuditContext> auditThreadLocal = new ThreadLocal<>();
+
+        public static ThreadLocal<AuditContext> getAuditThreadLocal() {
+            return auditThreadLocal;
+        }
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    public static class AuditContext {
+
+        List<AuditLog> auditLogList;
+        Map<String, Object> paramsMap;
+        OperatorLog operatorLog;
+        long beginTime;
+        AuditOperator operator;
     }
 }
