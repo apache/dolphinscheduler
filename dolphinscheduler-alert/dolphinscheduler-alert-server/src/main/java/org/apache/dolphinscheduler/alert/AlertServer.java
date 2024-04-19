@@ -23,11 +23,13 @@ import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
+import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryAutoConfiguration;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -37,14 +39,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 
 @Slf4j
+@Import({CommonConfiguration.class,
+        DaoConfiguration.class,
+        RegistryConfiguration.class})
 @SpringBootApplication
-@ComponentScan(value = "org.apache.dolphinscheduler", excludeFilters = {
-        @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, value = JdbcRegistryAutoConfiguration.class)
-})
 public class AlertServer {
 
     @Autowired

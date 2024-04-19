@@ -28,14 +28,14 @@ import org.apache.dolphinscheduler.dao.plugin.mysql.monitor.MysqlMonitor;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 
-@Profile("mysql")
-@Configuration
-public class MysqlDaoPluginConfiguration implements DaoPluginConfiguration {
+@Configuration(proxyBeanMethods = false)
+@Conditional(MysqlDatabaseEnvironmentCondition.class)
+public class MysqlDaoPluginAutoConfiguration implements DaoPluginConfiguration {
 
     @Autowired
     private DataSource dataSource;

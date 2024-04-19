@@ -34,7 +34,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 @ActiveProfiles(ProfileType.H2)
@@ -43,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = DaoConfiguration.class)
 @Transactional
 @Rollback
-@EnableTransactionManagement
 public class AlertDaoTest {
 
     @Autowired
