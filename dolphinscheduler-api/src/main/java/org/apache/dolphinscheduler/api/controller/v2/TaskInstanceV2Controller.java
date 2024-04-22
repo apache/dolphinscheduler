@@ -167,8 +167,8 @@ public class TaskInstanceV2Controller extends BaseController {
     public TaskInstanceSuccessResponse forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                         @PathVariable(value = "id") Integer id) {
-        Result result = taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
-        return new TaskInstanceSuccessResponse(result);
+        taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+        return new TaskInstanceSuccessResponse(Result.success());
     }
 
     /**

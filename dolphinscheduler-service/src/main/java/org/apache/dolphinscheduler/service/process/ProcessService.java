@@ -189,7 +189,7 @@ public interface ProcessService {
 
     public String findConfigYamlByName(String clusterName);
 
-    void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId);
+    void forceProcessInstanceSuccessByTaskInstanceId(TaskInstance taskInstance);
 
     void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 
