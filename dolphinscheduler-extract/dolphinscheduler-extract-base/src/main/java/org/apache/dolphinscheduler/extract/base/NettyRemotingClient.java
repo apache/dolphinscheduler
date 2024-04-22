@@ -90,6 +90,7 @@ public class NettyRemotingClient implements AutoCloseable {
     private NettySslConfig nettySslConfig;
 
     public NettyRemotingClient(final NettyClientConfig clientConfig, NettySslConfig nettySslConfig) {
+        this.nettySslConfig = nettySslConfig;
         this.clientConfig = clientConfig;
         if (nettySslConfig.isEnabled()) {
             try {
