@@ -76,6 +76,7 @@ public class NettyRemotingServer {
     private NettySslConfig nettySslConfig;
 
     public NettyRemotingServer(final NettyServerConfig serverConfig, final NettySslConfig nettySslConfig) {
+        this.nettySslConfig =nettySslConfig;
         if (nettySslConfig.isEnabled()) {
             try {
                 sslContext = SslContextBuilder.forServer(new File(nettySslConfig.getCertFilePath()),
