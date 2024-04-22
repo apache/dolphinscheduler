@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-{{- if and .Values.api.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -53,4 +52,3 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
-{{- end }}
