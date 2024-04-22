@@ -40,7 +40,6 @@ public class RemoteLogUtils {
 
     @Autowired
     private RemoteLogService autowiredRemoteLogService;
-
     @PostConstruct
     private void init() {
         remoteLogService = autowiredRemoteLogService;

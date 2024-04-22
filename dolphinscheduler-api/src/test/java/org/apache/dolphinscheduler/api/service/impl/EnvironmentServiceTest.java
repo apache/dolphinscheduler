@@ -96,9 +96,6 @@ public class EnvironmentServiceTest {
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
-    @Mock
-    private CodeGenerateUtils codeGenerateUtils;
-
     public static final String testUserName = "environmentServerTest";
 
     public static final String environmentName = "Env1";
@@ -141,8 +138,7 @@ public class EnvironmentServiceTest {
                 () -> environmentService.createEnvironment(adminUser, "testName", "test", "test", workerGroups));
 
         try (MockedStatic<CodeGenerateUtils> ignored = Mockito.mockStatic(CodeGenerateUtils.class)) {
-            when(CodeGenerateUtils.getInstance()).thenReturn(codeGenerateUtils);
-            when(codeGenerateUtils.genCode()).thenThrow(CodeGenerateUtils.CodeGenerateException.class);
+            when(CodeGenerateUtils.genCode()).thenThrow(CodeGenerateUtils.CodeGenerateException.class);
 
             assertThrowsServiceException(Status.INTERNAL_SERVER_ERROR_ARGS,
                     () -> environmentService.createEnvironment(adminUser, "testName", "test", "test", workerGroups));

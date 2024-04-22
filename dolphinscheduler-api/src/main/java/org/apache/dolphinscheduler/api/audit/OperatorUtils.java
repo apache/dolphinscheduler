@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.audit;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -36,23 +37,11 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 @Slf4j
 public class OperatorUtils {
-
-    protected void changeObjectForVersionRelated(AuditOperationType auditOperationType, Map<String, Object> paramsMap,
-                                                 List<AuditLog> auditLogList) {
-        switch (auditOperationType) {
-            case SWITCH_VERSION:
-            case DELETE_VERSION:
-                auditLogList.get(0).setModelName(paramsMap.get("version").toString());
-                break;
-            default:
-                break;
-        }
-    }
 
     public static boolean resultFail(Result<?> result) {
         return result != null && result.isFailed();
@@ -67,7 +56,6 @@ public class OperatorUtils {
         auditLog.setDescription(apiDescription);
         auditLog.setCreateTime(new Date());
         auditLogList.add(auditLog);
-
         return auditLogList;
     }
 
@@ -81,7 +69,7 @@ public class OperatorUtils {
         return null;
     }
 
-    public static Map<String, Object> getParamsMap(ProceedingJoinPoint point, MethodSignature signature) {
+    public static Map<String, Object> getParamsMap(JoinPoint point, MethodSignature signature) {
         Object[] args = point.getArgs();
         String[] strings = signature.getParameterNames();
 
@@ -96,7 +84,7 @@ public class OperatorUtils {
     public static AuditOperationType modifyReleaseOperationType(AuditType auditType, Map<String, Object> paramsMap) {
         switch (auditType.getAuditOperationType()) {
             case RELEASE:
-                ReleaseState releaseState = (ReleaseState) paramsMap.get("releaseState");
+                ReleaseState releaseState = (ReleaseState) paramsMap.get(Constants.RELEASE_STATE);
                 if (releaseState == null) {
                     break;
                 }
@@ -110,7 +98,7 @@ public class OperatorUtils {
                 }
                 break;
             case EXECUTE:
-                ExecuteType executeType = (ExecuteType) paramsMap.get("executeType");
+                ExecuteType executeType = (ExecuteType) paramsMap.get(Constants.EXECUTE_TYPE);
                 if (executeType == null) {
                     break;
                 }
@@ -185,7 +173,7 @@ public class OperatorUtils {
     }
 
     public static boolean isUdfResource(Map<String, Object> paramsMap) {
-        ResourceType resourceType = (ResourceType) paramsMap.get("type");
+        ResourceType resourceType = (ResourceType) paramsMap.get(Constants.STRING_PLUGIN_PARAM_TYPE);
         return resourceType != null && resourceType.equals(ResourceType.UDF);
     }
 

@@ -748,12 +748,7 @@ public final class Constants {
      */
     public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
 
-    /**
-     * netty config enable
-     */
-    public static final String NETTY_SSL_ENABLE = "netty.ssl.enable";
+    public static final String RELEASE_STATE = "releaseState";
+    public static final String EXECUTE_TYPE = "executeType";
 
-    public static final String NETTY_SSL_KEY_PATH = "netty.ssl.key.path";
-
-    public static final String NETTY_SSL_CERT_PATH = "netty.ssl.cert.path";
 }

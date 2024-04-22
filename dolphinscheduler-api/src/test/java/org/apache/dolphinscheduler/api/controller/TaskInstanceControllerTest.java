@@ -82,9 +82,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("taskInstanceId", "104");
 
-        Result mockResult = new Result();
-        putMsg(mockResult, Status.SUCCESS);
-        when(taskInstanceService.forceTaskSuccess(any(User.class), anyLong(), anyInt())).thenReturn(mockResult);
+        Mockito.doNothing().when(taskInstanceService).forceTaskSuccess(any(User.class), anyLong(), anyInt());
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/task-instance/force-success", "cxc_1113")
                 .header(SESSION_ID, sessionId)

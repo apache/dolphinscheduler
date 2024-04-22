@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master;
 
+import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -24,9 +25,12 @@ import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
@@ -36,6 +40,7 @@ import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
 import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
+import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
 import javax.annotation.PostConstruct;
@@ -46,15 +51,15 @@ import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication
-@ComponentScan("org.apache.dolphinscheduler")
-@EnableTransactionManagement
-@EnableCaching
 @Slf4j
+@Import({DaoConfiguration.class,
+        ServiceConfiguration.class,
+        CommonConfiguration.class,
+        StorageConfiguration.class,
+        RegistryConfiguration.class})
+@SpringBootApplication
 public class MasterServer implements IStoppable {
 
     @Autowired
@@ -62,9 +67,6 @@ public class MasterServer implements IStoppable {
 
     @Autowired
     private MasterRegistryClient masterRegistryClient;
-
-    @Autowired
-    private TaskPluginManager taskPluginManager;
 
     @Autowired
     private MasterSchedulerBootstrap masterSchedulerBootstrap;
@@ -111,7 +113,7 @@ public class MasterServer implements IStoppable {
         this.masterRPCServer.start();
 
         // install task plugin
-        this.taskPluginManager.loadPlugin();
+        TaskPluginManager.loadPlugin();
 
         this.masterSlotManager.start();
 
