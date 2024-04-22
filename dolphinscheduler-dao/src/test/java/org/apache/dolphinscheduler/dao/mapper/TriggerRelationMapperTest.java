@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
-
-import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -67,9 +67,9 @@ public class TriggerRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByTypeAndJobId() {
         TriggerRelation expectRelation = createTriggerRelation();
-        TriggerRelation actualRelation = triggerRelationMapper.queryByTypeAndJobId(
-                expectRelation.getTriggerType(), expectRelation.getJobId());
-        Assertions.assertEquals(expectRelation, actualRelation);
+        assertThat(
+                triggerRelationMapper.queryByTypeAndJobId(expectRelation.getTriggerType(), expectRelation.getJobId()))
+                        .containsExactly(expectRelation);
     }
 
     /**
@@ -80,9 +80,8 @@ public class TriggerRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByTriggerRelationCode() {
         TriggerRelation expectRelation = createTriggerRelation();
-        List<TriggerRelation> actualRelations = triggerRelationMapper.queryByTriggerRelationCode(
-                expectRelation.getTriggerCode());
-        Assertions.assertEquals(actualRelations.size(), 1);
+        assertThat(triggerRelationMapper.queryByTriggerRelationCode(expectRelation.getTriggerCode()))
+                .containsExactly(expectRelation);
     }
 
     /**
@@ -93,17 +92,15 @@ public class TriggerRelationMapperTest extends BaseDaoTest {
     @Test
     public void testQueryByTriggerRelationCodeAndType() {
         TriggerRelation expectRelation = createTriggerRelation();
-        List<TriggerRelation> actualRelations = triggerRelationMapper.queryByTriggerRelationCodeAndType(
-                expectRelation.getTriggerCode(), expectRelation.getTriggerType());
-        Assertions.assertEquals(actualRelations.size(), 1);
+        assertThat(triggerRelationMapper.queryByTriggerRelationCodeAndType(expectRelation.getTriggerCode(),
+                expectRelation.getTriggerType())).containsExactly(expectRelation);
     }
 
     @Test
     public void testUpsert() {
         TriggerRelation expectRelation = createTriggerRelation();
         triggerRelationMapper.upsert(expectRelation);
-        TriggerRelation actualRelation = triggerRelationMapper.selectById(expectRelation.getId());
-        Assertions.assertEquals(expectRelation, actualRelation);
+        assertThat(triggerRelationMapper.selectById(expectRelation.getId())).isEqualTo(expectRelation);
     }
 
     /**
@@ -113,8 +110,7 @@ public class TriggerRelationMapperTest extends BaseDaoTest {
     public void testDelete() {
         TriggerRelation expectRelation = createTriggerRelation();
         triggerRelationMapper.deleteById(expectRelation.getId());
-        TriggerRelation actualRelation = triggerRelationMapper.selectById(expectRelation.getId());
-        Assertions.assertNull(actualRelation);
+        assertThat(triggerRelationMapper.selectById(expectRelation.getId())).isNull();
     }
 
     /**

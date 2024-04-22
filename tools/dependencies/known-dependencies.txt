@@ -9,7 +9,7 @@ animal-sniffer-annotations-1.19.jar
 annotations-2.17.282.jar
 annotations-13.0.jar
 apache-client-2.17.282.jar
-asm-9.1.jar
+asm-9.6.jar
 aspectjweaver-1.9.7.jar
 aspectjrt-1.9.7.jar
 auth-2.17.282.jar
@@ -434,7 +434,7 @@ woodstox-core-6.4.0.jar
 azure-core-management-1.10.1.jar
 api-common-2.6.0.jar
 auto-value-1.10.1.jar
-auto-value-annotations-1.10.1.jar
+auto-value-annotations-1.10.4.jar
 bcpkix-jdk15on-1.67.jar
 bcprov-jdk15on-1.67.jar
 conscrypt-openjdk-uber-2.5.2.jar

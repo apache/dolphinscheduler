@@ -21,14 +21,20 @@ import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
 import org.apache.dolphinscheduler.dao.mapper.TriggerRelationMapper;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.Date;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- *  Trigger relation operator to db
+ * Trigger relation operator to db
  */
+@Slf4j
 @Component
 public class TriggerRelationServiceImpl implements TriggerRelationService {
 
@@ -45,29 +51,44 @@ public class TriggerRelationServiceImpl implements TriggerRelationService {
         triggerRelation.setUpdateTime(new Date());
         triggerRelationMapper.upsert(triggerRelation);
     }
+
     @Override
-    public TriggerRelation queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId) {
+    public List<TriggerRelation> queryByTypeAndJobId(ApiTriggerType apiTriggerType, int jobId) {
         return triggerRelationMapper.queryByTypeAndJobId(apiTriggerType.getCode(), jobId);
     }
 
     @Override
     public int saveCommandTrigger(Integer commandId, Integer processInstanceId) {
-        TriggerRelation exist = queryByTypeAndJobId(ApiTriggerType.PROCESS, processInstanceId);
-        if (exist == null) {
+        List<TriggerRelation> existTriggers = queryByTypeAndJobId(ApiTriggerType.PROCESS, processInstanceId);
+        if (CollectionUtils.isEmpty(existTriggers)) {
             return 0;
         }
-        saveTriggerToDb(ApiTriggerType.COMMAND, exist.getTriggerCode(), commandId);
-        return 1;
+        existTriggers.forEach(triggerRelation -> saveTriggerToDb(ApiTriggerType.COMMAND,
+                triggerRelation.getTriggerCode(), commandId));
+        int triggerRelationSize = existTriggers.size();
+        if (triggerRelationSize > 1) {
+            // Fix https://github.com/apache/dolphinscheduler/issues/15864
+            // This case shouldn't happen
+            log.error("The PROCESS TriggerRelation of command: {} is more than one", commandId);
+        }
+        return existTriggers.size();
     }
 
     @Override
     public int saveProcessInstanceTrigger(Integer commandId, Integer processInstanceId) {
-        TriggerRelation exist = queryByTypeAndJobId(ApiTriggerType.COMMAND, commandId);
-        if (exist == null) {
+        List<TriggerRelation> existTriggers = queryByTypeAndJobId(ApiTriggerType.COMMAND, commandId);
+        if (CollectionUtils.isEmpty(existTriggers)) {
             return 0;
         }
-        saveTriggerToDb(ApiTriggerType.PROCESS, exist.getTriggerCode(), processInstanceId);
-        return 1;
+        existTriggers.forEach(triggerRelation -> saveTriggerToDb(ApiTriggerType.PROCESS,
+                triggerRelation.getTriggerCode(), processInstanceId));
+        int triggerRelationSize = existTriggers.size();
+        if (triggerRelationSize > 1) {
+            // Fix https://github.com/apache/dolphinscheduler/issues/15864
+            // This case shouldn't happen
+            log.error("The COMMAND TriggerRelation of command: {} is more than one", commandId);
+        }
+        return existTriggers.size();
     }
 
 }

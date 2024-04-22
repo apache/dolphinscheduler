@@ -89,6 +89,7 @@
         <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
         <awaitility.version>4.2.0</awaitility.version>
+        <truth.version>1.4.2</truth.version>
         <docker.hub>apache</docker.hub>
         <docker.repo>${project.name}</docker.repo>
         <docker.tag>${project.version}</docker.tag>
@@ -370,6 +371,12 @@
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <version>${awaitility.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.truth</groupId>
+            <artifactId>truth</artifactId>
+            <version>${truth.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
