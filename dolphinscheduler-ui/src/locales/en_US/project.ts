@@ -447,6 +447,8 @@ export default {
     timeout_period_tips: 'Timeout must be a positive integer',
     script: 'Script',
     script_tips: 'Please enter script(required)',
+    master: 'Master',
+    master_tips: 'Please enter master url(required)',
     init_script: 'Initialization script',
     init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
