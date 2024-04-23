@@ -184,8 +184,13 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String buildConfigFilePath() {
-        return String.format("%s/seatunnel_%s.conf", taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+        return String.format("%s/seatunnel_%s.%s", taskExecutionContext.getExecutePath(),
+                taskExecutionContext.getTaskAppId(), formatDetector());
+    }
+
+    private String formatDetector() {
+        return JSONUtils.checkJsonValid(seatunnelParameters.getRawScript(), false) ? Constants.JSON_SUFFIX
+                : Constants.CONF_SUFFIX;
     }
 
     private void createConfigFileIfNotExists(String script, String scriptFile) throws IOException {

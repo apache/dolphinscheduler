@@ -135,7 +135,8 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.dm);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.dm);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.dm);
     }
 
     private String transformOther(Map<String, String> paramMap) {

@@ -75,7 +75,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -104,8 +103,6 @@ import com.google.common.collect.Lists;
 @Service
 @Slf4j
 public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
-
-    private static final String RELEASESTATE = "releaseState";
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -138,9 +135,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessService processService;
 
     @Autowired
-    private TaskPluginManager taskPluginManager;
-
-    @Autowired
     private ProcessDefinitionService processDefinitionService;
 
     @Autowired
@@ -149,8 +143,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser          login user
+     * @param projectCode        project code
      * @param taskDefinitionJson task definition json
      */
     @Transactional
@@ -173,7 +167,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-            if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+            if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                     .taskType(taskDefinitionLog.getTaskType())
                     .taskParams(taskDefinitionLog.getTaskParams())
                     .dependence(taskDefinitionLog.getDependence())
@@ -214,7 +208,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(user, project, permissions);
 
-        if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+        if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                 .taskType(taskDefinition.getTaskType())
                 .taskParams(taskDefinition.getTaskParams())
                 .dependence(taskDefinition.getDependence())
@@ -244,7 +238,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * Create resource task definition
      *
-     * @param loginUser login user
+     * @param loginUser         login user
      * @param taskCreateRequest task definition json
      * @return new TaskDefinition have created
      */
@@ -265,7 +259,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
         long taskDefinitionCode;
         try {
-            taskDefinitionCode = CodeGenerateUtils.getInstance().genCode();
+            taskDefinitionCode = CodeGenerateUtils.genCode();
         } catch (CodeGenerateException e) {
             throw new ServiceException(Status.INTERNAL_SERVER_ERROR_ARGS);
         }
@@ -288,11 +282,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * create single task definition that binds the workflow
      *
-     * @param loginUser login user
-     * @param projectCode project code
+     * @param loginUser             login user
+     * @param projectCode           project code
      * @param processDefinitionCode process definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return create result code
      */
     @Transactional
@@ -327,7 +321,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
             return result;
         }
-        if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+        if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                 .taskType(taskDefinition.getTaskType())
                 .taskParams(taskDefinition.getTaskParams())
                 .dependence(taskDefinition.getDependence())
@@ -338,7 +332,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         long taskCode = taskDefinition.getCode();
         if (taskCode == 0) {
-            taskDefinition.setCode(CodeGenerateUtils.getInstance().genCode());
+            taskDefinition.setCode(CodeGenerateUtils.genCode());
         }
         List<ProcessTaskRelationLog> processTaskRelationLogList =
                 processTaskRelationMapper.queryByProcessCode(processDefinitionCode)
@@ -414,10 +408,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * query task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
      * @param processCode process code
-     * @param taskName task name
+     * @param taskName    task name
      */
     @Override
     public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, long processCode,
@@ -475,12 +469,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     /**
      * Delete resource task definition by code
-     *
+     * <p>
      * Only task release state offline and no downstream tasks can be deleted, will also remove the exists
      * task relation [upstreamTaskCode, taskCode]
      *
      * @param loginUser login user
-     * @param taskCode task code
+     * @param taskCode  task code
      */
     @Transactional
     @Override
@@ -548,9 +542,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task code
      * @param taskDefinitionJsonObj task definition json object
      */
     @Transactional
@@ -606,8 +600,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition
      *
-     * @param loginUser login user
-     * @param taskCode task code
+     * @param loginUser         login user
+     * @param taskCode          task code
      * @param taskUpdateRequest task definition json object
      * @return new TaskDefinition have updated
      */
@@ -621,13 +615,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             throw new ServiceException(Status.TASK_DEFINITION_NOT_EXISTS, taskCode);
         }
 
-        TaskDefinition taskDefinitionUpdate;
-        try {
-            taskDefinitionUpdate = taskUpdateRequest.mergeIntoTaskDefinition(taskDefinitionOriginal);
-        } catch (InvocationTargetException | IllegalAccessException | InstantiationException
-                | NoSuchMethodException e) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, taskUpdateRequest.toString());
-        }
+        TaskDefinition taskDefinitionUpdate = taskUpdateRequest.mergeIntoTaskDefinition(taskDefinitionOriginal);
+
         this.checkTaskDefinitionValid(loginUser, taskDefinitionUpdate, TASK_DEFINITION_UPDATE);
         this.TaskDefinitionUpdateValid(taskDefinitionOriginal, taskDefinitionUpdate);
 
@@ -658,7 +647,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * Get resource task definition by code
      *
      * @param loginUser login user
-     * @param taskCode task code
+     * @param taskCode  task code
      * @return TaskDefinition
      */
     @Override
@@ -676,7 +665,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * Get resource task definition according to query parameter
      *
-     * @param loginUser login user
+     * @param loginUser         login user
      * @param taskFilterRequest taskFilterRequest object you want to filter the resource task definitions
      * @return TaskDefinitions of page
      */
@@ -743,7 +732,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
             return null;
         }
-        if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
+        if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
                 .taskType(taskDefinitionToUpdate.getTaskType())
                 .taskParams(taskDefinitionToUpdate.getTaskParams())
                 .dependence(taskDefinitionToUpdate.getDependence())
@@ -848,11 +837,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * update task definition and upstream
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param taskCode task definition code
+     * @param loginUser             login user
+     * @param projectCode           project code
+     * @param taskCode              task definition code
      * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes upstream task codes, sep comma
+     * @param upstreamCodes         upstream task codes, sep comma
      * @return update result code
      */
     @Override
@@ -1021,10 +1010,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * switch task definition
      *
-     * @param loginUser login user
+     * @param loginUser   login user
      * @param projectCode project code
-     * @param taskCode task code
-     * @param version the version user want to switch
+     * @param taskCode    task code
+     * @param version     the version user want to switch
      */
     @Transactional
     @Override
@@ -1264,7 +1253,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < genNum; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateException e) {
             log.error("Generate task definition code error.", e);
@@ -1279,9 +1268,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     /**
      * release task definition
      *
-     * @param loginUser login user
-     * @param projectCode project code
-     * @param code task definition code
+     * @param loginUser    login user
+     * @param projectCode  project code
+     * @param code         task definition code
      * @param releaseState releaseState
      * @return update result code
      */
@@ -1297,7 +1286,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             return result;
         }
         if (null == releaseState) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
+            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
             return result;
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(code);
@@ -1337,7 +1326,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 break;
             default:
                 log.warn("Parameter releaseState is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, RELEASESTATE);
+                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
                 return result;
         }
         int update = taskDefinitionMapper.updateById(taskDefinition);

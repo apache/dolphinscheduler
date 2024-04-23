@@ -320,7 +320,7 @@ public class DependentExecute {
                                                     int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
-                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, taskCode, dateInterval, testFlag);
 
         ProcessInstance lastManualProcess =
                 processInstanceDao.queryLastManualProcessInterval(definitionCode, taskCode, dateInterval, testFlag);

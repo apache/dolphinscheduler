@@ -258,7 +258,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkScheduleTimeNumExceed(commandType, cronTime);
         checkMasterExists();
 
-        long triggerCode = CodeGenerateUtils.getInstance().genCode();
+        long triggerCode = CodeGenerateUtils.genCode();
 
         /**
          * create command

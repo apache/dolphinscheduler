@@ -33,6 +33,7 @@ public class ProcessUtilsTest {
 
     @Test
     public void testExecuteScript() {
-        ProcessUtils.executeScript(cmd);
+        int code = ProcessUtils.executeScript(cmd);
+        assert code != -1;
     }
 }

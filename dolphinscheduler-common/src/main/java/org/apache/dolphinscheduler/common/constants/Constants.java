@@ -243,14 +243,14 @@ public final class Constants {
     public static final String HTTP_X_REAL_IP = "X-Real-IP";
 
     /**
-     * UTF-8
-     */
-    public static final String UTF_8 = "UTF-8";
-
-    /**
      * user name regex
      */
     public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
+
+    /**
+     * file path regex 
+     */
+    public static final Pattern REGEX_FILE_PATH = Pattern.compile("^[a-zA-Z0-9_./-]+$");
 
     /**
      * read permission
@@ -726,6 +726,13 @@ public final class Constants {
     public static final String REMOTE_LOGGING_GCS_BUCKET_NAME = "remote.logging.google.cloud.storage.bucket.name";
 
     /**
+     * remote logging for ABS
+     */
+    public static final String REMOTE_LOGGING_ABS_ACCOUNT_NAME = "remote.logging.abs.account.name";
+    public static final String REMOTE_LOGGING_ABS_ACCOUNT_KEY = "remote.logging.abs.account.key";
+    public static final String REMOTE_LOGGING_ABS_CONTAINER_NAME = "remote.logging.abs.container.name";
+
+    /**
      * data quality
      */
     public static final String DATABASES_QUERY = "show databases";
@@ -735,4 +742,8 @@ public final class Constants {
      * K8S sensitive param
      */
     public static final String K8S_CONFIG_REGEX = "(?<=((?i)configYaml(\" : \"))).*?(?=(\",\\n))";
+
+    public static final String RELEASE_STATE = "releaseState";
+    public static final String EXECUTE_TYPE = "executeType";
+
 }

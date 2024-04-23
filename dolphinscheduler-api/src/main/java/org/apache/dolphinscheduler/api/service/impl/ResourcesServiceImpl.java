@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkFilePath;
 import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
@@ -126,6 +127,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, currentDir);
 
         String userResRootPath = ResourceType.UDF.equals(type) ? storageOperate.getUdfDir(tenantCode)
                 : storageOperate.getResDir(tenantCode);
@@ -171,6 +173,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, currentDir);
 
         result = verifyFile(name, type, file);
         if (!result.getCode().equals(Status.SUCCESS.getCode())) {
@@ -257,6 +260,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, resourceFullName);
 
         if (!isUserTenantValid(isAdmin(loginUser), tenantCode, resTenantCode)) {
             log.error("current user does not have permission");
@@ -264,7 +268,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
             return result;
         }
 
-        String defaultPath = storageOperate.getResDir(tenantCode);
+        String defaultPath = storageOperate.getDir(type, tenantCode);
 
         StorageEntity resource;
         try {
@@ -949,6 +953,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         String tenantCode = getTenantCode(user);
+        checkFullName(tenantCode, currentDir);
 
         if (FileUtils.directoryTraversal(fileName)) {
             log.warn("File name verify failed, fileName:{}.", RegexUtils.escapeNRT(fileName));
@@ -1280,9 +1285,23 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     }
 
     private void checkFullName(String userTenantCode, String fullName) {
+        if (StringUtils.isEmpty(fullName)) {
+            return;
+        }
+        if (FOLDER_SEPARATOR.equalsIgnoreCase(fullName)) {
+            return;
+        }
+        // abnormal characters check
+        if (!checkFilePath(fullName)) {
+            throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH);
+        }
+        // Avoid returning to the parent directory
+        if (fullName.contains("../")) {
+            throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH, fullName);
+        }
         String baseDir = storageOperate.getDir(ResourceType.ALL, userTenantCode);
-        if (StringUtils.isNotBlank(fullName) && !StringUtils.startsWith(fullName, baseDir)) {
-            throw new ServiceException("Resource file: " + fullName + " is illegal");
+        if (!StringUtils.startsWith(fullName, baseDir)) {
+            throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH, fullName);
         }
     }
 }
