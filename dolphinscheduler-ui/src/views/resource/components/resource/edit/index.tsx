@@ -34,7 +34,7 @@ export default defineComponent({
     const detailPageStore = useDetailPageStore()
     const isDetailPageStore = useIsDetailPageStore()
     isDetailPageStore.$reset()
-    
+
     const componentName = route.name
     // fullname is now the id of resources
     const fullName = String(router.currentRoute.value.query.prefix || '')

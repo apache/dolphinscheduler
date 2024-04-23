@@ -25,7 +25,7 @@ import type {
   ILocalParam,
   IDependentParameters
 } from './types'
-import {ref} from "vue";
+import { ref } from 'vue'
 
 export function formatParams(data: INodeData): {
   processDefinitionCode: string
@@ -68,6 +68,7 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'SPARK') {
+    taskParams.master = data.master
     taskParams.driverCores = data.driverCores
     taskParams.driverMemory = data.driverMemory
     taskParams.numExecutors = data.numExecutors
@@ -132,7 +133,9 @@ export function formatParams(data: INodeData): {
           fieldsTerminated: data.targetHdfsFieldsTerminated,
           linesTerminated: data.targetHdfsLinesTerminated
         }
-      } else if (rdbmsSourceTypes.value.some(target => target === data.targetType)){
+      } else if (
+        rdbmsSourceTypes.value.some((target) => target === data.targetType)
+      ) {
         targetParams = {
           targetType: data.targetMysqlType,
           targetDatasource: data.targetMysqlDatasource,
@@ -145,16 +148,16 @@ export function formatParams(data: INodeData): {
           targetUpdateMode: data.targetMysqlUpdateMode
         }
       }
-      if (rdbmsSourceTypes.value.some(target => target === data.sourceType)) {
+      if (rdbmsSourceTypes.value.some((target) => target === data.sourceType)) {
         sourceParams = {
           srcTable: data.srcQueryType === '1' ? '' : data.srcTable,
           srcColumnType: data.srcQueryType === '1' ? '0' : data.srcColumnType,
           srcColumns:
-              data.srcQueryType === '1' || data.srcColumnType === '0'
-                  ? ''
-                  : data.srcColumns,
+            data.srcQueryType === '1' || data.srcColumnType === '0'
+              ? ''
+              : data.srcColumns,
           srcQuerySql:
-              data.srcQueryType === '0' ? '' : data.sourceMysqlSrcQuerySql,
+            data.srcQueryType === '0' ? '' : data.sourceMysqlSrcQuerySql,
           srcQueryType: data.srcQueryType,
           srcType: data.sourceMysqlType,
           srcDatasource: data.sourceMysqlDatasource,

@@ -19,11 +19,16 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
 
+import lombok.Data;
+
+import org.springframework.beans.BeanUtils;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+@Data
 @TableName("t_ds_audit_log")
 public class AuditLog {
 
@@ -39,19 +44,19 @@ public class AuditLog {
     private Integer userId;
 
     /**
-     * resource type
+     * model type
      */
-    private Integer resourceType;
+    private String modelType;
 
     /**
      * operation type
      */
-    private Integer operation;
+    private String operationType;
 
     /**
-     * resource id
+     * model id
      */
-    private Integer resourceId;
+    private Long modelId;
 
     /**
      * user name
@@ -62,53 +67,19 @@ public class AuditLog {
     /**
      * operation time
      */
-    private Date time;
+    private Date createTime;
 
-    public Integer getUserId() {
-        return userId;
-    }
+    private String detail;
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
+    private String description;
 
-    public Integer getResourceType() {
-        return resourceType;
-    }
+    private String modelName;
 
-    public void setResourceType(Integer resourceType) {
-        this.resourceType = resourceType;
-    }
+    private long latency;
 
-    public Integer getOperation() {
-        return operation;
-    }
-
-    public void setOperation(Integer operation) {
-        this.operation = operation;
-    }
-
-    public Integer getResourceId() {
-        return resourceId;
-    }
-
-    public void setResourceId(Integer resourceId) {
-        this.resourceId = resourceId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
+    public static AuditLog copyNewOne(AuditLog auditLog) {
+        AuditLog auditLogNew = new AuditLog();
+        BeanUtils.copyProperties(auditLog, auditLogNew);
+        return auditLogNew;
     }
 }

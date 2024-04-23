@@ -41,7 +41,7 @@ export default {
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
     all_permission: 'All Permission',
-    assign_worker_group: 'Worker Group',
+    assign_worker_group: 'Worker Group'
   },
   workflow: {
     on_line: 'Online',
@@ -239,12 +239,17 @@ export default {
     time_to_online: 'Confirm to make the Scheduler online?',
     time_to_offline: 'Confirm to make the Scheduler offline?',
     warning_dependent_tasks_title: 'Warning',
-    warning_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the workflow offline?',
+    warning_dependent_tasks_desc:
+      'The downstream dependent tasks exists. Are you sure to make the workflow offline?',
     warning_dependencies: 'Dependencies:',
-    delete_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the workflow.',
-    warning_offline_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to make the scheduler offline?',
-    delete_task_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the task.',
-    warning_delete_scheduler_dependent_tasks_desc: 'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
+    delete_validate_dependent_tasks_desc:
+      'The downstream dependent tasks exists. You can not delete the workflow.',
+    warning_offline_scheduler_dependent_tasks_desc:
+      'The downstream dependent tasks exists. Are you sure to make the scheduler offline?',
+    delete_task_validate_dependent_tasks_desc:
+      'The downstream dependent tasks exists. You can not delete the task.',
+    warning_delete_scheduler_dependent_tasks_desc:
+      'The downstream dependent tasks exists. Are you sure to delete the scheduler?'
   },
   task: {
     on_line: 'Online',
@@ -314,7 +319,8 @@ export default {
     whether_dry_run: 'Whether Dry-Run',
     please_choose: 'Please Choose',
     remove_task_cache: 'Clear cache',
-    delete_validate_dependent_tasks_desc: 'The downstream dependent tasks exists. You can not delete the task.',
+    delete_validate_dependent_tasks_desc:
+      'The downstream dependent tasks exists. You can not delete the task.'
   },
   dag: {
     create: 'Create Workflow',
@@ -441,6 +447,8 @@ export default {
     timeout_period_tips: 'Timeout must be a positive integer',
     script: 'Script',
     script_tips: 'Please enter script(required)',
+    master: 'Master',
+    master_tips: 'Please enter master url(required)',
     init_script: 'Initialization script',
     init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
@@ -843,9 +851,12 @@ export default {
     please_select_target_datasource: 'Please select target datasource id',
     please_select_target_database: 'Please select target database',
     please_enter_target_table: 'Please select target table name',
-    please_enter_target_filter_expression: 'Please enter target filter expression',
-    please_enter_comparison_name_the_alias_in_comparison_execute_sql: 'Please enter comparison name the alias in comparison execute sql',
-    please_enter_statistics_name_the_alias_in_statistics_execute_sql: 'Please enter statistics name the alias in statistics execute sql',
+    please_enter_target_filter_expression:
+      'Please enter target filter expression',
+    please_enter_comparison_name_the_alias_in_comparison_execute_sql:
+      'Please enter comparison name the alias in comparison execute sql',
+    please_enter_statistics_name_the_alias_in_statistics_execute_sql:
+      'Please enter statistics name the alias in statistics execute sql',
     please_enter_comparison_execute_sql: 'Please enter comparison execute sql',
     please_enter_statistics_execute_sql: 'Please enter statistics execute sql',
     please_enter_threshold_number_is_needed:
@@ -899,8 +910,7 @@ export default {
     yarn_queue_tips: 'Please input yarn queue(optional)',
     dependent_type: 'Dependency Type',
     dependent_on_workflow: 'Dependent on workflow',
-    dependent_on_task: 'Dependent on task',
-
+    dependent_on_task: 'Dependent on task'
   },
   menu: {
     fav: 'Favorites',
@@ -919,6 +929,8 @@ export default {
     code: 'Parameter Code',
     name: 'Parameter Name',
     value: 'Parameter Value',
+    create_user: 'Create User',
+    modify_user: 'Modify User',
     create_time: 'Create Time',
     update_time: 'Update Time',
     name_tips: 'Please enter your parameter name',
@@ -927,15 +939,16 @@ export default {
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?',
-    success: 'Success',
+    success: 'Success'
   },
   preference: {
     edit_preference: 'Edit Preference',
     preference_manage: 'Project Preference Management',
-    instruction_tips: 'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
+    instruction_tips:
+      'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
     success: 'Success',
     submit: 'Submit',
     enabled: 'Enabled',
     disabled: 'Disabled'
-  },
+  }
 }

@@ -97,7 +97,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
                     .builder()
                     .paramName(projectParameterName)
                     .paramValue(projectParameterValue)
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .projectCode(projectCode)
                     .userId(loginUser.getId())
                     .createTime(now)
@@ -155,6 +155,8 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         projectParameter.setParamName(projectParameterName);
         projectParameter.setParamValue(projectParameterValue);
+        projectParameter.setUpdateTime(new Date());
+        projectParameter.setOperator(loginUser.getId());
 
         if (projectParameterMapper.updateById(projectParameter) > 0) {
             log.info("Project parameter is updated and id is :{}", projectParameter.getId());

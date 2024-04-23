@@ -131,7 +131,8 @@ public class PostgreSQLDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.postgresql);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.postgresql);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.postgresql);
     }
 
     private String transformOther(Map<String, String> otherMap) {

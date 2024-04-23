@@ -48,9 +48,10 @@ public abstract class BaseTaskExecuteRunnableDispatchOperator implements TaskExe
         if (remainTime > 0) {
             taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
             taskInstanceDao.updateById(taskInstance);
-            log.info("Current taskInstance: {} is choose delay execution, delay time: {}/s, remainTime: {}/s",
+            log.info("Current taskInstance: {} is choose delay execution, delay time: {}/min, remainTime: {}/s",
                     taskInstance.getName(),
-                    taskInstance.getDelayTime(), remainTime);
+                    taskInstance.getDelayTime(),
+                    remainTime);
         }
         globalTaskDispatchWaitingQueue.submitTaskExecuteRunnable(taskExecuteRunnable);
     }
