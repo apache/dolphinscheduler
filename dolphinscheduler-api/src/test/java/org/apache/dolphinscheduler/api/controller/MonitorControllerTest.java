@@ -41,8 +41,7 @@ public class MonitorControllerTest extends AbstractControllerTest {
 
     @Test
     public void testListMaster() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/masters")
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/MASTER")
                 .header(SESSION_ID, sessionId)
         /* .param("type", ResourceType.FILE.name()) */)
                 .andExpect(status().isOk())
@@ -59,7 +58,24 @@ public class MonitorControllerTest extends AbstractControllerTest {
     @Test
     public void testListWorker() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/workers")
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/WORKER")
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        result.getCode().equals(Status.SUCCESS.getCode());
+
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testListAlert() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/ALERT_SERVER")
                 .header(SESSION_ID, sessionId)
         /* .param("type", ResourceType.FILE.name()) */)
                 .andExpect(status().isOk())

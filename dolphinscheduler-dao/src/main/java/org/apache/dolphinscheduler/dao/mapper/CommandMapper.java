@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * command mapper interface
@@ -48,7 +50,7 @@ public interface CommandMapper extends BaseMapper<Command> {
      * query command page
      * @return
      */
-    List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
+    IPage<Command> queryCommandPage(Page<Command> page);
 
     /**
      * query command page by slot
@@ -57,4 +59,7 @@ public interface CommandMapper extends BaseMapper<Command> {
     List<Command> queryCommandPageBySlot(@Param("limit") int limit,
                                          @Param("masterCount") int masterCount,
                                          @Param("thisMasterSlot") int thisMasterSlot);
+
+    IPage<Command> queryCommandPageByIds(Page<Command> page, @Param("definitionCodes") List<Long> definitionCodes,
+                                         @Param("projectCode") Long projectCode);
 }
