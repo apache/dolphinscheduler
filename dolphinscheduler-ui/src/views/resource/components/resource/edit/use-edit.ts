@@ -19,17 +19,12 @@ import { useI18n } from 'vue-i18n'
 import type { Router } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import {
-  updateResourceContent,
-  viewResource
-} from '@/service/modules/resources'
+import { updateResourceContent, viewResource } from '@/service/modules/resources'
 import { defineStore } from 'pinia'
-import { useDetailPageStore } from '../table/use-table'
 
 export function useEdit(state: any) {
   const { t } = useI18n()
   const router: Router = useRouter()
-  const detailPageStore = useDetailPageStore()
 
   const getResourceView = (fullName: string, tenantCode: string) => {
     const params = {
@@ -45,10 +40,6 @@ export function useEdit(state: any) {
   }
 
   const handleUpdateContent = (fullName: string, tenantCode: string) => {
-    const pathSplit = fullName.split('/')
-    pathSplit.pop()
-    detailPageStore.fullName = pathSplit.join('/')
-    detailPageStore.tenantCode = tenantCode
     state.fileFormRef.validate(async (valid: any) => {
       if (!valid) {
         await updateResourceContent({
