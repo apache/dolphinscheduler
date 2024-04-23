@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.dingtalk;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class DingTalkSenderTest {
     @Test
     public void testSend() {
         DingTalkSender dingTalkSender = new DingTalkSender(dingTalkConfig);
-        dingTalkSender.sendDingTalkMsg("keyWord+Welcome", "UTF-8");
+        dingTalkSender.sendDingTalkMsg("keyWord+Welcome", StandardCharsets.UTF_8.name());
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "true");
         dingTalkSender = new DingTalkSender(dingTalkConfig);
         AlertResult alertResult = dingTalkSender.sendDingTalkMsg("title", "content test");

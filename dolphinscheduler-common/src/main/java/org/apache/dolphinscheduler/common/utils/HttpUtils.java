@@ -36,6 +36,7 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
@@ -143,7 +144,7 @@ public class HttpUtils {
             }
 
             HttpEntity entity = response.getEntity();
-            return entity != null ? EntityUtils.toString(entity, Constants.UTF_8) : null;
+            return entity != null ? EntityUtils.toString(entity, StandardCharsets.UTF_8) : null;
         } catch (IOException e) {
             log.error("Error executing HTTP GET request", e);
             return null;

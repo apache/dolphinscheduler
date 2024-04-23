@@ -56,8 +56,6 @@ public final class EmailConstants {
 
     public static final String TABLE_BODY_HTML_TAIL = "</table></body></html>";
 
-    public static final String UTF_8 = "UTF-8";
-
     public static final String EXCEL_SUFFIX_XLSX = ".xlsx";
 
     public static final String SINGLE_SLASH = "/";

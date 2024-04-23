@@ -34,6 +34,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,7 +91,7 @@ public class PrometheusAlertSender {
                 }
 
                 HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, "utf-8");
+                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);
                 EntityUtils.consume(entity);
                 log.error(
                         "Prometheus alert manager send alert failed, http status code: {}, title: {} ,content: {}, resp: {}",
