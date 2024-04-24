@@ -138,6 +138,9 @@ $bgLight: #ffffff;
     &.icon-datax {
       background-image: url('/images/task-icons/datax.png');
     }
+    &.icon-addax {
+      background-image: url('/images/task-icons/addax.png');
+    }
     &.icon-pigeon {
       background-image: url('/images/task-icons/pigeon.png');
     }
@@ -253,6 +256,9 @@ $bgLight: #ffffff;
       }
       &.icon-datax {
         background-image: url('/images/task-icons/datax_hover.png');
+      }
+      &.icon-datax {
+        background-image: url('/images/task-icons/addax_hover.png');
       }
       &.icon-pigeon {
         background-image: url('/images/task-icons/pigeon_hover.png');

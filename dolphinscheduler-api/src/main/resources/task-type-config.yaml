@@ -45,6 +45,7 @@ task:
     - 'SEATUNNEL'
     - 'DATAX'
     - 'SQOOP'
+    - 'ADDAX'
   dataQuality:
     - 'DATA_QUALITY'
   machineLearning:

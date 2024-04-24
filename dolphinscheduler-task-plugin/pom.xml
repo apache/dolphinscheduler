@@ -63,6 +63,7 @@
         <module>dolphinscheduler-task-linkis</module>
         <module>dolphinscheduler-task-datafactory</module>
         <module>dolphinscheduler-task-remoteshell</module>
+        <module>dolphinscheduler-task-addax</module>
     </modules>
 
     <dependencyManagement>

@@ -36,8 +36,9 @@ const envConfigPlaceholder =
   'export HIVE_HOME=/opt/soft/hive\n' +
   'export FLINK_HOME=/opt/soft/flink\n' +
   'export DATAX_LAUNCHER=/opt/soft/datax/bin/datax.py\n' +
+  'export ADDAX_LAUNCHER=/opt/soft/addax/bin/addax.sh\n' +
   'export YARN_CONF_DIR=/etc/hadoop/conf\n' +
-  'export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH\n' +
+  'export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$ADDAX_LAUNCHER:$PATH\n' +
   'export HADOOP_CLASSPATH=`hadoop classpath`\n'
 
 const EnvironmentModal = defineComponent({

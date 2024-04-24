@@ -249,7 +249,7 @@ export function formatParams(data: INodeData): {
     }
   }
 
-  if (data.taskType === 'DATAX') {
+  if (data.taskType === 'DATAX' || data.taskType === 'ADDAX') {
     taskParams.customConfig = data.customConfig ? 1 : 0
     if (taskParams.customConfig === 0) {
       taskParams.dsType = data.dsType

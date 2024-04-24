@@ -27,6 +27,7 @@ export type TaskType =
   | 'DEPENDENT'
   | 'HTTP'
   | 'DATAX'
+  | 'ADDAX'
   | 'PIGEON'
   | 'SQOOP'
   | 'CONDITIONS'
@@ -96,6 +97,9 @@ export const TASK_TYPES_MAP = {
   },
   DATAX: {
     alias: 'DataX'
+  },
+  ADDAX: {
+    alias: 'Addax'
   },
   PIGEON: {
     alias: 'PIGEON'
