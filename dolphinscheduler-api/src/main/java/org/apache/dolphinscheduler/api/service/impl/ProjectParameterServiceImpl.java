@@ -227,11 +227,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         }
 
         for (ProjectParameter projectParameter : projectParameterList) {
-            try {
-                this.deleteProjectParametersByCode(loginUser, projectCode, projectParameter.getCode());
-            } catch (Exception e) {
-                throw new ServiceException(Status.DELETE_PROJECT_PARAMETER_ERROR, e.getMessage());
-            }
+            this.deleteProjectParametersByCode(loginUser, projectCode, projectParameter.getCode());
         }
 
         putMsg(result, Status.SUCCESS);
