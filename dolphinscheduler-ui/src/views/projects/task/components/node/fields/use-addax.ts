@@ -78,22 +78,22 @@ export function useAddax(model: { [field: string]: any }): IJsonItem[] {
     }
   ]
   const memoryLimitOptions = [
-      {
-        label: '32M',
-        value: 32
-      },
-      {
-        label: '64M',
-        value: 64
-      },
-      {
-        label: '128M',
-        value: 128
-      },
-      {
-        label: '256M',
-        value: 256
-      },
+    {
+      label: '32M',
+      value: 32
+    },
+    {
+      label: '64M',
+      value: 64
+    },
+    {
+      label: '128M',
+      value: 128
+    },
+    {
+      label: '256M',
+      value: 256
+    },
     {
       label: '1G',
       value: 1024
@@ -257,7 +257,7 @@ export function useAddax(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.addax_job_runtime_memory_xms'),
       span: 12,
       options: memoryLimitOptions,
-      value: 1
+      value: 32
     },
     {
       type: 'select',
@@ -265,7 +265,7 @@ export function useAddax(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.addax_job_runtime_memory_xmx'),
       span: 12,
       options: memoryLimitOptions,
-      value: 1
+      value: 64
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })
   ]
