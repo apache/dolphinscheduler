@@ -47,4 +47,11 @@
         order by process_instance_priority, id asc
             limit #{limit}
     </select>
+    <delete id="deleteByWorkflowInstanceIds" >
+        delete from t_ds_command
+        where process_instance_id in
+        <foreach collection="workflowInstanceIds" index="index" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </delete>
 </mapper>
