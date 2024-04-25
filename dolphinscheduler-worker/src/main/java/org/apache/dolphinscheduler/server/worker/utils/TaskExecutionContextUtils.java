@@ -151,7 +151,6 @@ public class TaskExecutionContextUtils {
             }
             ResourceContext.ResourceItem resourceItem = ResourceContext.ResourceItem.builder()
                     .resourceAbsolutePathInStorage(resourceAbsolutePathInStorage)
-                    .resourceRelativePath(resourceRelativePath)
                     .resourceAbsolutePathInLocal(resourceAbsolutePathInLocal)
                     .build();
             resourceContext.addResourceItem(resourceItem);
