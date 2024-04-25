@@ -78,7 +78,7 @@ public class TaskExecutionContextUtils {
             throw ex;
         } catch (Exception ex) {
             throw new TaskException(
-                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()), ex);
         }
     }
 
