@@ -183,11 +183,10 @@ public class OSUtils {
      *
      * @param userName user name
      */
-    public static void createUserIfAbsent(String userName) {
+    public static synchronized void createUserIfAbsent(String userName) {
         // if not exists this user, then create
         if (!getUserList().contains(userName)) {
-            boolean isSuccess = createUser(userName);
-            log.info("create user {} {}", userName, isSuccess ? "success" : "fail");
+            createUser(userName);
         }
     }
 
@@ -197,13 +196,12 @@ public class OSUtils {
      * @param userName user name
      * @return true if creation was successful, otherwise false
      */
-    public static boolean createUser(String userName) {
+    public static void createUser(String userName) {
         try {
             String userGroup = getGroup();
             if (StringUtils.isEmpty(userGroup)) {
-                String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
-                log.error(errorLog);
-                return false;
+                throw new UnsupportedOperationException(
+                        "There is no userGroup exist cannot create tenant, please create userGroupFirst");
             }
             if (SystemUtils.IS_OS_MAC) {
                 createMacUser(userName, userGroup);
@@ -212,18 +210,17 @@ public class OSUtils {
             } else {
                 createLinuxUser(userName, userGroup);
             }
-            return true;
+            log.info("Create tenant {} under userGroup: {} success", userName, userGroup);
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
+            throw new RuntimeException("Create tenant: {} failed", e);
         }
 
-        return false;
     }
 
     /**
      * create linux user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -237,7 +234,7 @@ public class OSUtils {
     /**
      * create mac user (Supports Mac OSX 10.10+)
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -256,7 +253,7 @@ public class OSUtils {
     /**
      * create windows user
      *
-     * @param userName user name
+     * @param userName  user name
      * @param userGroup user group
      * @throws IOException in case of an I/O error
      */
@@ -304,7 +301,7 @@ public class OSUtils {
      * get sudo command
      *
      * @param tenantCode tenantCode
-     * @param command command
+     * @param command    command
      * @return result of sudo execute command
      */
     public static String getSudoCmd(String tenantCode, String command) {
