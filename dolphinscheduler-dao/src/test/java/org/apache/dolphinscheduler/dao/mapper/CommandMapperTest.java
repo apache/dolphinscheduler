@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -173,6 +175,14 @@ public class CommandMapperTest extends BaseDaoTest {
         toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
     }
 
+    @Test
+    void deleteByWorkflowInstanceIds() {
+        Command command = createCommand();
+        assertThat(commandMapper.selectList(null)).isNotEmpty();
+        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getProcessInstanceId()));
+        assertThat(commandMapper.selectList(null)).isEmpty();
+    }
+
     private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
         Command command = createCommand();
         Integer id = command.getId();
@@ -280,5 +290,4 @@ public class CommandMapperTest extends BaseDaoTest {
 
         return command;
     }
-
 }
