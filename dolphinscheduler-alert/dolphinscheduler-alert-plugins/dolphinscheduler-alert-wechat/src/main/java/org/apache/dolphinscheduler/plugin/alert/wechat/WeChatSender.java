@@ -38,6 +38,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,6 +46,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -85,12 +88,12 @@ public final class WeChatSender {
                 CloseableHttpClient httpClient =
                         HttpClients.custom().setRetryHandler(HttpServiceRetryStrategy.retryStrategy).build()) {
             HttpPost httpPost = new HttpPost(url);
-            httpPost.setEntity(new StringEntity(data, WeChatAlertConstants.CHARSET));
+            httpPost.setEntity(new StringEntity(data, StandardCharsets.UTF_8));
             CloseableHttpResponse response = httpClient.execute(httpPost);
             String resp;
             try {
                 HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, WeChatAlertConstants.CHARSET);
+                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);
                 EntityUtils.consume(entity);
             } finally {
                 response.close();
@@ -142,7 +145,7 @@ public final class WeChatSender {
             HttpGet httpGet = new HttpGet(url);
             try (CloseableHttpResponse response = httpClient.execute(httpGet)) {
                 HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, WeChatAlertConstants.CHARSET);
+                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);
                 EntityUtils.consume(entity);
             }
 
@@ -259,28 +262,14 @@ public final class WeChatSender {
         return null;
     }
 
+    @Getter
+    @Setter
     static final class WeChatSendMsgResponse {
 
         private Integer errcode;
         private String errmsg;
 
         public WeChatSendMsgResponse() {
-        }
-
-        public Integer getErrcode() {
-            return this.errcode;
-        }
-
-        public void setErrcode(Integer errcode) {
-            this.errcode = errcode;
-        }
-
-        public String getErrmsg() {
-            return this.errmsg;
-        }
-
-        public void setErrmsg(String errmsg) {
-            this.errmsg = errmsg;
         }
 
         public boolean equals(final Object o) {
