@@ -28,7 +28,7 @@ public class DB2DataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return DbType.DB2.getDescp();
+        return DbType.DB2.getName();
     }
 
     @Override

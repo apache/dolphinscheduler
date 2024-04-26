@@ -28,7 +28,7 @@ public class SnowflakeDataSourceChannelFactory implements DataSourceChannelFacto
 
     @Override
     public String getName() {
-        return DbType.SNOWFLAKE.getDescp();
+        return DbType.SNOWFLAKE.getName();
     }
 
     @Override

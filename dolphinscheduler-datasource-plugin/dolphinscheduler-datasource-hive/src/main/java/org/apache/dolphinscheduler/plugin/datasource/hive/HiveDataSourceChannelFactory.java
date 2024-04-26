@@ -28,7 +28,7 @@ public class HiveDataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return DbType.HIVE.getDescp();
+        return DbType.HIVE.getName();
     }
 
     @Override

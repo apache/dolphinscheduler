@@ -33,7 +33,7 @@ public class ZeppelinDataSourceChannelFactory implements DataSourceChannelFactor
 
     @Override
     public String getName() {
-        return DbType.ZEPPELIN.getDescp();
+        return DbType.ZEPPELIN.getName();
     }
 
 }

@@ -33,7 +33,7 @@ public class SagemakerDataSourceChannelFactory implements DataSourceChannelFacto
 
     @Override
     public String getName() {
-        return DbType.SAGEMAKER.getDescp();
+        return DbType.SAGEMAKER.getName();
     }
 
 }

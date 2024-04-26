@@ -28,7 +28,7 @@ public class VerticaDataSourceChannelFactory implements DataSourceChannelFactory
 
     @Override
     public String getName() {
-        return DbType.VERTICA.getDescp();
+        return DbType.VERTICA.getName();
     }
 
     @Override

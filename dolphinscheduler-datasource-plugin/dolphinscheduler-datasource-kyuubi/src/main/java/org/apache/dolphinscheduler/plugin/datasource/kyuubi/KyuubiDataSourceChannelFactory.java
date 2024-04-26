@@ -28,7 +28,7 @@ public class KyuubiDataSourceChannelFactory implements DataSourceChannelFactory 
 
     @Override
     public String getName() {
-        return DbType.KYUUBI.getDescp();
+        return DbType.KYUUBI.getName();
     }
 
     @Override

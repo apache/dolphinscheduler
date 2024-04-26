@@ -28,7 +28,7 @@ public class PostgreSQLDataSourceChannelFactory implements DataSourceChannelFact
 
     @Override
     public String getName() {
-        return DbType.POSTGRESQL.getDescp();
+        return DbType.POSTGRESQL.getName();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class SSHDataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return DbType.SSH.getDescp();
+        return DbType.SSH.getName();
     }
 
     @Override

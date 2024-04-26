@@ -33,6 +33,6 @@ public class RedshiftDataSourceChannelFactory implements DataSourceChannelFactor
 
     @Override
     public String getName() {
-        return DbType.REDSHIFT.getDescp();
+        return DbType.REDSHIFT.getName();
     }
 }

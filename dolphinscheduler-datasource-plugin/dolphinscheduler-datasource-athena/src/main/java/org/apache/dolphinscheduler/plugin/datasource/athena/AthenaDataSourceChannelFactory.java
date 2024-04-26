@@ -33,6 +33,6 @@ public class AthenaDataSourceChannelFactory implements DataSourceChannelFactory 
 
     @Override
     public String getName() {
-        return DbType.ATHENA.getDescp();
+        return DbType.ATHENA.getName();
     }
 }
