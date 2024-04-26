@@ -121,7 +121,8 @@ export function useForm(id?: number) {
           if (
             !state.detailForm.userName &&
             state.detailForm.type !== 'AZURESQL' &&
-            state.detailForm.type !== 'K8S'
+            state.detailForm.type !== 'K8S' &&
+            state.detailForm.type !== 'FLINK'
           ) {
             return new Error(t('datasource.user_name_tips'))
           }
@@ -268,7 +269,8 @@ export function useForm(id?: number) {
       type === 'SSH' ||
       type === 'ZEPPELIN' ||
       type === 'SAGEMAKER' ||
-      type === 'K8S'
+      type === 'K8S' ||
+      type === 'FLINK'
     ) {
       state.showDataBaseName = false
       state.requiredDataBase = false
@@ -458,6 +460,11 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'K8S',
     label: 'K8S',
     defaultPort: 6443
+  },
+  FLINK: {
+    value: 'FLINK',
+    label: 'FLINK',
+    defaultPort: 8083
   }
 }
 
