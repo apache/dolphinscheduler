@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.aliyun.emr_serverless_spark20230808.models.CancelJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunResponse;
 import com.aliyun.emr_serverless_spark20230808.models.JobDriver;
@@ -144,7 +145,12 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-
+        CancelJobRunRequest cancelJobRunRequest = buildCancelJobRunRequest(aliyunServerlessSparkParameters);
+        try {
+            aliyunServerlessSparkClient.cancelJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId, cancelJobRunRequest);
+        } catch (Exception e) {
+            log.error("Failed to cancel serverless spark job run", e);
+        }
     }
 
     @Override
@@ -170,11 +176,14 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         String engineReleaseVersion = aliyunServerlessSparkParameters.getEngineReleaseVersion();
         engineReleaseVersion = StringUtils.isEmpty(engineReleaseVersion) ? "esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)" : engineReleaseVersion;
         startJobRunRequest.setReleaseVersion(engineReleaseVersion);
-        Tag tag = new Tag();
-        tag.setKey("environment");
+        Tag envTag = new Tag();
+        envTag.setKey("environment");
         String envType = aliyunServerlessSparkParameters.isProduction() ? "production" : "dev";
-        tag.setValue(envType);
-        startJobRunRequest.setTags(Collections.singletonList(tag));
+        envTag.setValue(envType);
+        Tag workflowTag = new Tag();
+        workflowTag.setKey("workflow");
+        workflowTag.setValue("true");
+        startJobRunRequest.setTags(Arrays.asList(envTag, workflowTag));
         List<String> entryPointArguments = StringUtils.isEmpty(aliyunServerlessSparkParameters.getEntryPointArguments()) ?
             Collections.emptyList() : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split(";"));
         JobDriver.JobDriverSparkSubmit jobDriverSparkSubmit = new JobDriver.JobDriverSparkSubmit()
@@ -191,5 +200,11 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         GetJobRunRequest getJobRunRequest = new GetJobRunRequest();
         getJobRunRequest.setRegionId(aliyunServerlessSparkParameters.getRegionId());
         return getJobRunRequest;
+    }
+
+    private CancelJobRunRequest buildCancelJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+        CancelJobRunRequest cancelJobRunRequest = new CancelJobRunRequest();
+        cancelJobRunRequest.setRegionId(aliyunServerlessSparkParameters.getRegionId());
+        return cancelJobRunRequest;
     }
 }
