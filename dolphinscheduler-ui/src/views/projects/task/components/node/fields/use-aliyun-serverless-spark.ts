@@ -213,30 +213,12 @@ export function useAliyunServerlessSpark(model: { [field: string]: any }): IJson
             }
         },
 
-        // todo: make it a switch
         {
             type: 'switch',
             field: 'isProduction',
             name: t('project.node.is_production'),
             span: 12
         },
-        // {
-        //     type: 'input',
-        //     field: 'isProduction',
-        //     name: t('project.node.is_production'),
-        //     props: {
-        //         placeholder: t('project.node.is_production_tips')
-        //     },
-        //     validate: {
-        //         trigger: ['input', 'blur'],
-        //         required: true,
-        //         validator(validate: any, value: string) {
-        //             if (!value) {
-        //                 return new Error(t('project.node.is_production_tips'))
-        //             }
-        //         }
-        //     }
-        // },
 
         ...useCustomParams({ model, field: 'localParams', isSimple: false })
     ]
