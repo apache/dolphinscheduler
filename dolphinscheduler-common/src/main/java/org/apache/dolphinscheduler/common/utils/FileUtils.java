@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPA
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
 
 import org.apache.commons.io.IOUtils;
@@ -207,7 +206,7 @@ public class FileUtils {
             while ((length = inputStream.read(buffer)) != -1) {
                 output.write(buffer, 0, length);
             }
-            return output.toString(UTF_8);
+            return output.toString(StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

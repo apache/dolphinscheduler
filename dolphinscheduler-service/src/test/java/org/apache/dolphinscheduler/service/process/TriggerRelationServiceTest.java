@@ -17,24 +17,26 @@
 
 package org.apache.dolphinscheduler.service.process;
 
+import static com.google.common.truth.Truth.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.common.enums.ApiTriggerType;
 import org.apache.dolphinscheduler.dao.entity.TriggerRelation;
 import org.apache.dolphinscheduler.dao.mapper.TriggerRelationMapper;
-import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 
 import java.util.Date;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 /**
  * Trigger Relation Service Test
@@ -43,8 +45,6 @@ import org.slf4j.LoggerFactory;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class TriggerRelationServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
-
     @InjectMocks
     private TriggerRelationServiceImpl triggerRelationService;
     @Mock
@@ -52,47 +52,37 @@ public class TriggerRelationServiceTest {
 
     @Test
     public void saveTriggerToDb() {
-        Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
+        doNothing().when(triggerRelationMapper).upsert(any());
         triggerRelationService.saveTriggerToDb(ApiTriggerType.COMMAND, 1234567890L, 100);
     }
 
     @Test
     public void queryByTypeAndJobId() {
-        Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-        Mockito.when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.PROCESS.getCode(), 100))
-                .thenReturn(getTriggerTdoDb());
+        doNothing().when(triggerRelationMapper).upsert(any());
+        when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.PROCESS.getCode(), 100))
+                .thenReturn(Lists.newArrayList(getTriggerTdoDb()));
 
-        TriggerRelation triggerRelation1 = triggerRelationService.queryByTypeAndJobId(
-                ApiTriggerType.PROCESS, 100);
-        Assertions.assertNotNull(triggerRelation1);
-        TriggerRelation triggerRelation2 = triggerRelationService.queryByTypeAndJobId(
-                ApiTriggerType.PROCESS, 200);
-        Assertions.assertNull(triggerRelation2);
+        assertThat(triggerRelationService.queryByTypeAndJobId(ApiTriggerType.PROCESS, 100)).hasSize(1);
+        assertThat(triggerRelationService.queryByTypeAndJobId(ApiTriggerType.PROCESS, 200)).isEmpty();
     }
 
     @Test
     public void saveCommandTrigger() {
-        Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-        Mockito.when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.PROCESS.getCode(), 100))
-                .thenReturn(getTriggerTdoDb());
-        int result = -1;
-        result = triggerRelationService.saveCommandTrigger(1234567890, 100);
-        Assertions.assertTrue(result > 0);
-        result = triggerRelationService.saveCommandTrigger(1234567890, 200);
-        Assertions.assertTrue(result == 0);
+        doNothing().when(triggerRelationMapper).upsert(any());
+        when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.PROCESS.getCode(), 100))
+                .thenReturn(Lists.newArrayList(getTriggerTdoDb()));
+        assertThat(triggerRelationService.saveCommandTrigger(1234567890, 100)).isAtLeast(1);
+        assertThat(triggerRelationService.saveCommandTrigger(1234567890, 200)).isEqualTo(0);
 
     }
 
     @Test
     public void saveProcessInstanceTrigger() {
-        Mockito.doNothing().when(triggerRelationMapper).upsert(Mockito.any());
-        Mockito.when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.COMMAND.getCode(), 100))
-                .thenReturn(getTriggerTdoDb());
-        int result = -1;
-        result = triggerRelationService.saveProcessInstanceTrigger(100, 1234567890);
-        Assertions.assertTrue(result > 0);
-        result = triggerRelationService.saveProcessInstanceTrigger(200, 1234567890);
-        Assertions.assertTrue(result == 0);
+        doNothing().when(triggerRelationMapper).upsert(any());
+        when(triggerRelationMapper.queryByTypeAndJobId(ApiTriggerType.COMMAND.getCode(), 100))
+                .thenReturn(Lists.newArrayList(getTriggerTdoDb()));
+        assertThat(triggerRelationService.saveProcessInstanceTrigger(100, 1234567890)).isAtLeast(1);
+        assertThat(triggerRelationService.saveProcessInstanceTrigger(200, 1234567890)).isEqualTo(0);
     }
 
     private TriggerRelation getTriggerTdoDb() {
