@@ -44,8 +44,7 @@ import {
   NSwitch,
   NCheckbox,
   NDatePicker,
-  NRadioButton,
-  NInputNumber
+  NRadioButton
 } from 'naive-ui'
 import {
   ArrowDownOutlined,
@@ -76,6 +75,7 @@ export default defineComponent({
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
+    const parallelismRef = ref(false)
     const { t } = useI18n()
     const route = useRoute()
     const { startState } = useForm()
@@ -296,6 +296,7 @@ export default defineComponent({
     return {
       t,
       showTaskDependType,
+      parallelismRef,
       hideModal,
       handleStart,
       generalWarningTypeListOptions,
@@ -503,20 +504,17 @@ export default defineComponent({
                   <NFormItem
                     label={t('project.workflow.parallelism')}
                     path='expectedParallelismNumber'
-                    feedback={t(
-                      'project.workflow.warning_too_large_parallelism_number'
-                    )}
-                    validationStatus={'warning'}
-                    showFeedback={
-                      parseInt(this.startForm.expectedParallelismNumber) > 10
-                    }
                   >
-                    <NInputNumber
+                    <NCheckbox v-model:checked={this.parallelismRef}>
+                      {t('project.workflow.custom_parallelism')}
+                    </NCheckbox>
+                    <NInput
+                      allowInput={this.trim}
+                      disabled={!this.parallelismRef}
                       placeholder={t(
                         'project.workflow.please_enter_parallelism'
                       )}
                       v-model:value={this.startForm.expectedParallelismNumber}
-                      min='1'
                     />
                   </NFormItem>
                 )}
