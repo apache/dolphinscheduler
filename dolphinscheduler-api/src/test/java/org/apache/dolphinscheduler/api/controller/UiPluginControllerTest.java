@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,8 +32,13 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.mockito.Mockito;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -40,6 +46,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.google.common.collect.ImmutableMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ui plugin controller test
@@ -52,6 +61,8 @@ public class UiPluginControllerTest extends AbstractControllerTest {
             "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}", Result.class);
     private static final ImmutableMap<String, Object> uiPluginServiceResult =
             ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
+
+    private static final Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
 
     @MockBean(name = "uiPluginService")
     private UiPluginService uiPluginService;
@@ -90,5 +101,33 @@ public class UiPluginControllerTest extends AbstractControllerTest {
         final Result actualResponseContent =
                 JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+    }
+
+    @Test
+    public void testQueryProductInfo() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(uiPluginService.queryProductInfo(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userId", "1");
+
+        MvcResult mvcResult = mockMvc.perform(post("/ui-plugins/queryProductInfo")
+                        .header(SESSION_ID, sessionId)
+                        .params(paramsMap))
+                        .andExpect(status().isOk())
+                        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                        .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    private User getLoginUser() {
+        User user = new User();
+        user.setId(1);
+        user.setUserName("admin");
+        return user;
     }
 }

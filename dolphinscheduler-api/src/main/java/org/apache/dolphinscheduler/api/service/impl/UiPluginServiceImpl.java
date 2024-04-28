@@ -17,11 +17,17 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.Version;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,8 +38,12 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+
+import org.apache.dolphinscheduler.dao.mapper.VersionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_CREATE;
 
 /**
  * ui plugin service impl
@@ -44,6 +54,9 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
 
     @Autowired
     PluginDefineMapper pluginDefineMapper;
+
+    @Autowired
+    VersionMapper versionMapper;
 
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
@@ -79,6 +92,26 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
         // pluginDefine.setPluginParams(parseParams(params));
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefine);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> queryProductInfo(User loginUser, int userId) {
+
+        Map<String, Object> result = new HashMap<>();
+        // check if user is existed
+        if (userId <= 0 || !(loginUser.getId() == userId)) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                    "User id: " + userId + " should not less than or equals to 0.");
+        }
+        // persist to the database
+        Version versionInfo = versionMapper.selectById(1);
+//        if(StringUtils.isBlank(versionInfo.getVersion())){
+//            throw new ServiceException(Status.VERSION_INFO_STATE_ERROR);
+//        }
+        putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, versionInfo.getVersion());
+
         return result;
     }
 

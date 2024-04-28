@@ -15,23 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.PluginType;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.Version;
+import org.apache.ibatis.annotations.Param;
 
-import java.util.Map;
+import java.util.Date;
+import java.util.List;
 
 /**
- * ui plugin service
+ * user mapper interface
  */
-public interface UiPluginService {
+public interface VersionMapper extends BaseMapper<Version> {
 
-    Map<String, Object> queryUiPluginsByType(PluginType pluginType);
-
-    Map<String, Object> queryUiPluginDetailById(int id);
-
-    Map<String, Object>  queryProductInfo(User loginUser, int userId);
+    /**
+     * select by user id
+     */
+    Version selectById(int id);
 
 }

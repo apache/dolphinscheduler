@@ -15,23 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.PluginType;
-import org.apache.dolphinscheduler.dao.entity.User;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import org.apache.dolphinscheduler.common.enums.UserType;
 
-import java.util.Map;
+import java.util.Date;
 
-/**
- * ui plugin service
- */
-public interface UiPluginService {
+@Data
+@TableName("t_ds_version")
+public class Version {
 
-    Map<String, Object> queryUiPluginsByType(PluginType pluginType);
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
-    Map<String, Object> queryUiPluginDetailById(int id);
-
-    Map<String, Object>  queryProductInfo(User loginUser, int userId);
+    private String version;
 
 }
