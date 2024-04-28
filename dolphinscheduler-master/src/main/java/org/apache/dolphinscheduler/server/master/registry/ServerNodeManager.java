@@ -245,7 +245,7 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void updateWorkerNodes() {
-        workerGroupWriteLock.lock();
+        workerNodeInfoWriteLock.lock();
         try {
             Map<String, String> workerNodeMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
             for (Map.Entry<String, String> entry : workerNodeMaps.entrySet()) {
@@ -254,7 +254,7 @@ public class ServerNodeManager implements InitializingBean {
                 workerNodeInfo.put(nodeAddress, workerHeartBeat);
             }
         } finally {
-            workerGroupWriteLock.unlock();
+            workerNodeInfoWriteLock.unlock();
         }
     }
 
