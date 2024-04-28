@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.athena;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
@@ -32,6 +33,6 @@ public class AthenaDataSourceChannelFactory implements DataSourceChannelFactory 
 
     @Override
     public String getName() {
-        return "athena";
+        return DbType.ATHENA.getName();
     }
 }

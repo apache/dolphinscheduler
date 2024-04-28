@@ -58,7 +58,7 @@ public class K8sDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         K8sConnectionParam baseConnectionParam = (K8sConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}", dbType.getDescp(),
+        return MessageFormat.format("{0}@{1}@{2}", dbType.getName(),
                 PasswordUtils.encodePassword(baseConnectionParam.getKubeConfig()), baseConnectionParam.getNamespace());
     }
 

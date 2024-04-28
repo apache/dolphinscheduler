@@ -28,42 +28,44 @@ import com.google.common.base.Functions;
 
 public enum DbType {
 
-    MYSQL(0, "mysql"),
-    POSTGRESQL(1, "postgresql"),
-    HIVE(2, "hive"),
-    SPARK(3, "spark"),
-    CLICKHOUSE(4, "clickhouse"),
-    ORACLE(5, "oracle"),
-    SQLSERVER(6, "sqlserver"),
-    DB2(7, "db2"),
-    PRESTO(8, "presto"),
-    H2(9, "h2"),
-    REDSHIFT(10, "redshift"),
-    ATHENA(11, "athena"),
-    TRINO(12, "trino"),
-    STARROCKS(13, "starrocks"),
-    AZURESQL(14, "azuresql"),
-    DAMENG(15, "dameng"),
-    OCEANBASE(16, "oceanbase"),
-    SSH(17, "ssh"),
-    KYUUBI(18, "kyuubi"),
-    DATABEND(19, "databend"),
-    SNOWFLAKE(20, "snowflake"),
-    VERTICA(21, "vertica"),
-    HANA(22, "hana"),
-    DORIS(23, "doris"),
-    ZEPPELIN(24, "zeppelin"),
-    SAGEMAKER(25, "sagemaker"),
+    MYSQL(0, "mysql", "mysql"),
+    POSTGRESQL(1, "postgresql", "postgresql"),
+    HIVE(2, "hive", "hive"),
+    SPARK(3, "spark", "spark"),
+    CLICKHOUSE(4, "clickhouse", "clickhouse"),
+    ORACLE(5, "oracle", "oracle"),
+    SQLSERVER(6, "sqlserver", "sqlserver"),
+    DB2(7, "db2", "db2"),
+    PRESTO(8, "presto", "presto"),
+    H2(9, "h2", "h2"),
+    REDSHIFT(10, "redshift", "redshift"),
+    ATHENA(11, "athena", "athena"),
+    TRINO(12, "trino", "trino"),
+    STARROCKS(13, "starrocks", "starrocks"),
+    AZURESQL(14, "azuresql", "azuresql"),
+    DAMENG(15, "dameng", "dameng"),
+    OCEANBASE(16, "oceanbase", "oceanbase"),
+    SSH(17, "ssh", "ssh"),
+    KYUUBI(18, "kyuubi", "kyuubi"),
+    DATABEND(19, "databend", "databend"),
+    SNOWFLAKE(20, "snowflake", "snowflake"),
+    VERTICA(21, "vertica", "vertica"),
+    HANA(22, "hana", "hana"),
+    DORIS(23, "doris", "doris"),
+    ZEPPELIN(24, "zeppelin", "zeppelin"),
+    SAGEMAKER(25, "sagemaker", "sagemaker"),
 
-    K8S(26, "k8s");
+    K8S(26, "k8s", "k8s");
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
     @EnumValue
     private final int code;
+    private final String name;
     private final String descp;
 
-    DbType(int code, String descp) {
+    DbType(int code, String name, String descp) {
         this.code = code;
+        this.name = name;
         this.descp = descp;
     }
 
@@ -81,6 +83,10 @@ public enum DbType {
 
     public int getCode() {
         return code;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getDescp() {

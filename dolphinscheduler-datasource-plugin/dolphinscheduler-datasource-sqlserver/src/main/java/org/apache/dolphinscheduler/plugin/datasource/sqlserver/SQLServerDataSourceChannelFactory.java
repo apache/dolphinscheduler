@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.sqlserver;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
@@ -27,7 +28,7 @@ public class SQLServerDataSourceChannelFactory implements DataSourceChannelFacto
 
     @Override
     public String getName() {
-        return "sqlserver";
+        return DbType.SQLSERVER.getName();
     }
 
     @Override
