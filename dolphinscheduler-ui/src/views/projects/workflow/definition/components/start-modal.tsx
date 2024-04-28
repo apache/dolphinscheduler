@@ -503,13 +503,15 @@ export default defineComponent({
                   <NFormItem
                     label={t('project.workflow.parallelism')}
                     path='expectedParallelismNumber'
+                    feedback={t('project.workflow.warning_too_large_parallelism_number')}
+                    validationStatus={'warning'}
+                    showFeedback={parseInt(this.startForm.expectedParallelismNumber) > 10}
                   >
                     <NInputNumber
                       placeholder={t(
                         'project.workflow.please_enter_parallelism'
                       )}
                       v-model:value={this.startForm.expectedParallelismNumber}
-                      max='100'
                       min='1'
                     />
                   </NFormItem>

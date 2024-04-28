@@ -249,7 +249,8 @@ export default {
     delete_task_validate_dependent_tasks_desc:
       'The downstream dependent tasks exists. You can not delete the task.',
     warning_delete_scheduler_dependent_tasks_desc:
-      'The downstream dependent tasks exists. Are you sure to delete the scheduler?'
+      'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
+    warning_too_large_parallelism_number: 'The parallelism number is too large. It\'s better not to be over 10.'
   },
   task: {
     on_line: 'Online',
