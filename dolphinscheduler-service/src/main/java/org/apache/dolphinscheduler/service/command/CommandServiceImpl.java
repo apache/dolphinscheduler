@@ -57,7 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.collect.Lists;
 import io.micrometer.core.annotation.Counted;
 
 /**
@@ -105,14 +104,6 @@ public class CommandServiceImpl implements CommandService {
         command.setId(null);
         result = commandMapper.insert(command);
         return result;
-    }
-
-    @Override
-    public List<Command> findCommandPageBySlot(int pageSize, int masterCount, int thisMasterSlot) {
-        if (masterCount <= 0) {
-            return Lists.newArrayList();
-        }
-        return commandMapper.queryCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
     }
 
     @Override

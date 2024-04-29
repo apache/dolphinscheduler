@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-import java.util.List;
-
 /**
  * Command Service
  */
@@ -43,15 +41,6 @@ public interface CommandService {
      * @return result
      */
     int createCommand(Command command);
-
-    /**
-     * Get command page
-     * @param pageSize page size
-     * @param masterCount master count
-     * @param thisMasterSlot master slot
-     * @return command page
-     */
-    List<Command> findCommandPageBySlot(int pageSize, int masterCount, int thisMasterSlot);
 
     /**
      * check the input command exists in queue list

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,6 +48,17 @@ public class MasterConfigTest {
         assertEquals(0.77, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
         assertEquals(0.77, serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds());
         assertEquals(0.77, serverLoadProtection.getMaxDiskUsagePercentageThresholds());
+    }
 
+    @Test
+    public void getCommandFetchStrategy() {
+        CommandFetchStrategy commandFetchStrategy = masterConfig.getCommandFetchStrategy();
+        assertThat(commandFetchStrategy.getType())
+                .isEqualTo(CommandFetchStrategy.CommandFetchStrategyType.ID_SLOT_BASED);
+
+        CommandFetchStrategy.IdSlotBasedFetchConfig idSlotBasedFetchConfig =
+                (CommandFetchStrategy.IdSlotBasedFetchConfig) commandFetchStrategy.getConfig();
+        assertThat(idSlotBasedFetchConfig.getIdStep()).isEqualTo(3);
+        assertThat(idSlotBasedFetchConfig.getFetchSize()).isEqualTo(11);
     }
 }

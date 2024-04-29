@@ -187,7 +187,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command command = createCommand();
         Integer id = command.getId();
         boolean hit = id % masterCount == thisMasterSlot;
-        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, masterCount, thisMasterSlot);
+        List<Command> commandList = commandMapper.queryCommandByIdSlot(thisMasterSlot, masterCount, 1, 1);
         if (hit) {
             Assertions.assertEquals(id, commandList.get(0).getId());
         } else {
@@ -201,8 +201,9 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
-     * @param count map count
-     * @param commandType comman type
+     *
+     * @param count                 map count
+     * @param commandType           comman type
      * @param processDefinitionCode process definition code
      * @return command map
      */
@@ -223,7 +224,8 @@ public class CommandMapperTest extends BaseDaoTest {
     }
 
     /**
-     *  create process definition
+     * create process definition
+     *
      * @return process definition
      */
     private ProcessDefinition createProcessDefinition() {
@@ -243,6 +245,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
+     *
      * @param count map count
      * @return command map
      */
@@ -258,6 +261,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return
      */
     private Command createCommand() {
@@ -266,6 +270,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return Command
      */
     private Command createCommand(CommandType commandType, long processDefinitionCode) {

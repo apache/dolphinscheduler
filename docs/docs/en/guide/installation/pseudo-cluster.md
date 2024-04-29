@@ -123,7 +123,6 @@ export SPRING_DATASOURCE_PASSWORD={password}
 # DolphinScheduler server related configuration
 export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
 export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
-export MASTER_FETCH_COMMAND_NUM=${MASTER_FETCH_COMMAND_NUM:-10}
 
 # Registry center configuration, determines the type and link of the registry center
 export REGISTRY_TYPE=${REGISTRY_TYPE:-zookeeper}

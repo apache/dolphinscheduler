@@ -49,10 +49,6 @@ public class MasterConfig implements Validator {
      */
     private int listenPort = 5678;
     /**
-     * The max batch size used to fetch command from database.
-     */
-    private int fetchCommandNum = 10;
-    /**
      * The thread number used to prepare processInstance. This number shouldn't bigger than fetchCommandNum.
      */
     private int preExecThreads = 10;
@@ -98,6 +94,8 @@ public class MasterConfig implements Validator {
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
 
+    private CommandFetchStrategy commandFetchStrategy = new CommandFetchStrategy();
+
     // ip:listenPort
     private String masterAddress;
 
@@ -114,9 +112,6 @@ public class MasterConfig implements Validator {
         MasterConfig masterConfig = (MasterConfig) target;
         if (masterConfig.getListenPort() <= 0) {
             errors.rejectValue("listen-port", null, "is invalidated");
-        }
-        if (masterConfig.getFetchCommandNum() <= 0) {
-            errors.rejectValue("fetch-command-num", null, "should be a positive value");
         }
         if (masterConfig.getPreExecThreads() <= 0) {
             errors.rejectValue("per-exec-threads", null, "should be a positive value");
@@ -149,6 +144,7 @@ public class MasterConfig implements Validator {
         if (StringUtils.isEmpty(masterConfig.getMasterAddress())) {
             masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         }
+        commandFetchStrategy.validate(errors);
 
         masterConfig.setMasterRegistryPath(
                 RegistryNodeType.MASTER.getRegistryPath() + "/" + masterConfig.getMasterAddress());
@@ -159,7 +155,6 @@ public class MasterConfig implements Validator {
         String config =
                 "\n****************************Master Configuration**************************************" +
                         "\n  listen-port -> " + listenPort +
-                        "\n  fetch-command-num -> " + fetchCommandNum +
                         "\n  pre-exec-threads -> " + preExecThreads +
                         "\n  exec-threads -> " + execThreads +
                         "\n  dispatch-task-number -> " + dispatchTaskNumber +
@@ -175,6 +170,7 @@ public class MasterConfig implements Validator {
                         "\n  master-address -> " + masterAddress +
                         "\n  master-registry-path: " + masterRegistryPath +
                         "\n  worker-group-refresh-interval: " + workerGroupRefreshInterval +
+                        "\n  command-fetch-strategy: " + commandFetchStrategy +
                         "\n****************************Master Configuration**************************************";
         log.info(config);
     }

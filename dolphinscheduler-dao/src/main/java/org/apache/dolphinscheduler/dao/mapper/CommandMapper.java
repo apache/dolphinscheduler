@@ -52,14 +52,10 @@ public interface CommandMapper extends BaseMapper<Command> {
      */
     List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
 
-    /**
-     * query command page by slot
-     *
-     * @return command list
-     */
-    List<Command> queryCommandPageBySlot(@Param("limit") int limit,
-                                         @Param("masterCount") int masterCount,
-                                         @Param("thisMasterSlot") int thisMasterSlot);
+    List<Command> queryCommandByIdSlot(@Param("currentSlotIndex") int currentSlotIndex,
+                                       @Param("totalSlot") int totalSlot,
+                                       @Param("idStep") int idStep,
+                                       @Param("fetchNumber") int fetchNum);
 
     void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
 }

@@ -160,8 +160,6 @@ casdoor:
 
 master:
   listen-port: 5678
-  # master fetch command num
-  fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
@@ -192,6 +190,13 @@ master:
   # kill yarn/k8s application when failover taskInstance, default true
   kill-application-when-task-failover: true
   worker-group-refresh-interval: 10s
+  command-fetch-strategy:
+    type: ID_SLOT_BASED
+    config:
+      # The incremental id step
+      id-step: 1
+      # master fetch command num
+      fetch-size: 10
 
 worker:
   # worker listener port
