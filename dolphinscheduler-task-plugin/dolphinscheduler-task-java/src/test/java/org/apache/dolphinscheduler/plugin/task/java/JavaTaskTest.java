@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JAR;
@@ -34,7 +35,6 @@ import org.apache.dolphinscheduler.plugin.task.java.exception.JavaSourceFileExis
 import org.apache.dolphinscheduler.plugin.task.java.exception.PublicClassNotFoundException;
 import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundException;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -82,10 +82,10 @@ public class JavaTaskTest {
      **/
     @Test
     public void buildJarCommand() {
-        String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
         JavaTask javaTask = runJarType();
-        Assertions.assertEquals(javaTask.buildJarCommand(), homeBinPath
-                + "java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+        assertThat(javaTask.buildJarCommand())
+                .isEqualTo(
+                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -101,14 +101,13 @@ public class JavaTaskTest {
         Assertions.assertEquals("JavaTaskTest", publicClassName);
         String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
         try {
-            String homeBinPath = JavaConstants.JAVA_HOME_VAR + File.separator + "bin" + File.separator;
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
                 Files.delete(path);
             }
-            Assertions.assertEquals(homeBinPath
-                    + "javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java",
-                    javaTask.buildJavaCompileCommand(sourceCode));
+            assertThat(javaTask.buildJavaCompileCommand(sourceCode))
+                    .isEqualTo(
+                            "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java");
         } finally {
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
@@ -121,26 +120,29 @@ public class JavaTaskTest {
     /**
      * Construct java to run the command
      *
-     *  @return void
+     * @return void
      **/
     @Test
     public void buildJavaCommand() throws Exception {
-        String wantJavaCommand =
-                "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m";
         JavaTask javaTask = runJavaType();
         String sourceCode = javaTask.buildJavaSourceContent();
         String publicClassName = javaTask.getPublicClassName(sourceCode);
+
         Assertions.assertEquals("JavaTaskTest", publicClassName);
+
         String fileName = javaTask.buildJavaSourceCodeFileFullName(publicClassName);
         Path path = Paths.get(fileName);
         if (Files.exists(path)) {
             Files.delete(path);
         }
-        Assertions.assertEquals(wantJavaCommand, javaTask.buildJavaCommand());
+        assertThat(javaTask.buildJavaCommand())
+                .isEqualTo(
+                        "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
      * There is no exception to overwriting the Java source file
+     *
      * @return void
      * @throws IOException
      **/
@@ -259,8 +261,8 @@ public class JavaTaskTest {
         resourceItem2.setResourceAbsolutePathInLocal("opt/share/jar/main.jar");
 
         ResourceContext.ResourceItem resourceItem3 = new ResourceContext.ResourceItem();
-        resourceItem2.setResourceAbsolutePathInStorage("/JavaTaskTest.java");
-        resourceItem2.setResourceAbsolutePathInLocal("JavaTaskTest.java");
+        resourceItem3.setResourceAbsolutePathInStorage("/JavaTaskTest.java");
+        resourceItem3.setResourceAbsolutePathInLocal("JavaTaskTest.java");
 
         ResourceContext resourceContext = new ResourceContext();
         resourceContext.addResourceItem(resourceItem1);
@@ -275,7 +277,7 @@ public class JavaTaskTest {
     /**
      * The Java task to construct the jar run mode
      *
-     *  @return JavaTask
+     * @return JavaTask
      **/
     private JavaTask runJarType() {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
