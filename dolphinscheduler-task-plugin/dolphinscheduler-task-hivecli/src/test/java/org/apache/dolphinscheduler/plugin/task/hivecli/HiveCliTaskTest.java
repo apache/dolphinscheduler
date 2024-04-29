@@ -65,7 +65,7 @@ public class HiveCliTaskTest {
     }
 
     @Test
-    public void hiveCliTaskExecuteSqlFromScript() throws Exception {
+    public void hiveCliTaskExecuteSqlFromScript() {
         String hiveCliTaskParameters = buildHiveCliTaskExecuteSqlFromScriptParameters();
         HiveCliTask hiveCliTask = prepareHiveCliTaskForTest(hiveCliTaskParameters);
         hiveCliTask.init();
@@ -78,7 +78,7 @@ public class HiveCliTaskTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskParams(hiveCliTaskParameters);
         ResourceContext resourceContext = new ResourceContext();
-        resourceContext.addResourceItem(new ResourceContext.ResourceItem("/sql_tasks/hive_task.sql", "123_node.sql",
+        resourceContext.addResourceItem(new ResourceContext.ResourceItem("/sql_tasks/hive_task.sql",
                 "/sql_tasks/hive_task.sql"));
         taskExecutionContext.setResourceContext(resourceContext);
 
