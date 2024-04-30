@@ -18,6 +18,6 @@
 export default {
   profile: '用户信息',
   password: '密码管理',
-  product: '产品信息',
+  about: '产品信息',
   logout: '退出登录'
 }

@@ -374,8 +374,8 @@ export function useDataList() {
         disabled: userStore.getSecurityConfigType !== 'PASSWORD'
       },
       {
-        label: t('user_dropdown.product'),
-        key: 'product',
+        label: t('user_dropdown.about'),
+        key: 'about',
         icon: renderIcon(SelectOutlined),
       },
       {

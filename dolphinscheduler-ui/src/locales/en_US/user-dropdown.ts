@@ -18,6 +18,6 @@
 export default {
   profile: 'Profile',
   password: 'Password',
-  product: 'Product',
+  about: 'About',
   logout: 'Logout'
 }

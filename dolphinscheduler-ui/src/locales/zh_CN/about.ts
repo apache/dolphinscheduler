@@ -16,6 +16,6 @@
  */
 
 export default {
-  product: '产品信息',
-  product_version: '产品版本'
+  about: '关于产品',
+  about_version: '产品版本'
 }

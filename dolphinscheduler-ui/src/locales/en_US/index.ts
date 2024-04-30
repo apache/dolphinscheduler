@@ -32,7 +32,7 @@ import security from '@/locales/en_US/security'
 import theme from '@/locales/en_US/theme'
 import user_dropdown from '@/locales/en_US/user-dropdown'
 import ui_setting from '@/locales/en_US/ui_setting'
-import product from "@/locales/en_US/product";
+import about from "@/locales/en_US/about";
 
 export default {
   login,
@@ -42,7 +42,7 @@ export default {
   menu,
   home,
   password,
-  product,
+  about,
   profile,
   monitor,
   resource,

@@ -16,6 +16,6 @@
  */
 
 export default {
-  product: 'Product Info',
-  product_version: 'Product Version'
+  about: 'About',
+  about_version: 'Product Version'
 }

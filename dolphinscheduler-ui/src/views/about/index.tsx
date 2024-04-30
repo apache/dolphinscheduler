@@ -23,8 +23,8 @@ import { useUserStore } from '@/store/user/user'
 import { queryProductInfo } from '@/service/modules/ui-plugins'
 
 const userStore = useUserStore()
-const product = defineComponent({
-  name: 'product',
+const about = defineComponent({
+  name: 'about',
   setup() {
     const info: any = ref('')
     const queryProduct = async (userId: number) => {
@@ -45,11 +45,11 @@ const product = defineComponent({
     return (
       <div>
         <Card
-          title={t('product.product')}
+          title={t('about.about')}
         >
           <NSpace vertical>
             <NSpace align='center' >
-              <span>{t('product.product_version')}</span>
+              <span>{t('about.about_version')}</span>
               <div>{ info }</div>
             </NSpace>
           </NSpace>
@@ -58,4 +58,4 @@ const product = defineComponent({
     )
   }
 })
-export default product
+export default about

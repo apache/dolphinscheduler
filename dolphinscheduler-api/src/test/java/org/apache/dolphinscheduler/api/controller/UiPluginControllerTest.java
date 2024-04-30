@@ -106,8 +106,6 @@ public class UiPluginControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryProductInfo() throws Exception {
-//        Map<String, Object> mockResult = new HashMap<>();
-//        mockResult.put(Constants.STATUS, Status.SUCCESS);
         ProductInfoDto mockResult = new ProductInfoDto();
         Mockito.when(uiPluginService.queryProductInfo(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
