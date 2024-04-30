@@ -323,7 +323,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         projectParameterList.forEach(projectParameter -> {
             Property property = new Property(projectParameter.getParamName(),
                     Direct.IN,
-                    DataType.VARCHAR,
+                    Enum.valueOf(DataType.class, projectParameter.getParamDataType()),
                     projectParameter.getParamValue());
             result.put(projectParameter.getParamName(), property);
         });
