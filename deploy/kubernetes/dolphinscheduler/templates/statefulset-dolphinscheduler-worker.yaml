@@ -133,11 +133,6 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
-        {{- else }}
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
-          emptyDir: {}
-        - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
-          emptyDir: {}
         {{- end }}
         - name: config-volume
           configMap:
