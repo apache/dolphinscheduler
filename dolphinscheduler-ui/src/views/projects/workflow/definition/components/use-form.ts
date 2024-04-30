@@ -66,7 +66,7 @@ export const useForm = () => {
       tenantCode: 'default',
       environmentCode: null,
       startParams: null,
-      expectedParallelismNumber: '',
+      expectedParallelismNumber: '2',
       dryRun: 0,
       testFlag: 0,
       version: null,
