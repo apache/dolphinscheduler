@@ -15,16 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.alert.rpc;
 
-import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import lombok.experimental.UtilityClass;
+class AlertRpcServerTest {
 
-@UtilityClass
-public class NettyRemotingServerFactory {
+    @Autowired
+    private AlertRpcServer alertRpcServer;
 
-    public NettyRemotingServer buildNettyRemotingServer(NettyServerConfig nettyServerConfig) {
-        return new NettyRemotingServer(nettyServerConfig);
+    @Test
+    void testStart() {
+        alertRpcServer.start();
     }
+
+    @Test
+    void testClose() {
+        alertRpcServer.close();
+    }
+
 }

@@ -15,18 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.extract.base.server;
 
-import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+interface ServerMethodInvokerRegistry {
 
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
+    /**
+     * Register service object, which will be used to invoke the {@link ServerMethodInvoker}.
+     * The serverMethodInvokerProviderObject should implement with interface which contains {@link org.apache.dolphinscheduler.extract.base.RpcService} annotation.
+     */
+    void registerServerMethodInvokerProvider(Object serverMethodInvokerProviderObject);
 
-@UtilityClass
-@Slf4j
-public class NettyRemotingClientFactory {
-
-    public NettyRemotingClient buildNettyRemotingClient(NettyClientConfig nettyClientConfig) {
-        return new NettyRemotingClient(nettyClientConfig);
-    }
 }

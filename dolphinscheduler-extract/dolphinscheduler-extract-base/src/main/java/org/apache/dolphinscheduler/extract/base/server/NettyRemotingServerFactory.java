@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.extract.base.server;
 
-import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 
-import org.mockito.Mockito;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import lombok.experimental.UtilityClass;
 
-/**
- * dependency config
- */
-@Configuration
-public class TaskResponseProcessorTestConfig {
+@UtilityClass
+class NettyRemotingServerFactory {
 
-    @Bean
-    public DataQualityResultOperator dataQualityResultOperator() {
-        return Mockito.mock(DataQualityResultOperator.class);
+    NettyRemotingServer buildNettyRemotingServer(NettyServerConfig nettyServerConfig) {
+        return new NettyRemotingServer(nettyServerConfig);
     }
 }
