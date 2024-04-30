@@ -68,6 +68,15 @@ const basePage: RouteRecordRaw[] = [
           title: '用户信息',
           auth: []
         }
+      },
+      {
+        path: '/product',
+        name: 'product',
+        component: components['product'],
+        meta: {
+          title: '产品信息',
+          auth: []
+        }
       }
     ]
   },

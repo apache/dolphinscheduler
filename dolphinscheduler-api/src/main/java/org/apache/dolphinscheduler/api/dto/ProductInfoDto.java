@@ -15,27 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.api.dto;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
-import org.apache.dolphinscheduler.dao.entity.Version;
-import org.apache.ibatis.annotations.Param;
+import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
 /**
- * user mapper interface
+ * ProductInfoDto
  */
-public interface VersionMapper extends BaseMapper<Version> {
+@Data
+public class ProductInfoDto {
 
-    /**
-     * select by user id
-     */
-    Version selectById(int id);
+    private Integer id;
+
+    private String version;
 
 }

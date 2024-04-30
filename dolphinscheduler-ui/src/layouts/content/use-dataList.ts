@@ -26,6 +26,7 @@ import {
   DesktopOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
+  SelectOutlined,
   LogoutOutlined,
   FundProjectionScreenOutlined,
   PartitionOutlined,
@@ -371,6 +372,11 @@ export function useDataList() {
         key: 'password',
         icon: renderIcon(KeyOutlined),
         disabled: userStore.getSecurityConfigType !== 'PASSWORD'
+      },
+      {
+        label: t('user_dropdown.product'),
+        key: 'product',
+        icon: renderIcon(SelectOutlined),
       },
       {
         label: t('user_dropdown.logout'),

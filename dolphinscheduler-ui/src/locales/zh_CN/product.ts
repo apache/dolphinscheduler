@@ -16,8 +16,6 @@
  */
 
 export default {
-  profile: 'Profile',
-  password: 'Password',
-  product: 'Product',
-  logout: 'Logout'
+  product: '产品信息',
+  product_version: '产品版本'
 }

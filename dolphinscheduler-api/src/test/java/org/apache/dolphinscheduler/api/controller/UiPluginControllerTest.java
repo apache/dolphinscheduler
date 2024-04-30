@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -105,8 +106,9 @@ public class UiPluginControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryProductInfo() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+//        Map<String, Object> mockResult = new HashMap<>();
+//        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        ProductInfoDto mockResult = new ProductInfoDto();
         Mockito.when(uiPluginService.queryProductInfo(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();

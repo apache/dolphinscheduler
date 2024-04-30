@@ -31,6 +31,8 @@ export function useDropDown() {
       useLogout()
     } else if (key === 'password') {
       router.push({ path: '/password' })
+    } else if (key === 'product') {
+      router.push({ path: '/product' })
     } else if (key === 'profile') {
       router.push({ path: '/profile' })
     }

@@ -17,6 +17,7 @@
 
 import { axios } from '@/service/service'
 import { PluginTypeReq, IPluginId } from './types'
+import { UserIdReq } from "@/service/modules/projects/types";
 
 export function queryUiPluginsByType(params: PluginTypeReq): any {
   return axios({
@@ -30,5 +31,13 @@ export function queryUiPluginDetailById(id: IPluginId): any {
   return axios({
     url: `/ui-plugins/${id}`,
     method: 'get'
+  })
+}
+
+export function queryProductInfo(params: UserIdReq): any {
+  return axios({
+    url: '/ui-plugins/queryProductInfo',
+    method: 'post',
+    params
   })
 }

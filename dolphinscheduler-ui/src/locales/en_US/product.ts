@@ -15,24 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-import org.apache.dolphinscheduler.common.enums.UserType;
-
-import java.util.Date;
-
-@Data
-@TableName("t_ds_version")
-public class Version {
-
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    private String version;
-
+export default {
+  product: 'Product Info',
+  product_version: 'Product Version'
 }

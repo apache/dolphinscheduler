@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -91,11 +92,10 @@ public class UiPluginController extends BaseController {
     @PostMapping(value = "/queryProductInfo")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERSION_INFO_STATE_ERROR)
-    public Result queryProductInfo(
+    public Result<ProductInfoDto> queryProductInfo(
             @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "userId") int userId) {
-        loginUser.setId(1);
-        Map<String, Object> result = uiPluginService.queryProductInfo(loginUser, userId);
-        return returnDataList(result);
+            @RequestParam(value = "userId") Integer userId) {
+        ProductInfoDto result = uiPluginService.queryProductInfo(loginUser, userId);
+        return Result.success(result);
     }
 }
