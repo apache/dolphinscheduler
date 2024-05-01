@@ -80,6 +80,16 @@ public class ScriptSenderTest {
     }
 
     @Test
+    public void testPathError() {
+        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, "/usr/sbin/abc");
+        ScriptSender scriptSender = new ScriptSender(scriptConfig);
+        AlertResult alertResult;
+        alertResult = scriptSender.sendScriptAlert("test path NPE", "test content");
+        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertTrue(alertResult.getMessage().contains("shell script is invalid, only support .sh file"));
+    }
+
+    @Test
     public void testTypeIsError() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TYPE, null);
         ScriptSender scriptSender = new ScriptSender(scriptConfig);

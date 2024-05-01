@@ -36,21 +36,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.stereotype.Component;
-
-@Component
 @Slf4j
 public class TaskPluginManager {
 
-    private final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();
-    private final Map<String, TaskChannel> taskChannelMap = new HashMap<>();
+    private static final Map<String, TaskChannelFactory> taskChannelFactoryMap = new HashMap<>();
+    private static final Map<String, TaskChannel> taskChannelMap = new HashMap<>();
 
-    private final AtomicBoolean loadedFlag = new AtomicBoolean(false);
+    private static final AtomicBoolean loadedFlag = new AtomicBoolean(false);
 
     /**
      * Load task plugins from classpath.
      */
-    public void loadPlugin() {
+    public static void loadPlugin() {
         if (!loadedFlag.compareAndSet(false, true)) {
             log.warn("The task plugin has already been loaded");
             return;
@@ -70,24 +67,24 @@ public class TaskPluginManager {
 
     }
 
-    public Map<String, TaskChannel> getTaskChannelMap() {
+    public static Map<String, TaskChannel> getTaskChannelMap() {
         return Collections.unmodifiableMap(taskChannelMap);
     }
 
-    public Map<String, TaskChannelFactory> getTaskChannelFactoryMap() {
+    public static Map<String, TaskChannelFactory> getTaskChannelFactoryMap() {
         return Collections.unmodifiableMap(taskChannelFactoryMap);
     }
 
-    public TaskChannel getTaskChannel(String type) {
-        return this.getTaskChannelMap().get(type);
+    public static TaskChannel getTaskChannel(String type) {
+        return getTaskChannelMap().get(type);
     }
 
-    public boolean checkTaskParameters(ParametersNode parametersNode) {
-        AbstractParameters abstractParameters = this.getParameters(parametersNode);
+    public static boolean checkTaskParameters(ParametersNode parametersNode) {
+        AbstractParameters abstractParameters = getParameters(parametersNode);
         return abstractParameters != null && abstractParameters.checkParameters();
     }
 
-    public AbstractParameters getParameters(ParametersNode parametersNode) {
+    public static AbstractParameters getParameters(ParametersNode parametersNode) {
         String taskType = parametersNode.getTaskType();
         if (Objects.isNull(taskType)) {
             return null;
@@ -106,7 +103,7 @@ public class TaskPluginManager {
             case TaskConstants.TASK_TYPE_DYNAMIC:
                 return JSONUtils.parseObject(parametersNode.getTaskParams(), DynamicParameters.class);
             default:
-                TaskChannel taskChannel = this.getTaskChannelMap().get(taskType);
+                TaskChannel taskChannel = getTaskChannelMap().get(taskType);
                 if (Objects.isNull(taskChannel)) {
                     return null;
                 }

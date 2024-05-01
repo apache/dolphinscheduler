@@ -44,7 +44,8 @@ import {
   NSwitch,
   NCheckbox,
   NDatePicker,
-  NRadioButton
+  NRadioButton,
+  NInputNumber
 } from 'naive-ui'
 import {
   ArrowDownOutlined,
@@ -54,6 +55,7 @@ import {
 } from '@vicons/antd'
 import { IDefinitionData } from '../types'
 import styles from '../index.module.scss'
+import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
 
 const props = {
   row: {
@@ -74,7 +76,6 @@ export default defineComponent({
   props,
   emits: ['update:show', 'update:row', 'updateList'],
   setup(props, ctx) {
-    const parallelismRef = ref(false)
     const { t } = useI18n()
     const route = useRoute()
     const { startState } = useForm()
@@ -172,6 +173,85 @@ export default defineComponent({
       ]
     }
 
+    const projectPreferences = ref({} as any)
+
+    const initProjectPreferences = async (projectCode: number) => {
+      if (projectCode) {
+        await queryProjectPreferenceByProjectCode(projectCode).then(
+          (result: any) => {
+            if (result?.preferences && result.state === 1) {
+              projectPreferences.value = JSON.parse(result.preferences)
+            }
+          }
+        )
+      }
+    }
+
+    const containValueInOptions = (
+      options: Array<any>,
+      findingValue: string
+    ): boolean => {
+      for (const { value } of options) {
+        if (findingValue === value) {
+          return true
+        }
+      }
+      return false
+    }
+
+    const restructureForm = async (form: any) => {
+      await initProjectPreferences(props.row.projectCode)
+      if (projectPreferences.value?.taskPriority) {
+        form.processInstancePriority = projectPreferences.value.taskPriority
+      }
+      if (projectPreferences.value?.warningType) {
+        form.warningType = projectPreferences.value.warningType
+      }
+      if (projectPreferences.value?.workerGroup) {
+        if (
+          containValueInOptions(
+            variables.workerGroups,
+            projectPreferences.value.workerGroup
+          )
+        ) {
+          form.workerGroup = projectPreferences.value.workerGroup
+        }
+      }
+      if (projectPreferences.value?.tenant) {
+        if (
+          containValueInOptions(
+            variables.tenantList,
+            projectPreferences.value.tenant
+          )
+        ) {
+          form.tenantCode = projectPreferences.value.tenant
+        }
+      }
+      if (
+        projectPreferences.value?.environmentCode &&
+        variables?.environmentList
+      ) {
+        if (
+          containValueInOptions(
+            variables.environmentList,
+            projectPreferences.value.environmentCode
+          )
+        ) {
+          form.environmentCode = projectPreferences.value.environmentCode
+        }
+      }
+      if (projectPreferences.value?.alertGroups && variables?.alertGroups) {
+        if (
+          containValueInOptions(
+            variables.alertGroups,
+            projectPreferences.value.alertGroups
+          )
+        ) {
+          form.warningGroupId = projectPreferences.value.alertGroups
+        }
+      }
+    }
+
     const updateWorkerGroup = () => {
       startState.startForm.environmentCode = null
     }
@@ -206,6 +286,7 @@ export default defineComponent({
       () => {
         if (props.show) {
           getStartParamsList(props.row.code)
+          restructureForm(startState.startForm)
           if (props.taskCode)
             startState.startForm.startNodeList = props.taskCode
         }
@@ -215,7 +296,6 @@ export default defineComponent({
     return {
       t,
       showTaskDependType,
-      parallelismRef,
       hideModal,
       handleStart,
       generalWarningTypeListOptions,
@@ -423,23 +503,26 @@ export default defineComponent({
                   <NFormItem
                     label={t('project.workflow.parallelism')}
                     path='expectedParallelismNumber'
+                    feedback={t(
+                      'project.workflow.warning_too_large_parallelism_number'
+                    )}
+                    validationStatus={'warning'}
+                    showFeedback={
+                      parseInt(this.startForm.expectedParallelismNumber) > 10
+                    }
                   >
-                    <NCheckbox v-model:checked={this.parallelismRef}>
-                      {t('project.workflow.custom_parallelism')}
-                    </NCheckbox>
-                    <NInput
-                      allowInput={this.trim}
-                      disabled={!this.parallelismRef}
+                    <NInputNumber
                       placeholder={t(
                         'project.workflow.please_enter_parallelism'
                       )}
                       v-model:value={this.startForm.expectedParallelismNumber}
+                      min='1'
                     />
                   </NFormItem>
                 )}
                 <NFormItem
-                    label={t('project.workflow.order_of_execution')}
-                    path='executionOrder'
+                  label={t('project.workflow.order_of_execution')}
+                  path='executionOrder'
                 >
                   <NRadioGroup v-model:value={this.startForm.executionOrder}>
                     <NSpace>

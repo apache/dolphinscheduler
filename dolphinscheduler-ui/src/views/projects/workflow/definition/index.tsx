@@ -45,6 +45,7 @@ import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
 import Search from '@/components/input-search'
+import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -317,6 +318,14 @@ export default defineComponent({
           negativeText={t('project.workflow.cancel')}
           maskClosable={false}
           onPositiveClick={this.confirmToSetWorkflowTiming}
+        />
+        <DependenciesModal
+          v-model:row={this.row}
+          v-model:show={this.dependenciesData.showRef}
+          v-model:taskLinks={this.dependenciesData.taskLinks}
+          required={this.dependenciesData.required}
+          content={this.dependenciesData.tip}
+          onConfirm={this.dependenciesData.action}
         />
       </NSpace>
     )

@@ -17,16 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ActiveProfiles("master")
-@ExtendWith(SpringExtension.class)
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@AutoConfigureMockMvc
 @SpringBootTest(classes = MasterConfig.class)
 public class MasterConfigTest {
 
@@ -36,6 +36,29 @@ public class MasterConfigTest {
     @Test
     public void getMasterDispatchTaskNumber() {
         int masterDispatchTaskNumber = masterConfig.getDispatchTaskNumber();
-        Assertions.assertEquals(3, masterDispatchTaskNumber);
+        assertEquals(30, masterDispatchTaskNumber);
+    }
+
+    @Test
+    public void getServerLoadProtection() {
+        MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
+        assertTrue(serverLoadProtection.isEnabled());
+        assertEquals(0.77, serverLoadProtection.getMaxSystemCpuUsagePercentageThresholds());
+        assertEquals(0.77, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
+        assertEquals(0.77, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
+        assertEquals(0.77, serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds());
+        assertEquals(0.77, serverLoadProtection.getMaxDiskUsagePercentageThresholds());
+    }
+
+    @Test
+    public void getCommandFetchStrategy() {
+        CommandFetchStrategy commandFetchStrategy = masterConfig.getCommandFetchStrategy();
+        assertThat(commandFetchStrategy.getType())
+                .isEqualTo(CommandFetchStrategy.CommandFetchStrategyType.ID_SLOT_BASED);
+
+        CommandFetchStrategy.IdSlotBasedFetchConfig idSlotBasedFetchConfig =
+                (CommandFetchStrategy.IdSlotBasedFetchConfig) commandFetchStrategy.getConfig();
+        assertThat(idSlotBasedFetchConfig.getIdStep()).isEqualTo(3);
+        assertThat(idSlotBasedFetchConfig.getFetchSize()).isEqualTo(11);
     }
 }

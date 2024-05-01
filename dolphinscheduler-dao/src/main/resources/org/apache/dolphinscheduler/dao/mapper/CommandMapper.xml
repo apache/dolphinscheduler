@@ -40,11 +40,18 @@
         limit #{limit} offset #{offset}
     </select>
 
-    <select id="queryCommandPageBySlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+    <select id="queryCommandByIdSlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select *
         from t_ds_command
-        where id % #{masterCount} = #{thisMasterSlot}
+        where (id / #{idStep}) % #{totalSlot} = #{currentSlotIndex}
         order by process_instance_priority, id asc
-            limit #{limit}
+            limit #{fetchNumber}
     </select>
+    <delete id="deleteByWorkflowInstanceIds" >
+        delete from t_ds_command
+        where process_instance_id in
+        <foreach collection="workflowInstanceIds" index="index" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </delete>
 </mapper>

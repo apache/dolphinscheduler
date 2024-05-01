@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.remoteshell;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -134,5 +135,23 @@ public class RemoteExecutorTest {
 
         doReturn("DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-1").when(remoteExecutor).runRemote(trackCommand);
         Assertions.assertEquals(1, remoteExecutor.getTaskExitCode(taskId));
+    }
+
+    @Test
+    void getAllRemotePidStr() throws IOException {
+
+        RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
+        doReturn("bash(9527)───sleep(9528)").when(remoteExecutor).runRemote(anyString());
+        String allPidStr = remoteExecutor.getAllRemotePidStr("9527");
+        Assertions.assertEquals("9527 9528", allPidStr);
+
+        doReturn("systemd(1)───sleep(9528)").when(remoteExecutor).runRemote(anyString());
+        allPidStr = remoteExecutor.getAllRemotePidStr("9527");
+        Assertions.assertEquals("9527", allPidStr);
+
+        doThrow(new TaskException()).when(remoteExecutor).runRemote(anyString());
+        allPidStr = remoteExecutor.getAllRemotePidStr("9527");
+        Assertions.assertEquals("9527", allPidStr);
+
     }
 }

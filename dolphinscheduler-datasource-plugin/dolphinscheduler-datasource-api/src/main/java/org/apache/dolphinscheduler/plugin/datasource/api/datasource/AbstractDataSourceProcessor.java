@@ -118,7 +118,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getUser(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(), baseConnectionParam.getUser(),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()), baseConnectionParam.getJdbcUrl());
     }
 
@@ -134,6 +134,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.other);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.other);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.other);
     }
 }

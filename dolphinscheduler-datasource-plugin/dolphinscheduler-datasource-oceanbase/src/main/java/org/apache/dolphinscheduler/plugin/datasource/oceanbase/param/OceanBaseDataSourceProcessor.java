@@ -192,6 +192,7 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.oceanbase);
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.oceanbase);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.oceanbase);
     }
 }

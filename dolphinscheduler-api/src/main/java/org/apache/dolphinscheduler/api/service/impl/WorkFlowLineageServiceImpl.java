@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -278,11 +279,29 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     public Set<TaskMainInfo> queryTaskDepOnProcess(long projectCode, long processDefinitionCode) {
         Set<TaskMainInfo> taskMainInfos = new HashSet<>();
         List<TaskMainInfo> taskDependents =
-                workFlowLineageMapper.queryTaskDependentDepOnProcess(projectCode, processDefinitionCode);
+                workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode, 0);
         List<TaskMainInfo> taskSubProcess =
                 workFlowLineageMapper.queryTaskSubProcessDepOnProcess(projectCode, processDefinitionCode);
         taskMainInfos.addAll(taskDependents);
         taskMainInfos.addAll(taskSubProcess);
         return taskMainInfos;
+    }
+
+    /**
+     * Query downstream tasks depend on a process definition or a task
+     *
+     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param taskCode Task code want to query tasks dependence
+     * @return downstream dependent tasks
+     */
+    @Override
+    public Map<String, Object> queryDownstreamDependentTasks(Long processDefinitionCode, Long taskCode) {
+        Map<String, Object> result = new HashMap<>();
+        List<TaskMainInfo> taskDependents =
+                workFlowLineageMapper.queryTaskDependentOnProcess(processDefinitionCode,
+                        Objects.isNull(taskCode) ? 0 : taskCode.longValue());
+        result.put(Constants.DATA_LIST, taskDependents);
+        putMsg(result, Status.SUCCESS);
+        return result;
     }
 }
