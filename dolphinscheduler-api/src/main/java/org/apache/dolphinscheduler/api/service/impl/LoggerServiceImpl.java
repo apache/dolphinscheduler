@@ -237,7 +237,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
 
-        byte[] logBytes = new byte[0];
+        byte[] logBytes;
 
         ILogService iLogService =
                 SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
@@ -251,6 +251,5 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
             throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
         }
-
     }
 }

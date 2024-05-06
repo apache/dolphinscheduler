@@ -40,8 +40,8 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 
 @Configuration
+@ComponentScan("org.apache.dolphinscheduler.dao")
 @EnableAutoConfiguration
-@ComponentScan({"org.apache.dolphinscheduler.dao.plugin"})
 @MapperScan(basePackages = "org.apache.dolphinscheduler.dao.mapper", sqlSessionFactoryRef = "sqlSessionFactory")
 public class DaoConfiguration {
 

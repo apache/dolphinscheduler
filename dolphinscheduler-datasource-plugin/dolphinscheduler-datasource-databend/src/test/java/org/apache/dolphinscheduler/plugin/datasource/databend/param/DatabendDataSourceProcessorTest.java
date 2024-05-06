@@ -151,7 +151,7 @@ public class DatabendDataSourceProcessorTest {
     @Test
     public void testDbType() {
         Assertions.assertEquals(19, DbType.DATABEND.getCode());
-        Assertions.assertEquals("databend", DbType.DATABEND.getDescp());
+        Assertions.assertEquals("databend", DbType.DATABEND.getName());
         Assertions.assertEquals(DbType.DATABEND, DbType.of(19));
     }
 

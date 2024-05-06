@@ -31,6 +31,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_DATASOUR
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_DATASOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_DATASOURCE_NAME_FAILURE;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
@@ -92,6 +94,7 @@ public class DataSourceController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_DATASOURCE_ERROR)
+    @OperatorLog(auditType = AuditType.DATASOURCE_CREATE)
     public Result<DataSource> createDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @Parameter(name = "dataSourceParam", description = "DATA_SOURCE_PARAM", required = true) @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
@@ -116,6 +119,7 @@ public class DataSourceController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_DATASOURCE_ERROR)
+    @OperatorLog(auditType = AuditType.DATASOURCE_UPDATE)
     public Result<DataSource> updateDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @PathVariable(value = "id") Integer id,
                                                @RequestBody String jsonStr) {
@@ -162,7 +166,7 @@ public class DataSourceController extends BaseController {
     @ApiException(QUERY_DATASOURCE_ERROR)
     public Result<Object> queryDataSourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                               @RequestParam("type") DbType type) {
-        List<DataSource> datasourceList = dataSourceService.queryDataSourceList(loginUser, type.ordinal());
+        List<DataSource> datasourceList = dataSourceService.queryDataSourceList(loginUser, type.getCode());
         return Result.success(datasourceList);
     }
 
@@ -250,6 +254,7 @@ public class DataSourceController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_DATA_SOURCE_FAILURE)
+    @OperatorLog(auditType = AuditType.DATASOURCE_DELETE)
     public Result<Boolean> deleteDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable("id") int id) {
         dataSourceService.delete(loginUser, id);

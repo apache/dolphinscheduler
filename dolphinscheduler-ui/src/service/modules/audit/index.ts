@@ -25,3 +25,17 @@ export function queryAuditLogListPaging(params: AuditListReq): any {
     params
   })
 }
+
+export function queryAuditModelType(): any {
+  return axios({
+    url: '/projects/audit/audit-log-model-type',
+    method: 'get'
+  })
+}
+
+export function queryAuditLogOperationType(): any {
+  return axios({
+    url: '/projects/audit/audit-log-operation-type',
+    method: 'get'
+  })
+}

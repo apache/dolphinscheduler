@@ -252,9 +252,58 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
     @Override
     public void kill() {
         try {
-            changeRunningSubprocessInstancesToStop(WorkflowExecutionStatus.READY_STOP);
+            doKillSubWorkflowInstances();
         } catch (MasterTaskExecuteException e) {
             log.error("kill {} error", taskInstance.getName(), e);
+        }
+    }
+
+    private void doKillSubWorkflowInstances() throws MasterTaskExecuteException {
+        List<ProcessInstance> existsSubProcessInstanceList =
+                subWorkflowService.getAllDynamicSubWorkflow(processInstance.getId(), taskInstance.getTaskCode());
+        if (CollectionUtils.isEmpty(existsSubProcessInstanceList)) {
+            return;
+        }
+
+        commandMapper.deleteByWorkflowInstanceIds(
+                existsSubProcessInstanceList.stream().map(ProcessInstance::getId).collect(Collectors.toList()));
+
+        List<ProcessInstance> runningSubProcessInstanceList =
+                subWorkflowService.filterRunningProcessInstances(existsSubProcessInstanceList);
+        doKillRunningSubWorkflowInstances(runningSubProcessInstanceList);
+
+        List<ProcessInstance> waitToRunProcessInstances =
+                subWorkflowService.filterWaitToRunProcessInstances(existsSubProcessInstanceList);
+        doKillWaitToRunSubWorkflowInstances(waitToRunProcessInstances);
+
+        this.haveBeenCanceled = true;
+    }
+
+    private void doKillRunningSubWorkflowInstances(List<ProcessInstance> runningSubProcessInstanceList) throws MasterTaskExecuteException {
+        for (ProcessInstance subProcessInstance : runningSubProcessInstanceList) {
+            subProcessInstance.setState(WorkflowExecutionStatus.READY_STOP);
+            processInstanceDao.updateById(subProcessInstance);
+            if (subProcessInstance.getState().isFinished()) {
+                log.info("The process instance [{}] is finished, no need to stop", subProcessInstance.getId());
+                continue;
+            }
+            try {
+                sendToSubProcess(taskExecutionContext, subProcessInstance);
+                log.info("Success send [{}] request to SubWorkflow's master: {}", WorkflowExecutionStatus.READY_STOP,
+                        subProcessInstance.getHost());
+            } catch (Exception e) {
+                throw new MasterTaskExecuteException(
+                        String.format("Send stop request to SubWorkflow's master: %s failed",
+                                subProcessInstance.getHost()),
+                        e);
+            }
+        }
+    }
+
+    private void doKillWaitToRunSubWorkflowInstances(List<ProcessInstance> waitToRunWorkflowInstances) {
+        for (ProcessInstance subProcessInstance : waitToRunWorkflowInstances) {
+            subProcessInstance.setState(WorkflowExecutionStatus.STOP);
+            processInstanceDao.updateById(subProcessInstance);
         }
     }
 

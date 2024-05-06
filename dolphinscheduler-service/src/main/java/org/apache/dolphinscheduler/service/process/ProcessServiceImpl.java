@@ -111,7 +111,6 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
@@ -263,9 +262,6 @@ public class ProcessServiceImpl implements ProcessService {
     private WorkFlowLineageMapper workFlowLineageMapper;
 
     @Autowired
-    private TaskPluginManager taskPluginManager;
-
-    @Autowired
     private ClusterMapper clusterMapper;
 
     @Autowired
@@ -276,6 +272,7 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private TriggerRelationService triggerRelationService;
+
     /**
      * todo: split this method
      * handle Command (construct ProcessInstance from Command) , wrapped in transaction
@@ -621,13 +618,13 @@ public class ProcessServiceImpl implements ProcessService {
 
     /**
      * Get workflow runtime tenant
-     *
+     * <p>
      * the workflow provides a tenant and uses the provided tenant;
      * when no tenant is provided or the provided tenant is the default tenant, \
      * the user's tenant created by the workflow is used
      *
      * @param tenantCode tenantCode
-     * @param userId   userId
+     * @param userId     userId
      * @return tenant code
      */
     @Override
@@ -798,7 +795,7 @@ public class ProcessServiceImpl implements ProcessService {
                 // recover tolerance fault process
                 // If the workflow instance is in ready state, we will change to running, this can avoid the workflow
                 // instance
-                // status is not correct with taskInsatnce status
+                // status is not correct with taskInstance status
                 if (processInstance.getState() == WorkflowExecutionStatus.READY_PAUSE
                         || processInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
                     // todo: If we handle the ready state in WorkflowExecuteRunnable then we can remove below code
@@ -1679,7 +1676,7 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLog.setOperator(operator.getId());
             if (taskDefinitionLog.getCode() == 0) {
-                taskDefinitionLog.setCode(CodeGenerateUtils.getInstance().genCode());
+                taskDefinitionLog.setCode(CodeGenerateUtils.genCode());
             }
             if (taskDefinitionLog.getVersion() == 0) {
                 // init first version
@@ -1774,6 +1771,7 @@ public class ProcessServiceImpl implements ProcessService {
         if (Boolean.TRUE.equals(syncDefine)) {
             if (processDefinition.getId() == null) {
                 result = processDefineMapper.insert(processDefinitionLog);
+                processDefinition.setId(processDefinitionLog.getId());
             } else {
                 processDefinitionLog.setId(processDefinition.getId());
                 result = processDefineMapper.updateById(processDefinitionLog);
@@ -2113,11 +2111,7 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     @Override
-    public void forceProcessInstanceSuccessByTaskInstanceId(Integer taskInstanceId) {
-        TaskInstance task = taskInstanceMapper.selectById(taskInstanceId);
-        if (task == null) {
-            return;
-        }
+    public void forceProcessInstanceSuccessByTaskInstanceId(TaskInstance task) {
         ProcessInstance processInstance = findProcessInstanceDetailById(task.getProcessInstanceId()).orElse(null);
         if (processInstance != null
                 && (processInstance.getState().isFailure() || processInstance.getState().isStop())) {
@@ -2138,7 +2132,7 @@ public class ProcessServiceImpl implements ProcessService {
                 List<Integer> failTaskList = validTaskList.stream()
                         .filter(instance -> instance.getState().isFailure() || instance.getState().isKill())
                         .map(TaskInstance::getId).collect(Collectors.toList());
-                if (failTaskList.size() == 1 && failTaskList.contains(taskInstanceId)) {
+                if (failTaskList.size() == 1 && failTaskList.contains(task.getId())) {
                     processInstance.setStateWithDesc(WorkflowExecutionStatus.SUCCESS, "success by task force success");
                     processInstanceDao.updateById(processInstance);
                 }

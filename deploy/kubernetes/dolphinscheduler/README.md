@@ -174,7 +174,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | image.master | string | `"dolphinscheduler-master"` | master image |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy. Options: Always, Never, IfNotPresent |
 | image.pullSecret | string | `""` | Specify a imagePullSecrets |
-| image.registry | string | `"apache/dolphinscheduler"` | Docker image repository for the DolphinScheduler |
+| image.registry | string | `"apache"` | Docker image repository for the DolphinScheduler |
 | image.tag | string | `"latest"` | Docker image version for the DolphinScheduler |
 | image.tools | string | `"dolphinscheduler-tools"` | tools image |
 | image.worker | string | `"dolphinscheduler-worker"` | worker image |
@@ -200,9 +200,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | master.env.MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER | string | `"true"` | Master kill application when handle failover |
 | master.env.MASTER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Master max heartbeat interval |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open master overload protection |
-| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow. |
-| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_STATE_WHEEL_INTERVAL | string | `"5s"` | master state wheel interval, the unit is second |
 | master.env.MASTER_TASK_COMMIT_INTERVAL | string | `"1s"` | master commit task interval, the unit is second |
@@ -301,9 +301,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_HOST_WEIGHT | string | `"100"` | Worker host weight to dispatch tasks |
 | worker.env.WORKER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Worker heartbeat interval |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open worker overload protection |
-| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max cpu usage, when the worker's cpu usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks. |
-| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max jvm memory usage , when the worker's jvm memory usage is smaller then this value, worker server can be dispatched tasks. |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max jvm cpu usage, when the worker's jvm cpu usage is smaller then this value, worker server can be dispatched tasks. |
+| worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
 | worker.env.WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT | bool | `false` | Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants. |

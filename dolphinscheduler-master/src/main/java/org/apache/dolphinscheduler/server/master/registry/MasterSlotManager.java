@@ -70,7 +70,8 @@ public class MasterSlotManager {
         public void notify(Map<String, MasterHeartBeat> masterNodeInfo) {
             List<Server> serverList = masterNodeInfo.values().stream()
                     .filter(heartBeat -> !heartBeat.getServerStatus().equals(ServerStatus.BUSY))
-                    .map(this::convertHeartBeatToServer).collect(Collectors.toList());
+                    .map(this::convertHeartBeatToServer)
+                    .collect(Collectors.toList());
             syncMasterNodes(serverList);
         }
 

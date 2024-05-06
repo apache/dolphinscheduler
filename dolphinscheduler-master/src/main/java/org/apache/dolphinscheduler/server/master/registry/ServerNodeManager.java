@@ -245,14 +245,16 @@ public class ServerNodeManager implements InitializingBean {
     }
 
     private void updateWorkerNodes() {
-        workerGroupWriteLock.lock();
+        workerNodeInfoWriteLock.lock();
         try {
             Map<String, String> workerNodeMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
             for (Map.Entry<String, String> entry : workerNodeMaps.entrySet()) {
-                workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
+                String nodeAddress = entry.getKey();
+                WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class);
+                workerNodeInfo.put(nodeAddress, workerHeartBeat);
             }
         } finally {
-            workerGroupWriteLock.unlock();
+            workerNodeInfoWriteLock.unlock();
         }
     }
 

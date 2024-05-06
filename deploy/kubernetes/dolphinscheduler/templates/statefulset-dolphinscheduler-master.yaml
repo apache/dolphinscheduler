@@ -112,7 +112,7 @@ spec:
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
