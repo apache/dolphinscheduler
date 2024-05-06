@@ -20,23 +20,15 @@ package org.apache.dolphinscheduler.registry.api.ha;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractServerStatusChangeListener implements ServerStatusChangeListener {
+public class DefaultServerStatusChangeListener extends AbstractServerStatusChangeListener {
 
     @Override
-    public void change(HAServer.ServerStatus originStatus, HAServer.ServerStatus currentStatus) {
-        log.info("The status change from {} to {}.", originStatus, currentStatus);
-        if (originStatus == HAServer.ServerStatus.ACTIVE) {
-            if (currentStatus == HAServer.ServerStatus.STAND_BY) {
-                changeToStandBy();
-            }
-        } else if (originStatus == HAServer.ServerStatus.STAND_BY) {
-            if (currentStatus == HAServer.ServerStatus.ACTIVE) {
-                changeToActive();
-            }
-        }
+    public void changeToActive() {
+        log.info("The status is active now.");
     }
 
-    public abstract void changeToActive();
-
-    public abstract void changeToStandBy();
+    @Override
+    public void changeToStandBy() {
+        log.info("The status is standby now.");
+    }
 }

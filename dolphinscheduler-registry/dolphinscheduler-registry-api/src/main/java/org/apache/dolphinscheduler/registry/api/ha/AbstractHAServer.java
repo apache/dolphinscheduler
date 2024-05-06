@@ -21,12 +21,13 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.collect.Lists;
 
 @Slf4j
 public abstract class AbstractHAServer implements HAServer {
@@ -43,7 +44,7 @@ public abstract class AbstractHAServer implements HAServer {
         this.registry = registry;
         this.serverPath = serverPath;
         this.serverStatus = ServerStatus.STAND_BY;
-        this.serverStatusChangeListeners = new ArrayList<>();
+        this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }
 
     @Override

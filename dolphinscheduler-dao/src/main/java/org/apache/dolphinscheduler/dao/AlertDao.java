@@ -272,8 +272,8 @@ public class AlertDao {
     /**
      * List pending alerts which id > minAlertId and status = {@link AlertStatus#WAIT_EXECUTION} order by id asc.
      */
-    public List<Alert> listPendingAlerts(int mixAlertId) {
-        return alertMapper.listingAlertByStatus(mixAlertId, AlertStatus.WAIT_EXECUTION.getCode(),
+    public List<Alert> listPendingAlerts(int minAlertId) {
+        return alertMapper.listingAlertByStatus(minAlertId, AlertStatus.WAIT_EXECUTION.getCode(),
                 QUERY_ALERT_THRESHOLD);
     }
 
@@ -281,15 +281,6 @@ public class AlertDao {
         LambdaQueryWrapper<Alert> wrapper = new LambdaQueryWrapper<Alert>()
                 .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
-    }
-
-    /**
-     * for test
-     *
-     * @return AlertMapper
-     */
-    public AlertMapper getAlertMapper() {
-        return alertMapper;
     }
 
     /**
