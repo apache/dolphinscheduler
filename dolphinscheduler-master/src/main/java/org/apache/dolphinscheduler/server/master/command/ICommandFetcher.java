@@ -15,24 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.oceanbase;
+package org.apache.dolphinscheduler.server.master.command;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.dao.entity.Command;
 
-import com.google.auto.service.AutoService;
+import java.util.List;
 
-@AutoService(DataSourceChannelFactory.class)
-public class OceanBaseDataSourceChannelFactory implements DataSourceChannelFactory {
+/**
+ * The command fetcher used to fetch commands
+ */
+public interface ICommandFetcher {
 
-    @Override
-    public String getName() {
-        return DbType.OCEANBASE.getName();
-    }
+    /**
+     * Fetch commands
+     *
+     * @return command list which need to be handled
+     */
+    List<Command> fetchCommands();
 
-    @Override
-    public DataSourceChannel create() {
-        return new OceanBaseDataSourceChannel();
-    }
 }

@@ -15,24 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.oceanbase;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.dao.entity.Command;
 
-import com.google.auto.service.AutoService;
+import java.util.List;
 
-@AutoService(DataSourceChannelFactory.class)
-public class OceanBaseDataSourceChannelFactory implements DataSourceChannelFactory {
+public interface CommandDao extends IDao<Command> {
 
-    @Override
-    public String getName() {
-        return DbType.OCEANBASE.getName();
-    }
-
-    @Override
-    public DataSourceChannel create() {
-        return new OceanBaseDataSourceChannel();
-    }
+    /**
+     * Query command by command id and server slot, return the command which match (commandId / step) %s totalSlot = currentSlotIndex
+     *
+     * @param currentSlotIndex current slot index
+     * @param totalSlot        total slot number
+     * @param idStep           id step in db
+     * @param fetchNum         fetch number
+     * @return command list
+     */
+    List<Command> queryCommandByIdSlot(int currentSlotIndex,
+                                       int totalSlot,
+                                       int idStep,
+                                       int fetchNum);
 }

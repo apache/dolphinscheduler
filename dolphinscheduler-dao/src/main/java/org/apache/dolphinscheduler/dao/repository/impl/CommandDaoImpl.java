@@ -15,24 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.oceanbase;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
-import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
-import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
+import org.apache.dolphinscheduler.dao.repository.CommandDao;
 
-import com.google.auto.service.AutoService;
+import java.util.List;
 
-@AutoService(DataSourceChannelFactory.class)
-public class OceanBaseDataSourceChannelFactory implements DataSourceChannelFactory {
+import org.springframework.stereotype.Repository;
 
-    @Override
-    public String getName() {
-        return DbType.OCEANBASE.getName();
+@Repository
+public class CommandDaoImpl extends BaseDao<Command, CommandMapper> implements CommandDao {
+
+    public CommandDaoImpl(CommandMapper commandMapper) {
+        super(commandMapper);
     }
 
     @Override
-    public DataSourceChannel create() {
-        return new OceanBaseDataSourceChannel();
+    public List<Command> queryCommandByIdSlot(int currentSlotIndex, int totalSlot, int idStep, int fetchNum) {
+        return mybatisMapper.queryCommandByIdSlot(currentSlotIndex, totalSlot, idStep, fetchNum);
     }
+
 }
