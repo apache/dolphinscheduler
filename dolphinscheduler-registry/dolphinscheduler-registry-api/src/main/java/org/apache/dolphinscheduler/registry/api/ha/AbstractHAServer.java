@@ -53,7 +53,6 @@ public abstract class AbstractHAServer implements HAServer {
             if (Event.Type.REMOVE.equals(event.type())) {
                 if (isActive() && !participateElection()) {
                     statusChange(ServerStatus.STAND_BY);
-                    log.info("The current server has been removed from the registry, change the status to STAND_BY.");
                 }
             }
         });
@@ -65,7 +64,6 @@ public abstract class AbstractHAServer implements HAServer {
             }
             if (participateElection()) {
                 statusChange(ServerStatus.ACTIVE);
-                log.info("The current server has been elected as the active server, change the status to ACTIVE.");
             }
         }, 10, TimeUnit.SECONDS);
     }
