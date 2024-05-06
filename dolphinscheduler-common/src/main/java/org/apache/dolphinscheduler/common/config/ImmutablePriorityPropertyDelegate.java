@@ -31,12 +31,18 @@ import lombok.extern.slf4j.Slf4j;
  * This class will get the property by the priority of the following: env > jvm > properties.
  */
 @Slf4j
-public class ImmutablePriorityPropertyDelegate extends ImmutablePropertyDelegate {
+public class ImmutablePriorityPropertyDelegate implements IPropertyDelegate {
 
     private static final Map<String, Optional<ConfigValue<String>>> configValueMap = new ConcurrentHashMap<>();
 
-    public ImmutablePriorityPropertyDelegate(String propertyAbsolutePath) {
-        super(propertyAbsolutePath);
+    private ImmutablePropertyDelegate immutablePropertyDelegate;
+
+    private ImmutableYamlDelegate immutableYamlDelegate;
+
+    public ImmutablePriorityPropertyDelegate(ImmutablePropertyDelegate immutablePropertyDelegate,
+                                             ImmutableYamlDelegate immutableYamlDelegate) {
+        this.immutablePropertyDelegate = immutablePropertyDelegate;
+        this.immutableYamlDelegate = immutableYamlDelegate;
     }
 
     @Override
@@ -56,8 +62,14 @@ public class ImmutablePriorityPropertyDelegate extends ImmutablePropertyDelegate
                 return value;
             }
             value = getConfigValueFromProperties(key);
+            if (value.isPresent()) {
+                log.debug("Get config value from properties, key: {} actualKey: {}, value: {}",
+                        k, value.get().getActualKey(), value.get().getValue());
+                return value;
+            }
+            value = getConfigValueFromYaml(key);
             value.ifPresent(
-                    stringConfigValue -> log.debug("Get config value from properties, key: {} actualKey: {}, value: {}",
+                    stringConfigValue -> log.debug("Get config value from yaml, key: {} actualKey: {}, value: {}",
                             k, stringConfigValue.getActualKey(), stringConfigValue.getValue()));
             return value;
         });
@@ -76,7 +88,8 @@ public class ImmutablePriorityPropertyDelegate extends ImmutablePropertyDelegate
     @Override
     public Set<String> getPropertyKeys() {
         Set<String> propertyKeys = new HashSet<>();
-        propertyKeys.addAll(super.getPropertyKeys());
+        propertyKeys.addAll(this.immutablePropertyDelegate.getPropertyKeys());
+        propertyKeys.addAll(this.immutableYamlDelegate.getPropertyKeys());
         propertyKeys.addAll(System.getProperties().stringPropertyNames());
         propertyKeys.addAll(System.getenv().keySet());
         return propertyKeys;
@@ -104,7 +117,15 @@ public class ImmutablePriorityPropertyDelegate extends ImmutablePropertyDelegate
     }
 
     private Optional<ConfigValue<String>> getConfigValueFromProperties(String key) {
-        String value = super.get(key);
+        String value = this.immutablePropertyDelegate.get(key);
+        if (value != null) {
+            return Optional.of(ConfigValue.fromProperties(key, value));
+        }
+        return Optional.empty();
+    }
+
+    private Optional<ConfigValue<String>> getConfigValueFromYaml(String key) {
+        String value = this.immutableYamlDelegate.get(key);
         if (value != null) {
             return Optional.of(ConfigValue.fromProperties(key, value));
         }

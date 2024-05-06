@@ -23,17 +23,6 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
   banner:
     charset: UTF-8
-  cache:
-    # default enable cache, you can disable by `type: none`
-    type: none
-    cache-names:
-      - tenant
-      - user
-      - processDefinition
-      - processTaskRelation
-      - taskDefinition
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s,recordStats
   sql:
     init:
       schema-locations: classpath:sql/dolphinscheduler_h2.sql
@@ -171,8 +160,6 @@ casdoor:
 
 master:
   listen-port: 5678
-  # master fetch command num
-  fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
@@ -203,6 +190,13 @@ master:
   # kill yarn/k8s application when failover taskInstance, default true
   kill-application-when-task-failover: true
   worker-group-refresh-interval: 10s
+  command-fetch-strategy:
+    type: ID_SLOT_BASED
+    config:
+      # The incremental id step
+      id-step: 1
+      # master fetch command num
+      fetch-size: 10
 
 worker:
   # worker listener port
@@ -340,4 +334,4 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8
     username: root
-    password: root@123
+    password: root

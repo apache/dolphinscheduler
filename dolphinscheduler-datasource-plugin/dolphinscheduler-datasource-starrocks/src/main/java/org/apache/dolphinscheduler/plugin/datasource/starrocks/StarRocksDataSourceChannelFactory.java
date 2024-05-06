@@ -33,6 +33,6 @@ public class StarRocksDataSourceChannelFactory implements DataSourceChannelFacto
 
     @Override
     public String getName() {
-        return DbType.STARROCKS.getDescp();
+        return DbType.STARROCKS.getName();
     }
 }

@@ -23,25 +23,29 @@ import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
 import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
 import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
+import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication
-@ComponentScan("org.apache.dolphinscheduler")
 @Slf4j
+@Import({CommonConfiguration.class,
+        DaoConfiguration.class,
+        RegistryConfiguration.class})
+@SpringBootApplication
 public class AlertServer {
 
     @Autowired
@@ -59,11 +63,11 @@ public class AlertServer {
         AlertServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
         Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         Thread.currentThread().setName(Constants.THREAD_NAME_ALERT_SERVER);
-        new SpringApplicationBuilder(AlertServer.class).run(args);
+        SpringApplication.run(AlertServer.class, args);
     }
 
-    @EventListener
-    public void run(ApplicationReadyEvent readyEvent) {
+    @PostConstruct
+    public void run() {
         log.info("Alert server is staring ...");
         alertPluginManager.start();
         alertRegistryClient.start();

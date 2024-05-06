@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
+import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -24,10 +25,12 @@ import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -46,20 +49,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication
-@EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler")
 @Slf4j
+@Import({CommonConfiguration.class,
+        StorageConfiguration.class,
+        RegistryConfiguration.class})
+@SpringBootApplication
 public class WorkerServer implements IStoppable {
 
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
-
-    @Autowired
-    private TaskPluginManager taskPluginManager;
 
     @Autowired
     private WorkerRpcServer workerRpcServer;
@@ -85,7 +85,7 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         this.workerRpcServer.start();
-        this.taskPluginManager.loadPlugin();
+        TaskPluginManager.loadPlugin();
 
         this.workerRegistryClient.setRegistryStoppable(this);
         this.workerRegistryClient.start();

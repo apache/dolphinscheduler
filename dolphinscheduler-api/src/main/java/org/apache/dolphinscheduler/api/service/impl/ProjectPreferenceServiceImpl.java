@@ -76,7 +76,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
             projectPreference.setProjectCode(projectCode);
             projectPreference.setPreferences(preferences);
             projectPreference.setUserId(loginUser.getId());
-            projectPreference.setCode(CodeGenerateUtils.getInstance().genCode());
+            projectPreference.setCode(CodeGenerateUtils.genCode());
             projectPreference.setState(1);
             projectPreference.setCreateTime(now);
             projectPreference.setUpdateTime(now);

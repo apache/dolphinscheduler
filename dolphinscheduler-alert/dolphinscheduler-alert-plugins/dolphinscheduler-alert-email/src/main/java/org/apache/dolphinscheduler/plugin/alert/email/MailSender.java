@@ -34,6 +34,7 @@ import org.apache.commons.mail.HtmlEmail;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -171,7 +172,7 @@ public final class MailSender {
                 Session session = getSession();
                 email.setMailSession(session);
                 email.setFrom(mailSenderEmail);
-                email.setCharset(EmailConstants.UTF_8);
+                email.setCharset(StandardCharsets.UTF_8.name());
                 if (CollectionUtils.isNotEmpty(receivers)) {
                     // receivers mail
                     for (String receiver : receivers) {
@@ -344,7 +345,8 @@ public final class MailSender {
         ExcelUtils.genExcelFile(content, randomFilename, xlsFilePath);
 
         part2.attachFile(file);
-        part2.setFileName(MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLSX, EmailConstants.UTF_8, "B"));
+        part2.setFileName(
+                MimeUtility.encodeText(title + EmailConstants.EXCEL_SUFFIX_XLSX, StandardCharsets.UTF_8.name(), "B"));
         // add components to collection
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
