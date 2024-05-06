@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.config;
 
 import static com.github.stefanbirkner.systemlambda.SystemLambda.withEnvironmentVariable;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.REMOTE_LOGGING_YAML_PATH;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,9 @@ import org.junit.jupiter.api.Test;
 class ImmutablePriorityPropertyDelegateTest {
 
     private final ImmutablePriorityPropertyDelegate immutablePriorityPropertyDelegate =
-            new ImmutablePriorityPropertyDelegate(COMMON_PROPERTIES_PATH);
+            new ImmutablePriorityPropertyDelegate(
+                    new ImmutablePropertyDelegate(COMMON_PROPERTIES_PATH),
+                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH));
 
     @Test
     void getOverrideFromEnv() throws Exception {

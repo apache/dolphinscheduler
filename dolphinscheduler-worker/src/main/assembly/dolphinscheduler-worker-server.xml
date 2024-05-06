@@ -53,6 +53,7 @@
             <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
             <includes>
                 <include>**/*.properties</include>
+                <include>**/*.yaml</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>
