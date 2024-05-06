@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.alert.rpc;
 
+import org.apache.dolphinscheduler.alert.config.AlertConfig;
+
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class AlertRpcServerTest {
 
-    @Autowired
-    private AlertRpcServer alertRpcServer;
+    private final AlertRpcServer alertRpcServer = new AlertRpcServer(new AlertConfig());
 
     @Test
     void testStart() {
