@@ -24,38 +24,40 @@ import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * This class is used to get the properties from the classpath.
- */
-@Slf4j
-public class ImmutablePropertyDelegate implements IPropertyDelegate {
+import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
+import org.springframework.core.io.InputStreamResource;
 
-    private static final String COMMON_PROPERTIES_NAME = "/common.properties";
+@Slf4j
+public class ImmutableYamlDelegate implements IPropertyDelegate {
+
+    private static final String REMOTE_LOGGING_YAML_NAME = "/remote-logging.yaml";
 
     private final Properties properties;
 
-    public ImmutablePropertyDelegate() {
-        this(COMMON_PROPERTIES_NAME);
+    public ImmutableYamlDelegate() {
+        this(REMOTE_LOGGING_YAML_NAME);
     }
 
-    public ImmutablePropertyDelegate(String... propertyAbsolutePath) {
+    public ImmutableYamlDelegate(String... yamlAbsolutePath) {
         properties = new Properties();
         // read from classpath
-        for (String fileName : propertyAbsolutePath) {
-            try (InputStream fis = getClass().getResourceAsStream(fileName)) {
-                Properties subProperties = new Properties();
-                subProperties.load(fis);
+        for (String fileName : yamlAbsolutePath) {
+            try (InputStream fis = ImmutableYamlDelegate.class.getResourceAsStream(fileName)) {
+                YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
+                factory.setResources(new InputStreamResource(fis));
+                factory.afterPropertiesSet();
+                Properties subProperties = factory.getObject();
                 properties.putAll(subProperties);
             } catch (IOException e) {
                 log.error("Load property: {} error, please check if the file exist under classpath",
-                        propertyAbsolutePath, e);
+                        yamlAbsolutePath, e);
                 throw new RuntimeException(e);
             }
         }
         printProperties();
     }
 
-    public ImmutablePropertyDelegate(Properties properties) {
+    public ImmutableYamlDelegate(Properties properties) {
         this.properties = properties;
     }
 
