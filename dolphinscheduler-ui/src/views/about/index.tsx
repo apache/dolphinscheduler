@@ -21,6 +21,7 @@ import Card from '@/components/card'
 import { NSelect, NSpace, NSwitch } from 'naive-ui'
 import { useUserStore } from '@/store/user/user'
 import { queryProductInfo } from '@/service/modules/ui-plugins'
+import {UserInfoRes} from "@/service/modules/users/types";
 
 const userStore = useUserStore()
 const about = defineComponent({
@@ -34,7 +35,7 @@ const about = defineComponent({
       info.value = productInfo.version
     }
     onMounted( () => {
-      queryProduct(userStore.getUserInfo.id)
+      queryProduct((userStore.getUserInfo as UserInfoRes).id)
     })
 
     return { queryProduct, info }

@@ -17,6 +17,9 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PLUGINS_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.VERSION_INFO_STATE_ERROR;
+
 import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
