@@ -20,17 +20,6 @@ spring:
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
-  cache:
-    # default enable cache, you can disable by `type: none`
-    type: none
-    cache-names:
-      - tenant
-      - user
-      - processDefinition
-      - processTaskRelation
-      - taskDefinition
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s,recordStats
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
@@ -100,8 +89,6 @@ registry:
 
 master:
   listen-port: 5678
-  # master fetch command num
-  fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
@@ -138,6 +125,13 @@ master:
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   worker-group-refresh-interval: 10s
+  command-fetch-strategy:
+    type: ID_SLOT_BASED
+    config:
+      # The incremental id step
+      id-step: 3
+      # master fetch command num
+      fetch-size: 11
 
 server:
   port: 5679

@@ -31,7 +31,7 @@ initImage:
 
 image:
   # -- Docker image repository for the DolphinScheduler
-  registry: apache/dolphinscheduler
+  registry: apache
   # -- Docker image version for the DolphinScheduler
   tag: latest
   # -- Image pull policy. Options: Always, Never, IfNotPresent

@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
+import static org.apache.dolphinscheduler.common.constants.Constants.REMOTE_LOGGING_YAML_PATH;
 
-import org.apache.dolphinscheduler.common.config.IPropertyDelegate;
 import org.apache.dolphinscheduler.common.config.ImmutablePriorityPropertyDelegate;
+import org.apache.dolphinscheduler.common.config.ImmutablePropertyDelegate;
+import org.apache.dolphinscheduler.common.config.ImmutableYamlDelegate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,8 +39,10 @@ import com.google.common.base.Strings;
 public class PropertyUtils {
 
     // todo: add another implementation for zookeeper/etcd/consul/xx
-    private static final IPropertyDelegate propertyDelegate =
-            new ImmutablePriorityPropertyDelegate(COMMON_PROPERTIES_PATH);
+    private final ImmutablePriorityPropertyDelegate propertyDelegate =
+            new ImmutablePriorityPropertyDelegate(
+                    new ImmutablePropertyDelegate(COMMON_PROPERTIES_PATH),
+                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH));
 
     public static String getString(String key) {
         return propertyDelegate.get(key.trim());

@@ -123,7 +123,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setUpdateTime(new Date());
         long code = 0L;
         try {
-            code = CodeGenerateUtils.getInstance().genCode();
+            code = CodeGenerateUtils.genCode();
             env.setCode(code);
         } catch (CodeGenerateException e) {
             log.error("Generate environment code error.", e);
