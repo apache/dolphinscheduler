@@ -102,9 +102,8 @@ public class UiPluginController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERSION_INFO_STATE_ERROR)
     public Result<ProductInfoDto> queryProductInfo(
-            @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-            @RequestParam(value = "userId") Integer userId) {
-        ProductInfoDto result = uiPluginService.queryProductInfo(loginUser, userId);
+            @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        ProductInfoDto result = uiPluginService.queryProductInfo(loginUser);
         return Result.success(result);
     }
 }

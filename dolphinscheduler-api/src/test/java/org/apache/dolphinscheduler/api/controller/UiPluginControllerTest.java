@@ -107,7 +107,7 @@ public class UiPluginControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryProductInfo() throws Exception {
         ProductInfoDto mockResult = new ProductInfoDto();
-        Mockito.when(uiPluginService.queryProductInfo(Mockito.any(), Mockito.anyInt())).thenReturn(mockResult);
+        Mockito.when(uiPluginService.queryProductInfo(Mockito.any())).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "1");
@@ -121,13 +121,5 @@ public class UiPluginControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    private User getLoginUser() {
-        User user = new User();
-        user.setId(1);
-        user.setUserName("admin");
-        return user;
     }
 }

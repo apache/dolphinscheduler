@@ -28,14 +28,13 @@ const about = defineComponent({
   name: 'about',
   setup() {
     const info: any = ref('')
-    const queryProduct = async (userId: number) => {
-      const productInfo = await queryProductInfo(
-          { userId })
+    const queryProduct = async () => {
+      const productInfo = await queryProductInfo()
       if (!productInfo) throw Error()
       info.value = productInfo.version
     }
     onMounted( () => {
-      queryProduct((userStore.getUserInfo as UserInfoRes).id)
+      queryProduct()
     })
 
     return { queryProduct, info }

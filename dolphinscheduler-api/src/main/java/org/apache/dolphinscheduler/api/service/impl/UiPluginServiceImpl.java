@@ -39,6 +39,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 
 
+import org.apache.dolphinscheduler.dao.repository.DsVersionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,11 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
 
     @Autowired
     DsVersionMapper dsVersionMapper;
+
+    @Autowired
+    private DsVersionDao dsVersionDao;
+
+    private volatile String dsVersion;
 
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
@@ -93,22 +99,16 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     }
 
     @Override
-    public ProductInfoDto queryProductInfo(User loginUser, int userId) {
+    public ProductInfoDto queryProductInfo(User loginUser) {
 
-        // check if user is existed
-        if (userId <= 0 || !(loginUser.getId() == userId)) {
-            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
-                    "User id: " + userId + " should not less than or equals to 0.");
-        }
         // persist to the database
-        DsVersion dsVersion = dsVersionMapper.selectById(1);
+        dsVersion = dsVersionDao.selectVersion().map(DsVersion::getVersion).orElse("unknown");
 
-        if(StringUtils.isBlank(dsVersion.getVersion())){
+        if(StringUtils.isBlank(dsVersion)){
             throw new ServiceException(Status.VERSION_INFO_STATE_ERROR);
         }
         ProductInfoDto result = new ProductInfoDto();
-        result.setId(dsVersion.getId());
-        result.setVersion(dsVersion.getVersion());
+        result.setVersion(dsVersion);
         return result;
     }
 

@@ -32,6 +32,6 @@ public interface UiPluginService {
 
     Map<String, Object> queryUiPluginDetailById(int id);
 
-    ProductInfoDto queryProductInfo(User loginUser, int userId);
+    ProductInfoDto queryProductInfo(User loginUser);
 
 }
