@@ -15,14 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.server;
+package org.apache.dolphinscheduler.server.worker.rpc;
 
-interface ServerMethodInvoker {
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
-    String getMethodIdentify();
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-    String getMethodProviderIdentify();
+class WorkerRpcServerTest {
 
-    Object invoke(final Object... arg) throws Throwable;
+    private final WorkerRpcServer workerRpcServer = new WorkerRpcServer(new WorkerConfig());
+
+    @Test
+    void testStart() {
+        Assertions.assertDoesNotThrow(workerRpcServer::start);
+    }
+
+    @Test
+    void testClose() {
+        Assertions.assertDoesNotThrow(workerRpcServer::close);
+    }
 
 }
