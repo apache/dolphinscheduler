@@ -15,22 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.alert.rpc;
 
-import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.alert.config.AlertConfig;
 
-import org.mockito.Mockito;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.junit.jupiter.api.Test;
 
-/**
- * dependency config
- */
-@Configuration
-public class TaskResponseProcessorTestConfig {
+class AlertRpcServerTest {
 
-    @Bean
-    public DataQualityResultOperator dataQualityResultOperator() {
-        return Mockito.mock(DataQualityResultOperator.class);
+    private final AlertRpcServer alertRpcServer = new AlertRpcServer(new AlertConfig());
+
+    @Test
+    void testStart() {
+        alertRpcServer.start();
     }
+
+    @Test
+    void testClose() {
+        alertRpcServer.close();
+    }
+
 }
