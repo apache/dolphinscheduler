@@ -73,7 +73,7 @@ public class PytorchTaskTest {
     }
 
     @Test
-    public void testGitProjectUrlInjection(){
+    public void testGitProjectUrlInjection() {
         Assertions.assertFalse(GitProjectManager.isGitPath("git@& cat /etc/passwd >/poc.txt #"));
         Assertions.assertFalse(GitProjectManager.isGitPath("git@| cat /etc/passwd >/poc.txt #"));
     }
