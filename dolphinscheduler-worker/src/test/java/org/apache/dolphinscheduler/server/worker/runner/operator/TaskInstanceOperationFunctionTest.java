@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHost
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
@@ -70,8 +69,6 @@ public class TaskInstanceOperationFunctionTest {
 
     private WorkerMessageSender workerMessageSender = Mockito.mock(WorkerMessageSender.class);
 
-    private TaskPluginManager taskPluginManager = Mockito.mock(TaskPluginManager.class);
-
     private WorkerTaskExecutorThreadPool workerManager = Mockito.mock(WorkerTaskExecutorThreadPool.class);
 
     private StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
@@ -94,7 +91,6 @@ public class TaskInstanceOperationFunctionTest {
         WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder = new WorkerTaskExecutorFactoryBuilder(
                 workerConfig,
                 workerMessageSender,
-                taskPluginManager,
                 workerManager,
                 storageOperate,
                 workerRegistryClient);
@@ -189,7 +185,6 @@ public class TaskInstanceOperationFunctionTest {
         WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder = new WorkerTaskExecutorFactoryBuilder(
                 workerConfig,
                 workerMessageSender,
-                taskPluginManager,
                 workerManager,
                 storageOperate,
                 workerRegistryClient);

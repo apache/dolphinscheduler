@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,7 +26,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -35,15 +35,16 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -65,7 +66,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -74,7 +74,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-@SpringBootTest(classes = ApiApplicationServer.class)
 public class TaskInstanceServiceTest {
 
     @InjectMocks
@@ -100,6 +99,8 @@ public class TaskInstanceServiceTest {
 
     @Mock
     TaskInstanceDao taskInstanceDao;
+    @Mock
+    ProcessInstanceDao workflowInstanceDao;
 
     @Test
     public void queryTaskListPaging() {
@@ -324,6 +325,7 @@ public class TaskInstanceServiceTest {
     private TaskInstance getTaskInstance() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
+        taskInstance.setProjectCode(1L);
         taskInstance.setName("test_task_instance");
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
@@ -343,64 +345,69 @@ public class TaskInstanceServiceTest {
     }
 
     @Test
-    public void testForceTaskSuccess() {
+    public void testForceTaskSuccess_withNoPermission() {
+        User user = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
+                .checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
+    }
+
+    @Test
+    public void testForceTaskSuccess_withTaskInstanceNotFound() {
+        User user = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
+        when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.empty());
+        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_FOUND,
+                () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
+    }
+
+    @Test
+    public void testForceTaskSuccess_withWorkflowInstanceNotFound() {
+        User user = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
+        when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
+        when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId())).thenReturn(Optional.empty());
+
+        assertThrowsServiceException(Status.PROCESS_INSTANCE_NOT_EXIST,
+                () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
+    }
+
+    @Test
+    public void testForceTaskSuccess_withWorkflowInstanceNotFinished() {
         User user = getAdminUser();
         long projectCode = 1L;
-        Project project = getProject(projectCode);
-        int taskId = 1;
         TaskInstance task = getTaskInstance();
+        ProcessInstance processInstance = getProcessInstance();
+        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, projectCode, FORCED_SUCCESS);
+        when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
+        when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId()))
+                .thenReturn(Optional.of(processInstance));
 
-        Map<String, Object> mockSuccess = new HashMap<>(5);
-        putMsg(mockSuccess, Status.SUCCESS);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        assertThrowsServiceException(
+                "The workflow instance is not finished: " + processInstance.getState()
+                        + " cannot force start task instance",
+                () -> taskInstanceService.forceTaskSuccess(user, projectCode, task.getId()));
+    }
 
-        // user auth failed
-        Map<String, Object> mockFailure = new HashMap<>(5);
-        putMsg(mockFailure, Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(), projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockFailure);
-        Result authFailRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertNotSame(Status.SUCCESS.getCode(), authFailRes.getCode());
+    @Test
+    public void testForceTaskSuccess_withTaskInstanceNotFinished() {
+        User user = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        ProcessInstance processInstance = getProcessInstance();
+        processInstance.setState(WorkflowExecutionStatus.FAILURE);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, task.getProjectCode(), FORCED_SUCCESS);
+        when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
+        when(workflowInstanceDao.queryOptionalById(task.getProcessInstanceId()))
+                .thenReturn(Optional.of(processInstance));
 
-        // test task not found
-        when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(mockSuccess);
-        when(taskInstanceMapper.selectById(Mockito.anyInt())).thenReturn(null);
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setProjectCode(projectCode);
-        when(taskDefinitionMapper.queryByCode(task.getTaskCode())).thenReturn(taskDefinition);
-        Result taskNotFoundRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), taskNotFoundRes.getCode().intValue());
-
-        // test task instance state error
-        task.setState(TaskExecutionStatus.SUCCESS);
-        when(taskInstanceMapper.selectById(1)).thenReturn(task);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Result taskStateErrorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.TASK_INSTANCE_STATE_OPERATION_ERROR.getCode(),
-                taskStateErrorRes.getCode().intValue());
-
-        // test error
-        task.setState(TaskExecutionStatus.FAILURE);
-        when(taskInstanceMapper.updateById(task)).thenReturn(0);
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Result errorRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.FORCE_TASK_SUCCESS_ERROR.getCode(), errorRes.getCode().intValue());
-
-        // test success
-        task.setState(TaskExecutionStatus.FAILURE);
-        task.setEndTime(null);
-        when(taskInstanceMapper.updateById(task)).thenReturn(1);
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, FORCED_SUCCESS)).thenReturn(result);
-        Result successRes = taskInstanceService.forceTaskSuccess(user, projectCode, taskId);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), successRes.getCode().intValue());
-        Assertions.assertNotNull(task.getEndTime());
-
+        assertThrowsServiceException(
+                Status.TASK_INSTANCE_STATE_OPERATION_ERROR,
+                () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
     }
 
     @Test

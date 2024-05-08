@@ -22,17 +22,6 @@ spring:
   jackson:
     time-zone: UTC
     date-format: "yyyy-MM-dd HH:mm:ss"
-  cache:
-    # default enable cache, you can disable by `type: none`
-    type: none
-    cache-names:
-      - tenant
-      - user
-      - processDefinition
-      - processTaskRelation
-      - taskDefinition
-    caffeine:
-      spec: maximumSize=100,expireAfterWrite=300s,recordStats
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
@@ -40,15 +29,7 @@ spring:
     password: root
     hikari:
       connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
       pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
   quartz:
     job-store-type: jdbc
     jdbc:
@@ -102,8 +83,6 @@ registry:
 
 master:
   listen-port: 5678
-  # master fetch command num
-  fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
@@ -122,10 +101,10 @@ master:
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true
-    # Master max cpu usage, when the master's cpu usage is smaller then this value, master server can execute workflow.
-    max-cpu-usage-percentage-thresholds: 0.7
-    # Master max JVM memory usage , when the master's jvm memory usage is smaller then this value, master server can execute workflow.
-    max-jvm-memory-usage-percentage-thresholds: 0.7
+    # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
+    max-system-cpu-usage-percentage-thresholds: 0.7
+    # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
+    max-jvm-cpu-usage-percentage-thresholds: 0.7
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
     max-system-memory-usage-percentage-thresholds: 0.7
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
@@ -140,6 +119,13 @@ master:
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   worker-group-refresh-interval: 10s
+  command-fetch-strategy:
+    type: ID_SLOT_BASED
+    config:
+      # The incremental id step
+      id-step: 1
+      # master fetch command num
+      fetch-size: 10
 
 server:
   port: 5679

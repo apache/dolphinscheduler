@@ -115,7 +115,7 @@ spec:
               name: {{ include "dolphinscheduler.fullname" . }}-api
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
             {{- if .Values.api.taskTypeFilter.enabled }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/task-type-config.yaml

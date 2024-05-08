@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
@@ -38,6 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -113,23 +115,25 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         }
 
         Set<String> workerGroupNames =
-                workerGroupMapper.queryAllWorkerGroup().stream().map(item -> item.getName()).collect(
+                workerGroupMapper.queryAllWorkerGroup().stream().map(WorkerGroup::getName).collect(
                         Collectors.toSet());
 
         workerGroupNames.add(Constants.DEFAULT_WORKER_GROUP);
 
-        Set<String> assignedWorkerGroupNames = workerGroups.stream().collect(Collectors.toSet());
+        Set<String> assignedWorkerGroupNames = new HashSet<>(workerGroups);
 
         Set<String> difference = SetUtils.difference(assignedWorkerGroupNames, workerGroupNames);
 
-        if (difference.size() > 0) {
+        if (!difference.isEmpty()) {
             putMsg(result, Status.WORKER_GROUP_NOT_EXIST, difference.toString());
             return result;
         }
 
         Set<String> projectWorkerGroupNames = projectWorkerGroupMapper.selectList(new QueryWrapper<ProjectWorkerGroup>()
                 .lambda()
-                .eq(ProjectWorkerGroup::getProjectCode, projectCode)).stream().map(item -> item.getWorkerGroup())
+                .eq(ProjectWorkerGroup::getProjectCode, projectCode))
+                .stream()
+                .map(ProjectWorkerGroup::getWorkerGroup)
                 .collect(Collectors.toSet());
 
         difference = SetUtils.difference(projectWorkerGroupNames, assignedWorkerGroupNames);

@@ -19,16 +19,15 @@ package org.apache.dolphinscheduler.meter.metrics;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import io.micrometer.core.instrument.MeterRegistry;
 
-@Component
 public class DefaultMetricsProvider implements MetricsProvider {
 
-    @Autowired
-    private MeterRegistry meterRegistry;
+    private final MeterRegistry meterRegistry;
+
+    public DefaultMetricsProvider(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+    }
 
     private SystemMetrics systemMetrics;
 
@@ -53,8 +52,7 @@ public class DefaultMetricsProvider implements MetricsProvider {
 
         systemMetrics = SystemMetrics.builder()
                 .systemCpuUsagePercentage(systemCpuUsage)
-                .processCpuUsagePercentage(processCpuUsage)
-                .totalCpuUsedPercentage(systemCpuUsage + processCpuUsage)
+                .jvmCpuUsagePercentage(processCpuUsage)
                 .jvmMemoryUsed(jvmMemoryUsed)
                 .jvmMemoryMax(jvmMemoryMax)
                 .jvmMemoryUsedPercentage(jvmMemoryUsed / jvmMemoryMax)

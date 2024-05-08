@@ -21,9 +21,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.AuditServiceImpl;
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
-import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 
 import java.util.ArrayList;
@@ -66,14 +67,15 @@ public class AuditServiceTest {
         page.setRecords(getLists());
         page.setTotal(1L);
         when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(""),
+                Mockito.eq(""),
                 eq(start), eq(end))).thenReturn(page);
         Assertions.assertDoesNotThrow(() -> {
             auditService.queryLogListPaging(
-                    new User(),
-                    null,
-                    null,
+                    "",
+                    "",
                     "2020-11-01 00:00:00",
                     "2020-11-02 00:00:00",
+                    "",
                     "",
                     1,
                     10);
@@ -89,8 +91,8 @@ public class AuditServiceTest {
     private AuditLog getAuditLog() {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserName("testName");
-        auditLog.setOperation(0);
-        auditLog.setResourceType(0);
+        auditLog.setOperationType(AuditOperationType.CREATE.getName());
+        auditLog.setModelType(AuditModelType.PROJECT.getName());
         return auditLog;
     }
 }

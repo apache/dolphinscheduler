@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.vertica;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
@@ -27,7 +28,7 @@ public class VerticaDataSourceChannelFactory implements DataSourceChannelFactory
 
     @Override
     public String getName() {
-        return "vertica";
+        return DbType.VERTICA.getName();
     }
 
     @Override

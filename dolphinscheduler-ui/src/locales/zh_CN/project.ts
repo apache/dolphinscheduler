@@ -246,7 +246,8 @@ export default {
     delete_task_validate_dependent_tasks_desc:
       '下游存在依赖，你不能删除该任务.',
     warning_delete_scheduler_dependent_tasks_desc:
-      '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?'
+      '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
+    warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.',
   },
   task: {
     on_line: '线上',
@@ -437,6 +438,8 @@ export default {
     timeout_period_tips: '超时时长必须为正整数',
     script: '脚本',
     script_tips: '请输入脚本（必填）',
+    master: 'Master',
+    master_tips: '请输入master url（必填）',
     init_script: '初始化脚本',
     init_script_tips: '请输入初始化脚本',
     resources: '资源',
