@@ -17,11 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.base.server;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
-import org.apache.dolphinscheduler.extract.base.RpcMethod;
-import org.apache.dolphinscheduler.extract.base.RpcService;
-
-import java.lang.reflect.Method;
+import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,38 +25,21 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.lang.Nullable;
 
+/**
+ * The RpcServer which will auto discovery the {@link ServerMethodInvoker} from Spring container.
+ */
 @Slf4j
-public class SpringServerMethodInvokerDiscovery implements BeanPostProcessor {
+public class SpringServerMethodInvokerDiscovery extends RpcServer implements BeanPostProcessor {
 
-    protected final NettyRemotingServer nettyRemotingServer;
-
-    public SpringServerMethodInvokerDiscovery(NettyRemotingServer nettyRemotingServer) {
-        this.nettyRemotingServer = nettyRemotingServer;
+    public SpringServerMethodInvokerDiscovery(NettyServerConfig nettyServerConfig) {
+        super(nettyServerConfig);
     }
 
     @Nullable
     @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        Class<?>[] interfaces = bean.getClass().getInterfaces();
-        for (Class<?> anInterface : interfaces) {
-            if (anInterface.getAnnotation(RpcService.class) == null) {
-                continue;
-            }
-            registerRpcMethodInvoker(anInterface, bean, beanName);
-        }
+        registerServerMethodInvokerProvider(bean);
         return bean;
     }
 
-    private void registerRpcMethodInvoker(Class<?> anInterface, Object bean, String beanName) {
-        Method[] declaredMethods = anInterface.getDeclaredMethods();
-        for (Method method : declaredMethods) {
-            RpcMethod rpcMethod = method.getAnnotation(RpcMethod.class);
-            if (rpcMethod == null) {
-                continue;
-            }
-            ServerMethodInvoker methodInvoker = new ServerMethodInvokerImpl(bean, method);
-            nettyRemotingServer.registerMethodInvoker(methodInvoker);
-            log.debug("Register ServerMethodInvoker: {} to bean: {}", methodInvoker.getMethodIdentify(), beanName);
-        }
-    }
 }

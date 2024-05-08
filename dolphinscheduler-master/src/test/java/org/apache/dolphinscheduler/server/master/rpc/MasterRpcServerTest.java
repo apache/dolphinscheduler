@@ -15,28 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.client;
+package org.apache.dolphinscheduler.server.master.rpc;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
-import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
-import java.lang.reflect.Method;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-public abstract class BaseRemoteMethodInvoker implements ClientMethodInvoker {
+class MasterRpcServerTest {
 
-    protected final String methodIdentifier;
+    private final MasterRpcServer masterRpcServer = new MasterRpcServer(new MasterConfig());
 
-    protected final NettyRemotingClient nettyRemotingClient;
-
-    protected final Method localMethod;
-
-    protected final Host serverHost;
-
-    public BaseRemoteMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
-        this.serverHost = serverHost;
-        this.localMethod = localMethod;
-        this.nettyRemotingClient = nettyRemotingClient;
-        this.methodIdentifier = localMethod.toGenericString();
+    @Test
+    void testStart() {
+        Assertions.assertDoesNotThrow(masterRpcServer::start);
     }
 
+    @Test
+    void testClose() {
+        Assertions.assertDoesNotThrow(masterRpcServer::close);
+    }
 }

@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.server;
+package org.apache.dolphinscheduler.extract.base.client;
 
-interface ServerMethodInvoker {
+import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 
-    String getMethodIdentify();
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
-    String getMethodProviderIdentify();
+@UtilityClass
+@Slf4j
+public class NettyRemotingClientFactory {
 
-    Object invoke(final Object... arg) throws Throwable;
-
+    public NettyRemotingClient buildNettyRemotingClient(NettyClientConfig nettyClientConfig) {
+        return new NettyRemotingClient(nettyClientConfig);
+    }
 }

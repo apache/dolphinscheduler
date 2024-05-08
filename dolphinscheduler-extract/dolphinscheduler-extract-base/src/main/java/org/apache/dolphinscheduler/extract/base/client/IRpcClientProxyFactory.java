@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
-public interface IRpcClientProxyFactory {
+interface IRpcClientProxyFactory {
 
     /**
      * Create the client proxy.

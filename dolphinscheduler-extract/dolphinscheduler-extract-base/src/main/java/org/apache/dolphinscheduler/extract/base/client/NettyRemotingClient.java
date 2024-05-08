@@ -15,33 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.base.IRpcResponse;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingException;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingTimeoutException;
-import org.apache.dolphinscheduler.extract.base.exception.RemotingTooMuchRequestException;
-import org.apache.dolphinscheduler.extract.base.future.InvokeCallback;
-import org.apache.dolphinscheduler.extract.base.future.ReleaseSemaphore;
 import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
-import org.apache.dolphinscheduler.extract.base.utils.CallerThreadExecutePolicy;
 import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -71,13 +62,7 @@ public class NettyRemotingClient implements AutoCloseable {
 
     private final NettyClientConfig clientConfig;
 
-    private final Semaphore asyncSemaphore = new Semaphore(1024, true);
-
-    private final ExecutorService callbackExecutor;
-
     private final NettyClientHandler clientHandler;
-
-    private final ScheduledExecutorService responseFutureExecutor;
 
     public NettyRemotingClient(final NettyClientConfig clientConfig) {
         this.clientConfig = clientConfig;
@@ -87,18 +72,7 @@ public class NettyRemotingClient implements AutoCloseable {
         } else {
             this.workerGroup = new NioEventLoopGroup(clientConfig.getWorkerThreads(), nettyClientThreadFactory);
         }
-        this.callbackExecutor = new ThreadPoolExecutor(
-                Constants.CPUS,
-                Constants.CPUS,
-                1,
-                TimeUnit.MINUTES,
-                new LinkedBlockingQueue<>(1000),
-                ThreadUtils.newDaemonThreadFactory("NettyClientCallbackThread-"),
-                new CallerThreadExecutePolicy());
-        this.clientHandler = new NettyClientHandler(this, callbackExecutor);
-
-        this.responseFutureExecutor = Executors.newSingleThreadScheduledExecutor(
-                ThreadUtils.newDaemonThreadFactory("NettyClientResponseFutureThread-"));
+        this.clientHandler = new NettyClientHandler(this);
 
         this.start();
     }
@@ -127,64 +101,7 @@ public class NettyRemotingClient implements AutoCloseable {
                                 .addLast(new TransporterDecoder(), clientHandler, new TransporterEncoder());
                     }
                 });
-        this.responseFutureExecutor.scheduleWithFixedDelay(ResponseFuture::scanFutureTable, 0, 1, TimeUnit.SECONDS);
         isStarted.compareAndSet(false, true);
-    }
-
-    public void sendAsync(final Host host,
-                          final Transporter transporter,
-                          final long timeoutMillis,
-                          final InvokeCallback invokeCallback) throws InterruptedException, RemotingException {
-        final Channel channel = getChannel(host);
-        if (channel == null) {
-            throw new RemotingException("network error");
-        }
-        /*
-         * request unique identification
-         */
-        final long opaque = transporter.getHeader().getOpaque();
-        /*
-         * control concurrency number
-         */
-        boolean acquired = this.asyncSemaphore.tryAcquire(timeoutMillis, TimeUnit.MILLISECONDS);
-        if (acquired) {
-            final ReleaseSemaphore releaseSemaphore = new ReleaseSemaphore(this.asyncSemaphore);
-
-            /*
-             * response future
-             */
-            final ResponseFuture responseFuture = new ResponseFuture(opaque,
-                    timeoutMillis,
-                    invokeCallback,
-                    releaseSemaphore);
-            try {
-                channel.writeAndFlush(transporter).addListener(future -> {
-                    if (future.isSuccess()) {
-                        responseFuture.setSendOk(true);
-                        return;
-                    } else {
-                        responseFuture.setSendOk(false);
-                    }
-                    responseFuture.setCause(future.cause());
-                    responseFuture.putResponse(null);
-                    try {
-                        responseFuture.executeInvokeCallback();
-                    } catch (Exception ex) {
-                        log.error("execute callback error", ex);
-                    } finally {
-                        responseFuture.release();
-                    }
-                });
-            } catch (Exception ex) {
-                responseFuture.release();
-                throw new RemotingException(String.format("Send transporter to host: %s failed", host), ex);
-            }
-        } else {
-            String message = String.format(
-                    "try to acquire async semaphore timeout: %d, waiting thread num: %d, total permits: %d",
-                    timeoutMillis, asyncSemaphore.getQueueLength(), asyncSemaphore.availablePermits());
-            throw new RemotingTooMuchRequestException(message);
-        }
     }
 
     public IRpcResponse sendSync(final Host host, final Transporter transporter,
@@ -194,7 +111,7 @@ public class NettyRemotingClient implements AutoCloseable {
             throw new RemotingException(String.format("connect to : %s fail", host));
         }
         final long opaque = transporter.getHeader().getOpaque();
-        final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis, null, null);
+        final ResponseFuture responseFuture = new ResponseFuture(opaque, timeoutMillis);
         channel.writeAndFlush(transporter).addListener(future -> {
             if (future.isSuccess()) {
                 responseFuture.setSendOk(true);
@@ -220,7 +137,7 @@ public class NettyRemotingClient implements AutoCloseable {
         return iRpcResponse;
     }
 
-    public Channel getChannel(Host host) {
+    private Channel getChannel(Host host) {
         Channel channel = channels.get(host);
         if (channel != null && channel.isActive()) {
             return channel;
@@ -235,9 +152,9 @@ public class NettyRemotingClient implements AutoCloseable {
      * @param isSync sync flag
      * @return channel
      */
-    public Channel createChannel(Host host, boolean isSync) {
-        ChannelFuture future;
+    private Channel createChannel(Host host, boolean isSync) {
         try {
+            ChannelFuture future;
             synchronized (bootstrap) {
                 future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
             }
@@ -249,10 +166,11 @@ public class NettyRemotingClient implements AutoCloseable {
                 channels.put(host, channel);
                 return channel;
             }
-        } catch (Exception ex) {
-            log.warn(String.format("connect to %s error", host), ex);
+            throw new IllegalArgumentException("connect to host: " + host + " failed");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Connect to host: " + host + " failed", e);
         }
-        return null;
     }
 
     @Override
@@ -262,12 +180,6 @@ public class NettyRemotingClient implements AutoCloseable {
                 closeChannels();
                 if (workerGroup != null) {
                     this.workerGroup.shutdownGracefully();
-                }
-                if (callbackExecutor != null) {
-                    this.callbackExecutor.shutdownNow();
-                }
-                if (this.responseFutureExecutor != null) {
-                    this.responseFutureExecutor.shutdownNow();
                 }
                 log.info("netty client closed");
             } catch (Exception ex) {

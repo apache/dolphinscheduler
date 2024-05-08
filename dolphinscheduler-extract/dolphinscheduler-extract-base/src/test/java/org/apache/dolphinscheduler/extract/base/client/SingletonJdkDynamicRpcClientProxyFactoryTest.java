@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.extract.base.client;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
@@ -37,7 +36,7 @@ import org.junit.jupiter.api.Test;
 
 public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
-    private NettyRemotingServer nettyRemotingServer;
+    private SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery;
 
     private String serverAddress;
 
@@ -48,11 +47,10 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
                 .serverName("ApiServer")
                 .listenPort(listenPort)
                 .build();
-        nettyRemotingServer = new NettyRemotingServer(nettyServerConfig);
-        nettyRemotingServer.start();
         serverAddress = "localhost:" + listenPort;
-        new SpringServerMethodInvokerDiscovery(nettyRemotingServer)
-                .postProcessAfterInitialization(new IServiceImpl(), "iServiceImpl");
+        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
+        springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new IServiceImpl());
+        springServerMethodInvokerDiscovery.start();
     }
 
     @Test
@@ -82,7 +80,7 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
     @AfterEach
     public void tearDown() {
-        nettyRemotingServer.close();
+        springServerMethodInvokerDiscovery.close();
     }
 
     @RpcService

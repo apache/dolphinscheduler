@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.StandardRpcRequest;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
@@ -29,9 +28,9 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import java.lang.reflect.Method;
 
-public class SyncClientMethodInvoker extends BaseRemoteMethodInvoker {
+class SyncClientMethodInvoker extends AbstractClientMethodInvoker {
 
-    public SyncClientMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
+    SyncClientMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
         super(serverHost, localMethod, nettyRemotingClient);
     }
 

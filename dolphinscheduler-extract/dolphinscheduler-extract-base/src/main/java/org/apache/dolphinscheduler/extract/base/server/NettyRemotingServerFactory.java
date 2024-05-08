@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.extract.base.server;
 
-import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 
 import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
 
 @UtilityClass
-@Slf4j
-public class NettyRemotingClientFactory {
+class NettyRemotingServerFactory {
 
-    public NettyRemotingClient buildNettyRemotingClient(NettyClientConfig nettyClientConfig) {
-        return new NettyRemotingClient(nettyClientConfig);
+    NettyRemotingServer buildNettyRemotingServer(NettyServerConfig nettyServerConfig) {
+        return new NettyRemotingServer(nettyServerConfig);
     }
 }

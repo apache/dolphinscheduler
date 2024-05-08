@@ -15,15 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.extract.base.client;
 
+import org.apache.dolphinscheduler.extract.base.StandardRpcResponse;
 import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
 import org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
 import org.apache.dolphinscheduler.extract.base.serialize.JsonSerializer;
 import org.apache.dolphinscheduler.extract.base.utils.ChannelUtils;
-
-import java.util.concurrent.ExecutorService;
 
 import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.ChannelFutureListener;
@@ -38,11 +37,8 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     private final NettyRemotingClient nettyRemotingClient;
 
-    private final ExecutorService callbackExecutor;
-
-    public NettyClientHandler(NettyRemotingClient nettyRemotingClient, ExecutorService callbackExecutor) {
+    public NettyClientHandler(NettyRemotingClient nettyRemotingClient) {
         this.nettyRemotingClient = nettyRemotingClient;
-        this.callbackExecutor = callbackExecutor;
     }
 
     @Override
@@ -64,13 +60,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
         }
         StandardRpcResponse deserialize = JsonSerializer.deserialize(transporter.getBody(), StandardRpcResponse.class);
         future.setIRpcResponse(deserialize);
-        future.release();
-        if (future.getInvokeCallback() != null) {
-            future.removeFuture();
-            this.callbackExecutor.execute(future::executeInvokeCallback);
-        } else {
-            future.putResponse(deserialize);
-        }
+        future.putResponse(deserialize);
     }
 
     @Override
