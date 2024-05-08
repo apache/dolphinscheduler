@@ -54,6 +54,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -62,6 +63,9 @@ import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 @Component
 public class CuringParamsServiceImpl implements CuringParamsService {
@@ -151,8 +155,16 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         }
         String startParamJson = cmdParam.get(CommandKeyConstants.CMD_PARAM_START_PARAMS);
         Map<String, String> startParamMap = JSONUtils.toMap(startParamJson);
-        return startParamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue())));
+        JsonElement jsonElement = JsonParser.parseString(startParamJson);
+        // check whether it is json
+        boolean isJson = jsonElement.isJsonObject();
+        if (isJson) {
+            return startParamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
+                    entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue())));
+        } else {
+            List<Property> propList = JSONUtils.toList(startParamJson, Property.class);
+            return propList.stream().collect(Collectors.toMap(Property::getProp, Function.identity()));
+        }
     }
 
     @Override
@@ -181,8 +193,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
         // assign value to definedParams here
-        Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
-        Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
+        Map<String, Property> globalParams = setGlobalParamsMap(processInstance);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
@@ -287,15 +298,16 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getProjectCode()));
         return params;
     }
-    private Map<String, String> setGlobalParamsMap(ProcessInstance processInstance) {
-        Map<String, String> globalParamsMap = new HashMap<>(16);
+    private Map<String, Property> setGlobalParamsMap(ProcessInstance processInstance) {
+        Map<String, Property> globalParamsMap = new HashMap<>(16);
 
         // global params string
         String globalParamsStr = processInstance.getGlobalParams();
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap
-                    .putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
+                    .putAll(globalParamsList.stream()
+                            .collect(Collectors.toMap(Property::getProp, Function.identity())));
         }
         return globalParamsMap;
     }

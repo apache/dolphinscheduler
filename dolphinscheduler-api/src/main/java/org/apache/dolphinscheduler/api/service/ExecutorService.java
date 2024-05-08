@@ -30,7 +30,9 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,7 +59,7 @@ public interface ExecutorService {
      * @param environmentCode environment code
      * @param runMode run mode
      * @param timeout timeout
-     * @param startParams the global param values which pass to new process instance
+     * @param startParamList the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @param executionOrder the execution order when complementing data
      * @return execute process instance code
@@ -71,7 +73,7 @@ public interface ExecutorService {
                                             Priority processInstancePriority, String workerGroup, String tenantCode,
                                             Long environmentCode,
                                             Integer timeout,
-                                            Map<String, String> startParams, Integer expectedParallelismNumber,
+                                            List<Property> startParamList, Integer expectedParallelismNumber,
                                             int dryRun, int testFlag,
                                             ComplementDependentMode complementDependentMode, Integer version,
                                             boolean allLevelDependent, ExecutionOrder executionOrder);
