@@ -35,6 +35,8 @@ public final class Constants {
      */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
+    public static final String REMOTE_LOGGING_YAML_PATH = "/remote-logging.yaml";
+
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
     public static final String FORMAT_S_S_COLON = "%s:%s";
@@ -683,9 +685,6 @@ public final class Constants {
     public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
     public static final Integer QUERY_ALL_ON_TASK = 3;
 
-    /**
-     * remote logging
-     */
     public static final String REMOTE_LOGGING_ENABLE = "remote.logging.enable";
 
     public static final String REMOTE_LOGGING_TARGET = "remote.logging.target";

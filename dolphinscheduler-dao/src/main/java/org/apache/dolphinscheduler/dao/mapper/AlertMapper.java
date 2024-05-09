@@ -34,9 +34,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface AlertMapper extends BaseMapper<Alert> {
 
     /**
-     * Query the alert by alertStatus and return limit with default sort.
+     * Query the alert which id > minAlertId and status = alertStatus order by id asc.
      */
-    List<Alert> listingAlertByStatus(@Param("alertStatus") int alertStatus, @Param("limit") int limit);
+    List<Alert> listingAlertByStatus(@Param("minAlertId") int minAlertId, @Param("alertStatus") int alertStatus,
+                                     @Param("limit") int limit);
 
     /**
      * Insert server crash alert

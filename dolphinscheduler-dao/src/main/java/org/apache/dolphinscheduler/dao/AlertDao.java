@@ -63,8 +63,7 @@ import com.google.common.collect.Lists;
 @Slf4j
 public class AlertDao {
 
-    @Value("${alert.query_alert_threshold:100}")
-    private Integer QUERY_ALERT_THRESHOLD;
+    private static final Integer QUERY_ALERT_THRESHOLD = 100;
 
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
@@ -104,8 +103,8 @@ public class AlertDao {
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
-     * @param log alert results json
-     * @param id id
+     * @param log         alert results json
+     * @param id          id
      * @return update alert result
      */
     public int updateAlert(AlertStatus alertStatus, String log, int id) {
@@ -134,9 +133,9 @@ public class AlertDao {
     /**
      * add AlertSendStatus
      *
-     * @param sendStatus alert send status
-     * @param log log
-     * @param alertId alert id
+     * @param sendStatus            alert send status
+     * @param log                   log
+     * @param alertId               alert id
      * @param alertPluginInstanceId alert plugin instance id
      * @return insert count
      */
@@ -192,7 +191,7 @@ public class AlertDao {
      * process time out alert
      *
      * @param processInstance processInstance
-     * @param projectUser projectUser
+     * @param projectUser     projectUser
      */
     public void sendProcessTimeoutAlert(ProcessInstance processInstance, ProjectUser projectUser) {
         int alertGroupId = processInstance.getWarningGroupId();
@@ -238,8 +237,8 @@ public class AlertDao {
      * task timeout warn
      *
      * @param processInstance processInstanceId
-     * @param taskInstance taskInstance
-     * @param projectUser projectUser
+     * @param taskInstance    taskInstance
+     * @param projectUser     projectUser
      */
     public void sendTaskTimeoutAlert(ProcessInstance processInstance, TaskInstance taskInstance,
                                      ProjectUser projectUser) {
@@ -271,25 +270,17 @@ public class AlertDao {
     }
 
     /**
-     * List alerts that are pending for execution
+     * List pending alerts which id > minAlertId and status = {@link AlertStatus#WAIT_EXECUTION} order by id asc.
      */
-    public List<Alert> listPendingAlerts() {
-        return alertMapper.listingAlertByStatus(AlertStatus.WAIT_EXECUTION.getCode(), QUERY_ALERT_THRESHOLD);
+    public List<Alert> listPendingAlerts(int minAlertId) {
+        return alertMapper.listingAlertByStatus(minAlertId, AlertStatus.WAIT_EXECUTION.getCode(),
+                QUERY_ALERT_THRESHOLD);
     }
 
     public List<Alert> listAlerts(int processInstanceId) {
         LambdaQueryWrapper<Alert> wrapper = new LambdaQueryWrapper<Alert>()
                 .eq(Alert::getProcessInstanceId, processInstanceId);
         return alertMapper.selectList(wrapper);
-    }
-
-    /**
-     * for test
-     *
-     * @return AlertMapper
-     */
-    public AlertMapper getAlertMapper() {
-        return alertMapper;
     }
 
     /**

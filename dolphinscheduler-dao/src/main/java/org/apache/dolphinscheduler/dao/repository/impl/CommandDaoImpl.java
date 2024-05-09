@@ -15,22 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
+import org.apache.dolphinscheduler.dao.repository.CommandDao;
 
-import org.mockito.Mockito;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import java.util.List;
 
-/**
- * dependency config
- */
-@Configuration
-public class TaskResponseProcessorTestConfig {
+import org.springframework.stereotype.Repository;
 
-    @Bean
-    public DataQualityResultOperator dataQualityResultOperator() {
-        return Mockito.mock(DataQualityResultOperator.class);
+@Repository
+public class CommandDaoImpl extends BaseDao<Command, CommandMapper> implements CommandDao {
+
+    public CommandDaoImpl(CommandMapper commandMapper) {
+        super(commandMapper);
     }
+
+    @Override
+    public List<Command> queryCommandByIdSlot(int currentSlotIndex, int totalSlot, int idStep, int fetchNum) {
+        return mybatisMapper.queryCommandByIdSlot(currentSlotIndex, totalSlot, idStep, fetchNum);
+    }
+
 }
