@@ -15,15 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.extract.base.server;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
-import org.apache.dolphinscheduler.extract.base.server.JdkDynamicServerHandler;
-import org.apache.dolphinscheduler.extract.base.server.ServerMethodInvoker;
 import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
@@ -32,6 +30,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -48,12 +47,15 @@ import io.netty.handler.timeout.IdleStateHandler;
  * remoting netty server
  */
 @Slf4j
-public class NettyRemotingServer {
+class NettyRemotingServer {
 
     private final ServerBootstrap serverBootstrap = new ServerBootstrap();
 
-    private final ExecutorService defaultExecutor = ThreadUtils
-            .newDaemonFixedThreadExecutor("NettyRemotingServerThread", Runtime.getRuntime().availableProcessors() * 2);
+    @Getter
+    private final String serverName;
+
+    @Getter
+    private final ExecutorService methodInvokerExecutor;
 
     private final EventLoopGroup bossGroup;
 
@@ -61,16 +63,20 @@ public class NettyRemotingServer {
 
     private final NettyServerConfig serverConfig;
 
-    private final JdkDynamicServerHandler serverHandler = new JdkDynamicServerHandler(this);
+    private final JdkDynamicServerHandler channelHandler;
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
-    public NettyRemotingServer(final NettyServerConfig serverConfig) {
+    NettyRemotingServer(final NettyServerConfig serverConfig) {
         this.serverConfig = serverConfig;
+        this.serverName = serverConfig.getServerName();
+        this.methodInvokerExecutor = ThreadUtils.newDaemonFixedThreadExecutor(
+                serverName + "MethodInvoker-%d", Runtime.getRuntime().availableProcessors() * 2 + 1);
+        this.channelHandler = new JdkDynamicServerHandler(methodInvokerExecutor);
         ThreadFactory bossThreadFactory =
-                ThreadUtils.newDaemonThreadFactory(serverConfig.getServerName() + "BossThread_%s");
+                ThreadUtils.newDaemonThreadFactory(serverName + "BossThread-%d");
         ThreadFactory workerThreadFactory =
-                ThreadUtils.newDaemonThreadFactory(serverConfig.getServerName() + "WorkerThread_%s");
+                ThreadUtils.newDaemonThreadFactory(serverName + "WorkerThread-%d");
         if (Epoll.isAvailable()) {
             this.bossGroup = new EpollEventLoopGroup(1, bossThreadFactory);
             this.workGroup = new EpollEventLoopGroup(serverConfig.getWorkerThread(), workerThreadFactory);
@@ -80,7 +86,7 @@ public class NettyRemotingServer {
         }
     }
 
-    public void start() {
+    void start() {
         if (isStarted.compareAndSet(false, true)) {
             this.serverBootstrap
                     .group(this.bossGroup, this.workGroup)
@@ -103,9 +109,9 @@ public class NettyRemotingServer {
             try {
                 future = serverBootstrap.bind(serverConfig.getListenPort()).sync();
             } catch (Exception e) {
-                log.error("{} bind fail {}, exit", serverConfig.getServerName(), e.getMessage(), e);
                 throw new RemoteException(
-                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()));
+                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()),
+                        e);
             }
 
             if (future.isSuccess()) {
@@ -113,14 +119,9 @@ public class NettyRemotingServer {
                 return;
             }
 
-            if (future.cause() != null) {
-                throw new RemoteException(
-                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()),
-                        future.cause());
-            } else {
-                throw new RemoteException(
-                        String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()));
-            }
+            throw new RemoteException(
+                    String.format("%s bind %s fail", serverConfig.getServerName(), serverConfig.getListenPort()),
+                    future.cause());
         }
     }
 
@@ -135,18 +136,14 @@ public class NettyRemotingServer {
                 .addLast("decoder", new TransporterDecoder())
                 .addLast("server-idle-handle",
                         new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
-                .addLast("handler", serverHandler);
+                .addLast("handler", channelHandler);
     }
 
-    public ExecutorService getDefaultExecutor() {
-        return defaultExecutor;
+    void registerMethodInvoker(ServerMethodInvoker methodInvoker) {
+        channelHandler.registerMethodInvoker(methodInvoker);
     }
 
-    public void registerMethodInvoker(ServerMethodInvoker methodInvoker) {
-        serverHandler.registerMethodInvoker(methodInvoker);
-    }
-
-    public void close() {
+    void close() {
         if (isStarted.compareAndSet(true, false)) {
             try {
                 if (bossGroup != null) {
@@ -155,7 +152,7 @@ public class NettyRemotingServer {
                 if (workGroup != null) {
                     this.workGroup.shutdownGracefully();
                 }
-                defaultExecutor.shutdown();
+                methodInvokerExecutor.shutdown();
             } catch (Exception ex) {
                 log.error("netty server close exception", ex);
             }
