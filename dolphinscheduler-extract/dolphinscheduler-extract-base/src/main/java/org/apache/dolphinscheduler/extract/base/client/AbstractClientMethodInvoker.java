@@ -15,14 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.server;
+package org.apache.dolphinscheduler.extract.base.client;
 
-interface ServerMethodInvoker {
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 
-    String getMethodIdentify();
+import java.lang.reflect.Method;
 
-    String getMethodProviderIdentify();
+abstract class AbstractClientMethodInvoker implements ClientMethodInvoker {
 
-    Object invoke(final Object... arg) throws Throwable;
+    protected final String methodIdentifier;
+
+    protected final NettyRemotingClient nettyRemotingClient;
+
+    protected final Method localMethod;
+
+    protected final Host serverHost;
+
+    AbstractClientMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
+        this.serverHost = serverHost;
+        this.localMethod = localMethod;
+        this.nettyRemotingClient = nettyRemotingClient;
+        this.methodIdentifier = localMethod.toGenericString();
+    }
 
 }
