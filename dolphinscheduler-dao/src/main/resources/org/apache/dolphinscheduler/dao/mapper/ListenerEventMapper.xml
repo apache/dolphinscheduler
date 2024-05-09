@@ -60,7 +60,8 @@
         select
         <include refid="baseSql"/>
         from t_ds_listener_event
-        where post_status = #{postStatus.code}
+        where id > #{minId} and post_status = #{postStatus}
+        order by id asc
         limit #{limit}
     </select>
 </mapper>

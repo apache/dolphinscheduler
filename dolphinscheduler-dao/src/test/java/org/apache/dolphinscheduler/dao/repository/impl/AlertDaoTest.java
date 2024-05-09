@@ -18,37 +18,23 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@ActiveProfiles(ProfileType.H2)
-@ExtendWith(MockitoExtension.class)
-@SpringBootApplication(scanBasePackageClasses = DaoConfiguration.class)
-@SpringBootTest(classes = DaoConfiguration.class)
-@Transactional
-@Rollback
-public class AlertDaoTest {
+class AlertDaoTest extends BaseDaoTest {
 
     @Autowired
     private AlertDao alertDao;
 
     @Test
-    public void testAlertDao() {
+    void testAlertDao() {
         Alert alert = new Alert();
         alert.setTitle("Mysql Exception");
         alert.setContent("[\"alarm time：2018-02-05\", \"service name：MYSQL_ALTER\", \"alarm name：MYSQL_ALTER_DUMP\", "
@@ -57,25 +43,25 @@ public class AlertDaoTest {
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alertDao.addAlert(alert);
 
-        List<Alert> alerts = alertDao.listPendingAlerts();
+        List<Alert> alerts = alertDao.listPendingAlerts(-1);
         Assertions.assertNotNull(alerts);
         Assertions.assertNotEquals(0, alerts.size());
     }
 
     @Test
-    public void testAddAlertSendStatus() {
+    void testAddAlertSendStatus() {
         int insertCount = alertDao.addAlertSendStatus(AlertStatus.EXECUTION_SUCCESS, "success", 1, 1);
         Assertions.assertEquals(1, insertCount);
     }
 
     @Test
-    public void testSendServerStoppedAlert() {
+    void testSendServerStoppedAlert() {
         int alertGroupId = 1;
         String host = "127.0.0.998165432";
         String serverType = "Master";
         alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
         alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
-        long count = alertDao.listPendingAlerts()
+        long count = alertDao.listPendingAlerts(-1)
                 .stream()
                 .filter(alert -> alert.getContent().contains(host))
                 .count();
