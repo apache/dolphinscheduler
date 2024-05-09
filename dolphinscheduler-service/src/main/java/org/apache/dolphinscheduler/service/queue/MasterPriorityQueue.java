@@ -37,6 +37,7 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
     /**
      * queue
      */
+    //使用优先级队列，按照创建时间排序，这里是不是应该按照负载排序？
     private PriorityBlockingQueue<Server> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE, new ServerComparator());
 
     private HashMap<String, Integer> hostIndexMap = new HashMap<>();
@@ -70,6 +71,7 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
 
     public void remove(Server server) {
         this.queue.remove(server);
+        refreshMasterList();
     }
 
     public void clear() {
