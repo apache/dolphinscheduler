@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.clickhouse;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
@@ -27,7 +28,7 @@ public class ClickHouseDataSourceChannelFactory implements DataSourceChannelFact
 
     @Override
     public String getName() {
-        return "clickhouse";
+        return DbType.CLICKHOUSE.getName();
     }
 
     @Override

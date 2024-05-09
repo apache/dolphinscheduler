@@ -48,6 +48,8 @@ import java.util.Objects;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -124,7 +126,7 @@ public final class DingTalkSender {
 
     private AlertResult checkSendDingTalkSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
 
         if (null == result) {
             alertResult.setMessage("send ding talk msg error");
@@ -138,7 +140,7 @@ public final class DingTalkSender {
             return alertResult;
         }
         if (sendMsgResponse.errcode == 0) {
-            alertResult.setStatus("true");
+            alertResult.setSuccess(true);
             alertResult.setMessage("send ding talk msg success");
             return alertResult;
         }
@@ -162,7 +164,7 @@ public final class DingTalkSender {
         } catch (Exception e) {
             log.info("send ding talk alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
-            alertResult.setStatus("false");
+            alertResult.setSuccess(false);
             alertResult.setMessage("send ding talk alert fail.");
         }
         return alertResult;
@@ -189,7 +191,7 @@ public final class DingTalkSender {
             String resp;
             try {
                 HttpEntity entity = response.getEntity();
-                resp = EntityUtils.toString(entity, "UTF-8");
+                resp = EntityUtils.toString(entity, StandardCharsets.UTF_8);
                 EntityUtils.consume(entity);
             } finally {
                 response.close();
@@ -317,37 +319,23 @@ public final class DingTalkSender {
         String sign = org.apache.commons.lang3.StringUtils.EMPTY;
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(secret.getBytes("UTF-8"), "HmacSHA256"));
-            byte[] signData = mac.doFinal(stringToSign.getBytes("UTF-8"));
-            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), "UTF-8");
+            mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+            byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));
+            sign = URLEncoder.encode(new String(Base64.encodeBase64(signData)), StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             log.error("generate sign error, message:{}", e);
         }
         return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
+    @Getter
+    @Setter
     static final class DingTalkSendMsgResponse {
 
         private Integer errcode;
         private String errmsg;
 
         public DingTalkSendMsgResponse() {
-        }
-
-        public Integer getErrcode() {
-            return this.errcode;
-        }
-
-        public void setErrcode(Integer errcode) {
-            this.errcode = errcode;
-        }
-
-        public String getErrmsg() {
-            return this.errmsg;
-        }
-
-        public void setErrmsg(String errmsg) {
-            this.errmsg = errmsg;
         }
 
         @Override

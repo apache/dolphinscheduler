@@ -78,7 +78,7 @@ public class TaskExecutionContextUtils {
             throw ex;
         } catch (Exception ex) {
             throw new TaskException(
-                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
+                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()), ex);
         }
     }
 
@@ -151,7 +151,6 @@ public class TaskExecutionContextUtils {
             }
             ResourceContext.ResourceItem resourceItem = ResourceContext.ResourceItem.builder()
                     .resourceAbsolutePathInStorage(resourceAbsolutePathInStorage)
-                    .resourceRelativePath(resourceRelativePath)
                     .resourceAbsolutePathInLocal(resourceAbsolutePathInLocal)
                     .build();
             resourceContext.addResourceItem(resourceItem);

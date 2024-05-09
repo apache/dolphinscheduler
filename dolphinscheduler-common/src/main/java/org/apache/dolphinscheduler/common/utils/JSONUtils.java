@@ -196,7 +196,10 @@ public final class JSONUtils {
      * @return true if valid
      */
     public static boolean checkJsonValid(String json) {
+        return checkJsonValid(json, true);
+    }
 
+    public static boolean checkJsonValid(String json, Boolean logFlag) {
         if (Strings.isNullOrEmpty(json)) {
             return false;
         }
@@ -205,7 +208,8 @@ public final class JSONUtils {
             objectMapper.readTree(json);
             return true;
         } catch (IOException e) {
-            log.error("check json object valid exception!", e);
+            if (logFlag)
+                log.error("check json object valid exception!", e);
         }
 
         return false;

@@ -70,6 +70,16 @@ export function useTable() {
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
+        title: t('project.parameter.create_user'),
+        key: 'createUser',
+        ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('project.parameter.modify_user'),
+        key: 'modifyUser',
+        ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
         title: t('project.parameter.create_time'),
         key: 'createTime',
         ...COLUMN_WIDTH_CONFIG['time']

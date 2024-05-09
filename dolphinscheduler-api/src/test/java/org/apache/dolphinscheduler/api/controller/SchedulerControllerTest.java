@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -38,6 +39,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
@@ -48,12 +50,24 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.google.common.collect.ImmutableMap;
+
 public class SchedulerControllerTest extends AbstractControllerTest {
+
+    private static Schedule scheduleObj = new Schedule();
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerControllerTest.class);
 
+    final ImmutableMap<String, Object> result =
+            ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, scheduleObj);
+
     @MockBean(name = "schedulerService")
     private SchedulerService schedulerService;
+
+    @BeforeAll
+    public static void initInstance() {
+        scheduleObj.setId(1);
+    }
 
     @Test
     public void testCreateSchedule() throws Exception {
@@ -72,7 +86,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
 
         Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
                 isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
-                isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(success());
+                isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(result);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/", 123)
                 .header(SESSION_ID, sessionId)
@@ -103,7 +117,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
 
         Mockito.when(schedulerService.updateSchedule(isA(User.class), isA(Long.class), isA(Integer.class),
                 isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
-                isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(success());
+                isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(result);
 
         MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/schedules/{id}", 123, 37)
                 .header(SESSION_ID, sessionId)

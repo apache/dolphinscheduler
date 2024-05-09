@@ -219,6 +219,16 @@
         where in_queue = #{inQueue} order by priority desc
     </select>
 
+    <select id="queryInQueueTaskGroupQueue" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group_queue
+        where in_queue = #{inQueue}
+        and id &gt; #{minTaskGroupQueueId}
+        order by id asc
+        limit #{limit}
+    </select>
+
     <select id="queryByTaskInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
         <include refid="baseSql" />
@@ -231,6 +241,23 @@
         <include refid="baseSql" />
         from t_ds_task_group_queue
         where group_id = #{taskGroupId} and status = #{status} and force_start = #{forceStart} and in_queue = #{inQueue}
+    </select>
+
+    <select id="countUsingTaskGroupQueueByGroupId" resultType="java.lang.Integer">
+        select count(1)
+        from t_ds_task_group_queue
+        where group_id = #{taskGroupId} and status = #{status} and force_start = #{forceStart} and in_queue = #{inQueue}
+    </select>
+
+    <select id="queryWaitNotifyForceStartTaskGroupQueue" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql"/>
+        from t_ds_task_group_queue
+        where in_queue = #{inQueue}
+        and force_start = #{forceStart}
+        and id &gt; #{minTaskGroupQueueId}
+        order by id asc
+        limit #{limit}
     </select>
 
 </mapper>

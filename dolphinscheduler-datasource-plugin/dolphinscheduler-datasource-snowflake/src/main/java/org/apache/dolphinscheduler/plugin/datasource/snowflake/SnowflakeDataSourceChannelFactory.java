@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.snowflake;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
@@ -27,7 +28,7 @@ public class SnowflakeDataSourceChannelFactory implements DataSourceChannelFacto
 
     @Override
     public String getName() {
-        return "snowflake";
+        return DbType.SNOWFLAKE.getName();
     }
 
     @Override
