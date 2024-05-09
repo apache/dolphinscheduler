@@ -761,7 +761,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (warningType != null) {
             command.setWarningType(warningType);
         }
-        if (startParamList != null && startParamList.size() > 0) {
+        if (CollectionUtils.isNotEmpty(startParamList)) {
             cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParamList));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));

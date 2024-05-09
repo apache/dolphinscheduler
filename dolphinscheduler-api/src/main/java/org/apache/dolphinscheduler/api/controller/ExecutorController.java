@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
+import org.apache.dolphinscheduler.api.utils.DataTransformUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -44,8 +45,6 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.lang3.StringUtils;
@@ -70,9 +69,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -169,19 +165,8 @@ public class ExecutorController extends BaseController {
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
-        List<Property> startParamList = null;
-        if (startParams != null) {
-            JsonElement jsonElement = JsonParser.parseString(startParams);
-            boolean isJson = jsonElement.isJsonObject();
-            if (isJson) {
-                Map<String, String> startParamMap = JSONUtils.toMap(startParams);
-                startParamList = startParamMap.entrySet().stream()
-                        .map(entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue()))
-                        .collect(Collectors.toList());
-            } else {
-                startParamList = JSONUtils.toList(startParams, Property.class);
-            }
-        }
+
+        List<Property> startParamList = DataTransformUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             complementDependentMode = ComplementDependentMode.OFF_MODE;
@@ -277,19 +262,7 @@ public class ExecutorController extends BaseController {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
 
-        List<Property> startParamList = null;
-        if (startParams != null) {
-            JsonElement jsonElement = JsonParser.parseString(startParams);
-            boolean isJson = jsonElement.isJsonObject();
-            if (isJson) {
-                Map<String, String> startParamMap = JSONUtils.toMap(startParams);
-                startParamList = startParamMap.entrySet().stream()
-                        .map(entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue()))
-                        .collect(Collectors.toList());
-            } else {
-                startParamList = JSONUtils.toList(startParams, Property.class);
-            }
-        }
+        List<Property> startParamList = DataTransformUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             log.debug("Parameter complementDependentMode set to {} due to null.", ComplementDependentMode.OFF_MODE);
