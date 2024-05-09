@@ -66,7 +66,6 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
         for (Server server : serverList) {
             this.queue.put(server);
         }
-        refreshMasterList();
     }
 
     public void remove(Server server) {
