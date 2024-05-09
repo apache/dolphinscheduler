@@ -131,7 +131,7 @@ public class RemoteExecutor implements AutoCloseable {
         int exitCode = -1;
         log.info("Remote shell task run status: {}", logLine);
         if (logLine.contains(STATUS_TAG_MESSAGE)) {
-            String status = logLine.replace(STATUS_TAG_MESSAGE, "").trim();
+            String status = StringUtils.substringAfter(logLine, STATUS_TAG_MESSAGE);
             if (status.equals("0")) {
                 log.info("Remote shell task success");
                 exitCode = 0;
