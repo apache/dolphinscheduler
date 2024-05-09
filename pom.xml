@@ -616,7 +616,7 @@
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                     <parallel>all</parallel>
-                    <threadCount>4</threadCount>
+                    <threadCount>8</threadCount>
                 </configuration>
             </plugin>
 
