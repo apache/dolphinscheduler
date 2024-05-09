@@ -34,7 +34,6 @@ import { useModal } from './use-modal'
 import {
   NForm,
   NFormItem,
-  NButton,
   NIcon,
   NInput,
   NSpace,
@@ -52,9 +51,7 @@ import {
 } from 'naive-ui'
 import {
   ArrowDownOutlined,
-  ArrowUpOutlined,
-  DeleteOutlined,
-  PlusCircleOutlined
+  ArrowUpOutlined
 } from '@vicons/antd'
 import { IDefinitionData } from '../types'
 import styles from '../index.module.scss'
