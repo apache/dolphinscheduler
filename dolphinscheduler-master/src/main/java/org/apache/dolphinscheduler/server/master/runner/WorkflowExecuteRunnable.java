@@ -2120,13 +2120,9 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         workflowInstance.setVarPool(JSONUtils.toJsonString(processProperties));
         processInstanceDao.updateById(workflowInstance);
 
-        // remove task instance from taskInstanceMap, completeTaskSet, validTaskMap, errorTaskMap
-        // completeTaskSet remove dependency taskInstanceMap, so the sort can't change
-        completeTaskSet.removeIf(taskCode -> {
-            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
-            return existTaskInstanceOptional
-                    .filter(taskInstance -> dag.containsNode(taskInstance.getTaskCode())).isPresent();
-        });
+        // remove task instance from taskInstanceMap,taskCodeInstanceMap , completeTaskSet, validTaskMap, errorTaskMap
+        completeTaskSet.removeIf(dag::containsNode);
+        taskCodeInstanceMap.entrySet().removeIf(entity -> dag.containsNode(entity.getValue().getTaskCode()));
         taskInstanceMap.entrySet().removeIf(entry -> dag.containsNode(entry.getValue().getTaskCode()));
         validTaskMap.entrySet().removeIf(entry -> dag.containsNode(entry.getKey()));
         errorTaskMap.entrySet().removeIf(entry -> dag.containsNode(entry.getKey()));
