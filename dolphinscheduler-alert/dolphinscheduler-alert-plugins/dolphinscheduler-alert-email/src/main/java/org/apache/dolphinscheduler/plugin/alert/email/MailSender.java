@@ -154,7 +154,7 @@ public final class MailSender {
      */
     public AlertResult sendMails(List<String> receivers, List<String> receiverCcs, String title, String content) {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
 
         // if there is no receivers && no receiversCc, no need to process
         if (CollectionUtils.isEmpty(receivers) && CollectionUtils.isEmpty(receiverCcs)) {
@@ -201,7 +201,7 @@ public final class MailSender {
 
                 attachment(title, content, partContent);
 
-                alertResult.setStatus("true");
+                alertResult.setSuccess(true);
                 return alertResult;
             } catch (Exception e) {
                 handleException(alertResult, e);
@@ -380,7 +380,7 @@ public final class MailSender {
         email.setDebug(true);
         email.send();
 
-        alertResult.setStatus("true");
+        alertResult.setSuccess(true);
 
         return alertResult;
     }

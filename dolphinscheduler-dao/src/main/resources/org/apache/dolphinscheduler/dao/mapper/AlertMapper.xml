@@ -55,7 +55,9 @@
         select
         <include refid="baseSql"/>
         from t_ds_alert
-        where alert_status = #{alertStatus}
+        where id > #{minAlertId}
+        and alert_status = #{alertStatus}
+        order by id asc
         limit #{limit}
     </select>
 

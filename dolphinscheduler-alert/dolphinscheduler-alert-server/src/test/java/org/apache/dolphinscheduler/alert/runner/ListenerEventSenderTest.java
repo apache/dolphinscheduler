@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
+import org.apache.dolphinscheduler.alert.service.ListenerEventSender;
 import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.ListenerEventType;
@@ -33,7 +33,7 @@ import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.ListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.event.ServerDownListenerEvent;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
+import org.apache.dolphinscheduler.dao.repository.ListenerEventDao;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -43,39 +43,32 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class ListenerEventPostServiceTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(ListenerEventPostServiceTest.class);
+@ExtendWith(MockitoExtension.class)
+class ListenerEventSenderTest {
 
     @Mock
-    private ListenerEventMapper listenerEventMapper;
+    private ListenerEventDao listenerEventDao;
+
     @Mock
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
     @Mock
     private AlertPluginManager alertPluginManager;
+
     @Mock
     private AlertConfig alertConfig;
 
     @InjectMocks
-    private ListenerEventPostService listenerEventPostService;
-
-    @BeforeEach
-    public void before() {
-        MockitoAnnotations.initMocks(this);
-    }
+    private ListenerEventSender listenerEventSender;
 
     @Test
-    public void testSendServerDownEventSuccess() {
-        List<ListenerEvent> events = new ArrayList<>();
+    void testSendServerDownEventSuccess() {
         ServerDownListenerEvent serverDownListenerEvent = new ServerDownListenerEvent();
         serverDownListenerEvent.setEventTime(new Date());
         serverDownListenerEvent.setType("WORKER");
@@ -88,7 +81,6 @@ public class ListenerEventPostServiceTest {
         successEvent.setEventType(ListenerEventType.SERVER_DOWN);
         successEvent.setCreateTime(new Date());
         successEvent.setUpdateTime(new Date());
-        events.add(successEvent);
 
         int pluginDefineId = 1;
         String pluginInstanceParams =
@@ -103,19 +95,17 @@ public class ListenerEventPostServiceTest {
         when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList()).thenReturn(alertInstanceList);
 
         AlertResult sendResult = new AlertResult();
-        sendResult.setStatus(String.valueOf(true));
+        sendResult.setSuccess(true);
         sendResult.setMessage(String.format("Alert Plugin %s send success", pluginInstanceName));
         AlertChannel alertChannelMock = mock(AlertChannel.class);
         when(alertChannelMock.process(Mockito.any())).thenReturn(sendResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
-        Assertions.assertTrue(Boolean.parseBoolean(sendResult.getStatus()));
-        when(listenerEventMapper.deleteById(1)).thenReturn(1);
-        listenerEventPostService.send(events);
+        Assertions.assertTrue(sendResult.isSuccess());
+        listenerEventSender.sendEvent(successEvent);
     }
 
     @Test
-    public void testSendServerDownEventFailed() {
-        List<ListenerEvent> events = new ArrayList<>();
+    void testSendServerDownEventFailed() {
         ServerDownListenerEvent serverDownListenerEvent = new ServerDownListenerEvent();
         serverDownListenerEvent.setEventTime(new Date());
         serverDownListenerEvent.setType("WORKER");
@@ -128,7 +118,6 @@ public class ListenerEventPostServiceTest {
         successEvent.setEventType(ListenerEventType.SERVER_DOWN);
         successEvent.setCreateTime(new Date());
         successEvent.setUpdateTime(new Date());
-        events.add(successEvent);
 
         int pluginDefineId = 1;
         String pluginInstanceParams =
@@ -143,12 +132,12 @@ public class ListenerEventPostServiceTest {
         when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList()).thenReturn(alertInstanceList);
 
         AlertResult sendResult = new AlertResult();
-        sendResult.setStatus(String.valueOf(false));
+        sendResult.setSuccess(false);
         sendResult.setMessage(String.format("Alert Plugin %s send failed", pluginInstanceName));
         AlertChannel alertChannelMock = mock(AlertChannel.class);
         when(alertChannelMock.process(Mockito.any())).thenReturn(sendResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
-        Assertions.assertFalse(Boolean.parseBoolean(sendResult.getStatus()));
-        listenerEventPostService.send(events);
+        Assertions.assertFalse(sendResult.isSuccess());
+        listenerEventSender.sendEvent(successEvent);
     }
 }

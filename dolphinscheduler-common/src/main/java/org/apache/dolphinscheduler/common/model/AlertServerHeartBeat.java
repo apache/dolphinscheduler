@@ -24,4 +24,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public class AlertServerHeartBeat extends BaseHeartBeat implements HeartBeat {
 
+    /**
+     * If the alert server is active or standby
+     */
+    private boolean isActive;
+
 }

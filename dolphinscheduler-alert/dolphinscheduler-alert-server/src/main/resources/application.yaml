@@ -73,7 +73,8 @@ alert:
   # Define value is (0 = infinite), and alert server would be waiting alert result.
   wait-timeout: 0
   max-heartbeat-interval: 60s
-  query_alert_threshold: 100
+  # The maximum number of alerts that can be processed in parallel
+  sender-parallelism: 100
 
 registry:
   type: zookeeper

@@ -46,7 +46,7 @@ public final class VoiceSender {
 
     public AlertResult send() {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
         try {
             Client client = createClient(voiceParam.getConnection());
             SingleCallByTtsRequest singleCallByTtsRequest = new SingleCallByTtsRequest()
@@ -61,7 +61,7 @@ public final class VoiceSender {
             }
             SingleCallByTtsResponseBody body = response.getBody();
             if (body.code.equalsIgnoreCase("ok")) {
-                alertResult.setStatus("true");
+                alertResult.setSuccess(true);
                 alertResult.setMessage(body.getCallId());
             } else {
                 alertResult.setMessage(body.getMessage());

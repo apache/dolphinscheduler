@@ -58,7 +58,6 @@ public interface Registry extends Closeable {
     String get(String key);
 
     /**
-     *
      * @param key
      * @param value
      * @param deleteOnDisconnect if true, when the connection state is disconnected, the key will be deleted
@@ -67,6 +66,7 @@ public interface Registry extends Closeable {
 
     /**
      * This function will delete the keys whose prefix is {@param key}
+     *
      * @param key the prefix of deleted key
      * @throws if the key not exists, there is a registryException
      */
@@ -89,6 +89,11 @@ public interface Registry extends Closeable {
      * Acquire the lock of the prefix {@param key}
      */
     boolean acquireLock(String key);
+
+    /**
+     * Acquire the lock of the prefix {@param key}, if acquire in the given timeout return true, else return false.
+     */
+    boolean acquireLock(String key, long timeout);
 
     /**
      * Release the lock of the prefix {@param key}

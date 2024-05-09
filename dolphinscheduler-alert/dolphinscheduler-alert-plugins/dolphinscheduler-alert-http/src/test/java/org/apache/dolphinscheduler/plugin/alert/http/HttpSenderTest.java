@@ -46,7 +46,7 @@ public class HttpSenderTest {
         HttpSender httpSender = spy(new HttpSender(paramsMap));
         doReturn("success").when(httpSender).getResponseString(any());
         AlertResult alertResult = httpSender.send("Fault tolerance warning");
-        Assertions.assertEquals("true", alertResult.getStatus());
+        Assertions.assertTrue(alertResult.isSuccess());
         Assertions.assertTrue(httpSender.getRequestUrl().contains(url));
         Assertions.assertTrue(httpSender.getRequestUrl().contains(contentField));
     }

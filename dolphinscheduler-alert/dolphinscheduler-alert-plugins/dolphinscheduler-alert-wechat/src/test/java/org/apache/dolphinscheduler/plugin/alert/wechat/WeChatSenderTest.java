@@ -71,7 +71,7 @@ public class WeChatSenderTest {
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
 
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class WeChatSenderTest {
         weChatConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TEXT.getDescp());
         WeChatSender weChatSender = new WeChatSender(weChatConfig);
         AlertResult alertResult = weChatSender.sendEnterpriseWeChat("test", content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
 }

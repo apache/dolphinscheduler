@@ -83,6 +83,30 @@ public class RegistryLockManager implements AutoCloseable {
         });
     }
 
+    /**
+     * Acquire the lock, if cannot get the lock will await.
+     */
+    public boolean acquireLock(String lockKey, long timeout) throws RegistryException {
+        long startTime = System.currentTimeMillis();
+        while (System.currentTimeMillis() - startTime < timeout) {
+            try {
+                if (lockHoldMap.containsKey(lockKey)) {
+                    return true;
+                }
+                JdbcRegistryLock jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey);
+                if (jdbcRegistryLock != null) {
+                    lockHoldMap.put(lockKey, jdbcRegistryLock);
+                    return true;
+                }
+            } catch (SQLException e) {
+                throw new RegistryException("Acquire the lock: " + lockKey + " error", e);
+            }
+            log.debug("Acquire the lock {} failed try again", lockKey);
+            ThreadUtils.sleep(JdbcRegistryConstant.LOCK_ACQUIRE_INTERVAL);
+        }
+        return false;
+    }
+
     public void releaseLock(String lockKey) {
         JdbcRegistryLock jdbcRegistryLock = lockHoldMap.get(lockKey);
         if (jdbcRegistryLock != null) {

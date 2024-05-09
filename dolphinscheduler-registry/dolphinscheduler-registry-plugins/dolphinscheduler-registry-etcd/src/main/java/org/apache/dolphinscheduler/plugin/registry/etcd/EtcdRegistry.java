@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLException;
@@ -303,6 +305,35 @@ public class EtcdRegistry implements Registry {
             }
             threadLocalLockMap.get().put(key, leaseId);
             return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RegistryException("etcd get lock error", e);
+        } catch (ExecutionException e) {
+            throw new RegistryException("etcd get lock error, lockKey: " + key, e);
+        }
+    }
+
+    @Override
+    public boolean acquireLock(String key, long timeout) {
+        Lock lockClient = client.getLockClient();
+        Lease leaseClient = client.getLeaseClient();
+        // get the lock with a lease
+        try {
+            long leaseId = leaseClient.grant(TIME_TO_LIVE_SECONDS).get().getID();
+            // keep the lease
+            lockClient.lock(byteSequence(key), leaseId).get(timeout, TimeUnit.MICROSECONDS);
+            client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
+            }));
+
+            // save the leaseId for release Lock
+            if (null == threadLocalLockMap.get()) {
+                threadLocalLockMap.set(new HashMap<>());
+            }
+            threadLocalLockMap.get().put(key, leaseId);
+            return true;
+        } catch (TimeoutException timeoutException) {
+            log.debug("Acquire lock: {} in {}/ms timeout", key, timeout);
+            return false;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get lock error", e);

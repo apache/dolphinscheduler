@@ -31,7 +31,7 @@ public final class PrometheusAlertChannel implements AlertChannel {
         AlertData alertData = info.getAlertData();
         Map<String, String> paramsMap = info.getAlertParams();
         if (null == paramsMap) {
-            return new AlertResult("false", "prometheus alert manager params is null");
+            return new AlertResult(false, "prometheus alert manager params is null");
         }
         return new PrometheusAlertSender(paramsMap).sendMessage(alertData);
 

@@ -43,6 +43,8 @@ public final class AlertConfig implements Validator {
 
     private Duration maxHeartbeatInterval = Duration.ofSeconds(60);
 
+    private int senderParallelism = 100;
+
     private String alertServerAddress;
 
     @Override
@@ -56,6 +58,10 @@ public final class AlertConfig implements Validator {
 
         if (maxHeartbeatInterval.getSeconds() <= 0) {
             errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
+        }
+
+        if (senderParallelism <= 0) {
+            errors.rejectValue("sender-parallelism", null, "should be a positive number");
         }
 
         if (StringUtils.isEmpty(alertServerAddress)) {

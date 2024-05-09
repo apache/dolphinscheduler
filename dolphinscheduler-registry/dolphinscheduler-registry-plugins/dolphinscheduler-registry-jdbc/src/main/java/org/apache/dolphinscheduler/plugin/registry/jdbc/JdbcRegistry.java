@@ -180,6 +180,17 @@ public class JdbcRegistry implements Registry {
     }
 
     @Override
+    public boolean acquireLock(String key, long timeout) {
+        try {
+            return registryLockManager.acquireLock(key, timeout);
+        } catch (RegistryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RegistryException(String.format("Acquire lock: %s error", key), e);
+        }
+    }
+
+    @Override
     public boolean releaseLock(String key) {
         registryLockManager.releaseLock(key);
         return true;

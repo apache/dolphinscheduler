@@ -62,9 +62,9 @@ public class HttpAlertChannelTest {
 
         // HttpSender(paramsMap).send(alertData.getContent()); already test in HttpSenderTest.sendTest. so we can mock
         // it
-        doReturn(new AlertResult("true", "success")).when(alertChannel).process(any());
+        doReturn(new AlertResult(true, "success")).when(alertChannel).process(any());
         AlertResult alertResult = alertChannel.process(alertInfo);
-        Assertions.assertEquals("true", alertResult.getStatus());
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     /**
