@@ -165,9 +165,9 @@ export DOLPHINSCHEDULER_OPTS="
 DolphinScheduler同样可以通过设置环境变量进行数据库连接相关的配置, 将以上小写字母转成大写并把`.`换成`_`作为环境变量名,
 设置值即可。
 
-## Zookeeper相关配置
+## 注册中心相关配置
 
-DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功能，配置文件位置：
+DolphinScheduler默认使用Zookeeper进行集群管理、容错、事件监听等功能，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/application.yaml`|
@@ -189,6 +189,9 @@ DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功�
 | registry.zookeeper.digest                       | {用户名:密码}         | 如果zookeeper打开了acl，则需要填写认证信息访问znode，认证信息格式为{用户名}:{密码}。关于Zookeeper ACL详见[https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper官方文档) |
 
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeeper相关的配置。
+
+如果使用etcd作为注册中心，详细请参考[链接](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md)。
+如果使用jdbc作为注册中心，详细请参考[链接](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md)。
 
 ## common.properties [hadoop、s3、yarn配置]
 
