@@ -36,6 +36,7 @@ class EtcdKeepAliveLeaseManagerTest {
     static Client client;
 
     static EtcdKeepAliveLeaseManager etcdKeepAliveLeaseManager;
+
     @BeforeAll
     public static void before() throws Exception {
         server = EtcdClusterExtension.builder()
@@ -65,8 +66,9 @@ class EtcdKeepAliveLeaseManagerTest {
 
     @AfterAll
     public static void after() throws IOException {
-        try (EtcdCluster closeServer = server.cluster()) {
-            client.close();
+        try (
+                EtcdCluster closeServer = server.cluster();
+                Client closedClient = client) {
         }
     }
 }

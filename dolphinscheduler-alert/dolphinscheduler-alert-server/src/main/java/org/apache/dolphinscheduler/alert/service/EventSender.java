@@ -15,28 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base.client;
+package org.apache.dolphinscheduler.alert.service;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
-import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.alert.api.AlertData;
+import org.apache.dolphinscheduler.alert.api.AlertResult;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
+import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
 
-import java.lang.reflect.Method;
+public interface EventSender<T> {
 
-public abstract class BaseRemoteMethodInvoker implements ClientMethodInvoker {
+    void sendEvent(T event);
 
-    protected final String methodIdentifier;
+    AlertResult doSendEvent(AlertPluginInstance instance, AlertData alertData);
 
-    protected final NettyRemotingClient nettyRemotingClient;
-
-    protected final Method localMethod;
-
-    protected final Host serverHost;
-
-    public BaseRemoteMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
-        this.serverHost = serverHost;
-        this.localMethod = localMethod;
-        this.nettyRemotingClient = nettyRemotingClient;
-        this.methodIdentifier = localMethod.toGenericString();
-    }
+    AlertSendResponse syncTestSend(int pluginDefineId, String pluginInstanceParams);
 
 }
