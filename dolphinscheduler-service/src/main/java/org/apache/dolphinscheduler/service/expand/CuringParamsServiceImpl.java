@@ -154,11 +154,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             return new HashMap<>();
         }
         String startParamJson = cmdParam.get(CommandKeyConstants.CMD_PARAM_START_PARAMS);
-        Map<String, String> startParamMap = JSONUtils.toMap(startParamJson);
         JsonElement jsonElement = JsonParser.parseString(startParamJson);
         // check whether it is json
         boolean isJson = jsonElement.isJsonObject();
         if (isJson) {
+            Map<String, String> startParamMap = JSONUtils.toMap(startParamJson);
             return startParamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
                     entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue())));
         } else {
