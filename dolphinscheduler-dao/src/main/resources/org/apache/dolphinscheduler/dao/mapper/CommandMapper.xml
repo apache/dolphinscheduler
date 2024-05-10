@@ -46,9 +46,6 @@
         *
         from t_ds_command
         where 1 = 1
-<!--        <if test="searchVal != null and searchVal != ''">-->
-<!--            and group_name like concat('%', #{searchVal}, '%')-->
-<!--        </if>-->
         <if test="definitionCodes != null and definitionCodes.size() > 0">
             and process_definition_code in
             <foreach item="id" index="index" collection="definitionCodes" open="(" separator="," close=")">

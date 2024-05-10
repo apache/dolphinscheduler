@@ -45,7 +45,6 @@ interface WorkerNode extends ServerNode {
   serverStatus?: 'NORMAL' | 'BUZY'
   workerHostWeight?: number
   threadPoolUsage?: number
-  // zkDirectories: Array<string>
 }
 
 interface AlertNode extends MasterNode {}

@@ -92,8 +92,7 @@ public class MonitorControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryDatabaseState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/monitor/databases")
-                .header(SESSION_ID, sessionId)
-        /* .param("type", ResourceType.FILE.name()) */)
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
