@@ -128,7 +128,6 @@ export default defineComponent({
                   placeholder={t('project.parameter.data_type_tips')}
                   style={{ width: '180px' }}
                   clearable
-                  onClear={this.onClearSearchTaskType}
               />
               <NButton size='small' type='primary' onClick={handleSearch}>
                 <NIcon>
