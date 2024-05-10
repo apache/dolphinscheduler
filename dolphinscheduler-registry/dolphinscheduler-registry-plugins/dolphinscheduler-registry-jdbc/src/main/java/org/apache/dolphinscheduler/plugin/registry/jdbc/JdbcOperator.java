@@ -29,26 +29,25 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.SQLException;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+import org.springframework.dao.DuplicateKeyException;
 
-@Component
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
-public class JdbcOperator {
+public final class JdbcOperator {
 
-    @Autowired
-    private JdbcRegistryDataMapper jdbcRegistryDataMapper;
-    @Autowired
-    private JdbcRegistryLockMapper jdbcRegistryLockMapper;
+    private final JdbcRegistryDataMapper jdbcRegistryDataMapper;
+    private final JdbcRegistryLockMapper jdbcRegistryLockMapper;
     private final long expireTimeWindow;
 
-    public JdbcOperator(JdbcRegistryProperties registryProperties) {
+    JdbcOperator(JdbcRegistryProperties registryProperties,
+                 JdbcRegistryDataMapper jdbcRegistryDataMapper,
+                 JdbcRegistryLockMapper jdbcRegistryLockMapper) {
         this.expireTimeWindow =
                 registryProperties.getTermExpireTimes() * registryProperties.getTermRefreshInterval().toMillis();
+        this.jdbcRegistryDataMapper = jdbcRegistryDataMapper;
+        this.jdbcRegistryLockMapper = jdbcRegistryLockMapper;
     }
 
     public void healthCheck() {
@@ -62,17 +61,21 @@ public class JdbcOperator {
     public Long insertOrUpdateEphemeralData(String key, String value) throws SQLException {
         JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMapper.selectByKey(key);
         if (jdbcRegistryData != null) {
-            long id = jdbcRegistryData.getId();
-            if (jdbcRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
+            jdbcRegistryData.setDataValue(value);
+            jdbcRegistryData.setLastUpdateTime(new Date());
+            jdbcRegistryData.setLastTerm(System.currentTimeMillis());
+            if (jdbcRegistryDataMapper.updateById(jdbcRegistryData) <= 0) {
                 throw new SQLException(String.format("update registry value failed, key: %s, value: %s", key, value));
             }
-            return id;
+            return jdbcRegistryData.getId();
         }
         jdbcRegistryData = JdbcRegistryData.builder()
                 .dataKey(key)
                 .dataValue(value)
                 .dataType(DataType.EPHEMERAL.getTypeValue())
                 .lastTerm(System.currentTimeMillis())
+                .lastUpdateTime(new Date())
+                .createTime(new Date())
                 .build();
         jdbcRegistryDataMapper.insert(jdbcRegistryData);
         return jdbcRegistryData.getId();
@@ -81,17 +84,21 @@ public class JdbcOperator {
     public long insertOrUpdatePersistentData(String key, String value) throws SQLException {
         JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMapper.selectByKey(key);
         if (jdbcRegistryData != null) {
-            long id = jdbcRegistryData.getId();
-            if (jdbcRegistryDataMapper.updateDataAndTermById(id, value, System.currentTimeMillis()) <= 0) {
+            jdbcRegistryData.setDataValue(value);
+            jdbcRegistryData.setLastUpdateTime(new Date());
+            jdbcRegistryData.setLastTerm(System.currentTimeMillis());
+            if (jdbcRegistryDataMapper.updateById(jdbcRegistryData) <= 0) {
                 throw new SQLException(String.format("update registry value failed, key: %s, value: %s", key, value));
             }
-            return id;
+            return jdbcRegistryData.getId();
         }
         jdbcRegistryData = JdbcRegistryData.builder()
                 .dataKey(key)
                 .dataValue(value)
                 .dataType(DataType.PERSISTENT.getTypeValue())
                 .lastTerm(System.currentTimeMillis())
+                .lastUpdateTime(new Date())
+                .createTime(new Date())
                 .build();
         jdbcRegistryDataMapper.insert(jdbcRegistryData);
         return jdbcRegistryData.getId();
@@ -127,7 +134,7 @@ public class JdbcOperator {
                 .collect(Collectors.toList());
     }
 
-    public boolean existKey(String key) throws SQLException {
+    public boolean existKey(String key) {
         JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMapper.selectByKey(key);
         return jdbcRegistryData != null;
     }
@@ -136,24 +143,25 @@ public class JdbcOperator {
      * Try to acquire the target Lock, if cannot acquire, return null.
      */
     @SuppressWarnings("checkstyle:IllegalCatch")
-    public JdbcRegistryLock tryToAcquireLock(String key) throws SQLException {
+    public JdbcRegistryLock tryToAcquireLock(String key) {
         JdbcRegistryLock jdbcRegistryLock = JdbcRegistryLock.builder()
                 .lockKey(key)
-                .lockOwner(JdbcRegistryConstant.LOCK_OWNER)
+                .lockOwner(LockUtils.getLockOwner())
                 .lastTerm(System.currentTimeMillis())
+                .lastUpdateTime(new Date())
                 .build();
         try {
             jdbcRegistryLockMapper.insert(jdbcRegistryLock);
             return jdbcRegistryLock;
         } catch (Exception e) {
-            if (e instanceof SQLIntegrityConstraintViolationException) {
+            if (e instanceof SQLIntegrityConstraintViolationException || e instanceof DuplicateKeyException) {
                 return null;
             }
             throw e;
         }
     }
 
-    public JdbcRegistryLock getLockById(long lockId) throws SQLException {
+    public JdbcRegistryLock getLockById(long lockId) {
         return jdbcRegistryLockMapper.selectById(lockId);
     }
 
@@ -161,7 +169,7 @@ public class JdbcOperator {
         return jdbcRegistryLockMapper.deleteById(lockId) > 0;
     }
 
-    public boolean updateEphemeralDataTerm(Collection<Long> ephemeralDateIds) throws SQLException {
+    public boolean updateEphemeralDataTerm(Collection<Long> ephemeralDateIds) {
         if (CollectionUtils.isEmpty(ephemeralDateIds)) {
             return true;
         }
