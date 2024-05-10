@@ -41,6 +41,7 @@ export default {
   service_manage: '服务管理',
   master: 'Master',
   worker: 'Worker',
+  alert_server: 'Alert Server',
   db: 'DB',
   statistical_manage: '统计管理',
   statistics: 'Statistics',
