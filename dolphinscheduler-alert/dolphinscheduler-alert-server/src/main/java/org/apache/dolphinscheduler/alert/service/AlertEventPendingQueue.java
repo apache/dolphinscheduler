@@ -15,22 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.processor;
+package org.apache.dolphinscheduler.alert.service;
 
-import org.apache.dolphinscheduler.server.master.utils.DataQualityResultOperator;
+import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
+import org.apache.dolphinscheduler.dao.entity.Alert;
 
-import org.mockito.Mockito;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-/**
- * dependency config
- */
-@Configuration
-public class TaskResponseProcessorTestConfig {
+@Component
+public class AlertEventPendingQueue extends AbstractEventPendingQueue<Alert> {
 
-    @Bean
-    public DataQualityResultOperator dataQualityResultOperator() {
-        return Mockito.mock(DataQualityResultOperator.class);
+    public AlertEventPendingQueue(AlertConfig alertConfig) {
+        super(alertConfig.getSenderParallelism() * 3 + 1);
+        AlertServerMetrics.registerPendingAlertGauge(this::size);
     }
 }

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
@@ -42,12 +43,15 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
     private final RegistryClient registryClient;
 
     private final MetricsProvider metricsProvider;
+
+    private final AlertHAServer alertHAServer;
     private final String heartBeatPath;
     private final long startupTime;
 
     public AlertHeartbeatTask(AlertConfig alertConfig,
                               MetricsProvider metricsProvider,
-                              RegistryClient registryClient) {
+                              RegistryClient registryClient,
+                              AlertHAServer alertHAServer) {
         super("AlertHeartbeatTask", alertConfig.getMaxHeartbeatInterval().toMillis());
         this.startupTime = System.currentTimeMillis();
         this.alertConfig = alertConfig;
@@ -55,6 +59,7 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
         this.registryClient = registryClient;
         this.heartBeatPath =
                 RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.getAlertServerAddress();
+        this.alertHAServer = alertHAServer;
         this.processId = OSUtils.getProcessID();
     }
 
@@ -70,6 +75,7 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
                 .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
                 .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
                 .serverStatus(ServerStatus.NORMAL)
+                .isActive(alertHAServer.isActive())
                 .host(NetUtils.getHost())
                 .port(alertConfig.getPort())
                 .build();

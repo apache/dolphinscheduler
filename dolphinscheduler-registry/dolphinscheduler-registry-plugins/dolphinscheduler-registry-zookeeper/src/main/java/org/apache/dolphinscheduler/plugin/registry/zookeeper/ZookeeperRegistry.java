@@ -217,11 +217,41 @@ public final class ZookeeperRegistry implements Registry {
     public boolean acquireLock(String key) {
         InterProcessMutex interProcessMutex = new InterProcessMutex(client, key);
         try {
-            interProcessMutex.acquire();
-            if (null == threadLocalLockMap.get()) {
-                threadLocalLockMap.set(new HashMap<>(3));
+            if (interProcessMutex.isAcquiredInThisProcess()) {
+                return true;
             }
-            threadLocalLockMap.get().put(key, interProcessMutex);
+            Map<String, InterProcessMutex> processMutexMap = threadLocalLockMap.get();
+            if (null == processMutexMap) {
+                processMutexMap = new HashMap<>();
+                threadLocalLockMap.set(processMutexMap);
+            }
+            interProcessMutex.acquire();
+            processMutexMap.put(key, interProcessMutex);
+            return true;
+        } catch (Exception e) {
+            try {
+                interProcessMutex.release();
+                throw new RegistryException(String.format("zookeeper get lock: %s error", key), e);
+            } catch (Exception exception) {
+                throw new RegistryException(String.format("zookeeper get lock: %s error", key), e);
+            }
+        }
+    }
+
+    @Override
+    public boolean acquireLock(String key, long timeout) {
+        InterProcessMutex interProcessMutex = new InterProcessMutex(client, key);
+        try {
+            if (interProcessMutex.isAcquiredInThisProcess()) {
+                return true;
+            }
+            Map<String, InterProcessMutex> processMutexMap = threadLocalLockMap.get();
+            if (null == processMutexMap) {
+                processMutexMap = new HashMap<>();
+                threadLocalLockMap.set(processMutexMap);
+            }
+            interProcessMutex.acquire(timeout, MILLISECONDS);
+            processMutexMap.put(key, interProcessMutex);
             return true;
         } catch (Exception e) {
             try {
@@ -235,13 +265,17 @@ public final class ZookeeperRegistry implements Registry {
 
     @Override
     public boolean releaseLock(String key) {
-        if (null == threadLocalLockMap.get().get(key)) {
+        Map<String, InterProcessMutex> processMutexMap = threadLocalLockMap.get();
+        if (processMutexMap == null) {
+            return true;
+        }
+        if (null == processMutexMap.get(key)) {
             return false;
         }
         try {
-            threadLocalLockMap.get().get(key).release();
-            threadLocalLockMap.get().remove(key);
-            if (threadLocalLockMap.get().isEmpty()) {
+            processMutexMap.get(key).release();
+            processMutexMap.remove(key);
+            if (processMutexMap.isEmpty()) {
                 threadLocalLockMap.remove();
             }
         } catch (Exception e) {
