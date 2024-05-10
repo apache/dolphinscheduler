@@ -36,8 +36,9 @@ public interface CommandMapper extends BaseMapper<Command> {
 
     /**
      * count command state
-     * @param startTime startTime
-     * @param endTime endTime
+     *
+     * @param startTime    startTime
+     * @param endTime      endTime
      * @param projectCodes projectCodes
      * @return CommandCount list
      */
@@ -48,17 +49,17 @@ public interface CommandMapper extends BaseMapper<Command> {
 
     /**
      * query command page
+     *
      * @return
      */
     IPage<Command> queryCommandPage(Page<Command> page);
 
-    /**
-     * query command page by slot
-     * @return command list
-     */
-    List<Command> queryCommandPageBySlot(@Param("limit") int limit,
-                                         @Param("masterCount") int masterCount,
-                                         @Param("thisMasterSlot") int thisMasterSlot);
+    List<Command> queryCommandByIdSlot(@Param("currentSlotIndex") int currentSlotIndex,
+                                       @Param("totalSlot") int totalSlot,
+                                       @Param("idStep") int idStep,
+                                       @Param("fetchNumber") int fetchNum);
+
+    void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
 
     IPage<Command> queryCommandPageByIds(Page<Command> page, @Param("definitionCodes") List<Long> definitionCodes,
                                          @Param("projectCode") Long projectCode);

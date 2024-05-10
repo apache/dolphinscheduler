@@ -60,7 +60,6 @@ public class ResourceContext {
     public static class ResourceItem {
 
         private String resourceAbsolutePathInStorage;
-        private String resourceRelativePath;
         private String resourceAbsolutePathInLocal;
     }
 

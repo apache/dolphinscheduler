@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -174,11 +176,19 @@ public class CommandMapperTest extends BaseDaoTest {
         toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
     }
 
+    @Test
+    void deleteByWorkflowInstanceIds() {
+        Command command = createCommand();
+        assertThat(commandMapper.selectList(null)).isNotEmpty();
+        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getProcessInstanceId()));
+        assertThat(commandMapper.selectList(null)).isEmpty();
+    }
+
     private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
         Command command = createCommand();
         Integer id = command.getId();
         boolean hit = id % masterCount == thisMasterSlot;
-        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, masterCount, thisMasterSlot);
+        List<Command> commandList = commandMapper.queryCommandByIdSlot(thisMasterSlot, masterCount, 1, 1);
         if (hit) {
             Assertions.assertEquals(id, commandList.get(0).getId());
         } else {
@@ -192,8 +202,9 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
-     * @param count map count
-     * @param commandType comman type
+     *
+     * @param count                 map count
+     * @param commandType           comman type
      * @param processDefinitionCode process definition code
      * @return command map
      */
@@ -214,7 +225,8 @@ public class CommandMapperTest extends BaseDaoTest {
     }
 
     /**
-     *  create process definition
+     * create process definition
+     *
      * @return process definition
      */
     private ProcessDefinition createProcessDefinition() {
@@ -234,6 +246,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
+     *
      * @param count map count
      * @return command map
      */
@@ -249,6 +262,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return
      */
     private Command createCommand() {
@@ -257,6 +271,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return Command
      */
     private Command createCommand(CommandType commandType, long processDefinitionCode) {
@@ -281,5 +296,4 @@ public class CommandMapperTest extends BaseDaoTest {
 
         return command;
     }
-
 }

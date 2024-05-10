@@ -23,8 +23,6 @@ public final class WeChatAlertConstants {
 
     static final String MARKDOWN_ENTER = "\n";
 
-    static final String CHARSET = "UTF-8";
-
     static final String WE_CHAT_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/message/send?access_token={token}";
 
     static final String WE_CHAT_APP_CHAT_PUSH_URL = "https://qyapi.weixin.qq.com/cgi-bin/appchat/send?access_token" +
