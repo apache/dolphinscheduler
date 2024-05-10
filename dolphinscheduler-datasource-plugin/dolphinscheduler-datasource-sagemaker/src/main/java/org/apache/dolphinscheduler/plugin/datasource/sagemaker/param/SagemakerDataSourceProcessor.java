@@ -57,7 +57,7 @@ public class SagemakerDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         SagemakerConnectionParam baseConnectionParam = (SagemakerConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(),
                 PasswordUtils.encodePassword(baseConnectionParam.getUserName()),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()),
                 PasswordUtils.encodePassword(baseConnectionParam.getAwsRegion()));

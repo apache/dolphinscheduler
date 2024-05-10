@@ -55,7 +55,7 @@ public class SSHDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         SSHConnectionParam baseConnectionParam = (SSHConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getHost(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(), baseConnectionParam.getHost(),
                 baseConnectionParam.getUser(),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()));
     }

@@ -15,16 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.alert.service;
 
-import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+/**
+ * The interface responsible for consuming event from upstream, e.g {@link EventPendingQueue}.
+ *
+ * @param <T> the type of event
+ */
+public interface EventLoop<T> {
 
-import lombok.experimental.UtilityClass;
+    /**
+     * Start the event loop, once the event loop is started, it will keep consuming event from upstream.
+     */
+    void start();
 
-@UtilityClass
-public class NettyRemotingServerFactory {
+    /**
+     * Handle the given event.
+     */
+    void handleEvent(T event);
 
-    public NettyRemotingServer buildNettyRemotingServer(NettyServerConfig nettyServerConfig) {
-        return new NettyRemotingServer(nettyServerConfig);
-    }
+    /**
+     * Get the count of handling event.
+     */
+    int getHandlingEventCount();
+
+    /**
+     * Shutdown the event loop, once the event loop is shutdown, it will stop consuming event from upstream.
+     */
+    void shutdown();
+
 }

@@ -34,7 +34,8 @@ public interface ListenerEventMapper extends BaseMapper<ListenerEvent> {
     void insertServerDownEvent(@Param("event") ListenerEvent event,
                                @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
 
-    List<ListenerEvent> listingListenerEventByStatus(@Param("postStatus") AlertStatus postStatus,
+    List<ListenerEvent> listingListenerEventByStatus(@Param("minId") int minId,
+                                                     @Param("postStatus") int postStatus,
                                                      @Param("limit") int limit);
 
     void updateListenerEvent(@Param("eventId") int eventId, @Param("postStatus") AlertStatus postStatus,
