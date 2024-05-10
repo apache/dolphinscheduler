@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.emr;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -120,10 +121,14 @@ public class EmrJobFlowTask extends AbstractEmrTask {
     protected RunJobFlowRequest createRunJobFlowRequest() {
 
         final RunJobFlowRequest runJobFlowRequest;
+        String jobFlowDefineJson = null;
         try {
-            runJobFlowRequest = objectMapper.readValue(emrParameters.getJobFlowDefineJson(), RunJobFlowRequest.class);
+            jobFlowDefineJson = ParameterUtils.convertParameterPlaceholders(
+                    emrParameters.getJobFlowDefineJson(),
+                    ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));
+            runJobFlowRequest = objectMapper.readValue(jobFlowDefineJson, RunJobFlowRequest.class);
         } catch (JsonProcessingException e) {
-            throw new EmrTaskException("can not parse RunJobFlowRequest from json", e);
+            throw new EmrTaskException("can not parse RunJobFlowRequest from json: " + jobFlowDefineJson, e);
         }
 
         return runJobFlowRequest;
