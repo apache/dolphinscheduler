@@ -46,7 +46,7 @@ class VoiceSenderTest {
         VoiceSender weChatSender = new VoiceSender(voiceParam);
 
         AlertResult alertResult = weChatSender.send();
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
 }

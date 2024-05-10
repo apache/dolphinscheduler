@@ -15,18 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.alert.service;
 
-import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import java.util.List;
 
-import lombok.experimental.UtilityClass;
-import lombok.extern.slf4j.Slf4j;
+/**
+ * The interface responsible for fetching events.
+ *
+ * @param <T> the type of event
+ */
+public interface EventFetcher<T> {
 
-@UtilityClass
-@Slf4j
-public class NettyRemotingClientFactory {
+    void start();
 
-    public NettyRemotingClient buildNettyRemotingClient(NettyClientConfig nettyClientConfig) {
-        return new NettyRemotingClient(nettyClientConfig);
-    }
+    List<T> fetchPendingEvent(int eventOffset);
+
+    void shutdown();
 }

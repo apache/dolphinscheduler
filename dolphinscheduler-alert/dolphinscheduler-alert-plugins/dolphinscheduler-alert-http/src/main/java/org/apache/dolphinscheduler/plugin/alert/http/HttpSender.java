@@ -92,18 +92,18 @@ public final class HttpSender {
         }
 
         if (httpRequest == null) {
-            alertResult.setStatus("false");
+            alertResult.setSuccess(false);
             alertResult.setMessage("Request types are not supported");
             return alertResult;
         }
 
         try {
             String resp = this.getResponseString(httpRequest);
-            alertResult.setStatus("true");
+            alertResult.setSuccess(true);
             alertResult.setMessage(resp);
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());
-            alertResult.setStatus("false");
+            alertResult.setSuccess(false);
             alertResult.setMessage(
                     String.format("Send http request alert failed: %s", e.getMessage()));
         }
