@@ -16,7 +16,7 @@
 
 ![worker](../../../img/new_ui/dev/monitor/worker.png)
 
-### Alert Server 
+### Alert Server
 
 - 主要是 alert server 的相关信息。
 
