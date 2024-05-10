@@ -15,33 +15,29 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import type { ServerNodeType } from './types'
-
-export function queryDatabaseState(): any {
-  return axios({
-    url: '/monitor/databases',
-    method: 'get'
-  })
+ @mixin base {
+  font-size: 5vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
 }
 
-export function listMaster(): any {
-  return axios({
-    url: '/monitor/masters',
-    method: 'get'
-  })
+.card {
+  @include base;
 }
 
-export function listWorker(): any {
-  return axios({
-    url: '/monitor/workers',
-    method: 'get'
-  })
+.load-average {
+  @include base;
+  color: var(--n-color-target);
 }
 
-export function listMonitorServerNode(nodeType: ServerNodeType): any {
-  return axios({
-    url: `/monitor/${nodeType}`,
-    method: 'get'
-  })
+.link-btn {
+  color: var(--n-color-target);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--n-color-target);
+    opacity: 0.8;
+  }
 }

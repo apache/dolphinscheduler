@@ -15,33 +15,24 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import type { ServerNodeType } from './types'
+import { reactive } from 'vue'
+import { useAsyncState } from '@vueuse/core'
+import { listMonitorServerNode } from '@/service/modules/monitor'
+import type { AlertNode } from '@/service/modules/monitor/types'
 
-export function queryDatabaseState(): any {
-  return axios({
-    url: '/monitor/databases',
-    method: 'get'
+export function useServerNode() {
+  const variables = reactive({
+    data: []
   })
-}
+  const getTableData = () => {
+    const { state } = useAsyncState(
+      listMonitorServerNode('ALERT_SERVER').then((res: Array<AlertNode>) => {
+        variables.data = res as any
+      }),
+      []
+    )
 
-export function listMaster(): any {
-  return axios({
-    url: '/monitor/masters',
-    method: 'get'
-  })
-}
-
-export function listWorker(): any {
-  return axios({
-    url: '/monitor/workers',
-    method: 'get'
-  })
-}
-
-export function listMonitorServerNode(nodeType: ServerNodeType): any {
-  return axios({
-    url: `/monitor/${nodeType}`,
-    method: 'get'
-  })
+    return state
+  }
+  return { variables, getTableData }
 }
