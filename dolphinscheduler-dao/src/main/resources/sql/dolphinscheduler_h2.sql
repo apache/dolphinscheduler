@@ -2184,3 +2184,10 @@ CREATE TABLE t_ds_listener_event
     KEY         idx_status (post_status),
     KEY         idx_event_sign (sign)
 );
+
+
+INSERT INTO t_ds_error_command (id,command_type,executor_id,process_definition_code,process_definition_version,process_instance_id,command_param,task_depend_type,failure_strategy,warning_type,warning_group_id,schedule_time,start_time,update_time,process_instance_priority,worker_group,environment_code,message,dry_run) VALUES
+    (1,2,240005,11053161626049,0,0,'{"ProcessInstanceId":900432}',2,1,0,NULL,NULL,'2023-10-30 02:44:23','2023-10-30 02:44:23',2,NULL,-1,'org.apache.dolphinscheduler.service.exceptions.ServiceException: delete command fail, id:1680513',0);
+
+INSERT INTO t_ds_command (id,command_type,process_definition_code,process_definition_version,process_instance_id,command_param,task_depend_type,failure_strategy,warning_type,warning_group_id,schedule_time,start_time,executor_id,update_time,process_instance_priority,worker_group,environment_code,dry_run) VALUES
+    (1,6,11729015685003,4,0,'{"schedule_timezone":"UTC"}',2,1,3,750013,'2024-05-10 02:10:00','2024-05-10 02:10:00',300007,'2024-05-10 02:10:00',2,'default',-1,0);

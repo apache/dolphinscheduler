@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -189,7 +190,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                         result.size(), cost, thisMasterSlot, masterCount);
                 ProcessInstanceMetrics.recordCommandQueryTime(cost);
             }
-            return result;
+            return new ArrayList<>();
         } catch (Exception ex) {
             throw new MasterException("Master loop command from database error", ex);
         }
