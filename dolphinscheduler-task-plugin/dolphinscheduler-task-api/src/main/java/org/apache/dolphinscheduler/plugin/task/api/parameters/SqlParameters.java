@@ -271,11 +271,22 @@ public class SqlParameters extends AbstractParameters {
                     varPool.add(info);
                 }
             }
-        } else {
+        } else if (sqlResult.size() == 1) {
             // result only one line
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
-                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+                String propValue = firstRow.get(info.getProp());
+                if ((propValue == null || propValue.length() == 0) && info.getValue() != null) {
+                    // if result has not rows and out property has a default value, then use it.
+                    propValue = info.getValue();
+                }
+                if (info.getType() == DataType.LIST) {
+                    ArrayList<String> arr = new ArrayList<>(1);
+                    arr.add(propValue);
+                    info.setValue(JSONUtils.toJsonString(arr));
+                } else {
+                    info.setValue(String.valueOf(propValue));
+                }
                 varPool.add(info);
             }
         }
