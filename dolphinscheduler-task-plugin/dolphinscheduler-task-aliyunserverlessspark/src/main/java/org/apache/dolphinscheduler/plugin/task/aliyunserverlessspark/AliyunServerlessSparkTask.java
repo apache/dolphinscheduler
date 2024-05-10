@@ -185,7 +185,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         workflowTag.setValue("true");
         startJobRunRequest.setTags(Arrays.asList(envTag, workflowTag));
         List<String> entryPointArguments = StringUtils.isEmpty(aliyunServerlessSparkParameters.getEntryPointArguments()) ?
-            Collections.emptyList() : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split(";"));
+            Collections.emptyList() : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split("#"));
         JobDriver.JobDriverSparkSubmit jobDriverSparkSubmit = new JobDriver.JobDriverSparkSubmit()
             .setEntryPoint(aliyunServerlessSparkParameters.getEntryPoint())
             .setEntryPointArguments(entryPointArguments)
