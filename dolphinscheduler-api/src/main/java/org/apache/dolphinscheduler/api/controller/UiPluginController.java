@@ -92,9 +92,6 @@ public class UiPluginController extends BaseController {
 
     /**
      * obtain project version and address
-     *
-//     * @param loginUser login user
-//     * @param userId token for user
      * @return product info
      */
     @Operation(summary = "queryProductInfo", description = "QUERY_PRODUCT_INFO")
