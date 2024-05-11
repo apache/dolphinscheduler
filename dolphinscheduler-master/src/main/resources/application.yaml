@@ -84,6 +84,8 @@ registry:
 master:
   listen-port: 5678
   # master prepare execute thread number to limit handle commands in parallel
+  scheduler-enabled: true
+  # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
   exec-threads: 100

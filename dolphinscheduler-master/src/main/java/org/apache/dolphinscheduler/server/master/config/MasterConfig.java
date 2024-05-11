@@ -84,6 +84,10 @@ public class MasterConfig implements Validator {
      */
     private Duration taskCommitInterval = Duration.ofSeconds(1);
     /**
+     * if scheduler enable to schedule job on master
+     */
+    private boolean schedulerEnabled = true;
+    /**
      * state wheel check interval, if this value is bigger, may increase the delay of task/processInstance.
      */
     private Duration stateWheelInterval = Duration.ofMillis(5);

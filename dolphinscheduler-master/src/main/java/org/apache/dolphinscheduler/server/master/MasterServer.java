@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
@@ -90,6 +91,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private TaskGroupCoordinator taskGroupCoordinator;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -120,7 +124,9 @@ public class MasterServer implements IStoppable {
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
 
-        this.schedulerApi.start();
+        if (masterConfig.isSchedulerEnabled()) {
+            this.schedulerApi.start();
+         }
         this.taskGroupCoordinator.start();
 
         MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
