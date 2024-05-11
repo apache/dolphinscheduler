@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.dao.entity.DsVersion;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.DsVersionMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -52,9 +51,6 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
 
     @Autowired
     PluginDefineMapper pluginDefineMapper;
-
-    @Autowired
-    DsVersionMapper dsVersionMapper;
 
     @Autowired
     private DsVersionDao dsVersionDao;
