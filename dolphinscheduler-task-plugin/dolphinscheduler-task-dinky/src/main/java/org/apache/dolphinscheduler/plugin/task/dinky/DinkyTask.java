@@ -357,17 +357,6 @@ public class DinkyTask extends AbstractRemoteTask {
         return variables;
     }
 
-    public static Map<String, String> convert(Map<String, Property> paramsMap) {
-        if (paramsMap == null) {
-            return null;
-        }
-        Map<String, String> map = new HashMap<>();
-        for (Map.Entry<String, Property> en : paramsMap.entrySet()) {
-            map.put(en.getKey(), en.getValue().getValue());
-        }
-        return map;
-    }
-
     private String getDinkyVersion(String address) {
         JsonNode versionJsonNode = parse(doGet(address + DinkyTaskConstants.GET_VERSION, new HashMap<>()));
         if (versionJsonNode instanceof MissingNode || versionJsonNode == null
