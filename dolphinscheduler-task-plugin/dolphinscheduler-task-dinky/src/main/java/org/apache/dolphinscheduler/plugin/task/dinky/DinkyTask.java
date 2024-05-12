@@ -348,7 +348,7 @@ public class DinkyTask extends AbstractRemoteTask {
         if (localParams == null || localParams.isEmpty()) {
             return variables;
         }
-        Map<String, String> convertMap = convert(prepareParamsMap);
+        Map<String, String> convertMap = ParameterUtils.convert(prepareParamsMap);
         for (Property property : localParams) {
             String propertyValue = property.getValue();
             String value = PlaceholderUtils.replacePlaceholders(propertyValue, convertMap, true);
