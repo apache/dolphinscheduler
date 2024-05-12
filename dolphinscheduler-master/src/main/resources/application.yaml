@@ -83,7 +83,7 @@ registry:
 
 master:
   listen-port: 5678
-  # Whether enable the master trigger scheduler.
+  # Whether to enable the master trigger scheduler.
   scheduler-enabled: true
   # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
