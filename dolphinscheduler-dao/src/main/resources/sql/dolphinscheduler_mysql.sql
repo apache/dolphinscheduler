@@ -850,6 +850,7 @@ CREATE TABLE `t_ds_schedules` (
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'schedule timezone id',
   `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
+  `misfire_policy` tinyint(4) NOT NULL COMMENT 'misfire policy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',
   `warning_type` tinyint(4) NOT NULL COMMENT 'Alarm type: 0 is not sent, 1 process is sent successfully, 2 process is sent failed, 3 process is sent successfully and all failures are sent',

@@ -296,6 +296,7 @@ export default defineComponent({
         timingState.timingForm.crontab = props.row.crontab
         timingState.timingForm.timezoneId = props.row.timezoneId
         timingState.timingForm.failureStrategy = props.row.failureStrategy
+        timingState.timingForm.misfirePolicy = props.row.misfirePolicy
         timingState.timingForm.warningType = props.row.warningType
         timingState.timingForm.processInstancePriority =
           props.row.processInstancePriority
@@ -420,6 +421,24 @@ export default defineComponent({
                   {t('project.workflow.continue')}
                 </NRadio>
                 <NRadio value='END'>{t('project.workflow.end')}</NRadio>
+              </NSpace>
+            </NRadioGroup>
+          </NFormItem>
+          <NFormItem
+            label={t('project.workflow.misfire_policy')}
+            path='misfirePolicy'
+          >
+            <NRadioGroup v-model:value={this.timingForm.misfirePolicy}>
+              <NSpace>
+                <NRadio value='KEEP_LATEST'>
+                  {t('project.workflow.keep_latest')}
+                </NRadio>
+                <NRadio value='EXACTLY_ONCE'>
+                  {t('project.workflow.exactly_once')}
+                </NRadio>
+                <NRadio value='DROP_MISFIRED'>
+                  {t('project.workflow.drop_misfired')}
+                </NRadio>
               </NSpace>
             </NRadioGroup>
           </NFormItem>
