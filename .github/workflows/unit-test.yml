@@ -76,7 +76,7 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
       - name: Run Unit tests
-        run: ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -DskipIT=false
+        run: ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false
       - name: Upload coverage report to codecov
         run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
 
@@ -99,23 +99,11 @@ jobs:
           -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
           -Dsonar.exclusions=,dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
-          -DskipUT=true -DskipIT=true
+          -DskipUT=true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-      - name: Collect logs
-        continue-on-error: true
-        run: |
-          mkdir -p ${LOG_DIR}
-          docker-compose -f $(pwd)/docker/docker-swarm/docker-compose.yml logs dolphinscheduler-postgresql > ${LOG_DIR}/db.txt
-
-      - name: Upload logs
-        uses: actions/upload-artifact@v2
-        continue-on-error: true
-        with:
-          name: unit-test-logs
-          path: ${LOG_DIR}
   result:
     name: Unit Test
     runs-on: ubuntu-latest

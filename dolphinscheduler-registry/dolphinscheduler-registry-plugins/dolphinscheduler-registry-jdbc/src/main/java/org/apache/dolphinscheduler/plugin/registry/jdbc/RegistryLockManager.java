@@ -15,12 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.task;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcOperator;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryConstant;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 
@@ -40,14 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
 @Slf4j
-public class RegistryLockManager implements AutoCloseable {
+class RegistryLockManager implements AutoCloseable {
 
     private final JdbcOperator jdbcOperator;
     private final JdbcRegistryProperties registryProperties;
+    // lock owner -> lock
     private final Map<String, JdbcRegistryLock> lockHoldMap;
     private final ScheduledExecutorService lockTermUpdateThreadPool;
 
-    public RegistryLockManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
+    RegistryLockManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
         this.registryProperties = registryProperties;
         this.jdbcOperator = jdbcOperator;
         this.lockHoldMap = new ConcurrentHashMap<>();
@@ -67,20 +65,24 @@ public class RegistryLockManager implements AutoCloseable {
      * Acquire the lock, if cannot get the lock will await.
      */
     public void acquireLock(String lockKey) throws RegistryException {
-        // maybe we can use the computeIf absent
-        lockHoldMap.computeIfAbsent(lockKey, key -> {
-            JdbcRegistryLock jdbcRegistryLock;
-            try {
-                while ((jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey)) == null) {
-                    log.debug("Acquire the lock {} failed try again", key);
-                    // acquire failed, wait and try again
-                    ThreadUtils.sleep(JdbcRegistryConstant.LOCK_ACQUIRE_INTERVAL);
+        try {
+            while (true) {
+                JdbcRegistryLock jdbcRegistryLock = lockHoldMap.get(lockKey);
+                if (jdbcRegistryLock != null && LockUtils.getLockOwner().equals(jdbcRegistryLock.getLockOwner())) {
+                    return;
                 }
-            } catch (SQLException e) {
-                throw new RegistryException("Acquire the lock error", e);
+                jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey);
+                if (jdbcRegistryLock != null) {
+                    lockHoldMap.put(lockKey, jdbcRegistryLock);
+                    return;
+                }
+                log.debug("Acquire the lock {} failed try again", lockKey);
+                // acquire failed, wait and try again
+                ThreadUtils.sleep(JdbcRegistryConstant.LOCK_ACQUIRE_INTERVAL);
             }
-            return jdbcRegistryLock;
-        });
+        } catch (Exception ex) {
+            throw new RegistryException("Acquire the lock: " + lockKey + " error", ex);
+        }
     }
 
     /**
@@ -88,21 +90,22 @@ public class RegistryLockManager implements AutoCloseable {
      */
     public boolean acquireLock(String lockKey, long timeout) throws RegistryException {
         long startTime = System.currentTimeMillis();
-        while (System.currentTimeMillis() - startTime < timeout) {
-            try {
-                if (lockHoldMap.containsKey(lockKey)) {
+        try {
+            while (System.currentTimeMillis() - startTime < timeout) {
+                JdbcRegistryLock jdbcRegistryLock = lockHoldMap.get(lockKey);
+                if (jdbcRegistryLock != null && LockUtils.getLockOwner().equals(jdbcRegistryLock.getLockOwner())) {
                     return true;
                 }
-                JdbcRegistryLock jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey);
+                jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey);
                 if (jdbcRegistryLock != null) {
                     lockHoldMap.put(lockKey, jdbcRegistryLock);
                     return true;
                 }
-            } catch (SQLException e) {
-                throw new RegistryException("Acquire the lock: " + lockKey + " error", e);
+                log.debug("Acquire the lock {} failed try again", lockKey);
+                ThreadUtils.sleep(JdbcRegistryConstant.LOCK_ACQUIRE_INTERVAL);
             }
-            log.debug("Acquire the lock {} failed try again", lockKey);
-            ThreadUtils.sleep(JdbcRegistryConstant.LOCK_ACQUIRE_INTERVAL);
+        } catch (Exception e) {
+            throw new RegistryException("Acquire the lock: " + lockKey + " error", e);
         }
         return false;
     }
@@ -115,6 +118,7 @@ public class RegistryLockManager implements AutoCloseable {
                 jdbcOperator.releaseLock(jdbcRegistryLock.getId());
                 lockHoldMap.remove(lockKey);
             } catch (SQLException e) {
+                lockHoldMap.remove(lockKey);
                 throw new RegistryException(String.format("Release lock: %s error", lockKey), e);
             }
         }
@@ -149,7 +153,6 @@ public class RegistryLockManager implements AutoCloseable {
                 if (!jdbcOperator.updateLockTerm(lockIds)) {
                     log.warn("Update the lock: {} term failed.", lockIds);
                 }
-                jdbcOperator.clearExpireLock();
             } catch (Exception e) {
                 log.error("Update lock term error", e);
             }

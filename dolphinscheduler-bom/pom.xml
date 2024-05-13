@@ -37,6 +37,7 @@
         <druid.version>1.2.20</druid.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
+        <!-- todo: Should upgrade the jetcd.test, 0.7.1 doesn't support arm -->
         <jetcd.test.version>0.7.1</jetcd.test.version>
         <io.grpc.version>1.41.0</io.grpc.version>
         <commons-codec.version>1.11</commons-codec.version>
@@ -943,6 +944,13 @@
             </dependency>
 
             <!-- test dependencies on TestContainers -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>mysql</artifactId>

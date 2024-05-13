@@ -50,6 +50,18 @@ public class JdbcRegistryAutoConfiguration {
     }
 
     @Bean
+    public JdbcOperator jdbcOperator(JdbcRegistryProperties jdbcRegistryProperties,
+                                     JdbcRegistryDataMapper jdbcRegistryDataMapper,
+                                     JdbcRegistryLockMapper jdbcRegistryLockMapper) {
+        return new JdbcOperator(jdbcRegistryProperties, jdbcRegistryDataMapper, jdbcRegistryLockMapper);
+    }
+
+    @Bean
+    public JdbcRegistry jdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties, JdbcOperator jdbcOperator) {
+        return new JdbcRegistry(jdbcRegistryProperties, jdbcOperator);
+    }
+
+    @Bean
     @ConditionalOnMissingBean
     public SqlSessionFactory sqlSessionFactory(JdbcRegistryProperties jdbcRegistryProperties) throws Exception {
         log.info("Initialize jdbcRegistrySqlSessionFactory");

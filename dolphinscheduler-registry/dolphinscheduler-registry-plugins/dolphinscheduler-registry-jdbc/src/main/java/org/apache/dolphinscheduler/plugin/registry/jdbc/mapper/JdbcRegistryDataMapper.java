@@ -40,9 +40,6 @@ public interface JdbcRegistryDataMapper extends BaseMapper<JdbcRegistryData> {
     @Select("select * from t_ds_jdbc_registry_data where data_key like CONCAT (#{key}, '%')")
     List<JdbcRegistryData> fuzzyQueryByKey(@Param("key") String key);
 
-    @Update("update t_ds_jdbc_registry_data set data_value = #{data}, last_term = #{term} where id = #{id}")
-    int updateDataAndTermById(@Param("id") long id, @Param("data") String data, @Param("term") long term);
-
     @Delete("delete from t_ds_jdbc_registry_data where data_key = #{key}")
     void deleteByKey(@Param("key") String key);
 
