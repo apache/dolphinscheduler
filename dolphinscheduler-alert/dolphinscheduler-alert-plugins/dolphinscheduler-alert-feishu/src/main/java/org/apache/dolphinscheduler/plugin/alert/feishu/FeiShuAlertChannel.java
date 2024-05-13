@@ -31,7 +31,7 @@ public final class FeiShuAlertChannel implements AlertChannel {
         AlertData alertData = alertInfo.getAlertData();
         Map<String, String> paramsMap = alertInfo.getAlertParams();
         if (null == paramsMap) {
-            return new AlertResult("false", "fei shu params is null");
+            return new AlertResult(false, "fei shu params is null");
         }
         return new FeiShuSender(paramsMap).sendFeiShuMsg(alertData);
     }

@@ -81,7 +81,7 @@ public class ListenerEventMapperTest extends BaseDaoTest {
         ListenerEvent event2 = generateServerDownListenerEvent("192.168.x.2");
         listenerEventMapper.batchInsert(Lists.newArrayList(event1, event2));
         List<ListenerEvent> listenerEvents =
-                listenerEventMapper.listingListenerEventByStatus(AlertStatus.WAIT_EXECUTION, 50);
+                listenerEventMapper.listingListenerEventByStatus(-1, AlertStatus.WAIT_EXECUTION.getCode(), 50);
         Assertions.assertEquals(listenerEvents.size(), 2);
     }
 
@@ -111,8 +111,10 @@ public class ListenerEventMapperTest extends BaseDaoTest {
         ListenerEvent actualAlert = listenerEventMapper.selectById(event.getId());
         Assertions.assertNull(actualAlert);
     }
+
     /**
      * create server down event
+     *
      * @param host worker host
      * @return listener event
      */
