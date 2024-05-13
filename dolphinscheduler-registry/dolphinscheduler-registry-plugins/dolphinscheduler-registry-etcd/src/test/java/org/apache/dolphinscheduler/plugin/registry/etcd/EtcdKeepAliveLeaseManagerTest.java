@@ -43,7 +43,7 @@ class EtcdKeepAliveLeaseManagerTest {
                 .withNodes(1)
                 .withImage("ibmcom/etcd:3.2.24")
                 .build();
-        server.restart();
+        server.cluster().start();
 
         client = Client.builder().endpoints(server.clientEndpoints()).build();
 

@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.task;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcOperator;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 
@@ -42,7 +40,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * This thread is used to check the connect state to jdbc.
  */
 @Slf4j
-public class EphemeralDateManager implements AutoCloseable {
+class EphemeralDateManager implements AutoCloseable {
 
     private ConnectionState connectionState;
     private final JdbcOperator jdbcOperator;
@@ -51,7 +49,7 @@ public class EphemeralDateManager implements AutoCloseable {
     private final Set<Long> ephemeralDateIds = Collections.synchronizedSet(new HashSet<>());
     private final ScheduledExecutorService scheduledExecutorService;
 
-    public EphemeralDateManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
+    EphemeralDateManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
         this.registryProperties = registryProperties;
         this.jdbcOperator = checkNotNull(jdbcOperator);
         this.scheduledExecutorService = Executors.newScheduledThreadPool(
@@ -151,7 +149,7 @@ public class EphemeralDateManager implements AutoCloseable {
             }
         }
 
-        private void updateEphemeralDateTerm() throws SQLException {
+        private void updateEphemeralDateTerm() {
             if (!jdbcOperator.updateEphemeralDataTerm(ephemeralDateIds)) {
                 log.warn("Update jdbc registry ephemeral data: {} term error", ephemeralDateIds);
             }
