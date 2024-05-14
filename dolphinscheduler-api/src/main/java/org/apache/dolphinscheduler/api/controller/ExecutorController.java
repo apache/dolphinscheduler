@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.utils.DataTransformUtils;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -46,6 +45,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -166,7 +166,7 @@ public class ExecutorController extends BaseController {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
 
-        List<Property> startParamList = DataTransformUtils.startParamsTransformPropertyList(startParams);
+        List<Property> startParamList = PropertyUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             complementDependentMode = ComplementDependentMode.OFF_MODE;
@@ -262,7 +262,7 @@ public class ExecutorController extends BaseController {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
 
-        List<Property> startParamList = DataTransformUtils.startParamsTransformPropertyList(startParams);
+        List<Property> startParamList = PropertyUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             log.debug("Parameter complementDependentMode set to {} due to null.", ComplementDependentMode.OFF_MODE);

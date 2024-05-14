@@ -45,7 +45,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -63,9 +65,6 @@ import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 @Component
 public class CuringParamsServiceImpl implements CuringParamsService {
@@ -154,17 +153,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             return new HashMap<>();
         }
         String startParamJson = cmdParam.get(CommandKeyConstants.CMD_PARAM_START_PARAMS);
-        JsonElement jsonElement = JsonParser.parseString(startParamJson);
-        // check whether it is json
-        boolean isJson = jsonElement.isJsonObject();
-        if (isJson) {
-            Map<String, String> startParamMap = JSONUtils.toMap(startParamJson);
-            return startParamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-                    entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue())));
-        } else {
-            List<Property> propList = JSONUtils.toList(startParamJson, Property.class);
-            return propList.stream().collect(Collectors.toMap(Property::getProp, Function.identity()));
+        List<Property> propertyList = PropertyUtils.startParamsTransformPropertyList(startParamJson);
+        if (CollectionUtils.isEmpty(propertyList)) {
+            return new HashMap<>();
         }
+        return propertyList.stream().collect(Collectors.toMap(Property::getProp, Function.identity()));
     }
 
     @Override

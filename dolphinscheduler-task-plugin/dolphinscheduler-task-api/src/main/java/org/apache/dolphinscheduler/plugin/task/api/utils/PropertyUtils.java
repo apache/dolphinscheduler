@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.utils;
+package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -30,12 +30,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
 /**
- * data transform utils
+ * property utils
  */
-public class DataTransformUtils {
+public class PropertyUtils {
 
-    private DataTransformUtils() {
-        throw new IllegalStateException("DataTransformUtils class");
+    private PropertyUtils() {
+        throw new IllegalStateException("PropertyUtils class");
     }
 
     /**
