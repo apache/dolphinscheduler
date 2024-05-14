@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.task;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcOperator;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryData;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -42,7 +40,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
  * Used to refresh if the subscribe path has been changed.
  */
 @Slf4j
-public class SubscribeDataManager implements AutoCloseable {
+class SubscribeDataManager implements AutoCloseable {
 
     private final JdbcOperator jdbcOperator;
     private final JdbcRegistryProperties registryProperties;
@@ -50,7 +48,7 @@ public class SubscribeDataManager implements AutoCloseable {
     private final ScheduledExecutorService dataSubscribeCheckThreadPool;
     private final Map<String, JdbcRegistryData> jdbcRegistryDataMap = new ConcurrentHashMap<>();
 
-    public SubscribeDataManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
+    SubscribeDataManager(JdbcRegistryProperties registryProperties, JdbcOperator jdbcOperator) {
         this.registryProperties = registryProperties;
         this.jdbcOperator = jdbcOperator;
         this.dataSubscribeCheckThreadPool = Executors.newScheduledThreadPool(
@@ -75,12 +73,8 @@ public class SubscribeDataManager implements AutoCloseable {
         dataSubScribeMap.remove(path);
     }
 
-    public String getData(String path) {
-        JdbcRegistryData jdbcRegistryData = jdbcRegistryDataMap.get(path);
-        if (jdbcRegistryData == null) {
-            return null;
-        }
-        return jdbcRegistryData.getDataValue();
+    public JdbcRegistryData getData(String path) {
+        return jdbcRegistryDataMap.get(path);
     }
 
     @Override
@@ -107,6 +101,7 @@ public class SubscribeDataManager implements AutoCloseable {
                 List<JdbcRegistryData> addedData = new ArrayList<>();
                 List<JdbcRegistryData> deletedData = new ArrayList<>();
                 List<JdbcRegistryData> updatedData = new ArrayList<>();
+
                 for (Map.Entry<String, JdbcRegistryData> entry : currentJdbcDataMap.entrySet()) {
                     JdbcRegistryData newData = entry.getValue();
                     JdbcRegistryData oldData = jdbcRegistryDataMap.get(entry.getKey());
@@ -118,6 +113,7 @@ public class SubscribeDataManager implements AutoCloseable {
                         }
                     }
                 }
+
                 for (Map.Entry<String, JdbcRegistryData> entry : jdbcRegistryDataMap.entrySet()) {
                     if (!currentJdbcDataMap.containsKey(entry.getKey())) {
                         deletedData.add(entry.getValue());
