@@ -174,7 +174,7 @@ public class DataAnalysisController extends BaseController {
                                                 @RequestParam("pageSize") Integer pageSize) {
         checkPageParams(pageNo, pageSize);
         PageInfo<Command> commandPageInfo =
-                dataAnalysisService.listQueueCommand(loginUser, projectCode, pageNo, pageSize);
+                dataAnalysisService.listPendingCommands(loginUser, projectCode, pageNo, pageSize);
         return Result.success(commandPageInfo);
     }
 
