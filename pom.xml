@@ -73,7 +73,6 @@
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.0.0-M6</maven-surefire-plugin.version>
-        <maven-failsafe-plugin.version>3.0.0-M6</maven-failsafe-plugin.version>
         <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <rpm-maven-plugion.version>2.2.0</rpm-maven-plugion.version>
@@ -100,7 +99,6 @@
         <spotless.skip>false</spotless.skip>
 
         <skipUT>false</skipUT>
-        <skipIT>true</skipIT>
     </properties>
 
     <dependencyManagement>
@@ -446,6 +444,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
+                        <quiet>true</quiet>
                         <source>8</source>
                         <failOnError>false</failOnError>
                     </configuration>
@@ -609,31 +608,10 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <skip>${skipUT}</skip>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
                     <systemPropertyVariables>
                         <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
                     </systemPropertyVariables>
                 </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven-failsafe-plugin.version}</version>
-                <configuration>
-                    <skip>${skipIT}</skip>
-                    <additionalClasspathElements>dolphinscheduler-dao/src/main/resources</additionalClasspathElements>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- jenkins plugin jacoco report-->

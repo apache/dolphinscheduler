@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLException;
@@ -69,6 +71,7 @@ import io.netty.handler.ssl.SslContext;
 @Slf4j
 public class EtcdRegistry implements Registry {
 
+    private final EtcdRegistryProperties etcdRegistryProperties;
     private final Client client;
     private EtcdConnectionStateListener etcdConnectionStateListener;
 
@@ -81,9 +84,8 @@ public class EtcdRegistry implements Registry {
 
     private final Map<String, Watch.Watcher> watcherMap = new ConcurrentHashMap<>();
 
-    private static final long TIME_TO_LIVE_SECONDS = 30L;
-
     public EtcdRegistry(EtcdRegistryProperties registryProperties) throws SSLException {
+        this.etcdRegistryProperties = registryProperties;
         ClientBuilder clientBuilder = Client.builder()
                 .endpoints(Util.toURIs(Splitter.on(",").trimResults().splitToList(registryProperties.getEndpoints())))
                 .namespace(byteSequence(registryProperties.getNamespace()))
@@ -128,6 +130,11 @@ public class EtcdRegistry implements Registry {
     }
 
     @Override
+    public void start() {
+        // The start has been set in the constructor
+    }
+
+    @Override
     public boolean isConnected() {
         return client.getKVClient().get(byteSequence("/")).join() != null;
     }
@@ -143,7 +150,7 @@ public class EtcdRegistry implements Registry {
      * @return if subcribe Returns true if no exception was thrown
      */
     @Override
-    public boolean subscribe(String path, SubscribeListener listener) {
+    public void subscribe(String path, SubscribeListener listener) {
         try {
             ByteSequence watchKey = byteSequence(path);
             WatchOption watchOption =
@@ -157,7 +164,6 @@ public class EtcdRegistry implements Registry {
         } catch (Exception e) {
             throw new RegistryException("Failed to subscribe listener for key: " + path, e);
         }
-        return true;
     }
 
     /**
@@ -191,7 +197,7 @@ public class EtcdRegistry implements Registry {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get data error", e);
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
             throw new RegistryException("etcd get data error, key = " + key, e);
         }
     }
@@ -204,7 +210,8 @@ public class EtcdRegistry implements Registry {
         try {
             if (deleteOnDisconnect) {
                 // keep the key by lease, if disconnected, the lease will expire and the key will delete
-                long leaseId = etcdKeepAliveLeaseManager.getOrCreateKeepAliveLease(key, TIME_TO_LIVE_SECONDS);
+                long leaseId = etcdKeepAliveLeaseManager.getOrCreateKeepAliveLease(key,
+                        etcdRegistryProperties.getTtl().get(ChronoUnit.SECONDS));
                 PutOption putOption = PutOption.newBuilder().withLeaseId(leaseId).build();
                 client.getKVClient().put(byteSequence(key), byteSequence(value), putOption).get();
             } else {
@@ -287,26 +294,67 @@ public class EtcdRegistry implements Registry {
      */
     @Override
     public boolean acquireLock(String key) {
+        Map<String, Long> leaseIdMap = threadLocalLockMap.get();
+        if (null == leaseIdMap) {
+            leaseIdMap = new HashMap<>();
+            threadLocalLockMap.set(leaseIdMap);
+        }
+        if (leaseIdMap.containsKey(key)) {
+            return true;
+        }
+
         Lock lockClient = client.getLockClient();
         Lease leaseClient = client.getLeaseClient();
         // get the lock with a lease
         try {
-            long leaseId = leaseClient.grant(TIME_TO_LIVE_SECONDS).get().getID();
+            long leaseId = leaseClient.grant(etcdRegistryProperties.getTtl().get(ChronoUnit.SECONDS)).get().getID();
             // keep the lease
             client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
             }));
             lockClient.lock(byteSequence(key), leaseId).get();
 
             // save the leaseId for release Lock
-            if (null == threadLocalLockMap.get()) {
-                threadLocalLockMap.set(new HashMap<>());
-            }
-            threadLocalLockMap.get().put(key, leaseId);
+            leaseIdMap.put(key, leaseId);
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get lock error", e);
-        } catch (ExecutionException e) {
+        } catch (Exception e) {
+            throw new RegistryException("etcd get lock error, lockKey: " + key, e);
+        }
+    }
+
+    @Override
+    public boolean acquireLock(String key, long timeout) {
+        Map<String, Long> leaseIdMap = threadLocalLockMap.get();
+        if (null == leaseIdMap) {
+            leaseIdMap = new HashMap<>();
+            threadLocalLockMap.set(leaseIdMap);
+        }
+        if (leaseIdMap.containsKey(key)) {
+            return true;
+        }
+
+        Lock lockClient = client.getLockClient();
+        Lease leaseClient = client.getLeaseClient();
+        // get the lock with a lease
+        try {
+            long leaseId = leaseClient.grant(etcdRegistryProperties.getTtl().get(ChronoUnit.SECONDS)).get().getID();
+            // keep the lease
+            lockClient.lock(byteSequence(key), leaseId).get(timeout, TimeUnit.MILLISECONDS);
+            client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
+            }));
+
+            // save the leaseId for release Lock
+            leaseIdMap.put(key, leaseId);
+            return true;
+        } catch (TimeoutException timeoutException) {
+            log.debug("Acquire lock: {} in {}/ms timeout", key, timeout);
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RegistryException("etcd get lock error", e);
+        } catch (Exception e) {
             throw new RegistryException("etcd get lock error, lockKey: " + key, e);
         }
     }

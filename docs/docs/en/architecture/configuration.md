@@ -165,7 +165,7 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports database configuration through `bin/env/dolphinscheduler_env.sh`.
 
-### Zookeeper related configuration
+### Registry Related configuration
 
 DolphinScheduler uses Zookeeper for cluster management, fault tolerance, event monitoring and other functions.
 Configuration file location:
@@ -190,6 +190,9 @@ The default configuration is as follows:
 | registry.zookeeper.digest                       | {username}:{password} | digest of zookeeper to access znode, works only when acl is enabled, for more details please check [https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper doc) |
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
+
+For ETCD Registry, please see more details on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md).
+For JDBC Registry, please see more details on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md).
 
 ### common.properties [hadoop、s3、yarn config properties]
 
@@ -286,7 +289,6 @@ Location: `master-server/conf/application.yaml`
 |                                 Parameters                                  | Default value |                                                                                                                                                         Description                                                                                                                                                          |
 |-----------------------------------------------------------------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | master.listen-port                                                          | 5678          | master listen port                                                                                                                                                                                                                                                                                                           |
-| master.fetch-command-num                                                    | 10            | the number of commands fetched by master                                                                                                                                                                                                                                                                                     |
 | master.pre-exec-threads                                                     | 10            | master prepare execute thread number to limit handle commands in parallel                                                                                                                                                                                                                                                    |
 | master.exec-threads                                                         | 100           | master execute thread number to limit process instances in parallel                                                                                                                                                                                                                                                          |
 | master.dispatch-task-number                                                 | 3             | master dispatch task number per batch                                                                                                                                                                                                                                                                                        |
@@ -305,6 +307,9 @@ Location: `master-server/conf/application.yaml`
 | master.registry-disconnect-strategy.strategy                                | stop          | Used when the master disconnect from registry, default value: stop. Optional values include stop, waiting                                                                                                                                                                                                                    |
 | master.registry-disconnect-strategy.max-waiting-time                        | 100s          | Used when the master disconnect from registry, and the disconnect strategy is waiting, this config means the master will waiting to reconnect to registry in given times, and after the waiting times, if the master still cannot connect to registry, will stop itself, if the value is 0s, the Master will wait infinitely |
 | master.worker-group-refresh-interval                                        | 10s           | The interval to refresh worker group from db to memory                                                                                                                                                                                                                                                                       |
+| master.command-fetch-strategy.type                                          | ID_SLOT_BASED | The command fetch strategy, only support `ID_SLOT_BASED`                                                                                                                                                                                                                                                                     |
+| master.command-fetch-strategy.config.id-step                                | 1             | The id auto incremental step of t_ds_command in db                                                                                                                                                                                                                                                                           |
+| master.command-fetch-strategy.config.fetch-size                             | 10            | The number of commands fetched by master                                                                                                                                                                                                                                                                                     |
 
 ### Worker Server related configuration
 
