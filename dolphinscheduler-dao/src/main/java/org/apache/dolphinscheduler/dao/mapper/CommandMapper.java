@@ -61,6 +61,5 @@ public interface CommandMapper extends BaseMapper<Command> {
 
     void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
 
-    IPage<Command> queryCommandPageByIds(Page<Command> page, @Param("definitionCodes") List<Long> definitionCodes,
-                                         @Param("projectCode") Long projectCode);
+    IPage<Command> queryCommandPageByIds(Page<Command> page, @Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 }
