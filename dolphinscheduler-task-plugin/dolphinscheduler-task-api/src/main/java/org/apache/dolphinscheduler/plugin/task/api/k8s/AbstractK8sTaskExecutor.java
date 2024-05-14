@@ -39,7 +39,8 @@ public abstract class AbstractK8sTaskExecutor {
         this.taskRequest = taskRequest;
         this.k8sUtils = new K8sUtils();
         this.yaml = new Yaml(new ClassFilterConstructor(new Class[]{
-                List.class
+                List.class,
+                String.class
         }));
         this.taskOutputParams = new HashMap<>();
     }
