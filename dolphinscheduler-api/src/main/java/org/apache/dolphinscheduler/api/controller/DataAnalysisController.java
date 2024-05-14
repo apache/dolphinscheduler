@@ -159,7 +159,7 @@ public class DataAnalysisController extends BaseController {
      * @param loginUser login user
      * @return queue state count
      */
-    @Operation(summary = "listQueueCommand", description = "LIST_QUEUE_COMMAND_LIST_PAGING_NOTES")
+    @Operation(summary = "listPendingCommands", description = "LIST_PENDING_COMMANDS")
     @Parameters({
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
