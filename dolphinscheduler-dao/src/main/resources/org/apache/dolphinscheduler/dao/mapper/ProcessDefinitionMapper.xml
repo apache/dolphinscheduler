@@ -213,12 +213,9 @@
         select
         code
         from t_ds_process_definition
-        where 1=1
-        <if test="projectCodes != null and projectCodes.size() != 0">
-            and project_code in
+        where project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
-        </if>
     </select>
 </mapper>
