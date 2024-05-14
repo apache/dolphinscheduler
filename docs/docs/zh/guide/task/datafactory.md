@@ -19,10 +19,10 @@ DolphinScheduler DataFactory 组件的功能:
 
 ### 应用权限设置
 
-首先打开当前`Subcription`页面，点击`Access control (IAM)`，再点击`Add role assignment`进入授权页面。
-![Subcription-IAM](../../../../img/tasks/demo/datafactory_auth1.png)
+首先打开当前`Subscription`页面，点击`Access control (IAM)`，再点击`Add role assignment`进入授权页面。
+![Subscription-IAM](../../../../img/tasks/demo/datafactory_auth1.png)
 首先选择`Contributor`角色足够满足调用数据工厂。然后选择`Members`页面，再选择`Select members`，检索APP名称或APP的`Object ID`并添加，从给指定APP添加权限.
-![Subcription-Role](../../../../img/tasks/demo/datafactory_auth2.png)
+![Subscription-Role](../../../../img/tasks/demo/datafactory_auth2.png)
 
 ## 环境配置
 
