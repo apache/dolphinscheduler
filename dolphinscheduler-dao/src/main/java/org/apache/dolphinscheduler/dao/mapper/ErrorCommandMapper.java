@@ -49,6 +49,5 @@ public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
     IPage<ErrorCommand> queryErrorCommandPage(Page<ErrorCommand> page);
 
     IPage<ErrorCommand> queryErrorCommandPageByIds(Page<ErrorCommand> page,
-                                                   @Param("definitionCodes") List<Long> definitionCodes,
-                                                   @Param("projectCode") Long projectCode);
+                                                   @Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 }
