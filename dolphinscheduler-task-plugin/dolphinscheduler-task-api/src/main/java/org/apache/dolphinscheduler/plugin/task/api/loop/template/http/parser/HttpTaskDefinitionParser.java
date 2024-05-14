@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Map;
 
 import lombok.NonNull;
 
@@ -61,7 +62,18 @@ public class HttpTaskDefinitionParser implements TaskDefinitionParser<HttpLoopTa
 
     protected @NonNull LoopTaskYamlDefinition parseYamlConfigFile(@NonNull String yamlConfigFile) throws IOException {
         try (FileReader fileReader = new FileReader(yamlConfigFile)) {
-            return new Yaml(new ClassFilterConstructor(new Class[]{LoopTaskYamlDefinition.class, LoopTaskYamlDefinition.LoopTaskSubmitMethodYamlDefinition.class}))
+            return new Yaml(new ClassFilterConstructor(new Class[]{
+                LoopTaskYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskServiceYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskAPIYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskSubmitMethodYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskQueryStateYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskCancelYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskMethodYamlDefinition.class,
+                LoopTaskYamlDefinition.LoopTaskQueryStateYamlDefinition.class,
+                Map.class,
+                String.class
+            }))
                     .loadAs(fileReader, LoopTaskYamlDefinition.class);
         }
     }
