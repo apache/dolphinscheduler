@@ -387,21 +387,21 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     }
 
     @Override
-    public PageInfo<Command> listQueueCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize) {
+    public PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize) {
         Page<Command> page = new Page<>(pageNo, pageSize);
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             IPage<Command> commandIPage = commandMapper.queryCommandPage(page);
             return PageInfo.of(commandIPage);
         }
 
-        List<Long> definitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
+        List<Long> workflowDefinitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
 
-        if (definitionCodes.isEmpty()) {
+        if (workflowDefinitionCodes.isEmpty()) {
             return PageInfo.of(pageNo, pageSize);
         }
 
         IPage<Command> commandIPage =
-                commandMapper.queryCommandPageByIds(page, new ArrayList<>(definitionCodes), projectCode);
+                commandMapper.queryCommandPageByIds(page, new ArrayList<>(workflowDefinitionCodes));
         return PageInfo.of(commandIPage);
     }
 
@@ -413,14 +413,14 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             return PageInfo.of(commandIPage);
         }
 
-        List<Long> definitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
+        List<Long> workflowDefinitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
 
-        if (definitionCodes.isEmpty()) {
+        if (workflowDefinitionCodes.isEmpty()) {
             return PageInfo.of(pageNo, pageSize);
         }
 
         IPage<ErrorCommand> commandIPage =
-                errorCommandMapper.queryErrorCommandPageByIds(page, new ArrayList<>(definitionCodes), projectCode);
+                errorCommandMapper.queryErrorCommandPageByIds(page, new ArrayList<>(workflowDefinitionCodes));
         return PageInfo.of(commandIPage);
     }
 

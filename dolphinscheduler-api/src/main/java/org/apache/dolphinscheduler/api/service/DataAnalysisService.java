@@ -120,7 +120,7 @@ public interface DataAnalysisService {
      */
     TaskCountDto countOneTaskStates(User loginUser, Long taskCode);
 
-    PageInfo<Command> listQueueCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
+    PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
 
     PageInfo<ErrorCommand> listErrorCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
 }

@@ -45,13 +45,10 @@
         select
         *
         from t_ds_command
-        where 1 = 1
-        <if test="definitionCodes != null and definitionCodes.size() > 0">
-            and process_definition_code in
-            <foreach item="id" index="index" collection="definitionCodes" open="(" separator="," close=")">
+        where process_definition_code in
+            <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
                 #{id}
             </foreach>
-        </if>
         order by process_instance_priority, id asc
     </select>
 

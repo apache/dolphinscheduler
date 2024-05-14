@@ -47,7 +47,7 @@
         *
         from t_ds_error_command
         where process_definition_code in
-            <foreach item="id" index="index" collection="definitionCodes" open="(" separator="," close=")">
+            <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
                 #{id}
             </foreach>
         order by process_instance_priority, id asc
