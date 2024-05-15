@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
@@ -30,6 +32,9 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public class ErrorCommandMapperTest extends BaseDaoTest {
 
@@ -52,6 +57,18 @@ public class ErrorCommandMapperTest extends BaseDaoTest {
         errorCommand.setStartTime(new Date());
         errorCommandMapper.insert(errorCommand);
         return errorCommand;
+    }
+
+    @Test
+    public void testQueryCommandPageByIds() {
+        ErrorCommand expectedCommand = insertOne();
+        Page<ErrorCommand> page = new Page<>(1, 10);
+        IPage<ErrorCommand> commandIPage = errorCommandMapper.queryErrorCommandPageByIds(page,
+                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+        List<ErrorCommand> commandList = commandIPage.getRecords();
+        assertThat(commandList).isNotEmpty();
+        assertThat(commandIPage.getTotal()).isEqualTo(1);
+        assertThat(commandList.get(0).getId()).isEqualTo(expectedCommand.getId());
     }
 
     /**

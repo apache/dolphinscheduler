@@ -43,6 +43,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
 /**
@@ -63,6 +65,18 @@ public class CommandMapperTest extends BaseDaoTest {
     public void testInsert() {
         Command command = createCommand();
         Assertions.assertTrue(command.getId() > 0);
+    }
+
+    @Test
+    public void testQueryCommandPageByIds() {
+        Command expectedCommand = createCommand();
+        Page<Command> page = new Page<>(1, 10);
+        IPage<Command> commandIPage = commandMapper.queryCommandPageByIds(page,
+                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+        List<Command> commandList = commandIPage.getRecords();
+        assertThat(commandList).isNotEmpty();
+        assertThat(commandIPage.getTotal()).isEqualTo(1);
+        assertThat(commandList.get(0).getId()).isEqualTo(expectedCommand.getId());
     }
 
     /**
