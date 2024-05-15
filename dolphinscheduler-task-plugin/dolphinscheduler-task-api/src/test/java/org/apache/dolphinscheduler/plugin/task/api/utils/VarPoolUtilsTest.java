@@ -32,22 +32,31 @@ class VarPoolUtilsTest {
 
     @Test
     void mergeVarPool() {
-        List<Property> varpool1 = null;
-        List<Property> varpool2 = null;
-        Truth.assertThat(VarPoolUtils.mergeVarPool(varpool1, varpool2)).isNull();
+        Truth.assertThat(VarPoolUtils.mergeVarPool(null)).isNull();
 
         // Override the value of the same property
         // Merge the property with different key.
-        varpool1 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"));
-        varpool2 = Lists.newArrayList(
+        List<Property> varpool1 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"));
+        List<Property> varpool2 = Lists.newArrayList(
                 new Property("name", Direct.OUT, DataType.VARCHAR, "tim"),
                 new Property("age", Direct.OUT, DataType.INTEGER, "10"));
 
-        Truth.assertThat(VarPoolUtils.mergeVarPool(varpool1, varpool2))
+        Truth.assertThat(VarPoolUtils.mergeVarPool(Lists.newArrayList(varpool1, varpool2)))
                 .containsExactly(
                         new Property("name", Direct.OUT, DataType.VARCHAR, "tim"),
                         new Property("age", Direct.OUT, DataType.INTEGER, "10"));
 
     }
 
+    @Test
+    void subtractVarPool() {
+        Truth.assertThat(VarPoolUtils.subtractVarPool(null, null)).isNull();
+        List<Property> varpool1 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"),
+                new Property("age", Direct.OUT, DataType.INTEGER, "10"));
+        List<Property> varpool2 = Lists.newArrayList(new Property("name", Direct.OUT, DataType.VARCHAR, "tom"));
+        List<Property> varpool3 = Lists.newArrayList(new Property("location", Direct.OUT, DataType.VARCHAR, "china"));
+
+        Truth.assertThat(VarPoolUtils.subtractVarPool(varpool1, Lists.newArrayList(varpool2, varpool3)))
+                .containsExactly(new Property("age", Direct.OUT, DataType.INTEGER, "10"));
+    }
 }

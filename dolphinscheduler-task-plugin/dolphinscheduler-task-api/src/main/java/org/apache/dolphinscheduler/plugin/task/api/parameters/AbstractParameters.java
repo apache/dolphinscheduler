@@ -44,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Lists;
 
 @Getter
 @Slf4j
@@ -138,7 +139,7 @@ public abstract class AbstractParameters implements IParameters {
             }
         }
 
-        varPool = VarPoolUtils.mergeVarPool(varPool, outProperty);
+        varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
     }
 
     protected List<Property> getOutProperty(List<Property> params) {

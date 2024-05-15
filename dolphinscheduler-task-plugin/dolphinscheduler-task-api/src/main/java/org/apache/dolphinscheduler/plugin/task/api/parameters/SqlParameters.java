@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 /**
  * Sql/Hql parameter
@@ -246,7 +247,7 @@ public class SqlParameters extends AbstractParameters {
             return;
         }
         if (StringUtils.isEmpty(result)) {
-            varPool = VarPoolUtils.mergeVarPool(varPool, outProperty);
+            varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
             return;
         }
         List<Map<String, String>> sqlResult = getListMapByString(result);
@@ -278,7 +279,7 @@ public class SqlParameters extends AbstractParameters {
                 info.setValue(String.valueOf(firstRow.get(info.getProp())));
             }
         }
-        varPool = VarPoolUtils.mergeVarPool(varPool, outProperty);
+        varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
 
     }
 
