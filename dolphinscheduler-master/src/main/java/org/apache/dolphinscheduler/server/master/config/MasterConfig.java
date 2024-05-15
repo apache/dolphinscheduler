@@ -84,7 +84,7 @@ public class MasterConfig implements Validator {
      */
     private Duration taskCommitInterval = Duration.ofSeconds(1);
     /**
-     * if scheduler enable to schedule job on master
+     * if scheduler is enabled to schedule job on master
      */
     private boolean schedulerEnabled = true;
     /**
