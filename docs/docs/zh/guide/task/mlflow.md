@@ -139,7 +139,7 @@ mlflow server -h 0.0.0.0 -p 5000 --serve-artifacts --backend-store-uri sqlite://
 
 ### 内置算法仓库配置
 
-如果遇到github无法访问的情况，可以修改`commom.properties`配置文件的以下字段，将github地址替换能访问的地址。
+如果遇到github无法访问的情况，可以修改`common.properties`配置文件的以下字段，将github地址替换能访问的地址。
 
 ```yaml
 # mlflow task plugin preset repository

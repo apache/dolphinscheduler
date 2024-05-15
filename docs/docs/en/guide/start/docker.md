@@ -128,7 +128,7 @@ and use `admin` and `dolphinscheduler123` as default username and password in th
 ![login](../../../../img/new_ui/dev/quick-start/login.png)
 
 > Note: If you start the services by the way [using exists PostgreSQL ZooKeeper](#using-exists-postgresql-zookeeper), and
-> strating with multiple machine, you should change URL domain from `localhost` to IP or hostname the api server running.
+> starting with multiple machine, you should change URL domain from `localhost` to IP or hostname the api server running.
 
 ## Change Environment Variable
 
