@@ -40,7 +40,8 @@ ALTER TABLE t_ds_alert ADD COLUMN IF NOT EXISTS "process_instance_id" int DEFAUL
 ALTER TABLE t_ds_alert ADD COLUMN IF NOT EXISTS "alert_type" int DEFAULT NULL;
 
 --- Add unique key
-CREATE UNIQUE INDEX IF NOT EXISTS t_ds_relation_project_user_un on t_ds_relation_project_user (user_id, project_id);
+
+CREATE INDEX IF NOT EXISTS t_ds_relation_project_user_un on t_ds_relation_project_user (user_id, project_id);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_name on t_ds_project (name);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_code on t_ds_project (code);
 CREATE UNIQUE INDEX IF NOT EXISTS unique_queue_name on t_ds_queue (queue_name);
