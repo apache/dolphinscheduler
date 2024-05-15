@@ -148,6 +148,11 @@ public class TaskExecutionContext implements Serializable {
     private String tenantCode;
 
     /**
+     * tenant id
+     */
+    private int tenantId;
+
+    /**
      * process define id
      */
     private int processDefineId;

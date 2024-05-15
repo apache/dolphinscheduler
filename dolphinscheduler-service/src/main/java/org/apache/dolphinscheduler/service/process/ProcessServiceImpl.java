@@ -292,6 +292,10 @@ public class ProcessServiceImpl implements ProcessService {
             commandService.moveToErrorCommand(command, "process instance is null");
             return null;
         }
+
+        Tenant tenant = tenantMapper.queryByTenantCode(processInstance.getTenantCode());
+        processInstance.setTenantId(tenant.getId());
+
         processInstance.setCommandType(command.getCommandType());
         processInstance.addHistoryCmd(command.getCommandType());
         processInstance.setTestFlag(command.getTestFlag());

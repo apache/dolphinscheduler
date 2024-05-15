@@ -50,11 +50,14 @@ public class TaskExecutionContextUtils {
             TenantConfig tenantConfig = workerConfig.getTenantConfig();
 
             String tenantCode = taskExecutionContext.getTenantCode();
+            final int tenantId = taskExecutionContext.getTenantId();
+
             if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) && tenantConfig.isDefaultTenantEnabled()) {
                 log.info("Current tenant is default tenant, will use bootstrap user: {} to execute the task",
                         TenantConstants.BOOTSTRAPT_SYSTEM_USER);
                 return TenantConstants.BOOTSTRAPT_SYSTEM_USER;
             }
+            int userId = tenantId + 1000;
             boolean osUserExistFlag;
             // if Using distributed is true and Currently supported systems are linux,Should not let it
             // automatically
@@ -64,7 +67,7 @@ public class TaskExecutionContextUtils {
                 osUserExistFlag = OSUtils.existTenantCodeInLinux(tenantCode);
             } else if (OSUtils.isSudoEnable() && tenantConfig.isAutoCreateTenantEnabled()) {
                 // if not exists this user, then create
-                OSUtils.createUserIfAbsent(tenantCode);
+                OSUtils.createUserIfAbsent(userId,tenantCode);
                 osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
             } else {
                 osUserExistFlag = OSUtils.getUserList().contains(tenantCode);

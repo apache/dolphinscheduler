@@ -126,6 +126,9 @@ public class ProcessInstance {
 
     private String tenantCode;
 
+    @TableField(exist = false)
+    private int tenantId;
+
     /**
      * queue
      */

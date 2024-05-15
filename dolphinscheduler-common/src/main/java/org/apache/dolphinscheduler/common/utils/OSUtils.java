@@ -218,6 +218,51 @@ public class OSUtils {
     }
 
     /**
+     * create user
+     *
+     * @param userId user id
+     * @param userName user name
+     * @return true if creation was successful, otherwise false
+     */
+    public static boolean createUser(int userId, String userName) {
+        try {
+            String userGroup = getGroup();
+            if (StringUtils.isEmpty(userGroup)) {
+                String errorLog = String.format("%s group does not exist for this operating system.", userGroup);
+                log.error(errorLog);
+                return false;
+            }
+            if (SystemUtils.IS_OS_MAC) {
+                createMacUser(userName, userGroup);
+            } else if (SystemUtils.IS_OS_WINDOWS) {
+                createWindowsUser(userName, userGroup);
+            } else {
+                createLinuxUser(userId,userName, userGroup);
+            }
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return false;
+    }
+
+    /**
+     * create user
+     *
+     * @param userId user id
+     * @param userName user name
+     */
+    public static void createUserIfAbsent(int userId, String userName) {
+        // if not exists this user, then create
+        if (!getUserList().contains(userName)) {
+            //boolean isSuccess = createUser(userName);
+            boolean isSuccess = createUser(userId, userName);
+            log.info("create user {} {} {}", userId, userName, isSuccess ? "success" : "fail");
+        }
+    }
+
+    /**
      * create linux user
      *
      * @param userName  user name
@@ -227,6 +272,21 @@ public class OSUtils {
     private static void createLinuxUser(String userName, String userGroup) throws IOException {
         log.info("create linux os user: {}", userName);
         String cmd = String.format("sudo useradd -m -g %s %s", userGroup, userName);
+        log.info("execute cmd: {}", cmd);
+        exeCmd(cmd);
+    }
+
+    /**
+     * create linux user
+     *
+     * @param userId  user id
+     * @param userName  user name
+     * @param userGroup user group
+     * @throws IOException in case of an I/O error
+     */
+    private static void createLinuxUser(int userId, String userName, String userGroup) throws IOException {
+        log.info("create linux os user id: {},userName:{}", userId, userName);
+        String cmd = String.format("sudo useradd -u %s -g %s %s", userId, userGroup, userName);
         log.info("execute cmd: {}", cmd);
         exeCmd(cmd);
     }

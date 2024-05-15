@@ -144,18 +144,18 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
                                String tenantCode,
                                int queueId,
                                String desc) throws Exception {
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_CREATE)) {
+        if (checkTenantExists(tenantCode)) {
+            return tenantMapper.queryByTenantCode(tenantCode);
+        }
+        if(canOperator(loginUser,loginUser.getId())){
+            Tenant tenant = new Tenant(tenantCode, desc, queueId);
+            createTenantValid(tenant);
+            tenantMapper.insert(tenant);
+            storageOperate.createTenantDirIfNotExists(tenantCode);
+            return tenant;
+        }else {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        if (checkDescriptionLength(desc)) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
-        }
-        Tenant tenant = new Tenant(tenantCode, desc, queueId);
-        createTenantValid(tenant);
-        tenantMapper.insert(tenant);
-
-        storageOperate.createTenantDirIfNotExists(tenantCode);
-        return tenant;
     }
 
     /**

@@ -103,6 +103,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setGlobalParams(processInstance.getGlobalParams());
         taskExecutionContext.setExecutorId(processInstance.getExecutorId());
         taskExecutionContext.setCmdTypeIfComplement(processInstance.getCmdTypeIfComplement().getCode());
+        taskExecutionContext.setTenantId(processInstance.getTenantId());
         taskExecutionContext.setTenantCode(processInstance.getTenantCode());
         return this;
     }
