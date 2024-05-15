@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * error command mapper interface
@@ -43,4 +45,9 @@ public interface ErrorCommandMapper extends BaseMapper<ErrorCommand> {
                                          @Param("startTime") Date startTime,
                                          @Param("endTime") Date endTime,
                                          @Param("projectCodes") List<Long> projectCodes);
+
+    IPage<ErrorCommand> queryErrorCommandPage(Page<ErrorCommand> page);
+
+    IPage<ErrorCommand> queryErrorCommandPageByIds(Page<ErrorCommand> page,
+                                                   @Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 }

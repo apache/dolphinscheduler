@@ -15,45 +15,24 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
-}
+import { reactive } from 'vue'
+import { useAsyncState } from '@vueuse/core'
+import { listMonitorServerNode } from '@/service/modules/monitor'
+import type { AlertNode } from '@/service/modules/monitor/types'
 
-type ServerNodeType = 'MASTER' | 'WORKER' | 'ALERT_SERVER'
+export function useServerNode() {
+  const variables = reactive({
+    data: []
+  })
+  const getTableData = () => {
+    const { state } = useAsyncState(
+      listMonitorServerNode('ALERT_SERVER').then((res: Array<AlertNode>) => {
+        variables.data = res as any
+      }),
+      []
+    )
 
-interface ServerNode {
-  id: number
-  host: string
-  port: number
-  zkDirectory: string
-  resInfo: string
-  createTime: string
-  lastHeartbeatTime: string
-}
-
-interface MasterNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-}
-
-interface WorkerNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-  workerHostWeight?: number
-  threadPoolUsage?: number
-}
-
-interface AlertNode extends MasterNode {}
-
-export {
-  DatabaseRes,
-  MasterNode,
-  WorkerNode,
-  ServerNodeType,
-  ServerNode,
-  AlertNode
+    return state
+  }
+  return { variables, getTableData }
 }

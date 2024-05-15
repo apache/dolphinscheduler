@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import { NGrid, NGi, NCard, NNumberAnimation, NSpace } from 'naive-ui'
+import { NGrid, NGi, NCard, NNumberAnimation, NSpace, NTag } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useMaster } from './use-master'
 import styles from './index.module.scss'
@@ -27,6 +27,7 @@ import MasterModal from './master-modal'
 import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { MasterNode } from '@/service/modules/monitor/types'
+import { capitalize } from 'lodash'
 
 const master = defineComponent({
   name: 'master',
@@ -62,6 +63,18 @@ const master = defineComponent({
     const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
       this
 
+    const renderNodeServerStatusTag = (item: MasterNode) => {
+      const serverStatus = JSON.parse(item.resInfo)?.serverStatus
+
+      if (!serverStatus) return ''
+
+      return (
+        <NTag type={serverStatus === 'NORMAL' ? 'info' : 'warning'}>
+          {capitalize(serverStatus)}
+        </NTag>
+      )
+    }
+
     return this.data.length < 1 ? (
       <Result
         title={t('monitor.master.master_no_data_result_title')}
@@ -76,8 +89,15 @@ const master = defineComponent({
             return (
               <NSpace vertical>
                 <NCard>
-                  <NSpace justify='space-between'>
+                  <NSpace
+                    justify='space-between'
+                    style={{
+                      'line-height': '28px'
+                    }}
+                  >
                     <NSpace>
+                      {renderNodeServerStatusTag(item)}
+
                       <span>{`${t('monitor.master.host')}: ${
                         item ? item.host : ' - '
                       }`}</span>

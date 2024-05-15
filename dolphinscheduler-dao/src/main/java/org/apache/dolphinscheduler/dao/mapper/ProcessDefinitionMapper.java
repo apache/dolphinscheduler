@@ -188,4 +188,5 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return project ids list
      */
     List<Integer> listProjectIds();
+    List<Long> queryDefinitionCodeListByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 }

@@ -67,6 +67,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.TriggerRelationService;
@@ -242,7 +243,7 @@ public class ExecuteFunctionServiceTest {
         Mockito.when(processService.getTenantForProcess(tenantCode, userId)).thenReturn(tenantCode);
         doReturn(1).when(commandService).createCommand(argThat(c -> c.getId() == null));
         doReturn(0).when(commandService).createCommand(argThat(c -> c.getId() != null));
-        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(getMasterServersList());
+        Mockito.when(monitorService.listServer(RegistryNodeType.MASTER)).thenReturn(getMasterServersList());
         Mockito.when(processService.findProcessInstanceDetailById(processInstanceId))
                 .thenReturn(Optional.ofNullable(processInstance));
         Mockito.when(processService.findProcessDefinition(1L, 1)).thenReturn(this.processDefinition);
@@ -498,7 +499,7 @@ public class ExecuteFunctionServiceTest {
 
     @Test
     public void testNoMasterServers() {
-        Mockito.when(monitorService.getServerListFromRegistry(true)).thenReturn(new ArrayList<>());
+        Mockito.when(monitorService.listServer(RegistryNodeType.MASTER)).thenReturn(new ArrayList<>());
 
         Assertions.assertThrows(ServiceException.class, () -> executorService.execProcessInstance(
                 loginUser,

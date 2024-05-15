@@ -208,4 +208,14 @@
         SELECT DISTINCT(id) as project_id
         FROM t_ds_project
     </select>
+
+    <select id="queryDefinitionCodeListByProjectCodes" resultType="java.lang.Long">
+        select
+        code
+        from t_ds_process_definition
+        where project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+    </select>
 </mapper>

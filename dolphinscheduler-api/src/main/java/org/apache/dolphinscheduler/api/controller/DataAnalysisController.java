@@ -20,17 +20,21 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.COMMAND_STATE_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_DEFINITION_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.COUNT_PROCESS_INSTANCE_STATE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_GROUP_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUEUE_COUNT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_INSTANCE_STATE_COUNT_ERROR;
 
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -147,5 +151,55 @@ public class DataAnalysisController extends BaseController {
 
         Map<String, Integer> stringIntegerMap = dataAnalysisService.countQueueState(loginUser);
         return Result.success(stringIntegerMap);
+    }
+
+    /**
+     * command queue
+     *
+     * @param loginUser login user
+     * @return queue state count
+     */
+    @Operation(summary = "listPendingCommands", description = "LIST_PENDING_COMMANDS")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
+    })
+    @GetMapping("/listCommand")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
+    public Result<PageInfo<Command>> listPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam(value = "projectCode", required = false) Long projectCode,
+                                                @RequestParam("pageNo") Integer pageNo,
+                                                @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
+        PageInfo<Command> commandPageInfo =
+                dataAnalysisService.listPendingCommands(loginUser, projectCode, pageNo, pageSize);
+        return Result.success(commandPageInfo);
+    }
+
+    /**
+     * error command
+     *
+     * @param loginUser login user
+     * @return queue state count
+     */
+    @Operation(summary = "listErrorCommand", description = "LIST_ERROR_COMMAND_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
+    })
+    @GetMapping("/listErrorCommand")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(LIST_PAGING_ALERT_GROUP_ERROR)
+    public Result<PageInfo<ErrorCommand>> listErrorCommand(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @RequestParam(value = "projectCode", required = false) Long projectCode,
+                                                           @RequestParam("pageNo") Integer pageNo,
+                                                           @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
+        PageInfo<ErrorCommand> errorCommandPageInfo =
+                dataAnalysisService.listErrorCommand(loginUser, projectCode, pageNo, pageSize);
+        return Result.success(errorCommandPageInfo);
     }
 }

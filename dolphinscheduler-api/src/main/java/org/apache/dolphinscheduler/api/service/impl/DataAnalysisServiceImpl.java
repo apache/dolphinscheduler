@@ -27,14 +27,18 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -71,6 +75,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
 /**
@@ -378,6 +384,66 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
         List<ExecuteStatusCount> executeStatusCounts = startTimeStates.orElse(null);
         return new TaskCountDto(executeStatusCounts);
+    }
+
+    @Override
+    public PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize) {
+        Page<Command> page = new Page<>(pageNo, pageSize);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            IPage<Command> commandIPage = commandMapper.queryCommandPage(page);
+            return PageInfo.of(commandIPage);
+        }
+
+        List<Long> workflowDefinitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
+
+        if (workflowDefinitionCodes.isEmpty()) {
+            return PageInfo.of(pageNo, pageSize);
+        }
+
+        IPage<Command> commandIPage =
+                commandMapper.queryCommandPageByIds(page, new ArrayList<>(workflowDefinitionCodes));
+        return PageInfo.of(commandIPage);
+    }
+
+    @Override
+    public PageInfo<ErrorCommand> listErrorCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize) {
+        Page<ErrorCommand> page = new Page<>(pageNo, pageSize);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            IPage<ErrorCommand> commandIPage = errorCommandMapper.queryErrorCommandPage(page);
+            return PageInfo.of(commandIPage);
+        }
+
+        List<Long> workflowDefinitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
+
+        if (workflowDefinitionCodes.isEmpty()) {
+            return PageInfo.of(pageNo, pageSize);
+        }
+
+        IPage<ErrorCommand> commandIPage =
+                errorCommandMapper.queryErrorCommandPageByIds(page, new ArrayList<>(workflowDefinitionCodes));
+        return PageInfo.of(commandIPage);
+    }
+
+    private List<Long> getAuthDefinitionCodes(User loginUser, Long projectCode) {
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return Collections.emptyList();
+        }
+        List<Long> projectCodes = projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
+
+        if (projectCode != null) {
+            if (!projectCodes.contains(projectCode)) {
+                return Collections.emptyList();
+            }
+
+            projectCodes = Collections.singletonList(projectCode);
+        }
+
+        return processDefinitionMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
     }
 
     /**

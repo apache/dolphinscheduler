@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 
 /**
@@ -135,7 +136,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
-        List<Command> actualCommand = commandMapper.queryCommandPage(1, 0);
+        List<Command> actualCommand = commandMapper.selectList(new QueryWrapper<>());
 
         Assertions.assertNotNull(actualCommand);
     }

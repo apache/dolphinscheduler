@@ -90,6 +90,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTrigg
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -289,7 +290,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     private void checkMasterExists() {
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
+        List<Server> masterServers = monitorService.listServer(RegistryNodeType.MASTER);
 
         // no master
         if (masterServers.isEmpty()) {
@@ -1142,7 +1143,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkValidTenant(tenantCode);
         checkMasterExists();
         // todo dispatch improvement
-        List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
+        List<Server> masterServerList = monitorService.listServer(RegistryNodeType.MASTER);
         Server server = masterServerList.get(0);
 
         StreamingTaskTriggerRequest taskExecuteStartMessage = new StreamingTaskTriggerRequest();

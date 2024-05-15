@@ -15,45 +15,29 @@
  * limitations under the License.
  */
 
-interface DatabaseRes {
-  dbType: string
-  state: string
-  maxConnections: number
-  maxUsedConnections: number
-  threadsConnections: number
-  threadsRunningConnections: number
-  date: string
+ @mixin base {
+  font-size: 5vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
 }
 
-type ServerNodeType = 'MASTER' | 'WORKER' | 'ALERT_SERVER'
-
-interface ServerNode {
-  id: number
-  host: string
-  port: number
-  zkDirectory: string
-  resInfo: string
-  createTime: string
-  lastHeartbeatTime: string
+.card {
+  @include base;
 }
 
-interface MasterNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
+.load-average {
+  @include base;
+  color: var(--n-color-target);
 }
 
-interface WorkerNode extends ServerNode {
-  serverStatus?: 'NORMAL' | 'BUZY'
-  workerHostWeight?: number
-  threadPoolUsage?: number
-}
+.link-btn {
+  color: var(--n-color-target);
+  cursor: pointer;
 
-interface AlertNode extends MasterNode {}
-
-export {
-  DatabaseRes,
-  MasterNode,
-  WorkerNode,
-  ServerNodeType,
-  ServerNode,
-  AlertNode
+  &:hover {
+    color: var(--n-color-target);
+    opacity: 0.8;
+  }
 }

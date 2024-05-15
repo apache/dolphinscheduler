@@ -17,7 +17,7 @@
 
 import { reactive } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { listWorker } from '@/service/modules/monitor'
+import { listMonitorServerNode } from '@/service/modules/monitor'
 import type { WorkerNode } from '@/service/modules/monitor/types'
 
 export function useWorker() {
@@ -27,7 +27,7 @@ export function useWorker() {
 
   const getTableWorker = () => {
     const { state } = useAsyncState(
-      listWorker().then((res: Array<WorkerNode>) => {
+      listMonitorServerNode('WORKER').then((res: Array<WorkerNode>) => {
         variables.data = res as any
       }),
       []
