@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -28,7 +29,6 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.ResourcesServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
@@ -172,37 +172,55 @@ public class ResourcesServiceTest {
         assertEquals(new ServiceException(Status.ILLEGAL_RESOURCE_PATH, illegal_path), serviceException);
 
         // RESOURCE_FILE_IS_EMPTY
-        MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
-        Result result = resourcesService.uploadResource(user, "ResourcesServiceTest", ResourceType.FILE,
-                mockMultipartFile, tenantFileResourceDir);
-        assertEquals(Status.RESOURCE_FILE_IS_EMPTY.getMsg(), result.getMsg());
+        serviceException = Assertions.assertThrows(ServiceException.class,
+                () -> {
+                    MockMultipartFile mockMultipartFile = new MockMultipartFile("test.pdf", "".getBytes());
+                    resourcesService.uploadResource(user, "ResourcesServiceTest", ResourceType.FILE,
+                            mockMultipartFile, tenantFileResourceDir);
+                });
+        assertEquals(new ServiceException(Status.RESOURCE_FILE_IS_EMPTY), serviceException);
 
         // RESOURCE_SUFFIX_FORBID_CHANGE
-        mockMultipartFile = new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
-        when(Files.getFileExtension("test.pdf")).thenReturn("pdf");
-        when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
-        result = resourcesService.uploadResource(user, "ResourcesServiceTest.jar", ResourceType.FILE, mockMultipartFile,
-                tenantFileResourceDir);
-        assertEquals(Status.RESOURCE_SUFFIX_FORBID_CHANGE.getMsg(), result.getMsg());
+        serviceException = Assertions.assertThrows(ServiceException.class,
+                () -> {
+                    MockMultipartFile mockMultipartFile =
+                            new MockMultipartFile("test.pdf", "test.pdf", "pdf", "test".getBytes());
+                    when(Files.getFileExtension("test.pdf")).thenReturn("pdf");
+                    when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
+                    resourcesService.uploadResource(user, "ResourcesServiceTest.jar", ResourceType.FILE,
+                            mockMultipartFile,
+                            tenantFileResourceDir);
+                });
+        assertEquals(new ServiceException(Status.RESOURCE_SUFFIX_FORBID_CHANGE), serviceException);
 
         // UDF_RESOURCE_SUFFIX_NOT_JAR
-        mockMultipartFile =
-                new MockMultipartFile("ResourcesServiceTest.pdf", "ResourcesServiceTest.pdf", "pdf", "test".getBytes());
-        when(Files.getFileExtension("ResourcesServiceTest.pdf")).thenReturn("pdf");
-        result = resourcesService.uploadResource(user, "ResourcesServiceTest.pdf", ResourceType.UDF, mockMultipartFile,
-                tenantUdfResourceDir);
-        assertEquals(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), result.getMsg());
+        serviceException = Assertions.assertThrows(ServiceException.class,
+                () -> {
+                    MockMultipartFile mockMultipartFile =
+                            new MockMultipartFile("ResourcesServiceTest.pdf", "ResourcesServiceTest.pdf", "pdf",
+                                    "test".getBytes());
+                    when(Files.getFileExtension("ResourcesServiceTest.pdf")).thenReturn("pdf");
+                    resourcesService.uploadResource(user, "ResourcesServiceTest.pdf", ResourceType.UDF,
+                            mockMultipartFile,
+                            tenantUdfResourceDir);
+                });
+        assertEquals(new ServiceException(Status.UDF_RESOURCE_SUFFIX_NOT_JAR), serviceException);
 
         // FULL_FILE_NAME_TOO_LONG
-        String tooLongFileName = getRandomStringWithLength(Constants.RESOURCE_FULL_NAME_MAX_LENGTH) + ".pdf";
-        mockMultipartFile = new MockMultipartFile(tooLongFileName, tooLongFileName, "pdf", "test".getBytes());
-        when(Files.getFileExtension(tooLongFileName)).thenReturn("pdf");
+        serviceException = Assertions.assertThrows(ServiceException.class,
+                () -> {
+                    String tooLongFileName =
+                            getRandomStringWithLength(Constants.RESOURCE_FULL_NAME_MAX_LENGTH) + ".pdf";
+                    MockMultipartFile mockMultipartFile =
+                            new MockMultipartFile(tooLongFileName, tooLongFileName, "pdf", "test".getBytes());
+                    when(Files.getFileExtension(tooLongFileName)).thenReturn("pdf");
 
-        // '/databasePath/tenantCode/RESOURCE/'
-        when(storageOperate.getResDir(tenantCode)).thenReturn(tenantFileResourceDir);
-        result = resourcesService.uploadResource(user, tooLongFileName, ResourceType.FILE, mockMultipartFile,
-                tenantFileResourceDir);
-        assertEquals(Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR.getMsg(), result.getMsg());
+                    // '/databasePath/tenantCode/RESOURCE/'
+                    when(storageOperate.getResDir(tenantCode)).thenReturn(tenantFileResourceDir);
+                    resourcesService.uploadResource(user, tooLongFileName, ResourceType.FILE, mockMultipartFile,
+                            tenantFileResourceDir);
+                });
+        assertEquals(new ServiceException(Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR), serviceException);
     }
 
     @Test
@@ -220,8 +238,7 @@ public class ResourcesServiceTest {
         when(storageOperate.getDir(ResourceType.ALL, tenantCode)).thenReturn(basePath);
         when(storageOperate.getResDir(tenantCode)).thenReturn(tenantFileResourceDir);
         when(storageOperate.exists(tenantFileResourceDir + fileName)).thenReturn(true);
-        Result result = resourcesService.createDirectory(user, fileName, ResourceType.FILE, -1, tenantFileResourceDir);
-        assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
+        resourcesService.createDirectory(user, fileName, ResourceType.FILE, -1, tenantFileResourceDir);
     }
 
     @Test
@@ -250,9 +267,10 @@ public class ResourcesServiceTest {
         when(storageOperate.getDir(ResourceType.ALL, "321")).thenReturn(basePath);
 
         String fileName = "ResourcesServiceTest";
-        Result result = resourcesService.updateResource(user, tenantFileResourceDir + fileName,
-                tenantCode, fileName, ResourceType.FILE, null);
-        assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION.getMsg(), result.getMsg());
+        String finalFileName = fileName;
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.updateResource(user, tenantFileResourceDir + finalFileName,
+                        tenantCode, finalFileName, ResourceType.FILE, null));
 
         // SUCCESS
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
@@ -262,9 +280,8 @@ public class ResourcesServiceTest {
         when(storageOperate.getFileStatus(tenantFileResourceDir + fileName,
                 tenantFileResourceDir, tenantCode, ResourceType.FILE))
                         .thenReturn(getStorageEntityResource(fileName));
-        result = resourcesService.updateResource(user, tenantFileResourceDir + fileName,
+        resourcesService.updateResource(user, tenantFileResourceDir + fileName,
                 tenantCode, fileName, ResourceType.FILE, null);
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
 
         // Tests for udf resources.
         fileName = "ResourcesServiceTest.jar";
@@ -273,9 +290,8 @@ public class ResourcesServiceTest {
         when(storageOperate.getFileStatus(tenantUdfResourceDir + fileName, tenantUdfResourceDir, tenantCode,
                 ResourceType.UDF))
                         .thenReturn(getStorageEntityUdfResource(fileName));
-        result = resourcesService.updateResource(user, tenantUdfResourceDir + fileName,
+        resourcesService.updateResource(user, tenantUdfResourceDir + fileName,
                 tenantCode, fileName, ResourceType.UDF, null);
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
     }
 
     @Test
@@ -298,11 +314,9 @@ public class ResourcesServiceTest {
         when(storageOperate.listFilesStatus(tenantFileResourceDir, tenantFileResourceDir,
                 tenantCode, ResourceType.FILE)).thenReturn(mockResList);
 
-        Result result = resourcesService.queryResourceListPaging(loginUser, "", "", ResourceType.FILE, "Test", 1, 10);
-        assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
-        PageInfo pageInfo = (PageInfo) result.getData();
+        PageInfo<StorageEntity> pageInfo =
+                resourcesService.queryResourceListPaging(loginUser, "", "", ResourceType.FILE, "Test", 1, 10);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
-
     }
 
     @Test
@@ -319,11 +333,9 @@ public class ResourcesServiceTest {
         when(storageOperate.listFilesStatusRecursively(tenantFileResourceDir,
                 tenantFileResourceDir, tenantCode, ResourceType.FILE))
                         .thenReturn(Collections.singletonList(getStorageEntityResource(fileName)));
-        Map<String, Object> result =
+        List<ResourceComponent> resourceComponents =
                 resourcesService.queryResourceList(loginUser, ResourceType.FILE, tenantFileResourceDir);
-        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        List<ResourceComponent> resourceList = (List<ResourceComponent>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(resourceList));
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(resourceComponents));
 
         // test udf
         when(storageOperate.getDir(ResourceType.UDF, tenantCode)).thenReturn(tenantUdfResourceDir);
@@ -331,10 +343,8 @@ public class ResourcesServiceTest {
         when(storageOperate.listFilesStatusRecursively(tenantUdfResourceDir, tenantUdfResourceDir,
                 tenantCode, ResourceType.UDF)).thenReturn(Arrays.asList(getStorageEntityUdfResource("test.jar")));
         loginUser.setUserType(UserType.GENERAL_USER);
-        result = resourcesService.queryResourceList(loginUser, ResourceType.UDF, tenantUdfResourceDir);
-        assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        resourceList = (List<ResourceComponent>) result.get(Constants.DATA_LIST);
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(resourceList));
+        resourceComponents = resourcesService.queryResourceList(loginUser, ResourceType.UDF, tenantUdfResourceDir);
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(resourceComponents));
     }
 
     @Test
@@ -356,13 +366,12 @@ public class ResourcesServiceTest {
         when(storageOperate.getResDir(getTenant().getTenantCode())).thenReturn(tenantFileResourceDir);
         when(storageOperate.getFileStatus(tenantFileResourceDir + fileName, tenantFileResourceDir, tenantCode, null))
                 .thenReturn(getStorageEntityResource(fileName));
-        Result result = resourcesService.delete(loginUser, tenantFileResourceDir + "ResNotExist", tenantCode);
-        assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.delete(loginUser, tenantFileResourceDir + "ResNotExist", tenantCode));
 
         // SUCCESS
         loginUser.setTenantId(1);
-        result = resourcesService.delete(loginUser, tenantFileResourceDir + fileName, tenantCode);
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        resourcesService.delete(loginUser, tenantFileResourceDir + fileName, tenantCode);
     }
 
     @Test
@@ -374,16 +383,15 @@ public class ResourcesServiceTest {
         String fileName = "ResourcesServiceTest";
         when(storageOperate.exists(tenantFileResourceDir + fileName)).thenReturn(true);
 
-        Result result = resourcesService.verifyResourceName(tenantFileResourceDir + fileName, ResourceType.FILE, user);
-        assertEquals(Status.RESOURCE_EXIST.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.verifyResourceName(tenantFileResourceDir + fileName, ResourceType.FILE, user));
 
         // RESOURCE_FILE_EXIST
-        result = resourcesService.verifyResourceName(tenantFileResourceDir + fileName, ResourceType.FILE, user);
-        Assertions.assertTrue(Status.RESOURCE_EXIST.getCode() == result.getCode());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.verifyResourceName(tenantFileResourceDir + fileName, ResourceType.FILE, user));
 
         // SUCCESS
-        result = resourcesService.verifyResourceName("test2", ResourceType.FILE, user);
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        resourcesService.verifyResourceName("test2", ResourceType.FILE, user);
     }
 
     @Test
@@ -391,20 +399,18 @@ public class ResourcesServiceTest {
         // RESOURCE_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
         when(tenantMapper.queryById(getUser().getTenantId())).thenReturn(getTenant());
-        Result result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        assertEquals(Status.RESOURCE_FILE_NOT_EXIST.getCode(), (int) result.getCode());
+        Assertions.assertThrows(ServiceException.class, () -> resourcesService.readResource(getUser(), "", "", 1, 10));
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
-        result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class, () -> resourcesService.readResource(getUser(), "", "", 1, 10));
 
         // USER_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(null);
         when(FileUtils.getResourceViewSuffixes()).thenReturn("jar");
         when(Files.getFileExtension("ResourcesServiceTest.jar")).thenReturn("jar");
-        result = resourcesService.readResource(getUser(), "", "", 1, 10);
-        assertEquals(Status.USER_NOT_EXIST.getCode(), (int) result.getCode());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.readResource(getUser(), "ResourcesServiceTest.jar", tenantCode, 1, 10));
 
         // TENANT_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
@@ -420,9 +426,7 @@ public class ResourcesServiceTest {
         when(storageOperate.exists(Mockito.any())).thenReturn(true);
         when(storageOperate.vimFile(Mockito.any(), Mockito.any(), eq(1), eq(10))).thenReturn(getContent());
         when(Files.getFileExtension("/dolphinscheduler/123/resources/test.jar")).thenReturn("jar");
-        result = resourcesService.readResource(getUser(), "/dolphinscheduler/123/resources/test.jar", tenantCode, 1,
-                10);
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        resourcesService.readResource(getUser(), "/dolphinscheduler/123/resources/test.jar", tenantCode, 1, 10);
     }
 
     @Test
@@ -468,25 +472,20 @@ public class ResourcesServiceTest {
         when(storageOperate.getResDir(Mockito.anyString())).thenReturn(tenantFileResourceDir);
         when(storageOperate.getFileStatus(tenantFileResourceDir + fileName, "", tenantCode, ResourceType.FILE))
                 .thenReturn(null);
-        Result result = resourcesService.updateResourceContent(getUser(), tenantFileResourceDir + fileName, tenantCode,
-                "content");
-        assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class, () -> resourcesService.updateResourceContent(getUser(),
+                tenantFileResourceDir + fileName, tenantCode, "content"));
 
         // RESOURCE_SUFFIX_NOT_SUPPORT_VIEW
         when(FileUtils.getResourceViewSuffixes()).thenReturn("class");
         when(storageOperate.getFileStatus(tenantFileResourceDir, "", tenantCode, ResourceType.FILE))
                 .thenReturn(getStorageEntityResource(fileName));
-
-        result = resourcesService.updateResourceContent(getUser(), tenantFileResourceDir, tenantCode,
-                "content");
-        assertEquals(Status.RESOURCE_SUFFIX_NOT_SUPPORT_VIEW.getMsg(), result.getMsg());
+        Assertions.assertThrows(ServiceException.class,
+                () -> resourcesService.updateResourceContent(getUser(), tenantFileResourceDir, tenantCode, "content"));
 
         // USER_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(null);
-        result = resourcesService.updateResourceContent(getUser(), tenantFileResourceDir + "123.class",
-                tenantCode,
-                "content");
-        Assertions.assertTrue(Status.USER_NOT_EXIST.getCode() == result.getCode());
+        Assertions.assertThrows(ServiceException.class, () -> resourcesService.updateResourceContent(getUser(),
+                tenantFileResourceDir + "123.class", tenantCode, "content"));
 
         // TENANT_NOT_EXIST
         when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
@@ -504,9 +503,7 @@ public class ResourcesServiceTest {
         when(tenantMapper.queryById(1)).thenReturn(getTenant());
         when(FileUtils.getUploadFilename(Mockito.anyString(), Mockito.anyString())).thenReturn("test");
         when(FileUtils.writeContent2File(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
-        result = resourcesService.updateResourceContent(getUser(),
-                tenantFileResourceDir + fileName, tenantCode, "content");
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        resourcesService.updateResourceContent(getUser(), tenantFileResourceDir + fileName, tenantCode, "content");
     }
 
     @Test
@@ -588,8 +585,8 @@ public class ResourcesServiceTest {
         when(storageOperate.getDir(ResourceType.FILE, tenantCode)).thenReturn(tenantFileResourceDir);
         when(storageOperate.getFileStatus(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),
                 Mockito.any())).thenReturn(getStorageEntityResource(fileName));
-        Result<Object> result = resourcesService.queryResourceBaseDir(user, ResourceType.FILE);
-        assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
+        String baseDir = resourcesService.queryResourceBaseDir(user, ResourceType.FILE);
+        assertNotNull(baseDir);
     }
 
     private Tenant getTenant() {

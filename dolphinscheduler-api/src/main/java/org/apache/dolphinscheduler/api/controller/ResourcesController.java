@@ -40,6 +40,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERR
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.service.UdfFuncService;
@@ -55,6 +56,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -114,13 +116,14 @@ public class ResourcesController extends BaseController {
     @PostMapping(value = "/directory")
     @ApiException(CREATE_RESOURCE_ERROR)
     @OperatorLog(auditType = AuditType.FOLDER_CREATE)
-    public Result<Object> createDirectory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam(value = "type") ResourceType type,
-                                          @RequestParam(value = "name") String alias,
-                                          @RequestParam(value = "pid") int pid,
-                                          @RequestParam(value = "currentDir") String currentDir) {
+    public Result<Void> createDirectory(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @RequestParam(value = "type") ResourceType type,
+                                        @RequestParam(value = "name") String alias,
+                                        @RequestParam(value = "pid") int pid,
+                                        @RequestParam(value = "currentDir") String currentDir) {
         // todo verify the directory name
-        return resourceService.createDirectory(loginUser, alias, type, pid, currentDir);
+        resourceService.createDirectory(loginUser, alias, type, pid, currentDir);
+        return Result.success();
     }
 
     /**
@@ -137,13 +140,14 @@ public class ResourcesController extends BaseController {
     @PostMapping()
     @ApiException(CREATE_RESOURCE_ERROR)
     @OperatorLog(auditType = AuditType.FILE_CREATE)
-    public Result<Object> createResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "type") ResourceType type,
-                                         @RequestParam(value = "name") String alias,
-                                         @RequestParam("file") MultipartFile file,
-                                         @RequestParam(value = "currentDir") String currentDir) {
+    public Result<Void> createResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "type") ResourceType type,
+                                       @RequestParam(value = "name") String alias,
+                                       @RequestParam("file") MultipartFile file,
+                                       @RequestParam(value = "currentDir") String currentDir) {
         // todo verify the file name
-        return resourceService.uploadResource(loginUser, alias, type, file, currentDir);
+        resourceService.uploadResource(loginUser, alias, type, file, currentDir);
+        return Result.success();
     }
 
     /**
@@ -165,13 +169,14 @@ public class ResourcesController extends BaseController {
     @PutMapping()
     @ApiException(UPDATE_RESOURCE_ERROR)
     @OperatorLog(auditType = AuditType.FILE_UPDATE)
-    public Result<Object> updateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "fullName") String fullName,
-                                         @RequestParam(value = "tenantCode", required = false) String tenantCode,
-                                         @RequestParam(value = "type") ResourceType type,
-                                         @RequestParam(value = "name") String alias,
-                                         @RequestParam(value = "file", required = false) MultipartFile file) {
-        return resourceService.updateResource(loginUser, fullName, tenantCode, alias, type, file);
+    public Result<Void> updateResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "fullName") String fullName,
+                                       @RequestParam(value = "tenantCode", required = false) String tenantCode,
+                                       @RequestParam(value = "type") ResourceType type,
+                                       @RequestParam(value = "name") String alias,
+                                       @RequestParam(value = "file", required = false) MultipartFile file) {
+        resourceService.updateResource(loginUser, fullName, tenantCode, alias, type, file);
+        return Result.success();
     }
 
     /**
@@ -188,11 +193,10 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)
-    public Result<Object> queryResourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestParam(value = "type") ResourceType type,
-                                            @RequestParam(value = "fullName") String fullName) {
-        Map<String, Object> result = resourceService.queryResourceList(loginUser, type, fullName);
-        return returnDataList(result);
+    public Result<List<ResourceComponent>> queryResourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @RequestParam(value = "type") ResourceType type,
+                                                             @RequestParam(value = "fullName") String fullName) {
+        return Result.success(resourceService.queryResourceList(loginUser, type, fullName));
     }
 
     /**
@@ -225,8 +229,9 @@ public class ResourcesController extends BaseController {
         checkPageParams(pageNo, pageSize);
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
-                pageSize);
+        return Result.success(
+                resourceService.queryResourceListPaging(loginUser, fullName, tenantCode, type, searchVal, pageNo,
+                        pageSize));
     }
 
     /**
@@ -242,10 +247,11 @@ public class ResourcesController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_RESOURCE_ERROR)
     @OperatorLog(auditType = AuditType.FILE_DELETE)
-    public Result<Object> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "fullName") String fullName,
-                                         @RequestParam(value = "tenantCode", required = false) String tenantCode) throws Exception {
-        return resourceService.delete(loginUser, fullName, tenantCode);
+    public Result<Void> deleteResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "fullName") String fullName,
+                                       @RequestParam(value = "tenantCode", required = false) String tenantCode) throws Exception {
+        resourceService.delete(loginUser, fullName, tenantCode);
+        return Result.success();
     }
 
     /**
@@ -280,10 +286,11 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_RESOURCE_BY_NAME_AND_TYPE_ERROR)
-    public Result<Object> verifyResourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @RequestParam(value = "fullName") String fullName,
-                                             @RequestParam(value = "type") ResourceType type) {
-        return resourceService.verifyResourceName(fullName, type, loginUser);
+    public Result<Void> verifyResourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @RequestParam(value = "fullName") String fullName,
+                                           @RequestParam(value = "type") ResourceType type) {
+        resourceService.verifyResourceName(fullName, type, loginUser);
+        return Result.success();
     }
 
     /**
@@ -299,10 +306,10 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)
-    public Result<Object> queryResourceJarList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @RequestParam(value = "type") ResourceType type,
-                                               @RequestParam(value = "programType", required = false) ProgramType programType) {
-        return resourceService.queryResourceByProgramType(loginUser, type, programType);
+    public Result<List<ResourceComponent>> queryResourceJarList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                @RequestParam(value = "type") ResourceType type,
+                                                                @RequestParam(value = "programType", required = false) ProgramType programType) {
+        return Result.success(resourceService.queryResourceByProgramType(loginUser, type, programType));
     }
 
     /**
@@ -322,12 +329,12 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/query-file-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
-    public Result<Object> queryResourceByFileName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @RequestParam(value = "fileName", required = false) String fileName,
-                                                  @RequestParam(value = "tenantCode", required = false) String tenantCode,
-                                                  @RequestParam(value = "type") ResourceType type) {
+    public Result<StorageEntity> queryResourceByFileName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @RequestParam(value = "fileName", required = false) String fileName,
+                                                         @RequestParam(value = "tenantCode", required = false) String tenantCode,
+                                                         @RequestParam(value = "type") ResourceType type) {
 
-        return resourceService.queryResourceByFileName(loginUser, fileName, type, tenantCode);
+        return Result.success(resourceService.queryResourceByFileName(loginUser, fileName, type, tenantCode));
     }
 
     /**
@@ -346,12 +353,12 @@ public class ResourcesController extends BaseController {
             @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))})
     @GetMapping(value = "/view")
     @ApiException(VIEW_RESOURCE_FILE_ON_LINE_ERROR)
-    public Result viewResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                               @RequestParam(value = "skipLineNum") int skipLineNum,
-                               @RequestParam(value = "limit") int limit,
-                               @RequestParam(value = "fullName") String fullName,
-                               @RequestParam(value = "tenantCode") String tenantCode) {
-        return resourceService.readResource(loginUser, fullName, tenantCode, skipLineNum, limit);
+    public Result<Map<String, Object>> viewResource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                    @RequestParam(value = "skipLineNum") int skipLineNum,
+                                                    @RequestParam(value = "limit") int limit,
+                                                    @RequestParam(value = "fullName") String fullName,
+                                                    @RequestParam(value = "tenantCode") String tenantCode) {
+        return Result.success(resourceService.readResource(loginUser, fullName, tenantCode, skipLineNum, limit));
     }
 
     @Operation(summary = "onlineCreateResource", description = "ONLINE_CREATE_RESOURCE_NOTES")
@@ -365,17 +372,18 @@ public class ResourcesController extends BaseController {
     @PostMapping(value = "/online-create")
     @ApiException(CREATE_RESOURCE_FILE_ON_LINE_ERROR)
     @OperatorLog(auditType = AuditType.FILE_CREATE)
-    public Result createResourceFile(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                     @RequestParam(value = "type") ResourceType type,
-                                     @RequestParam(value = "fileName") String fileName,
-                                     @RequestParam(value = "suffix") String fileSuffix,
-                                     @RequestParam(value = "content") String content,
-                                     @RequestParam(value = "currentDir") String currentDir) {
+    public Result<Void> createResourceFile(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @RequestParam(value = "type") ResourceType type,
+                                           @RequestParam(value = "fileName") String fileName,
+                                           @RequestParam(value = "suffix") String fileSuffix,
+                                           @RequestParam(value = "content") String content,
+                                           @RequestParam(value = "currentDir") String currentDir) {
         if (StringUtils.isEmpty(content)) {
             log.error("resource file contents are not allowed to be empty");
-            return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
+            return Result.error(RESOURCE_FILE_IS_EMPTY);
         }
-        return resourceService.createResourceFile(loginUser, type, fileName, fileSuffix, content, currentDir);
+        resourceService.createResourceFile(loginUser, type, fileName, fileSuffix, content, currentDir);
+        return Result.success();
     }
 
     /**
@@ -398,10 +406,10 @@ public class ResourcesController extends BaseController {
                                         @RequestParam(value = "tenantCode") String tenantCode,
                                         @RequestParam(value = "content") String content) {
         if (StringUtils.isEmpty(content)) {
-            log.error("The resource file contents are not allowed to be empty");
-            return error(RESOURCE_FILE_IS_EMPTY.getCode(), RESOURCE_FILE_IS_EMPTY.getMsg());
+            return Result.error(RESOURCE_FILE_IS_EMPTY);
         }
-        return resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);
+        resourceService.updateResourceContent(loginUser, fullName, tenantCode, content);
+        return Result.success();
     }
 
     /**
@@ -612,8 +620,8 @@ public class ResourcesController extends BaseController {
     @GetMapping(value = "/base-dir")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(RESOURCE_NOT_EXIST)
-    public Result<Object> queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<String> queryResourceBaseDir(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                @RequestParam(value = "type") ResourceType type) {
-        return resourceService.queryResourceBaseDir(loginUser, type);
+        return Result.success(resourceService.queryResourceBaseDir(loginUser, type));
     }
 }

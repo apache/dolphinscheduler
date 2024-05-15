@@ -18,14 +18,15 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.resources.DeleteDataTransferResponse;
+import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -43,13 +44,12 @@ public interface ResourcesService {
      * @param type type
      * @param pid parent id
      * @param currentDir current directory
-     * @return create directory result
      */
-    Result<Object> createDirectory(User loginUser,
-                                   String name,
-                                   ResourceType type,
-                                   int pid,
-                                   String currentDir);
+    void createDirectory(User loginUser,
+                         String name,
+                         ResourceType type,
+                         int pid,
+                         String currentDir);
 
     /**
      * create resource
@@ -59,13 +59,12 @@ public interface ResourcesService {
      * @param type type
      * @param file file
      * @param currentDir current directory
-     * @return create result code
      */
-    Result<Object> uploadResource(User loginUser,
-                                  String name,
-                                  ResourceType type,
-                                  MultipartFile file,
-                                  String currentDir);
+    void uploadResource(User loginUser,
+                        String name,
+                        ResourceType type,
+                        MultipartFile file,
+                        String currentDir);
 
     /**
      * update resource
@@ -75,12 +74,12 @@ public interface ResourcesService {
      * @param file          resource file
      * @return  update result code
      */
-    Result<Object> updateResource(User loginUser,
-                                  String fullName,
-                                  String tenantCode,
-                                  String name,
-                                  ResourceType type,
-                                  MultipartFile file);
+    void updateResource(User loginUser,
+                        String fullName,
+                        String tenantCode,
+                        String name,
+                        ResourceType type,
+                        MultipartFile file);
 
     /**
      * query resources list paging
@@ -92,9 +91,9 @@ public interface ResourcesService {
      * @param pageSize page size
      * @return resource list page
      */
-    Result<PageInfo<StorageEntity>> queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
-                                                            ResourceType type, String searchVal, Integer pageNo,
-                                                            Integer pageSize);
+    PageInfo<StorageEntity> queryResourceListPaging(User loginUser, String fullName, String resTenantCode,
+                                                    ResourceType type, String searchVal, Integer pageNo,
+                                                    Integer pageSize);
 
     /**
      * query resource list
@@ -103,7 +102,7 @@ public interface ResourcesService {
      * @param type resource type
      * @return resource list
      */
-    Map<String, Object> queryResourceList(User loginUser, ResourceType type, String fullName);
+    List<ResourceComponent> queryResourceList(User loginUser, ResourceType type, String fullName);
 
     /**
      * query resource list by program type
@@ -112,33 +111,30 @@ public interface ResourcesService {
      * @param type resource type
      * @return resource list
      */
-    Result<Object> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType);
+    List<ResourceComponent> queryResourceByProgramType(User loginUser, ResourceType type, ProgramType programType);
 
     /**
      * delete resource
      *
      * @param loginUser login user
-     * @return delete result code
      * @throws IOException exception
      */
-    Result<Object> delete(User loginUser, String fullName, String tenantCode) throws IOException;
+    void delete(User loginUser, String fullName, String tenantCode) throws IOException;
 
     /**
      * verify resource by name and type
      * @param loginUser login user
      * @param fullName  resource full name
      * @param type      resource type
-     * @return true if the resource name not exists, otherwise return false
      */
-    Result<Object> verifyResourceName(String fullName, ResourceType type, User loginUser);
+    void verifyResourceName(String fullName, ResourceType type, User loginUser);
 
     /**
      * verify resource by file name
      * @param fileName  resource file name
      * @param type      resource type
-     * @return true if the resource file name, otherwise return false
      */
-    Result<Object> queryResourceByFileName(User loginUser, String fileName, ResourceType type, String resTenantCode);
+    StorageEntity queryResourceByFileName(User loginUser, String fileName, ResourceType type, String resTenantCode);
 
     /**
      * view resource file online
@@ -148,7 +144,7 @@ public interface ResourcesService {
      * @param fullName fullName
      * @return resource content
      */
-    Result<Object> readResource(User loginUser, String fullName, String tenantCode, int skipLineNum, int limit);
+    Map<String, Object> readResource(User loginUser, String fullName, String tenantCode, int skipLineNum, int limit);
 
     /**
      * create resource file online
@@ -160,8 +156,8 @@ public interface ResourcesService {
      * @param content content
      * @return create result code
      */
-    Result<Object> createResourceFile(User loginUser, ResourceType type, String fileName, String fileSuffix,
-                                      String content, String currentDirectory);
+    void createResourceFile(User loginUser, ResourceType type, String fileName, String fileSuffix,
+                            String content, String currentDirectory);
 
     /**
      * create or update resource.
@@ -180,10 +176,9 @@ public interface ResourcesService {
      * @param fullName full name
      * @param tenantCode tenantCode
      * @param content content
-     * @return update result cod
      */
-    Result<Object> updateResourceContent(User loginUser, String fullName, String tenantCode,
-                                         String content);
+    void updateResourceContent(User loginUser, String fullName, String tenantCode,
+                               String content);
 
     /**
      * download file
@@ -217,6 +212,6 @@ public interface ResourcesService {
      * @param type      resource type
      * @return
      */
-    Result<Object> queryResourceBaseDir(User loginUser, ResourceType type);
+    String queryResourceBaseDir(User loginUser, ResourceType type);
 
 }
