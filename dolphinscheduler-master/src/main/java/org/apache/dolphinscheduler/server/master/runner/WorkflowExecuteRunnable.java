@@ -62,6 +62,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
@@ -115,6 +116,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -441,7 +443,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     /**
      * crate new task instance to retry, different objects from the original
-     *
      */
     private void retryTaskInstance(TaskInstance taskInstance) throws StateEventHandleException {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
@@ -530,16 +531,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         if (!taskInstanceMap.containsKey(stateEvent.getTaskInstanceId())) {
             throw new StateEventHandleError("Cannot find the taskInstance from taskInstanceMap");
         }
-    }
-
-    /**
-     * check if task instance exist by id
-     */
-    public boolean checkTaskInstanceById(int taskInstanceId) {
-        if (taskInstanceMap.isEmpty()) {
-            return false;
-        }
-        return taskInstanceMap.containsKey(taskInstanceId);
     }
 
     /**
@@ -1070,7 +1061,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
      * new a taskInstance
      *
      * @param processInstance process instance
-     * @param taskNode task node
+     * @param taskNode        task node
      * @return task instance
      */
     public TaskInstance newTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
@@ -1161,40 +1152,38 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         return taskInstance;
     }
 
-    public void getPreVarPool(TaskInstance taskInstance, Set<Long> preTask) {
+    void initializeTaskInstanceVarPool(TaskInstance taskInstance) {
+        // get pre task ,get all the task varPool to this task
+        // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
+        String preTasks =
+                workflowExecuteContext.getWorkflowGraph().getTaskNodeByCode(taskInstance.getTaskCode()).getPreTasks();
+        Set<Long> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, Long.class));
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
+
+        if (CollectionUtils.isEmpty(preTaskList)) {
+            taskInstance.setVarPool(workflowInstance.getVarPool());
+            return;
+        }
+
         Map<String, Property> allProperty = new HashMap<>();
         Map<String, TaskInstance> allTaskInstance = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(preTask)) {
-            for (Long preTaskCode : preTask) {
-                Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(preTaskCode);
-                if (!existTaskInstanceOptional.isPresent()) {
-                    continue;
-                }
-
-                Integer taskId = existTaskInstanceOptional.get().getId();
-                if (taskId == null) {
-                    continue;
-                }
-                TaskInstance preTaskInstance = taskInstanceMap.get(taskId);
-                if (preTaskInstance == null) {
-                    continue;
-                }
-                String preVarPool = preTaskInstance.getVarPool();
-                if (StringUtils.isNotEmpty(preVarPool)) {
-                    List<Property> properties = JSONUtils.toList(preVarPool, Property.class);
-                    for (Property info : properties) {
-                        setVarPoolValue(allProperty, allTaskInstance, preTaskInstance, info);
-                    }
+        for (Long preTaskCode : preTaskList) {
+            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(preTaskCode);
+            if (!existTaskInstanceOptional.isPresent()) {
+                continue;
+            }
+            TaskInstance preTaskInstance = existTaskInstanceOptional.get();
+            String preVarPool = preTaskInstance.getVarPool();
+            if (StringUtils.isNotEmpty(preVarPool)) {
+                // Only the out varPool will be used
+                List<Property> properties = JSONUtils.toList(preVarPool, Property.class);
+                for (Property info : properties) {
+                    setVarPoolValue(allProperty, allTaskInstance, preTaskInstance, info);
                 }
             }
-            if (allProperty.size() > 0) {
-                taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
-            }
-        } else {
-            if (StringUtils.isNotEmpty(workflowInstance.getVarPool())) {
-                taskInstance.setVarPool(workflowInstance.getVarPool());
-            }
+        }
+        if (MapUtils.isNotEmpty(allProperty)) {
+            taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
         }
     }
 
@@ -1204,30 +1193,31 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     private void setVarPoolValue(Map<String, Property> allProperty,
                                  Map<String, TaskInstance> allTaskInstance,
-                                 TaskInstance preTaskInstance, Property thisProperty) {
-        // for this taskInstance all the param in this part is IN.
-        thisProperty.setDirect(Direct.IN);
-        // get the pre taskInstance Property's name
+                                 TaskInstance preTaskInstance,
+                                 Property thisProperty) {
+        // All direct of property in varpool should be OUT
+        // since only OUT property should be used in the varpool
         String proName = thisProperty.getProp();
-        // if the Previous nodes have the Property of same name
-        if (allProperty.containsKey(proName)) {
-            // comparison the value of two Property
-            Property otherPro = allProperty.get(proName);
-            // if this property'value of loop is empty,use the other,whether the other's value is empty or not
-            if (StringUtils.isEmpty(thisProperty.getValue())) {
-                allProperty.put(proName, otherPro);
-                // if property'value of loop is not empty,and the other's value is not empty too, use the earlier value
-            } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
-                TaskInstance otherTask = allTaskInstance.get(proName);
-                if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
-                    allProperty.put(proName, thisProperty);
-                    allTaskInstance.put(proName, preTaskInstance);
-                } else {
-                    allProperty.put(proName, otherPro);
-                }
-            } else {
+        if (!allProperty.containsKey(proName)) {
+            allProperty.put(proName, thisProperty);
+            allTaskInstance.put(proName, preTaskInstance);
+            return;
+        }
+
+        // Will merge the value of the same property
+        // comparison the value of two Property
+        Property otherPro = allProperty.get(proName);
+        // if this property'value of loop is empty,use the other,whether the other's value is empty or not
+        if (StringUtils.isEmpty(thisProperty.getValue())) {
+            allProperty.put(proName, otherPro);
+            // if property'value of loop is not empty,and the other's value is not empty too, use the earlier value
+        } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
+            TaskInstance otherTask = allTaskInstance.get(proName);
+            if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
                 allProperty.put(proName, thisProperty);
                 allTaskInstance.put(proName, preTaskInstance);
+            } else {
+                allProperty.put(proName, otherPro);
             }
         } else {
             allProperty.put(proName, thisProperty);
@@ -1311,44 +1301,16 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         }
         // the end node of the branch of the dag
         if (parentNodeCode != null && dag.getEndNode().contains(parentNodeCode)) {
+            // Set the varPool to workflow instance
+            // The workflow instance varpool should be workflow out param + task out param
             Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(parentNodeCode);
             if (existTaskInstanceOptional.isPresent()) {
                 TaskInstance endTaskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
-                String taskInstanceVarPool = endTaskInstance.getVarPool();
-                if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
-                    Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
-                    String processInstanceVarPool = workflowInstance.getVarPool();
-                    List<Property> processGlobalParams =
-                            new ArrayList<>(JSONUtils.toList(workflowInstance.getGlobalParams(), Property.class));
-                    Map<String, Direct> oldProcessGlobalParamsMap = processGlobalParams.stream()
-                            .collect(Collectors.toMap(Property::getProp, Property::getDirect));
-                    Set<Property> processVarPoolOut = taskProperties.stream()
-                            .filter(property -> property.getDirect().equals(Direct.OUT)
-                                    && oldProcessGlobalParamsMap.containsKey(property.getProp())
-                                    && oldProcessGlobalParamsMap.get(property.getProp()).equals(Direct.OUT))
-                            .collect(Collectors.toSet());
-                    Set<Property> taskVarPoolIn =
-                            taskProperties.stream().filter(property -> property.getDirect().equals(Direct.IN))
-                                    .collect(Collectors.toSet());
-                    if (StringUtils.isNotEmpty(processInstanceVarPool)) {
-                        Set<Property> properties =
-                                new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
-                        Set<String> newProcessVarPoolKeys =
-                                taskProperties.stream().map(Property::getProp).collect(Collectors.toSet());
-                        properties = properties.stream()
-                                .filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
-                                .collect(Collectors.toSet());
-                        properties.addAll(processVarPoolOut);
-                        properties.addAll(taskVarPoolIn);
-
-                        workflowInstance.setVarPool(JSONUtils.toJsonString(properties));
-                    } else {
-                        Set<Property> varPool = new HashSet<>();
-                        varPool.addAll(taskVarPoolIn);
-                        varPool.addAll(processVarPoolOut);
-                        workflowInstance.setVarPool(JSONUtils.toJsonString(varPool));
-                    }
-                }
+                List<Property> taskInstanceVarPool = JSONUtils.toList(endTaskInstance.getVarPool(), Property.class);
+                List<Property> workflowInstanceVarPool =
+                        JSONUtils.toList(workflowInstance.getVarPool(), Property.class);
+                List<Property> finalVarPool = VarPoolUtils.mergeVarPool(workflowInstanceVarPool, taskInstanceVarPool);
+                workflowInstance.setVarPool(JSONUtils.toJsonString(finalVarPool));
             }
         }
 
@@ -1907,14 +1869,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     continue;
                 }
             }
-            // init varPool only this task is the first time running
             if (task.isFirstRun()) {
-                // get pre task ,get all the task varPool to this task
-                // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
-                String preTasks = workflowExecuteContext.getWorkflowGraph()
-                        .getTaskNodeByCode(task.getTaskCode()).getPreTasks();
-                Set<Long> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, Long.class));
-                getPreVarPool(task, preTaskList);
+                initializeTaskInstanceVarPool(task);
             }
             DependResult dependResult = getDependResultForTask(task);
             if (DependResult.SUCCESS == dependResult) {
@@ -2165,14 +2121,13 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             workflowInstance.setVarPool(taskVarPoolJson);
             return;
         }
-        List<Property> processVarPool = new ArrayList<>(JSONUtils.toList(processVarPoolJson, Property.class));
-        List<Property> taskVarPool = JSONUtils.toList(taskVarPoolJson, Property.class);
-        Set<String> newProcessVarPoolKeys = taskVarPool.stream().map(Property::getProp).collect(Collectors.toSet());
-        processVarPool = processVarPool.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
-                .collect(Collectors.toList());
 
-        processVarPool.addAll(taskVarPool);
+        List<Property> processVarPool = JSONUtils.parseObject(processVarPoolJson, new TypeReference<List<Property>>() {
+        });
+        List<Property> taskVarPool = JSONUtils.parseObject(taskVarPoolJson, new TypeReference<List<Property>>() {
+        });
+        List<Property> finalVarPool = VarPoolUtils.mergeVarPool(processVarPool, taskVarPool);
+        workflowInstance.setVarPool(JSONUtils.toJsonString(finalVarPool));
 
-        workflowInstance.setVarPool(JSONUtils.toJsonString(processVarPool));
     }
 }
