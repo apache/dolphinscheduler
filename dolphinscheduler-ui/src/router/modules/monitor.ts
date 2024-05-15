@@ -52,6 +52,17 @@ export default {
       }
     },
     {
+      path: '/monitor/alert_server',
+      name: 'servers-alert-server',
+      component: components['monitor-servers-alert_server'],
+      meta: {
+        title: '服务管理-Alert Server',
+        activeMenu: 'monitor',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/monitor/db',
       name: 'servers-db',
       component: components['monitor-servers-db'],

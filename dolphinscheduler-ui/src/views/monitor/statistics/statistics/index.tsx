@@ -15,58 +15,44 @@
  * limitations under the License.
  */
 
-import { defineComponent, ref } from 'vue'
-import { NGrid, NGi, NNumberAnimation } from 'naive-ui'
-import { useStatistics } from './use-statistics'
-import { useI18n } from 'vue-i18n'
-import Card from '@/components/card'
-import styles from './index.module.scss'
+import { defineComponent } from 'vue'
+import { NGrid, NGi, NTabs, NTabPane, NCard } from 'naive-ui'
+import ListCommandTable from './list-command-table'
+import ListErrorCommandTable from './list-error-command-table'
 
 const statistics = defineComponent({
   name: 'statistics',
-  setup() {
-    const { t } = useI18n()
-    const { getStatistics } = useStatistics()
-    const statisticsRef = ref(getStatistics())
+  setup() {},
 
-    return { t, statisticsRef }
-  },
   render() {
-    const { t, statisticsRef } = this
-
     return (
-      <NGrid x-gap='12' y-gap='8' cols='2' responsive='screen'>
+      <NGrid x-gap='12' y-gap='8' cols='1' responsive='screen'>
         <NGi>
-          <Card
-            title={t(
-              'monitor.statistics.command_number_of_waiting_for_running'
-            )}
-          >
-            <div class={styles.connections}>
-              {statisticsRef.command.length > 0 && (
-                <NNumberAnimation
-                  from={0}
-                  to={statisticsRef.command
-                    .map((item) => item.normalCount)
-                    .reduce((prev, next) => prev + next)}
-                />
-              )}
-            </div>
-          </Card>
-        </NGi>
-        <NGi>
-          <Card title={t('monitor.statistics.failure_command_number')}>
-            <div class={styles.connections}>
-              {statisticsRef.command.length > 0 && (
-                <NNumberAnimation
-                  from={0}
-                  to={statisticsRef.command
-                    .map((item) => item.errorCount)
-                    .reduce((prev, next) => prev + next)}
-                />
-              )}
-            </div>
-          </Card>
+          <NCard>
+            <NTabs
+              type='card'
+              animated
+              pane-style={{
+                padding: '0px',
+                border: 'none'
+              }}
+            >
+              <NTabPane
+                name='command'
+                tab='Command Statistics List'
+                display-directiv='show'
+              >
+                <ListCommandTable></ListCommandTable>
+              </NTabPane>
+              <NTabPane
+                name='command-error'
+                tab='Failure Command Statistics List'
+                display-directiv='show'
+              >
+                <ListErrorCommandTable></ListErrorCommandTable>
+              </NTabPane>
+            </NTabs>
+          </NCard>
         </NGi>
       </NGrid>
     )

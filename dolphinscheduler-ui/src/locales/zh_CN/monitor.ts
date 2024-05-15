@@ -35,6 +35,7 @@ export default {
     memory_usage: '内存使用量',
     disk_available: '磁盘可用容量',
     load_average: '平均负载量',
+    thread_pool_usage: '线程池使用量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
@@ -43,6 +44,11 @@ export default {
     worker_no_data_result_title: 'Worker节点不存在',
     worker_no_data_result_desc:
       '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'
+  },
+  alert_server: {
+    alert_server_no_data_result_title: 'Alert Server节点不存在',
+    alert_server_no_data_result_desc:
+      '目前没有任何Alert Server节点，请先创建Alert Server节点，再访问该页面'
   },
   db: {
     health_state: '健康状态',
