@@ -20,10 +20,10 @@ package org.apache.dolphinscheduler.service.queue;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -80,15 +80,23 @@ public class MasterPriorityQueue implements TaskPriorityQueue<Server> {
 
     private void refreshMasterList() {
         hostIndexMap.clear();
-        Iterator<Server> iterator = queue.iterator();
         int index = 0;
-        while (iterator.hasNext()) {
-            Server server = iterator.next();
+        for (Server server : getOrderedElements()) {
             String addr = NetUtils.getAddr(server.getHost(), server.getPort());
             hostIndexMap.put(addr, index);
             index += 1;
         }
+    }
 
+    /**
+     * get ordered collection of priority queue
+     *
+     * @return ordered collection
+     */
+    Server[] getOrderedElements() {
+        Server[] nQueue = queue.toArray(new Server[0]);
+        Arrays.sort(nQueue, new ServerComparator());
+        return nQueue;
     }
 
     public int getIndex(String addr) {
