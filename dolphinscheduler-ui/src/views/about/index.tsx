@@ -16,14 +16,11 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import {defineComponent, getCurrentInstance, onMounted, ref, toRefs} from 'vue'
+import { defineComponent, onMounted, ref} from 'vue'
 import Card from '@/components/card'
-import { NSelect, NSpace, NSwitch } from 'naive-ui'
-import { useUserStore } from '@/store/user/user'
+import { NSpace } from 'naive-ui'
 import { queryProductInfo } from '@/service/modules/ui-plugins'
-import {UserInfoRes} from "@/service/modules/users/types";
 
-const userStore = useUserStore()
 const about = defineComponent({
   name: 'about',
   setup() {

@@ -17,7 +17,6 @@
 
 import { axios } from '@/service/service'
 import { PluginTypeReq, IPluginId } from './types'
-import { UserIdReq } from "@/service/modules/projects/types";
 
 export function queryUiPluginsByType(params: PluginTypeReq): any {
   return axios({
