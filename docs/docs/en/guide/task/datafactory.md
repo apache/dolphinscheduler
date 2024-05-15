@@ -19,11 +19,11 @@ DolphinScheduler DataFactory functions:
 
 ### Application Permission Setting
 
-First, visit the `Subcription` page and choose `Access control (IAM)`, then click `Add role assignment` to the authorization page.
-![Subcription-IAM](../../../../img/tasks/demo/datafactory_auth1.png)
+First, visit the `Subscription` page and choose `Access control (IAM)`, then click `Add role assignment` to the authorization page.
+![Subscription-IAM](../../../../img/tasks/demo/datafactory_auth1.png)
 After that, select `Contributor` role which satisfy functions calls in data factory. Then click `Members` page, and click `Select members`.
 Search application name or application `Object ID` to assign `Contributor` role to application.
-![Subcription-Role](../../../../img/tasks/demo/datafactory_auth2.png)
+![Subscription-Role](../../../../img/tasks/demo/datafactory_auth2.png)
 
 ## Configurations
 
