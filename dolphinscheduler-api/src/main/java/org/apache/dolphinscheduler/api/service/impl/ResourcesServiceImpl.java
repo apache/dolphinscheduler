@@ -887,10 +887,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         String defaultPath = storageOperate.getResDir(user.getTenantCode());
         String fullName = defaultPath + filepath;
 
-        Result<Object> result = uploadContentToStorage(fullName, user.getTenantCode(), resourceContent);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
-            throw new ServiceException(result.getMsg());
-        }
+        uploadContentToStorage(fullName, user.getTenantCode(), resourceContent);
         return storageOperate.getFileStatus(fullName, defaultPath, user.getTenantCode(), ResourceType.FILE);
     }
 
