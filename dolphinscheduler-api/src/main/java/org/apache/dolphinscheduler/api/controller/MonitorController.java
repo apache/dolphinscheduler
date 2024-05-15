@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -26,15 +25,16 @@ import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.WorkerServerModel;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -56,33 +56,17 @@ public class MonitorController extends BaseController {
     private MonitorService monitorService;
 
     /**
-     * master list
+     * server list
      *
-     * @param loginUser login user
-     * @return master list
+     * @return server list
      */
-    @Operation(summary = "listMaster", description = "MASTER_LIST_NOTES")
-    @GetMapping(value = "/masters")
+    @Operation(summary = "listServer", description = "SERVER_LIST_NOTES")
+    @GetMapping(value = "/{nodeType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
-    public Result<List<Server>> listMaster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<Server> servers = monitorService.queryMaster(loginUser);
+    public Result<List<Server>> listServer(@PathVariable("nodeType") RegistryNodeType nodeType) {
+        List<Server> servers = monitorService.listServer(nodeType);
         return Result.success(servers);
-    }
-
-    /**
-     * worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
-    @Operation(summary = "listWorker", description = "WORKER_LIST_NOTES")
-    @GetMapping(value = "/workers")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_WORKERS_ERROR)
-    public Result<List<WorkerServerModel>> listWorker(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<WorkerServerModel> workerServerModels = monitorService.queryWorker(loginUser);
-        return Result.success(workerServerModels);
     }
 
     /**

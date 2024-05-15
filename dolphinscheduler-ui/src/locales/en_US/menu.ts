@@ -40,6 +40,7 @@ export default {
   service_manage: 'Service Manage',
   master: 'Master',
   worker: 'Worker',
+  alert_server: 'Alert Server',
   db: 'DB',
   statistical_manage: 'Statistical Manage',
   statistics: 'Statistics',
