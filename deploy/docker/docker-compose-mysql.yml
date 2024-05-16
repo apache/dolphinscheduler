@@ -1,0 +1,17 @@
+version: "3.3"
+
+services:
+  mysql-db:
+    # 指定容器的名称
+    container_name: mysql
+    # 指定镜像和版本
+    image: mysql:5.7.22
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      # 配置root密码
+      MYSQL_ROOT_PASSWORD: xj2022
+    volumes:
+      # 挂载数据目录 启动后运行 stellarops-server-dao/src/main/resources/sql/dolphinscheduler_mysql.sql 文件初始化数据库
+      - "/Users/liuyangyang/Documents/workProgram/java/dolphinscheduler/deploy/docker/mysql/data:/var/lib/mysql"

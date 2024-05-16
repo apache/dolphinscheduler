@@ -1,0 +1,88 @@
+{
+  // 使用 IntelliSense 了解相关属性。 
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "AlertServer",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.alert.AlertServer",
+      "projectName": "dolphinscheduler-alert-server"
+    },
+    {
+      "type": "java",
+      "name": "local-Api",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.api.ApiApplicationServer",
+      "vmArgs": "-Dspring.profiles.active=local -Denv=FAT -server -Djava._appid_=int-service-arch-stellarops-portal-api -Djava._environment_=work -Dapollo.meta=http://apollo.tuhu.work:8090 -Dspring.application.name=int-service-arch-stellarops-portal-api",
+      "projectName": "dolphinscheduler-api",
+    },
+    {
+      "type": "java",
+      "name": "Mysql-Api",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.api.ApiApplicationServer",
+      "vmArgs": "-Dspring.profiles.active=mysql -Denv=FAT -server -Djava._appid_=int-service-arch-stellarops-portal-api -Djava._environment_=work -Dapollo.meta=http://apollo.tuhu.work:8090 -Dspring.application.name=int-service-arch-stellarops-portal-api",
+      "projectName": "dolphinscheduler-api"
+    },
+    {
+      "type": "java",
+      "name": "local-Master",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.server.master.MasterServer",
+      "vmArgs": "-Dspring.profiles.active=local -Denv=FAT -server -Djava._appid_=int-service-arch-stellarops-portal-api -Djava._environment_=work -Dapollo.meta=http://apollo.tuhu.work:8090 -Dspring.application.name=int-service-arch-stellarops-portal-api",
+      "projectName": "dolphinscheduler-master"
+    },
+    {
+      "type": "java",
+      "name": "MasterServer",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.server.master.MasterServer",
+      "envFile": "${workspaceFolder}/deploy/docker/.env",
+      "projectName": "dolphinscheduler-master"
+    },
+    {
+      "type": "java",
+      "name": "Mysql-Master",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.server.master.MasterServer",
+      "vmArgs": "-Dspring.profiles.active=mysql -Denv=FAT -server -Djava._appid_=int-service-arch-stellarops-portal-api -Djava._environment_=work -Dapollo.meta=http://apollo.tuhu.work:8090 -Dspring.application.name=int-service-arch-stellarops-portal-api",
+      "projectName": "dolphinscheduler-master"
+    },
+    {
+      "type": "java",
+      "name": "local-Worker",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.server.worker.WorkerServer",
+      "vmArgs": "-Dspring.profiles.active=local -Denv=FAT -server -Djava._appid_=int-service-arch-stellarops-portal-api -Djava._environment_=work -Dapollo.meta=http://apollo.tuhu.work:8090 -Dspring.application.name=int-service-arch-stellarops-portal-api",
+      "projectName": "dolphinscheduler-worker"
+    },
+    {
+      "type": "java",
+      "name": "WorkerServer",
+      "request": "launch",
+      "mainClass": "org.apache.dolphinscheduler.server.worker.WorkerServer",
+      "envFile": "${workspaceFolder}/deploy/docker/.env",
+      "projectName": "dolphinscheduler-worker"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Mysql-API-Master",
+      "configurations": [
+        "Mysql-Master",
+        "Mysql-Api"
+      ]
+    },
+    {
+      "name": "local-All",
+      "configurations": [
+        "local-Master",
+        "local-Api",
+        "local-Worker"
+      ]
+    }
+  ]
+}

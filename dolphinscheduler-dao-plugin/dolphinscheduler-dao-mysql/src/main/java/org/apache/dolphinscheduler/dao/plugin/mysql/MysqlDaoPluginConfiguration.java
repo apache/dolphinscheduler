@@ -28,12 +28,15 @@ import org.apache.dolphinscheduler.dao.plugin.mysql.monitor.MysqlMonitor;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 
-@Profile("mysql")
+// @Profile("local")
+// @ConditionalOnProperty(name = "datasource.plugin", havingValue = "mysql")
 @Configuration
 public class MysqlDaoPluginConfiguration implements DaoPluginConfiguration {
 

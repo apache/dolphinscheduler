@@ -14,6 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+apollo:
+  bootstrap:
+    enabled: true
+    namespaces: RD.tuhu-spring-cloud-cover,RD.tuhu-spring-cloud-public,application
+    eagerLoad:
+      enabled: true
+  autoUpdateInjectedSpringProperties: true
 
 dolphin.enable: false
 
@@ -31,7 +38,7 @@ registry:
   type: zookeeper
   zookeeper:
     namespace: dolphinscheduler
-    connect-string: localhost:2181
+    connect-string: 127.0.0.1:2181
     retry-policy:
       base-sleep-time: 60ms
       max-sleep: 300ms

@@ -14,9 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+dolphin.enable: false
+
 spring:
-  profiles:
-    active: postgresql
+  config:
+    activate:
+      on-profile: mysql
   banner:
     charset: UTF-8
   jackson:
@@ -34,10 +37,10 @@ spring:
     caffeine:
       spec: maximumSize=100,expireAfterWrite=300s,recordStats
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
     username: root
-    password: root
+    password: xj2022
     hikari:
       connection-test-query: select 1
       minimum-idle: 5
@@ -68,7 +71,7 @@ spring:
       org.quartz.jobStore.misfireThreshold: 60000
       org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
-      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
 
 # Mybatis-plus configuration, you don't need to change it
@@ -89,7 +92,7 @@ registry:
   type: zookeeper
   zookeeper:
     namespace: dolphinscheduler
-    connect-string: localhost:2181
+    connect-string: 127.0.0.1:2181
     retry-policy:
       base-sleep-time: 60ms
       max-sleep: 300ms
@@ -163,18 +166,3 @@ management:
 
 metrics:
   enabled: true
-# Override by profile
-
-# ---
-# spring:
-#   config:
-#     activate:
-#       on-profile: mysql
-#   datasource:
-#     driver-class-name: com.mysql.cj.jdbc.Driver
-#     url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-#     username: root
-#     password: root
-#   quartz:
-#     properties:
-#       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate

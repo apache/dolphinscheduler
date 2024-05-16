@@ -99,7 +99,7 @@ public class TaskExecutionContextFactory {
     @Autowired
     private MasterConfig masterConfig;
 
-    @Autowired
+    @Autowired(required = false)
     private HikariDataSource hikariDataSource;
 
     public TaskExecutionContext createTaskExecutionContext(TaskInstance taskInstance) throws TaskExecutionContextCreateException {
