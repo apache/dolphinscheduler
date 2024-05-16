@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -51,11 +52,6 @@ public class ParameterUtils {
     private static final Pattern DATE_START_PATTERN = Pattern.compile("^[0-9]");
 
     private static final char PARAM_REPLACE_CHAR = '?';
-
-    private static final String PARAM_REGEX =
-            String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", "paramName1", "paramName2");
-
-    private static final Pattern PARAM_REGEX_PATTERN = Pattern.compile(PARAM_REGEX);
 
     private ParameterUtils() {
         throw new UnsupportedOperationException("Construct ParameterUtils");
@@ -198,7 +194,7 @@ public class ParameterUtils {
             return sql;
         }
         StringBuilder ret = new StringBuilder(sql);
-        Matcher m = PARAM_REGEX_PATTERN.matcher(sql);
+        Matcher m = TaskConstants.SQL_PARAMS_PATTERN.matcher(sql);
         int index = 1;
         int paramsIndex = 1;
         // When matching with a regex, determine whether the corresponding property is a list.
