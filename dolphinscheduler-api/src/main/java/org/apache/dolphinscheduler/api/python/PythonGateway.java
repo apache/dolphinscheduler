@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
@@ -620,9 +619,9 @@ public class PythonGateway {
     public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE,
-                ProgramType.valueOf(programType));
-        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.getData();
+        List<ResourceComponent> resourcesComponent =
+                resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE,
+                        ProgramType.valueOf(programType));
         List<ResourceComponent> namedResources =
                 resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
         if (CollectionUtils.isEmpty(namedResources)) {

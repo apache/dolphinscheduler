@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
@@ -401,7 +400,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public PageInfo<StorageEntity> queryResourceListPaging(User loginUser, String fullName,
                                                            String resTenantCode, ResourceType type,
                                                            String searchVal, Integer pageNo, Integer pageSize) {
-        Result<PageInfo<StorageEntity>> result = new Result<>();
         PageInfo<StorageEntity> pageInfo = new PageInfo<>(pageNo, pageSize);
         if (storageOperate == null) {
             log.warn("The resource storage is not opened.");
