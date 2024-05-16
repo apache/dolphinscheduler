@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 
 /**
  * Sql/Hql parameter
@@ -245,7 +247,7 @@ public class SqlParameters extends AbstractParameters {
             return;
         }
         if (StringUtils.isEmpty(result)) {
-            varPool.addAll(outProperty);
+            varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
             return;
         }
         List<Map<String, String>> sqlResult = getListMapByString(result);
@@ -268,7 +270,6 @@ public class SqlParameters extends AbstractParameters {
             for (Property info : outProperty) {
                 if (info.getType() == DataType.LIST) {
                     info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
-                    varPool.add(info);
                 }
             }
         } else {
@@ -276,9 +277,9 @@ public class SqlParameters extends AbstractParameters {
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
                 info.setValue(String.valueOf(firstRow.get(info.getProp())));
-                varPool.add(info);
             }
         }
+        varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
 
     }
 
@@ -322,6 +323,7 @@ public class SqlParameters extends AbstractParameters {
 
     /**
      * TODO SQLTaskExecutionContext needs to be optimized
+     *
      * @param parametersHelper
      * @return
      */

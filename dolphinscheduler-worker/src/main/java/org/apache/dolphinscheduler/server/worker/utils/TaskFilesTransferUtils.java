@@ -70,16 +70,17 @@ public class TaskFilesTransferUtils {
      */
     public static void uploadOutputFiles(TaskExecutionContext taskExecutionContext,
                                          StorageOperate storageOperate) throws TaskException {
-        List<Property> varPools = getVarPools(taskExecutionContext);
-        // get map of varPools for quick search
-        Map<String, Property> varPoolsMap = varPools.stream().collect(Collectors.toMap(Property::getProp, x -> x));
-
         // get OUTPUT FILE parameters
         List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.OUT);
-
         if (localParamsProperty.isEmpty()) {
             return;
         }
+
+        List<Property> varPools = getVarPools(taskExecutionContext);
+        // get map of varPools for quick search
+        Map<String, Property> varPoolsMap = varPools.stream()
+                .filter(property -> Direct.OUT.equals(property.getDirect()))
+                .collect(Collectors.toMap(Property::getProp, x -> x));
 
         log.info("Upload output files ...");
         for (Property property : localParamsProperty) {
@@ -137,16 +138,19 @@ public class TaskFilesTransferUtils {
      * @throws TaskException task exception
      */
     public static void downloadUpstreamFiles(TaskExecutionContext taskExecutionContext, StorageOperate storageOperate) {
-        List<Property> varPools = getVarPools(taskExecutionContext);
-        // get map of varPools for quick search
-        Map<String, Property> varPoolsMap = varPools.stream().collect(Collectors.toMap(Property::getProp, x -> x));
-
         // get "IN FILE" parameters
         List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.IN);
 
         if (localParamsProperty.isEmpty()) {
             return;
         }
+
+        List<Property> varPools = getVarPools(taskExecutionContext);
+        // get map of varPools for quick search
+        Map<String, Property> varPoolsMap = varPools
+                .stream()
+                .filter(property -> Direct.IN.equals(property.getDirect()))
+                .collect(Collectors.toMap(Property::getProp, x -> x));
 
         String executePath = taskExecutionContext.getExecutePath();
         // data path to download packaged data
