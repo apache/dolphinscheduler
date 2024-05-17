@@ -152,7 +152,7 @@ public class NettyRemotingClient implements AutoCloseable {
             if (channel != null && channel.isActive()) {
                 return channel;
             }
-            channel = createChannel(host, true);
+            channel = createChannel(host);
             channels.put(host, channel);
         } finally {
             channelsLock.unlock();
@@ -163,23 +163,21 @@ public class NettyRemotingClient implements AutoCloseable {
     /**
      * create channel
      *
-     * @param host   host
-     * @param isSync sync flag
+     * @param host host
      * @return channel
      */
-    private Channel createChannel(Host host, boolean isSync) {
+    private Channel createChannel(Host host) {
         try {
             ChannelFuture future;
             synchronized (bootstrap) {
                 future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
             }
-            if (isSync) {
-                future.sync();
-            }
+            future.await(clientConfig.getConnectTimeoutMillis());
             if (future.isSuccess()) {
                 return future.channel();
+            } else {
+                throw new IllegalArgumentException("connect to host: " + host + " failed", future.cause());
             }
-            throw new IllegalArgumentException("connect to host: " + host + " failed");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Connect to host: " + host + " failed", e);
