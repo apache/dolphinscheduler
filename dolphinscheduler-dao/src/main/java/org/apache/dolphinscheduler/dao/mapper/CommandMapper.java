@@ -26,6 +26,8 @@ import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * command mapper interface
@@ -50,7 +52,7 @@ public interface CommandMapper extends BaseMapper<Command> {
      *
      * @return
      */
-    List<Command> queryCommandPage(@Param("limit") int limit, @Param("offset") int offset);
+    IPage<Command> queryCommandPage(Page<Command> page);
 
     List<Command> queryCommandByIdSlot(@Param("currentSlotIndex") int currentSlotIndex,
                                        @Param("totalSlot") int totalSlot,
@@ -58,4 +60,7 @@ public interface CommandMapper extends BaseMapper<Command> {
                                        @Param("fetchNumber") int fetchNum);
 
     void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
+
+    IPage<Command> queryCommandPageByIds(Page<Command> page,
+                                         @Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 }

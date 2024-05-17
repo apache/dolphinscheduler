@@ -45,9 +45,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.annotation.PostConstruct;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.google.common.base.Strings;
 
 @Slf4j
-public final class ZookeeperRegistry implements Registry {
+final class ZookeeperRegistry implements Registry {
 
     private final ZookeeperRegistryProperties.ZookeeperProperties properties;
     private final CuratorFramework client;
@@ -64,7 +63,7 @@ public final class ZookeeperRegistry implements Registry {
 
     private static final ThreadLocal<Map<String, InterProcessMutex>> threadLocalLockMap = new ThreadLocal<>();
 
-    public ZookeeperRegistry(ZookeeperRegistryProperties registryProperties) {
+    ZookeeperRegistry(ZookeeperRegistryProperties registryProperties) {
         properties = registryProperties.getZookeeper();
 
         final ExponentialBackoffRetry retryPolicy = new ExponentialBackoffRetry(
@@ -82,28 +81,24 @@ public final class ZookeeperRegistry implements Registry {
 
         final String digest = properties.getDigest();
         if (!Strings.isNullOrEmpty(digest)) {
-            buildDigest(builder, digest);
+            builder.authorization("digest", digest.getBytes(StandardCharsets.UTF_8))
+                    .aclProvider(new ACLProvider() {
+
+                        @Override
+                        public List<ACL> getDefaultAcl() {
+                            return ZooDefs.Ids.CREATOR_ALL_ACL;
+                        }
+
+                        @Override
+                        public List<ACL> getAclForPath(final String path) {
+                            return ZooDefs.Ids.CREATOR_ALL_ACL;
+                        }
+                    });
         }
         client = builder.build();
     }
 
-    private void buildDigest(CuratorFrameworkFactory.Builder builder, String digest) {
-        builder.authorization("digest", digest.getBytes(StandardCharsets.UTF_8))
-                .aclProvider(new ACLProvider() {
-
-                    @Override
-                    public List<ACL> getDefaultAcl() {
-                        return ZooDefs.Ids.CREATOR_ALL_ACL;
-                    }
-
-                    @Override
-                    public List<ACL> getAclForPath(final String path) {
-                        return ZooDefs.Ids.CREATOR_ALL_ACL;
-                    }
-                });
-    }
-
-    @PostConstruct
+    @Override
     public void start() {
         client.start();
         try {
@@ -127,19 +122,19 @@ public final class ZookeeperRegistry implements Registry {
         try {
             if (!client.blockUntilConnected((int) timeout.toMillis(), MILLISECONDS)) {
                 throw new RegistryException(
-                        String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()));
+                        String.format("Cannot connect to registry in %s s", timeout.getSeconds()));
             }
         } catch (RegistryException e) {
             throw e;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException(
-                    String.format("Cannot connect to the Zookeeper registry in %s s", timeout.getSeconds()), e);
+                    String.format("Cannot connect to registry in %s s", timeout.getSeconds()), e);
         }
     }
 
     @Override
-    public boolean subscribe(String path, SubscribeListener listener) {
+    public void subscribe(String path, SubscribeListener listener) {
         final TreeCache treeCache = treeCacheMap.computeIfAbsent(path, $ -> new TreeCache(client, path));
         treeCache.getListenable().addListener(($, event) -> listener.notify(new EventAdaptor(event, path)));
         try {
@@ -148,7 +143,6 @@ public final class ZookeeperRegistry implements Registry {
             treeCacheMap.remove(path);
             throw new RegistryException("Failed to subscribe listener for key: " + path, e);
         }
-        return true;
     }
 
     @Override
@@ -215,17 +209,60 @@ public final class ZookeeperRegistry implements Registry {
 
     @Override
     public boolean acquireLock(String key) {
-        InterProcessMutex interProcessMutex = new InterProcessMutex(client, key);
+        Map<String, InterProcessMutex> processMutexMap = threadLocalLockMap.get();
+        if (null == processMutexMap) {
+            processMutexMap = new HashMap<>();
+            threadLocalLockMap.set(processMutexMap);
+        }
+        InterProcessMutex interProcessMutex = null;
         try {
-            interProcessMutex.acquire();
-            if (null == threadLocalLockMap.get()) {
-                threadLocalLockMap.set(new HashMap<>(3));
+            interProcessMutex =
+                    Optional.ofNullable(processMutexMap.get(key)).orElse(new InterProcessMutex(client, key));
+            if (interProcessMutex.isAcquiredInThisProcess()) {
+                // Since etcd/jdbc cannot implement a reentrant lock, we need to check if the lock is already acquired
+                // If it is already acquired, return true directly
+                // This means you only need to release once when you acquire multiple times
+                return true;
             }
-            threadLocalLockMap.get().put(key, interProcessMutex);
+            interProcessMutex.acquire();
+            processMutexMap.put(key, interProcessMutex);
             return true;
         } catch (Exception e) {
             try {
-                interProcessMutex.release();
+                if (interProcessMutex != null) {
+                    interProcessMutex.release();
+                }
+                throw new RegistryException(String.format("zookeeper get lock: %s error", key), e);
+            } catch (Exception exception) {
+                throw new RegistryException(String.format("zookeeper get lock: %s error", key), e);
+            }
+        }
+    }
+
+    @Override
+    public boolean acquireLock(String key, long timeout) {
+        Map<String, InterProcessMutex> processMutexMap = threadLocalLockMap.get();
+        if (null == processMutexMap) {
+            processMutexMap = new HashMap<>();
+            threadLocalLockMap.set(processMutexMap);
+        }
+        InterProcessMutex interProcessMutex = null;
+        try {
+            interProcessMutex =
+                    Optional.ofNullable(processMutexMap.get(key)).orElse(new InterProcessMutex(client, key));
+            if (interProcessMutex.isAcquiredInThisProcess()) {
+                return true;
+            }
+            if (interProcessMutex.acquire(timeout, MILLISECONDS)) {
+                processMutexMap.put(key, interProcessMutex);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            try {
+                if (interProcessMutex != null) {
+                    interProcessMutex.release();
+                }
                 throw new RegistryException(String.format("zookeeper get lock: %s error", key), e);
             } catch (Exception exception) {
                 throw new RegistryException(String.format("zookeeper get lock: %s error", key), e);
@@ -235,13 +272,18 @@ public final class ZookeeperRegistry implements Registry {
 
     @Override
     public boolean releaseLock(String key) {
-        if (null == threadLocalLockMap.get().get(key)) {
+        Map<String, InterProcessMutex> processMutexMap = threadLocalLockMap.get();
+        if (processMutexMap == null) {
+            return true;
+        }
+        InterProcessMutex interProcessMutex = processMutexMap.get(key);
+        if (null == interProcessMutex) {
             return false;
         }
         try {
-            threadLocalLockMap.get().get(key).release();
-            threadLocalLockMap.get().remove(key);
-            if (threadLocalLockMap.get().isEmpty()) {
+            interProcessMutex.release();
+            processMutexMap.remove(key);
+            if (processMutexMap.isEmpty()) {
                 threadLocalLockMap.remove();
             }
         } catch (Exception e) {

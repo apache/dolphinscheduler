@@ -283,6 +283,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
         // upload out files and modify the "OUT FILE" property in VarPool
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 
