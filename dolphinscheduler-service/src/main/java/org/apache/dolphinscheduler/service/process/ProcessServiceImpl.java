@@ -492,10 +492,22 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public List<Long> findAllSubWorkflowDefinitionCode(long parentCode) {
+        return findAllSubWorkflowDefinitionCode(parentCode, new HashSet<>());
+    }
+
+    /**
+     * recursive query sub process definition id by parent id.
+     *
+     * @param parentCode parentCode
+     * @param visited visited
+     */
+    private List<Long> findAllSubWorkflowDefinitionCode(long parentCode, Set<Long> visited) {
         List<TaskDefinition> taskNodeList = taskDefinitionDao.getTaskDefinitionListByDefinition(parentCode);
         if (CollectionUtils.isEmpty(taskNodeList)) {
             return Collections.emptyList();
         }
+        visited.add(parentCode);
+
         List<Long> subWorkflowDefinitionCodes = new ArrayList<>();
 
         for (TaskDefinition taskNode : taskNodeList) {
@@ -504,10 +516,15 @@ public class ProcessServiceImpl implements ProcessService {
             if (parameterJson.get(CMD_PARAM_SUB_PROCESS_DEFINE_CODE) != null) {
                 SubProcessParameters subProcessParam = JSONUtils.parseObject(parameter, SubProcessParameters.class);
                 long subWorkflowDefinitionCode = subProcessParam.getProcessDefinitionCode();
+                if (visited.contains(subWorkflowDefinitionCode)) {
+                    throw new ServiceException("Detected a cycle in the workflow definitions with code: " + subWorkflowDefinitionCode);
+                }
                 subWorkflowDefinitionCodes.add(subWorkflowDefinitionCode);
-                subWorkflowDefinitionCodes.addAll(findAllSubWorkflowDefinitionCode(subWorkflowDefinitionCode));
+                subWorkflowDefinitionCodes.addAll(findAllSubWorkflowDefinitionCode(subWorkflowDefinitionCode, visited));
             }
         }
+
+        visited.remove(parentCode);
         return subWorkflowDefinitionCodes;
     }
 
