@@ -42,6 +42,13 @@ header:
     - '**/node_modules/**'
     - '**/banner.txt'
     - '.terraform.lock.hcl'
+    - 'org.mockito.plugins.MockMaker'
     - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/CodeGenerateUtils.java
 
   comment: on-failure
+
+dependency:
+  files:
+    - pom.xml
+    - dolphinscheduler-bom/pom.xml
+    - dolphinscheduler-ui/package.json
