@@ -21,16 +21,15 @@ header:
     copyright-owner: Apache Software Foundation
 
   paths-ignore:
-    - dist
     - NOTICE
     - LICENSE
     - DISCLAIMER
-    - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/ScriptRunner.java
-    - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/CodeGenerateUtils.java
-    - mvnw.cmd
-    - dolphinscheduler-dao/src/main/resources/sql/soft_version
     - .mvn
+    - mvnw.cmd
     - .gitattributes
+    - dolphinscheduler-dao/src/main/resources/sql/soft_version
+    - tools/dependencies/known-dependencies.txt
+    - deploy/kubernetes/dolphinscheduler/README.md.gotmpl
     - '**/licenses/**/LICENSE-*'
     - '**/*.md'
     - '**/*.svg'
@@ -40,16 +39,9 @@ header:
     - '**/.babelrc'
     - '**/.eslintignore'
     - '**/.gitignore'
-    - '**/LICENSE'
-    - '**/NOTICE'
     - '**/node_modules/**'
-    - '.github/actions/comment-on-issue/**'
-    - '.github/actions/translate-on-issue/**'
-    - '**/.gitkeep'
-    - 'org.mockito.plugins.MockMaker'
-    - tools/dependencies/known-dependencies.txt
     - '**/banner.txt'
     - '.terraform.lock.hcl'
-    - deploy/kubernetes/dolphinscheduler/README.md.gotmpl
+    - dolphinscheduler-common/src/main/java/org/apache/dolphinscheduler/common/utils/CodeGenerateUtils.java
 
   comment: on-failure
