@@ -20,18 +20,18 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.*;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +78,17 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
     }
 
     /**
+     * test query by code
+     */
+    @Test
+    public void testQueryByCode() {
+        // insertOne
+        ProcessDefinition expectedDefinition = insertOne("def 1");
+        ProcessDefinition actualDefinition = processDefinitionMapper.queryByCode(expectedDefinition.getCode());
+        Assertions.assertEquals(expectedDefinition.getCode(), actualDefinition.getCode());
+    }
+
+    /**
      * test update
      */
     @Test
@@ -109,6 +120,17 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         // query
         List<ProcessDefinition> dataSources = processDefinitionMapper.selectList(null);
         Assertions.assertNotEquals(0, dataSources.size());
+    }
+
+    /**
+     * test query by codes
+     */
+    @Test
+    public void testQueryByCodes() {
+        ProcessDefinition processDefinition = insertOne("def 1");
+        List<ProcessDefinition> processDefinitions = processDefinitionMapper
+                .queryByCodes(Collections.singletonList(processDefinition.getCode()));
+        Assertions.assertNotEquals(0, processDefinitions.size());
     }
 
     /**
@@ -250,6 +272,20 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
     }
 
     /**
+     * test filter process definition
+     */
+    @Test
+    public void testFilterProcessDefinition() {
+        ProcessDefinition processDefinition = insertOne("def 1");
+        processDefinition.setReleaseState(ReleaseState.ONLINE);
+
+        Page<ProcessDefinition> page = new Page<>(1, 3);
+        IPage<ProcessDefinition> processDefinitionIPage =
+                processDefinitionMapper.filterProcessDefinition(page, processDefinition);
+        Assertions.assertEquals(0, processDefinitionIPage.getTotal());
+    }
+
+    /**
      * test query all process definition
      */
     @Test
@@ -257,6 +293,19 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         insertOne("def 1");
         List<ProcessDefinition> processDefinitionIPage = processDefinitionMapper.queryAllDefinitionList(1010L);
         Assertions.assertNotEquals(0, processDefinitionIPage.size());
+    }
+
+    /**
+     * test query definition list by project code and process definition codes
+     */
+    @Test
+    public void testQueryDefinitionListByProjectCodeAndProcessDefinitionCodes() {
+        ProcessDefinition processDefinition = insertOne("def 1");
+        List<DependentSimplifyDefinition> dependentSimplifyDefinitions = processDefinitionMapper.queryDefinitionListByProjectCodeAndProcessDefinitionCodes(
+                processDefinition.getProjectCode(),
+                Collections.singletonList(processDefinition.getCode())
+        );
+        Assertions.assertNotEquals(0, dependentSimplifyDefinitions.size());
     }
 
     /**
@@ -302,6 +351,35 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         Assertions.assertNotEquals(0, processDefinitions.size());
     }
 
+    /**
+     * test count definition by project codes(V2)
+     */
+    @Test
+    public void testCountDefinitionByProjectCodesV2() {
+        User user = new User();
+        user.setUserName("user1");
+        user.setUserPassword("1");
+        user.setEmail("xx@123.com");
+        user.setUserType(UserType.GENERAL_USER);
+        user.setCreateTime(new Date());
+        user.setTenantId(1);
+        user.setUpdateTime(new Date());
+        userMapper.insert(user);
+
+        ProcessDefinition processDefinition = insertOne("def 1");
+        processDefinition.setUserId(user.getId());
+        processDefinitionMapper.updateById(processDefinition);
+
+        List<Long> projectCodes = Collections.singletonList(processDefinition.getProjectCode());
+        List<WorkflowDefinitionCountDto> processDefinitions = processDefinitionMapper
+                .countDefinitionByProjectCodesV2(projectCodes, user.getId(), null);
+        Assertions.assertEquals(1, processDefinitions.size());
+
+        processDefinitions = processDefinitionMapper
+                .countDefinitionByProjectCodesV2(projectCodes, user.getId(), ReleaseState.ONLINE.getCode());
+        Assertions.assertEquals(0, processDefinitions.size());
+    }
+
     @Test
     public void listResourcesTest() {
         ProcessDefinition processDefinition = insertOne("def 1");
@@ -323,6 +401,36 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         insertOne("def 1");
         List<Integer> projectIds = processDefinitionMapper.listProjectIds();
         Assertions.assertNotNull(projectIds);
+    }
+
+    /**
+     * test query definition code list by project codes
+     */
+    @Test
+    public void testQueryDefinitionCodeListByProjectCodes() {
+        Date now = new Date();
+
+        ProcessDefinition processDefinition1 = new ProcessDefinition();
+        processDefinition1.setCode(0L);
+        processDefinition1.setName("def 1");
+        processDefinition1.setProjectCode(1010L);
+        processDefinition1.setUserId(101);
+        processDefinition1.setUpdateTime(now);
+        processDefinition1.setCreateTime(now);
+        processDefinitionMapper.insert(processDefinition1);
+
+        ProcessDefinition processDefinition2 = new ProcessDefinition();
+        processDefinition2.setCode(1L);
+        processDefinition2.setName("def 2");
+        processDefinition2.setProjectCode(2020L);
+        processDefinition2.setUserId(101);
+        processDefinition2.setUpdateTime(now);
+        processDefinition2.setCreateTime(now);
+        processDefinitionMapper.insert(processDefinition2);
+
+        List<Long> codes = processDefinitionMapper.queryDefinitionCodeListByProjectCodes(Arrays.asList(1010L, 2020L));
+        codes.sort(Comparator.naturalOrder());
+        Assertions.assertEquals(Arrays.asList(0L, 1L), codes);
     }
 
 }
