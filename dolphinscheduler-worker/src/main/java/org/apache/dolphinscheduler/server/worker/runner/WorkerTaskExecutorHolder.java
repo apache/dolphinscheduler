@@ -48,6 +48,10 @@ public class WorkerTaskExecutorHolder {
         workerTaskExecutorMap.clear();
     }
 
+    public static int size() {
+        return workerTaskExecutorMap.size();
+    }
+
     public static Collection<WorkerTaskExecutor> getAllTaskExecutor() {
         return workerTaskExecutorMap.values();
     }
