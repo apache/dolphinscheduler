@@ -37,15 +37,15 @@ import com.google.common.base.Preconditions;
 public class StandByTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInstance> {
 
     /**
-     * queue size
+     * queue initial size
      */
-    private static final Integer QUEUE_MAX_SIZE = 3000;
+    private static final Integer QUEUE_INITIAL_SIZE = 3000;
 
     /**
      * queue
      */
     private final PriorityQueue<TaskInstance> queue =
-            new PriorityQueue<>(QUEUE_MAX_SIZE, new TaskInstancePriorityComparator());
+            new PriorityQueue<>(QUEUE_INITIAL_SIZE, new TaskInstancePriorityComparator());
     private final Set<String> taskInstanceIdentifySet = Collections.synchronizedSet(new HashSet<>());
 
     /**
