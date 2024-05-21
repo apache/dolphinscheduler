@@ -17,10 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.*;
 
 import java.util.Date;
 
@@ -86,6 +83,11 @@ public class Schedule {
      * failure strategy
      */
     private FailureStrategy failureStrategy;
+
+    /**
+     * misfire policy
+     */
+    private MisfirePolicy misfirePolicy;
 
     /**
      * warning type

@@ -54,3 +54,7 @@ d//
 delimiter ;
 CALL modify_data_t_ds_audit_log_input_entry;
 DROP PROCEDURE modify_data_t_ds_audit_log_input_entry;
+
+ALTER TABLE t_ds_schedules ADD COLUMN misfire_policy tinyint(4) NOT NULL;
+
+UPDATE t_ds_schedules SET misfire_policy=1;
