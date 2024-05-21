@@ -26,5 +26,5 @@ registry:
       max-retries: 5
     session-timeout: 30s
     connection-timeout: 9s
-    block-until-connected: 600ms
+    block-until-connected: 3s
     digest: ~
