@@ -39,6 +39,12 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
+            <directory>${basedir}/src/main/dist-bin</directory>
+            <outputDirectory>dist-bin</outputDirectory>
+            <fileMode>0755</fileMode>
+            <directoryMode>0755</directoryMode>
+        </fileSet>
+        <fileSet>
             <directory>${basedir}/../dolphinscheduler-dao/src/main/resources</directory>
             <includes>
                 <include>sql/**/*</include>
