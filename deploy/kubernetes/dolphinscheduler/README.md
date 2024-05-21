@@ -158,6 +158,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."yarn.application.status.address" | string | `"http://ds1:%s/ws/v1/cluster/apps/%s"` | if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname |
 | conf.common."yarn.job.history.status.address" | string | `"http://ds1:19888/ws/v1/history/mapreduce/jobs/%s"` | job history status url when application number threshold is reached(default 10000, maybe it was set to 1000) |
 | conf.common."yarn.resourcemanager.ha.rm.ids" | string | `"192.168.xx.xx,192.168.xx.xx"` | if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty |
+| datasource.profile | string | `"postgresql"` | The profile of datasource |
 | externalDatabase.database | string | `"dolphinscheduler"` | The database of external database |
 | externalDatabase.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName of external database |
 | externalDatabase.enabled | bool | `false` | If exists external database, and set postgresql.enable value to false. external database will be used, otherwise Dolphinscheduler's internal database will be used. |
