@@ -23,9 +23,10 @@ import {
   watch
 } from 'vue'
 import Modal from '@/components/modal'
-import { NForm, NFormItem, NInput } from 'naive-ui'
+import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
 import { useI18n } from 'vue-i18n'
+import { DATA_TYPES_MAP, DEFAULT_DATA_TYPE } from "@/views/projects/parameter/data_type"
 
 const ParameterModal = defineComponent({
   name: 'ParameterModal',
@@ -52,9 +53,11 @@ const ParameterModal = defineComponent({
       if (props.statusRef === 0) {
         variables.model.projectParameterName = ''
         variables.model.projectParameterValue = ''
+        variables.model.projectParameterDataType = DEFAULT_DATA_TYPE
       } else {
         variables.model.projectParameterName = props.row.paramName
         variables.model.projectParameterValue = props.row.paramValue
+        variables.model.projectParameterDataType = props.row.paramDataType
       }
       ctx.emit('cancelModal', props.showModalRef)
     }
@@ -78,10 +81,12 @@ const ParameterModal = defineComponent({
         if (props.statusRef === 0) {
           variables.model.projectParameterName = ''
           variables.model.projectParameterValue = ''
+          variables.model.projectParameterDataType = DEFAULT_DATA_TYPE
         } else {
           variables.model.code = props.row.code
           variables.model.projectParameterName = props.row.paramName
           variables.model.projectParameterValue = props.row.paramValue
+          variables.model.projectParameterDataType = props.row.paramDataType
         }
       }
     )
@@ -92,6 +97,7 @@ const ParameterModal = defineComponent({
         variables.model.code = props.row.code
         variables.model.projectParameterName = props.row.paramName
         variables.model.projectParameterValue = props.row.paramValue
+        variables.model.projectParameterDataType = props.row.paramDataType
       }
     )
 
@@ -112,7 +118,8 @@ const ParameterModal = defineComponent({
           onConfirm={this.confirmModal}
           confirmDisabled={
             !this.model.projectParameterName ||
-            !this.model.projectParameterValue
+            !this.model.projectParameterValue ||
+            !this.model.projectParameterDataType
           }
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
@@ -133,6 +140,15 @@ const ParameterModal = defineComponent({
                     allowInput={this.trim}
                     placeholder={t('project.parameter.value_tips')}
                     v-model={[this.model.projectParameterValue, 'value']}
+                  />
+                </NFormItem>
+                <NFormItem label={t('project.parameter.data_type')} path='data_type'>
+                  <NSelect
+                      placeholder={t('project.parameter.data_type_tips')}
+                      options={Object.keys(DATA_TYPES_MAP).map((item) => {
+                        return { value: item, label: item }
+                      })}
+                      v-model={[this.model.projectParameterDataType, 'value']}
                   />
                 </NFormItem>
               </NForm>

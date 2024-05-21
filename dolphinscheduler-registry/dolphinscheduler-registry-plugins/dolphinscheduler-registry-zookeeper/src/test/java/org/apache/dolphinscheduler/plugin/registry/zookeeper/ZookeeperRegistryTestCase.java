@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
 import org.apache.dolphinscheduler.plugin.registry.RegistryTestCase;
 
+import org.apache.commons.lang3.RandomUtils;
+
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -51,10 +53,10 @@ class ZookeeperRegistryTestCase extends RegistryTestCase<ZookeeperRegistry> {
     public static void setUpTestingServer() {
         zookeeperContainer = new GenericContainer<>(DockerImageName.parse("zookeeper:3.8"))
                 .withNetwork(NETWORK);
-
-        zookeeperContainer.setPortBindings(Lists.newArrayList("2181:2181"));
+        int randomPort = RandomUtils.nextInt(10000, 65535);
+        zookeeperContainer.setPortBindings(Lists.newArrayList(randomPort + ":2181"));
         Startables.deepStart(Stream.of(zookeeperContainer)).join();
-        System.setProperty("registry.zookeeper.connect-string", "localhost:2181");
+        System.setProperty("registry.zookeeper.connect-string", "localhost:" + randomPort);
     }
 
     @SneakyThrows

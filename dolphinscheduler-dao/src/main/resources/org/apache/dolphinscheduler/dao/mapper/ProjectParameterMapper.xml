@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper">
     <sql id="baseSql">
-        id, param_name, param_value, code, project_code, user_id, operator, create_time, update_time
+        id, param_name, param_value, param_data_type, code, project_code, user_id, operator, create_time, update_time
     </sql>
 
     <select id="queryByCode" resultType="org.apache.dolphinscheduler.dao.entity.ProjectParameter">
@@ -51,7 +51,7 @@
 
     <select id="queryProjectParameterListPaging" resultType="org.apache.dolphinscheduler.dao.entity.ProjectParameter">
         select
-        pp.id, param_name, param_value, code, project_code, user_id, operator, pp.create_time, pp.update_time,
+        pp.id, param_name, param_value, param_data_type, code, project_code, user_id, operator, pp.create_time, pp.update_time,
         u.user_name as create_user,
         u2.user_name as modify_user
         from t_ds_project_parameter pp
@@ -68,6 +68,9 @@
             AND (param_name LIKE concat('%', #{searchName}, '%')
             OR param_value LIKE concat('%', #{searchName}, '%')
             )
+        </if>
+        <if test="projectParameterDataType!=null and projectParameterDataType != ''">
+            AND param_data_type = #{projectParameterDataType}
         </if>
         order by pp.update_time desc
     </select>
