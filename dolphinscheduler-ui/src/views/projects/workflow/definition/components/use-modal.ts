@@ -119,14 +119,8 @@ export function useModal(
         })
       }
 
-      const startParams = {} as any
-      for (const item of variables.startParamsList) {
-        if (item.value !== '') {
-          startParams[item.prop] = item.value
-        }
-      }
-      params.startParams = !_.isEmpty(startParams)
-        ? JSON.stringify(startParams)
+      params.startParams = !_.isEmpty(variables.startParamsList)
+        ? JSON.stringify(variables.startParamsList)
         : ''
       await startProcessInstance(params, variables.projectCode)
       window.$message.success(t('project.workflow.success'))

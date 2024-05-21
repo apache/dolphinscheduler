@@ -54,3 +54,5 @@ d//
 delimiter ;
 CALL modify_data_t_ds_audit_log_input_entry;
 DROP PROCEDURE modify_data_t_ds_audit_log_input_entry;
+
+ALTER TABLE t_ds_project_parameter ADD  `param_data_type` varchar (50) DEFAULT 'VARCHAR' COMMENT 'project parameter data type';

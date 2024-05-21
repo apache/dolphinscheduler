@@ -21,7 +21,8 @@ import {
   NInput,
   NPagination,
   NSpace,
-  NButton
+  NButton,
+  NSelect
 } from 'naive-ui'
 import { defineComponent, onMounted, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -29,6 +30,7 @@ import { useTable } from '@/views/projects/parameter/use-table'
 import Card from '@/components/card'
 import ParameterModal from '@/views/projects/parameter/components/parameter-modal'
 import { SearchOutlined } from '@vicons/antd'
+import { DATA_TYPES_MAP } from "@/views/projects/parameter/data_type"
 
 export default defineComponent({
   name: 'ProjectParameterList',
@@ -40,6 +42,7 @@ export default defineComponent({
         pageSize: variables.pageSize,
         pageNo: variables.page,
         searchVal: variables.searchVal,
+        projectParameterDataType: variables.projectParameterDataType,
         projectCode: variables.projectCode
       })
     }
@@ -115,6 +118,16 @@ export default defineComponent({
                 clearable
                 v-model={[this.searchVal, 'value']}
                 placeholder={t('project.parameter.name')}
+              />
+              <NSelect
+                  v-model={[this.projectParameterDataType, 'value']}
+                  size='small'
+                  options={Object.keys(DATA_TYPES_MAP).map((item) => {
+                    return { value: item, label: item }
+                  })}
+                  placeholder={t('project.parameter.data_type_tips')}
+                  style={{ width: '180px' }}
+                  clearable
               />
               <NButton size='small' type='primary' onClick={handleSearch}>
                 <NIcon>

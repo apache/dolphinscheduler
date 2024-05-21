@@ -90,6 +90,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTrigg
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -204,7 +205,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param environmentCode           environment code
      * @param runMode                   run mode
      * @param timeout                   timeout
-     * @param startParams               the global param values which pass to new process instance
+     * @param startParamList               the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @param testFlag testFlag
      * @param executionOrder the execution order when complementing data
@@ -220,7 +221,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Priority processInstancePriority, String workerGroup,
                                                    String tenantCode,
                                                    Long environmentCode, Integer timeout,
-                                                   Map<String, String> startParams, Integer expectedParallelismNumber,
+                                                   List<Property> startParamList, Integer expectedParallelismNumber,
                                                    int dryRun, int testFlag,
                                                    ComplementDependentMode complementDependentMode, Integer version,
                                                    boolean allLevelDependent, ExecutionOrder executionOrder) {
@@ -270,7 +271,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup, tenantCode,
-                        environmentCode, startParams, expectedParallelismNumber, dryRun, testFlag,
+                        environmentCode, startParamList, expectedParallelismNumber, dryRun, testFlag,
                         complementDependentMode, allLevelDependent, executionOrder);
 
         if (create > 0) {
@@ -732,7 +733,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               WarningType warningType, int executorId, Integer warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, String tenantCode,
                               Long environmentCode,
-                              Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
+                              List<Property> startParamList, Integer expectedParallelismNumber, int dryRun,
                               int testFlag, ComplementDependentMode complementDependentMode,
                               boolean allLevelDependent, ExecutionOrder executionOrder) {
 
@@ -761,8 +762,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (warningType != null) {
             command.setWarningType(warningType);
         }
-        if (startParams != null && startParams.size() > 0) {
-            cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
+        if (CollectionUtils.isNotEmpty(startParamList)) {
+            cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParamList));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(executorId);
