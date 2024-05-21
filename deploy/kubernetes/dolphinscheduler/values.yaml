@@ -49,6 +49,10 @@ image:
   # -- tools image
   tools: dolphinscheduler-tools
 
+datasource:
+  # -- The profile of datasource
+  profile: postgresql
+
 postgresql:
   # -- If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL
   enabled: true

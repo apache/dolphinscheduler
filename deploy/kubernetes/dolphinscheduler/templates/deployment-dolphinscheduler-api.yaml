@@ -141,7 +141,7 @@ spec:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
         - name: api-config-volume
           configMap:
-            name: { { include "dolphinscheduler.fullname" . } }-api
+            name: {{ include "dolphinscheduler.fullname" . }}-api
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.ldap.ssl.volume" . | nindent 8 }}
