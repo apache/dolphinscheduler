@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -86,6 +87,7 @@ public class WorkerServer implements IStoppable {
     public void run() {
         this.workerRpcServer.start();
         TaskPluginManager.loadPlugin();
+        DataSourceProcessorProvider.initialize();
 
         this.workerRegistryClient.setRegistryStoppable(this);
         this.workerRegistryClient.start();

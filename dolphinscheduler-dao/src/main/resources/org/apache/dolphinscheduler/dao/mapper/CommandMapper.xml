@@ -34,17 +34,36 @@
         group by cmd.command_type
     </select>
     <select id="queryCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-        select *
+        select
+        *
         from t_ds_command
+        where 1 = 1
         order by process_instance_priority, id asc
-        limit #{limit} offset #{offset}
     </select>
 
-    <select id="queryCommandPageBySlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+    <select id="queryCommandPageByIds" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select
+        *
+        from t_ds_command
+        where process_definition_code in
+            <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        order by process_instance_priority, id asc
+    </select>
+
+    <select id="queryCommandByIdSlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select *
         from t_ds_command
-        where id % #{masterCount} = #{thisMasterSlot}
+        where (id / #{idStep}) % #{totalSlot} = #{currentSlotIndex}
         order by process_instance_priority, id asc
-            limit #{limit}
+            limit #{fetchNumber}
     </select>
+    <delete id="deleteByWorkflowInstanceIds" >
+        delete from t_ds_command
+        where process_instance_id in
+        <foreach collection="workflowInstanceIds" index="index" item="i" open="(" close=")" separator=",">
+            #{i}
+        </foreach>
+    </delete>
 </mapper>

@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.api.loop.template.http.parser;
 import org.apache.dolphinscheduler.plugin.task.api.loop.template.LoopTaskYamlDefinition;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,11 +34,24 @@ public class HttpTaskDefinitionParserTest {
     @Test
     public void parseYamlConfigFile() throws IOException {
         LoopTaskYamlDefinition loopTaskYamlDefinition = new HttpTaskDefinitionParser().parseYamlConfigFile(yamlFile);
+        // check not null
         Assertions.assertNotNull(loopTaskYamlDefinition);
         Assertions.assertNotNull(loopTaskYamlDefinition.getService());
+        Assertions.assertNotNull(loopTaskYamlDefinition.getService().getName());
+        Assertions.assertNotNull(loopTaskYamlDefinition.getService().getType());
+        Assertions.assertNotNull(loopTaskYamlDefinition.getService().getApi());
+        Assertions.assertNotNull(loopTaskYamlDefinition.getService().getApi().getSubmit());
+        Assertions.assertNotNull(loopTaskYamlDefinition.getService().getApi().getQueryState());
+        Assertions.assertNotNull(loopTaskYamlDefinition.getService().getApi().getCancel());
+        // check data consistency
         LoopTaskYamlDefinition.LoopTaskServiceYamlDefinition service = loopTaskYamlDefinition.getService();
         Assertions.assertEquals("MockService", service.getName());
-        Assertions.assertNotNull(service.getApi());
+        Assertions.assertEquals("Http", service.getType());
+        Map<String, String> expectedHeaders = new HashMap<>();
+        expectedHeaders.put("Content-Type", "text/html");
+        expectedHeaders.put("Content-Length", "1234");
+        Assertions.assertEquals("/api/v1/submit", service.getApi().getSubmit().getUrl());
+        Assertions.assertEquals(expectedHeaders, service.getApi().getSubmit().getHttpHeaders());
     }
 
     @Test

@@ -1,0 +1,108 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if and .Values.worker.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-worker
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
+    {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
+data:
+  application.yaml: |
+    spring:
+      banner:
+        charset: UTF-8
+      jackson:
+        time-zone: UTC
+        date-format: "yyyy-MM-dd HH:mm:ss"
+      autoconfigure:
+        exclude:
+          - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    
+    registry:
+      type: zookeeper
+      zookeeper:
+        namespace: dolphinscheduler
+        connect-string: localhost:2181
+        retry-policy:
+          base-sleep-time: 60ms
+          max-sleep: 300ms
+          max-retries: 5
+        session-timeout: 30s
+        connection-timeout: 9s
+        block-until-connected: 600ms
+        digest: ~
+    
+    worker:
+      # worker listener port
+      listen-port: 1234
+      # worker execute thread number to limit task instances in parallel
+      exec-threads: 100
+      # worker heartbeat interval
+      max-heartbeat-interval: 10s
+      # worker host weight to dispatch tasks, default value 100
+      host-weight: 100
+      server-load-protection:
+        # If set true, will open worker overload protection
+        enabled: true
+        # Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks.
+        max-system-cpu-usage-percentage-thresholds: 0.7
+        # Worker max jvm cpu usage, when the worker's jvm cpu usage is smaller then this value, worker server can be dispatched tasks.
+        max-jvm-cpu-usage-percentage-thresholds: 0.7
+        # Worker max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.
+        max-system-memory-usage-percentage-thresholds: 0.7
+        # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+        max-disk-usage-percentage-thresholds: 0.7
+      registry-disconnect-strategy:
+        # The disconnect strategy: stop, waiting
+        strategy: waiting
+        # The max waiting time to reconnect to registry if you set the strategy to waiting
+        max-waiting-time: 100s
+      task-execute-threads-full-policy: REJECT
+      tenant-config:
+        # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
+        auto-create-tenant-enabled: true
+        # Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, auto-create-tenant-enabled has no effect and will not automatically create tenants.
+        distributed-tenant-enabled: false
+        # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`.
+        default-tenant-enabled: false
+    
+    server:
+      port: 1235
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,metrics,prometheus
+      endpoint:
+        health:
+          enabled: true
+          show-details: always
+      health:
+        db:
+          enabled: true
+        defaults:
+          enabled: false
+      metrics:
+        tags:
+          application: ${spring.application.name}
+    
+    metrics:
+      enabled: true
+{{- end }}

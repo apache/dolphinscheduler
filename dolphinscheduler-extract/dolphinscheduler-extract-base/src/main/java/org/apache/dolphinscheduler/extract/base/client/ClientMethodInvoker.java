@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.extract.base.client;
 
 import java.lang.reflect.Method;
 
-public interface ClientMethodInvoker {
+interface ClientMethodInvoker {
 
     Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
 
