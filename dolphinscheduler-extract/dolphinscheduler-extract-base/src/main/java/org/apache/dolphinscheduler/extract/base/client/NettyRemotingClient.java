@@ -141,7 +141,7 @@ public class NettyRemotingClient implements AutoCloseable {
         return iRpcResponse;
     }
 
-    private Channel getOrCreateChannel(Host host) {
+    Channel getOrCreateChannel(Host host) {
         Channel channel = channels.get(host);
         if (channel != null && channel.isActive()) {
             return channel;
@@ -166,13 +166,10 @@ public class NettyRemotingClient implements AutoCloseable {
      * @param host host
      * @return channel
      */
-    private Channel createChannel(Host host) {
+    Channel createChannel(Host host) {
         try {
-            ChannelFuture future;
-            synchronized (bootstrap) {
-                future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
-            }
-            future.await(clientConfig.getConnectTimeoutMillis());
+            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
+            future = future.sync();
             if (future.isSuccess()) {
                 return future.channel();
             } else {
