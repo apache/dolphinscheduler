@@ -36,7 +36,6 @@ import com.google.common.base.Preconditions;
  */
 public class StandByTaskInstancePriorityQueue implements TaskPriorityQueue<TaskInstance> {
 
-
     /**
      * queue
      */
