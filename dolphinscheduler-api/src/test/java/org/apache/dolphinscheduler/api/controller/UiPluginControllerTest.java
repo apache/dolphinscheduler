@@ -112,7 +112,7 @@ public class UiPluginControllerTest extends AbstractControllerTest {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "1");
 
-        MvcResult mvcResult = mockMvc.perform(post("/ui-plugins/queryProductInfo")
+        MvcResult mvcResult = mockMvc.perform(get("/ui-plugins/queryProductInfo")
                         .header(SESSION_ID, sessionId)
                         .params(paramsMap))
                         .andExpect(status().isOk())

@@ -42,6 +42,8 @@ import org.apache.dolphinscheduler.dao.repository.DsVersionDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+
 /**
  * ui plugin service impl
  */
@@ -55,7 +57,15 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     @Autowired
     private DsVersionDao dsVersionDao;
 
-    private volatile String dsVersion;
+    private String dsVersion;
+
+    @PostConstruct
+    private void init() {
+        dsVersion = dsVersionDao.selectVersion().map(DsVersion::getVersion).orElse("unknown");
+        if(StringUtils.isBlank(dsVersion)){
+            throw new ServiceException(Status.VERSION_INFO_STATE_ERROR);
+        }
+    }
 
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
@@ -96,13 +106,7 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
 
     @Override
     public ProductInfoDto queryProductInfo(User loginUser) {
-
         // persist to the database
-        dsVersion = dsVersionDao.selectVersion().map(DsVersion::getVersion).orElse("unknown");
-
-        if(StringUtils.isBlank(dsVersion)){
-            throw new ServiceException(Status.VERSION_INFO_STATE_ERROR);
-        }
         ProductInfoDto result = new ProductInfoDto();
         result.setVersion(dsVersion);
         return result;

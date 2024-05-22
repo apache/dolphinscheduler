@@ -95,7 +95,7 @@ public class UiPluginController extends BaseController {
      * @return product info
      */
     @Operation(summary = "queryProductInfo", description = "QUERY_PRODUCT_INFO")
-    @PostMapping(value = "/queryProductInfo")
+    @GetMapping(value = "/queryProductInfo")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERSION_INFO_STATE_ERROR)
     public Result<ProductInfoDto> queryProductInfo(
