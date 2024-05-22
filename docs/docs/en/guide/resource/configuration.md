@@ -28,7 +28,7 @@ The configuration you may need to change:
 
 ## connect AWS S3
 
-if you want to upload resources to `Resource Center` connected to `S3`, you need to configure `api-server/conf/common.properties`, `api-server/conf/s3.yaml` and `worker-server/conf/common.properties`, `worker-server/conf/s3.yaml`. You can refer to the following:
+if you want to upload resources to `Resource Center` connected to `S3`, you need to configure `api-server/conf/common.properties`, `api-server/conf/aws.yaml` and `worker-server/conf/common.properties`, `worker-server/conf/aws.yaml`. You can refer to the following:
 
 config the following fields
 

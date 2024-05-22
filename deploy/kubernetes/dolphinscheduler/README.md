@@ -120,13 +120,13 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.auto | bool | `false` | auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false |
 | conf.common."alert.rpc.port" | int | `50052` | rpc port |
 | conf.common."appId.collect" | string | `"log"` | way to collect applicationId: log, aop |
+| conf.common."aws.credentials.provider.type" | string | `"AWSStaticCredentialsProvider"` |  |
 | conf.common."aws.s3.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
 | conf.common."aws.s3.access.key.secret" | string | `"minioadmin"` | The AWS secret access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
 | conf.common."aws.s3.bucket.name" | string | `"dolphinscheduler"` | The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name. |
 | conf.common."aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
 | conf.common."aws.s3.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3, This configuration is required |
 | conf.common."conda.path" | string | `"/opt/anaconda3/etc/profile.d/conda.sh"` | set path of conda.sh |
-| conf.common."credentials.provider.type" | string | `"AWSStaticCredentialsProvider"` |  |
 | conf.common."data-quality.jar.dir" | string | `nil` | data quality option |
 | conf.common."data.basedir.path" | string | `"/tmp/dolphinscheduler"` | user data local directory path, please make sure the directory exists and have read write permissions |
 | conf.common."datasource.encryption.enable" | bool | `false` | datasource encryption enable |

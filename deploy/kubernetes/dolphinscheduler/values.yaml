@@ -253,7 +253,7 @@ conf:
     # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
-    credentials.provider.type: AWSStaticCredentialsProvider
+    aws.credentials.provider.type: AWSStaticCredentialsProvider
 
     # -- The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required
     aws.s3.access.key.id: minioadmin

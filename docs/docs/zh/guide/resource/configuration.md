@@ -26,7 +26,7 @@ Dolphinscheduler 资源中心使用本地系统默认是开启的，不需要用
 
 ## 对接AWS S3
 
-如果需要使用到资源中心的 S3 上传资源，我们需要对以下路径的进行配置：`api-server/conf/common.properties`, `api-server/conf/s3.yaml` 和 `worker-server/conf/common.properties`, `worker-server/conf/s3.yaml`。可参考如下：
+如果需要使用到资源中心的 S3 上传资源，我们需要对以下路径的进行配置：`api-server/conf/common.properties`, `api-server/conf/aws.yaml` 和 `worker-server/conf/common.properties`, `worker-server/conf/aws.yaml`。可参考如下：
 
 配置以下字段
 
