@@ -1358,7 +1358,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             }
         }
         log.info("The dependTasks of task all success, currentTaskCode: {}, dependTaskCodes: {}",
-                taskCode, Arrays.toString(completeTaskSet.toArray()));
+                taskCode, Arrays.toString(indirectDepCodeList.toArray()));
         return DependResult.SUCCESS;
     }
 
