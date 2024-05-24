@@ -17,13 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.datasync;
 
+import org.apache.dolphinscheduler.authentication.aws.DataSyncClientFactory;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.datasync.DataSyncClient;
 import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionResponse;
@@ -48,6 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.Data;
@@ -73,16 +70,8 @@ public class DatasyncHook {
     }
 
     protected static DataSyncClient createClient() {
-        final String awsAccessKeyId = PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
-        final String awsSecretAccessKey = PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
-        final String awsRegion = PropertyUtils.getString(TaskConstants.AWS_REGION);
-
-        final AwsBasicCredentials basicAWSCredentials = AwsBasicCredentials.create(awsAccessKeyId, awsSecretAccessKey);
-        final AwsCredentialsProvider awsCredentialsProvider = StaticCredentialsProvider.create(basicAWSCredentials);
-
-        // create a datasync client
-        return DataSyncClient.builder().region(Region.of(awsRegion)).credentialsProvider(awsCredentialsProvider)
-                .build();
+        Map<String, String> awsProperties = PropertyUtils.getByPrefix("aws.datasync.", "");
+        return DataSyncClientFactory.createDataSyncClient(awsProperties);
     }
 
     public Boolean createDatasyncTask(DatasyncParameters parameters) {
