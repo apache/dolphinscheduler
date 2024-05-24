@@ -22,7 +22,9 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
 
+import org.apache.dolphinscheduler.authentication.aws.AmazonSageMakerClientFactory;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.sagemaker.param.SagemakerConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
@@ -41,11 +43,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.amazonaws.auth.AWSCredentialsProvider;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.sagemaker.AmazonSageMaker;
-import com.amazonaws.services.sagemaker.AmazonSageMakerClientBuilder;
 import com.amazonaws.services.sagemaker.model.StartPipelineExecutionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
@@ -186,16 +184,8 @@ public class SagemakerTask extends AbstractRemoteTask {
     }
 
     protected AmazonSageMaker createClient() {
-        final String awsAccessKeyId = parameters.getUsername();
-        final String awsSecretAccessKey = parameters.getPassword();
-        final String awsRegion = parameters.getAwsRegion();
-        final BasicAWSCredentials basicAWSCredentials = new BasicAWSCredentials(awsAccessKeyId, awsSecretAccessKey);
-        final AWSCredentialsProvider awsCredentialsProvider = new AWSStaticCredentialsProvider(basicAWSCredentials);
-        // create a SageMaker client
-        return AmazonSageMakerClientBuilder.standard()
-                .withCredentials(awsCredentialsProvider)
-                .withRegion(awsRegion)
-                .build();
+        Map<String, String> awsProperties = PropertyUtils.getByPrefix("aws.sagemaker.", "");
+        return AmazonSageMakerClientFactory.createAmazonSageMakerClient(awsProperties);
     }
 
 }

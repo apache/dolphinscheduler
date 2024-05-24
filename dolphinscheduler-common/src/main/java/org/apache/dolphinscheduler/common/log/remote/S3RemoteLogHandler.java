@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.log.remote;
 
+import org.apache.dolphinscheduler.authentication.aws.AmazonS3ClientFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
@@ -26,41 +27,25 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 
 @Slf4j
 public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
 
-    private String accessKeyId;
+    private final String bucketName;
 
-    private String accessKeySecret;
-
-    private String region;
-
-    private String bucketName;
-
-    private String endPoint;
-
-    private AmazonS3 s3Client;
+    private final AmazonS3 s3Client;
 
     private static S3RemoteLogHandler instance;
 
     private S3RemoteLogHandler() {
-        accessKeyId = readAccessKeyID();
-        accessKeySecret = readAccessKeySecret();
-        region = readRegion();
         bucketName = readBucketName();
-        endPoint = readEndPoint();
         s3Client = buildS3Client();
         checkBucketNameExists(bucketName);
     }
@@ -74,23 +59,8 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     protected AmazonS3 buildS3Client() {
-        if (StringUtils.isNotEmpty(endPoint)) {
-            return AmazonS3ClientBuilder
-                    .standard()
-                    .withPathStyleAccessEnabled(true)
-                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
-                            endPoint, Regions.fromName(region).getName()))
-                    .withCredentials(
-                            new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
-                    .build();
-        } else {
-            return AmazonS3ClientBuilder
-                    .standard()
-                    .withCredentials(
-                            new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
-                    .withRegion(Regions.fromName(region))
-                    .build();
-        }
+        Map<String, String> awsProperties = PropertyUtils.getByPrefix("aws.s3.", "");
+        return AmazonS3ClientFactory.createAmazonS3Client(awsProperties);
     }
 
     @Override
@@ -131,24 +101,8 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
         }
     }
 
-    protected String readAccessKeyID() {
-        return PropertyUtils.getString(Constants.REMOTE_LOGGING_S3_ACCESS_KEY_ID);
-    }
-
-    protected String readAccessKeySecret() {
-        return PropertyUtils.getString(Constants.REMOTE_LOGGING_S3_ACCESS_KEY_SECRET);
-    }
-
-    protected String readRegion() {
-        return PropertyUtils.getString(Constants.REMOTE_LOGGING_S3_REGION);
-    }
-
     protected String readBucketName() {
-        return PropertyUtils.getString(Constants.REMOTE_LOGGING_S3_BUCKET_NAME);
-    }
-
-    protected String readEndPoint() {
-        return PropertyUtils.getString(Constants.REMOTE_LOGGING_S3_ENDPOINT);
+        return PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME);
     }
 
     public void checkBucketNameExists(String bucketName) {

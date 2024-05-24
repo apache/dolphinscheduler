@@ -33,14 +33,17 @@ DolphinScheduler SageMaker 组件的功能:
 
 ## 环境配置
 
-需要进行AWS的一些配置，修改`common.properties`中的`xxxxx`为你的配置信息
+需要进行AWS的一些配置，修改`aws.yml`中的以下配置信息
 
 ```yaml
-# The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-resource.aws.access.key.id=<YOUR AWS ACCESS KEY>
-# The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-resource.aws.secret.access.key=<YOUR AWS SECRET KEY>
-# The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-resource.aws.region=<AWS REGION>
+sagemaker:
+  # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+  # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
+  # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+  credentials.provider.type: AWSStaticCredentialsProvider
+  access.key.id: <access.key.id>
+  access.key.secret: <access.key.secret>
+  region: <region>
+  endpoint: <endpoint>
 ```
 

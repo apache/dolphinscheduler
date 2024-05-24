@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.AWS_YAML_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_PROPERTIES_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.REMOTE_LOGGING_YAML_PATH;
 
@@ -42,7 +43,7 @@ public class PropertyUtils {
     private final ImmutablePriorityPropertyDelegate propertyDelegate =
             new ImmutablePriorityPropertyDelegate(
                     new ImmutablePropertyDelegate(COMMON_PROPERTIES_PATH),
-                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH));
+                    new ImmutableYamlDelegate(REMOTE_LOGGING_YAML_PATH, AWS_YAML_PATH));
 
     public static String getString(String key) {
         return propertyDelegate.get(key.trim());
@@ -101,6 +102,19 @@ public class PropertyUtils {
         for (String propName : propertyDelegate.getPropertyKeys()) {
             if (propName.startsWith(prefix)) {
                 matchedProperties.put(propName, propertyDelegate.get(propName));
+            }
+        }
+        return matchedProperties;
+    }
+
+    /**
+     * Get all properties with specified prefix, like: fs., will replace the prefix with newPrefix
+     */
+    public static Map<String, String> getByPrefix(String prefix, String newPrefix) {
+        Map<String, String> matchedProperties = new HashMap<>();
+        for (String propName : propertyDelegate.getPropertyKeys()) {
+            if (propName.startsWith(prefix)) {
+                matchedProperties.put(propName.replace(prefix, newPrefix), propertyDelegate.get(propName));
             }
         }
         return matchedProperties;
