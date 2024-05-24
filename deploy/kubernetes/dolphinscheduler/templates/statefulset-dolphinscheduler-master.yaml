@@ -127,7 +127,7 @@ spec:
           {{- end }}
         - name: master-config-volume
           configMap:
-            name: { { include "dolphinscheduler.fullname" . } }-master
+            name: {{ include "dolphinscheduler.fullname" . }}-master
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         - name: config-volume
           configMap:
