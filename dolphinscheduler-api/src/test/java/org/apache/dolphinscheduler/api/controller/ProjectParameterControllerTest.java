@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectParameterServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,9 +48,8 @@ public class ProjectParameterControllerTest {
         User loginUser = getGeneralUser();
 
         Mockito.when(projectParameterService.createProjectParameter(Mockito.any(), Mockito.anyLong(), Mockito.any(),
-                Mockito.any(), Mockito.any())).thenReturn(getSuccessResult());
-        Result result = projectParameterController.createProjectParameter(loginUser, 1, "key", "value",
-                DataType.VARCHAR.name());
+                Mockito.any())).thenReturn(getSuccessResult());
+        Result result = projectParameterController.createProjectParameter(loginUser, 1, "key", "value");
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
@@ -60,9 +58,8 @@ public class ProjectParameterControllerTest {
         User loginUser = getGeneralUser();
 
         Mockito.when(projectParameterService.updateProjectParameter(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(),
-                Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(getSuccessResult());
-        Result result = projectParameterController.updateProjectParameter(loginUser, 1, 1L, "key", "value",
-                DataType.LONG.name());
+                Mockito.any(), Mockito.any())).thenReturn(getSuccessResult());
+        Result result = projectParameterController.updateProjectParameter(loginUser, 1, 1L, "key", "value");
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
@@ -91,9 +88,8 @@ public class ProjectParameterControllerTest {
         User loginUser = getGeneralUser();
 
         Mockito.when(projectParameterService.queryProjectParameterListPaging(Mockito.any(), Mockito.anyLong(),
-                Mockito.anyInt(), Mockito.anyInt(), Mockito.any(), Mockito.any())).thenReturn(getSuccessResult());
-        Result result = projectParameterController.queryProjectParameterListPaging(loginUser, 1, "1",
-                DataType.VARCHAR.name(), 1, 10);
+                Mockito.anyInt(), Mockito.anyInt(), Mockito.any())).thenReturn(getSuccessResult());
+        Result result = projectParameterController.queryProjectParameterListPaging(loginUser, 1, "1", 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 

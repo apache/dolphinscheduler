@@ -15,40 +15,19 @@
  * limitations under the License.
  */
 
-export const DATA_TYPES_MAP = {
-    VARCHAR: {
-        alias: 'VARCHAR'
-    },
-    INTEGER: {
-        alias: 'INTEGER'
-    },
-    LONG: {
-        alias: 'LONG'
-    },
-    FLOAT: {
-        alias: 'FLOAT'
-    },
-    DOUBLE: {
-        alias: 'DOUBLE'
-    },
-    DATE: {
-        alias: 'DATE'
-    },
-    TIME: {
-        alias: 'TIME'
-    },
-    TIMESTAMP: {
-        alias: 'TIMESTAMP'
-    },
-    BOOLEAN: {
-        alias: 'BOOLEAN'
-    },
-    LIST: {
-        alias: 'LIST'
-    },
-    FILE: {
-        alias: 'FILE'
+package org.apache.dolphinscheduler.server.master.event;
+
+/**
+ * This exception represent the exception can be recovered, when we get this exception,
+ * we will move the event to the fail of the queue.
+ */
+public class StateEventHandleFailure extends Exception {
+
+    public StateEventHandleFailure(String message) {
+        super(message);
+    }
+
+    public StateEventHandleFailure(String message, Throwable throwable) {
+        super(message, throwable);
     }
 }
-
-export const DEFAULT_DATA_TYPE = 'VARCHAR'

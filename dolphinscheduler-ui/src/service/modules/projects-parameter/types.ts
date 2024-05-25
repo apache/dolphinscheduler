@@ -19,7 +19,6 @@ interface ListReq {
   pageNo: number
   pageSize: number
   searchVal?: string
-  projectParameterDataType?: string
 }
 
 interface ProjectParameterCodeReq {
@@ -29,7 +28,6 @@ interface ProjectParameterCodeReq {
 interface ProjectParameterReq {
   projectParameterName: string
   projectParameterValue: string
-  projectParameterDataType: string
 }
 
 interface UpdateProjectParameterReq extends ProjectParameterReq {
@@ -41,7 +39,6 @@ interface ProjectParameterList {
   code: number
   name: string
   value: string
-  data_type: string
   createTime: string
   updateTime: string
 }

@@ -145,7 +145,7 @@ public class ParameterUtils {
         } else if (dataType.equals(DataType.DATE)) {
             stmt.setDate(index, java.sql.Date.valueOf(value));
         } else if (dataType.equals(DataType.TIME)) {
-            stmt.setTime(index, java.sql.Time.valueOf(value));
+            stmt.setString(index, value);
         } else if (dataType.equals(DataType.TIMESTAMP)) {
             stmt.setTimestamp(index, java.sql.Timestamp.valueOf(value));
         } else if (dataType.equals(DataType.BOOLEAN)) {

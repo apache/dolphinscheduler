@@ -67,28 +67,16 @@
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-tools/target/tools</directory>
             <outputDirectory>tools</outputDirectory>
-            <excludes>
-                <exclude>libs/</exclude>
-                <exclude>bin/</exclude>
-                <exclude>dist-bin/</exclude>
-            </excludes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-tools/target/tools/libs</directory>
-            <outputDirectory>tools/libs</outputDirectory>
-            <includes>
-                <include>dolphinscheduler-*.jar</include>
-                <include>spring-*.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/../dolphinscheduler-tools/target/tools/dist-bin</directory>
-            <outputDirectory>tools/bin</outputDirectory>
         </fileSet>
 
         <fileSet>
             <directory>${basedir}/../dolphinscheduler-dist/target/dolphinscheduler-dist-${project.version}</directory>
             <outputDirectory>.</outputDirectory>
+        </fileSet>
+
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-ui/dist</directory>
+            <outputDirectory>./ui</outputDirectory>
         </fileSet>
 
         <fileSet>

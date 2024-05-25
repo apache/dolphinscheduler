@@ -191,21 +191,19 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
 
-For ETCD Registry, please see more details
-on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md).
-For JDBC Registry, please see more details
-on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md).
+For ETCD Registry, please see more details on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md).
+For JDBC Registry, please see more details on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md).
 
 ### common.properties [hadoop、s3、yarn config properties]
 
 Currently, common.properties mainly configures Hadoop,s3a related configurations. Configuration file location:
 
-|    Service    |                          Configuration file                           |
-|---------------|-----------------------------------------------------------------------|
-| Master Server | `master-server/conf/common.properties`                                |
-| Api Server    | `api-server/conf/common.properties`, `api-server/conf/aws.yaml`       |
-| Worker Server | `worker-server/conf/common.properties`, `worker-server/conf/aws.yaml` |
-| Alert Server  | `alert-server/conf/common.properties`                                 |
+|    Service    |           Configuration file           |
+|---------------|----------------------------------------|
+| Master Server | `master-server/conf/common.properties` |
+| Api Server    | `api-server/conf/common.properties`    |
+| Worker Server | `worker-server/conf/common.properties` |
+| Alert Server  | `alert-server/conf/common.properties`  |
 
 The default configuration is as follows:
 
@@ -214,6 +212,10 @@ The default configuration is as follows:
 | data.basedir.path                             | /tmp/dolphinscheduler                            | local directory used to store temp files                                                                                                                                                                                                                                                                                                                                                                                             |
 | resource.storage.type                         | NONE                                             | type of resource files: HDFS, S3, OSS, GCS, ABS, NONE                                                                                                                                                                                                                                                                                                                                                                                |
 | resource.upload.path                          | /dolphinscheduler                                | storage path of resource files                                                                                                                                                                                                                                                                                                                                                                                                       |
+| aws.access.key.id                             | minioadmin                                       | access key id of S3                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| aws.secret.access.key                         | minioadmin                                       | secret access key of S3                                                                                                                                                                                                                                                                                                                                                                                                              |
+| aws.region                                    | us-east-1                                        | region of S3                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| aws.s3.endpoint                               | http://minio:9000                                | endpoint of S3                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | hdfs.root.user                                | hdfs                                             | configure users with corresponding permissions if storage type is HDFS                                                                                                                                                                                                                                                                                                                                                               |
 | fs.defaultFS                                  | hdfs://mycluster:8020                            | If resource.storage.type=S3, then the request url would be similar to 's3a://dolphinscheduler'. Otherwise if resource.storage.type=HDFS and hadoop supports HA, copy core-site.xml and hdfs-site.xml into 'conf' directory                                                                                                                                                                                                           |
 | hadoop.security.authentication.startup.state  | false                                            | whether hadoop grant kerberos permission                                                                                                                                                                                                                                                                                                                                                                                             |

@@ -31,12 +31,10 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.extern.slf4j.Slf4j;
 import io.netty.bootstrap.Bootstrap;
@@ -56,8 +54,7 @@ public class NettyRemotingClient implements AutoCloseable {
 
     private final Bootstrap bootstrap = new Bootstrap();
 
-    private final ReentrantLock channelsLock = new ReentrantLock();
-    private final Map<Host, Channel> channels = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Host, Channel> channels = new ConcurrentHashMap<>(128);
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
 
@@ -107,10 +104,9 @@ public class NettyRemotingClient implements AutoCloseable {
         isStarted.compareAndSet(false, true);
     }
 
-    public IRpcResponse sendSync(final Host host,
-                                 final Transporter transporter,
+    public IRpcResponse sendSync(final Host host, final Transporter transporter,
                                  final long timeoutMillis) throws InterruptedException, RemotingException {
-        final Channel channel = getOrCreateChannel(host);
+        final Channel channel = getChannel(host);
         if (channel == null) {
             throw new RemotingException(String.format("connect to : %s fail", host));
         }
@@ -141,40 +137,36 @@ public class NettyRemotingClient implements AutoCloseable {
         return iRpcResponse;
     }
 
-    Channel getOrCreateChannel(Host host) {
+    private Channel getChannel(Host host) {
         Channel channel = channels.get(host);
         if (channel != null && channel.isActive()) {
             return channel;
         }
-        try {
-            channelsLock.lock();
-            channel = channels.get(host);
-            if (channel != null && channel.isActive()) {
-                return channel;
-            }
-            channel = createChannel(host);
-            channels.put(host, channel);
-        } finally {
-            channelsLock.unlock();
-        }
-        return channel;
+        return createChannel(host, true);
     }
 
     /**
      * create channel
      *
-     * @param host host
+     * @param host   host
+     * @param isSync sync flag
      * @return channel
      */
-    Channel createChannel(Host host) {
+    private Channel createChannel(Host host, boolean isSync) {
         try {
-            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
-            future = future.sync();
-            if (future.isSuccess()) {
-                return future.channel();
-            } else {
-                throw new IllegalArgumentException("connect to host: " + host + " failed", future.cause());
+            ChannelFuture future;
+            synchronized (bootstrap) {
+                future = bootstrap.connect(new InetSocketAddress(host.getIp(), host.getPort()));
             }
+            if (isSync) {
+                future.sync();
+            }
+            if (future.isSuccess()) {
+                Channel channel = future.channel();
+                channels.put(host, channel);
+                return channel;
+            }
+            throw new IllegalArgumentException("connect to host: " + host + " failed");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Connect to host: " + host + " failed", e);
@@ -197,23 +189,16 @@ public class NettyRemotingClient implements AutoCloseable {
     }
 
     private void closeChannels() {
-        try {
-            channelsLock.lock();
-            channels.values().forEach(Channel::close);
-        } finally {
-            channelsLock.unlock();
+        for (Channel channel : this.channels.values()) {
+            channel.close();
         }
+        this.channels.clear();
     }
 
     public void closeChannel(Host host) {
-        try {
-            channelsLock.lock();
-            Channel channel = this.channels.remove(host);
-            if (channel != null) {
-                channel.close();
-            }
-        } finally {
-            channelsLock.unlock();
+        Channel channel = this.channels.remove(host);
+        if (channel != null) {
+            channel.close();
         }
     }
 }

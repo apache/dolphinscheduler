@@ -144,7 +144,7 @@ spec:
         {{- end }}
         - name: worker-config-volume
           configMap:
-            name: {{ include "dolphinscheduler.fullname" . }}-worker
+            name: { { include "dolphinscheduler.fullname" . } }-worker
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs

@@ -55,9 +55,6 @@ public class ProjectParameter {
     @TableField("param_value")
     private String paramValue;
 
-    @TableField("param_data_type")
-    private String paramDataType;
-
     private Date createTime;
 
     private Date updateTime;
