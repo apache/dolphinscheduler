@@ -63,11 +63,13 @@ public abstract class BaseTaskExecuteRunnable implements TaskExecuteRunnable {
             return workflowInstancePriorityCompareResult;
         }
 
+        // smaller number, higher priority
         int taskInstancePriorityCompareResult = taskInstance.getTaskInstancePriority().getCode()
                 - other.getTaskInstance().getTaskInstancePriority().getCode();
         if (taskInstancePriorityCompareResult != 0) {
             return taskInstancePriorityCompareResult;
         }
+
         // larger number, higher priority
         int taskGroupPriorityCompareResult =
                 taskInstance.getTaskGroupPriority() - other.getTaskInstance().getTaskGroupPriority();
