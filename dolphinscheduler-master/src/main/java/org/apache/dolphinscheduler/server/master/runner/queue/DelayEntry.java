@@ -74,4 +74,9 @@ public class DelayEntry<V extends Comparable<V>> implements Delayed {
         DelayEntry<?> that = (DelayEntry<?>) o;
         return delayTimeMills == that.delayTimeMills && Objects.equals(data, that.data);
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(delayTimeMills, data);
+    }
 }
