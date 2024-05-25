@@ -17,7 +17,7 @@
 
 import { reactive } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { listMaster } from '@/service/modules/monitor'
+import { listMonitorServerNode } from '@/service/modules/monitor'
 import type { MasterNode } from '@/service/modules/monitor/types'
 
 export function useMaster() {
@@ -26,7 +26,7 @@ export function useMaster() {
   })
   const getTableMaster = () => {
     const { state } = useAsyncState(
-      listMaster().then((res: Array<MasterNode>) => {
+      listMonitorServerNode('MASTER').then((res: Array<MasterNode>) => {
         variables.data = res as any
       }),
       []

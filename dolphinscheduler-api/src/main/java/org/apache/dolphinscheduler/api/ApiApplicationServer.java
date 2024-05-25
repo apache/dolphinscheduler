@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.PluginDao;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -69,6 +70,7 @@ public class ApiApplicationServer {
         log.info("Received spring application context ready event will load taskPlugin and write to DB");
         // install task plugin
         TaskPluginManager.loadPlugin();
+        DataSourceProcessorProvider.initialize();
         for (Map.Entry<String, TaskChannelFactory> entry : TaskPluginManager.getTaskChannelFactoryMap().entrySet()) {
             String taskPluginName = entry.getKey();
             TaskChannelFactory taskChannelFactory = entry.getValue();

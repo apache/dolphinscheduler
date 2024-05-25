@@ -121,6 +121,9 @@ spec:
               mountPath: /opt/dolphinscheduler/conf/task-type-config.yaml
               subPath: task-type-config.yaml
             {{- end }}
+            - name: api-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.ldap.ssl.volumeMount" . | nindent 12 }}
@@ -136,6 +139,9 @@ spec:
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
+        - name: api-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-api
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.ldap.ssl.volume" . | nindent 8 }}
