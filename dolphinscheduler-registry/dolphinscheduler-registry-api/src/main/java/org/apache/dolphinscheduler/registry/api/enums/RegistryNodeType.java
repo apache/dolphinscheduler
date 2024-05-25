@@ -37,5 +37,4 @@ public enum RegistryNodeType {
     private final String name;
 
     private final String registryPath;
-
 }

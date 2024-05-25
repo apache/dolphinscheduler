@@ -89,7 +89,7 @@ public class ProjectParameterMapperTest extends BaseDaoTest {
         insertOne(2, "name2", 2);
 
         Page<ProjectParameter> page = new Page(1, 3);
-        IPage<ProjectParameter> res = projectParameterMapper.queryProjectParameterListPaging(page, 1, null, null);
+        IPage<ProjectParameter> res = projectParameterMapper.queryProjectParameterListPaging(page, 1, null, null, null);
         Assertions.assertEquals(1, res.getRecords().size());
     }
 }

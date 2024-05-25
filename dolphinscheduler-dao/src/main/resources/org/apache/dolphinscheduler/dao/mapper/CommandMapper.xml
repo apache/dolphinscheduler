@@ -34,10 +34,22 @@
         group by cmd.command_type
     </select>
     <select id="queryCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.Command">
-        select *
+        select
+        *
         from t_ds_command
+        where 1 = 1
         order by process_instance_priority, id asc
-        limit #{limit} offset #{offset}
+    </select>
+
+    <select id="queryCommandPageByIds" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select
+        *
+        from t_ds_command
+        where process_definition_code in
+            <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        order by process_instance_priority, id asc
     </select>
 
     <select id="queryCommandByIdSlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">

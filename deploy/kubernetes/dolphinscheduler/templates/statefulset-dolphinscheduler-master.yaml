@@ -109,6 +109,9 @@ spec:
           volumeMounts:
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-master
+            - name: master-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
@@ -122,6 +125,9 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        - name: master-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-master
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         - name: config-volume
           configMap:

@@ -66,6 +66,12 @@ interface CommandStateRes {
   commandState: string
 }
 
+interface ListReq {
+  pageNo: number
+  pageSize: number
+  searchVal?: string
+}
+
 export {
   CodeReq,
   StateReq,
@@ -73,5 +79,6 @@ export {
   WorkflowInstanceCountVo,
   TaskInstanceCountVo,
   TaskQueueRes,
-  CommandStateRes
+  CommandStateRes,
+  ListReq
 }
