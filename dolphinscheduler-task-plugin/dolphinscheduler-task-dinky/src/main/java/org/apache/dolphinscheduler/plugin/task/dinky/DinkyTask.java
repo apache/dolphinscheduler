@@ -348,24 +348,13 @@ public class DinkyTask extends AbstractRemoteTask {
         if (localParams == null || localParams.isEmpty()) {
             return variables;
         }
-        Map<String, String> convertMap = convert(prepareParamsMap);
+        Map<String, String> convertMap = ParameterUtils.convert(prepareParamsMap);
         for (Property property : localParams) {
             String propertyValue = property.getValue();
             String value = PlaceholderUtils.replacePlaceholders(propertyValue, convertMap, true);
             variables.put(property.getProp(), value);
         }
         return variables;
-    }
-
-    public static Map<String, String> convert(Map<String, Property> paramsMap) {
-        if (paramsMap == null) {
-            return null;
-        }
-        Map<String, String> map = new HashMap<>();
-        for (Map.Entry<String, Property> en : paramsMap.entrySet()) {
-            map.put(en.getKey(), en.getValue().getValue());
-        }
-        return map;
     }
 
     private String getDinkyVersion(String address) {

@@ -105,7 +105,7 @@ public final class TelegramSender {
         } catch (Exception e) {
             log.warn("send telegram alert msg exception : {}", e.getMessage());
             result = new AlertResult();
-            result.setStatus("false");
+            result.setSuccess(false);
             result.setMessage(String.format("send telegram alert fail. %s", e.getMessage()));
         }
         return result;
@@ -113,7 +113,7 @@ public final class TelegramSender {
 
     private AlertResult parseRespToResult(String resp) {
         AlertResult result = new AlertResult();
-        result.setStatus("false");
+        result.setSuccess(false);
         if (null == resp || resp.isEmpty()) {
             result.setMessage("send telegram msg error. telegram server resp is empty");
             return result;
@@ -127,7 +127,7 @@ public final class TelegramSender {
             result.setMessage(String.format("send telegram alert fail. telegram server error_code: %d, description: %s",
                     response.errorCode, response.description));
         } else {
-            result.setStatus("true");
+            result.setSuccess(true);
             result.setMessage("send telegram msg success.");
         }
         return result;

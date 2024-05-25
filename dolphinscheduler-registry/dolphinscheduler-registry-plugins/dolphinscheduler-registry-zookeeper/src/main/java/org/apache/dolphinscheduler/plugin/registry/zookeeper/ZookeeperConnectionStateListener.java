@@ -26,11 +26,11 @@ import org.apache.curator.framework.state.ConnectionStateListener;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public final class ZookeeperConnectionStateListener implements ConnectionStateListener {
+final class ZookeeperConnectionStateListener implements ConnectionStateListener {
 
     private final ConnectionListener listener;
 
-    public ZookeeperConnectionStateListener(ConnectionListener listener) {
+    ZookeeperConnectionStateListener(ConnectionListener listener) {
         this.listener = listener;
     }
 
@@ -38,6 +38,10 @@ public final class ZookeeperConnectionStateListener implements ConnectionStateLi
     public void stateChanged(CuratorFramework client,
                              org.apache.curator.framework.state.ConnectionState newState) {
         switch (newState) {
+            case CONNECTED:
+                log.info("Registry connected");
+                listener.onUpdate(ConnectionState.CONNECTED);
+                break;
             case LOST:
                 log.warn("Registry disconnected");
                 listener.onUpdate(ConnectionState.DISCONNECTED);

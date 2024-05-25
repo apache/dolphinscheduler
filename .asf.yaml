@@ -46,7 +46,7 @@ github:
           - E2E
           - Docs
           - Frontend Build
-          - "Mergeable: milestone-label-check"
+#          - "Mergeable: milestone-label-check"
       required_pull_request_reviews:
         dismiss_stale_reviews: true
         required_approving_review_count: 2
