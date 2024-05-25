@@ -154,8 +154,7 @@ export default defineComponent({
         formValue.value.globalParams = process.globalParamList.map((param) => ({
           key: param.prop,
           value: param.value,
-          direct: param.direct,
-          type: param.type
+          direct: param.direct
         }))
       }
     }
@@ -240,7 +239,6 @@ export default defineComponent({
                 return {
                   key: '',
                   direct: 'IN',
-                  type: 'VARCHAR',
                   value: ''
                 }
               }}
@@ -248,16 +246,16 @@ export default defineComponent({
             >
               {{
                 default: (param: {
-                  value: { key: string; direct: string; type: string; value: string }
+                  value: { key: string; direct: string; value: string }
                 }) => (
                   <NGrid xGap={12} cols={24}>
-                    <NGridItem span={6}>
+                    <NGridItem span={9}>
                       <NInput
                         v-model:value={param.value.key}
                         placeholder={t('project.dag.key')}
                       />
                     </NGridItem>
-                    <NGridItem span={5}>
+                    <NGridItem span={6}>
                       <NSelect
                         options={[
                           { value: 'IN', label: 'IN' },
@@ -267,25 +265,7 @@ export default defineComponent({
                         defaultValue={'IN'}
                       />
                     </NGridItem>
-                    <NGridItem span={7}>
-                      <NSelect
-                          options={[
-                            { value: 'VARCHAR', label: 'VARCHAR' },
-                            { value: 'INTEGER', label: 'INTEGER' },
-                            { value: 'LONG', label: 'LONG' },
-                            { value: 'FLOAT', label: 'FLOAT' },
-                            { value: 'DOUBLE', label: 'DOUBLE' },
-                            { value: 'DATE', label: 'DATE' },
-                            { value: 'TIME', label: 'TIME' },
-                            { value: 'BOOLEAN', label: 'BOOLEAN' },
-                            { value: 'LIST', label: 'LIST' },
-                            { value: 'FILE', label: 'FILE' }
-                          ]}
-                          v-model:value={param.value.type}
-                          defaultValue={'VARCHAR'}
-                      />
-                    </NGridItem>
-                    <NGridItem span={6}>
+                    <NGridItem span={9}>
                       <NInput
                         v-model:value={param.value.value}
                         placeholder={t('project.dag.value')}

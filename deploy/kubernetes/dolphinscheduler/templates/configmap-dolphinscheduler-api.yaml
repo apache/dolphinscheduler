@@ -54,13 +54,15 @@ data:
       messages:
         basename: i18n/messages
       datasource:
-        driver-class-name: org.postgresql.Driver
-        url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
-        username: root
-        password: root
-        hikari:
-          connection-test-query: select 1
-          pool-name: DolphinScheduler
+        profile: postgresql
+        config:
+          driver-class-name: org.postgresql.Driver
+          url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+          username: root
+          password: root
+          hikari:
+            connection-test-query: select 1
+            pool-name: DolphinScheduler
       quartz:
         auto-startup: false
         job-store-type: jdbc
@@ -237,21 +239,6 @@ data:
       application-name: ""
       # Doplhinscheduler login url
       redirect-url: ""
-    
-    # Override by profile
-    ---
-    spring:
-      config:
-        activate:
-          on-profile: mysql
-      datasource:
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
-        username: root
-        password: root
-      quartz:
-        properties:
-          org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
 {{- end }}
 
 

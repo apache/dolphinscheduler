@@ -73,17 +73,14 @@ Parameters of restarting the task by interface
 
 ## Environment to prepare
 
-Some AWS configuration is required, modify a field in file `aws.yaml`
+Some AWS configuration is required, modify a field in file `common.properties`
 
 ```yaml
-dms:
-  # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
-  # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
-  # InstanceProfileCredentialsProvider: use the IAM role to authenticate
-  credentials.provider.type: AWSStaticCredentialsProvider
-  access.key.id: <access.key.id>
-  access.key.secret: <access.key.secret>
-  region: <region>
-  endpoint: <endpoint>
+# The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.access.key.id=<YOUR AWS ACCESS KEY>
+# The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.secret.access.key=<YOUR AWS SECRET KEY>
+# The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
+resource.aws.region=<AWS REGION>
 ```
 

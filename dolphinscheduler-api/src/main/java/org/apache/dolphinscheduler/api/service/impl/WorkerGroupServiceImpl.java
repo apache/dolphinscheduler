@@ -66,6 +66,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.facebook.presto.jdbc.internal.guava.base.Strings;
 
 /**
  * worker group service impl
@@ -247,7 +248,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return boolean
      */
     private String checkWorkerGroupAddrList(WorkerGroup workerGroup) {
-        if (StringUtils.isEmpty(workerGroup.getAddrList())) {
+        if (Strings.isNullOrEmpty(workerGroup.getAddrList())) {
             return null;
         }
         Map<String, String> serverMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);

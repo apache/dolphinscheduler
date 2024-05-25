@@ -17,18 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.storage.s3;
 
+import static org.apache.dolphinscheduler.common.constants.Constants.AWS_END_POINT;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
-import org.apache.dolphinscheduler.authentication.aws.AmazonS3ClientFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,7 +57,11 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Request;
@@ -74,7 +79,15 @@ import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 @Data
 public class S3StorageOperator implements Closeable, StorageOperate {
 
+    private String accessKeyId;
+
+    private String accessKeySecret;
+
+    private String region;
+
     private String bucketName;
+
+    private String endPoint;
 
     private AmazonS3 s3Client;
 
@@ -82,17 +95,53 @@ public class S3StorageOperator implements Closeable, StorageOperate {
     }
 
     public void init() {
+        accessKeyId = readAccessKeyID();
+        accessKeySecret = readAccessKeySecret();
+        region = readRegion();
         bucketName = readBucketName();
+        endPoint = readEndPoint();
         s3Client = buildS3Client();
         checkBucketNameExists(bucketName);
     }
 
     protected AmazonS3 buildS3Client() {
-        return AmazonS3ClientFactory.createAmazonS3Client(PropertyUtils.getByPrefix("aws.s3.", ""));
+        if (!StringUtils.isEmpty(endPoint)) {
+            return AmazonS3ClientBuilder
+                    .standard()
+                    .withPathStyleAccessEnabled(true)
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(
+                            endPoint, region))
+                    .withCredentials(
+                            new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
+                    .build();
+        } else {
+            return AmazonS3ClientBuilder
+                    .standard()
+                    .withCredentials(
+                            new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKeyId, accessKeySecret)))
+                    .withRegion(region)
+                    .build();
+        }
+    }
+
+    protected String readAccessKeyID() {
+        return PropertyUtils.getString(TaskConstants.AWS_ACCESS_KEY_ID);
+    }
+
+    protected String readAccessKeySecret() {
+        return PropertyUtils.getString(TaskConstants.AWS_SECRET_ACCESS_KEY);
+    }
+
+    protected String readRegion() {
+        return PropertyUtils.getString(TaskConstants.AWS_REGION);
     }
 
     protected String readBucketName() {
         return PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME);
+    }
+
+    protected String readEndPoint() {
+        return PropertyUtils.getString(AWS_END_POINT);
     }
 
     @Override

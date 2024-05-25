@@ -89,8 +89,8 @@ public class TaskInstanceKillOperationFunction
             taskExecutionContext
                     .setCurrentExecutionStatus(result ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
 
-            WorkerTaskExecutorHolder.remove(taskInstanceId);
-            messageRetryRunner.removeRetryMessages(taskInstanceId);
+            WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
+            messageRetryRunner.removeRetryMessages(taskExecutionContext.getTaskInstanceId());
             return TaskInstanceKillResponse.success(taskExecutionContext);
         } finally {
             LogUtils.removeTaskInstanceIdMDC();

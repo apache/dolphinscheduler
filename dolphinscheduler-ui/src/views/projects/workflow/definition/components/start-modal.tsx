@@ -34,6 +34,7 @@ import { useModal } from './use-modal'
 import {
   NForm,
   NFormItem,
+  NButton,
   NIcon,
   NInput,
   NSpace,
@@ -44,14 +45,13 @@ import {
   NCheckbox,
   NDatePicker,
   NRadioButton,
-  NInputNumber,
-  NDynamicInput,
-  NGrid,
-  NGridItem
+  NInputNumber
 } from 'naive-ui'
 import {
   ArrowDownOutlined,
-  ArrowUpOutlined
+  ArrowUpOutlined,
+  DeleteOutlined,
+  PlusCircleOutlined
 } from '@vicons/antd'
 import { IDefinitionData } from '../types'
 import styles from '../index.module.scss'
@@ -580,67 +580,50 @@ export default defineComponent({
             label={t('project.workflow.startup_parameter')}
             path='startup_parameter'
           >
-            <NDynamicInput
-                v-model:value={this.startParamsList}
-                onCreate={() => {
-                  return {
-                    key: '',
-                    direct: 'IN',
-                    type: 'VARCHAR',
-                    value: ''
-                  }
-                }}
-                class='input-startup-params'
-            >
-              {{
-                default: (param: {
-                  value: { prop: string; direct: string; type: string; value: string }
-                }) => (
-                    <NGrid xGap={12} cols={24}>
-                      <NGridItem span={6}>
-                        <NInput
-                            v-model:value={param.value.prop}
-                            placeholder={t('project.dag.key')}
-                        />
-                      </NGridItem>
-                      <NGridItem span={5}>
-                        <NSelect
-                            options={[
-                              { value: 'IN', label: 'IN' },
-                              { value: 'OUT', label: 'OUT' }
-                            ]}
-                            v-model:value={param.value.direct}
-                            defaultValue={'IN'}
-                        />
-                      </NGridItem>
-                      <NGridItem span={7}>
-                        <NSelect
-                            options={[
-                              { value: 'VARCHAR', label: 'VARCHAR' },
-                              { value: 'INTEGER', label: 'INTEGER' },
-                              { value: 'LONG', label: 'LONG' },
-                              { value: 'FLOAT', label: 'FLOAT' },
-                              { value: 'DOUBLE', label: 'DOUBLE' },
-                              { value: 'DATE', label: 'DATE' },
-                              { value: 'TIME', label: 'TIME' },
-                              { value: 'BOOLEAN', label: 'BOOLEAN' },
-                              { value: 'LIST', label: 'LIST' },
-                              { value: 'FILE', label: 'FILE' }
-                            ]}
-                            v-model:value={param.value.type}
-                            defaultValue={'VARCHAR'}
-                        />
-                      </NGridItem>
-                      <NGridItem span={6}>
-                        <NInput
-                            v-model:value={param.value.value}
-                            placeholder={t('project.dag.value')}
-                        />
-                      </NGridItem>
-                    </NGrid>
-                )
-              }}
-            </NDynamicInput>
+            {this.startParamsList.length === 0 ? (
+              <NButton text type='primary' onClick={this.addStartParams}>
+                <NIcon>
+                  <PlusCircleOutlined />
+                </NIcon>
+              </NButton>
+            ) : (
+              <NSpace vertical>
+                {this.startParamsList.map((item, index) => (
+                  <NSpace class={styles.startup} key={Date.now() + index}>
+                    <NInput
+                      allowInput={this.trim}
+                      pair
+                      separator=':'
+                      placeholder={['prop', 'value']}
+                      defaultValue={[item.prop, item.value]}
+                      onUpdateValue={(param) =>
+                        this.updateParamsList(index, param)
+                      }
+                    />
+                    <NButton
+                      text
+                      type='error'
+                      onClick={() => this.removeStartParams(index)}
+                      class='btn-delete-custom-parameter'
+                    >
+                      <NIcon>
+                        <DeleteOutlined />
+                      </NIcon>
+                    </NButton>
+                    <NButton
+                      text
+                      type='primary'
+                      onClick={this.addStartParams}
+                      class='btn-create-custom-parameter'
+                    >
+                      <NIcon>
+                        <PlusCircleOutlined />
+                      </NIcon>
+                    </NButton>
+                  </NSpace>
+                ))}
+              </NSpace>
+            )}
           </NFormItem>
           <NFormItem
             label={t('project.workflow.whether_dry_run')}

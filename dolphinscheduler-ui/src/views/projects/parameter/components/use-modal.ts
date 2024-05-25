@@ -27,7 +27,6 @@ import {
   UpdateProjectParameterReq
 } from '@/service/modules/projects-parameter/types'
 import { useRouter } from 'vue-router'
-import { DEFAULT_DATA_TYPE } from "@/views/projects/parameter/data_type";
 
 export function useModal(
   props: any,
@@ -42,8 +41,7 @@ export function useModal(
     model: {
       code: ref<number>(-1),
       projectParameterName: ref(''),
-      projectParameterValue: ref(''),
-      projectParameterDataType: ref(DEFAULT_DATA_TYPE)
+      projectParameterValue: ref('')
     },
     saving: false,
     rules: {
@@ -62,15 +60,6 @@ export function useModal(
         validator() {
           if (variables.model.projectParameterValue === '') {
             return new Error(t('project.parameter.value_tips'))
-          }
-        }
-      },
-      data_type: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (variables.model.projectParameterDataType === '') {
-            return new Error(t('project.parameter.data_type_tips'))
           }
         }
       }
@@ -94,14 +83,12 @@ export function useModal(
   const submitModal = () => {
     const data: ProjectParameterReq = {
       projectParameterName: variables.model.projectParameterName,
-      projectParameterValue: variables.model.projectParameterValue,
-      projectParameterDataType: variables.model.projectParameterDataType
+      projectParameterValue: variables.model.projectParameterValue
     }
 
     createProjectParameter(data, variables.projectCode).then(() => {
       variables.model.projectParameterName = ''
       variables.model.projectParameterValue = ''
-      variables.model.projectParameterDataType = DEFAULT_DATA_TYPE
       ctx.emit('confirmModal', props.showModalRef)
     })
   }
@@ -110,8 +97,7 @@ export function useModal(
     const data: UpdateProjectParameterReq = {
       code: variables.model.code,
       projectParameterName: variables.model.projectParameterName,
-      projectParameterValue: variables.model.projectParameterValue,
-      projectParameterDataType: variables.model.projectParameterDataType
+      projectParameterValue: variables.model.projectParameterValue
     }
 
     updateProjectParameter(data, variables.projectCode).then(() => {

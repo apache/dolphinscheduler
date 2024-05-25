@@ -668,7 +668,6 @@ CREATE TABLE `t_ds_project_parameter` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `param_name` varchar(255) NOT NULL COMMENT 'project parameter name',
   `param_value` text NOT NULL COMMENT 'project parameter value',
-  `param_data_type` varchar(50) DEFAULT 'VARCHAR' COMMENT 'project parameter data type',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
@@ -1045,7 +1044,7 @@ CREATE TABLE `t_ds_version` (
 -- ----------------------------
 -- Records of t_ds_version
 -- ----------------------------
-INSERT IGNORE INTO `t_ds_version` VALUES ('1', '3.2.2');
+INSERT IGNORE INTO `t_ds_version` VALUES ('1', '3.3.0');
 
 
 -- ----------------------------
