@@ -74,7 +74,7 @@ public abstract class BaseTaskExecuteRunnable implements TaskExecuteRunnable {
         if (taskGroupPriorityCompareResult != 0) {
             return -taskGroupPriorityCompareResult;
         }
-        // The task instance shouldn't be equals
+        // earlier submit time, higher priority
         return taskInstance.getFirstSubmitTime().compareTo(other.getTaskInstance().getFirstSubmitTime());
     }
 

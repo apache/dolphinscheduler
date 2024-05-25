@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
+import org.apache.commons.lang3.time.DateUtils;
+
 import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.CompletableFuture;
@@ -121,6 +123,33 @@ class GlobalTaskDispatchWaitingQueueTest {
         TaskExecuteRunnable taskExecuteRunnable3 = createTaskExecuteRunnable();
         taskExecuteRunnable3.getTaskInstance().setId(3);
         taskExecuteRunnable3.getTaskInstance().setTaskGroupPriority(Priority.LOW.getCode());
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable3);
+
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+                .isEqualTo(3);
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+                .isEqualTo(1);
+        assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
+                .isEqualTo(2);
+    }
+
+    @Test
+    void takeTaskExecuteRunnable_withDifferentSubmitTime() {
+        Date now = new Date();
+
+        TaskExecuteRunnable taskExecuteRunnable1 = createTaskExecuteRunnable();
+        taskExecuteRunnable1.getTaskInstance().setId(1);
+        taskExecuteRunnable1.getTaskInstance().setFirstSubmitTime(now);
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable1);
+
+        TaskExecuteRunnable taskExecuteRunnable2 = createTaskExecuteRunnable();
+        taskExecuteRunnable2.getTaskInstance().setId(2);
+        taskExecuteRunnable2.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, 1));
+        globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable2);
+
+        TaskExecuteRunnable taskExecuteRunnable3 = createTaskExecuteRunnable();
+        taskExecuteRunnable3.getTaskInstance().setId(3);
+        taskExecuteRunnable3.getTaskInstance().setFirstSubmitTime(DateUtils.addMinutes(now, -1));
         globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnable(taskExecuteRunnable3);
 
         assertThat(globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable().getTaskInstance().getId())
