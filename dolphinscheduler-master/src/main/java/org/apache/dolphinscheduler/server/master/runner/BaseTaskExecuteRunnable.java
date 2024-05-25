@@ -52,4 +52,30 @@ public abstract class BaseTaskExecuteRunnable implements TaskExecuteRunnable {
         return taskExecutionContext;
     }
 
+    @Override
+    public int compareTo(TaskExecuteRunnable other) {
+        if (other == null) {
+            return 1;
+        }
+        int workflowInstancePriorityCompareResult = workflowInstance.getProcessInstancePriority().getCode() -
+                other.getWorkflowInstance().getProcessInstancePriority().getCode();
+        if (workflowInstancePriorityCompareResult != 0) {
+            return workflowInstancePriorityCompareResult;
+        }
+
+        int taskInstancePriorityCompareResult = taskInstance.getTaskInstancePriority().getCode()
+                - other.getTaskInstance().getTaskInstancePriority().getCode();
+        if (taskInstancePriorityCompareResult != 0) {
+            return taskInstancePriorityCompareResult;
+        }
+        // larger number, higher priority
+        int taskGroupPriorityCompareResult =
+                taskInstance.getTaskGroupPriority() - other.getTaskInstance().getTaskGroupPriority();
+        if (taskGroupPriorityCompareResult != 0) {
+            return -taskGroupPriorityCompareResult;
+        }
+        // The task instance shouldn't be equals
+        return taskInstance.getFirstSubmitTime().compareTo(other.getTaskInstance().getFirstSubmitTime());
+    }
+
 }
