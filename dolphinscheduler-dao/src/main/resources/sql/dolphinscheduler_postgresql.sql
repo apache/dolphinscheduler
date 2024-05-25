@@ -595,6 +595,7 @@ CREATE TABLE t_ds_project_parameter (
   id int NOT NULL  ,
   param_name varchar(255) NOT NULL ,
   param_value text NOT NULL ,
+  param_data_type varchar(50) DEFAULT 'VARCHAR',
   code bigint NOT NULL,
   project_code bigint NOT NULL,
   user_id int DEFAULT NULL ,
@@ -1063,7 +1064,7 @@ INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('3.3.0');
+INSERT INTO t_ds_version(version) VALUES ('3.2.2');
 
 --
 -- Table structure for table t_ds_plugin_define

@@ -57,6 +57,7 @@
         <module>dolphinscheduler-storage-plugin</module>
         <module>dolphinscheduler-extract</module>
         <module>dolphinscheduler-dao-plugin</module>
+        <module>dolphinscheduler-authentication</module>
     </modules>
 
     <properties>
@@ -232,6 +233,11 @@
                 <artifactId>dolphinscheduler-task-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-task-all-prune</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
@@ -291,6 +297,12 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-dao-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-aws-authentication</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
