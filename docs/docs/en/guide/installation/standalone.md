@@ -36,7 +36,7 @@ Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinSch
 
 ### Start or Stop Server
 
-The script `./bin/dolphinscheduler-daemon.sh`can be used not only quickly start standalone, but also to stop the service operation. The following are all the commands:
+The script `./bin/dolphinscheduler-daemon.sh` can be used not only quickly start standalone, but also to stop the service operation. The following are all the commands:
 
 ```shell
 # Start Standalone Server
