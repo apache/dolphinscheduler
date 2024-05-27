@@ -67,8 +67,6 @@ worker:
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     auto-create-tenant-enabled: true
-    # Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, auto-create-tenant-enabled has no effect and will not automatically create tenants.
-    distributed-tenant-enabled: false
     # If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`.
     default-tenant-enabled: false
 

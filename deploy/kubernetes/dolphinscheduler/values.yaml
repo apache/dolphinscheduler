@@ -654,8 +654,6 @@ worker:
     WORKER_HOST_WEIGHT: "100"
     # -- tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: true
-    # -- Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
-    WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT: false
     # -- If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
     DEFAULT_TENANT_ENABLED: false
 
