@@ -15,30 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+package org.apache.dolphinscheduler.server.master.runner.queue;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import java.util.concurrent.DelayQueue;
 
-/**
- * This interface is used to define a task which is executing.
- * todo: split to MasterTaskExecuteRunnable and WorkerTaskExecuteRunnable
- */
-public interface TaskExecuteRunnable extends Comparable<TaskExecuteRunnable> {
+import lombok.SneakyThrows;
 
-    void dispatch();
+public class PriorityDelayQueue<V extends DelayEntry> {
 
-    void kill();
+    private final DelayQueue<V> queue = new DelayQueue<>();
 
-    void pause();
+    public void add(V v) {
+        queue.put(v);
+    }
 
-    void timeout();
+    @SneakyThrows
+    public V take() {
+        return queue.take();
+    }
 
-    ProcessInstance getWorkflowInstance();
-
-    TaskInstance getTaskInstance();
-
-    TaskExecutionContext getTaskExecutionContext();
+    public int size() {
+        return queue.size();
+    }
 
 }
