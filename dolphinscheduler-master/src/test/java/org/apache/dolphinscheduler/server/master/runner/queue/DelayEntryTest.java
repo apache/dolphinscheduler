@@ -15,30 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.runner;
+package org.apache.dolphinscheduler.server.master.runner.queue;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import java.util.concurrent.TimeUnit;
 
-/**
- * This interface is used to define a task which is executing.
- * todo: split to MasterTaskExecuteRunnable and WorkerTaskExecuteRunnable
- */
-public interface TaskExecuteRunnable extends Comparable<TaskExecuteRunnable> {
+import org.junit.jupiter.api.Test;
 
-    void dispatch();
+import com.google.common.truth.Truth;
 
-    void kill();
+class DelayEntryTest {
 
-    void pause();
-
-    void timeout();
-
-    ProcessInstance getWorkflowInstance();
-
-    TaskInstance getTaskInstance();
-
-    TaskExecutionContext getTaskExecutionContext();
-
+    @Test
+    void getDelay() {
+        DelayEntry<String> delayEntry = new DelayEntry<>(1_000L, "Item");
+        Truth.assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
+                .isWithin(100)
+                .of(TimeUnit.NANOSECONDS.convert(1_000L, TimeUnit.MILLISECONDS));
+    }
 }

@@ -66,7 +66,6 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setEnvironmentConfig(taskInstance.getEnvironmentConfig());
         taskExecutionContext.setHost(taskInstance.getHost());
-        taskExecutionContext.setDelayTime(taskInstance.getDelayTime());
         taskExecutionContext.setVarPool(taskInstance.getVarPool());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());
         taskExecutionContext.setTestFlag(taskInstance.getTestFlag());
