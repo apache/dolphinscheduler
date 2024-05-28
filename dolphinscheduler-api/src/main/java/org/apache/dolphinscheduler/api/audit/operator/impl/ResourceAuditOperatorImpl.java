@@ -37,7 +37,7 @@ public class ResourceAuditOperatorImpl extends BaseAuditOperator {
     }
 
     @Override
-    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
+    protected void setObjectByParam(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
 
         Object objName = getFileNameFromParam(paramNameArr, paramsMap);

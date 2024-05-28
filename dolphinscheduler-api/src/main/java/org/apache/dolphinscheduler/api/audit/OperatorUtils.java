@@ -126,7 +126,7 @@ public class OperatorUtils {
         return auditType.getAuditOperationType();
     }
 
-    public static long getObjectIdentityByParma(String[] paramNameArr, Map<String, Object> paramsMap) {
+    public static long getObjectIdentityByParam(String[] paramNameArr, Map<String, Object> paramsMap) {
         for (String name : paramNameArr) {
             if (paramsMap.get(name) instanceof String) {
                 String param = (String) paramsMap.get(name);

@@ -31,7 +31,7 @@ public class TaskInstancesAuditOperatorImpl extends BaseAuditOperator {
     private TaskInstanceMapper taskInstanceMapper;
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";

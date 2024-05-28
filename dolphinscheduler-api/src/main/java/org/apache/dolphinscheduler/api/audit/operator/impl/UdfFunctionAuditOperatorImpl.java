@@ -33,7 +33,7 @@ public class UdfFunctionAuditOperatorImpl extends BaseAuditOperator {
     private UdfFuncMapper udfFuncMapper;
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromIdentity(Object identity) {
         int objId = NumberUtils.toInt(identity.toString(), -1);
         if (objId == -1) {
             return "";
