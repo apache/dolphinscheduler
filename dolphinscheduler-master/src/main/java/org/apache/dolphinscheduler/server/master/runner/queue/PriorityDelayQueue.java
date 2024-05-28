@@ -15,29 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.server.master.runner.queue;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import java.util.concurrent.DelayQueue;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import lombok.SneakyThrows;
 
-@Service
-public class TaskGroupAuditOperatorImpl extends BaseAuditOperator {
+public class PriorityDelayQueue<V extends DelayEntry> {
 
-    @Autowired
-    private TaskGroupMapper taskGroupMapper;
+    private final DelayQueue<V> queue = new DelayQueue<>();
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
-
-        TaskGroup obj = taskGroupMapper.selectById(objId);
-        return obj == null ? "" : obj.getName();
+    public void add(V v) {
+        queue.put(v);
     }
+
+    @SneakyThrows
+    public V take() {
+        return queue.take();
+    }
+
+    public int size() {
+        return queue.size();
+    }
+
 }
