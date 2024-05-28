@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.runner.operator.TaskExecuteRunnableOperatorManager;
 
-public class DefaultTaskExecuteRunnable extends PriorityDelayTaskExecuteRunnable {
+public class DefaultTaskExecuteRunnable extends BaseTaskExecuteRunnable {
 
     private final TaskExecuteRunnableOperatorManager taskExecuteRunnableOperatorManager;
 
