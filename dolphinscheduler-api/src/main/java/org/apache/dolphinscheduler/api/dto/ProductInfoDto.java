@@ -28,8 +28,5 @@ import java.util.List;
 @Data
 public class ProductInfoDto {
 
-    private Integer id;
-
     private String version;
-
 }

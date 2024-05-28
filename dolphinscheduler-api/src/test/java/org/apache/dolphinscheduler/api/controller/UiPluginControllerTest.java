@@ -63,8 +63,6 @@ public class UiPluginControllerTest extends AbstractControllerTest {
     private static final ImmutableMap<String, Object> uiPluginServiceResult =
             ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
 
-    private static final Logger logger = LoggerFactory.getLogger(TenantControllerTest.class);
-
     @MockBean(name = "uiPluginService")
     private UiPluginService uiPluginService;
 
@@ -107,7 +105,7 @@ public class UiPluginControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryProductInfo() throws Exception {
         ProductInfoDto mockResult = new ProductInfoDto();
-        Mockito.when(uiPluginService.queryProductInfo(Mockito.any())).thenReturn(mockResult);
+        Mockito.when(uiPluginService.queryProductInfo()).thenReturn(mockResult);
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("userId", "1");

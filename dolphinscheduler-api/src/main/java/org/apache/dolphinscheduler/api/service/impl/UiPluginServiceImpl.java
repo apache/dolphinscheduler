@@ -105,8 +105,7 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     }
 
     @Override
-    public ProductInfoDto queryProductInfo(User loginUser) {
-        // persist to the database
+    public ProductInfoDto queryProductInfo() {
         ProductInfoDto result = new ProductInfoDto();
         result.setVersion(dsVersion);
         return result;
