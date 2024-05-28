@@ -711,6 +711,7 @@ const DetailModal = defineComponent({
                 >
                   <NInput
                     allowInput={this.trim}
+                    defaultValue={'default'}
                     v-model={[detailForm.namespace, 'value']}
                     placeholder={t('datasource.namespace_tips')}
                   />
