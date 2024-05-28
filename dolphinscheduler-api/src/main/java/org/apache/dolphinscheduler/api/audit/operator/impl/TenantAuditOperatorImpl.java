@@ -31,7 +31,7 @@ public class TenantAuditOperatorImpl extends BaseAuditOperator {
     private TenantMapper tenantMapper;
 
     @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
+    public String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";
