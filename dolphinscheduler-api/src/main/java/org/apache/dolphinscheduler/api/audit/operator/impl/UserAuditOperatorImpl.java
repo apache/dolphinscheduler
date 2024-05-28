@@ -31,7 +31,7 @@ public class UserAuditOperatorImpl extends BaseAuditOperator {
     private UserMapper userMapper;
 
     @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
+    public String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";
