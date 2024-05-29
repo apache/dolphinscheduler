@@ -94,5 +94,9 @@ export default {
   kubeConfig: 'kubeConfig',
   kubeConfig_tips: '请输入KubeConfig',
   namespace: 'namespace',
-  namespace_tips: '请输入namespace'
+  namespace_tips: '请输入namespace',
+  access_key_id: 'Access Key Id',
+  access_key_id_tips: '请输入access key id',
+  access_Key_secret: 'Access Key Secret',
+  access_Key_secret_tips: '请输入access key secret'
 }

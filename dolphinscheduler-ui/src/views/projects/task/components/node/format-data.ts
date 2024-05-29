@@ -337,9 +337,9 @@ export function formatParams(data: INodeData): {
   }
 
   if (data.taskType === 'ALIYUN_SERVERLESS_SPARK') {
-    taskParams.regionId = data.regionId
-    taskParams.accessKeyId = data.accessKeyId
-    taskParams.accessKeySecret = data.accessKeySecret
+    // taskParams.regionId = data.regionId
+    // taskParams.accessKeyId = data.accessKeyId
+    // taskParams.accessKeySecret = data.accessKeySecret
     taskParams.workspaceId = data.workspaceId
     taskParams.resourceQueueId = data.resourceQueueId
     taskParams.codeType = data.codeType
@@ -349,6 +349,7 @@ export function formatParams(data: INodeData): {
     taskParams.entryPointArguments = data.entryPointArguments
     taskParams.sparkSubmitParameters = data.sparkSubmitParameters
     taskParams.isProduction = data.isProduction
+    taskParams.type = data.type
   }
 
   if (data.taskType === 'K8S') {

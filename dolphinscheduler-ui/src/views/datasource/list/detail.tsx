@@ -155,6 +155,9 @@ const DetailModal = defineComponent({
       showHost,
       showPort,
       showRestEndpoint,
+      showAccessKeyId,
+      showAccessKeySecret,
+      showRegionId,
       showAwsRegion,
       showCompatibleMode,
       showConnectType,
@@ -268,6 +271,51 @@ const DetailModal = defineComponent({
                     type='text'
                     maxlength={255}
                     placeholder={t('datasource.zeppelin_rest_endpoint_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showAccessKeyId}
+                    label={t('datasource.access_key_id')}
+                    path='accessKeyId'
+                    show-require-mark
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      class='input-access_key_id'
+                      v-model={[detailForm.accessKeyId, 'value']}
+                      type='text'
+                      maxlength={255}
+                      placeholder={t('datasource.access_key_id_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showAccessKeySecret}
+                    label={t('datasource.access_key_secret')}
+                    path='accessKeySecret'
+                    show-require-mark
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      class='input-access_key_secret'
+                      v-model={[detailForm.accessKeySecret, 'value']}
+                      type='text'
+                      maxlength={255}
+                      placeholder={t('datasource.access_key_secret_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showRegionId}
+                    label={t('datasource.region_id')}
+                    path='regionId'
+                    show-require-mark
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      class='input-region_id'
+                      v-model={[detailForm.regionId, 'value']}
+                      type='text'
+                      maxlength={255}
+                      placeholder={t('datasource.region_id_tips')}
                   />
                 </NFormItem>
                 <NFormItem
@@ -546,7 +594,7 @@ const DetailModal = defineComponent({
                 <NFormItem
                   v-show={
                     (!showMode || detailForm.mode === 'password') &&
-                    detailForm.type != 'K8S'
+                    detailForm.type != 'K8S' && detailForm.type != 'ALIYUN_SERVERLESS_SPARK'
                   }
                   label={t('datasource.user_name')}
                   path='userName'
@@ -564,7 +612,7 @@ const DetailModal = defineComponent({
                 <NFormItem
                   v-show={
                     (!showMode || detailForm.mode === 'password') &&
-                    detailForm.type != 'K8S'
+                    detailForm.type != 'K8S' && detailForm.type != 'ALIYUN_SERVERLESS_SPARK'
                   }
                   label={t('datasource.user_password')}
                   path='password'

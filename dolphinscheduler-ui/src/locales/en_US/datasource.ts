@@ -97,5 +97,11 @@ export default {
   kubeConfig: 'kubeConfig',
   kubeConfig_tips: 'Please input KubeConfig',
   namespace: 'namespace',
-  namespace_tips: 'Please input namespace'
+  namespace_tips: 'Please input namespace',
+  access_key_id: 'Access Key Id',
+  access_key_id_tips: 'Please enter access key id',
+  access_Key_secret: 'Access Key Secret',
+  access_Key_secret_tips: 'Please enter access key secret',
+  region_id: 'Region Id',
+  region_id_tips: 'Please enter region id'
 }

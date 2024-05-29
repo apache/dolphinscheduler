@@ -65,7 +65,7 @@ export function useAliyunServerlessSpark({
             ...Fields.useFailed(),
             Fields.useDelayTime(model),
             ...Fields.useTimeoutAlarm(model),
-            // ...Fields.useDatasource(model),
+            ...Fields.useDatasource(model),
             ...Fields.useAliyunServerlessSpark(model),
             Fields.usePreTasks()
         ] as IJsonItem[],

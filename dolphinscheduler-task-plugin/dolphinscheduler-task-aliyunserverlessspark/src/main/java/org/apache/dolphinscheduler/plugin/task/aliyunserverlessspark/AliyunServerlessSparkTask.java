@@ -18,12 +18,18 @@
 package org.apache.dolphinscheduler.plugin.task.aliyunserverlessspark;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.param.AliyunServerlessSparkConnectionParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.aliyun.emr_serverless_spark20230808.Client;
 
@@ -56,11 +62,19 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private AliyunServerlessSparkParameters aliyunServerlessSparkParameters;
 
+    private AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam;
+
     private String jobRunId;
 
     private RunState previousState;
 
     private RunState currentState;
+
+    private String accessKeyId;
+
+    private String accessKeySecret;
+
+    private String regionId;
 
     protected AliyunServerlessSparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -75,9 +89,19 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             throw new AliyunServerlessSparkTaskException("Aliyun-Serverless-Spark task parameters are not valid!");
         }
 
-        String accessKeyId = aliyunServerlessSparkParameters.getAccessKeyId();
-        String accessKeySecret = aliyunServerlessSparkParameters.getAccessKeySecret();
-        String regionId = aliyunServerlessSparkParameters.getRegionId();
+        ResourceParametersHelper resourceParametersHelper = taskExecutionContext.getResourceParametersHelper();
+        DataSourceParameters dataSourceParameters = (DataSourceParameters) resourceParametersHelper.getResourceParameters(ResourceType.DATASOURCE, aliyunServerlessSparkParameters.getDatasource());
+        log.info("[debug111] dataSourceParameters - {}", dataSourceParameters);
+        log.info("[debug111] aliyunServerlessSparkParameters - {}", aliyunServerlessSparkParameters);
+        aliyunServerlessSparkConnectionParam = (AliyunServerlessSparkConnectionParam) DataSourceUtils
+            .buildConnectionParams(
+                DbType.valueOf(aliyunServerlessSparkParameters.getType()),
+                dataSourceParameters.getConnectionParams());
+
+        accessKeyId = aliyunServerlessSparkConnectionParam.getAccessKeyId();
+        accessKeySecret = aliyunServerlessSparkConnectionParam.getAccessKeySecret();
+        regionId = aliyunServerlessSparkConnectionParam.getRegionId();
+
         try {
             aliyunServerlessSparkClient = buildAliyunServerlessSparkClient(accessKeyId, accessKeySecret, regionId);
         } catch (Exception e) {
@@ -169,7 +193,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private StartJobRunRequest buildStartJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
         StartJobRunRequest startJobRunRequest = new StartJobRunRequest();
-        startJobRunRequest.setRegionId(aliyunServerlessSparkParameters.getRegionId());
+        startJobRunRequest.setRegionId(regionId);
         startJobRunRequest.setResourceQueueId(aliyunServerlessSparkParameters.getResourceQueueId());
         startJobRunRequest.setCodeType(aliyunServerlessSparkParameters.getCodeType());
         startJobRunRequest.setName(aliyunServerlessSparkParameters.getJobName());
@@ -198,13 +222,13 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private GetJobRunRequest buildGetJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
         GetJobRunRequest getJobRunRequest = new GetJobRunRequest();
-        getJobRunRequest.setRegionId(aliyunServerlessSparkParameters.getRegionId());
+        getJobRunRequest.setRegionId(regionId);
         return getJobRunRequest;
     }
 
     private CancelJobRunRequest buildCancelJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
         CancelJobRunRequest cancelJobRunRequest = new CancelJobRunRequest();
-        cancelJobRunRequest.setRegionId(aliyunServerlessSparkParameters.getRegionId());
+        cancelJobRunRequest.setRegionId(regionId);
         return cancelJobRunRequest;
     }
 }
