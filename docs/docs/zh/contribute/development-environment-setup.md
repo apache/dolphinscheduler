@@ -148,7 +148,7 @@ pnpm run dev
 
 #### zookeeper
 
-下载 [ZooKeeper](https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.6.3)，解压
+下载 [ZooKeeper](https://zookeeper.apache.org/releases.html)，解压
 
 * 在 ZooKeeper 的目录下新建 zkData、zkLog文件夹
 * 将 conf 目录下的 `zoo_sample.cfg` 文件，复制一份，重命名为 `zoo.cfg`，修改其中数据和日志的配置，如：
