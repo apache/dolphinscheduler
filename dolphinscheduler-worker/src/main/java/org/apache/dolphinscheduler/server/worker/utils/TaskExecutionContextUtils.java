@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -28,12 +26,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
-import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -44,43 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TaskExecutionContextUtils {
-
-    public static String getOrCreateTenant(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
-        try {
-            TenantConfig tenantConfig = workerConfig.getTenantConfig();
-
-            String tenantCode = taskExecutionContext.getTenantCode();
-            if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) && tenantConfig.isDefaultTenantEnabled()) {
-                log.info("Current tenant is default tenant, will use bootstrap user: {} to execute the task",
-                        TenantConstants.BOOTSTRAPT_SYSTEM_USER);
-                return TenantConstants.BOOTSTRAPT_SYSTEM_USER;
-            }
-            boolean osUserExistFlag;
-            // if Using distributed is true and Currently supported systems are linux,Should not let it
-            // automatically
-            // create tenants,so TenantAutoCreate has no effect
-            if (tenantConfig.isDistributedTenantEnabled() && SystemUtils.IS_OS_LINUX) {
-                // use the id command to judge in linux
-                osUserExistFlag = OSUtils.existTenantCodeInLinux(tenantCode);
-            } else if (OSUtils.isSudoEnable() && tenantConfig.isAutoCreateTenantEnabled()) {
-                // if not exists this user, then create
-                OSUtils.createUserIfAbsent(tenantCode);
-                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
-            } else {
-                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
-            }
-            if (!osUserExistFlag) {
-                throw new TaskException(
-                        String.format("TenantCode: %s doesn't exist", tenantCode));
-            }
-            return tenantCode;
-        } catch (TaskException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new TaskException(
-                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()), ex);
-        }
-    }
 
     public static void createTaskInstanceWorkingDirectory(TaskExecutionContext taskExecutionContext) throws TaskException {
         // local execute path

@@ -15,29 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.server.master.runner.queue;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.TaskGroup;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import java.util.concurrent.TimeUnit;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.Test;
 
-@Service
-public class TaskGroupAuditOperatorImpl extends BaseAuditOperator {
+import com.google.common.truth.Truth;
 
-    @Autowired
-    private TaskGroupMapper taskGroupMapper;
+class DelayEntryTest {
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
-
-        TaskGroup obj = taskGroupMapper.selectById(objId);
-        return obj == null ? "" : obj.getName();
+    @Test
+    void getDelay() {
+        DelayEntry<String> delayEntry = new DelayEntry<>(1_000L, "Item");
+        Truth.assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
+                .isWithin(100)
+                .of(TimeUnit.NANOSECONDS.convert(1_000L, TimeUnit.MILLISECONDS));
     }
 }
