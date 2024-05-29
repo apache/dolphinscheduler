@@ -100,8 +100,8 @@ export default {
   namespace_tips: 'Please input namespace',
   access_key_id: 'Access Key Id',
   access_key_id_tips: 'Please enter access key id',
-  access_Key_secret: 'Access Key Secret',
-  access_Key_secret_tips: 'Please enter access key secret',
+  access_key_secret: 'Access Key Secret',
+  access_key_secret_tips: 'Please enter access key secret',
   region_id: 'Region Id',
-  region_id_tips: 'Please enter region id'
+  region_id_tips: 'Please enter Region Id'
 }

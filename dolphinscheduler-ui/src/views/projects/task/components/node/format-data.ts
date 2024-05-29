@@ -350,6 +350,7 @@ export function formatParams(data: INodeData): {
     taskParams.sparkSubmitParameters = data.sparkSubmitParameters
     taskParams.isProduction = data.isProduction
     taskParams.type = data.type
+    taskParams.datasource = data.datasource
   }
 
   if (data.taskType === 'K8S') {

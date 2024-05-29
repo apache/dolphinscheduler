@@ -928,10 +928,10 @@ export default {
     engine_release_version_tips: "engine release version",
     entry_point: "entry point",
     entry_point_tips: "entry point",
-    entry_point_arguments: "",
-    entry_point_arguments_tip: "entry point arguments",
+    entry_point_arguments: "entry point arguments",
+    entry_point_arguments_tips: "entry point arguments",
     spark_submit_parameters: "spark submit parameters",
-    spark_submit_parameters_tip: "spark submit parameters",
+    spark_submit_parameters_tips: "spark submit parameters",
     is_production: "is production",
     is_production_tips: "is production"
   },

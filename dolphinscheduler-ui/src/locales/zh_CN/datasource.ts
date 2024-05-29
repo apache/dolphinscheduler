@@ -97,6 +97,8 @@ export default {
   namespace_tips: '请输入namespace',
   access_key_id: 'Access Key Id',
   access_key_id_tips: '请输入access key id',
-  access_Key_secret: 'Access Key Secret',
-  access_Key_secret_tips: '请输入access key secret'
+  access_key_secret: 'Access Key Secret',
+  access_key_secret_tips: '请输入access key secret',
+  region_id: 'Region Id',
+  region_id_tips: '请输入Region Id'
 }
