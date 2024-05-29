@@ -393,8 +393,7 @@
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql-connector.version}</version>
-<!--                TODO: Revert this!!!-->
-<!--                <scope>test</scope>-->
+                <scope>test</scope>
             </dependency>
 
             <dependency>

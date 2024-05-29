@@ -91,8 +91,6 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
         ResourceParametersHelper resourceParametersHelper = taskExecutionContext.getResourceParametersHelper();
         DataSourceParameters dataSourceParameters = (DataSourceParameters) resourceParametersHelper.getResourceParameters(ResourceType.DATASOURCE, aliyunServerlessSparkParameters.getDatasource());
-        log.info("[debug111] dataSourceParameters - {}", dataSourceParameters);
-        log.info("[debug111] aliyunServerlessSparkParameters - {}", aliyunServerlessSparkParameters);
         aliyunServerlessSparkConnectionParam = (AliyunServerlessSparkConnectionParam) DataSourceUtils
             .buildConnectionParams(
                 DbType.valueOf(aliyunServerlessSparkParameters.getType()),
@@ -184,9 +182,6 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private Client buildAliyunServerlessSparkClient(String accessKeyId, String accessKeySecret, String regionId) throws Exception {
         String endpoint = String.format("emr-serverless-spark.%s.aliyuncs.com", regionId);
-        log.info("[debug111] ak - {}", accessKeyId);
-        log.info("[debug111] sk - {}", accessKeySecret);
-        log.info("[debug111] region - {}", regionId);
         Config config = new Config()
             .setEndpoint(endpoint)
             .setAccessKeyId(accessKeyId)
