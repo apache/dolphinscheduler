@@ -257,6 +257,10 @@ export function useDataList() {
                 key: '/monitor/worker'
               },
               {
+                label: t('menu.alert_server'),
+                key: '/monitor/alert_server'
+              },
+              {
                 label: t('menu.db'),
                 key: '/monitor/db'
               }

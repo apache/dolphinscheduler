@@ -14,7 +14,7 @@ Configure all the configurations refer to [pseudo-cluster deployment](pseudo-clu
 
 ### Modify Configuration
 
-This step differs quite a lot from [pseudo-cluster deployment](pseudo-cluster.md), because the deployment script transfers the required resources for installation to each deployment machine by using `scp`. So we only need to modify the configuration of the machine that runs `install.sh` script and configurations will dispatch to cluster by `scp`. The configuration file is under the path `bin/env/install_env.sh`, here we only need to modify section **INSTALL MACHINE**, **DolphinScheduler ENV, Database, Registry Server** and keep other sections the same as [pseudo-cluster deployment](pseudo-cluster .md), the following describes the parameters that must be modified:
+This step differs quite a lot from [pseudo-cluster deployment](pseudo-cluster.md), because the deployment script transfers the required resources for installation to each deployment machine by using `scp`. So we only need to modify the configuration of the machine that runs `install.sh` script and configurations will dispatch to cluster by `scp`. The configuration file is under the path `bin/env/install_env.sh`, here we only need to modify section **INSTALL MACHINE**, **DolphinScheduler ENV, Database, Registry Server** and keep other sections the same as [pseudo-cluster deployment](pseudo-cluster.md), the following describes the parameters that must be modified:
 
 ```shell
 # ---------------------------------------------------------

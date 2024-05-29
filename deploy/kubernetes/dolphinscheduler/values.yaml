@@ -49,6 +49,10 @@ image:
   # -- tools image
   tools: dolphinscheduler-tools
 
+datasource:
+  # -- The profile of datasource
+  profile: postgresql
+
 postgresql:
   # -- If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL
   enabled: true
@@ -246,20 +250,25 @@ conf:
     # -- resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended
     resource.storage.upload.base.path: /dolphinscheduler
 
-    # -- The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-    resource.aws.access.key.id: minioadmin
+    # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
+    # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
+    # InstanceProfileCredentialsProvider: use the IAM role to authenticate
+    aws.credentials.provider.type: AWSStaticCredentialsProvider
 
-    # -- The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-    resource.aws.secret.access.key: minioadmin
+    # -- The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required
+    aws.s3.access.key.id: minioadmin
 
-    # -- The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required
-    resource.aws.region: ca-central-1
+    # -- The AWS secret access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required
+    aws.s3.access.key.secret: minioadmin
+
+    # -- The AWS Region to use. if resource.storage.type=S3, This configuration is required
+    aws.s3.region: ca-central-1
 
     # -- The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name.
-    resource.aws.s3.bucket.name: dolphinscheduler
+    aws.s3.bucket.name: dolphinscheduler
 
     # -- You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
-    resource.aws.s3.endpoint: http://minio:9000
+    aws.s3.endpoint: http://minio:9000
 
     # -- alibaba cloud access key id, required if you set resource.storage.type=OSS
     resource.alibaba.cloud.access.key.id: <your-access-key-id>
@@ -645,8 +654,6 @@ worker:
     WORKER_HOST_WEIGHT: "100"
     # -- tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: true
-    # -- Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
-    WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT: false
     # -- If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
     DEFAULT_TENANT_ENABLED: false
 

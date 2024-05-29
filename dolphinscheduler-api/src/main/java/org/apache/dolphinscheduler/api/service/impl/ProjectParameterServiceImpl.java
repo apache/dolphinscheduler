@@ -68,7 +68,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
     @Override
     @Transactional
     public Result createProjectParameter(User loginUser, long projectCode, String projectParameterName,
-                                         String projectParameterValue) {
+                                         String projectParameterValue, String projectParameterDataType) {
         Result result = new Result();
 
         // check if user have write perm for project
@@ -97,6 +97,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
                     .builder()
                     .paramName(projectParameterName)
                     .paramValue(projectParameterValue)
+                    .paramDataType(projectParameterDataType)
                     .code(CodeGenerateUtils.genCode())
                     .projectCode(projectCode)
                     .userId(loginUser.getId())
@@ -122,7 +123,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
     @Override
     public Result updateProjectParameter(User loginUser, long projectCode, long code, String projectParameterName,
-                                         String projectParameterValue) {
+                                         String projectParameterValue, String projectParameterDataType) {
         Result result = new Result();
 
         // check if user have write perm for project
@@ -155,6 +156,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         projectParameter.setParamName(projectParameterName);
         projectParameter.setParamValue(projectParameterValue);
+        projectParameter.setParamDataType(projectParameterDataType);
         projectParameter.setUpdateTime(new Date());
         projectParameter.setOperator(loginUser.getId());
 
@@ -236,7 +238,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
     @Override
     public Result queryProjectParameterListPaging(User loginUser, long projectCode, Integer pageSize, Integer pageNo,
-                                                  String searchVal) {
+                                                  String searchVal, String projectParameterDataType) {
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
@@ -249,7 +251,8 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
 
         IPage<ProjectParameter> iPage =
-                projectParameterMapper.queryProjectParameterListPaging(page, projectCode, null, searchVal);
+                projectParameterMapper.queryProjectParameterListPaging(page, projectCode, null, searchVal,
+                        projectParameterDataType);
 
         List<ProjectParameter> projectParameterList = iPage.getRecords();
 

@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.alert.api.HttpServiceRetryStrategy;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -64,11 +65,10 @@ public class PrometheusAlertSender {
             String resp = sendMsg(alertData);
             return checkSendAlertManageMsgResult(resp);
         } catch (Exception e) {
-            String errorMsg = String.format("send prometheus alert manager alert error, exception: %s", e.getMessage());
-            log.error(errorMsg);
+            log.error("Send prometheus alert manager alert error", e);
             alertResult = new AlertResult();
-            alertResult.setStatus("false");
-            alertResult.setMessage(errorMsg);
+            alertResult.setSuccess(false);
+            alertResult.setMessage(ExceptionUtils.getMessage(e));
         }
         return alertResult;
     }
@@ -106,10 +106,10 @@ public class PrometheusAlertSender {
 
     public AlertResult checkSendAlertManageMsgResult(String resp) {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
 
         if (Objects.equals(resp, PrometheusAlertConstants.ALERT_SUCCESS)) {
-            alertResult.setStatus("true");
+            alertResult.setSuccess(true);
             alertResult.setMessage("prometheus alert manager send success");
             return alertResult;
         }

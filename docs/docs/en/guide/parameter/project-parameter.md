@@ -8,7 +8,7 @@ Project-level parameters are valid for all task nodes under the entire project.
 
 ### Define project-level parameters
 
-On the project page, click Project Parameters and Create Parameters, and fill in the parameter name and parameter value. As shown below:
+On the project page, click Project Parameters and Create Parameters, and fill in the parameter name and parameter value, select the appropriate parameter value type. As shown below:
 
 ![project-parameter01](../../../../img/new_ui/dev/parameter/project_parameter01.png)
 

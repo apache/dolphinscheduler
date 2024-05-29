@@ -18,13 +18,11 @@
 package org.apache.dolphinscheduler.server.master.runner;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatchFactory;
-import org.apache.dolphinscheduler.server.master.runner.dispatcher.TaskDispatcher;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,10 +41,6 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     private final AtomicBoolean RUNNING_FLAG = new AtomicBoolean(false);
 
-    private final AtomicInteger DISPATCHED_CONSECUTIVE_FAILURE_TIMES = new AtomicInteger();
-
-    private static final Integer MAX_DISPATCHED_FAILED_TIMES = 100;
-
     public GlobalTaskDispatchWaitingQueueLooper() {
         super("GlobalTaskDispatchWaitingQueueLooper");
     }
@@ -64,29 +58,34 @@ public class GlobalTaskDispatchWaitingQueueLooper extends BaseDaemonThread imple
 
     @Override
     public void run() {
-        DefaultTaskExecuteRunnable defaultTaskExecuteRunnable;
         while (RUNNING_FLAG.get()) {
-            defaultTaskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
-            try {
-                TaskExecutionStatus status = defaultTaskExecuteRunnable.getTaskInstance().getState();
-                if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
-                    log.warn("The TaskInstance {} state is : {}, will not dispatch",
-                            defaultTaskExecuteRunnable.getTaskInstance().getName(), status);
-                    continue;
-                }
+            doDispatch();
+        }
+    }
 
-                TaskDispatcher taskDispatcher =
-                        taskDispatchFactory.getTaskDispatcher(defaultTaskExecuteRunnable.getTaskInstance());
-                taskDispatcher.dispatchTask(defaultTaskExecuteRunnable);
-                DISPATCHED_CONSECUTIVE_FAILURE_TIMES.set(0);
-            } catch (Exception e) {
-                defaultTaskExecuteRunnable.getTaskExecutionContext().increaseDispatchFailTimes();
-                globalTaskDispatchWaitingQueue.submitTaskExecuteRunnable(defaultTaskExecuteRunnable);
-                if (DISPATCHED_CONSECUTIVE_FAILURE_TIMES.incrementAndGet() > MAX_DISPATCHED_FAILED_TIMES) {
-                    ThreadUtils.sleep(10 * 1000L);
-                }
-                log.error("Dispatch Task: {} failed", defaultTaskExecuteRunnable.getTaskInstance().getName(), e);
+    void doDispatch() {
+        final TaskExecuteRunnable taskExecuteRunnable = globalTaskDispatchWaitingQueue.takeTaskExecuteRunnable();
+        TaskInstance taskInstance = taskExecuteRunnable.getTaskInstance();
+        if (taskInstance == null) {
+            // This case shouldn't happen, but if it does, log an error and continue
+            log.error("The TaskInstance is null, drop it(This case shouldn't happen)");
+            return;
+        }
+        try {
+            TaskExecutionStatus status = taskInstance.getState();
+            if (status != TaskExecutionStatus.SUBMITTED_SUCCESS && status != TaskExecutionStatus.DELAY_EXECUTION) {
+                log.warn("The TaskInstance {} state is : {}, will not dispatch", taskInstance.getName(), status);
+                return;
             }
+            taskDispatchFactory.getTaskDispatcher(taskInstance).dispatchTask(taskExecuteRunnable);
+        } catch (Exception e) {
+            // If dispatch failed, will put the task back to the queue
+            // The task will be dispatched after waiting time.
+            // the waiting time will increase multiple of times, but will not exceed 60 seconds
+            long waitingTimeMills = Math.max(
+                    taskExecuteRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
+            globalTaskDispatchWaitingQueue.dispatchTaskExecuteRunnableWithDelay(taskExecuteRunnable, waitingTimeMills);
+            log.error("Dispatch Task: {} failed will retry after: {}/ms", taskInstance.getName(), waitingTimeMills, e);
         }
     }
 

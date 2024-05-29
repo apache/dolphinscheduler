@@ -165,9 +165,9 @@ export DOLPHINSCHEDULER_OPTS="
 DolphinScheduler同样可以通过设置环境变量进行数据库连接相关的配置, 将以上小写字母转成大写并把`.`换成`_`作为环境变量名,
 设置值即可。
 
-## Zookeeper相关配置
+## 注册中心相关配置
 
-DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功能，配置文件位置：
+DolphinScheduler默认使用Zookeeper进行集群管理、容错、事件监听等功能，配置文件位置：
 |服务名称| 配置文件 |
 |--|--|
 |Master Server | `master-server/conf/application.yaml`|
@@ -189,6 +189,9 @@ DolphinScheduler使用Zookeeper进行集群管理、容错、事件监听等功�
 | registry.zookeeper.digest                       | {用户名:密码}         | 如果zookeeper打开了acl，则需要填写认证信息访问znode，认证信息格式为{用户名}:{密码}。关于Zookeeper ACL详见[https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper官方文档) |
 
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeeper相关的配置。
+
+如果使用etcd作为注册中心，详细请参考[链接](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md)。
+如果使用jdbc作为注册中心，详细请参考[链接](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md)。
 
 ## common.properties [hadoop、s3、yarn配置]
 
@@ -328,7 +331,6 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | worker.registry-disconnect-strategy.max-waiting-time                        | 100s      | 当Worker与注册中心失联之后重连时间, 之后当strategy为waiting时，该值生效。 该值表示当Worker与注册中心失联时会在给定时间之内进行重连, 在给定时间之内重连失败将会停止自己，在重连时，Worker会丢弃kill正在执行的任务。值为0表示会无限期等待 |
 | worker.task-execute-threads-full-policy                                     | REJECT    | 如果是 REJECT, 当Worker中等待队列中的任务数达到exec-threads时, Worker将会拒绝接下来新接收的任务，Master将会重新分发该任务; 如果是 CONTINUE, Worker将会接收任务，放入等待队列中等待空闲线程去执行该任务         |
 | worker.tenant-config.auto-create-tenant-enabled                             | true      | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。                                                                 |
-| worker.tenant-config.distributed-tenant-enabled                             | false     | 如果设置为true, auto-create-tenant-enabled 将会不起作用。                                                                                             |
 | worker.tenant-config.default-tenant-enabled                                 | false     | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                                                                               |
 
 ## Alert Server相关配置

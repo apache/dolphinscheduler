@@ -53,6 +53,7 @@ import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -209,8 +210,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         // In most of case the origin tenant is the same as the current tenant
         // Except `default` tenant. The originTenant is used to download the resources
         String originTenant = taskExecutionContext.getTenantCode();
-        String tenant = TaskExecutionContextUtils.getOrCreateTenant(workerConfig, taskExecutionContext);
-        taskExecutionContext.setTenantCode(tenant);
+        taskExecutionContext.setTenantCode(TenantUtils.getOrCreateActualTenant(workerConfig, taskExecutionContext));
         log.info("TenantCode: {} check successfully", taskExecutionContext.getTenantCode());
 
         TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
@@ -283,6 +283,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
         // upload out files and modify the "OUT FILE" property in VarPool
         TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 

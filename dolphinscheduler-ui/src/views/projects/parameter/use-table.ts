@@ -45,6 +45,7 @@ export function useTable() {
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
+    projectParameterDataType: ref(),
     totalPage: ref(1),
     showRef: ref(false),
     statusRef: ref(0),
@@ -67,6 +68,11 @@ export function useTable() {
       {
         title: t('project.parameter.value'),
         key: 'paramValue',
+        ...COLUMN_WIDTH_CONFIG['name']
+      },
+      {
+        title: t('project.parameter.data_type'),
+        key: 'paramDataType',
         ...COLUMN_WIDTH_CONFIG['name']
       },
       {
@@ -192,7 +198,8 @@ export function useTable() {
       getTableData({
         pageSize: variables.pageSize,
         pageNo: variables.page,
-        searchVal: variables.searchVal
+        searchVal: variables.searchVal,
+        projectParameterDataType: variables.projectParameterDataType
       })
     })
   }
