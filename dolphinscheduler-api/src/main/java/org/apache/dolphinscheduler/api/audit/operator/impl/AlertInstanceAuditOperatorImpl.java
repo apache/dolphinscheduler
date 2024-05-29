@@ -31,7 +31,7 @@ public class AlertInstanceAuditOperatorImpl extends BaseAuditOperator {
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
 
     @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
+    public String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";

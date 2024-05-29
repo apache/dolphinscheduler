@@ -57,3 +57,5 @@ d//
 
 select modify_data_t_ds_audit_log_input_entry();
 DROP FUNCTION IF EXISTS modify_data_t_ds_audit_log_input_entry();
+
+ALTER TABLE t_ds_project_parameter ADD COLUMN IF NOT EXISTS param_data_type varchar(50) DEFAULT 'VARCHAR';

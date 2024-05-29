@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
 import java.util.Collections;
 
@@ -76,7 +77,8 @@ public class ProjectParameterServiceTest {
         // PERMISSION DENIED
         when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
                 .thenReturn(false);
-        Result result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value");
+        Result result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
+                DataType.VARCHAR.name());
         assertNull(result.getData());
         assertNull(result.getCode());
         assertNull(result.getMsg());
@@ -88,25 +90,29 @@ public class ProjectParameterServiceTest {
         try (MockedStatic<CodeGenerateUtils> ignored = Mockito.mockStatic(CodeGenerateUtils.class)) {
             when(CodeGenerateUtils.genCode()).thenThrow(CodeGenerateUtils.CodeGenerateException.class);
 
-            result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value");
+            result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
+                    DataType.VARCHAR.name());
             assertEquals(Status.CREATE_PROJECT_PARAMETER_ERROR.getCode(), result.getCode());
         }
 
         // PROJECT_PARAMETER_ALREADY_EXISTS
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         when(projectParameterMapper.selectOne(Mockito.any())).thenReturn(getProjectParameter());
-        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value");
+        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
+                DataType.VARCHAR.name());
         assertEquals(Status.PROJECT_PARAMETER_ALREADY_EXISTS.getCode(), result.getCode());
 
         // INSERT DATA ERROR
         when(projectParameterMapper.selectOne(Mockito.any())).thenReturn(null);
         when(projectParameterMapper.insert(Mockito.any())).thenReturn(-1);
-        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key1", "value");
+        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key1", "value",
+                DataType.VARCHAR.name());
         assertEquals(Status.CREATE_PROJECT_PARAMETER_ERROR.getCode(), result.getCode());
 
         // SUCCESS
         when(projectParameterMapper.insert(Mockito.any())).thenReturn(1);
-        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key1", "value");
+        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key1", "value",
+                DataType.VARCHAR.name());
         assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 
@@ -117,7 +123,8 @@ public class ProjectParameterServiceTest {
         // NO PERMISSION
         when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
                 .thenReturn(false);
-        Result result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value");
+        Result result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
+                DataType.VARCHAR.name());
         assertNull(result.getData());
         assertNull(result.getCode());
         assertNull(result.getMsg());
@@ -127,28 +134,33 @@ public class ProjectParameterServiceTest {
         when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
                 .thenReturn(true);
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
-        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value");
+        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
+                DataType.VARCHAR.name());
         assertEquals(Status.PROJECT_PARAMETER_NOT_EXISTS.getCode(), result.getCode());
 
         // PROJECT_PARAMETER_ALREADY_EXISTS
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(getProjectParameter());
         when(projectParameterMapper.selectOne(Mockito.any())).thenReturn(getProjectParameter());
-        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value");
+        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
+                DataType.VARCHAR.name());
         assertEquals(Status.PROJECT_PARAMETER_ALREADY_EXISTS.getCode(), result.getCode());
 
         // PROJECT_UPDATE_ERROR
         when(projectParameterMapper.selectOne(Mockito.any())).thenReturn(null);
         when(projectParameterMapper.updateById(Mockito.any())).thenReturn(-1);
-        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key1", "value");
+        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key1", "value",
+                DataType.VARCHAR.name());
         assertEquals(Status.UPDATE_PROJECT_PARAMETER_ERROR.getCode(), result.getCode());
 
         // SUCCESS
         when(projectParameterMapper.updateById(Mockito.any())).thenReturn(1);
-        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key1", "value");
+        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key1", "value",
+                DataType.LONG.name());
         assertEquals(Status.SUCCESS.getCode(), result.getCode());
         ProjectParameter projectParameter = (ProjectParameter) result.getData();
         assertNotNull(projectParameter.getOperator());
         assertNotNull(projectParameter.getUpdateTime());
+        assertEquals(DataType.LONG.name(), projectParameter.getParamDataType());
     }
 
     @Test
@@ -223,7 +235,8 @@ public class ProjectParameterServiceTest {
                         .thenReturn(false);
 
         Result result =
-                projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo, null);
+                projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo, null,
+                        DataType.VARCHAR.name());
         assertNull(result.getData());
         assertNull(result.getCode());
         assertNull(result.getMsg());
@@ -235,9 +248,10 @@ public class ProjectParameterServiceTest {
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
         page.setRecords(Collections.singletonList(getProjectParameter()));
 
-        when(projectParameterMapper.queryProjectParameterListPaging(any(), anyLong(), any(), any())).thenReturn(page);
+        when(projectParameterMapper.queryProjectParameterListPaging(any(), anyLong(), any(), any(), any()))
+                .thenReturn(page);
         result = projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo,
-                null);
+                null, null);
         assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 

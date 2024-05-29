@@ -72,7 +72,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
     }
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";

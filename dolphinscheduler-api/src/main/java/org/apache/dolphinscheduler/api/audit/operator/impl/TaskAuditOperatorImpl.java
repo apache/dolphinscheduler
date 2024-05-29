@@ -46,17 +46,17 @@ public class TaskAuditOperatorImpl extends BaseAuditOperator {
     }
 
     @Override
-    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
+    protected void setObjectByParam(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
 
-        super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
+        super.setObjectByParam(paramNameArr, paramsMap, auditLogList);
         if (paramsMap.containsKey(AuditLogConstants.VERSION)) {
             auditLogList.get(0).setDetail(paramsMap.get(AuditLogConstants.VERSION).toString());
         }
     }
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";

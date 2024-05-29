@@ -165,7 +165,7 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports database configuration through `bin/env/dolphinscheduler_env.sh`.
 
-### Zookeeper related configuration
+### Registry Related configuration
 
 DolphinScheduler uses Zookeeper for cluster management, fault tolerance, event monitoring and other functions.
 Configuration file location:
@@ -191,16 +191,21 @@ The default configuration is as follows:
 
 Note that DolphinScheduler also supports zookeeper related configuration through `bin/env/dolphinscheduler_env.sh`.
 
+For ETCD Registry, please see more details
+on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-etcd/README.md).
+For JDBC Registry, please see more details
+on [link](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-registry/dolphinscheduler-registry-plugins/dolphinscheduler-registry-jdbc/README.md).
+
 ### common.properties [hadoop、s3、yarn config properties]
 
 Currently, common.properties mainly configures Hadoop,s3a related configurations. Configuration file location:
 
-|    Service    |           Configuration file           |
-|---------------|----------------------------------------|
-| Master Server | `master-server/conf/common.properties` |
-| Api Server    | `api-server/conf/common.properties`    |
-| Worker Server | `worker-server/conf/common.properties` |
-| Alert Server  | `alert-server/conf/common.properties`  |
+|    Service    |                          Configuration file                           |
+|---------------|-----------------------------------------------------------------------|
+| Master Server | `master-server/conf/common.properties`                                |
+| Api Server    | `api-server/conf/common.properties`, `api-server/conf/aws.yaml`       |
+| Worker Server | `worker-server/conf/common.properties`, `worker-server/conf/aws.yaml` |
+| Alert Server  | `alert-server/conf/common.properties`                                 |
 
 The default configuration is as follows:
 
@@ -209,10 +214,6 @@ The default configuration is as follows:
 | data.basedir.path                             | /tmp/dolphinscheduler                            | local directory used to store temp files                                                                                                                                                                                                                                                                                                                                                                                             |
 | resource.storage.type                         | NONE                                             | type of resource files: HDFS, S3, OSS, GCS, ABS, NONE                                                                                                                                                                                                                                                                                                                                                                                |
 | resource.upload.path                          | /dolphinscheduler                                | storage path of resource files                                                                                                                                                                                                                                                                                                                                                                                                       |
-| aws.access.key.id                             | minioadmin                                       | access key id of S3                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| aws.secret.access.key                         | minioadmin                                       | secret access key of S3                                                                                                                                                                                                                                                                                                                                                                                                              |
-| aws.region                                    | us-east-1                                        | region of S3                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| aws.s3.endpoint                               | http://minio:9000                                | endpoint of S3                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | hdfs.root.user                                | hdfs                                             | configure users with corresponding permissions if storage type is HDFS                                                                                                                                                                                                                                                                                                                                                               |
 | fs.defaultFS                                  | hdfs://mycluster:8020                            | If resource.storage.type=S3, then the request url would be similar to 's3a://dolphinscheduler'. Otherwise if resource.storage.type=HDFS and hadoop supports HA, copy core-site.xml and hdfs-site.xml into 'conf' directory                                                                                                                                                                                                           |
 | hadoop.security.authentication.startup.state  | false                                            | whether hadoop grant kerberos permission                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -327,7 +328,6 @@ Location: `worker-server/conf/application.yaml`
 | worker.registry-disconnect-strategy.max-waiting-time                        | 100s          | Used when the worker disconnect from registry, and the disconnect strategy is waiting, this config means the worker will waiting to reconnect to registry in given times, and after the waiting times, if the worker still cannot connect to registry, will stop itself, if the value is 0s, will wait infinitely |
 | worker.task-execute-threads-full-policy                                     | REJECT        | If REJECT, when the task waiting in the worker reaches exec-threads, it will reject the received task and the Master will redispatch it; If CONTINUE, it will put the task into the worker's execution queue and wait for a free thread to start execution                                                        |
 | worker.tenant-config.auto-create-tenant-enabled                             | true          | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.                                                                                           |
-| worker.tenant-config.distributed-tenant-enabled                             | false         | When this parameter is true, auto-create-tenant-enabled has no effect and will not automatically create tenants                                                                                                                                                                                                   |
 | worker.tenant-config.default-tenant-enabled                                 | false         | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`.                                                                                                                                                                                                           |
 
 ### Alert Server related configuration

@@ -23,6 +23,5 @@ import lombok.Data;
 public class TenantConfig {
 
     private boolean autoCreateTenantEnabled = true;
-    private boolean distributedTenantEnabled = false;
     private boolean defaultTenantEnabled = false;
 }

@@ -16,7 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import { CodeReq, StateReq } from './types'
+import { ListReq, CodeReq, StateReq } from './types'
 
 export function countCommandState(): any {
   return axios({
@@ -51,6 +51,22 @@ export function countQueueState(): any {
 export function countTaskState(params: StateReq): any {
   return axios({
     url: '/projects/analysis/task-state-count',
+    method: 'get',
+    params
+  })
+}
+
+export function queryListCommandPaging(params: ListReq): any {
+  return axios({
+    url: '/projects/analysis/listCommand',
+    method: 'get',
+    params
+  })
+}
+
+export function queryListErrorCommandPaging(params: ListReq): any {
+  return axios({
+    url: '/projects/analysis/listErrorCommand',
     method: 'get',
     params
   })

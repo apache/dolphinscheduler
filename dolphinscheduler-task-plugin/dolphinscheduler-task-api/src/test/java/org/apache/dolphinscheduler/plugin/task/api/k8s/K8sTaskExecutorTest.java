@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -97,6 +98,14 @@ public class K8sTaskExecutorTest {
         } catch (TaskException e) {
             Assertions.assertEquals(e.getMessage(), "K8sTask is timeout");
         }
+    }
+
+    @Test
+    public void testLoadYamlCorrectly() {
+        List<String> expectedCommands = Arrays.asList("perl", "-Mbignum=bpi", "-wle", "print bpi(2000)");
+        List<String> actualCommands =
+                k8sTaskExecutor.getJob().getSpec().getTemplate().getSpec().getContainers().get(0).getCommand();
+        Assertions.assertEquals(expectedCommands, actualCommands);
     }
 
 }

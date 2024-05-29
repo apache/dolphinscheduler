@@ -120,6 +120,12 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.auto | bool | `false` | auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false |
 | conf.common."alert.rpc.port" | int | `50052` | rpc port |
 | conf.common."appId.collect" | string | `"log"` | way to collect applicationId: log, aop |
+| conf.common."aws.credentials.provider.type" | string | `"AWSStaticCredentialsProvider"` |  |
+| conf.common."aws.s3.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
+| conf.common."aws.s3.access.key.secret" | string | `"minioadmin"` | The AWS secret access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
+| conf.common."aws.s3.bucket.name" | string | `"dolphinscheduler"` | The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name. |
+| conf.common."aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
+| conf.common."aws.s3.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3, This configuration is required |
 | conf.common."conda.path" | string | `"/opt/anaconda3/etc/profile.d/conda.sh"` | set path of conda.sh |
 | conf.common."data-quality.jar.dir" | string | `nil` | data quality option |
 | conf.common."data.basedir.path" | string | `"/tmp/dolphinscheduler"` | user data local directory path, please make sure the directory exists and have read write permissions |
@@ -138,11 +144,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."resource.alibaba.cloud.oss.bucket.name" | string | `"dolphinscheduler"` | oss bucket name, required if you set resource.storage.type=OSS |
 | conf.common."resource.alibaba.cloud.oss.endpoint" | string | `"https://oss-cn-hangzhou.aliyuncs.com"` | oss bucket endpoint, required if you set resource.storage.type=OSS |
 | conf.common."resource.alibaba.cloud.region" | string | `"cn-hangzhou"` | alibaba cloud region, required if you set resource.storage.type=OSS |
-| conf.common."resource.aws.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required |
-| conf.common."resource.aws.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required |
-| conf.common."resource.aws.s3.bucket.name" | string | `"dolphinscheduler"` | The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name. |
-| conf.common."resource.aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
-| conf.common."resource.aws.secret.access.key" | string | `"minioadmin"` | The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required |
 | conf.common."resource.azure.client.id" | string | `"minioadmin"` | azure storage account name, required if you set resource.storage.type=ABS |
 | conf.common."resource.azure.client.secret" | string | `"minioadmin"` | azure storage account key, required if you set resource.storage.type=ABS |
 | conf.common."resource.azure.subId" | string | `"minioadmin"` | azure storage subId, required if you set resource.storage.type=ABS |
@@ -158,6 +159,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."yarn.application.status.address" | string | `"http://ds1:%s/ws/v1/cluster/apps/%s"` | if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname |
 | conf.common."yarn.job.history.status.address" | string | `"http://ds1:19888/ws/v1/history/mapreduce/jobs/%s"` | job history status url when application number threshold is reached(default 10000, maybe it was set to 1000) |
 | conf.common."yarn.resourcemanager.ha.rm.ids" | string | `"192.168.xx.xx,192.168.xx.xx"` | if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty |
+| datasource.profile | string | `"postgresql"` | The profile of datasource |
 | externalDatabase.database | string | `"dolphinscheduler"` | The database of external database |
 | externalDatabase.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName of external database |
 | externalDatabase.enabled | bool | `false` | If exists external database, and set postgresql.enable value to false. external database will be used, otherwise Dolphinscheduler's internal database will be used. |
@@ -306,7 +308,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
-| worker.env.WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT | bool | `false` | Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants. |
 | worker.keda.advanced | object | `{}` | Specify HPA related options |
 | worker.keda.cooldownPeriod | int | `30` | How many seconds KEDA will wait before scaling to zero. Note that HPA has a separate cooldown period for scale-downs |
 | worker.keda.enabled | bool | `false` | Enable or disable the Keda component |

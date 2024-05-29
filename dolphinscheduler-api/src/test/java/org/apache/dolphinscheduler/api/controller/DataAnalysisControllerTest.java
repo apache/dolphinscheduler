@@ -150,4 +150,40 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
+
+    @Test
+    public void testListCommand() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectCode", "16");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "10");
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/listCommand")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testListErrorCommand() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectCode", "16");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "10");
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/listErrorCommand")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 }

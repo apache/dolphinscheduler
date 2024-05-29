@@ -33,4 +33,23 @@
         </if>
         group by cmd.command_type
     </select>
+
+    <select id="queryErrorCommandPage" resultType="org.apache.dolphinscheduler.dao.entity.ErrorCommand">
+        select
+        *
+        from t_ds_error_command
+    
+        order by process_instance_priority, id asc
+    </select>
+
+    <select id="queryErrorCommandPageByIds" resultType="org.apache.dolphinscheduler.dao.entity.ErrorCommand">
+        select
+        *
+        from t_ds_error_command
+        where process_definition_code in
+            <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        order by process_instance_priority, id asc
+    </select>
 </mapper>
