@@ -29,6 +29,7 @@
 
     <modules>
         <module>dolphinscheduler-task-all</module>
+        <module>dolphinscheduler-task-pure</module>
         <module>dolphinscheduler-task-api</module>
         <module>dolphinscheduler-task-shell</module>
         <module>dolphinscheduler-task-datax</module>
