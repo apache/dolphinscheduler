@@ -1,6 +1,29 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.dolphinscheduler.plugin.task.aliyunserverlessspark;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+
 import java.util.Collections;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import com.aliyun.emr_serverless_spark20230808.Client;
 import com.aliyun.emr_serverless_spark20230808.models.StartJobRunResponse;
@@ -8,57 +31,21 @@ import com.aliyun.emr_serverless_spark20230808.models.Tag;
 import com.aliyun.tea.TeaException;
 
 public class AliyunServerlessSparkTaskTest {
-    public static void main(String[] args) throws Exception {
-        com.aliyun.emr_serverless_spark20230808.Client client = AliyunServerlessSparkTaskTest.createClient();
-        com.aliyun.emr_serverless_spark20230808.models.StartJobRunRequest startJobRunRequest = new com.aliyun.emr_serverless_spark20230808.models.StartJobRunRequest();
-        startJobRunRequest.setRegionId("cn-hangzhou");
-        startJobRunRequest.setResourceQueueId("root_queue");
-        startJobRunRequest.setCodeType("JAR");
-        startJobRunRequest.setName("ds-test");
-        startJobRunRequest.setReleaseVersion("esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)");
-        Tag tag = new Tag();
-        tag.setKey("environment");
-        tag.setValue("production");
-        startJobRunRequest.setTags(Collections.singletonList(tag));
-        com.aliyun.emr_serverless_spark20230808.models.JobDriver.JobDriverSparkSubmit jobDriverSparkSubmit = new com.aliyun.emr_serverless_spark20230808.models.JobDriver.JobDriverSparkSubmit()
-            .setEntryPoint("oss://datadev-oss-hdfs-test/spark-resource/examples/jars/spark-examples_2.12-3.3.1.jar")
-            .setEntryPointArguments(java.util.Arrays.asList(
-                "1"
-            ))
-            .setSparkSubmitParameters("--class org.apache.spark.examples.SparkPi --conf spark.executor.cores=4 --conf spark.executor.memory=20g --conf spark.driver.cores=4 --conf spark.driver.memory=8g --conf spark.executor.instances=1");
-        com.aliyun.emr_serverless_spark20230808.models.JobDriver jobDriver = new com.aliyun.emr_serverless_spark20230808.models.JobDriver()
-            .setSparkSubmit(jobDriverSparkSubmit);
-        startJobRunRequest.setJobDriver(jobDriver);
-        com.aliyun.teautil.models.RuntimeOptions runtime = new com.aliyun.teautil.models.RuntimeOptions();
-        java.util.Map<String, String> headers = new java.util.HashMap<>();
-        try {
-            // 复制代码运行请自行打印 API 的返回值
-            StartJobRunResponse startJobRunResponse = client.startJobRunWithOptions("w-f7b841e8c73211be", startJobRunRequest, headers, runtime);
-            System.out.println(startJobRunResponse.getBody().getRequestId());
-            System.out.println(startJobRunResponse.getBody().getJobRunId());
-        } catch (TeaException error) {
-            // 此处仅做打印展示，请谨慎对待异常处理，在工程项目中切勿直接忽略异常。
-            // 错误 message
-            System.out.println(error.getMessage());
-            // 诊断地址
-            System.out.println(error.getData().get("Recommend"));
-            com.aliyun.teautil.Common.assertAsString(error.message);
-        } catch (Exception _error) {
-            TeaException error = new TeaException(_error.getMessage(), _error);
-            // 此处仅做打印展示，请谨慎对待异常处理，在工程项目中切勿直接忽略异常。
-            // 错误 message
-            System.out.println(error.getMessage());
-            // 诊断地址
-            System.out.println(error.getData().get("Recommend"));
-            com.aliyun.teautil.Common.assertAsString(error.message);
-        }
+    @Mock
+    private TaskExecutionContext mockTaskExecutionContext;
+
+    @Mock
+    private Client mockAliyunServerlessSparkClient;
+
+    @InjectMocks
+    private AliyunServerlessSparkTask aliyunServerlessSparkTask;
+
+    @BeforeEach
+    public void before() {
+
     }
 
-    public static Client createClient() throws Exception {
-        com.aliyun.teaopenapi.models.Config config = new com.aliyun.teaopenapi.models.Config()
-            .setAccessKeyId(System.getenv("ALIBABA_CLOUD_ACCESS_KEY_ID"))
-            .setAccessKeySecret(System.getenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET"));
-        config.endpoint = "emr-serverless-spark.cn-hangzhou.aliyuncs.com";
-        return new com.aliyun.emr_serverless_spark20230808.Client(config);
+    public void testInit() {
+
     }
 }

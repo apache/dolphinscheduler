@@ -23,60 +23,6 @@ export function useAliyunServerlessSpark(model: { [field: string]: any }): IJson
 
     return [
         // mandatory field
-        // {
-        //     type: 'input',
-        //     field: 'regionId',
-        //     name: t('project.node.region_id'),
-        //     props: {
-        //         placeholder: t('project.node.region_id_tips')
-        //     },
-        //     validate: {
-        //         trigger: ['input', 'blur'],
-        //         required: true,
-        //         validator(validate: any, value: string) {
-        //             if (!value) {
-        //                 return new Error(t('project.node.region_id_tips'))
-        //             }
-        //         }
-        //     }
-        // },
-
-        // {
-        //     type: 'input',
-        //     field: 'accessKeyId',
-        //     name: t('project.node.access_key_id'),
-        //     props: {
-        //         placeholder: t('project.node.access_key_id_tips')
-        //     },
-        //     validate: {
-        //         trigger: ['input', 'blur'],
-        //         required: true,
-        //         validator(validate: any, value: string) {
-        //             if (!value) {
-        //                 return new Error(t('project.node.access_key_id_tips'))
-        //             }
-        //         }
-        //     }
-        // },
-
-        // {
-        //     type: 'input',
-        //     field: 'accessKeySecret',
-        //     name: t('project.node.access_key_secret'),
-        //     props: {
-        //         placeholder: t('project.node.access_key_secret_tips')
-        //     },
-        //     validate: {
-        //         trigger: ['input', 'blur'],
-        //         required: true,
-        //         validator(validate: any, value: string) {
-        //             if (!value) {
-        //                 return new Error(t('project.node.access_key_secret_tips'))
-        //             }
-        //         }
-        //     }
-        // },
-
         {
             type: 'input',
             field: 'workspaceId',

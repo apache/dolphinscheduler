@@ -66,8 +66,6 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private String jobRunId;
 
-    private RunState previousState;
-
     private RunState currentState;
 
     private String accessKeyId;
@@ -107,7 +105,6 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             throw new AliyunServerlessSparkTaskException("Failed to build Aliyun-Serverless-Spark client!");
         }
 
-        previousState = RunState.Submitted;
         currentState = RunState.Submitted;
     }
 
