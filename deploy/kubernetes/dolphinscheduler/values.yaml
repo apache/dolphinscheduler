@@ -596,8 +596,6 @@ worker:
   customizedConfig: { }
 #  customizedConfig:
 #    application.yaml: |
-#      profiles:
-#        active: postgresql
 #      banner:
 #        charset: UTF-8
 #      jackson:
