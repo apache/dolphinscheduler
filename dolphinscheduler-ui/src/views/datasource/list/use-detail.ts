@@ -59,7 +59,7 @@ export function useDetail(getFieldsValue: Function) {
     try {
       const res = await connectDataSource(formatParams())
       window.$message.success(
-        res
+        res && res.msg
           ? res.msg
           : `${t('datasource.test_connect')} ${t('datasource.success')}`
       )
