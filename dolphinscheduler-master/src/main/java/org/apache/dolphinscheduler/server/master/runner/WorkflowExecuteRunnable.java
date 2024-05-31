@@ -639,6 +639,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(workflowInstance.getProcessDefinitionVersion());
         command.setTestFlag(workflowInstance.getTestFlag());
+        command.setTenantCode(workflowInstance.getTenantCode());
         int create = commandService.createCommand(command);
         processService.saveCommandTrigger(command.getId(), workflowInstance.getId());
         return create;
