@@ -92,24 +92,4 @@ public class CheckUtilsTest {
         Assertions.assertTrue(CheckUtils.checkPhone("17362537263"));
     }
 
-    /**
-     * check file path
-     */
-    @Test
-    public void testCheckFilePath() {
-        // true
-        Assertions.assertTrue(CheckUtils.checkFilePath("/"));
-        Assertions.assertTrue(CheckUtils.checkFilePath("xx/"));
-        Assertions.assertTrue(CheckUtils.checkFilePath("/xx"));
-        Assertions.assertTrue(CheckUtils.checkFilePath("14567134578654"));
-        Assertions.assertTrue(CheckUtils.checkFilePath("/admin/root/"));
-        Assertions.assertTrue(CheckUtils.checkFilePath("/admin/root/1531531..13513/153135.."));
-        // false
-        Assertions.assertFalse(CheckUtils.checkFilePath(null));
-        Assertions.assertFalse(CheckUtils.checkFilePath("file://xxx/ss"));
-        Assertions.assertFalse(CheckUtils.checkFilePath("/xxx/ss;/dasd/123"));
-        Assertions.assertFalse(CheckUtils.checkFilePath("/xxx/ss && /dasd/123"));
-        Assertions.assertFalse(CheckUtils.checkFilePath("/xxx/ss || /dasd/123"));
-    }
-
 }

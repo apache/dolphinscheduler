@@ -250,11 +250,6 @@ public final class Constants {
     public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
 
     /**
-     * file path regex 
-     */
-    public static final Pattern REGEX_FILE_PATH = Pattern.compile("^[a-zA-Z0-9_./-]+$");
-
-    /**
      * read permission
      */
     public static final int READ_PERMISSION = 2;
