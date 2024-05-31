@@ -342,7 +342,8 @@
             <dependencies>
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-task-pure</artifactId></dependency>
+                    <artifactId>dolphinscheduler-task-pure</artifactId>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
