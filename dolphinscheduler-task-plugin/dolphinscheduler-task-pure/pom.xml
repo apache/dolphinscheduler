@@ -106,23 +106,11 @@
             <version>${project.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.dolphinscheduler</groupId>-->
-<!--            <artifactId>dolphinscheduler-task-sqoop</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-emr</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.dolphinscheduler</groupId>-->
-<!--            <artifactId>dolphinscheduler-task-zeppelin</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
@@ -136,24 +124,6 @@
             <version>${project.version}</version>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.apache.dolphinscheduler</groupId>-->
-<!--            <artifactId>dolphinscheduler-task-mlflow</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.dolphinscheduler</groupId>-->
-<!--            <artifactId>dolphinscheduler-task-openmldb</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.dolphinscheduler</groupId>-->
-<!--            <artifactId>dolphinscheduler-task-dvc</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-dinky</artifactId>
@@ -165,12 +135,6 @@
             <artifactId>dolphinscheduler-task-java</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.dolphinscheduler</groupId>-->
-<!--            <artifactId>dolphinscheduler-task-sagemaker</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
