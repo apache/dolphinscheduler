@@ -223,6 +223,10 @@
             <artifactId>azure-resourcemanager-datafactory</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-identity</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-extract-alert</artifactId>
         </dependency>
