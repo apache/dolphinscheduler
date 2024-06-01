@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.security.impl.ldap;
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.Map;
+
 import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +34,13 @@ public class LdapAuthenticator extends AbstractAuthenticator {
     @Override
     public User login(@NonNull String userId, String password) {
         User user = null;
-        String ldapEmail = ldapService.ldapLogin(userId, password);
-        if (ldapEmail != null) {
+        Map<String, String> ldapAttributes = ldapService.ldapLogin(userId, password);
+        if (ldapAttributes != null && ldapAttributes.containsKey(LdapService.ATTRIBUTE_EMAIL)) {
             // check if user exist
             user = userService.getUserByUserName(userId);
             if (user == null && ldapService.createIfUserNotExists()) {
-                user = userService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+                String ldapEmail = ldapAttributes.get(LdapService.ATTRIBUTE_EMAIL);
+                user = userService.createUser(ldapService.getUserType(ldapAttributes), userId, ldapEmail);
             }
         }
         return user;
