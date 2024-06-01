@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import com.google.common.collect.ImmutableSet;
 import lombok.experimental.UtilityClass;
 
-import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;

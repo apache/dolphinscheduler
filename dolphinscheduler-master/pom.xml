@@ -343,6 +343,12 @@
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-task-pure</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>org.apache.dolphinscheduler</groupId>
+                            <artifactId>dolphinscheduler-datasource-all</artifactId>
+                        </exclusion>
+                    </exclusions>
                 </dependency>
             </dependencies>
         </profile>

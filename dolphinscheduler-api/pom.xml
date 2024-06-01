@@ -68,12 +68,6 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-all</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-ui</artifactId>
         </dependency>
         <dependency>
@@ -300,6 +294,10 @@
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-task-pure</artifactId>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.dolphinscheduler</groupId>
+                    <artifactId>dolphinscheduler-datasource-pure</artifactId>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -311,6 +309,10 @@
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-task-all</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.dolphinscheduler</groupId>
+                    <artifactId>dolphinscheduler-datasource-all</artifactId>
                 </dependency>
             </dependencies>
         </profile>
