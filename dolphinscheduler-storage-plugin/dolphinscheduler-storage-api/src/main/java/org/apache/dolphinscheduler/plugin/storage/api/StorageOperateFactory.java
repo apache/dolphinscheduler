@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.plugin.storage.api;
 
 public interface StorageOperateFactory {
 
-    StorageOperate createStorageOperate();
+    StorageOperator createStorageOperate();
 
     StorageType getStorageOperate();
 }

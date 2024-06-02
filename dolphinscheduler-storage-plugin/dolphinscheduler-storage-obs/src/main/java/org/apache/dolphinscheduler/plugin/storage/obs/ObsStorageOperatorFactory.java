@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.obs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 
 import com.google.auto.service.AutoService;
@@ -26,14 +26,9 @@ import com.google.auto.service.AutoService;
 @AutoService({StorageOperateFactory.class})
 public class ObsStorageOperatorFactory implements StorageOperateFactory {
 
-    public ObsStorageOperatorFactory() {
-    }
-
     @Override
-    public StorageOperate createStorageOperate() {
-        ObsStorageOperator ossOperator = new ObsStorageOperator();
-        ossOperator.init();
-        return ossOperator;
+    public StorageOperator createStorageOperate() {
+        return new ObsStorageOperator();
     }
 
     @Override

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 
 import com.google.auto.service.AutoService;
@@ -27,7 +27,7 @@ import com.google.auto.service.AutoService;
 public class HdfsStorageOperatorFactory implements StorageOperateFactory {
 
     @Override
-    public StorageOperate createStorageOperate() {
+    public StorageOperator createStorageOperate() {
         HdfsStorageOperator hdfsOperator = new HdfsStorageOperator();
         hdfsOperator.init();
         return hdfsOperator;

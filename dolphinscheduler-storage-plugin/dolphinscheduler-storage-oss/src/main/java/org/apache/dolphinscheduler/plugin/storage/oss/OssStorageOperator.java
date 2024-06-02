@@ -17,21 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.storage.oss;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
-
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.factory.OssClientFactory;
 import org.apache.dolphinscheduler.common.model.OssConnection;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,23 +39,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSException;
-import com.aliyun.oss.ServiceException;
-import com.aliyun.oss.model.DeleteObjectsRequest;
+import com.aliyun.oss.model.GetObjectRequest;
 import com.aliyun.oss.model.ListObjectsV2Request;
 import com.aliyun.oss.model.ListObjectsV2Result;
 import com.aliyun.oss.model.OSSObject;
@@ -68,9 +62,8 @@ import com.aliyun.oss.model.OSSObjectSummary;
 import com.aliyun.oss.model.ObjectMetadata;
 import com.aliyun.oss.model.PutObjectRequest;
 
-@Data
 @Slf4j
-public class OssStorageOperator implements Closeable, StorageOperate {
+public class OssStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
     private String accessKeyId;
 
@@ -108,7 +101,7 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         this.region = readOssRegion();
         this.bucketName = readOssBucketName();
         this.ossConnection = ossConnection;
-        this.ossClient = getOssClient();
+        this.ossClient = buildOssClient();
         ensureBucketSuccessfullyCreated(bucketName);
     }
 
@@ -137,79 +130,42 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
+    public String getStorageBaseDirectory() {
+        // All directory should end with File.separator
+        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
+            log.warn("{} -> {} should not start with / in Oss", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
+            return RESOURCE_UPLOAD_PATH.substring(1);
+        }
+        return RESOURCE_UPLOAD_PATH;
+    }
+
+    @Override
     public void close() throws IOException {
         ossClient.shutdown();
     }
 
+    @SneakyThrows
     @Override
-    public void createTenantDirIfNotExists(String tenantCode) throws Exception {
-        mkdir(tenantCode, getOssResDir(tenantCode));
-        mkdir(tenantCode, getOssUdfDir(tenantCode));
-    }
+    public void createStorageDir(String directory) {
+        directory = transformAbsolutePathToOssKey(directory);
 
-    @Override
-    public String getResDir(String tenantCode) {
-        return getOssResDir(tenantCode) + FOLDER_SEPARATOR;
-    }
-
-    @Override
-    public String getUdfDir(String tenantCode) {
-        return getOssUdfDir(tenantCode) + FOLDER_SEPARATOR;
-    }
-
-    @Override
-    public boolean mkdir(String tenantCode, String path) throws IOException {
-        final String key = path + FOLDER_SEPARATOR;
-        if (!ossClient.doesObjectExist(bucketName, key)) {
-            createOssPrefix(bucketName, key);
+        if (ossClient.doesObjectExist(bucketName, directory)) {
+            throw new FileAlreadyExistsException("directory: " + directory + " already exists");
         }
-        return true;
-    }
-
-    protected void createOssPrefix(final String bucketName, final String key) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(0);
         InputStream emptyContent = new ByteArrayInputStream(new byte[0]);
-        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, key, emptyContent, metadata);
+        PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, directory, emptyContent, metadata);
         ossClient.putObject(putObjectRequest);
     }
 
+    @SneakyThrows
     @Override
-    public String getResourceFullName(String tenantCode, String fileName) {
-        if (fileName.startsWith(FOLDER_SEPARATOR)) {
-            fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
-        }
-        return String.format(FORMAT_S_S, getOssResDir(tenantCode), fileName);
-    }
+    public void download(String srcFilePath,
+                         String dstFilePath,
+                         boolean overwrite) {
+        srcFilePath = transformAbsolutePathToOssKey(srcFilePath);
 
-    @Override
-    public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
-        if (fileName.startsWith(FOLDER_SEPARATOR)) {
-            fileName = fileName.replaceFirst(FOLDER_SEPARATOR, "");
-        }
-        return getDir(resourceType, tenantCode) + fileName;
-    }
-
-    @Override
-    public boolean delete(String fullName, List<String> childrenPathList, boolean recursive) throws IOException {
-        // append the resource fullName to the list for deletion.
-        childrenPathList.add(fullName);
-
-        DeleteObjectsRequest deleteObjectsRequest = new DeleteObjectsRequest(bucketName)
-                .withKeys(childrenPathList);
-        try {
-            ossClient.deleteObjects(deleteObjectsRequest);
-        } catch (Exception e) {
-            log.error("delete objects error", e);
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void download(String srcFilePath, String dstFilePath,
-                         boolean overwrite) throws IOException {
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
@@ -234,268 +190,118 @@ public class OssStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean exists(String fileName) throws IOException {
+    public boolean exists(String fileName) {
+        fileName = transformAbsolutePathToOssKey(fileName);
         return ossClient.doesObjectExist(bucketName, fileName);
     }
 
     @Override
-    public boolean delete(String filePath, boolean recursive) throws IOException {
-        try {
-            ossClient.deleteObject(bucketName, filePath);
-            return true;
-        } catch (OSSException e) {
-            log.error("fail to delete the object, the resource path is {}", filePath, e);
-            return false;
-        }
+    public void delete(String filePath, boolean recursive) {
+        filePath = transformAbsolutePathToOssKey(filePath);
+        ossClient.deleteObject(bucketName, filePath);
     }
 
     @Override
-    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
+    public void copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) {
+        srcPath = transformAbsolutePathToOssKey(srcPath);
+        dstPath = transformAbsolutePathToOssKey(dstPath);
+
         ossClient.copyObject(bucketName, srcPath, bucketName, dstPath);
         if (deleteSource) {
             ossClient.deleteObject(bucketName, srcPath);
         }
-        return true;
     }
 
+    @SneakyThrows
     @Override
-    public String getDir(ResourceType resourceType, String tenantCode) {
-        switch (resourceType) {
-            case UDF:
-                return getUdfDir(tenantCode);
-            case FILE:
-                return getResDir(tenantCode);
-            case ALL:
-                return getOssDataBasePath();
-            default:
-                return "";
-        }
-    }
-
-    @Override
-    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
-                          boolean overwrite) throws IOException {
-        try {
-            ossClient.putObject(bucketName, dstPath, new File(srcFile));
-            if (deleteSource) {
-                Files.delete(Paths.get(srcFile));
+    public void upload(String srcFile, String dstPath, boolean deleteSource, boolean overwrite) {
+        dstPath = transformAbsolutePathToOssKey(dstPath);
+        if (ossClient.doesObjectExist(bucketName, dstPath)) {
+            if (!overwrite) {
+                throw new FileAlreadyExistsException("file: " + dstPath + " already exists");
+            } else {
+                ossClient.deleteObject(bucketName, dstPath);
             }
-            return true;
-        } catch (OSSException e) {
-            log.error("upload failed, the bucketName is {}, the filePath is {}", bucketName, dstPath, e);
-            return false;
+
+        }
+        ossClient.putObject(bucketName, dstPath, new File(srcFile));
+        if (deleteSource) {
+            Files.delete(Paths.get(srcFile));
         }
     }
 
+    @SneakyThrows
     @Override
-    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
-        if (StringUtils.isBlank(filePath)) {
-            log.error("file path:{} is empty", filePath);
-            return Collections.emptyList();
-        }
+    public List<String> fetchFileContent(String filePath, int skipLineNums, int limit) {
+        filePath = transformAbsolutePathToOssKey(filePath);
         OSSObject ossObject = ossClient.getObject(bucketName, filePath);
-        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(ossObject.getObjectContent()))) {
-            Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
-            return stream.collect(Collectors.toList());
+        try (
+                InputStreamReader inputStreamReader = new InputStreamReader(ossObject.getObjectContent());
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            return bufferedReader.lines()
+                    .skip(skipLineNums)
+                    .limit(limit)
+                    .collect(Collectors.toList());
         }
     }
 
     @Override
-    public ResUploadType returnStorageType() {
-        return ResUploadType.OSS;
+    public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
+        final String ossResourceAbsolutePath = transformAbsolutePathToOssKey(resourceAbsolutePath);
+
+        ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request()
+                .withBucketName(bucketName)
+                .withDelimiter("/")
+                .withPrefix(ossResourceAbsolutePath);
+
+        ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
+        List<StorageEntity> storageEntities = new ArrayList<>();
+        storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()
+                .stream()
+                .map(this::transformCommonPrefixToStorageEntity)
+                .collect(Collectors.toList()));
+        storageEntities.addAll(
+                listObjectsV2Result.getObjectSummaries().stream()
+                        .filter(s3ObjectSummary -> !s3ObjectSummary.getKey().equals(resourceAbsolutePath))
+                        .map(this::transformOSSObjectToStorageEntity)
+                        .collect(Collectors.toList()));
+
+        return storageEntities;
+
     }
 
     @Override
-    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
-                                                          ResourceType type) {
+    public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
+        resourceAbsolutePath = transformOssKeyToAbsolutePath(resourceAbsolutePath);
+
+        Set<String> visited = new HashSet<>();
         List<StorageEntity> storageEntityList = new ArrayList<>();
-        LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
-
-        StorageEntity initialEntity = null;
-        try {
-            initialEntity = getFileStatus(path, defaultPath, tenantCode, type);
-        } catch (Exception e) {
-            log.error("error while listing files status recursively, path: {}", path, e);
-            return storageEntityList;
-        }
-        foldersToFetch.add(initialEntity);
+        LinkedList<String> foldersToFetch = new LinkedList<>();
+        foldersToFetch.addLast(resourceAbsolutePath);
 
         while (!foldersToFetch.isEmpty()) {
-            String pathToExplore = foldersToFetch.pop().getFullName();
-            try {
-                List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
-                for (StorageEntity temp : tempList) {
-                    if (temp.isDirectory()) {
-                        foldersToFetch.add(temp);
+            String pathToExplore = foldersToFetch.pop();
+            visited.add(pathToExplore);
+            List<StorageEntity> tempList = listStorageEntity(pathToExplore);
+            for (StorageEntity temp : tempList) {
+                if (temp.isDirectory()) {
+                    if (visited.contains(temp.getFullName())) {
+                        continue;
                     }
+                    foldersToFetch.add(temp.getFullName());
                 }
-                storageEntityList.addAll(tempList);
-            } catch (Exception e) {
-                log.error("error while listing files stat:wus recursively, path: {}", pathToExplore, e);
             }
+            storageEntityList.addAll(tempList);
         }
 
         return storageEntityList;
     }
 
     @Override
-    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
-                                               ResourceType type) throws Exception {
-        List<StorageEntity> storageEntityList = new ArrayList<>();
-
-        ListObjectsV2Result result = null;
-        String nextContinuationToken = null;
-        do {
-            try {
-                ListObjectsV2Request request = new ListObjectsV2Request();
-                request.setBucketName(bucketName);
-                request.setPrefix(path);
-                request.setDelimiter(FOLDER_SEPARATOR);
-                request.setContinuationToken(nextContinuationToken);
-
-                result = ossClient.listObjectsV2(request);
-            } catch (Exception e) {
-                throw new ServiceException("Get OSS file list exception", e);
-            }
-
-            List<OSSObjectSummary> summaries = result.getObjectSummaries();
-
-            for (OSSObjectSummary summary : summaries) {
-                if (!summary.getKey().endsWith(FOLDER_SEPARATOR)) {
-                    // the path is a file
-                    String[] aliasArr = summary.getKey().split(FOLDER_SEPARATOR);
-                    String alias = aliasArr[aliasArr.length - 1];
-                    String fileName = StringUtils.difference(defaultPath, summary.getKey());
-
-                    StorageEntity entity = new StorageEntity();
-                    entity.setAlias(alias);
-                    entity.setFileName(fileName);
-                    entity.setFullName(summary.getKey());
-                    entity.setDirectory(false);
-                    entity.setUserName(tenantCode);
-                    entity.setType(type);
-                    entity.setSize(summary.getSize());
-                    entity.setCreateTime(summary.getLastModified());
-                    entity.setUpdateTime(summary.getLastModified());
-                    entity.setPfullName(path);
-
-                    storageEntityList.add(entity);
-                }
-            }
-
-            for (String commonPrefix : result.getCommonPrefixes()) {
-                // the paths in commonPrefix are directories
-                String suffix = StringUtils.difference(path, commonPrefix);
-                String fileName = StringUtils.difference(defaultPath, commonPrefix);
-
-                StorageEntity entity = new StorageEntity();
-                entity.setAlias(suffix);
-                entity.setFileName(fileName);
-                entity.setFullName(commonPrefix);
-                entity.setDirectory(true);
-                entity.setUserName(tenantCode);
-                entity.setType(type);
-                entity.setSize(0);
-                entity.setCreateTime(null);
-                entity.setUpdateTime(null);
-                entity.setPfullName(path);
-
-                storageEntityList.add(entity);
-            }
-
-            nextContinuationToken = result.getNextContinuationToken();
-        } while (result.isTruncated());
-
-        return storageEntityList;
-    }
-
-    @Override
-    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
-                                       ResourceType type) throws Exception {
-        ListObjectsV2Request request = new ListObjectsV2Request();
-        request.setBucketName(bucketName);
-        request.setPrefix(path);
-        request.setDelimiter(FOLDER_SEPARATOR);
-
-        ListObjectsV2Result result;
-        try {
-            result = ossClient.listObjectsV2(request);
-        } catch (Exception e) {
-            throw new ServiceException("Get OSS file list exception", e);
-        }
-
-        List<OSSObjectSummary> summaries = result.getObjectSummaries();
-
-        if (path.endsWith(FOLDER_SEPARATOR)) {
-            // the path is a directory that may or may not exist in OSS
-            String alias = findDirAlias(path);
-            String fileName = StringUtils.difference(defaultPath, path);
-
-            StorageEntity entity = new StorageEntity();
-            entity.setAlias(alias);
-            entity.setFileName(fileName);
-            entity.setFullName(path);
-            entity.setDirectory(true);
-            entity.setUserName(tenantCode);
-            entity.setType(type);
-            entity.setSize(0);
-
-            return entity;
-
-        } else {
-            // the path is a file
-            if (summaries.size() > 0) {
-                OSSObjectSummary summary = summaries.get(0);
-                String[] aliasArr = summary.getKey().split(FOLDER_SEPARATOR);
-                String alias = aliasArr[aliasArr.length - 1];
-                String fileName = StringUtils.difference(defaultPath, summary.getKey());
-
-                StorageEntity entity = new StorageEntity();
-                entity.setAlias(alias);
-                entity.setFileName(fileName);
-                entity.setFullName(summary.getKey());
-                entity.setDirectory(false);
-                entity.setUserName(tenantCode);
-                entity.setType(type);
-                entity.setSize(summary.getSize());
-                entity.setCreateTime(summary.getLastModified());
-                entity.setUpdateTime(summary.getLastModified());
-
-                return entity;
-            }
-        }
-
-        throw new FileNotFoundException("Object is not found in OSS Bucket: " + bucketName);
-    }
-
-    @Override
-    public void deleteTenant(String tenantCode) throws Exception {
-        deleteTenantCode(tenantCode);
-    }
-
-    public String getOssResDir(String tenantCode) {
-        return String.format("%s/" + RESOURCE_TYPE_FILE, getOssTenantDir(tenantCode));
-    }
-
-    public String getOssUdfDir(String tenantCode) {
-        return String.format("%s/" + RESOURCE_TYPE_UDF, getOssTenantDir(tenantCode));
-    }
-
-    public String getOssTenantDir(String tenantCode) {
-        return String.format(FORMAT_S_S, getOssDataBasePath(), tenantCode);
-    }
-
-    public String getOssDataBasePath() {
-        if (FOLDER_SEPARATOR.equals(RESOURCE_UPLOAD_PATH)) {
-            return "";
-        } else {
-            return RESOURCE_UPLOAD_PATH.replaceFirst(FOLDER_SEPARATOR, "");
-        }
-    }
-
-    protected void deleteTenantCode(String tenantCode) {
-        deleteDir(getResDir(tenantCode));
-        deleteDir(getUdfDir(tenantCode));
+    public StorageEntity getStorageEntity(String resourceAbsolutePath) {
+        resourceAbsolutePath = transformAbsolutePathToOssKey(resourceAbsolutePath);
+        OSSObject object = ossClient.getObject(new GetObjectRequest(bucketName, resourceAbsolutePath));
+        return transformOSSObjectToStorageEntity(object);
     }
 
     public void ensureBucketSuccessfullyCreated(String bucketName) {
@@ -512,22 +318,70 @@ public class OssStorageOperator implements Closeable, StorageOperate {
         log.info("bucketName: {} has been found, the current regionName is {}", bucketName, region);
     }
 
-    protected void deleteDir(String directoryName) {
-        if (ossClient.doesObjectExist(bucketName, directoryName)) {
-            ossClient.deleteObject(bucketName, directoryName);
-        }
-    }
-
     protected OSS buildOssClient() {
         return OssClientFactory.buildOssClient(ossConnection);
     }
 
-    private String findDirAlias(String dirPath) {
-        if (!dirPath.endsWith(FOLDER_SEPARATOR)) {
-            return dirPath;
-        }
+    protected StorageEntity transformOSSObjectToStorageEntity(OSSObject ossObject) {
+        ResourceMetadata resourceMetaData = getResourceMetaData(ossObject.getKey());
 
-        Path path = Paths.get(dirPath);
-        return path.getName(path.getNameCount() - 1) + FOLDER_SEPARATOR;
+        StorageEntity storageEntity = new StorageEntity();
+        storageEntity.setFileName(new File(ossObject.getKey()).getName());
+        storageEntity.setFullName(ossObject.getKey());
+        storageEntity.setPfullName(resourceMetaData.getResourceParentAbsolutePath());
+        storageEntity.setType(resourceMetaData.getResourceType());
+        storageEntity.setDirectory(resourceMetaData.isDirectory());
+        storageEntity.setSize(ossObject.getObjectMetadata().getContentLength());
+        storageEntity.setCreateTime(ossObject.getObjectMetadata().getLastModified());
+        storageEntity.setUpdateTime(ossObject.getObjectMetadata().getLastModified());
+        return storageEntity;
+    }
+
+    private StorageEntity transformOSSObjectToStorageEntity(OSSObjectSummary ossObjectSummary) {
+        String absolutePath = transformOssKeyToAbsolutePath(ossObjectSummary.getKey());
+
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+
+        StorageEntity storageEntity = new StorageEntity();
+        storageEntity.setFileName(new File(absolutePath).getName());
+        storageEntity.setFullName(absolutePath);
+        storageEntity.setPfullName(resourceMetaData.getResourceParentAbsolutePath());
+        storageEntity.setType(resourceMetaData.getResourceType());
+        storageEntity.setDirectory(resourceMetaData.isDirectory());
+        storageEntity.setSize(ossObjectSummary.getSize());
+        storageEntity.setCreateTime(ossObjectSummary.getLastModified());
+        storageEntity.setUpdateTime(ossObjectSummary.getLastModified());
+        return storageEntity;
+    }
+
+    private StorageEntity transformCommonPrefixToStorageEntity(String commonPrefix) {
+        String absolutePath = transformOssKeyToAbsolutePath(commonPrefix);
+
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+
+        StorageEntity entity = new StorageEntity();
+        entity.setFileName(new File(absolutePath).getName());
+        entity.setFullName(absolutePath);
+        entity.setDirectory(resourceMetaData.isDirectory());
+        entity.setType(resourceMetaData.getResourceType());
+        entity.setSize(0L);
+        entity.setCreateTime(null);
+        entity.setUpdateTime(null);
+        return entity;
+    }
+
+    private String transformAbsolutePathToOssKey(String absolutePath) {
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+        if (resourceMetaData.isDirectory()) {
+            return FileUtils.concatFilePath(absolutePath, "/");
+        }
+        return absolutePath;
+    }
+
+    private String transformOssKeyToAbsolutePath(String s3Key) {
+        if (s3Key.endsWith("/")) {
+            return s3Key.substring(0, s3Key.length() - 1);
+        }
+        return s3Key;
     }
 }

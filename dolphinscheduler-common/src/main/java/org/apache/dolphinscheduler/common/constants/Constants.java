@@ -392,8 +392,6 @@ public final class Constants {
     public static final String QUEUE_NAME = "queueName";
     public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
     public static final int LOG_QUERY_LIMIT = 4096;
-    public static final String ALIAS = "alias";
-    public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final long DEPENDENT_ALL_TASK_CODE = -1;
     public static final long DEPENDENT_WORKFLOW_CODE = 0;

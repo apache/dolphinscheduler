@@ -18,18 +18,14 @@
 package org.apache.dolphinscheduler.plugin.storage.gcs;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
-import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
-import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_FILE;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_TYPE_UDF;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -37,22 +33,25 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.api.gax.paging.Page;
@@ -66,7 +65,7 @@ import com.google.cloud.storage.StorageOptions;
 
 @Data
 @Slf4j
-public class GcsStorageOperator implements Closeable, StorageOperate {
+public class GcsStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
     private Storage gcsStorage;
 
@@ -74,72 +73,46 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
 
     private String credential;
 
+    @SneakyThrows
     public GcsStorageOperator() {
-
-    }
-
-    public void init() {
-        try {
-            credential = readCredentials();
-            bucketName = readBucketName();
-            gcsStorage = buildGcsStorage(credential);
-
-            checkBucketNameExists(bucketName);
-        } catch (IOException e) {
-            log.error("GCS Storage operator init failed", e);
-        }
-    }
-
-    protected Storage buildGcsStorage(String credential) throws IOException {
-        return StorageOptions.newBuilder()
+        credential = PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_CREDENTIAL);
+        bucketName = PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME);
+        gcsStorage = StorageOptions.newBuilder()
                 .setCredentials(ServiceAccountCredentials.fromStream(
                         Files.newInputStream(Paths.get(credential))))
                 .build()
                 .getService();
-    }
 
-    protected String readCredentials() {
-        return PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_CREDENTIAL);
-    }
+        checkBucketNameExists(bucketName);
 
-    protected String readBucketName() {
-        return PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME);
     }
 
     @Override
-    public void createTenantDirIfNotExists(String tenantCode) throws Exception {
-        mkdir(tenantCode, getGcsResDir(tenantCode));
-        mkdir(tenantCode, getGcsUdfDir(tenantCode));
-    }
-
-    @Override
-    public String getResDir(String tenantCode) {
-        return getGcsResDir(tenantCode) + FOLDER_SEPARATOR;
-    }
-
-    @Override
-    public String getUdfDir(String tenantCode) {
-        return getGcsUdfDir(tenantCode) + FOLDER_SEPARATOR;
-    }
-
-    @Override
-    public String getResourceFullName(String tenantCode, String fileName) {
-        if (fileName.startsWith(FOLDER_SEPARATOR)) {
-            fileName.replaceFirst(FOLDER_SEPARATOR, EMPTY_STRING);
+    public String getStorageBaseDirectory() {
+        // All directory should end with File.separator
+        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
+            log.warn("{} -> {} should not start with / in Gcs", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
+            return RESOURCE_UPLOAD_PATH.substring(1);
         }
-        return String.format(FORMAT_S_S, getGcsResDir(tenantCode), fileName);
+        return RESOURCE_UPLOAD_PATH;
     }
 
+    @SneakyThrows
     @Override
-    public String getFileName(ResourceType resourceType, String tenantCode, String fileName) {
-        if (fileName.startsWith(FOLDER_SEPARATOR)) {
-            fileName = fileName.replaceFirst(FOLDER_SEPARATOR, EMPTY_STRING);
+    public void createStorageDir(String directoryAbsolutePath) {
+        directoryAbsolutePath = transformAbsolutePathToGcsKey(directoryAbsolutePath);
+        if (exists(directoryAbsolutePath)) {
+            throw new FileAlreadyExistsException("directory: " + directoryAbsolutePath + " already exists");
         }
-        return getDir(resourceType, tenantCode) + fileName;
+        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, directoryAbsolutePath)).build();
+        gcsStorage.create(blobInfo, EMPTY_STRING.getBytes(StandardCharsets.UTF_8));
     }
 
+    @SneakyThrows
     @Override
-    public void download(String srcFilePath, String dstFilePath, boolean overwrite) throws IOException {
+    public void download(String srcFilePath, String dstFilePath, boolean overwrite) {
+        srcFilePath = transformAbsolutePathToGcsKey(srcFilePath);
+
         File dstFile = new File(dstFilePath);
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
@@ -152,40 +125,26 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
     }
 
     @Override
-    public boolean exists(String fullName) throws IOException {
-        return isObjectExists(fullName);
+    public boolean exists(String fullName) {
+        fullName = transformAbsolutePathToGcsKey(fullName);
+        Blob blob = gcsStorage.get(BlobId.of(bucketName, fullName));
+        return blob != null && blob.exists();
     }
 
+    @SneakyThrows
     @Override
-    public boolean delete(String filePath, boolean recursive) throws IOException {
-        try {
-            if (isObjectExists(filePath)) {
-                gcsStorage.delete(BlobId.of(bucketName, filePath));
-            }
-            return true;
-        } catch (Exception e) {
-            log.error("delete the object error,the resource path is {}", filePath);
-            return false;
+    public void delete(String filePath, boolean recursive) {
+        filePath = transformAbsolutePathToGcsKey(filePath);
+        if (exists(filePath)) {
+            gcsStorage.delete(BlobId.of(bucketName, filePath));
         }
     }
 
     @Override
-    public boolean delete(String fullName, List<String> childrenPathList, boolean recursive) throws IOException {
-        // append the resource fullName to the list for deletion.
-        childrenPathList.add(fullName);
+    public void copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) {
+        srcPath = transformGcsKeyToAbsolutePath(srcPath);
+        dstPath = transformGcsKeyToAbsolutePath(dstPath);
 
-        boolean result = true;
-        for (String filePath : childrenPathList) {
-            if (!delete(filePath, recursive)) {
-                result = false;
-            }
-        }
-
-        return result;
-    }
-
-    @Override
-    public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         BlobId source = BlobId.of(bucketName, srcPath);
         BlobId target = BlobId.of(bucketName, dstPath);
 
@@ -198,31 +157,30 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
         if (deleteSource) {
             gcsStorage.delete(source);
         }
-        return true;
     }
 
+    @SneakyThrows
     @Override
-    public boolean upload(String tenantCode, String srcFile, String dstPath, boolean deleteSource,
-                          boolean overwrite) throws IOException {
-        try {
-            BlobInfo blobInfo = BlobInfo.newBuilder(
-                    BlobId.of(bucketName, dstPath)).build();
+    public void upload(String srcFile, String dstPath, boolean deleteSource, boolean overwrite) {
+        dstPath = transformAbsolutePathToGcsKey(dstPath);
+        if (exists(dstPath) && !overwrite) {
+            throw new FileAlreadyExistsException("file: " + dstPath + " already exists");
+        }
+        BlobInfo blobInfo = BlobInfo.newBuilder(
+                BlobId.of(bucketName, dstPath)).build();
 
-            Path srcPath = Paths.get(srcFile);
-            gcsStorage.create(blobInfo, Files.readAllBytes(srcPath));
+        Path srcPath = Paths.get(srcFile);
+        gcsStorage.create(blobInfo, Files.readAllBytes(srcPath));
 
-            if (deleteSource) {
-                Files.delete(srcPath);
-            }
-            return true;
-        } catch (Exception e) {
-            log.error("upload failed,the bucketName is {},the filePath is {}", bucketName, dstPath);
-            return false;
+        if (deleteSource) {
+            Files.delete(srcPath);
         }
     }
 
+    @SneakyThrows
     @Override
-    public List<String> vimFile(String tenantCode, String filePath, int skipLineNums, int limit) throws IOException {
+    public List<String> fetchFileContent(String filePath, int skipLineNums, int limit) {
+        filePath = transformAbsolutePathToGcsKey(filePath);
         if (StringUtils.isBlank(filePath)) {
             log.error("file path:{} is blank", filePath);
             return Collections.emptyList();
@@ -237,232 +195,58 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
         }
     }
 
-    @Override
-    public void deleteTenant(String tenantCode) throws Exception {
-        deleteTenantCode(tenantCode);
-    }
-
-    protected void deleteTenantCode(String tenantCode) {
-        deleteDirectory(getResDir(tenantCode));
-        deleteDirectory(getUdfDir(tenantCode));
-    }
-
-    @Override
-    public String getDir(ResourceType resourceType, String tenantCode) {
-        switch (resourceType) {
-            case UDF:
-                return getUdfDir(tenantCode);
-            case FILE:
-                return getResDir(tenantCode);
-            case ALL:
-                return getGcsDataBasePath();
-            default:
-                return EMPTY_STRING;
-        }
-
-    }
-
-    protected void deleteDirectory(String directoryName) {
-        if (isObjectExists(directoryName)) {
-            gcsStorage.delete(BlobId.of(bucketName, directoryName));
-        }
-    }
-
-    public String getGcsResDir(String tenantCode) {
-        return String.format("%s/" + RESOURCE_TYPE_FILE, getGcsTenantDir(tenantCode));
-    }
-
-    public String getGcsUdfDir(String tenantCode) {
-        return String.format("%s/" + RESOURCE_TYPE_UDF, getGcsTenantDir(tenantCode));
-    }
-
-    public String getGcsTenantDir(String tenantCode) {
-        return String.format(FORMAT_S_S, getGcsDataBasePath(), tenantCode);
-    }
-
-    public String getGcsDataBasePath() {
-        if (FOLDER_SEPARATOR.equals(RESOURCE_UPLOAD_PATH)) {
-            return EMPTY_STRING;
-        } else {
-            return RESOURCE_UPLOAD_PATH.replaceFirst(FOLDER_SEPARATOR, EMPTY_STRING);
-        }
-    }
-
-    @Override
-    public boolean mkdir(String tenantCode, String path) throws IOException {
-        String objectName = path + FOLDER_SEPARATOR;
-        if (!isObjectExists(objectName)) {
-            BlobInfo blobInfo = BlobInfo.newBuilder(
-                    BlobId.of(bucketName, objectName)).build();
-
-            gcsStorage.create(blobInfo, EMPTY_STRING.getBytes(StandardCharsets.UTF_8));
-        }
-        return true;
-    }
-
+    @SneakyThrows
     @Override
     public void close() throws IOException {
-        try {
-            if (gcsStorage != null) {
-                gcsStorage.close();
-            }
-        } catch (Exception e) {
-            throw new IOException(e);
+        if (gcsStorage != null) {
+            gcsStorage.close();
         }
     }
 
     @Override
-    public ResUploadType returnStorageType() {
-        return ResUploadType.GCS;
+    public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
+        resourceAbsolutePath = transformAbsolutePathToGcsKey(resourceAbsolutePath);
+
+        Page<Blob> blobs = gcsStorage.list(bucketName, Storage.BlobListOption.prefix(resourceAbsolutePath));
+        List<StorageEntity> storageEntities = new ArrayList<>();
+        blobs.iterateAll().forEach(blob -> storageEntities.add(transformBlobToStorageEntity(blob)));
+        return storageEntities;
     }
 
     @Override
-    public List<StorageEntity> listFilesStatusRecursively(String path, String defaultPath, String tenantCode,
-                                                          ResourceType type) {
+    public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
+        resourceAbsolutePath = transformAbsolutePathToGcsKey(resourceAbsolutePath);
+
+        Set<String> visited = new HashSet<>();
         List<StorageEntity> storageEntityList = new ArrayList<>();
-        LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
-
-        StorageEntity initialEntity = null;
-        try {
-            initialEntity = getFileStatus(path, defaultPath, tenantCode, type);
-        } catch (Exception e) {
-            log.error("error while listing files status recursively, path: {}", path, e);
-            return storageEntityList;
-        }
-        foldersToFetch.add(initialEntity);
+        LinkedList<String> foldersToFetch = new LinkedList<>();
+        foldersToFetch.addLast(resourceAbsolutePath);
 
         while (!foldersToFetch.isEmpty()) {
-            String pathToExplore = foldersToFetch.pop().getFullName();
-            try {
-                List<StorageEntity> tempList = listFilesStatus(pathToExplore, defaultPath, tenantCode, type);
-                for (StorageEntity temp : tempList) {
-                    if (temp.isDirectory()) {
-                        foldersToFetch.add(temp);
+            String pathToExplore = foldersToFetch.pop();
+            visited.add(pathToExplore);
+            List<StorageEntity> tempList = listStorageEntity(pathToExplore);
+            for (StorageEntity temp : tempList) {
+                if (temp.isDirectory()) {
+                    if (visited.contains(temp.getFullName())) {
+                        continue;
                     }
+                    foldersToFetch.add(temp.getFullName());
                 }
-                storageEntityList.addAll(tempList);
-            } catch (Exception e) {
-                log.error("error while listing files stat:wus recursively, path: {}", pathToExplore, e);
             }
+            storageEntityList.addAll(tempList);
         }
-
         return storageEntityList;
     }
 
     @Override
-    public List<StorageEntity> listFilesStatus(String path, String defaultPath, String tenantCode,
-                                               ResourceType type) throws Exception {
-        List<StorageEntity> storageEntityList = new ArrayList<>();
-
-        Page<Blob> blobs;
-        try {
-            blobs =
-                    gcsStorage.list(
-                            bucketName,
-                            Storage.BlobListOption.prefix(path),
-                            Storage.BlobListOption.currentDirectory());
-        } catch (Exception e) {
-            throw new RuntimeException("Get GCS file list exception. ", e);
-        }
-
-        if (blobs == null) {
-            return storageEntityList;
-        }
-
-        for (Blob blob : blobs.iterateAll()) {
-            if (path.equals(blob.getName())) {
-                continue;
-            }
-            if (blob.isDirectory()) {
-                String suffix = StringUtils.difference(path, blob.getName());
-                String fileName = StringUtils.difference(defaultPath, blob.getName());
-                StorageEntity entity = new StorageEntity();
-                entity.setAlias(suffix);
-                entity.setFileName(fileName);
-                entity.setFullName(blob.getName());
-                entity.setDirectory(true);
-                entity.setUserName(tenantCode);
-                entity.setType(type);
-                entity.setSize(0);
-                entity.setCreateTime(null);
-                entity.setUpdateTime(null);
-                entity.setPfullName(path);
-
-                storageEntityList.add(entity);
-            } else {
-                String[] aliasArr = blob.getName().split("/");
-                String alias = aliasArr[aliasArr.length - 1];
-                String fileName = StringUtils.difference(defaultPath, blob.getName());
-
-                StorageEntity entity = new StorageEntity();
-                entity.setAlias(alias);
-                entity.setFileName(fileName);
-                entity.setFullName(blob.getName());
-                entity.setDirectory(false);
-                entity.setUserName(tenantCode);
-                entity.setType(type);
-                entity.setSize(blob.getSize());
-                entity.setCreateTime(Date.from(blob.getCreateTimeOffsetDateTime().toInstant()));
-                entity.setUpdateTime(Date.from(blob.getUpdateTimeOffsetDateTime().toInstant()));
-                entity.setPfullName(path);
-
-                storageEntityList.add(entity);
-            }
-        }
-
-        return storageEntityList;
+    public StorageEntity getStorageEntity(String resourceAbsolutePath) {
+        resourceAbsolutePath = transformAbsolutePathToGcsKey(resourceAbsolutePath);
+        Blob blob = gcsStorage.get(BlobId.of(bucketName, resourceAbsolutePath));
+        return transformBlobToStorageEntity(blob);
     }
 
-    @Override
-    public StorageEntity getFileStatus(String path, String defaultPath, String tenantCode,
-                                       ResourceType type) throws Exception {
-        if (path.endsWith(FOLDER_SEPARATOR)) {
-            // the path is a directory that may or may not exist
-            String alias = findDirAlias(path);
-            String fileName = StringUtils.difference(defaultPath, path);
-
-            StorageEntity entity = new StorageEntity();
-            entity.setAlias(alias);
-            entity.setFileName(fileName);
-            entity.setFullName(path);
-            entity.setDirectory(true);
-            entity.setUserName(tenantCode);
-            entity.setType(type);
-            entity.setSize(0);
-
-            return entity;
-        } else {
-            if (isObjectExists(path)) {
-                Blob blob = gcsStorage.get(BlobId.of(bucketName, path));
-
-                String[] aliasArr = blob.getName().split(FOLDER_SEPARATOR);
-                String alias = aliasArr[aliasArr.length - 1];
-                String fileName = StringUtils.difference(defaultPath, blob.getName());
-
-                StorageEntity entity = new StorageEntity();
-                entity.setAlias(alias);
-                entity.setFileName(fileName);
-                entity.setFullName(blob.getName());
-                entity.setDirectory(false);
-                entity.setUserName(tenantCode);
-                entity.setType(type);
-                entity.setSize(blob.getSize());
-                entity.setCreateTime(Date.from(blob.getCreateTimeOffsetDateTime().toInstant()));
-                entity.setUpdateTime(Date.from(blob.getUpdateTimeOffsetDateTime().toInstant()));
-
-                return entity;
-            } else {
-                throw new FileNotFoundException("Object is not found in GCS Bucket: " + bucketName);
-            }
-        }
-    }
-
-    protected boolean isObjectExists(String objectName) {
-        Blob blob = gcsStorage.get(BlobId.of(bucketName, objectName));
-        return blob != null && blob.exists();
-    }
-
-    public void checkBucketNameExists(String bucketName) {
+    private void checkBucketNameExists(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME + " is blank");
         }
@@ -483,12 +267,35 @@ public class GcsStorageOperator implements Closeable, StorageOperate {
         }
     }
 
-    private String findDirAlias(String dirPath) {
-        if (!dirPath.endsWith(FOLDER_SEPARATOR)) {
-            return dirPath;
-        }
+    private StorageEntity transformBlobToStorageEntity(Blob blob) {
+        String absolutePath = transformGcsKeyToAbsolutePath(blob.getName());
 
-        Path path = Paths.get(dirPath);
-        return path.getName(path.getNameCount() - 1) + FOLDER_SEPARATOR;
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+
+        StorageEntity entity = new StorageEntity();
+        entity.setFileName(new File(absolutePath).getName());
+        entity.setFullName(absolutePath);
+        entity.setDirectory(resourceMetaData.isDirectory());
+        entity.setType(resourceMetaData.getResourceType());
+        entity.setSize(blob.getSize());
+        entity.setCreateTime(Date.from(blob.getCreateTimeOffsetDateTime().toInstant()));
+        entity.setUpdateTime(Date.from(blob.getUpdateTimeOffsetDateTime().toInstant()));
+        return entity;
     }
+
+    private String transformAbsolutePathToGcsKey(String absolutePath) {
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+        if (resourceMetaData.isDirectory()) {
+            return FileUtils.concatFilePath(absolutePath, "/");
+        }
+        return absolutePath;
+    }
+
+    private String transformGcsKeyToAbsolutePath(String s3Key) {
+        if (s3Key.endsWith("/")) {
+            return s3Key.substring(0, s3Key.length() - 1);
+        }
+        return s3Key;
+    }
+
 }

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.s3;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 
 import com.google.auto.service.AutoService;
@@ -27,10 +27,8 @@ import com.google.auto.service.AutoService;
 public class S3StorageOperatorFactory implements StorageOperateFactory {
 
     @Override
-    public StorageOperate createStorageOperate() {
-        S3StorageOperator s3StorageOperator = new S3StorageOperator();
-        s3StorageOperator.init();
-        return s3StorageOperator;
+    public StorageOperator createStorageOperate() {
+        return new S3StorageOperator();
     }
 
     @Override
