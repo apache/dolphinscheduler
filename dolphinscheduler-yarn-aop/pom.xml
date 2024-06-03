@@ -23,7 +23,7 @@
         <artifactId>dolphinscheduler</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
-    <artifactId>dolphinscheduler-aop</artifactId>
+    <artifactId>dolphinscheduler-yarn-aop</artifactId>
     <packaging>jar</packaging>
     <name>${project.artifactId}</name>
     <description>aop 4 YarnClient to get application id when submitting jars using 'yarn jar mainClass args'</description>

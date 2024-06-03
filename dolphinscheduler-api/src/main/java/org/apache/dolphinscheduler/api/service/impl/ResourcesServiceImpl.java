@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkFilePath;
 import static org.apache.dolphinscheduler.common.constants.Constants.ALIAS;
 import static org.apache.dolphinscheduler.common.constants.Constants.CONTENT;
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
@@ -1290,10 +1289,6 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
         if (FOLDER_SEPARATOR.equalsIgnoreCase(fullName)) {
             return;
-        }
-        // abnormal characters check
-        if (!checkFilePath(fullName)) {
-            throw new ServiceException(Status.ILLEGAL_RESOURCE_PATH);
         }
         // Avoid returning to the parent directory
         if (fullName.contains("../")) {
