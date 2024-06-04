@@ -90,12 +90,8 @@ public class UiPluginController extends BaseController {
         return returnDataList(result);
     }
 
-    /**
-     * obtain project version and address
-     * @return product info
-     */
     @Operation(summary = "queryProductInfo", description = "QUERY_PRODUCT_INFO")
-    @GetMapping(value = "/queryProductInfo")
+    @GetMapping(value = "/query-product-info")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERSION_INFO_STATE_ERROR)
     public Result<ProductInfoDto> queryProductInfo() {

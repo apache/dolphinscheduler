@@ -62,9 +62,6 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
     @PostConstruct
     private void init() {
         dsVersion = dsVersionDao.selectVersion().map(DsVersion::getVersion).orElse("unknown");
-        if(StringUtils.isBlank(dsVersion)){
-            throw new ServiceException(Status.VERSION_INFO_STATE_ERROR);
-        }
     }
 
     @Override

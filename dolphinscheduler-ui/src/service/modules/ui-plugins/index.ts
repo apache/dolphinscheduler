@@ -35,7 +35,7 @@ export function queryUiPluginDetailById(id: IPluginId): any {
 
 export function queryProductInfo(): any {
   return axios({
-    url: '/ui-plugins/queryProductInfo',
+    url: '/ui-plugins/query-product-info',
     method: 'get'
   })
 }
