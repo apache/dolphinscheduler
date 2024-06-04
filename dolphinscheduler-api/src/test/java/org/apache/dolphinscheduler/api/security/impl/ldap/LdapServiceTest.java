@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 
 import java.lang.reflect.Field;
-
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -72,7 +71,8 @@ public class LdapServiceTest {
 
     @Test
     public void getUserType() {
-        UserType userType = ldapService.getUserType(Map.of(LdapService.ATTRIBUTE_USER_TYPE, UserType.ADMIN_USER.toString()));
+        UserType userType =
+                ldapService.getUserType(Map.of(LdapService.ATTRIBUTE_USER_TYPE, UserType.ADMIN_USER.toString()));
         Assertions.assertEquals(UserType.ADMIN_USER, userType);
 
         userType = ldapService.getUserType(Map.of());

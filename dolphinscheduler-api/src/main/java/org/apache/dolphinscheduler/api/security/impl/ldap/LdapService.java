@@ -129,7 +129,7 @@ public class LdapService {
             // Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
             ctx = new InitialLdapContext(searchEnv, null);
             SearchControls sc = new SearchControls();
-            sc.setReturningAttributes(new String[] { ldapEmailAttribute, ldapAdminIdentifingAttribute });
+            sc.setReturningAttributes(new String[]{ldapEmailAttribute, ldapAdminIdentifingAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
             NamingEnumeration<SearchResult> results = null;
@@ -159,7 +159,8 @@ public class LdapService {
 
                     if (ldapAttributeMap == null) {
                         ldapAttributeMap = new HashMap<>();
-                        UserType userType = userId.equalsIgnoreCase(adminUserId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
+                        UserType userType =
+                                userId.equalsIgnoreCase(adminUserId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
 
                         ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, userType.toString());
                     }

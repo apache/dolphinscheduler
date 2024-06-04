@@ -77,7 +77,7 @@ public class LdapAuthenticatorTest extends AbstractControllerTest {
 
     private LdapAuthenticator ldapAuthenticator;
 
-    //test param
+    // test param
     private User mockUser;
     private Session mockSession;
 
