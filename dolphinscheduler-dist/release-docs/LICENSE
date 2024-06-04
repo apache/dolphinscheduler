@@ -525,7 +525,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     reactor-netty-core 1.0.22: https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty-core/1.0.22, Apache 2.0
     reactor-netty-http 1.0.22: https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty-http/1.0.22, Apache 2.0
     DmJdbcDriver18 8.1.2.79: https://mvnrepository.com/artifact/com.dameng/DmJdbcDriver18/8.1.2.79, Apache 2.0
-    nimbus-jose-jwt 9.22: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.22, Apache 2.0
     woodstox-core 6.4.0: https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.4.0, Apache 2.0
     auto-value 1.10.1: https://mvnrepository.com/artifact/com.google.auto.value/auto-value/1.10.1, Apache 2.0
     auto-value-annotations 1.10.4: https://mvnrepository.com/artifact/com.google.auto.value/auto-value-annotations/1.10.4, Apache 2.0
