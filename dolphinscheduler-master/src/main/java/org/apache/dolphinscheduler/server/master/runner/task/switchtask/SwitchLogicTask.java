@@ -61,26 +61,30 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
         this.taskInstance = workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId())
                 .orElseThrow(() -> new LogicTaskInitializeException(
                         "Cannot find the task instance in workflow execute runnable"));
+        // Since the default branch is not in the dependTaskList, we need to add it to the end
+        // otherwise the default branch will never be skipped in DAGHelper
+        addDefaultBranchToEnd();
     }
 
     @Override
     public void handle() throws MasterTaskExecuteException {
-        // Calculate the condition result and get the next node
         if (CollectionUtils.isEmpty(taskParameters.getDependTaskList())) {
+            // If the branch is empty then will go into the default branch
+            // This case shouldn't happen, we can directly throw exception and forbid the user to set branch
             moveToDefaultBranch();
         } else {
             calculateSwitchBranch();
         }
         taskInstance.setSwitchDependency(taskParameters);
-        log.info("Switch task execute finished");
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
+        log.info("Switch task execute finished: {}", taskExecutionContext.getCurrentExecutionStatus().name());
     }
 
     private void moveToDefaultBranch() {
-        checkIfBranchExist(taskParameters.getNextNode());
-
         List<SwitchResultVo> switchResultVos = taskParameters.getDependTaskList();
-        switchResultVos.add(new SwitchResultVo(null, taskParameters.getNextNode()));
+        SwitchResultVo defaultSwitchResultVo = getDefaultSwitchResultVo();
+        checkIfBranchExist(defaultSwitchResultVo.getNextNode());
+
         taskParameters.setResultConditionLocation(switchResultVos.size() - 1);
 
         log.info("The condition is not satisfied, move to the default branch: {}",
@@ -90,9 +94,6 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
     private void calculateSwitchBranch() {
         List<SwitchResultVo> switchResultVos = taskParameters.getDependTaskList();
-        if (CollectionUtils.isEmpty(switchResultVos)) {
-            moveToDefaultBranch();
-        }
         Map<String, Property> globalParams = taskExecutionContext.getPrepareParamsMap();
         Map<String, Property> varParams = JSONUtils
                 .toList(taskInstance.getVarPool(), Property.class)
@@ -100,7 +101,8 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                 .collect(Collectors.toMap(Property::getProp, Property -> Property));
 
         int finalConditionLocation = -1;
-        for (int i = 0; i < switchResultVos.size(); i++) {
+        // The last one is the default branch, no need to calculate
+        for (int i = 0; i < switchResultVos.size() - 1; i++) {
             SwitchResultVo switchResultVo = switchResultVos.get(i);
             log.info("Begin to execute {} condition: {} ", i, switchResultVo.getCondition());
             String content = SwitchTaskUtils.generateContentWithTaskParams(switchResultVo.getCondition(), globalParams,
@@ -111,14 +113,18 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                 result = SwitchTaskUtils.evaluate(content);
                 log.info("Execute condition sentence: {} successfully: {}", content, result);
                 if (result) {
+                    // If matched, break the loop
                     finalConditionLocation = i;
+                    break;
                 }
             } catch (Exception e) {
                 log.info("Execute condition sentence: {} failed", content, e);
             }
         }
+        // If the finalConditionLocation is -1, then the default branch will be executed
         if (finalConditionLocation >= 0) {
-            checkIfBranchExist(switchResultVos.get(finalConditionLocation).getNextNode());
+            List<Long> nextNodes = switchResultVos.get(finalConditionLocation).getNextNode();
+            checkIfBranchExist(nextNodes);
             log.info("The condition is satisfied, move to the branch: {}",
                     switchResultVos.get(finalConditionLocation).getNextNode().stream()
                             .map(node -> workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowGraph().getDag()
@@ -126,7 +132,6 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                             .collect(Collectors.toList()));
             taskParameters.setResultConditionLocation(finalConditionLocation);
         } else {
-            log.info("All conditions are not satisfied, move to the default branch");
             moveToDefaultBranch();
         }
     }
@@ -145,6 +150,18 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                                 + ") is not in the dag, please check the switch task configuration");
             }
         }
+    }
+
+    private void addDefaultBranchToEnd() {
+        SwitchResultVo switchResultVo = new SwitchResultVo(null, taskParameters.getNextNode());
+        List<SwitchResultVo> dependTaskList = taskParameters.getDependTaskList();
+        if (!dependTaskList.contains(switchResultVo)) {
+            dependTaskList.add(switchResultVo);
+        }
+    }
+
+    private SwitchResultVo getDefaultSwitchResultVo() {
+        return taskParameters.getDependTaskList().get(taskParameters.getDependTaskList().size() - 1);
     }
 
 }
