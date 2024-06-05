@@ -16,18 +16,17 @@
  */
 package org.apache.dolphinscheduler.plugin.task.aliyunserverlessspark;
 
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
-import java.util.List;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 @Data
 @Slf4j
 public class AliyunServerlessSparkParameters extends AbstractParameters {
+
     // spark job configurations
     private String workspaceId;
     private String resourceQueueId;

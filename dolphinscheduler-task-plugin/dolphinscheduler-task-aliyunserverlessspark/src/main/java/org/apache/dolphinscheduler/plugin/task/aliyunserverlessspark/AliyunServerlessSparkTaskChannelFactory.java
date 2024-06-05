@@ -26,6 +26,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class AliyunServerlessSparkTaskChannelFactory implements TaskChannelFactory {
+
     @Override
     public String getName() {
         return "ALIYUN_SERVERLESS_SPARK";

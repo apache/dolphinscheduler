@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import com.aliyun.emr_serverless_spark20230808.Client;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,8 +41,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.apache.commons.lang3.StringUtils;
-
+import com.aliyun.emr_serverless_spark20230808.Client;
 import com.aliyun.emr_serverless_spark20230808.models.CancelJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunRequest;
 import com.aliyun.emr_serverless_spark20230808.models.GetJobRunResponse;
@@ -88,11 +87,12 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         }
 
         ResourceParametersHelper resourceParametersHelper = taskExecutionContext.getResourceParametersHelper();
-        DataSourceParameters dataSourceParameters = (DataSourceParameters) resourceParametersHelper.getResourceParameters(ResourceType.DATASOURCE, aliyunServerlessSparkParameters.getDatasource());
+        DataSourceParameters dataSourceParameters = (DataSourceParameters) resourceParametersHelper
+                .getResourceParameters(ResourceType.DATASOURCE, aliyunServerlessSparkParameters.getDatasource());
         aliyunServerlessSparkConnectionParam = (AliyunServerlessSparkConnectionParam) DataSourceUtils
-            .buildConnectionParams(
-                DbType.valueOf(aliyunServerlessSparkParameters.getType()),
-                dataSourceParameters.getConnectionParams());
+                .buildConnectionParams(
+                        DbType.valueOf(aliyunServerlessSparkParameters.getType()),
+                        dataSourceParameters.getConnectionParams());
 
         accessKeyId = aliyunServerlessSparkConnectionParam.getAccessKeyId();
         accessKeySecret = aliyunServerlessSparkConnectionParam.getAccessKeySecret();
@@ -114,15 +114,17 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             StartJobRunRequest startJobRunRequest = buildStartJobRunRequest(aliyunServerlessSparkParameters);
             RuntimeOptions runtime = new RuntimeOptions();
             Map<String, String> headers = new HashMap<>();
-            StartJobRunResponse startJobRunResponse = aliyunServerlessSparkClient.startJobRunWithOptions(aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest, headers, runtime);
+            log.info("[debug111] aliyunServerlessSparkParameters - {}", aliyunServerlessSparkParameters);
+            StartJobRunResponse startJobRunResponse = aliyunServerlessSparkClient.startJobRunWithOptions(
+                    aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest, headers, runtime);
             jobRunId = startJobRunResponse.getBody().getJobRunId();
             setAppIds(jobRunId);
             log.info("Successfully submitted serverless spark job, jobRunId - {}", jobRunId);
 
-            // todo: deal with null
-            while(!RunState.isFinal(currentState)) {
+            while (!RunState.isFinal(currentState)) {
                 GetJobRunRequest getJobRunRequest = buildGetJobRunRequest(aliyunServerlessSparkParameters);
-                GetJobRunResponse getJobRunResponse = aliyunServerlessSparkClient.getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId, getJobRunRequest);
+                GetJobRunResponse getJobRunResponse = aliyunServerlessSparkClient
+                        .getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId, getJobRunRequest);
                 currentState = RunState.valueOf(getJobRunResponse.getBody().getJobRun().getState());
                 log.info("job - {} state - {}", jobRunId, currentState);
                 Thread.sleep(10 * 1000L);
@@ -146,7 +148,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     }
 
-    private int mapFinalStateToExitCode(RunState state) {
+    protected int mapFinalStateToExitCode(RunState state) {
         switch (state) {
             case Success:
                 return TaskConstants.EXIT_CODE_SUCCESS;
@@ -166,7 +168,8 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     public void cancelApplication() throws TaskException {
         CancelJobRunRequest cancelJobRunRequest = buildCancelJobRunRequest(aliyunServerlessSparkParameters);
         try {
-            aliyunServerlessSparkClient.cancelJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId, cancelJobRunRequest);
+            aliyunServerlessSparkClient.cancelJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
+                    cancelJobRunRequest);
         } catch (Exception e) {
             log.error("Failed to cancel serverless spark job run", e);
         }
@@ -177,23 +180,26 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         return Collections.emptyList();
     }
 
-    private Client buildAliyunServerlessSparkClient(String accessKeyId, String accessKeySecret, String regionId) throws Exception {
+    protected Client buildAliyunServerlessSparkClient(String accessKeyId, String accessKeySecret,
+                                                      String regionId) throws Exception {
         String endpoint = String.format("emr-serverless-spark.%s.aliyuncs.com", regionId);
         Config config = new Config()
-            .setEndpoint(endpoint)
-            .setAccessKeyId(accessKeyId)
-            .setAccessKeySecret(accessKeySecret);
+                .setEndpoint(endpoint)
+                .setAccessKeyId(accessKeyId)
+                .setAccessKeySecret(accessKeySecret);
         return new Client(config);
     }
 
-    private StartJobRunRequest buildStartJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+    protected StartJobRunRequest buildStartJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
         StartJobRunRequest startJobRunRequest = new StartJobRunRequest();
         startJobRunRequest.setRegionId(regionId);
         startJobRunRequest.setResourceQueueId(aliyunServerlessSparkParameters.getResourceQueueId());
         startJobRunRequest.setCodeType(aliyunServerlessSparkParameters.getCodeType());
         startJobRunRequest.setName(aliyunServerlessSparkParameters.getJobName());
         String engineReleaseVersion = aliyunServerlessSparkParameters.getEngineReleaseVersion();
-        engineReleaseVersion = StringUtils.isEmpty(engineReleaseVersion) ? "esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)" : engineReleaseVersion;
+        engineReleaseVersion =
+                StringUtils.isEmpty(engineReleaseVersion) ? "esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)"
+                        : engineReleaseVersion;
         startJobRunRequest.setReleaseVersion(engineReleaseVersion);
         Tag envTag = new Tag();
         envTag.setKey("environment");
@@ -203,25 +209,26 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         workflowTag.setKey("workflow");
         workflowTag.setValue("true");
         startJobRunRequest.setTags(Arrays.asList(envTag, workflowTag));
-        List<String> entryPointArguments = StringUtils.isEmpty(aliyunServerlessSparkParameters.getEntryPointArguments()) ?
-            Collections.emptyList() : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split("#"));
+        List<String> entryPointArguments =
+                StringUtils.isEmpty(aliyunServerlessSparkParameters.getEntryPointArguments()) ? Collections.emptyList()
+                        : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split("#"));
         JobDriver.JobDriverSparkSubmit jobDriverSparkSubmit = new JobDriver.JobDriverSparkSubmit()
-            .setEntryPoint(aliyunServerlessSparkParameters.getEntryPoint())
-            .setEntryPointArguments(entryPointArguments)
-            .setSparkSubmitParameters(aliyunServerlessSparkParameters.getSparkSubmitParameters());
+                .setEntryPoint(aliyunServerlessSparkParameters.getEntryPoint())
+                .setEntryPointArguments(entryPointArguments)
+                .setSparkSubmitParameters(aliyunServerlessSparkParameters.getSparkSubmitParameters());
         JobDriver jobDriver = new com.aliyun.emr_serverless_spark20230808.models.JobDriver()
-            .setSparkSubmit(jobDriverSparkSubmit);
+                .setSparkSubmit(jobDriverSparkSubmit);
         startJobRunRequest.setJobDriver(jobDriver);
         return startJobRunRequest;
     }
 
-    private GetJobRunRequest buildGetJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+    protected GetJobRunRequest buildGetJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
         GetJobRunRequest getJobRunRequest = new GetJobRunRequest();
         getJobRunRequest.setRegionId(regionId);
         return getJobRunRequest;
     }
 
-    private CancelJobRunRequest buildCancelJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+    protected CancelJobRunRequest buildCancelJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
         CancelJobRunRequest cancelJobRunRequest = new CancelJobRunRequest();
         cancelJobRunRequest.setRegionId(regionId);
         return cancelJobRunRequest;

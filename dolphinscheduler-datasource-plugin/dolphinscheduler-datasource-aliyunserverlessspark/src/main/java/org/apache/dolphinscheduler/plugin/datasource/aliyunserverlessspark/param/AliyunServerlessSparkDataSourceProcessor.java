@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.param;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.AliyunServerlessSparkClientWrapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
-import org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.AliyunServerlessSparkClientWrapper;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -46,29 +46,33 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
 
     @Override
     public void checkDatasourceParam(BaseDataSourceParamDTO datasourceParamDTO) {
-        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO = (AliyunServerlessSparkDataSourceParamDTO) datasourceParamDTO;
+        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
+                (AliyunServerlessSparkDataSourceParamDTO) datasourceParamDTO;
         if (StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getRegionId()) ||
-            StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getAccessKeyId()) ||
-            StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getRegionId())) {
+                StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getAccessKeyId()) ||
+                StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getRegionId())) {
             throw new IllegalArgumentException("spark datasource param is not valid");
         }
     }
 
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
-        AliyunServerlessSparkConnectionParam baseConnectionParam = (AliyunServerlessSparkConnectionParam) connectionParam;
+        AliyunServerlessSparkConnectionParam baseConnectionParam =
+                (AliyunServerlessSparkConnectionParam) connectionParam;
         return MessageFormat.format(
-            "{0}@{1}@{2}@{3}",
-            dbType.getName(),
-            baseConnectionParam.getRegionId(),
-            PasswordUtils.encodePassword(baseConnectionParam.getAccessKeyId()),
-            PasswordUtils.encodePassword(baseConnectionParam.getAccessKeySecret()));
+                "{0}@{1}@{2}@{3}",
+                dbType.getName(),
+                baseConnectionParam.getRegionId(),
+                PasswordUtils.encodePassword(baseConnectionParam.getAccessKeyId()),
+                PasswordUtils.encodePassword(baseConnectionParam.getAccessKeySecret()));
     }
 
     @Override
     public BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson) {
-        AliyunServerlessSparkConnectionParam connectionParams = (AliyunServerlessSparkConnectionParam) createConnectionParams(connectionJson);
-        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO = new AliyunServerlessSparkDataSourceParamDTO();
+        AliyunServerlessSparkConnectionParam connectionParams =
+                (AliyunServerlessSparkConnectionParam) createConnectionParams(connectionJson);
+        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
+                new AliyunServerlessSparkDataSourceParamDTO();
 
         aliyunServerlessSparkDataSourceParamDTO.setAccessKeyId(connectionParams.getAccessKeyId());
         aliyunServerlessSparkDataSourceParamDTO.setAccessKeySecret(connectionParams.getAccessKeySecret());
@@ -78,10 +82,13 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
 
     @Override
     public AliyunServerlessSparkConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
-        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO = (AliyunServerlessSparkDataSourceParamDTO) datasourceParam;
-        AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam = new AliyunServerlessSparkConnectionParam();
+        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
+                (AliyunServerlessSparkDataSourceParamDTO) datasourceParam;
+        AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam =
+                new AliyunServerlessSparkConnectionParam();
         aliyunServerlessSparkConnectionParam.setAccessKeyId(aliyunServerlessSparkDataSourceParamDTO.getAccessKeyId());
-        aliyunServerlessSparkConnectionParam.setAccessKeySecret(aliyunServerlessSparkDataSourceParamDTO.getAccessKeySecret());
+        aliyunServerlessSparkConnectionParam
+                .setAccessKeySecret(aliyunServerlessSparkDataSourceParamDTO.getAccessKeySecret());
         aliyunServerlessSparkConnectionParam.setRegionId(aliyunServerlessSparkDataSourceParamDTO.getRegionId());
 
         return aliyunServerlessSparkConnectionParam;
@@ -114,18 +121,18 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
 
     @Override
     public boolean checkDataSourceConnectivity(ConnectionParam connectionParam) {
-        AliyunServerlessSparkConnectionParam baseConnectionParam = (AliyunServerlessSparkConnectionParam) connectionParam;
+        AliyunServerlessSparkConnectionParam baseConnectionParam =
+                (AliyunServerlessSparkConnectionParam) connectionParam;
         try (
-            AliyunServerlessSparkClientWrapper aliyunServerlessSparkClientWrapper =
+                AliyunServerlessSparkClientWrapper aliyunServerlessSparkClientWrapper =
                         new AliyunServerlessSparkClientWrapper(
-                            baseConnectionParam.getAccessKeyId(),
-                            baseConnectionParam.getAccessKeySecret(),
-                            baseConnectionParam.getRegionId())
-        ) {
+                                baseConnectionParam.getAccessKeyId(),
+                                baseConnectionParam.getAccessKeySecret(),
+                                baseConnectionParam.getRegionId())) {
             return aliyunServerlessSparkClientWrapper.checkConnect(
-                baseConnectionParam.getAccessKeyId(),
-                baseConnectionParam.getAccessKeySecret(),
-                baseConnectionParam.getRegionId());
+                    baseConnectionParam.getAccessKeyId(),
+                    baseConnectionParam.getAccessKeySecret(),
+                    baseConnectionParam.getRegionId());
         } catch (Exception e) {
             log.error("spark client failed to connect to the server", e);
             return false;

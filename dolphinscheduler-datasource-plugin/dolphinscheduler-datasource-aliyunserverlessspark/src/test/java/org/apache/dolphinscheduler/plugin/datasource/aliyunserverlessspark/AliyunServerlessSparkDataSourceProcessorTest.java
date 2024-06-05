@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedConstruction;
@@ -46,30 +45,36 @@ public class AliyunServerlessSparkDataSourceProcessorTest {
 
     @Test
     void testCheckDatasourceParam() {
-        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO = new AliyunServerlessSparkDataSourceParamDTO();
+        AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
+                new AliyunServerlessSparkDataSourceParamDTO();
         aliyunServerlessSparkDataSourceParamDTO.setRegionId("cn-hangzhou");
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> aliyunServerlessSparkDataSourceProcessor.checkDatasourceParam(aliyunServerlessSparkDataSourceParamDTO));
+                () -> aliyunServerlessSparkDataSourceProcessor
+                        .checkDatasourceParam(aliyunServerlessSparkDataSourceParamDTO));
         aliyunServerlessSparkDataSourceParamDTO.setAccessKeyId("mockAccessKeyId");
         aliyunServerlessSparkDataSourceParamDTO.setAccessKeySecret("mockAccessKeySecret");
         Assertions
-                .assertDoesNotThrow(() -> aliyunServerlessSparkDataSourceProcessor.checkDatasourceParam(aliyunServerlessSparkDataSourceParamDTO));
+                .assertDoesNotThrow(() -> aliyunServerlessSparkDataSourceProcessor
+                        .checkDatasourceParam(aliyunServerlessSparkDataSourceParamDTO));
     }
 
     @Test
     void testGetDatasourceUniqueId() {
-        AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam = new AliyunServerlessSparkConnectionParam();
+        AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam =
+                new AliyunServerlessSparkConnectionParam();
         aliyunServerlessSparkConnectionParam.setRegionId("cn-hangzhou");
         aliyunServerlessSparkConnectionParam.setAccessKeyId("mockAccessKeyId");
         aliyunServerlessSparkConnectionParam.setAccessKeySecret("mockAccessKeySecret");
         Assertions.assertEquals("aliyun_serverless_spark@cn-hangzhou@mockAccessKeyId@mockAccessKeySecret",
-            aliyunServerlessSparkDataSourceProcessor.getDatasourceUniqueId(aliyunServerlessSparkConnectionParam, DbType.ALIYUN_SERVERLESS_SPARK));
+                aliyunServerlessSparkDataSourceProcessor.getDatasourceUniqueId(aliyunServerlessSparkConnectionParam,
+                        DbType.ALIYUN_SERVERLESS_SPARK));
     }
 
     @Test
     void testCreateDatasourceParamDTO() {
         AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
-                (AliyunServerlessSparkDataSourceParamDTO) aliyunServerlessSparkDataSourceProcessor.createDatasourceParamDTO(connectJson);
+                (AliyunServerlessSparkDataSourceParamDTO) aliyunServerlessSparkDataSourceProcessor
+                        .createDatasourceParamDTO(connectJson);
         Assertions.assertEquals("cn-hangzhou", aliyunServerlessSparkDataSourceParamDTO.getRegionId());
         Assertions.assertEquals("mockAccessKeyId", aliyunServerlessSparkDataSourceParamDTO.getAccessKeyId());
         Assertions.assertEquals("mockAccessKeySecret", aliyunServerlessSparkDataSourceParamDTO.getAccessKeySecret());
@@ -78,9 +83,11 @@ public class AliyunServerlessSparkDataSourceProcessorTest {
     @Test
     void testCreateConnectionParams() {
         AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
-                (AliyunServerlessSparkDataSourceParamDTO) aliyunServerlessSparkDataSourceProcessor.createDatasourceParamDTO(connectJson);
+                (AliyunServerlessSparkDataSourceParamDTO) aliyunServerlessSparkDataSourceProcessor
+                        .createDatasourceParamDTO(connectJson);
         AliyunServerlessSparkConnectionParam aliyunServerlessSparkConnectionParam =
-            aliyunServerlessSparkDataSourceProcessor.createConnectionParams(aliyunServerlessSparkDataSourceParamDTO);
+                aliyunServerlessSparkDataSourceProcessor
+                        .createConnectionParams(aliyunServerlessSparkDataSourceParamDTO);
         Assertions.assertEquals("cn-hangzhou", aliyunServerlessSparkConnectionParam.getRegionId());
         Assertions.assertEquals("mockAccessKeyId", aliyunServerlessSparkConnectionParam.getAccessKeyId());
         Assertions.assertEquals("mockAccessKeySecret", aliyunServerlessSparkConnectionParam.getAccessKeySecret());
@@ -89,18 +96,22 @@ public class AliyunServerlessSparkDataSourceProcessorTest {
     @Test
     void testTestConnection() {
         AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
-                (AliyunServerlessSparkDataSourceParamDTO) aliyunServerlessSparkDataSourceProcessor.createDatasourceParamDTO(connectJson);
+                (AliyunServerlessSparkDataSourceParamDTO) aliyunServerlessSparkDataSourceProcessor
+                        .createDatasourceParamDTO(connectJson);
         AliyunServerlessSparkConnectionParam connectionParam =
-                aliyunServerlessSparkDataSourceProcessor.createConnectionParams(aliyunServerlessSparkDataSourceParamDTO);
+                aliyunServerlessSparkDataSourceProcessor
+                        .createConnectionParams(aliyunServerlessSparkDataSourceParamDTO);
         Assertions.assertTrue(aliyunServerlessSparkDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
         try (
                 MockedConstruction<AliyunServerlessSparkClientWrapper> AliyunServerlessSparkClientWrapper =
                         Mockito.mockConstruction(AliyunServerlessSparkClientWrapper.class, (mock, context) -> {
                             Mockito.when(
-                                    mock.checkConnect(connectionParam.getAccessKeyId(), connectionParam.getAccessKeySecret(), connectionParam.getRegionId()))
+                                    mock.checkConnect(connectionParam.getAccessKeyId(),
+                                            connectionParam.getAccessKeySecret(), connectionParam.getRegionId()))
                                     .thenReturn(true);
                         })) {
-            Assertions.assertTrue(aliyunServerlessSparkDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
+            Assertions
+                    .assertTrue(aliyunServerlessSparkDataSourceProcessor.checkDataSourceConnectivity(connectionParam));
         }
     }
 }
