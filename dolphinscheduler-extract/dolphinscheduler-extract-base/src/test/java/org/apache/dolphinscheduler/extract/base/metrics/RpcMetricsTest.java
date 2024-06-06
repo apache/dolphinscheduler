@@ -1,0 +1,52 @@
+package org.apache.dolphinscheduler.extract.base.metrics;
+
+import static com.google.common.truth.Truth.assertThat;
+
+import org.apache.dolphinscheduler.common.utils.NetUtils;
+
+import org.junit.jupiter.api.Test;
+
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+
+class RpcMetricsTest {
+
+    @Test
+    public void setup() {
+        Metrics.globalRegistry.clear();
+        Metrics.addRegistry(new SimpleMeterRegistry());
+    }
+
+    @Test
+    void testRecordClientSyncRequestException() {
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.exception").counter()).isNull();
+
+        String clientHost = NetUtils.getHost();
+        String serverHost = NetUtils.getHost();
+
+        RpcMetrics.recordClientSyncRequestException(
+                new IllegalArgumentException("id is null"), "getById", clientHost, serverHost);
+        RpcMetrics.recordClientSyncRequestException(
+                new IllegalArgumentException("name is null"), "getByName", clientHost, serverHost);
+        RpcMetrics.recordClientSyncRequestException(
+                new IllegalArgumentException("age is null"), "getByAge", clientHost, serverHost);
+        RpcMetrics.recordClientSyncRequestException(new UnsupportedOperationException("update id is not supported"),
+                "updateById", clientHost, serverHost);
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.exception").counter()).isNotNull();
+    }
+
+    @Test
+    void testRecordRpcRequestDuration() {
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.duration").timer()).isNull();
+
+        String clientHost = NetUtils.getHost();
+        String serverHost = NetUtils.getHost();
+
+        RpcMetrics.recordClientSyncRequestDuration("getById", 100, clientHost, serverHost);
+        RpcMetrics.recordClientSyncRequestDuration("getByName", 200, clientHost, serverHost);
+        RpcMetrics.recordClientSyncRequestDuration("getByAge", 300, clientHost, serverHost);
+        RpcMetrics.recordClientSyncRequestDuration("updateById", 400, clientHost, serverHost);
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.duration").timer()).isNotNull();
+    }
+
+}
