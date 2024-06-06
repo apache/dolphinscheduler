@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.sqlserver.param;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -94,5 +97,33 @@ public class SQLServerDataSourceProcessorTest {
     public void testGetValidationQuery() {
         Assertions.assertEquals(DataSourceConstants.SQLSERVER_VALIDATION_QUERY,
                 sqlServerDatasourceProcessor.getValidationQuery());
+    }
+
+    @Test
+    void splitAndRemoveComment_singleSelect() {
+        String sql = "select * from table;";
+        List<String> subSqls = sqlServerDatasourceProcessor.splitAndRemoveComment(sql);
+        assertThat(subSqls).hasSize(1);
+        assertThat(subSqls.get(0)).isEqualTo("select * from table;");
+    }
+
+    @Test
+    void splitAndRemoveComment_singleMerge() {
+        String sql = "MERGE\n" +
+                "    [ TOP ( expression ) [ PERCENT ] ]\n" +
+                "    [ INTO ] <target_table> [ WITH ( <merge_hint> ) ] [ [ AS ] table_alias ]\n" +
+                "    USING <table_source> [ [ AS ] table_alias ]\n" +
+                "    ON <merge_search_condition>\n" +
+                "    [ WHEN MATCHED [ AND <clause_search_condition> ]\n" +
+                "        THEN <merge_matched> ] [ ...n ]\n" +
+                "    [ WHEN NOT MATCHED [ BY TARGET ] [ AND <clause_search_condition> ]\n" +
+                "        THEN <merge_not_matched> ]\n" +
+                "    [ WHEN NOT MATCHED BY SOURCE [ AND <clause_search_condition> ]\n" +
+                "        THEN <merge_matched> ] [ ...n ]\n" +
+                "    [ <output_clause> ]\n" +
+                "    [ OPTION ( <query_hint> [ ,...n ] ) ];";
+        List<String> subSqls = sqlServerDatasourceProcessor.splitAndRemoveComment(sql);
+        assertThat(subSqls).hasSize(1);
+        assertThat(subSqls.get(0)).isEqualTo(sql);
     }
 }

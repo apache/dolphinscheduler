@@ -35,6 +35,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
@@ -128,8 +129,10 @@ public class SQLServerDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public List<String> splitAndRemoveComment(String sql) {
-        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.sqlserver);
-        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.sqlserver);
+        return SQLParserUtils.splitAndRemoveComment(sql, com.alibaba.druid.DbType.sqlserver)
+                .stream()
+                .map(subSql -> subSql.concat(";"))
+                .collect(Collectors.toList());
     }
 
     private String transformOther(Map<String, String> otherMap) {
