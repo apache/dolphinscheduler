@@ -53,7 +53,7 @@ public class RpcMetrics {
                                                         final String serverHost) {
         final String exceptionType = throwable == null ? "unknown" : throwable.getClass().getSimpleName();
         final Counter counter = rpcRequestExceptionCounter.computeIfAbsent(exceptionType,
-                (et) -> Counter.builder("ds.rpc.client.sync.request.exception")
+                (et) -> Counter.builder("ds.rpc.client.sync.request.exception.count")
                         .tag("method_name", methodName)
                         .tag("client_host", clientHost)
                         .tag("server_host", serverHost)
@@ -80,7 +80,7 @@ public class RpcMetrics {
                                                        final String clientHost,
                                                        final String serverHost) {
         rpcRequestDurationTimer.computeIfAbsent(methodName,
-                (method) -> Timer.builder("ds.rpc.client.sync.request.duration")
+                (method) -> Timer.builder("ds.rpc.client.sync.request.duration.time")
                         .tag("method_name", method)
                         .tag("client_host", clientHost)
                         .tag("server_host", serverHost)
