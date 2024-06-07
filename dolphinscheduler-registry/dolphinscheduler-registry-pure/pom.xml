@@ -19,45 +19,17 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler</artifactId>
+        <artifactId>dolphinscheduler-registry</artifactId>
         <version>3.2.3-SNAPSHOT</version>
     </parent>
-    <artifactId>dolphinscheduler-registry</artifactId>
-    <packaging>pom</packaging>
 
-    <modules>
-        <module>dolphinscheduler-registry-api</module>
-        <module>dolphinscheduler-registry-plugins</module>
-        <module>dolphinscheduler-registry-all</module>
-        <module>dolphinscheduler-registry-pure</module>
-    </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-bom</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <artifactId>dolphinscheduler-registry-pure</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-registry-zookeeper</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

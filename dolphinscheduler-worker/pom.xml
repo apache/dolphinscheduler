@@ -50,10 +50,6 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-meter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-registry-all</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
@@ -175,6 +171,10 @@
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-datasource-pure</artifactId>
                 </dependency>
+                <dependency>
+                    <groupId>org.apache.dolphinscheduler</groupId>
+                    <artifactId>dolphinscheduler-registry-pure</artifactId>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -190,6 +190,10 @@
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-datasource-all</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.dolphinscheduler</groupId>
+                    <artifactId>dolphinscheduler-registry-all</artifactId>
                 </dependency>
             </dependencies>
         </profile>
