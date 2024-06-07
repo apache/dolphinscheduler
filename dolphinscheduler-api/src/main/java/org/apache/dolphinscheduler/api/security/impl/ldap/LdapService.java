@@ -79,11 +79,8 @@ public class LdapService {
     @Value("${security.authentication.ldap.user.email-attribute:#{null}}")
     private String ldapEmailAttribute;
 
-    @Value("${security.authentication.ldap.user.admin-attribute:#{null}}")
-    private String ldapAdminIdentifingAttribute;
-
-    @Value("${security.authentication.ldap.user.admin-value:#{null}}")
-    private String ldapAdminIdentifingValue;
+    @Value("${security.authentication.ldap.user.admin-filter:#{null}}")
+    private String ldapAdminUserFilter;
 
     @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
     private String ldapUserNotExistAction;
@@ -121,7 +118,7 @@ public class LdapService {
      * @return user email
      */
     public Map<String, String> ldapLogin(String userId, String userPwd) {
-        Map<String, String> ldapAttributeMap = null;
+        Map<String, String> ldapAttributeMap = new HashMap<>();
         Properties searchEnv = getManagerLdapEnv();
         LdapContext ctx = null;
 
@@ -129,7 +126,7 @@ public class LdapService {
             // Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
             ctx = new InitialLdapContext(searchEnv, null);
             SearchControls sc = new SearchControls();
-            sc.setReturningAttributes(new String[]{ldapEmailAttribute, ldapAdminIdentifingAttribute});
+            sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
             NamingEnumeration<SearchResult> results = null;
@@ -141,6 +138,7 @@ public class LdapService {
                 results = ctx.search(ldapBaseDn, filter.toString(), sc);
             }
 
+            // Get all requested attributes
             if (results.hasMore()) {
                 // get the users DN (distinguishedName) from the result
                 SearchResult result = results.next();
@@ -157,27 +155,27 @@ public class LdapService {
                         return null;
                     }
 
-                    if (ldapAttributeMap == null) {
-                        ldapAttributeMap = new HashMap<>();
-                        UserType userType =
-                                userId.equalsIgnoreCase(adminUserId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
-
-                        ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, userType.toString());
-                    }
-
                     Attribute attr = attrs.next();
                     if (attr.getID().equals(ldapEmailAttribute)) {
                         String value = (String) attr.get();
 
                         ldapAttributeMap.put(ATTRIBUTE_EMAIL, value);
-                    } else if (ldapAdminIdentifingAttribute != null
-                            && attr.getID().equals(ldapAdminIdentifingAttribute)) {
-                        String value = (String) attr.get();
-
-                        if (value != null && value.equals(ldapAdminIdentifingValue)) {
-                            ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, UserType.ADMIN_USER.toString());
-                        }
                     }
+                }
+            }
+
+            // Check for admin role
+            UserType userType =
+                    userId.equalsIgnoreCase(adminUserId) ? UserType.ADMIN_USER : UserType.GENERAL_USER;
+
+            ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, userType.toString());
+
+            if (ldapAdminUserFilter != null) {
+                results = ctx.search(ldapBaseDn, ldapAdminUserFilter, new Object[]{userId}, sc);
+
+                if (results.hasMore()) {
+                    // found the users with or part of the admin context
+                    ldapAttributeMap.put(ATTRIBUTE_USER_TYPE, UserType.ADMIN_USER.toString());
                 }
             }
         } catch (NamingException e) {

@@ -50,8 +50,7 @@ import org.springframework.test.context.TestPropertySource;
         "security.authentication.ldap.ssl.enable=false",
         "security.authentication.ldap.ssl.trust-store=",
         "security.authentication.ldap.ssl.trust-store-password=",
-        "security.authentication.ldap.user.admin-attribute=uid",
-        "security.authentication.ldap.user.admin-value=tesla"
+        "security.authentication.ldap.user.admin-filter=(&(ou=scientists)(uniqueMember=uid={0},dc=example,dc=com))"
 })
 public class LdapServiceTest {
 
