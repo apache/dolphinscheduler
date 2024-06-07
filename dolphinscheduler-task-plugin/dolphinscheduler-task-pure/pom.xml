@@ -48,12 +48,6 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-flink-stream</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-http</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -61,12 +55,6 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-mr</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-pigeon</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -108,12 +96,6 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-emr</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-jupyter</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -126,19 +108,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-dinky</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-java</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-pytorch</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -148,17 +118,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-datasync</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-task-kubeflow</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-linkis</artifactId>

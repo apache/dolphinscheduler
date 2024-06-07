@@ -39,17 +39,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-oracle</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-postgresql</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-sqlserver</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
