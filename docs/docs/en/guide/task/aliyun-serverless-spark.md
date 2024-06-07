@@ -43,3 +43,69 @@
 | engine release version  | Spark engine release version.                                                                       |
 | is production           | Whether the spark job runs in production or development environment.                                |
 
+## Examples
+
+### Submit Jar tasks
+
+|     **Parameters**      |                                                                                   **Example Values / Operations**                                                                                    |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| region id               | cn-hangzhou                                                                                                                                                                                          |
+| access key id           | <your-access-key-id>                                                                                                                                                                                 |
+| access key secret       | <your-access-key-secret>                                                                                                                                                                             |
+| resource queue id       | root_queue                                                                                                                                                                                           |
+| code type               | JAR                                                                                                                                                                                                  |
+| job name                | ds-emr-spark-jar                                                                                                                                                                                     |
+| entry point             | oss://datadev-oss-hdfs-test/spark-resource/examples/jars/spark-examples_2.12-3.3.1.jar                                                                                                               |
+| entry point arguments   | 100                                                                                                                                                                                                  |
+| spark submit parameters | --class org.apache.spark.examples.SparkPi --conf spark.executor.cores=4 --conf spark.executor.memory=20g --conf spark.driver.cores=4 --conf spark.driver.memory=8g --conf spark.executor.instances=1 |
+| engine release version  | esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)                                                                                                                                             |
+| is production           | Please open the switch                                                                                                                                                                               |
+
+### Submit SQL tasks
+
+|     **Parameters**      |                                                                                               **Example Values / Operations**                                                                                               |
+|-------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| region id               | cn-hangzhou                                                                                                                                                                                                                 |
+| access key id           | <your-access-key-id>                                                                                                                                                                                                        |
+| access key secret       | <your-access-key-secret>                                                                                                                                                                                                    |
+| resource queue id       | root_queue                                                                                                                                                                                                                  |
+| code type               | SQL                                                                                                                                                                                                                         |
+| job name                | ds-emr-spark-sql-1                                                                                                                                                                                                          |
+| entry point             | Any non-empty string                                                                                                                                                                                                        |
+| entry point arguments   | -e#show tables;show tables;                                                                                                                                                                                                 |
+| spark submit parameters | --class org.apache.spark.sql.hive.thriftserver.SparkSQLCLIDriver --conf spark.executor.cores=4 --conf spark.executor.memory=20g --conf spark.driver.cores=4 --conf spark.driver.memory=8g --conf spark.executor.instances=1 |
+| engine release version  | esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)                                                                                                                                                                    |
+| is production           | Please open the switch                                                                                                                                                                                                      |
+
+### Submit SQL tasks located in OSS
+
+|     **Parameters**      |                                                                                               **Example Values / Operations**                                                                                                |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| region id               | cn-hangzhou                                                                                                                                                                                                                  |
+| access key id           | <your-access-key-id>                                                                                                                                                                                                         |
+| access key secret       | <your-access-key-secret>                                                                                                                                                                                                     |
+| resource queue id       | root_queue                                                                                                                                                                                                                   |
+| code type               | SQL                                                                                                                                                                                                                          |
+| job name                | ds-emr-spark-sql-2                                                                                                                                                                                                           |
+| entry point             | Any non-empty string                                                                                                                                                                                                         |
+| entry point arguments   | -f#oss://datadev-oss-hdfs-test/spark-resource/examples/sql/show_db.sql                                                                                                                                                       |
+| spark submit parameters | --class org.apache.spark.sql.hive.thriftserver.SparkSQLCLIDriver --conf spark.executor.cores=4 --conf spark.executor.memory=20g --conf spark.driver.cores=4 --conf spark.driver.memory=8g --conf spark.executor.instances=1" |
+| engine release version  | esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)                                                                                                                                                                     |
+| is production           | Please open the switch                                                                                                                                                                                                       |
+
+### Submit PySpark Tasks
+
+|     **Parameters**      |                                                              **Example Values / Operations**                                                               |
+|-------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| region id               | cn-hangzhou                                                                                                                                                |
+| access key id           | <your-access-key-id>                                                                                                                                       |
+| access key secret       | <your-access-key-secret>                                                                                                                                   |
+| resource queue id       | root_queue                                                                                                                                                 |
+| code type               | PYTHON                                                                                                                                                     |
+| job name                | ds-emr-spark-python                                                                                                                                        |
+| entry point             | oss://datadev-oss-hdfs-test/spark-resource/examples/src/main/python/pi.py                                                                                  |
+| entry point arguments   | 100                                                                                                                                                        |
+| spark submit parameters | --conf spark.executor.cores=4 --conf spark.executor.memory=20g --conf spark.driver.cores=4 --conf spark.driver.memory=8g --conf spark.executor.instances=1 |
+| engine release version  | esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)                                                                                                   |
+| is production           | Please open the switch                                                                                                                                     |
+
