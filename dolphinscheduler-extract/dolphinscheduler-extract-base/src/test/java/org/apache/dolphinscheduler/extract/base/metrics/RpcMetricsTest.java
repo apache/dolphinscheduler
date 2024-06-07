@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.Metrics;
@@ -28,7 +29,7 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 
 class RpcMetricsTest {
 
-    @Test
+    @BeforeEach
     public void setup() {
         Metrics.globalRegistry.clear();
         Metrics.addRegistry(new SimpleMeterRegistry());
@@ -49,12 +50,12 @@ class RpcMetricsTest {
                 new IllegalArgumentException("age is null"), "getByAge", clientHost, serverHost);
         RpcMetrics.recordClientSyncRequestException(new UnsupportedOperationException("update id is not supported"),
                 "updateById", clientHost, serverHost);
-        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.exception").counter()).isNotNull();
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.exception.count").counter()).isNotNull();
     }
 
     @Test
     void testRecordRpcRequestDuration() {
-        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.duration").timer()).isNull();
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.duration.time").timer()).isNull();
 
         String clientHost = NetUtils.getHost();
         String serverHost = NetUtils.getHost();
@@ -63,7 +64,7 @@ class RpcMetricsTest {
         RpcMetrics.recordClientSyncRequestDuration("getByName", 200, clientHost, serverHost);
         RpcMetrics.recordClientSyncRequestDuration("getByAge", 300, clientHost, serverHost);
         RpcMetrics.recordClientSyncRequestDuration("updateById", 400, clientHost, serverHost);
-        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.duration").timer()).isNotNull();
+        assertThat(Metrics.globalRegistry.find("ds.rpc.client.sync.request.duration.time").timer()).isNotNull();
     }
 
 }
