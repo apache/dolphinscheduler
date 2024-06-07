@@ -78,13 +78,7 @@ public class S3StorageOperatorTest {
     public void setUp() throws Exception {
         s3StorageOperator = Mockito.spy(new S3StorageOperator());
 
-        doReturn(ACCESS_KEY_ID_MOCK).when(s3StorageOperator)
-                .readAccessKeyID();
-        doReturn(ACCESS_KEY_SECRET_MOCK).when(s3StorageOperator)
-                .readAccessKeySecret();
-        doReturn(REGION_MOCK).when(s3StorageOperator).readRegion();
         doReturn(BUCKET_NAME_MOCK).when(s3StorageOperator).readBucketName();
-        doReturn(END_POINT_MOCK).when(s3StorageOperator).readEndPoint();
         Mockito.doReturn(s3Client)
                 .when(s3StorageOperator).buildS3Client();
         Mockito.doNothing()
@@ -96,9 +90,6 @@ public class S3StorageOperatorTest {
     @Test
     public void testInit() {
         verify(s3StorageOperator, times(1)).buildS3Client();
-        Assertions.assertEquals(ACCESS_KEY_ID_MOCK, s3StorageOperator.getAccessKeyId());
-        Assertions.assertEquals(ACCESS_KEY_SECRET_MOCK, s3StorageOperator.getAccessKeySecret());
-        Assertions.assertEquals(REGION_MOCK, s3StorageOperator.getRegion());
         Assertions.assertEquals(BUCKET_NAME_MOCK, s3StorageOperator.getBucketName());
     }
 

@@ -15,19 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.event;
+package org.apache.dolphinscheduler.server.master.runner.queue;
 
-/**
- * This exception represent the exception can be recovered, when we get this exception,
- * we will move the event to the fail of the queue.
- */
-public class StateEventHandleFailure extends Exception {
+import java.util.concurrent.TimeUnit;
 
-    public StateEventHandleFailure(String message) {
-        super(message);
-    }
+import org.junit.jupiter.api.Test;
 
-    public StateEventHandleFailure(String message, Throwable throwable) {
-        super(message, throwable);
+import com.google.common.truth.Truth;
+
+class DelayEntryTest {
+
+    @Test
+    void getDelay() {
+        DelayEntry<String> delayEntry = new DelayEntry<>(1_000L, "Item");
+        Truth.assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
+                .isWithin(100)
+                .of(TimeUnit.NANOSECONDS.convert(1_000L, TimeUnit.MILLISECONDS));
     }
 }

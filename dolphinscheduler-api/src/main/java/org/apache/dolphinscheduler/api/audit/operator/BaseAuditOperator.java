@@ -80,14 +80,14 @@ public abstract class BaseAuditOperator implements AuditOperator {
         }
 
         modifyRequestParams(paramNameArr, paramsMap, auditLogList);
-        setObjectByParma(paramNameArr, paramsMap, auditLogList);
+        setObjectByParam(paramNameArr, paramsMap, auditLogList);
 
         if (auditLogList.get(0).getModelId() == null) {
-            auditLogList.get(0).setModelId(OperatorUtils.getObjectIdentityByParma(paramNameArr, paramsMap));
+            auditLogList.get(0).setModelId(OperatorUtils.getObjectIdentityByParam(paramNameArr, paramsMap));
         }
     }
 
-    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
+    protected void setObjectByParam(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
 
         String name = paramNameArr[0];
@@ -97,7 +97,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
             return;
         }
 
-        String objName = getObjectNameFromReturnIdentity(value);
+        String objName = getObjectNameFromIdentity(value);
 
         if (Strings.isNullOrEmpty(objName)) {
             auditLogList.get(0).setModelName(value.toString());
@@ -114,7 +114,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
         auditLogList.get(0).setModelName(objName);
     }
 
-    protected void setObjectByParmaArr(String[] paramNameArr, Map<String, Object> paramsMap,
+    protected void setObjectByParamArr(String[] paramNameArr, Map<String, Object> paramsMap,
                                        List<AuditLog> auditLogList) {
 
         AuditLog auditLog = auditLogList.get(0);
@@ -127,7 +127,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
             for (String identityString : identityArr) {
                 long identity = toLong(identityString);
 
-                String value = getObjectNameFromReturnIdentity(identity);
+                String value = getObjectNameFromIdentity(identity);
 
                 if (value == null) {
                     continue;
@@ -156,7 +156,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
 
     protected void setObjectNameFromReturnIdentity(List<AuditLog> auditLogList) {
         auditLogList
-                .forEach(auditLog -> auditLog.setModelName(getObjectNameFromReturnIdentity(auditLog.getModelId())));
+                .forEach(auditLog -> auditLog.setModelName(getObjectNameFromIdentity(auditLog.getModelId())));
     }
 
     protected void modifyObjectFromReturnObject(String[] params, Map<String, Object> returnObjectMap,
@@ -180,7 +180,7 @@ public abstract class BaseAuditOperator implements AuditOperator {
         return NumberUtils.toLong(str.toString(), -1);
     }
 
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromIdentity(Object identity) {
         return identity.toString();
     }
 

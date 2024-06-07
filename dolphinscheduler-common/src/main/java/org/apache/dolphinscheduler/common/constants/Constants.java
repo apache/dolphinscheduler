@@ -36,6 +36,7 @@ public final class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     public static final String REMOTE_LOGGING_YAML_PATH = "/remote-logging.yaml";
+    public static final String AWS_YAML_PATH = "/aws.yaml";
 
     public static final String FORMAT_SS = "%s%s";
     public static final String FORMAT_S_S = "%s/%s";
@@ -130,8 +131,7 @@ public final class Constants {
      */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
-    public static final String AWS_S3_BUCKET_NAME = "resource.aws.s3.bucket.name";
-    public static final String AWS_END_POINT = "resource.aws.s3.endpoint";
+    public static final String AWS_S3_BUCKET_NAME = "aws.s3.bucket.name";
 
     public static final String ALIBABA_CLOUD_OSS_BUCKET_NAME = "resource.alibaba.cloud.oss.bucket.name";
     public static final String ALIBABA_CLOUD_OSS_END_POINT = "resource.alibaba.cloud.oss.endpoint";
@@ -248,11 +248,6 @@ public final class Constants {
      * user name regex
      */
     public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
-
-    /**
-     * file path regex 
-     */
-    public static final Pattern REGEX_FILE_PATH = Pattern.compile("^[a-zA-Z0-9_./-]+$");
 
     /**
      * read permission
@@ -704,18 +699,7 @@ public final class Constants {
 
     public static final String REMOTE_LOGGING_OSS_ENDPOINT = "remote.logging.oss.endpoint";
 
-    /**
-     * remote logging for S3
-     */
-    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_ID = "remote.logging.s3.access.key.id";
-
-    public static final String REMOTE_LOGGING_S3_ACCESS_KEY_SECRET = "remote.logging.s3.access.key.secret";
-
     public static final String REMOTE_LOGGING_S3_BUCKET_NAME = "remote.logging.s3.bucket.name";
-
-    public static final String REMOTE_LOGGING_S3_ENDPOINT = "remote.logging.s3.endpoint";
-
-    public static final String REMOTE_LOGGING_S3_REGION = "remote.logging.s3.region";
 
     /**
      * remote logging for GCS
