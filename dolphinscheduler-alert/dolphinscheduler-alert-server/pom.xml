@@ -115,30 +115,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>task-pure</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-registry-pure</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>task-all</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-registry-all</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
     </profiles>
 
 </project>

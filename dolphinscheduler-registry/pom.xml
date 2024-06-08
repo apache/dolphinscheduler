@@ -30,7 +30,6 @@
         <module>dolphinscheduler-registry-api</module>
         <module>dolphinscheduler-registry-plugins</module>
         <module>dolphinscheduler-registry-all</module>
-        <module>dolphinscheduler-registry-pure</module>
     </modules>
 
     <dependencyManagement>
