@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>dev-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>dolphinscheduler-storage-plugin</artifactId>
@@ -36,6 +36,7 @@
         <module>dolphinscheduler-storage-gcs</module>
         <module>dolphinscheduler-storage-abs</module>
         <module>dolphinscheduler-storage-obs</module>
+        <module>dolphinscheduler-storage-pure</module>
     </modules>
 
     <dependencyManagement>

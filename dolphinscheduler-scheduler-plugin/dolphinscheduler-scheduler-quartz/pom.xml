@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler-scheduler-plugin</artifactId>
-        <version>dev-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>dolphinscheduler-scheduler-quartz</artifactId>

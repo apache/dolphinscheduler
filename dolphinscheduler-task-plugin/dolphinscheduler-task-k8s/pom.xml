@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
-        <version>dev-SNAPSHOT</version>
+        <version>3.2.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>dolphinscheduler-task-k8s</artifactId>
@@ -31,6 +31,7 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-all</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

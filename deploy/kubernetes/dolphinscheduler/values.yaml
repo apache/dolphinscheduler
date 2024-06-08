@@ -33,7 +33,7 @@ image:
   # -- Docker image repository for the DolphinScheduler
   registry: apache
   # -- Docker image version for the DolphinScheduler
-  tag: latest
+  tag: 3.2.2
   # -- Image pull policy. Options: Always, Never, IfNotPresent
   pullPolicy: "IfNotPresent"
   # -- Specify a imagePullSecrets
