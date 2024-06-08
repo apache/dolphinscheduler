@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 import static org.apache.dolphinscheduler.plugin.task.spark.SparkConstants.TYPE_FILE;
 import static org.mockito.ArgumentMatchers.any;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.ProgramType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SparkParameters;

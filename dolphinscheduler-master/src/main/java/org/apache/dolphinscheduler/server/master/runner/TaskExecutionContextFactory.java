@@ -50,6 +50,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SparkParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractResourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -57,7 +58,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SparkParameters;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;

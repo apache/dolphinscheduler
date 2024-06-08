@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.spark;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SparkParameters;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SparkParameters;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
