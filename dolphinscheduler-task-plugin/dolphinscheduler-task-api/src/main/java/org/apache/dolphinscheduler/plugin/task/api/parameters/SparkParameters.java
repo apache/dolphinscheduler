@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.spark;
+package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.ArrayList;
 import java.util.List;

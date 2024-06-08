@@ -57,7 +57,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
-import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SparkParameters;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.exception.TaskExecutionContextCreateException;
