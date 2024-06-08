@@ -259,6 +259,11 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-storage-pure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-extract-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
