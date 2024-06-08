@@ -92,6 +92,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-all</artifactId>
+        </dependency>
+        
+        <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
         </dependency>
@@ -298,10 +303,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-datasource-pure</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-storage-pure</artifactId>
                 </dependency>
             </dependencies>
@@ -315,10 +316,6 @@
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
                     <artifactId>dolphinscheduler-task-all</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-datasource-all</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.dolphinscheduler</groupId>
