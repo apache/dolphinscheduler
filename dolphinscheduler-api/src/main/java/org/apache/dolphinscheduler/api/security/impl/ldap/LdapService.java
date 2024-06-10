@@ -38,8 +38,6 @@ import javax.naming.ldap.LdapContext;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.filter.EqualsFilter;
@@ -49,8 +47,6 @@ import org.springframework.stereotype.Component;
 @Configuration
 @Slf4j
 public class LdapService {
-
-    private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
 
     public static final String ATTRIBUTE_EMAIL = "email";
     public static final String ATTRIBUTE_USER_TYPE = "userType";
