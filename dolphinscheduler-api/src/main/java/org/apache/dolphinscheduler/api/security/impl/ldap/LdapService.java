@@ -60,9 +60,6 @@ public class LdapService {
     @Value("${security.authentication.ldap.base-dn:#{null}}")
     private String ldapBaseDn;
 
-    @Value("${security.authentication.ldap.filter:#{null}}")
-    private String ldapFilter;
-
     @Value("${security.authentication.ldap.username:#{null}}")
     private String ldapSecurityPrincipal;
 
@@ -124,15 +121,8 @@ public class LdapService {
             SearchControls sc = new SearchControls();
             sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-            NamingEnumeration<SearchResult> results = null;
-
-            if (ldapFilter != null) {
-                results = ctx.search(ldapBaseDn, ldapFilter, new Object[]{userId}, sc);
-            } else {
-                EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
-                results = ctx.search(ldapBaseDn, filter.toString(), sc);
-            }
+            EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
+            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
 
             // Get all requested attributes
             if (results.hasMore()) {
