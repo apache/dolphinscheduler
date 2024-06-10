@@ -109,7 +109,7 @@ security:
         # were ONE uses can be identified by userId and the rest using a role based filter
         admin: read-only-admin
         # alternative to admin using a ROLE when you use LDAP login, all scientists are admin users
-        admin-filer: (&(ou=scientists)(uniqueMember=uid={0},dc=example,dc=com))
+        admin-filter: (&(ou=scientists)(uniqueMember=uid={0},dc=example,dc=com))
         identity-attribute: uid
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
