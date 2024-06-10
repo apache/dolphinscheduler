@@ -108,7 +108,7 @@ security:
         # admin userId when you use LDAP login. Properties admin are admin-filter are not mutually exclusive
         # were ONE uses can be identified by userId and the rest using a role based filter
         admin: read-only-admin
-        # alternative to admin using a ROLE when you use LDAP login, all scientists are admin users
+        # filter admin users by groups. eg, all scientists are admin users
         # admin-filter: (&(ou=scientists)(uniqueMember=uid={0},dc=example,dc=com))
         identity-attribute: uid
         email-attribute: mail
