@@ -54,7 +54,7 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-storage-api</artifactId>
+            <artifactId>dolphinscheduler-storage-all</artifactId>
         </dependency>
 
         <dependency>
