@@ -106,7 +106,7 @@ security:
       password: password
       user:
         # admin userId when you use LDAP login. Properties admin are admin-filter are not mutually exclusive
-        # were ONE uses can be identified by userId and the rest using a role based filter
+        # one uses can be identified by userId and the rest using a role based filter
         admin: read-only-admin
         # filter admin users by groups. eg, all scientists are admin users
         # admin-filter: (&(ou=scientists)(uniqueMember=uid={0},dc=example,dc=com))
