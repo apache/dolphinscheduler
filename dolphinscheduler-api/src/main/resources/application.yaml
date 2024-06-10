@@ -113,18 +113,16 @@ management:
       application: ${spring.application.name}
 
 registry:
-  type: zookeeper
-  zookeeper:
-    namespace: dolphinscheduler
-    connect-string: localhost:2181
-    retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
-      max-retries: 5
-    session-timeout: 60s
-    connection-timeout: 15s
-    block-until-connected: 15s
-    digest: ~
+  type: jdbc
+  term-refresh-interval: 2s
+  term-expire-times: 3
+  hikari-config:
+    jdbc-url: jdbc:postgresql://localhost:5432/dolphinscheduler
+    username: root
+    password: root
+    maximum-pool-size: 5
+    connection-timeout: 9000
+    idle-timeout: 600000
 
 api:
   audit-enable: false

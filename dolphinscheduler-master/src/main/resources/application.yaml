@@ -68,18 +68,16 @@ mybatis-plus:
 
 
 registry:
-  type: zookeeper
-  zookeeper:
-    namespace: dolphinscheduler
-    connect-string: localhost:2181
-    retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
-      max-retries: 5
-    session-timeout: 30s
-    connection-timeout: 9s
-    block-until-connected: 600ms
-    digest: ~
+  type: jdbc
+  term-refresh-interval: 2s
+  term-expire-times: 3
+  hikari-config:
+    jdbc-url: jdbc:postgresql://localhost:5432/dolphinscheduler
+    username: root
+    password: root
+    maximum-pool-size: 5
+    connection-timeout: 9000
+    idle-timeout: 600000
 
 master:
   listen-port: 5678

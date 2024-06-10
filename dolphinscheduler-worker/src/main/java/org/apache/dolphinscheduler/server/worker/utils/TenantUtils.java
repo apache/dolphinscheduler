@@ -56,7 +56,8 @@ public class TenantUtils {
 
         String tenantCode = taskExecutionContext.getTenantCode();
         if (isDefaultTenant(tenantCode)) {
-            if (tenantConfig.isDefaultTenantEnabled()) {
+//            if (tenantConfig.isDefaultTenantEnabled()) {
+            if (true) {
                 log.info("Current tenant is default tenant, will use bootstrap user: {} to execute the task",
                         getBootstrapTenant());
                 return getBootstrapTenant();

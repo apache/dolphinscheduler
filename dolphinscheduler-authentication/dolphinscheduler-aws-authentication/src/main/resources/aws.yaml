@@ -21,11 +21,11 @@ aws:
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate
     # InstanceProfileCredentialsProvider: use the IAM role to authenticate
     credentials.provider.type: AWSStaticCredentialsProvider
-    access.key.id: accessKey123
-    access.key.secret: secretKey123
+    access.key.id: minioadmin
+    access.key.secret: minioadmin
     region: us-east-1
     bucket.name: dolphinscheduler
-    endpoint: http://s3:9000
+    endpoint: http://localhost:9000
   emr:
     # The AWS credentials provider type. support: AWSStaticCredentialsProvider, InstanceProfileCredentialsProvider
     # AWSStaticCredentialsProvider: use the access key and secret key to authenticate

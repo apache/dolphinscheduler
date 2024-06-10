@@ -48,6 +48,11 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         finalScripts.add(shellHeader());
         finalScripts.add("BASEDIR=$(cd `dirname $0`; pwd)");
         finalScripts.add("cd $BASEDIR");
+        finalScripts.add("export JAVA_HOME=/usr/local/jdk1.8.0_371");
+        finalScripts.add("export HADOOP_HOME=/opt/apache/hadoop-3.3.6");
+        finalScripts.add("export HIVE_HOME=/opt/apache/apache-hive-3.1.3-bin");
+        finalScripts.add("export SPARK_HOME=/opt/apache/spark-3.5.0-bin-hadoop3");
+        finalScripts.add("export FLINK_HOME=/opt/apache/flink-1.18.1");
         // add system env
         finalScripts.addAll(systemEnvScript());
         // add custom env
