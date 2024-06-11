@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.extract.base.config;
 
+import java.time.Duration;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -65,6 +67,12 @@ public class NettyServerConfig {
      */
     @Builder.Default
     private int workerThread = Runtime.getRuntime().availableProcessors() * 2;
+
+    /**
+     * If done's receive any data from a {@link io.netty.channel.Channel} during 180s then will close it.
+     */
+    @Builder.Default
+    private long connectionIdleTime = Duration.ofSeconds(60).toMillis();
 
     /**
      * listen port
