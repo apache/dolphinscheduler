@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProces
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.trigger.api.TriggerPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
@@ -70,6 +71,7 @@ public class ApiApplicationServer {
         log.info("Received spring application context ready event will load taskPlugin and write to DB");
         // install task plugin
         TaskPluginManager.loadPlugin();
+        TriggerPluginManager.loadPlugin();
         DataSourceProcessorProvider.initialize();
         for (Map.Entry<String, TaskChannelFactory> entry : TaskPluginManager.getTaskChannelFactoryMap().entrySet()) {
             String taskPluginName = entry.getKey();

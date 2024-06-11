@@ -500,6 +500,57 @@ CREATE TABLE t_ds_task_definition
 );
 
 -- ----------------------------
+-- Table structure for t_ds_trigger_offset
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_offset CASCADE;
+CREATE TABLE t_ds_trigger_offset
+(
+    id                      int(11) NOT NULL,
+    code                    bigint(20) NOT NULL,
+    PRIMARY KEY (id, code)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_definition
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_definition CASCADE;
+CREATE TABLE t_ds_trigger_definition
+(
+    id                      int(11) NOT NULL AUTO_INCREMENT,
+    code                    bigint(20) NOT NULL,
+    name                    varchar(255) DEFAULT NULL,
+    description             text,
+    project_code            bigint(20) NOT NULL,
+    user_id                 int(11) DEFAULT NULL,
+    trigger_type            varchar(50) NOT NULL,
+    trigger_params          longtext,
+    create_time             datetime NOT NULL,
+    update_time             datetime DEFAULT NULL,
+    PRIMARY KEY (id, code)
+);
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_instance
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_trigger_instance CASCADE;
+CREATE TABLE t_ds_trigger_instance
+(
+    id                      int(11) NOT NULL AUTO_INCREMENT,
+    name                    varchar(255) DEFAULT NULL,
+    trigger_type            varchar(50) NOT NULL,
+    trigger_code            bigint(20) NOT NULL,
+    process_instance_id     int(11) DEFAULT NULL,
+    process_instance_name   varchar(255) DEFAULT NULL,
+    project_code            bigint(20) DEFAULT NULL,
+    state                   tinyint(4) DEFAULT NULL,
+    submit_time             datetime     DEFAULT NULL,
+    start_time              datetime     DEFAULT NULL,
+    end_time                datetime     DEFAULT NULL,
+    trigger_params          longtext,
+    PRIMARY KEY (id)
+);
+
+-- ----------------------------
 -- Table structure for t_ds_task_definition_log
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_task_definition_log CASCADE;
@@ -2153,7 +2204,6 @@ CREATE TABLE t_ds_trigger_relation
     PRIMARY KEY (id),
     UNIQUE KEY t_ds_trigger_relation_UN(trigger_type,job_id,trigger_code)
 );
-
 
 DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
 CREATE TABLE t_ds_relation_sub_workflow (

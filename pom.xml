@@ -58,6 +58,7 @@
         <module>dolphinscheduler-extract</module>
         <module>dolphinscheduler-dao-plugin</module>
         <module>dolphinscheduler-authentication</module>
+        <module>dolphinscheduler-trigger-plugin</module>
     </modules>
 
     <properties>
@@ -231,6 +232,17 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-task-all</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-trigger-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-trigger-all</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -60,6 +60,8 @@ type TaskType =
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
 
+type TriggerType = 'SIMPLE' | 'TIMER' | 'KAFKA'
+
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 
 type DependentResultType = {
@@ -113,6 +115,7 @@ export {
   BDependentResultType,
   IMainJar,
   TaskType,
+  TriggerType,
   ITaskType,
   ITaskTypeItem,
   TaskTypeState,

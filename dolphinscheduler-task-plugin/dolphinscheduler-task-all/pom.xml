@@ -222,6 +222,11 @@
             <artifactId>dolphinscheduler-task-remoteshell</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-trigger</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

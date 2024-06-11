@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.trigger.api.TriggerPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
@@ -38,6 +39,7 @@ import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
 import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
+import org.apache.dolphinscheduler.server.master.runner.MasterTriggerBootstrap;
 import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
@@ -69,6 +71,9 @@ public class MasterServer implements IStoppable {
 
     @Autowired
     private MasterSchedulerBootstrap masterSchedulerBootstrap;
+
+    @Autowired
+    private MasterTriggerBootstrap masterTriggerBootstrap;
 
     @Autowired
     private SchedulerApi schedulerApi;
@@ -109,6 +114,7 @@ public class MasterServer implements IStoppable {
 
         // install task plugin
         TaskPluginManager.loadPlugin();
+        TriggerPluginManager.loadPlugin();
         DataSourceProcessorProvider.initialize();
 
         this.masterSlotManager.start();
@@ -118,6 +124,8 @@ public class MasterServer implements IStoppable {
         this.masterRegistryClient.setRegistryStoppable(this);
 
         this.masterSchedulerBootstrap.start();
+
+        this.masterTriggerBootstrap.start();
 
         this.eventExecuteService.start();
         this.failoverExecuteThread.start();
@@ -162,6 +170,7 @@ public class MasterServer implements IStoppable {
         try (
                 SchedulerApi closedSchedulerApi = schedulerApi;
                 MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
+                MasterTriggerBootstrap closedTriggerBootstrap = masterTriggerBootstrap;
                 MasterRpcServer closedRpcServer = masterRPCServer;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.

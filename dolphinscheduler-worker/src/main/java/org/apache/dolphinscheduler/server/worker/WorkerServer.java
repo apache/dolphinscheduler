@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.trigger.api.TriggerPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
@@ -87,6 +88,7 @@ public class WorkerServer implements IStoppable {
     public void run() {
         this.workerRpcServer.start();
         TaskPluginManager.loadPlugin();
+        TriggerPluginManager.loadPlugin();
         DataSourceProcessorProvider.initialize();
 
         this.workerRegistryClient.setRegistryStoppable(this);

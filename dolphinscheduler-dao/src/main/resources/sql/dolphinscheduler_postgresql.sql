@@ -420,6 +420,61 @@ CREATE TABLE t_ds_task_definition (
 create index task_definition_index on t_ds_task_definition (project_code,id);
 
 --
+-- Table structure for table t_ds_trigger_offset
+--
+
+DROP TABLE IF EXISTS t_ds_trigger_offset;
+CREATE TABLE t_ds_trigger_offset (
+ id int NOT NULL  ,
+ code bigint NOT NULL,
+ PRIMARY KEY (id)
+) ;
+
+--
+-- Table structure for table t_ds_trigger_definition
+--
+
+DROP TABLE IF EXISTS t_ds_trigger_definition;
+CREATE TABLE t_ds_trigger_definition (
+  id int NOT NULL  ,
+  code bigint NOT NULL,
+  name varchar(255) DEFAULT NULL ,
+  description text ,
+  project_code bigint DEFAULT NULL ,
+  user_id int DEFAULT NULL ,
+  trigger_type varchar(50) DEFAULT NULL ,
+  trigger_params text ,
+  create_time timestamp DEFAULT NULL ,
+  update_time timestamp DEFAULT NULL ,
+  PRIMARY KEY (id)
+) ;
+
+create index trigger_definition_index on t_ds_trigger_definition (project_code,id);
+
+--
+-- Table structure for table t_ds_trigger_instance
+--
+
+DROP TABLE IF EXISTS t_ds_trigger_instance;
+CREATE TABLE t_ds_trigger_instance (
+   id int NOT NULL  ,
+   name varchar(255) DEFAULT NULL ,
+   trigger_type varchar(50) DEFAULT NULL ,
+   trigger_code bigint NOT NULL,
+   process_instance_id int DEFAULT NULL ,
+   process_instance_name varchar(255) DEFAULT NULL,
+   project_code bigint DEFAULT NULL,
+   state int DEFAULT NULL ,
+   submit_time timestamp DEFAULT NULL ,
+   start_time timestamp DEFAULT NULL ,
+   end_time timestamp DEFAULT NULL ,
+   trigger_params text ,
+   PRIMARY KEY (id)
+) ;
+
+create index idx_trigger_instance_code_version on t_ds_trigger_instance (task_code, task_definition_version);
+
+--
 -- Table structure for table t_ds_task_definition_log
 --
 
@@ -837,6 +892,8 @@ CREATE TABLE t_ds_task_instance (
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
 create index idx_cache_key on t_ds_task_instance (cache_key);
+
+
 
 --
 -- Table structure for table t_ds_tenant

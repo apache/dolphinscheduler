@@ -940,6 +940,68 @@ CREATE TABLE `t_ds_task_instance` (
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_trigger_offset
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_trigger_offset`;
+CREATE TABLE `t_ds_trigger_offset` (
+   `id` int(11) NOT NULL COMMENT 'self-increasing id',
+   `code` bigint(20) NOT NULL COMMENT 'encoding',
+   PRIMARY KEY (`id`,`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of t_ds_trigger_offset
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_definition
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_trigger_definition`;
+CREATE TABLE `t_ds_trigger_definition` (
+   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'self-increasing id',
+   `code` bigint(20) NOT NULL COMMENT 'encoding',
+   `name` varchar(255) DEFAULT NULL COMMENT 'trigger definition name',
+   `description` text COMMENT 'description',
+   `project_code` bigint(20) NOT NULL COMMENT 'project code',
+   `user_id` int(11) DEFAULT NULL COMMENT 'trigger definition creator id',
+   `trigger_type` varchar(50) NOT NULL COMMENT 'trigger type',
+   `trigger_params` longtext COMMENT 'job custom parameters',
+   `create_time` datetime NOT NULL COMMENT 'create time',
+   `update_time` datetime NOT NULL COMMENT 'update time',
+   PRIMARY KEY (`id`,`code`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of t_ds_trigger_definition
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for t_ds_trigger_instance
+-- ----------------------------
+DROP TABLE IF EXISTS `t_ds_trigger_instance`;
+CREATE TABLE `t_ds_trigger_instance` (
+    `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
+    `name` varchar(255) DEFAULT NULL COMMENT 'trigger name',
+    `trigger_type` varchar(50) NOT NULL COMMENT 'trigger type',
+    `trigger_code` bigint(20) NOT NULL COMMENT 'trigger definition code',
+    `process_instance_id` int(11) DEFAULT NULL COMMENT 'process instance id',
+    `process_instance_name` varchar(255) DEFAULT NULL COMMENT 'process instance name',
+    `project_code` bigint(20) DEFAULT NULL COMMENT 'project code',
+    `state` tinyint(4) DEFAULT NULL COMMENT 'Status: 0 commit succeeded, 1 running, 2 prepare to pause, 3 pause, 4 prepare to stop, 5 stop, 6 fail, 7 succeed, 8 need fault tolerance, 9 kill, 10 wait for thread, 11 wait for dependency to complete',
+    `submit_time` datetime DEFAULT NULL COMMENT 'trigger submit time',
+    `start_time` datetime DEFAULT NULL COMMENT 'trigger start time',
+    `end_time` datetime DEFAULT NULL COMMENT 'trigger end time',
+    `trigger_params` longtext COMMENT 'job custom parameters',
+    PRIMARY KEY (`id`),
+    KEY `process_instance_id` (`process_instance_id`) USING BTREE,
+    KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of t_ds_trigger_instance
+-- ----------------------------
+
+-- ----------------------------
 -- Table structure for t_ds_tenant
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_tenant`;

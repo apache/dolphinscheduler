@@ -76,6 +76,7 @@ export default {
     modify_user: '修改用户',
     operation: '操作',
     edit: '编辑',
+    trigger: '触发',
     confirm: '确定',
     cancel: '取消',
     start: '运行',
@@ -318,6 +319,12 @@ export default {
     please_choose: '请选择',
     remove_task_cache: '清除缓存',
     delete_validate_dependent_tasks_desc: '下游存在依赖，你不能删除该任务定义'
+  },
+  trigger: {
+    trigger: '触发器',
+    create_trigger: '创建触发器',
+    trigger_definition: '触发器定义',
+    trigger_name: '触发器名称'
   },
   dag: {
     create: '创建工作流',

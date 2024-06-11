@@ -76,6 +76,7 @@ export default {
     modify_user: 'Modify User',
     operation: 'Operation',
     edit: 'Edit',
+    trigger: '触发',
     confirm: 'Confirm',
     cancel: 'Cancel',
     start: 'Start',
@@ -322,6 +323,12 @@ export default {
     remove_task_cache: 'Clear cache',
     delete_validate_dependent_tasks_desc:
       'The downstream dependent tasks exists. You can not delete the task.'
+  },
+  trigger: {
+    trigger: 'Trigger',
+    create_trigger: 'Create Trigger',
+    trigger_definition: 'Trigger Definition',
+    trigger_name: 'Trigger Name'
   },
   dag: {
     create: 'Create Workflow',

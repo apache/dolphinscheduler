@@ -162,6 +162,27 @@ export default defineComponent({
         </NTooltip>
         <NTooltip trigger={'hover'}>
           {{
+            default: () => t('project.workflow.trigger'),
+            trigger: () => (
+              <NButton
+                size='small'
+                type='info'
+                tag='div'
+                circle
+                onClick={this.handleEditWorkflow}
+                disabled={releaseState === 'ONLINE'}
+                class='btn-edit'
+                /* TODO: Edit Trigger */
+              >
+                <NIcon>
+                  <FormOutlined />
+                </NIcon>
+              </NButton>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
             default: () =>
               releaseState === 'ONLINE'
                 ? t('project.workflow.down_line')

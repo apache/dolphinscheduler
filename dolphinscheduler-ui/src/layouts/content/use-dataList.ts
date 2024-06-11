@@ -167,6 +167,23 @@ export function useDataList() {
                 payload: { projectName: projectName }
               }
             ]
+          },
+          {
+            label: t('menu.trigger'),
+            key: 'trigger',
+            icon: renderIcon(SettingOutlined),
+            children: [
+              {
+                label: t('menu.trigger_definition'),
+                key: `/projects/${projectCode}/trigger/definitions`,
+                payload: { projectName: projectName }
+              },
+              {
+                label: t('menu.trigger_instance'),
+                key: `/projects/${projectCode}/trigger/instances`,
+                payload: { projectName: projectName }
+              }
+            ]
           }
         ]
       },

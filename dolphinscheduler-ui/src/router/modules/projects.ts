@@ -202,6 +202,28 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/trigger/definitions',
+      name: 'trigger-definition',
+      component: components['projects-trigger-definition'],
+      meta: {
+        title: '触发器定义',
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
+      path: '/projects/:projectCode/trigger/instances',
+      name: 'trigger-instance',
+      component: components['projects-trigger-instance'],
+      meta: {
+        title: '触发器实例',
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/projects/:projectCode/workflow-definition/tree/:definitionCode',
       name: 'workflow-definition-tree',
       component: components['projects-workflow-definition-tree'],
