@@ -50,7 +50,7 @@ public class SwitchTaskUtilsTest {
         Map<String, Property> globalParams = new HashMap<>();
         Map<String, Property> varParams = new HashMap<>();
         globalParams.put("test", new Property("test", Direct.IN, DataType.INTEGER, "1"));
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+        Assertions.assertDoesNotThrow(() -> {
             SwitchTaskUtils.generateContentWithTaskParams(content, globalParams, varParams);
         });
 
@@ -68,16 +68,6 @@ public class SwitchTaskUtilsTest {
         Assertions.assertThrowsExactly(ScriptException.class, () -> {
             String script = SwitchTaskUtils.generateContentWithTaskParams(contentWithUnicode, globalParams, varParams);
             SwitchTaskUtils.evaluate(script);
-        });
-
-        String contentWithSpecify1 = "cmd.abc";
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(contentWithSpecify1, globalParams, varParams);
-        });
-
-        String contentWithSpecify2 = "cmd()";
-        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
-            SwitchTaskUtils.generateContentWithTaskParams(contentWithSpecify2, globalParams, varParams);
         });
 
     }

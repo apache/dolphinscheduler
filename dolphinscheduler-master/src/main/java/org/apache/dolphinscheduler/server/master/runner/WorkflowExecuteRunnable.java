@@ -639,6 +639,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(workflowInstance.getProcessDefinitionVersion());
         command.setTestFlag(workflowInstance.getTestFlag());
+        command.setTenantCode(workflowInstance.getTenantCode());
         int create = commandService.createCommand(command);
         processService.saveCommandTrigger(command.getId(), workflowInstance.getId());
         return create;
@@ -1218,12 +1219,12 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         || state == TaskExecutionStatus.DISPATCH
                         || state == TaskExecutionStatus.SUBMITTED_SUCCESS
                         || state == TaskExecutionStatus.DELAY_EXECUTION) {
-                    // try to take over task instance
-                    if (state == TaskExecutionStatus.SUBMITTED_SUCCESS || state == TaskExecutionStatus.DELAY_EXECUTION
-                            || state == TaskExecutionStatus.DISPATCH) {
+                    if (state == TaskExecutionStatus.SUBMITTED_SUCCESS
+                            || state == TaskExecutionStatus.DELAY_EXECUTION) {
                         // The taskInstance is not in running, directly takeover it
                     } else if (tryToTakeOverTaskInstance(existTaskInstance)) {
-                        log.info("Success take over task {}", existTaskInstance.getName());
+                        // If the taskInstance has already dispatched to worker then will try to take-over it
+                        log.info("Success take over task {} -> status: {}", existTaskInstance.getName(), state);
                         continue;
                     } else {
                         // set the task instance state to fault tolerance
