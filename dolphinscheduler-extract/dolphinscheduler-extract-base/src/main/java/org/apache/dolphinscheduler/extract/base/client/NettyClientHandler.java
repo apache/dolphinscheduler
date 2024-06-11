@@ -77,7 +77,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
                     .writeAndFlush(HeartBeatTransporter.getHeartBeatTransporter())
                     .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
             if (log.isDebugEnabled()) {
-                log.debug("Client send heart beat to: {}", ChannelUtils.getRemoteAddress(ctx.channel()));
+                log.info("Client send heartbeat to: {}", ctx.channel().remoteAddress());
             }
         } else {
             super.userEventTriggered(ctx, evt);
