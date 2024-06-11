@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+set -xeuo pipefail
 script_dir=`dirname $0`
 cd $script_dir/../../../target
 package_file=`ls apache-dolphinscheduler-*-bin.tar.gz`
