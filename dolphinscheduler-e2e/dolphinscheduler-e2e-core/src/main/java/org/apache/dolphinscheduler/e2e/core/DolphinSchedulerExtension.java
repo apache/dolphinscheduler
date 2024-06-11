@@ -134,8 +134,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private void setBrowserContainerByOsName() {
         DockerImageName imageName;
 
-        if (LOCAL_MODE && M1_CHIP_FLAG) {
-            imageName = DockerImageName.parse("seleniarm/standalone-chromium:4.1.2-20220227")
+        if (M1_CHIP_FLAG) {
+            imageName = DockerImageName.parse("seleniarm/standalone-chromium:124.0-chromedriver-124.0")
                     .asCompatibleSubstituteFor("selenium/standalone-chrome");
 
             browser = new BrowserWebDriverContainer<>(imageName)
@@ -143,6 +143,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
                             Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                    .withRecordingMode(RECORD_ALL, record.toFile(), MP4)
                     .withStartupTimeout(Duration.ofSeconds(300));
         } else {
             browser = new BrowserWebDriverContainer<>()
@@ -203,7 +204,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                                        .map(URL::getPath)
                                        .map(File::new)
                                        .collect(Collectors.toList());
-									   
+
        ComposeContainer compose = new ComposeContainer(files)
                 .withPull(true)
                 .withTailChildContainers(true)
@@ -213,7 +214,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                         DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
                 .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
-	   
+
 
         return compose;
     }
