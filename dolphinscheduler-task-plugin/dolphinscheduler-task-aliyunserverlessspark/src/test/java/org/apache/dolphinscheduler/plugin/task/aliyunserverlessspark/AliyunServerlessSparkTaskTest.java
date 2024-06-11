@@ -153,7 +153,7 @@ public class AliyunServerlessSparkTaskTest {
                 () -> doReturn(mockStartJobRunResponse).when(mockAliyunServerlessSparkClient)
                         .startJobRunWithOptions(any(), any(), any(), any()));
 
-        doReturn(mockGetJobRunRequest).when(aliyunServerlessSparkTask).buildGetJobRunRequest(any());
+        doReturn(mockGetJobRunRequest).when(aliyunServerlessSparkTask).buildGetJobRunRequest();
         GetJobRunResponseBody getJobRunResponseBody = new GetJobRunResponseBody();
         GetJobRunResponseBody.GetJobRunResponseBodyJobRun jobRun =
                 new GetJobRunResponseBody.GetJobRunResponseBodyJobRun();
@@ -172,14 +172,14 @@ public class AliyunServerlessSparkTaskTest {
 
     @Test
     public void testCancelApplication() throws Exception {
-        doReturn(mockCancelJobRunRequest).when(aliyunServerlessSparkTask).buildCancelJobRunRequest(any());
+        doReturn(mockCancelJobRunRequest).when(aliyunServerlessSparkTask).buildCancelJobRunRequest();
         Assertions.assertDoesNotThrow(
                 () -> doReturn(mockCancelJobRunResponse).when(mockAliyunServerlessSparkClient).cancelJobRun(any(),
                         any(), any()));
 
         aliyunServerlessSparkTask.init();
         aliyunServerlessSparkTask.cancelApplication();
-        verify(aliyunServerlessSparkTask).buildCancelJobRunRequest(any());
+        verify(aliyunServerlessSparkTask).buildCancelJobRunRequest();
         verify(mockAliyunServerlessSparkClient).cancelJobRun(eq(mockWorkspaceId), any(), eq(mockCancelJobRunRequest));
     }
 

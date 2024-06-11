@@ -44,6 +44,7 @@ public class AliyunServerlessSparkClientWrapper implements AutoCloseable {
         aliyunServerlessSparkClient = new Client(config);
     }
 
+    // TODO: update checkConnect when aliyun serverless spark service support the service connection check
     public boolean checkConnect(String accessKeyId, String accessKeySecret, String regionId) {
         try {
             // If the login fails, an exception will be thrown directly

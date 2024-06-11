@@ -122,7 +122,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             log.info("Successfully submitted serverless spark job, jobRunId - {}", jobRunId);
 
             while (!RunState.isFinal(currentState)) {
-                GetJobRunRequest getJobRunRequest = buildGetJobRunRequest(aliyunServerlessSparkParameters);
+                GetJobRunRequest getJobRunRequest = buildGetJobRunRequest();
                 GetJobRunResponse getJobRunResponse = aliyunServerlessSparkClient
                         .getJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId, getJobRunRequest);
                 currentState = RunState.valueOf(getJobRunResponse.getBody().getJobRun().getState());
@@ -166,7 +166,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() throws TaskException {
-        CancelJobRunRequest cancelJobRunRequest = buildCancelJobRunRequest(aliyunServerlessSparkParameters);
+        CancelJobRunRequest cancelJobRunRequest = buildCancelJobRunRequest();
         try {
             aliyunServerlessSparkClient.cancelJobRun(aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
                     cancelJobRunRequest);
@@ -222,13 +222,13 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         return startJobRunRequest;
     }
 
-    protected GetJobRunRequest buildGetJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+    protected GetJobRunRequest buildGetJobRunRequest() {
         GetJobRunRequest getJobRunRequest = new GetJobRunRequest();
         getJobRunRequest.setRegionId(regionId);
         return getJobRunRequest;
     }
 
-    protected CancelJobRunRequest buildCancelJobRunRequest(AliyunServerlessSparkParameters aliyunServerlessSparkParameters) {
+    protected CancelJobRunRequest buildCancelJobRunRequest() {
         CancelJobRunRequest cancelJobRunRequest = new CancelJobRunRequest();
         cancelJobRunRequest.setRegionId(regionId);
         return cancelJobRunRequest;
