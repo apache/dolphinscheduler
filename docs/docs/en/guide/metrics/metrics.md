@@ -91,6 +91,11 @@ For example, you can get the master metrics by `curl http://localhost:5679/actua
   - stop: the number of stopped workflow instances
   - failover: the number of workflow instance fail-overs
 
+### RPC Related Metrics
+
+- ds.rpc.client.sync.request.exception.count: (counter) the number of exceptions occurred in sync rpc requests
+- ds.rpc.client.sync.request.duration.time: (histogram) the time cost of sync rpc requests
+
 ### Master Server Metrics
 
 - ds.master.overload.count: (counter) the number of times the master overloaded
