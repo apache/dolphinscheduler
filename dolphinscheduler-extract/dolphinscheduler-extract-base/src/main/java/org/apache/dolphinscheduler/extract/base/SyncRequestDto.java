@@ -17,17 +17,22 @@
 
 package org.apache.dolphinscheduler.extract.base;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface RpcMethod {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    long timeout() default -1;
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class SyncRequestDto {
+
+    private Host serverHost;
+    private Transporter transporter;
+    private long timeoutMillis;
 
 }

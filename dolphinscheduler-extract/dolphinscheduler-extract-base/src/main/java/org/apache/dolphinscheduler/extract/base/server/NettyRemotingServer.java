@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
-import org.apache.dolphinscheduler.extract.base.utils.Constants;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
 import java.util.concurrent.ExecutorService;
@@ -135,7 +134,7 @@ class NettyRemotingServer {
                 .addLast("encoder", new TransporterEncoder())
                 .addLast("decoder", new TransporterDecoder())
                 .addLast("server-idle-handle",
-                        new IdleStateHandler(0, 0, Constants.NETTY_SERVER_HEART_BEAT_TIME, TimeUnit.MILLISECONDS))
+                        new IdleStateHandler(serverConfig.getConnectionIdleTime(), 0, 0, TimeUnit.MILLISECONDS))
                 .addLast("handler", channelHandler);
     }
 
