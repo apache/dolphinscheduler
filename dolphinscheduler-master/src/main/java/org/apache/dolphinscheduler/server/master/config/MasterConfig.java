@@ -96,10 +96,14 @@ public class MasterConfig implements Validator {
 
     private CommandFetchStrategy commandFetchStrategy = new CommandFetchStrategy();
 
-    // ip:listenPort
+    /**
+     * The IP address and listening port of the master server in the format 'ip:listenPort'.
+     */
     private String masterAddress;
 
-    // /nodes/master/ip:listenPort
+    /**
+     * The registry path for the master server in the format '/nodes/master/ip:listenPort'.
+     */
     private String masterRegistryPath;
 
     @Override
