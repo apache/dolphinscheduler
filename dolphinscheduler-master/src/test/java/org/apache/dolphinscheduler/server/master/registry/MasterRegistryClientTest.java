@@ -97,6 +97,11 @@ public class MasterRegistryClientTest {
     }
 
     @Test
+    public void deregistryTest() {
+        masterRegistryClient.deregister();
+    }
+
+    @Test
     public void removeNodePathTest() {
         masterRegistryClient.removeMasterNodePath("/path", RegistryNodeType.MASTER, false);
         masterRegistryClient.removeMasterNodePath("/path", RegistryNodeType.MASTER, true);
