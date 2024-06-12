@@ -366,6 +366,7 @@ interface ITaskParams {
   executionTimeout?: string
   startTimeout?: string
   processDefinitionCode?: number
+  childNodeProjectCode?: number | null
   conditionResult?: {
     successNode?: number[]
     failedNode?: number[]

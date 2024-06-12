@@ -60,7 +60,7 @@ export function useSubProcess({
       Fields.useEnvironmentName(model, !data?.id),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useTimeoutAlarm(model),
-      Fields.useChildNode({
+      ...Fields.useChildNode({
         model,
         projectCode,
         from,

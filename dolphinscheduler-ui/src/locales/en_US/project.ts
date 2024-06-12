@@ -250,7 +250,8 @@ export default {
       'The downstream dependent tasks exists. You can not delete the task.',
     warning_delete_scheduler_dependent_tasks_desc:
       'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
-    warning_too_large_parallelism_number: 'The parallelism number is too large. It is better not to be over 10.'
+    warning_too_large_parallelism_number:
+      'The parallelism number is too large. It is better not to be over 10.'
   },
   task: {
     on_line: 'Online',
@@ -387,6 +388,9 @@ export default {
     task_type_tips: 'Please select a task type (required)',
     workflow_name: 'Workflow Name',
     workflow_name_tips: 'Please select a workflow (required)',
+    child_node_project: 'Child Node Project',
+    child_node_project_tips:
+      'Select this field for choose different project child node',
     child_node: 'Child Node',
     child_node_tips: 'Please select a child node (required)',
     run_flag: 'Run flag',

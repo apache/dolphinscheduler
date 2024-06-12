@@ -247,7 +247,7 @@ export default {
       '下游存在依赖，你不能删除该任务.',
     warning_delete_scheduler_dependent_tasks_desc:
       '下游存在依赖, 删除定时可能会对下游任务产生影响. 你确定要删除该定时嘛?',
-    warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.',
+    warning_too_large_parallelism_number: '并行度设置太大了, 最好不要超过10.'
   },
   task: {
     on_line: '线上',
@@ -383,6 +383,8 @@ export default {
     task_type_tips: '请选择任务类型(必选)',
     workflow_name: '工作流名称',
     workflow_name_tips: '请选择工作流(必选)',
+    child_node_project: '子节点项目名',
+    child_node_project_tips: '选择项目名，获取目标项目中的子节点',
     child_node: '子节点',
     child_node_tips: '请选择子节点(必选)',
     run_flag: '运行标志',

@@ -15,13 +15,15 @@
  * limitations under the License.
  */
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   querySimpleList,
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
 import type { IJsonItem } from '../types'
+import { queryProjectListPaging } from '@/service/modules/projects'
+import type { ProjectRes, ProjectList } from '@/service/modules/projects/types'
 
 export function useChildNode({
   model,
@@ -35,16 +37,18 @@ export function useChildNode({
   from?: number
   processName?: number
   code?: number
-}): IJsonItem {
+}): IJsonItem[] {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
+  const accessibleProjectList = ref([] as ProjectList[])
   const loading = ref(false)
 
-  const getProcessList = async () => {
-    if (loading.value) return
+  const diffCode = ref(0)
+
+  const getProcessList = async (project_code: number) => {
     loading.value = true
-    const res = await querySimpleList(projectCode)
+    const res = await querySimpleList(project_code)
     options.value = res
       .filter((option: { name: string; code: number }) => option.code !== code)
       .map((option: { name: string; code: number }) => ({
@@ -59,32 +63,79 @@ export function useChildNode({
     model.definition = res
   }
 
+  const getAccessibleProjectList = async () => {
+    queryProjectListPaging({
+      pageNo: 1,
+      pageSize: 999
+    })
+      .then((res: ProjectRes) => {
+        accessibleProjectList.value = res.totalList
+      })
+      .catch(() => {
+        accessibleProjectList.value = []
+      })
+  }
+
+  watch(
+    () => model?.childNodeProjectCode,
+    (val) => {
+      diffCode.value = val || projectCode
+    }
+  )
+
   onMounted(() => {
     if (from === 1 && processName) {
       getProcessListByCode(processName)
     }
-    getProcessList()
+    getAccessibleProjectList()
+
+    getProcessList(projectCode).then(() => {
+      if (diffCode.value && diffCode.value != projectCode) {
+        getProcessList(diffCode.value)
+      }
+    })
   })
 
-  return {
-    type: 'select',
-    field: 'processDefinitionCode',
-    span: 24,
-    name: t('project.node.child_node'),
-    props: {
-      loading: loading,
-      filterable: true
+  return [
+    {
+      type: 'select',
+      field: 'childNodeProjectCode',
+      span: 24,
+      name: t('project.node.child_node_project'),
+      props: {
+        'label-field': 'name',
+        'value-field': 'code',
+        'onUpdate:value': (value: any) => {
+          model.processDefinitionCode = null
+          getProcessList(value || projectCode)
+        },
+        filterable: true,
+        clearable: true,
+        placeholder: t('project.node.child_node_project_tips')
+      },
+      options: accessibleProjectList,
+      class: 'select-project-name'
     },
-    options: options,
-    class: 'select-child-node',
-    validate: {
-      trigger: ['input', 'blur'],
-      required: true,
-      validator(unuse: any, value: number) {
-        if (!value) {
-          return Error(t('project.node.child_node_tips'))
+    {
+      type: 'select',
+      field: 'processDefinitionCode',
+      span: 24,
+      name: t('project.node.child_node'),
+      props: {
+        loading: loading,
+        filterable: true
+      },
+      options: options,
+      class: 'select-child-node',
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true,
+        validator(unuse: any, value: number) {
+          if (!value) {
+            return Error(t('project.node.child_node_tips'))
+          }
         }
       }
     }
-  }
+  ]
 }
