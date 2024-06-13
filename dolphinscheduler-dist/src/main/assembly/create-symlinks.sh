@@ -19,8 +19,14 @@
 set -eu
 script_dir=`dirname $0`
 cd $script_dir/../../../target
-package_file=`ls apache-dolphinscheduler-*-bin.tar.gz`
+# Check if the package file exists
+if ! ls ./apache-dolphinscheduler-*-bin.tar.gz &> /dev/null; then
+	echo "File apache-dolphinscheduler-*-bin.tar.gz not found"
+	exit 0
+fi
+package_file=$(ls apache-dolphinscheduler-*-bin.tar.gz)
 echo $package_file
+
 decompress_dirname="${package_file%.tar.gz}"
 rm -rf $decompress_dirname
 #Decompress package file
