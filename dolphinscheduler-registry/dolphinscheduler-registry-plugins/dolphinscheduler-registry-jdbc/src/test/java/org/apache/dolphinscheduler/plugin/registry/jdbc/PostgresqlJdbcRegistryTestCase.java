@@ -57,7 +57,7 @@ public class PostgresqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withDatabaseName("dolphinscheduler")
                 .withNetwork(Network.newNetwork())
                 .withExposedPorts(5432)
-                .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
+                .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(500)));
         int exposedPort = RandomUtils.nextInt(10000, 65535);
 
         postgresqlContainer.setPortBindings(Lists.newArrayList(exposedPort + ":5432"));
