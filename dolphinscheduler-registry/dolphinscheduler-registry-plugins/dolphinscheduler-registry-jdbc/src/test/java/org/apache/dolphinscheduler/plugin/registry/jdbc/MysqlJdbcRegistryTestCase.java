@@ -53,7 +53,7 @@ class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withDatabaseName("dolphinscheduler")
                 .withNetwork(Network.newNetwork())
                 .withExposedPorts(3306)
-                .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(500)));
+                .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         int exposedPort = RandomUtils.nextInt(10000, 65535);
         mysqlContainer.setPortBindings(Lists.newArrayList(exposedPort + ":3306"));
