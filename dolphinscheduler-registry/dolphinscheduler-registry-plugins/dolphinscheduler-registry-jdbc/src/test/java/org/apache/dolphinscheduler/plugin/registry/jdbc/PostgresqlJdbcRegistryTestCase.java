@@ -22,6 +22,7 @@ import org.apache.commons.lang3.RandomUtils;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -34,6 +35,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
@@ -54,7 +56,8 @@ public class PostgresqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withPassword("root")
                 .withDatabaseName("dolphinscheduler")
                 .withNetwork(Network.newNetwork())
-                .withExposedPorts(5432);
+                .withExposedPorts(5432)
+                .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
         int exposedPort = RandomUtils.nextInt(10000, 65535);
 
         postgresqlContainer.setPortBindings(Lists.newArrayList(exposedPort + ":5432"));
