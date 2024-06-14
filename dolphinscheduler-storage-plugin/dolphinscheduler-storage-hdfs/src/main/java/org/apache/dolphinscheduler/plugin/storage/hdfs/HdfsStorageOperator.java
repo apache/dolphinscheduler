@@ -64,6 +64,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -72,7 +73,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HdfsStorageOperator implements Closeable, StorageOperate {
 
     protected static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
-    private static final String HADOOP_UTILS_KEY = "HADOOP_UTILS_KEY";
 
     private volatile boolean yarnEnabled = false;
 
@@ -105,50 +105,35 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
         }
     }
 
-    /**
-     * init hadoop configuration
-     */
+    @SneakyThrows
     public void init() throws NullPointerException {
-        try {
-            configuration = new HdfsConfiguration();
+        configuration = new HdfsConfiguration();
+        Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
+        fsRelatedProps.forEach((key, value) -> {
+            configuration.set(key, value);
+            log.info("Set HDFS prop: {}  -> {}", key, value);
+        });
+        configuration.set(Constants.HDFS_DEFAULT_FS, getDefaultFS());
 
-            String hdfsUser = hdfsProperties.getUser();
-            if (CommonUtils.loadKerberosConf(configuration)) {
-                hdfsUser = "";
-            }
-
-            String defaultFS = getDefaultFS();
-            // first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
-            // the default is the local file system
-            if (StringUtils.isNotBlank(defaultFS)) {
-                Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
-                configuration.set(Constants.HDFS_DEFAULT_FS, defaultFS);
-                fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
-            } else {
-                log.error("property:{} can not to be empty, please set!", Constants.FS_DEFAULT_FS);
-                throw new NullPointerException(
-                        String.format("property: %s can not to be empty, please set!", Constants.FS_DEFAULT_FS));
-            }
-
-            if (!defaultFS.startsWith("file")) {
-                log.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", Constants.FS_DEFAULT_FS,
-                        defaultFS);
-            }
-
-            if (StringUtils.isNotEmpty(hdfsUser)) {
-                UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
-                ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
-                    fs = FileSystem.get(configuration);
-                    return true;
-                });
-            } else {
-                log.warn("resource.hdfs.root.user is not set value!");
-                fs = FileSystem.get(configuration);
-            }
-
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        if (CommonUtils.getKerberosStartupState()) {
+            CommonUtils.loadKerberosConf(configuration);
+            fs = FileSystem.get(configuration);
+            log.info("Initialize HdfsStorageOperator with kerberos");
+            return;
         }
+        String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
+        if (StringUtils.isNotEmpty(hdfsUser)) {
+            UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
+            ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
+                fs = FileSystem.get(configuration);
+                return true;
+            });
+            UserGroupInformation.setLoginUser(ugi);
+            log.info("Initialize HdfsStorageOperator with remote user: {}", hdfsUser);
+            return;
+        }
+        fs = FileSystem.get(configuration);
+        log.info("Initialize HdfsStorageOperator with default user");
     }
 
     /**
@@ -337,15 +322,10 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
      * copy hdfs file to local
      *
      * @param srcHdfsFilePath source hdfs file path
-     *
-     * @param dstFile destination file
-     *
-     * @param deleteSource delete source
-     *
-     * @param overwrite overwrite
-     *
+     * @param dstFile         destination file
+     * @param deleteSource    delete source
+     * @param overwrite       overwrite
      * @return result of copy hdfs file to local
-     *
      * @throws IOException errors
      */
     public boolean copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource,
@@ -389,10 +369,10 @@ public class HdfsStorageOperator implements Closeable, StorageOperate {
     /**
      * delete a list of files
      *
-     * @param filePath the path to delete, usually it is a directory.
-     * @param recursive    if path is a directory and set to
-     *                     true, the directory is deleted else throws an exception. In
-     *                     case of a file the recursive can be set to either true or false.
+     * @param filePath  the path to delete, usually it is a directory.
+     * @param recursive if path is a directory and set to
+     *                  true, the directory is deleted else throws an exception. In
+     *                  case of a file the recursive can be set to either true or false.
      * @return true if delete is successful else false.
      * @throws IOException errors
      */
