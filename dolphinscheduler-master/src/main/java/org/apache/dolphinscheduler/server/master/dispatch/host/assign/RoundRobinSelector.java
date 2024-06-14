@@ -73,6 +73,14 @@ public class RoundRobinSelector extends AbstractSelector<HostWorker> {
 
     }
 
+    /**
+     * This method selects a HostWorker from a collection of HostWorker objects using a weighted round-robin algorithm.
+     * The selection is based on the current weight of each HostWorker.
+     * The HostWorker with the highest current weight is selected.
+     *
+     * @param source A collection of HostWorker objects to select from.
+     * @return The selected HostWorker with the highest current weight.
+     */
     @Override
     public HostWorker doSelect(Collection<HostWorker> source) {
 
