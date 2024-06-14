@@ -57,6 +57,7 @@ type TaskType =
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
   | 'ALIYUN_SERVERLESS_SPARK'
+  | 'FLINK_MATERIALIZED_TABLE'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

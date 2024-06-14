@@ -114,6 +114,7 @@ $bgLight: #ffffff;
       background-image: url('/images/task-icons/sql.png');
     }
     &.icon-flink,
+    &.icon-flink_materialized_table,
     &.icon-flink_stream {
       background-image: url('/images/task-icons/flink.png');
     }
@@ -224,6 +225,7 @@ $bgLight: #ffffff;
         background-image: url('/images/task-icons/sql_hover.png');
       }
       &.icon-flink,
+      &.icon-flink_materialized_table,
       &.icon-flink_stream {
         background-image: url('/images/task-icons/flink_hover.png');
       }

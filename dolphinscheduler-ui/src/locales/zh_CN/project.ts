@@ -895,7 +895,19 @@ export default {
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
     is_production_tips: 'is production',
-    json_format_tips: 'JSON参数格式异常'
+    json_format_tips: 'JSON参数格式异常',
+    identifier: 'identifier',
+    identifier_tips: 'identifier',
+    gateway_endpoint: 'gateway_endpoint',
+    gateway_endpoint_tips: 'gateway_endpoint',
+    is_periodic: 'is_periodic',
+    is_periodic_tips: 'is_periodic',
+    dynamic_options: 'dynamic_options',
+    dynamic_options_tips: 'dynamic_options',
+    static_partitions: 'static_partitions',
+    static_partitions_tips: 'static_partitions',
+    execution_config: 'execution_config',
+    execution_config_tips: 'execution_config'
   },
   menu: {
     fav: '收藏组件',

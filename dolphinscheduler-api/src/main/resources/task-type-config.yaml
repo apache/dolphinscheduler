@@ -30,6 +30,7 @@ task:
     - 'FLINK_STREAM'
     - 'HIVECLI'
     - 'REMOTESHELL'
+    - 'FLINK_MATERIALIZED_TABLE'
   cloud:
     - 'EMR'
     - 'K8S'

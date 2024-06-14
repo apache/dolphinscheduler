@@ -392,7 +392,8 @@
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql-connector.version}</version>
-                <scope>test</scope>
+                <!--                TODO: Revert this!!!-->
+                <!--                <scope>test</scope>-->
             </dependency>
 
             <dependency>

@@ -925,7 +925,19 @@ export default {
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
     is_production_tips: 'is production',
-    json_format_tips: 'Json parameters format is abnormal'
+    json_format_tips: 'Json parameters format is abnormal',
+    identifier: 'identifier',
+    identifier_tips: 'identifier',
+    gateway_endpoint: 'gateway_endpoint',
+    gateway_endpoint_tips: 'gateway_endpoint',
+    is_periodic: 'is_periodic',
+    is_periodic_tips: 'is_periodic',
+    dynamic_options: 'dynamic_options',
+    dynamic_options_tips: 'dynamic_options',
+    static_partitions: 'static_partitions',
+    static_partitions_tips: 'static_partitions',
+    execution_config: 'execution_config',
+    execution_config_tips: 'execution_config'
   },
   menu: {
     fav: 'Favorites',

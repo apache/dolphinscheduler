@@ -51,6 +51,7 @@ import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
 import { useAliyunServerlessSpark } from './use-aliyun-serverless-spark'
+import { useFlinkMaterializedTable } from './use-flink-materialized-table'
 
 export default {
   SHELL: useShell,
@@ -88,5 +89,6 @@ export default {
   LINKIS: useLinkis,
   DATA_FACTORY: useDataFactory,
   REMOTESHELL: useRemoteShell,
-  ALIYUN_SERVERLESS_SPARK: useAliyunServerlessSpark
+  ALIYUN_SERVERLESS_SPARK: useAliyunServerlessSpark,
+  FLINK_MATERIALIZED_TABLE: useFlinkMaterializedTable
 }

@@ -154,6 +154,10 @@ export const TASK_TYPES_MAP = {
   REMOTESHELL: {
     alias: 'REMOTESHELL',
     helperLinkDisable: true
+  },
+  FLINK_MATERIALIZED_TABLE: {
+    alias: 'FLINK_MATERIALIZED_TABLE',
+    helperLinkDisable: true
   }
 } as {
   [key in TaskType]: {

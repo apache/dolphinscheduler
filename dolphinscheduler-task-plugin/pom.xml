@@ -62,6 +62,7 @@
         <module>dolphinscheduler-task-datafactory</module>
         <module>dolphinscheduler-task-remoteshell</module>
         <module>dolphinscheduler-task-aliyunserverlessspark</module>
+        <module>dolphinscheduler-task-flink-materialized-table</module>
     </modules>
 
     <dependencyManagement>
