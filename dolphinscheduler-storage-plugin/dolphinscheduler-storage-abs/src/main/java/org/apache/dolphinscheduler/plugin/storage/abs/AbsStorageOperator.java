@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPA
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
@@ -44,7 +43,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,64 +53,32 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobContainerItem;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 
-@Data
 @Slf4j
 public class AbsStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    private BlobContainerClient blobContainerClient;
+    private final BlobContainerClient blobContainerClient;
 
-    private BlobServiceClient blobServiceClient;
+    private final BlobServiceClient blobServiceClient;
 
-    private String connectionString;
-
-    private String storageAccountName;
-
-    private String containerName;
-
-    public AbsStorageOperator() {
-
-    }
-
-    public void init() {
-        containerName = readContainerName();
-        connectionString = readConnectionString();
-        storageAccountName = readAccountName();
-        blobServiceClient = buildBlobServiceClient();
-        blobContainerClient = buildBlobContainerClient();
-        checkContainerNameExists();
-    }
-
-    protected BlobServiceClient buildBlobServiceClient() {
-        return new BlobServiceClientBuilder()
-                .endpoint("https://" + storageAccountName + ".blob.core.windows.net/")
-                .connectionString(connectionString)
+    public AbsStorageOperator(AbsStorageProperties absStorageProperties) {
+        super(absStorageProperties.getResourceUploadPath());
+        blobServiceClient = new BlobServiceClientBuilder()
+                .endpoint("https://" + absStorageProperties.getStorageAccountName() + ".blob.core.windows.net/")
+                .connectionString(absStorageProperties.getConnectionString())
                 .buildClient();
-    }
-
-    protected BlobContainerClient buildBlobContainerClient() {
-        return blobServiceClient.getBlobContainerClient(containerName);
-    }
-
-    protected String readConnectionString() {
-        return PropertyUtils.getString(Constants.AZURE_BLOB_STORAGE_CONNECTION_STRING);
-    }
-
-    protected String readContainerName() {
-        return PropertyUtils.getString(Constants.AZURE_BLOB_STORAGE_CONTAINER_NAME);
-    }
-
-    protected String readAccountName() {
-        return PropertyUtils.getString(Constants.AZURE_BLOB_STORAGE_ACCOUNT_NAME);
+        blobContainerClient = blobServiceClient.getBlobContainerClient(absStorageProperties.getContainerName());
+        checkContainerNameExists(absStorageProperties.getContainerName());
     }
 
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in abs", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
-            return RESOURCE_UPLOAD_PATH.substring(1);
+        if (getStorageBaseDirectory().startsWith("/")) {
+            log.warn("{} -> {} should not start with / in abs", Constants.RESOURCE_UPLOAD_PATH,
+                    getStorageBaseDirectory());
+            return getStorageBaseDirectory().substring(1);
         }
-        return RESOURCE_UPLOAD_PATH;
+        return getStorageBaseDirectory();
     }
 
     @SneakyThrows
@@ -217,7 +183,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
         return null;
     }
 
-    public void checkContainerNameExists() {
+    public void checkContainerNameExists(String containerName) {
         if (StringUtils.isBlank(containerName)) {
             throw new IllegalArgumentException(containerName + " is blank");
         }

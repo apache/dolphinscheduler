@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.nio.file.FileAlreadyExistsException;
@@ -28,8 +26,6 @@ public interface StorageOperator {
 
     String FILE_FOLDER_NAME = "resources";
     String UDF_FOLDER_NAME = "udfs";
-
-    String RESOURCE_UPLOAD_PATH = PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
 
     ResourceMetadata getResourceMetaData(String resourceAbsolutePath);
 

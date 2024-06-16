@@ -79,10 +79,11 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
     private OSS ossClient;
 
-    public OssStorageOperator() {
+    public OssStorageOperator(String resourceBaseAbsolutePath) {
+        super(resourceBaseAbsolutePath);
     }
 
-    public void init() {
+    private void init() {
         this.accessKeyId = readOssAccessKeyID();
         this.accessKeySecret = readOssAccessKeySecret();
         this.endPoint = readOssEndPoint();
@@ -132,11 +133,12 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in Oss", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
-            return RESOURCE_UPLOAD_PATH.substring(1);
+        if (resourceBaseAbsolutePath.startsWith("/")) {
+            log.warn("{} -> {} should not start with / in Oss", Constants.RESOURCE_UPLOAD_PATH,
+                    resourceBaseAbsolutePath);
+            return resourceBaseAbsolutePath.substring(1);
         }
-        return RESOURCE_UPLOAD_PATH;
+        return resourceBaseAbsolutePath;
     }
 
     @Override

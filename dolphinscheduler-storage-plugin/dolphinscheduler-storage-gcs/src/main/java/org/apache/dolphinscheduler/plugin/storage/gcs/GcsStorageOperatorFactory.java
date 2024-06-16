@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.gcs;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
@@ -28,7 +30,16 @@ public class GcsStorageOperatorFactory implements StorageOperatorFactory {
 
     @Override
     public StorageOperator createStorageOperate() {
-        return new GcsStorageOperator();
+        final GcsStorageProperties gcsStorageProperties = getGcsStorageProperties();
+        return new GcsStorageOperator(gcsStorageProperties);
+    }
+
+    public GcsStorageProperties getGcsStorageProperties() {
+        return GcsStorageProperties.builder()
+                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .credential(PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_CREDENTIAL))
+                .bucketName(PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME))
+                .build();
     }
 
     @Override

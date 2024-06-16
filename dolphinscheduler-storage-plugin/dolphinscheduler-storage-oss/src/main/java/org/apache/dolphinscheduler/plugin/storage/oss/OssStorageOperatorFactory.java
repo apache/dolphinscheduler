@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.oss;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
@@ -28,9 +30,7 @@ public class OssStorageOperatorFactory implements StorageOperatorFactory {
 
     @Override
     public StorageOperator createStorageOperate() {
-        OssStorageOperator ossOperator = new OssStorageOperator();
-        ossOperator.init();
-        return ossOperator;
+        return new OssStorageOperator(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"));
     }
 
     @Override

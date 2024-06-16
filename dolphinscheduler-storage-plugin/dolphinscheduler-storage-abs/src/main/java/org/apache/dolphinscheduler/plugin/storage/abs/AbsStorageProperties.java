@@ -15,9 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.storage.hdfs;
-
-import java.util.Map;
+package org.apache.dolphinscheduler.plugin.storage.abs;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,14 +26,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HdfsStorageProperties {
+public class AbsStorageProperties {
 
-    private String user;
-
-    private String defaultFS;
-
-    private Map<String, String> configurationProperties;
-
+    private String containerName;
+    private String connectionString;
+    private String storageAccountName;
     private String resourceUploadPath;
 
 }

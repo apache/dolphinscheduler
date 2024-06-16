@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.storage.s3;
 import org.apache.dolphinscheduler.authentication.aws.AmazonS3ClientFactory;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
@@ -46,7 +45,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,27 +58,28 @@ import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 @Slf4j
-@Data
 public class S3StorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    private String bucketName;
+    private final String bucketName;
 
-    private AmazonS3 s3Client;
+    private final AmazonS3 s3Client;
 
-    public S3StorageOperator() {
-        bucketName = PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME);
-        s3Client = AmazonS3ClientFactory.createAmazonS3Client(PropertyUtils.getByPrefix("aws.s3.", ""));
+    public S3StorageOperator(S3StorageProperties s3StorageProperties) {
+        super(s3StorageProperties.getResourceUploadPath());
+        bucketName = s3StorageProperties.getBucketName();
+        s3Client = AmazonS3ClientFactory.createAmazonS3Client(s3StorageProperties.getS3Configuration());
         exceptionWhenBucketNameNotExists(bucketName);
     }
 
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in s3", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
-            return RESOURCE_UPLOAD_PATH.substring(1);
+        if (resourceBaseAbsolutePath.startsWith("/")) {
+            log.warn("{} -> {} should not start with / in s3", Constants.RESOURCE_UPLOAD_PATH,
+                    resourceBaseAbsolutePath);
+            return resourceBaseAbsolutePath.substring(1);
         }
-        return RESOURCE_UPLOAD_PATH;
+        return resourceBaseAbsolutePath;
     }
 
     @Override

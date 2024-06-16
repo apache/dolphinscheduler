@@ -17,16 +17,26 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 
 public abstract class AbstractStorageOperator implements StorageOperator {
+
+    protected final String resourceBaseAbsolutePath;
+
+    public AbstractStorageOperator(String resourceBaseAbsolutePath) {
+        Preconditions.checkNotNull(resourceBaseAbsolutePath, "Resource upload path should not be null");
+        this.resourceBaseAbsolutePath = resourceBaseAbsolutePath;
+    }
 
     @Override
     public ResourceMetadata getResourceMetaData(String resourceAbsolutePath) {
@@ -50,7 +60,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        return RESOURCE_UPLOAD_PATH;
+        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
     }
 
     @Override

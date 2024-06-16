@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRIN
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
@@ -50,7 +49,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,38 +61,35 @@ import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
-@Data
 @Slf4j
 public class GcsStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    private Storage gcsStorage;
+    private final Storage gcsStorage;
 
-    private String bucketName;
-
-    private String credential;
+    private final String bucketName;
 
     @SneakyThrows
-    public GcsStorageOperator() {
-        credential = PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_CREDENTIAL);
-        bucketName = PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME);
+    public GcsStorageOperator(GcsStorageProperties gcsStorageProperties) {
+        super(gcsStorageProperties.getResourceUploadPath());
+        bucketName = gcsStorageProperties.getBucketName();
         gcsStorage = StorageOptions.newBuilder()
                 .setCredentials(ServiceAccountCredentials.fromStream(
-                        Files.newInputStream(Paths.get(credential))))
+                        Files.newInputStream(Paths.get(gcsStorageProperties.getCredential()))))
                 .build()
                 .getService();
 
         checkBucketNameExists(bucketName);
-
     }
 
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in Gcs", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
-            return RESOURCE_UPLOAD_PATH.substring(1);
+        if (resourceBaseAbsolutePath.startsWith("/")) {
+            log.warn("{} -> {} should not start with / in Gcs", Constants.RESOURCE_UPLOAD_PATH,
+                    resourceBaseAbsolutePath);
+            return resourceBaseAbsolutePath.substring(1);
         }
-        return RESOURCE_UPLOAD_PATH;
+        return getStorageBaseDirectory();
     }
 
     @SneakyThrows
@@ -291,11 +286,11 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         return absolutePath;
     }
 
-    private String transformGcsKeyToAbsolutePath(String s3Key) {
-        if (s3Key.endsWith("/")) {
-            return s3Key.substring(0, s3Key.length() - 1);
+    private String transformGcsKeyToAbsolutePath(String gcsKey) {
+        if (gcsKey.endsWith("/")) {
+            return gcsKey.substring(0, gcsKey.length() - 1);
         }
-        return s3Key;
+        return gcsKey;
     }
 
 }

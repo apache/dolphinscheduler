@@ -60,28 +60,6 @@ public final class Constants {
     public static final String HDFS_DEFAULT_FS = "fs.defaultFS";
 
     /**
-     * hadoop configuration
-     */
-    public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
-
-    public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
-
-    /**
-     * yarn.resourcemanager.ha.rm.ids
-     */
-    public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
-
-    /**
-     * yarn.application.status.address
-     */
-    public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
-
-    /**
-     * yarn.job.history.status.address
-     */
-    public static final String YARN_JOB_HISTORY_STATUS_ADDRESS = "yarn.job.history.status.address";
-
-    /**
      * hdfs configuration
      * resource.hdfs.root.user
      */

@@ -19,12 +19,10 @@ package org.apache.dolphinscheduler.plugin.storage.obs;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -46,7 +44,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,26 +55,20 @@ import com.obs.services.model.ObjectMetadata;
 import com.obs.services.model.ObsObject;
 import com.obs.services.model.PutObjectRequest;
 
-@Data
 @Slf4j
 public class ObsStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    private String accessKeyId;
+    private final String bucketName;
 
-    private String accessKeySecret;
+    private final ObsClient obsClient;
 
-    private String bucketName;
-
-    private String endPoint;
-
-    private ObsClient obsClient;
-
-    public ObsStorageOperator() {
-        this.accessKeyId = PropertyUtils.getString(TaskConstants.HUAWEI_CLOUD_ACCESS_KEY_ID);
-        this.accessKeySecret = PropertyUtils.getString(TaskConstants.HUAWEI_CLOUD_ACCESS_KEY_SECRET);
-        this.endPoint = PropertyUtils.getString(Constants.HUAWEI_CLOUD_OBS_END_POINT);
-        this.bucketName = PropertyUtils.getString(Constants.HUAWEI_CLOUD_OBS_BUCKET_NAME);
-        this.obsClient = new ObsClient(accessKeyId, accessKeySecret, endPoint);
+    public ObsStorageOperator(ObsStorageProperties obsStorageProperties) {
+        super(obsStorageProperties.getResourceUploadPath());
+        this.bucketName = obsStorageProperties.getBucketName();
+        this.obsClient = new ObsClient(
+                obsStorageProperties.getAccessKeyId(),
+                obsStorageProperties.getAccessKeySecret(),
+                obsStorageProperties.getEndPoint());
         ensureBucketSuccessfullyCreated(bucketName);
     }
 
@@ -89,11 +80,12 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (RESOURCE_UPLOAD_PATH.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in obs", Constants.RESOURCE_UPLOAD_PATH, RESOURCE_UPLOAD_PATH);
-            return RESOURCE_UPLOAD_PATH.substring(1);
+        if (resourceBaseAbsolutePath.startsWith("/")) {
+            log.warn("{} -> {} should not start with / in obs", Constants.RESOURCE_UPLOAD_PATH,
+                    resourceBaseAbsolutePath);
+            return resourceBaseAbsolutePath.substring(1);
         }
-        return RESOURCE_UPLOAD_PATH;
+        return resourceBaseAbsolutePath;
     }
 
     @SneakyThrows

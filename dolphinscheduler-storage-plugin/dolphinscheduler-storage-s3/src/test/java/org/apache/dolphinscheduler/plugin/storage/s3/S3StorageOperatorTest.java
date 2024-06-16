@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.plugin.storage.s3;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.apache.dolphinscheduler.common.constants.Constants.AWS_S3_BUCKET_NAME;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_UPLOAD_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,6 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.MinIOContainer;
 import org.testcontainers.lifecycle.Startables;
+import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -73,13 +72,6 @@ public class S3StorageOperatorTest {
 
         String endpoint = minIOContainer.getS3URL();
 
-        System.setProperty(RESOURCE_UPLOAD_PATH, "tmp/dolphinscheduler");
-        System.setProperty(AWS_S3_BUCKET_NAME, bucketName);
-        System.setProperty("aws.s3.access.key.id", accessKey);
-        System.setProperty("aws.s3.access.key.secret", secretKey);
-        System.setProperty("aws.s3.region", region);
-        System.setProperty("aws.s3.endpoint", endpoint);
-
         AmazonS3 amazonS3 = AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(new AmazonS3ClientBuilder.EndpointConfiguration(endpoint, region))
                 .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
@@ -87,7 +79,16 @@ public class S3StorageOperatorTest {
                 .build();
         amazonS3.createBucket(bucketName);
 
-        s3StorageOperator = new S3StorageOperator();
+        S3StorageProperties s3StorageProperties = S3StorageProperties.builder()
+                .bucketName(bucketName)
+                .resourceUploadPath("tmp/dolphinscheduler")
+                .s3Configuration(ImmutableMap.of(
+                        "access.key.id", accessKey,
+                        "access.key.secret", secretKey,
+                        "region", region,
+                        "endpoint", endpoint))
+                .build();
+        s3StorageOperator = new S3StorageOperator(s3StorageProperties);
     }
 
     @BeforeEach

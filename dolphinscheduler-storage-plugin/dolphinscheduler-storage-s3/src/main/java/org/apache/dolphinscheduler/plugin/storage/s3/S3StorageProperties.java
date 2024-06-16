@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.storage.hdfs;
+package org.apache.dolphinscheduler.plugin.storage.s3;
 
 import java.util.Map;
 
@@ -28,14 +28,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class HdfsStorageProperties {
+public class S3StorageProperties {
 
-    private String user;
+    private Map<String, String> s3Configuration;
 
-    private String defaultFS;
-
-    private Map<String, String> configurationProperties;
+    private String bucketName;
 
     private String resourceUploadPath;
-
 }

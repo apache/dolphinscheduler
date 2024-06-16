@@ -17,17 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FS_DEFAULT_FS;
-import static org.apache.dolphinscheduler.common.constants.Constants.HDFS_ROOT_USER;
-import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_UPLOAD_PATH;
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.io.File;
+import java.nio.file.FileAlreadyExistsException;
 import java.time.Duration;
+import java.util.List;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -41,15 +43,11 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
 
-import com.google.common.truth.Truth;
-
 class HdfsStorageOperatorTest {
 
     private static HdfsStorageOperator storageOperator;
 
     private static ComposeContainer hdfsContainer;
-
-    private static final String RESOURCE_BASE_DIRECTORY_ABSOLUTE_PATH = "hdfs://localhost/tmp/dolphinscheduler";
 
     @BeforeAll
     public static void setUp() throws InterruptedException {
@@ -64,14 +62,14 @@ class HdfsStorageOperatorTest {
 
         Startables.deepStart(Stream.of(hdfsContainer)).join();
 
-        System.setProperty(RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler");
-        System.setProperty(FS_DEFAULT_FS, "hdfs://localhost");
-        System.setProperty(HDFS_ROOT_USER, "hadoop");
-
-        HdfsStorageProperties hdfsStorageProperties = new HdfsStorageProperties();
-        // The default replication factor is 3, which is too large for the test environment.
-        // So we set it to 1.
-        hdfsStorageProperties.setConfigurationProperties(ImmutableMap.of("dfs.replication", "1"));
+        HdfsStorageProperties hdfsStorageProperties = HdfsStorageProperties.builder()
+                .resourceUploadPath("/tmp/dolphinscheduler")
+                .user("hadoop")
+                .defaultFS("hdfs://localhost")
+                // The default replication factor is 3, which is too large for the test environment.
+                // So we set it to 1.
+                .configurationProperties(ImmutableMap.of("dfs.replication", "1"))
+                .build();
         storageOperator = new HdfsStorageOperator(hdfsStorageProperties);
     }
 
@@ -80,6 +78,7 @@ class HdfsStorageOperatorTest {
         storageOperator.delete("hdfs://localhost/tmp/dolphinscheduler/test-default", true);
         storageOperator.createStorageDir("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/empty");
         storageOperator.createStorageDir("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql");
+        // todo: upload file and add file case
     }
 
     @Test
@@ -89,7 +88,7 @@ class HdfsStorageOperatorTest {
                         "hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sqlDirectory/demo.sql");
         assertEquals("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sqlDirectory/demo.sql",
                 resourceMetaData.getResourceAbsolutePath());
-        assertEquals(RESOURCE_BASE_DIRECTORY_ABSOLUTE_PATH, resourceMetaData.getResourceBaseDirectory());
+        assertEquals("hdfs://localhost/tmp/dolphinscheduler", resourceMetaData.getResourceBaseDirectory());
         assertEquals("test-default", resourceMetaData.getTenant());
         assertEquals(ResourceType.FILE, resourceMetaData.getResourceType());
         assertEquals("sqlDirectory/demo.sql", resourceMetaData.getResourceRelativePath());
@@ -100,20 +99,91 @@ class HdfsStorageOperatorTest {
 
     @Test
     public void testGetStorageBaseDirectory() {
-        assertEquals(RESOURCE_BASE_DIRECTORY_ABSOLUTE_PATH, storageOperator.getStorageBaseDirectory());
+        assertEquals("hdfs://localhost/tmp/dolphinscheduler", storageOperator.getStorageBaseDirectory());
+    }
+
+    @Test
+    public void testGetStorageBaseDirectory_withTenantCode() {
+        assertEquals("hdfs://localhost/tmp/dolphinscheduler/default",
+                storageOperator.getStorageBaseDirectory("default"));
+    }
+
+    @Test
+    public void testGetStorageBaseDirectory_withTenantCode_withFile() {
+        assertEquals("hdfs://localhost/tmp/dolphinscheduler/default/resources",
+                storageOperator.getStorageBaseDirectory("default", ResourceType.FILE));
+    }
+
+    @Test
+    public void testGetStorageBaseDirectory_withTenantCode_withAll() {
+        assertEquals("hdfs://localhost/tmp/dolphinscheduler/default",
+                storageOperator.getStorageBaseDirectory("default", ResourceType.ALL));
+    }
+
+    @Test
+    public void testGetStorageFileAbsolutePath() {
+        assertEquals("hdfs://localhost/tmp/dolphinscheduler/default/resources/a.sql",
+                storageOperator.getStorageFileAbsolutePath("default", "a.sql"));
+    }
+
+    @Test
+    public void testCreateStorageDir_notExist() {
+        storageOperator.createStorageDir("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/newDirectory");
+        storageOperator.exists("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/newDirectory");
+    }
+
+    @Test
+    public void testCreateStorageDir_exist() {
+        assertThrows(FileAlreadyExistsException.class,
+                () -> storageOperator
+                        .createStorageDir("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/empty"));
     }
 
     @Test
     public void testExist_DirectoryExist() {
-        Truth.assertThat(storageOperator.exists("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql"))
+        assertThat(storageOperator.exists("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql"))
                 .isTrue();
     }
 
     @Test
     public void testExist_DirectoryNotExist() {
-        Truth.assertThat(
+        assertThat(
                 storageOperator.exists("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/notExist"))
+                        .isFalse();
+    }
+
+    @Test
+    public void testDelete_directoryExist() {
+        storageOperator.delete("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql", true);
+        assertThat(storageOperator.exists("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql"))
                 .isFalse();
+    }
+
+    @Test
+    public void testDelete_directoryNotExist() {
+        storageOperator.delete("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/non", true);
+        assertThat(storageOperator.exists("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/non"))
+                .isFalse();
+    }
+
+    @Test
+    public void testListStorageEntity_directory() {
+        List<StorageEntity> storageEntities =
+                storageOperator.listStorageEntity("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/");
+        assertThat(storageEntities).hasSize(2);
+    }
+
+    @Test
+    public void testGetStorageEntity_directory() {
+        StorageEntity storageEntity =
+                storageOperator.getStorageEntity("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql");
+        assertThat(storageEntity.getFullName())
+                .isEqualTo("hdfs://localhost/tmp/dolphinscheduler/test-default/resources/sql");
+        assertThat(storageEntity.isDirectory()).isTrue();
+        assertThat(storageEntity.getPfullName())
+                .isEqualTo("hdfs://localhost/tmp/dolphinscheduler/test-default/resources");
+        assertThat(storageEntity.getType()).isEqualTo(ResourceType.FILE);
+        assertThat(storageEntity.getFileName()).isEqualTo("sql");
     }
 
     @SneakyThrows

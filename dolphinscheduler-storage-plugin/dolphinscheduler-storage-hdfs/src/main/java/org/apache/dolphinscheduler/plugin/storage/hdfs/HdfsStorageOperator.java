@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
@@ -54,7 +53,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -68,11 +66,8 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     private Configuration configuration;
     private FileSystem fs;
 
-    public HdfsStorageOperator() {
-        this(new HdfsStorageProperties());
-    }
-
     public HdfsStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
+        super(hdfsStorageProperties.getResourceUploadPath());
         // Overwrite config from passing hdfsStorageProperties
         hdfsProperties = hdfsStorageProperties;
         init();
@@ -81,7 +76,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
 
     @SneakyThrows
     private void initHdfsPath() {
-        Path path = new Path(RESOURCE_UPLOAD_PATH);
+        Path path = new Path(resourceBaseAbsolutePath);
         if (!fs.exists(path)) {
             fs.mkdirs(path);
             log.info("Create hdfs path: {}", path);
@@ -91,12 +86,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     @SneakyThrows
     private void init() {
         configuration = new HdfsConfiguration();
-
-        Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
-        fsRelatedProps.forEach((key, value) -> {
-            configuration.set(key, value);
-            log.info("Set HDFS prop: {}  -> {}", key, value);
-        });
 
         if (MapUtils.isNotEmpty(hdfsProperties.getConfigurationProperties())) {
             hdfsProperties.getConfigurationProperties().forEach((key, value) -> {
@@ -116,15 +105,14 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
             log.info("Initialize HdfsStorageOperator with kerberos");
             return;
         }
-        String hdfsUser = PropertyUtils.getString(Constants.HDFS_ROOT_USER);
-        if (StringUtils.isNotEmpty(hdfsUser)) {
-            UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsUser);
+        if (StringUtils.isNotEmpty(hdfsProperties.getUser())) {
+            UserGroupInformation ugi = UserGroupInformation.createRemoteUser(hdfsProperties.getUser());
             ugi.doAs((PrivilegedExceptionAction<Boolean>) () -> {
                 fs = FileSystem.get(configuration);
                 return true;
             });
             UserGroupInformation.setLoginUser(ugi);
-            log.info("Initialize HdfsStorageOperator with remote user: {}", hdfsUser);
+            log.info("Initialize HdfsStorageOperator with remote user: {}", hdfsProperties.getUser());
             return;
         }
         fs = FileSystem.get(configuration);
@@ -135,7 +123,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     @Override
     public String getStorageBaseDirectory() {
         String defaultFS = hdfsProperties.getDefaultFS();
-        return FileUtils.concatFilePath(defaultFS, RESOURCE_UPLOAD_PATH);
+        return FileUtils.concatFilePath(defaultFS, resourceBaseAbsolutePath);
     }
 
     @SneakyThrows
