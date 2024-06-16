@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 
 import com.google.auto.service.AutoService;
 
-@AutoService(StorageOperateFactory.class)
-public class LocalStorageOperatorFactory implements StorageOperateFactory {
+@AutoService(StorageOperatorFactory.class)
+public class LocalStorageOperatorFactory implements StorageOperatorFactory {
 
     public static final String LOCAL_DEFAULT_FS = "file:/";
 

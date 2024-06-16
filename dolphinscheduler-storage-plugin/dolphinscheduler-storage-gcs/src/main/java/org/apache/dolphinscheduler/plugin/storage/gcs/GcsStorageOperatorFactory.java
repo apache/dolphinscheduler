@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.storage.gcs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 
 import com.google.auto.service.AutoService;
 
-@AutoService(StorageOperateFactory.class)
-public class GcsStorageOperatorFactory implements StorageOperateFactory {
+@AutoService(StorageOperatorFactory.class)
+public class GcsStorageOperatorFactory implements StorageOperatorFactory {
 
     @Override
     public StorageOperator createStorageOperate() {

@@ -43,7 +43,7 @@ import org.junit.jupiter.api.Test;
 
 class LocalStorageOperatorTest {
 
-    private static StorageOperator storageOperator;
+    private StorageOperator storageOperator;
 
     private static final String resourceBaseDir = StringUtils
             .substringBeforeLast(FileUtils.getClassPathAbsolutePath(LocalStorageOperatorTest.class), File.separator);

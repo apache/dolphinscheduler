@@ -21,19 +21,17 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FS_DEFAULT_
 import static org.apache.dolphinscheduler.common.constants.Constants.HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT;
 import static org.apache.dolphinscheduler.common.constants.Constants.HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.HDFS_ROOT_USER;
-import static org.apache.dolphinscheduler.common.constants.Constants.KERBEROS_EXPIRE_TIME;
 import static org.apache.dolphinscheduler.common.constants.Constants.YARN_APPLICATION_STATUS_ADDRESS;
 import static org.apache.dolphinscheduler.common.constants.Constants.YARN_JOB_HISTORY_STATUS_ADDRESS;
 import static org.apache.dolphinscheduler.common.constants.Constants.YARN_RESOURCEMANAGER_HA_RM_IDS;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
+import java.util.Map;
+
 import lombok.Data;
 
-import org.springframework.context.annotation.Configuration;
-
 @Data
-@Configuration
 public class HdfsStorageProperties {
 
     /**
@@ -73,10 +71,6 @@ public class HdfsStorageProperties {
     private boolean hadoopSecurityAuthStartupState =
             PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
 
-    /**
-     * Kerberos expire time
-     */
-    public static int getKerberosExpireTime() {
-        return PropertyUtils.getInt(KERBEROS_EXPIRE_TIME, 2);
-    }
+    private Map<String, String> configurationProperties;
+
 }

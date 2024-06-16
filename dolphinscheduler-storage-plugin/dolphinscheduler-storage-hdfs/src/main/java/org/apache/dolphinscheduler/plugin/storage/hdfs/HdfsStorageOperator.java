@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -62,7 +63,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class HdfsStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    protected static HdfsStorageProperties hdfsProperties = new HdfsStorageProperties();
+    private final HdfsStorageProperties hdfsProperties;
 
     private Configuration configuration;
     private FileSystem fs;
@@ -88,7 +89,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     }
 
     @SneakyThrows
-    public void init() throws NullPointerException {
+    private void init() {
         configuration = new HdfsConfiguration();
 
         Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
@@ -96,6 +97,13 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
             configuration.set(key, value);
             log.info("Set HDFS prop: {}  -> {}", key, value);
         });
+
+        if (MapUtils.isNotEmpty(hdfsProperties.getConfigurationProperties())) {
+            hdfsProperties.getConfigurationProperties().forEach((key, value) -> {
+                configuration.set(key, value);
+                log.info("Set HDFS prop: {}  -> {}", key, value);
+            });
+        }
 
         String defaultFS = hdfsProperties.getDefaultFS();
         if (StringUtils.isNotEmpty(defaultFS)) {
