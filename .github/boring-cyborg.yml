@@ -30,7 +30,7 @@ insertIssueLinkInPrDescription:
       titleIssueIdRegexp:  \[(Test-[0-9])\]
       # the issue link to be added. ${1}, ${2} ... are replaced with the match groups from the
       # title match (remember to use quotes)
-      descriptionIssueLink: "[${1}](https://github.com/apache/dolphinschedule/${1}/)"
+      descriptionIssueLink: "[${1}](https://github.com/apache/dolphinschedule/issues/${1}/)"
 
 ###### Title Validator #################################################################################################
 # Verifies if commit/PR titles match the regexp specified
