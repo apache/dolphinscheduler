@@ -46,7 +46,6 @@ github:
           - E2E
           - Docs
           - Frontend Build
-          - Check PR title
 #          - "Mergeable: milestone-label-check"
       required_pull_request_reviews:
         dismiss_stale_reviews: true
