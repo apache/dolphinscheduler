@@ -23,5 +23,5 @@
 	url = https://github.com/xingchun-chen/translation-helper
 [submodule ".github/actions/auto-assign-action"]
 	path = .github/actions/auto-assign-action
-	url = https://github.com/kentaro-m/auto-assign-action.git
+	url = https://github.com/kentaro-m/auto-assign-action
 	branch = 288f36f
