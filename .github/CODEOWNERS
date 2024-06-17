@@ -16,30 +16,30 @@
 #
 
 /.github/ @SbloodyS
-/deploy/ @caishunfeng
-/dolphinscheduler-alert/ @caishunfeng
+/deploy/
+/dolphinscheduler-alert/
 /dolphinscheduler-e2e/ @SbloodyS
 /dolphinscheduler-api-test/ @SbloodyS
-/dolphinscheduler-registry/ @caishunfeng @ruanwenjun
+/dolphinscheduler-registry/  @ruanwenjun
 /dolphinscheduler-api/ @caishunfeng @SbloodyS
-/dolphinscheduler-dao/ @caishunfeng @SbloodyS
+/dolphinscheduler-dao/  @SbloodyS
 /dolphinscheduler-dao/src/main/resources/sql/ @EricGao888
-/dolphinscheduler-common/ @caishunfeng
-/dolphinscheduler-standalone-server/ @caishunfeng
-/dolphinscheduler-datasource-plugin/ @caishunfeng
-/dolphinscheduler-dist/ @caishunfeng
-/dolphinscheduler-meter/ @caishunfeng @ruanwenjun @EricGao888
-/dolphinscheduler-scheduler-plugin/ @caishunfeng
+/dolphinscheduler-common/
+/dolphinscheduler-standalone-server/
+/dolphinscheduler-datasource-plugin/
+/dolphinscheduler-dist/
+/dolphinscheduler-meter/  @ruanwenjun @EricGao888
+/dolphinscheduler-scheduler-plugin/
 /dolphinscheduler-master/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-worker/ @caishunfeng @SbloodyS @ruanwenjun
 /dolphinscheduler-service/ @caishunfeng
-/dolphinscheduler-extract/ @caishunfeng @ruanwenjun
+/dolphinscheduler-extract/  @ruanwenjun
 /dolphinscheduler-spi/ @caishunfeng
 /dolphinscheduler-task-plugin/ @caishunfeng @SbloodyS @zhuangchong
 /dolphinscheduler-tools/ @caishunfeng @SbloodyS @EricGao888
-/script/ @caishunfeng @SbloodyS @EricGao888
+/script/  @SbloodyS @EricGao888
 /dolphinscheduler-ui/ @songjianet @Amy0104
 /docs/ @EricGao888
 /licenses/ @EricGao888
 /images/ @EricGao888
-/style/ @caishunfeng
+/style/
