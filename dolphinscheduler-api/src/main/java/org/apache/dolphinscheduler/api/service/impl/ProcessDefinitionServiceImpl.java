@@ -38,10 +38,9 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WOR
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
@@ -112,7 +111,11 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
@@ -1464,6 +1467,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             }
             taskDefinitionLogList.add(taskDefinitionLog);
         }
+        rebuildConditionTaskDefinition(taskDefinitionLogList, taskCodeMap);
         int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
         int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
         if ((logInsert & insert) == 0) {
@@ -1538,6 +1542,59 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         log.info("Import process definition complete, projectCode:{}, processDefinitionCode:{}.", projectCode,
                 processDefinition.getCode());
         return true;
+    }
+
+    protected void rebuildConditionTaskDefinition(List<TaskDefinitionLog> taskDefinitionLogList, Map<Long, Long> taskCodeMap) {
+
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
+            if (TASK_TYPE_CONDITIONS.equals(taskDefinitionLog.getTaskType())) {
+                rebuildSingleConditionTaskDefinition(taskDefinitionLog, taskCodeMap);
+            }
+        }
+    }
+
+    private void rebuildSingleConditionTaskDefinition(TaskDefinitionLog taskDefinitionLog, Map<Long, Long> taskCodeMap) {
+
+        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskDefinitionLog.getTaskParams(), new TypeReference<Map<String, Object>>() {
+        });
+        String dependentParametersStr = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.DEPENDENCE);
+        DependentParameters dependency = JSONUtils.parseObject(dependentParametersStr, DependentParameters.class);
+
+        for (DependentTaskModel dependentTaskModel : dependency.getDependTaskList()) {
+            for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
+                long oldTaskCode = dependentItem.getDepTaskCode();
+                dependentItem.setDepTaskCode(taskCodeMap.get(oldTaskCode));
+            }
+        }
+        taskParamsMap.put(Constants.DEPENDENCE, dependency);
+
+        String conditionsParametersStr = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.CONDITION_RESULT);
+        ConditionsParameters conditionResult = JSONUtils.parseObject(conditionsParametersStr, ConditionsParameters.class);
+        if (conditionResult != null) {
+
+            List<Long> successNode = conditionResult.getSuccessNode();
+            if (successNode != null) {
+                ArrayList<Long> newSuccessNode = new ArrayList<>();
+                for (Long taskCode : successNode) {
+                    newSuccessNode.add(taskCodeMap.get(taskCode));
+                }
+                conditionResult.setSuccessNode(newSuccessNode);
+            }
+
+            List<Long> failedNode = conditionResult.getFailedNode();
+            if (failedNode != null) {
+                ArrayList<Long> newFailedNodeNode = new ArrayList<>();
+                for (Long taskCode : failedNode) {
+                    newFailedNodeNode.add(taskCodeMap.get(taskCode));
+                }
+                conditionResult.setFailedNode(newFailedNodeNode);
+            }
+
+            taskParamsMap.put(Constants.CONDITION_RESULT, conditionResult);
+
+        }
+        taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
+
     }
 
     /**
