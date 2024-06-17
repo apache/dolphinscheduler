@@ -22,18 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LocalStorageOperator extends HdfsStorageOperator {
 
-    public LocalStorageOperator() {
-        super(new HdfsStorageProperties());
-    }
-
     public LocalStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
         super(hdfsStorageProperties);
     }
 
-    @Override
-    public String getResourceFileName(String tenantCode, String fullName) {
-        // prefix schema `file:/` should be remove in local file mode
-        String fullNameRemoveSchema = fullName.replaceFirst(hdfsProperties.getDefaultFS(), "");
-        return super.getResourceFileName(tenantCode, fullNameRemoveSchema);
-    }
 }
