@@ -15,20 +15,21 @@
 # limitations under the License.
 #
 
-name: "pull-request-robot"
+name: "pull-request-target-robot"
 
 on:
   pull_request_target:
 
 jobs:
-  labelRobot:
+  pullRequestTargetRobot:
     permissions:
       contents: read
       pull-requests: write
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: "Checkout ${{ github.ref }}"
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
           submodules: true
@@ -39,3 +40,8 @@ jobs:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           configuration-path: .github/actions/labeler/labeler.yml
           sync-labels: true
+
+      - name: "Auto assign in pull request"
+        uses: kentaro-m/auto-assign-action@v2.0.0
+        with:
+          configuration-path: .github/actions/auto-assign/auto-assign.yml
