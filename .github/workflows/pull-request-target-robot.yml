@@ -34,12 +34,12 @@ jobs:
           persist-credentials: false
           submodules: true
 
-      - name: "Label in pull request"
-        uses: actions/labeler@v4
-        with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: .github/actions/labeler/labeler.yml
-          sync-labels: true
+#      - name: "Label in pull request"
+#        uses: actions/labeler@v4
+#        with:
+#          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+#          configuration-path: .github/actions/labeler/labeler.yml
+#          sync-labels: true
 
       - name: "Auto assign in pull request"
         uses: ./.github/actions/auto-assign-action

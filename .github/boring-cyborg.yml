@@ -16,6 +16,13 @@
 # limitations under the License.
 # Details: https://github.com/apps/boring-cyborg
 
+##### Labeler ##########################################################################################################
+# Enable "labeler" for your PR that would add labels to PRs based on the paths that are modified in the PR.
+labelPRBasedOnFilePath:
+  # Add 'label1' to any changes within 'example' folder or any subfolders
+  e2e:
+    - /**/*
+
 ###### IssueLink Adder #################################################################################################
 # Insert Issue (Jira/Github etc) link in PR description based on the Issue ID in PR title.
 insertIssueLinkInPrDescription:
