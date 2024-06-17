@@ -33,7 +33,7 @@ waste time。
         <tr>
             <td style="text-align: center;">Bug</td>
             <td style="text-align: center;">Fix</td>
-            <td style="text-align: center;">[Fix-3333][server] Fix xxx</td>
+            <td style="text-align: center;">[Fix-3333][ui] Fix xxx</td>
         </tr>
         <tr>
             <td style="text-align: center;">Improvement</td>
