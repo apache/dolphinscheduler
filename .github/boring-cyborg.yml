@@ -27,7 +27,7 @@ insertIssueLinkInPrDescription:
     jiraIssueMatch:
       # specify the regexp of issue id that you can find in the title of the PR
       # the match groups can be used to build the issue id (${1}, ${2}, etc.).
-      titleIssueIdRegexp:  \[(Test-[0-9]${4})\]
+      titleIssueIdRegexp:  \[(Test-[0-9]${1})\]
       # the issue link to be added. ${1}, ${2} ... are replaced with the match groups from the
       # title match (remember to use quotes)
       descriptionIssueLink: "[${1}](https://github.com/apache/dolphinschedule/issues/${1}/)"
