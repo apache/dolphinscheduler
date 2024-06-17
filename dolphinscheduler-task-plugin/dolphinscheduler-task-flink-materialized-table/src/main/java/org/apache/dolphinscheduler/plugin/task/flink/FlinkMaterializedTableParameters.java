@@ -51,6 +51,10 @@ public class FlinkMaterializedTableParameters extends AbstractParameters {
 
     private String executionConfig;
 
+    private String initConfig;
+
+    private String statementDescription;
+
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(identifier) && StringUtils.isNotEmpty(gatewayEndpoint);
