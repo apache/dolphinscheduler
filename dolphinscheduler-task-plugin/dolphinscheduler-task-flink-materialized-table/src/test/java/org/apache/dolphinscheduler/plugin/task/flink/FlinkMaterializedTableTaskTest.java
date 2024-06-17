@@ -20,6 +20,12 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.TableEnvironment;
+import org.apache.flink.table.catalog.CatalogStore;
+import org.apache.flink.table.catalog.FileCatalogStore;
+import org.apache.flink.table.file.testutils.catalog.TestFileSystemCatalog;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -29,10 +35,14 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,8 +50,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Slf4j
 public class FlinkMaterializedTableTaskTest {
 
-   public static void main(String[] args) throws Exception {
+   protected static final String TEST_CATALOG = "test_catalog";
+   protected static final String TEST_DEFAULT_DATABASE = "test_db";
 
+   protected static TestFileSystemCatalog catalog;
+
+   protected static File tempFile;
+
+   public static void main(String[] args) throws Exception {
+//      testHttpRequest();
+      createFlinkMT();
+   }
+
+   private static void testHttpRequest() throws IOException {
       String result = "";
       HttpPost post = new HttpPost("http://localhost:8083/v1/sessions");
 
@@ -70,7 +91,23 @@ public class FlinkMaterializedTableTaskTest {
             e.printStackTrace();
          }
       }
+   }
 
+   private static void createFlinkMT() throws Exception {
+      tempFile = new File("/Users/alibaba/workplace/metadata");
+      File testDb = new File(tempFile, TEST_DEFAULT_DATABASE);
+      testDb.mkdir();
+
+      String catalogPathStr = tempFile.getAbsolutePath();
+      catalog = new TestFileSystemCatalog(catalogPathStr, TEST_CATALOG, TEST_DEFAULT_DATABASE);
+      catalog.open();
+      List<String> databases = catalog.listDatabases();
+      log.info("list test dbs - {}", databases);
+
+      List<String> tables = catalog.listTables(TEST_DEFAULT_DATABASE);
+      log.info("list test tables - {}", tables);
+
+      catalog.close();
    }
 
 }

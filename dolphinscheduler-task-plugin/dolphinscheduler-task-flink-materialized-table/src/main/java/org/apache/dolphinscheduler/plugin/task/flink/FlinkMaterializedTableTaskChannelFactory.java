@@ -30,7 +30,7 @@ public class FlinkMaterializedTableTaskChannelFactory implements TaskChannelFact
 
     @Override
     public String getName() {
-        return "ZEPPELIN";
+        return "FLINK_MATERIALIZED_TABLE";
     }
 
     @Override
