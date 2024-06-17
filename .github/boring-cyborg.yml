@@ -57,7 +57,7 @@ verifyTitles:
   # The title the GitHub status should appear from.
   statusTitle: "Title Validator"
   # A custom message to be displayed when the title passes validation.
-  successMessage: "Title Validation successful!"
+  successMessage: "Validation successful!"
   # A custom message to be displayed when the title fails validation.
   # Allows insertion of ${type} (commit/PR), ${title} (the title validated) and ${regex} (the titleRegexp above).
   failureMessage: "Wrong ${type} title: ${title}"
