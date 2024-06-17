@@ -39,7 +39,7 @@ public class NettyServerConfig {
     private int soBacklog = 1024;
 
     /**
-     * whether tpc delay
+     * whether tcp delay
      */
     @Builder.Default
     private boolean tcpNoDelay = true;
