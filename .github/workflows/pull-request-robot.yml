@@ -18,25 +18,17 @@
 name: "pull-request-robot"
 
 on:
-  pull_request_target:
+  pull_request:
 
 jobs:
-  labelerRobot:
-    permissions:
-      contents: read
-      pull-requests: write
+  pullRequestRobot:
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout ${{ github.ref }}"
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          submodules: true
 
-      - name: "Label in pull request"
-        uses: actions/labeler@v4
+      - name: "Check PR title"
+        uses: Slashgear/action-check-pr-title@v4.3.0
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          configuration-path: .github/actions/labeler/labeler.yml
-          sync-labels: true
-
+          regexp: "^\[(Feature|Fix|Doc|Improvement|Test-[0-9]+\].*$|^\[E2E|CI|Chore].*$"
+          helpMessage: "Example: '[Feature-3333][server] Implement'"

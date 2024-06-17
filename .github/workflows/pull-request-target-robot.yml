@@ -18,22 +18,29 @@
 name: "pull-request-target-robot"
 
 on:
-  pull_request:
+  pull_request_target:
 
 jobs:
-  pullRequestRobot:
-      runs-on: ubuntu-latest
-      steps:
-        - name: "Checkout ${{ github.ref }}"
-          uses: actions/checkout@v4
+  pullRequestTargetRobot:
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout ${{ github.ref }}"
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: true
 
-        - name: "Auto assign in pull request"
-          uses: kentaro-m/auto-assign-action@v2.0.0
-          with:
-            configuration-path: .github/actions/auto-assign/auto-assign.yml
+      - name: "Label in pull request"
+        uses: actions/labeler@v4
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          configuration-path: .github/actions/labeler/labeler.yml
+          sync-labels: true
 
-        - name: "Check PR title"
-          uses: Slashgear/action-check-pr-title@v4.3.0
-          with:
-            regexp: "^\[(Feature|Fix|Doc|Improvement|Test-[0-9]+\].*$|^\[E2E|CI|Chore].*$"
-            helpMessage: "Example: '[Feature-3333][server] Implement'"
+      - name: "Auto assign in pull request"
+        uses: kentaro-m/auto-assign-action@v2.0.0
+        with:
+          configuration-path: .github/actions/auto-assign/auto-assign.yml
