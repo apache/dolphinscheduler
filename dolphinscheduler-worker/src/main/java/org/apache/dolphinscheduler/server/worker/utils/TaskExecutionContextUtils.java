@@ -18,7 +18,8 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -65,9 +66,8 @@ public class TaskExecutionContextUtils {
         }
     }
 
-    public static ResourceContext downloadResourcesIfNeeded(String tenant,
-                                                            TaskChannel taskChannel,
-                                                            StorageOperate storageOperate,
+    public static ResourceContext downloadResourcesIfNeeded(TaskChannel taskChannel,
+                                                            StorageOperator storageOperator,
                                                             TaskExecutionContext taskExecutionContext) {
         AbstractParameters abstractParameters = taskChannel.parseParameters(
                 ParametersNode.builder()
@@ -86,14 +86,15 @@ public class TaskExecutionContextUtils {
 
         for (ResourceInfo resourceInfo : resourceFilesList) {
             String resourceAbsolutePathInStorage = resourceInfo.getResourceName();
-            String resourceRelativePath = storageOperate.getResourceFileName(tenant, resourceAbsolutePathInStorage);
-            String resourceAbsolutePathInLocal = Paths.get(taskWorkingDirectory, resourceRelativePath).toString();
+            ResourceMetadata resourceMetaData = storageOperator.getResourceMetaData(resourceAbsolutePathInStorage);
+            String resourceAbsolutePathInLocal =
+                    Paths.get(taskWorkingDirectory, resourceMetaData.getResourceRelativePath()).toString();
             File file = new File(resourceAbsolutePathInLocal);
             if (!file.exists()) {
                 try {
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(resourceAbsolutePathInStorage, resourceAbsolutePathInLocal, true);
-                    log.debug("Download resource file {} under: {} successfully", resourceAbsolutePathInStorage,
+                    storageOperator.download(resourceAbsolutePathInStorage, resourceAbsolutePathInLocal, true);
+                    log.info("Download resource file {} -> {} successfully", resourceAbsolutePathInStorage,
                             resourceAbsolutePathInLocal);
                     FileUtils.setFileTo755(file);
                     WorkerServerMetrics

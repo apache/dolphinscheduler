@@ -24,7 +24,10 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 // StorageEneity is an entity representing a resource in the third-part storage service.
 // It is only stored in t_ds_relation_resources_task if the resource is used by a task.
@@ -32,32 +35,16 @@ import lombok.Data;
 //  in table t_ds_relation_resources_task.
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class StorageEntity {
 
-    /**
-     * exist only if it is stored in t_ds_relation_resources_task.
-     *
-     */
-    private int id;
-    /**
-     * fullname is in a format of basepath + tenantCode + res/udf + filename
-     */
     private String fullName;
-    /**
-     * filename is in a format of possible parent folders + alias
-     */
+
     private String fileName;
-    /**
-     * the name of the file
-     */
-    private String alias;
-    /**
-     * parent folder time
-     */
     private String pfullName;
     private boolean isDirectory;
-    private int userId;
-    private String userName;
     private ResourceType type;
     private long size;
     private Date createTime;

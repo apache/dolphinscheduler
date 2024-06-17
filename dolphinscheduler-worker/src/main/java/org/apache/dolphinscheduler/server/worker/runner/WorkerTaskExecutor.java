@@ -33,7 +33,7 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -76,7 +76,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
     protected final WorkerMessageSender workerMessageSender;
-    protected final @Nullable StorageOperate storageOperate;
+    protected final @Nullable StorageOperator storageOperator;
     protected final WorkerRegistryClient workerRegistryClient;
 
     protected @Nullable AbstractTask task;
@@ -85,12 +85,12 @@ public abstract class WorkerTaskExecutor implements Runnable {
                                  @NonNull TaskExecutionContext taskExecutionContext,
                                  @NonNull WorkerConfig workerConfig,
                                  @NonNull WorkerMessageSender workerMessageSender,
-                                 @Nullable StorageOperate storageOperate,
+                                 @Nullable StorageOperator storageOperator,
                                  @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.storageOperate = storageOperate;
+        this.storageOperator = storageOperator;
         this.workerRegistryClient = workerRegistryClient;
         SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
     }
@@ -223,12 +223,12 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
         log.info("Create TaskChannel: {} successfully", taskChannel.getClass().getName());
 
-        ResourceContext resourceContext = TaskExecutionContextUtils.downloadResourcesIfNeeded(originTenant, taskChannel,
-                storageOperate, taskExecutionContext);
+        ResourceContext resourceContext = TaskExecutionContextUtils.downloadResourcesIfNeeded(taskChannel,
+                storageOperator, taskExecutionContext);
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: \n{}", taskExecutionContext.getResourceContext());
 
-        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
+        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperator);
         log.info("Download upstream files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN));
 
@@ -282,7 +282,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         taskExecutionContext.setEndTime(System.currentTimeMillis());
 
         // upload out files and modify the "OUT FILE" property in VarPool
-        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperator);
 
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));

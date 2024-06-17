@@ -29,7 +29,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOGIN_US
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RESOURCE_UPLOAD_PATH;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.ResUploadType;
+import org.apache.dolphinscheduler.common.enums.StorageType;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,9 +72,9 @@ public class CommonUtils {
      */
     public static boolean getKerberosStartupState() {
         String resUploadStartupType = PropertyUtils.getUpperCaseString(RESOURCE_STORAGE_TYPE);
-        ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
+        StorageType storageType = StorageType.valueOf(resUploadStartupType);
         Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        return resUploadType == ResUploadType.HDFS && kerberosStartupState;
+        return storageType == StorageType.HDFS && kerberosStartupState;
     }
 
     /**
