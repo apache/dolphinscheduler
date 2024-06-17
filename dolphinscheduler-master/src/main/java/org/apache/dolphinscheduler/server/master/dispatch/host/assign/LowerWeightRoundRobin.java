@@ -25,10 +25,12 @@ import java.util.Collection;
 public class LowerWeightRoundRobin extends AbstractSelector<HostWeight> {
 
     /**
-     * select
+     * Selects a HostWeight from a collection of HostWeight objects.
+     * The selection is based on the current weight of each HostWeight.
+     * The HostWeight with the smallest current weight is selected.
      *
-     * @param sources sources
-     * @return HostWeight
+     * @param sources A collection of HostWeight objects to select from.
+     * @return The selected HostWeight with the smallest current weight.
      */
     @Override
     public HostWeight doSelect(Collection<HostWeight> sources) {
