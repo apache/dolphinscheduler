@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.CRC_SUFFIX;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -65,11 +65,11 @@ public class TaskFilesTransferUtils {
      * upload output files to resource storage
      *
      * @param taskExecutionContext is the context of task
-     * @param storageOperate       is the storage operate
+     * @param storageOperator      is the storage operate
      * @throws TaskException TaskException
      */
     public static void uploadOutputFiles(TaskExecutionContext taskExecutionContext,
-                                         StorageOperate storageOperate) throws TaskException {
+                                         StorageOperator storageOperator) throws TaskException {
         // get OUTPUT FILE parameters
         List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.OUT);
         if (localParamsProperty.isEmpty()) {
@@ -102,15 +102,15 @@ public class TaskFilesTransferUtils {
             try {
                 // upload file to storage
                 String resourceWholePath =
-                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
+                        storageOperator.getStorageFileAbsolutePath(taskExecutionContext.getTenantCode(), resourcePath);
                 String resourceCRCWholePath =
-                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourceCRCPath);
+                        storageOperator.getStorageFileAbsolutePath(taskExecutionContext.getTenantCode(),
+                                resourceCRCPath);
                 log.info("{} --- Local:{} to Remote:{}", property, srcPath, resourceWholePath);
-                storageOperate.upload(taskExecutionContext.getTenantCode(), srcPath, resourceWholePath, false, true);
+                storageOperator.upload(srcPath, resourceWholePath, false, true);
                 log.info("{} --- Local:{} to Remote:{}", "CRC file", srcCRCPath, resourceCRCWholePath);
-                storageOperate.upload(taskExecutionContext.getTenantCode(), srcCRCPath, resourceCRCWholePath, false,
-                        true);
-            } catch (IOException ex) {
+                storageOperator.upload(srcCRCPath, resourceCRCWholePath, false, true);
+            } catch (Exception ex) {
                 throw new TaskException("Upload file to storage error", ex);
             }
 
@@ -134,10 +134,11 @@ public class TaskFilesTransferUtils {
      * only download files which are defined in the task parameters
      *
      * @param taskExecutionContext is the context of task
-     * @param storageOperate       is the storage operate
+     * @param storageOperator      is the storage operate
      * @throws TaskException task exception
      */
-    public static void downloadUpstreamFiles(TaskExecutionContext taskExecutionContext, StorageOperate storageOperate) {
+    public static void downloadUpstreamFiles(TaskExecutionContext taskExecutionContext,
+                                             StorageOperator storageOperator) {
         // get "IN FILE" parameters
         List<Property> localParamsProperty = getFileLocalParams(taskExecutionContext, Direct.IN);
 
@@ -178,14 +179,10 @@ public class TaskFilesTransferUtils {
                 downloadPath = targetPath;
             }
 
-            try {
-                String resourceWholePath =
-                        storageOperate.getResourceFullName(taskExecutionContext.getTenantCode(), resourcePath);
-                log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
-                storageOperate.download(resourceWholePath, downloadPath, true);
-            } catch (IOException ex) {
-                throw new TaskException("Download file from storage error", ex);
-            }
+            String resourceWholePath =
+                    storageOperator.getStorageFileAbsolutePath(taskExecutionContext.getTenantCode(), resourcePath);
+            log.info("{} --- Remote:{} to Local:{}", property, resourceWholePath, downloadPath);
+            storageOperator.download(resourceWholePath, downloadPath, true);
 
             // unpack if the data is packaged
             if (isPack) {

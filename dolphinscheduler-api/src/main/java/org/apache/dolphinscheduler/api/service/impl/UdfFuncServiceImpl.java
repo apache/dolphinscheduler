@@ -28,11 +28,10 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -62,7 +61,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
     private UDFUserMapper udfUserMapper;
 
     @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     /**
      * create udf function
@@ -107,12 +106,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
             return result;
         }
 
-        Boolean existResource = false;
-        try {
-            existResource = storageOperate.exists(fullName);
-        } catch (IOException e) {
-            log.error("Check resource error: {}", fullName, e);
-        }
+        boolean existResource = storageOperator.exists(fullName);
 
         if (!existResource) {
             log.error("resource full name {} is not exist", fullName);
@@ -241,7 +235,7 @@ public class UdfFuncServiceImpl extends BaseServiceImpl implements UdfFuncServic
 
         Boolean doesResExist = false;
         try {
-            doesResExist = storageOperate.exists(fullName);
+            doesResExist = storageOperator.exists(fullName);
         } catch (Exception e) {
             log.error("udf resource :{} checking error", fullName, e);
             result.setCode(Status.RESOURCE_NOT_EXIST.getCode());

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,26 +29,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.truth.Truth;
 
 @ExtendWith(MockitoExtension.class)
 public class FileUtilsTest {
 
     @Test
     public void testGetDownloadFilename() {
-        try (MockedStatic<DateUtils> mockedDateUtils = Mockito.mockStatic(DateUtils.class)) {
-            mockedDateUtils.when(() -> DateUtils.getCurrentTime(YYYYMMDDHHMMSS)).thenReturn("20190101101059");
-            Assertions.assertEquals("/tmp/dolphinscheduler/download/20190101101059/test",
-                    FileUtils.getDownloadFilename("test"));
-        }
+        Truth.assertThat(FileUtils.getDownloadFilename("test")).startsWith("/tmp/dolphinscheduler/tmp/");
     }
 
     @Test
     public void testGetUploadFilename() {
-        Assertions.assertEquals("/tmp/dolphinscheduler/aaa/resources/bbb",
-                FileUtils.getUploadFilename("aaa", "bbb"));
+        Truth.assertThat(FileUtils.getUploadFileLocalTmpAbsolutePath()).startsWith("/tmp/dolphinscheduler/tmp/");
     }
 
     @Test

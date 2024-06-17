@@ -22,12 +22,11 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -50,7 +49,7 @@ public class MigrateResourceService {
     private static final Logger logger = LoggerFactory.getLogger(MigrateResourceService.class);
 
     @Autowired
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -83,11 +82,11 @@ public class MigrateResourceService {
             try {
                 oriFullName = oriFullName.startsWith("/") ? oriFullName.substring(1) : oriFullName;
                 if (ResourceType.FILE.getCode() == type) {
-                    storageOperate.copy(oriFullName,
+                    storageOperator.copy(oriFullName,
                             String.format(FORMAT_S_S, resMigrateBasePath, oriFullName), true, true);
                 } else if (ResourceType.UDF.getCode() == type) {
                     String fullName = String.format(FORMAT_S_S, udfMigrateBasePath, oriFullName);
-                    storageOperate.copy(oriFullName, fullName, true, true);
+                    storageOperator.copy(oriFullName, fullName, true, true);
 
                     // change relative udfs resourceName
                     List<UdfFunc> udfs = udfFuncMapper.listUdfByResourceId(new Integer[]{id});
@@ -96,7 +95,7 @@ public class MigrateResourceService {
                         udfFuncMapper.updateById(udf);
                     });
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error("Migrate resource: {} failed: {}", item, e);
             }
         }
@@ -121,12 +120,11 @@ public class MigrateResourceService {
     }
 
     public String createMigrateDirByType(String targetTenantCode, ResourceType type) {
-        String migrateBasePath = type.equals(ResourceType.FILE) ? storageOperate.getResDir(targetTenantCode)
-                : storageOperate.getUdfDir(targetTenantCode);
+        String migrateBasePath = storageOperator.getStorageBaseDirectory(targetTenantCode, type);
         migrateBasePath += MIGRATE_BASE_DIR;
         try {
-            storageOperate.mkdir(targetTenantCode, migrateBasePath);
-        } catch (IOException e) {
+            storageOperator.createStorageDir(migrateBasePath);
+        } catch (Exception e) {
             logger.error("create migrate base directory {} failed", migrateBasePath);
             return "";
         }

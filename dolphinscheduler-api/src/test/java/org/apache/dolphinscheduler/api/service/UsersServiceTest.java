@@ -48,7 +48,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -117,7 +117,7 @@ public class UsersServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;

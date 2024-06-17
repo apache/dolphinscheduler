@@ -52,4 +52,8 @@ public class ServiceException extends RuntimeException {
         this.code = code;
     }
 
+    public ServiceException(String message, Exception exception) {
+        this(Status.INTERNAL_SERVER_ERROR_ARGS, message, exception);
+    }
+
 }
