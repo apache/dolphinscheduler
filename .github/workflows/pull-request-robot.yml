@@ -23,6 +23,7 @@ on:
 jobs:
   pullRequestRobot:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: "Checkout ${{ github.ref }}"
         uses: actions/checkout@v4
@@ -30,5 +31,5 @@ jobs:
       - name: "Check PR title"
         uses: Slashgear/action-check-pr-title@v4.3.0
         with:
-          regexp: "^\[(Feature|Fix|Doc|Improvement|Test-[0-9]+\].*$|^\[E2E|CI|Chore].*$"
+          regexp: "^[(Feature|Fix|Doc|Improvement|Test-[0-9]+\].*$|^[E2E|CI|Chore].*$"
           helpMessage: "Example: '[Feature-3333][server] Implement'"
