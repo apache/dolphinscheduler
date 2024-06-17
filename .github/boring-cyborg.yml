@@ -77,3 +77,6 @@ firstPRWelcomeComment: >
 # Comment to be posted to congratulate user on their first merged PR
 firstPRMergeComment: >
   Awesome work, congrats on your first merged pull request!
+
+checkUpToDate:
+  targetBranch: dev_test
