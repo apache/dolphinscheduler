@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -36,7 +36,7 @@ public class WorkerTaskExecutorFactoryBuilder {
     private WorkerMessageSender workerMessageSender;
 
     @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Autowired
     private WorkerRegistryClient workerRegistryClient;
@@ -45,11 +45,11 @@ public class WorkerTaskExecutorFactoryBuilder {
                                             WorkerConfig workerConfig,
                                             WorkerMessageSender workerMessageSender,
                                             WorkerTaskExecutorThreadPool workerManager,
-                                            StorageOperate storageOperate,
+                                            StorageOperator storageOperator,
                                             WorkerRegistryClient workerRegistryClient) {
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.storageOperate = storageOperate;
+        this.storageOperator = storageOperator;
         this.workerRegistryClient = workerRegistryClient;
     }
 
@@ -57,7 +57,7 @@ public class WorkerTaskExecutorFactoryBuilder {
         return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                storageOperate,
+                storageOperator,
                 workerRegistryClient);
     }
 
