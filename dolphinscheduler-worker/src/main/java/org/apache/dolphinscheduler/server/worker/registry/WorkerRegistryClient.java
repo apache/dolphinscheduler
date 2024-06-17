@@ -91,13 +91,16 @@ public class WorkerRegistryClient implements AutoCloseable {
     }
 
     private void registry() throws InterruptedException {
+        log.info("Worker node: {} start registry", workerConfig.getWorkerAddress());
+        String workerRegistryPath = workerConfig.getWorkerRegistryPath();
+
         WorkerHeartBeat workerHeartBeat = workerHeartBeatTask.getHeartBeat();
         while (ServerStatus.BUSY.equals(workerHeartBeat.getServerStatus())) {
             log.warn("Worker node is BUSY: {}", workerHeartBeat);
             workerHeartBeat = workerHeartBeatTask.getHeartBeat();
             Thread.sleep(SLEEP_TIME_MILLIS);
         }
-        String workerRegistryPath = workerConfig.getWorkerRegistryPath();
+
         // remove before persist
         registryClient.remove(workerRegistryPath);
         registryClient.persistEphemeral(workerRegistryPath, JSONUtils.toJsonString(workerHeartBeat));
