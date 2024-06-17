@@ -17,20 +17,29 @@
 
 package org.apache.dolphinscheduler.plugin.storage.gcs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
 
 import com.google.auto.service.AutoService;
 
-@AutoService(StorageOperateFactory.class)
-public class GcsStorageOperatorFactory implements StorageOperateFactory {
+@AutoService(StorageOperatorFactory.class)
+public class GcsStorageOperatorFactory implements StorageOperatorFactory {
 
     @Override
-    public StorageOperate createStorageOperate() {
-        GcsStorageOperator gcsStorageOperator = new GcsStorageOperator();
-        gcsStorageOperator.init();
-        return gcsStorageOperator;
+    public StorageOperator createStorageOperate() {
+        final GcsStorageProperties gcsStorageProperties = getGcsStorageProperties();
+        return new GcsStorageOperator(gcsStorageProperties);
+    }
+
+    public GcsStorageProperties getGcsStorageProperties() {
+        return GcsStorageProperties.builder()
+                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .credential(PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_CREDENTIAL))
+                .bucketName(PropertyUtils.getString(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME))
+                .build();
     }
 
     @Override

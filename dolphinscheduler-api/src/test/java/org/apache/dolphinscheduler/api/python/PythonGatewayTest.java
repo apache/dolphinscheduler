@@ -98,19 +98,6 @@ public class PythonGatewayTest {
     }
 
     @Test
-    public void testCreateResource() {
-        User user = getTestUser();
-        String resourceDir = "/dir1/dir2/";
-        String resourceName = "test";
-        String resourceSuffix = "py";
-        String content = "content";
-        String resourceFullName = resourceDir + resourceName + "." + resourceSuffix;
-
-        Assertions.assertDoesNotThrow(
-                () -> pythonGateway.createOrUpdateResource(user.getUserName(), resourceFullName, content));
-    }
-
-    @Test
     public void testQueryResourcesFileInfo() throws Exception {
         User user = getTestUser();
         StorageEntity storageEntity = getTestResource();
@@ -118,12 +105,11 @@ public class PythonGatewayTest {
         Mockito.when(resourcesService.queryFileStatus(user.getUserName(), storageEntity.getFullName()))
                 .thenReturn(storageEntity);
         StorageEntity result = pythonGateway.queryResourcesFileInfo(user.getUserName(), storageEntity.getFullName());
-        Assertions.assertEquals(result.getId(), storageEntity.getId());
+        Assertions.assertEquals(result.getFullName(), storageEntity.getFullName());
     }
 
     private StorageEntity getTestResource() {
         StorageEntity storageEntity = new StorageEntity();
-        storageEntity.setId(1);
         storageEntity.setType(ResourceType.FILE);
         storageEntity.setFullName("/dev/test.py");
         return storageEntity;
