@@ -21,12 +21,20 @@
 //import lombok.extern.slf4j.Slf4j;
 //
 //import org.apache.flink.configuration.Configuration;
+//import org.apache.flink.table.api.DataTypes;
 //import org.apache.flink.table.api.EnvironmentSettings;
+//import org.apache.flink.table.api.Schema;
 //import org.apache.flink.table.api.TableEnvironment;
 //import org.apache.flink.table.catalog.CatalogBaseTable;
+//import org.apache.flink.table.catalog.CatalogMaterializedTable;
 //import org.apache.flink.table.catalog.CatalogStore;
+//import org.apache.flink.table.catalog.Column;
 //import org.apache.flink.table.catalog.FileCatalogStore;
+//import org.apache.flink.table.catalog.IntervalFreshness;
 //import org.apache.flink.table.catalog.ObjectPath;
+//import org.apache.flink.table.catalog.ResolvedCatalogMaterializedTable;
+//import org.apache.flink.table.catalog.ResolvedSchema;
+//import org.apache.flink.table.catalog.UniqueConstraint;
 //import org.apache.flink.table.file.testutils.catalog.TestFileSystemCatalog;
 //import org.apache.http.NameValuePair;
 //import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -40,6 +48,8 @@
 //import java.io.File;
 //import java.io.IOException;
 //import java.util.ArrayList;
+//import java.util.Arrays;
+//import java.util.Collections;
 //import java.util.HashMap;
 //import java.util.List;
 //import java.util.Map;
@@ -55,8 +65,8 @@
 //@Slf4j
 //public class FlinkMaterializedTableTaskTest {
 //
-//   protected static final String TEST_CATALOG = "test_catalog";
-//   protected static final String TEST_DEFAULT_DATABASE = "test_db";
+//   protected static final String TEST_CATALOG = "TestCatalog111";
+//   protected static final String TEST_DEFAULT_DATABASE = "TestDb111";
 //
 //   protected static TestFileSystemCatalog catalog;
 //
@@ -64,10 +74,33 @@
 //
 //   private static final Map<String, String> EXPECTED_OPTIONS = new HashMap<>();
 //
+//   private static final List<Column> CREATE_COLUMNS =
+//       Arrays.asList(
+//           Column.physical("id", DataTypes.BIGINT()),
+//           Column.physical("name", DataTypes.VARCHAR(20)),
+//           Column.physical("age", DataTypes.INT()),
+//           Column.physical("tss", DataTypes.TIMESTAMP(3)),
+//           Column.physical("partition", DataTypes.VARCHAR(10)));
+//
+//   private static final UniqueConstraint CONSTRAINTS =
+//       UniqueConstraint.primaryKey("primary_constraint", Collections.singletonList("id"));
+//
+//   private static final List<String> PARTITION_KEYS = Collections.singletonList("partition");
+//
+//   private static final ResolvedSchema CREATE_RESOLVED_SCHEMA =
+//       new ResolvedSchema(CREATE_COLUMNS, Collections.emptyList(), CONSTRAINTS);
+//
+//   private static final Schema CREATE_SCHEMA =
+//       Schema.newBuilder().fromResolvedSchema(CREATE_RESOLVED_SCHEMA).build();
+//
 //   static {
 //      EXPECTED_OPTIONS.put("source.monitor-interval", "5S");
 //      EXPECTED_OPTIONS.put("auto-compaction", "true");
 //   }
+//
+//   private static final String DEFINITION_QUERY = "SELECT id, region, county FROM T";
+//
+//   private static final IntervalFreshness FRESHNESS = IntervalFreshness.ofMinute("3");
 //
 //   private static final ResolvedCatalogMaterializedTable EXPECTED_CATALOG_MATERIALIZED_TABLE =
 //       new ResolvedCatalogMaterializedTable(
@@ -88,7 +121,7 @@
 //
 //   public static void main(String[] args) throws Exception {
 ////      testHttpRequest();
-//      createFlinkMT();
+////      createFlinkMT();
 //   }
 //
 //   private static void testHttpRequest() throws IOException {
@@ -152,10 +185,46 @@
 //              DATA_PATH));
 //
 //      // test get materialized table
-//      CatalogBaseTable actualTable = catalog.getTable(tablePath);
-//
+//      CatalogBaseTable materializedTable = catalog.getTable(tablePath);
+//      log.info("materializedTable - {}", materializedTable);
 //
 //      catalog.close();
+//   }
+//
+//   private static void createCsvTable() {
+//      TableEnvironment tEnv =
+//          TableEnvironment.create(EnvironmentSettings.inBatchMode());
+//      tEnv.registerCatalog(TEST_CATALOG, catalog);
+//      tEnv.useCatalog(TEST_CATALOG);
+//
+//      tEnv.executeSql(
+//          "CREATE TABLE CsvTable (\n"
+//              + "  id BIGINT,\n"
+//              + "  user_name STRING,\n"
+//              + "  message STRING,\n"
+//              + "  log_ts STRING\n"
+//              + ") WITH (\n"
+//              + "  'format' = 'csv'\n"
+//              + ")");
+//
+//      tEnv.getConfig().getConfiguration().setString("parallelism.default", "1");
+//      tEnv.executeSql(
+//              String.format(
+//                  "INSERT INTO %s.%s.CsvTable VALUES\n"
+//                      + "(1001, 'user1', 'hello world', '2021-06-10 10:00:00'),\n"
+//                      + "(1002, 'user2', 'hi', '2021-06-10 10:01:00'),\n"
+//                      + "(1003, 'user3', 'ciao', '2021-06-10 10:02:00'),\n"
+//                      + "(1004, 'user4', '你好', '2021-06-10 10:03:00')",
+//                  TEST_CATALOG, TEST_DEFAULT_DATABASE))
+//          .await();
+//
+//      CloseableIterator<Row> result =
+//          tEnv.executeSql(
+//                  String.format(
+//                      "SELECT * FROM %s.%s.CsvTable",
+//                      TEST_CATALOG, TEST_DEFAULT_DATABASE))
+//              .collect();
+//
 //   }
 //
 //}
