@@ -14,6 +14,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 # limitations under the License.
+# Details: https://github.com/apps/boring-cyborg
 
 ###### IssueLink Adder #################################################################################################
 # Insert Issue (Jira/Github etc) link in PR description based on the Issue ID in PR title.
@@ -37,7 +38,7 @@ verifyTitles:
   # Regular expression that should be matched by titles of commits or PR
   titleRegexp: ^\[Feature-[0-9]+\].*$|^\[Fix-[0-9]+\].*$|^\[Doc-[0-9]+\].*$|^\[Improvement-[0-9]+\].*$|^\[Test-[0-9]+\].*$|^\[E2E-[0-9]+\].*$|^\[CI].*$|^\[Chore].*$
   # If set to true, it will always check the PR title (as opposed to the individual commits).
-  alwaysUsePrTitle: false
+  alwaysUsePrTitle: true
   # If set to true, it will only check the commit in case there is a single commit.
   # In case of multiple commits it will check PR title.
   # This reflects the standard behaviour of Github that for `Squash & Merge` GitHub
@@ -49,7 +50,7 @@ verifyTitles:
   # The title the GitHub status should appear from.
   statusTitle: "Title Validator"
   # A custom message to be displayed when the title passes validation.
-  successMessage: "Validation successful!"
+  successMessage: "Title Validation successful!"
   # A custom message to be displayed when the title fails validation.
   # Allows insertion of ${type} (commit/PR), ${title} (the title validated) and ${regex} (the titleRegexp above).
   failureMessage: "Wrong ${type} title: ${title}"
