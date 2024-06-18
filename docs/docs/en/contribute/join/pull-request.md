@@ -31,7 +31,7 @@ The corresponding relationship between `Pull Request Type` and `Issue Type` is a
         <tr>
             <td style="text-align: center;">Bug</td>
             <td style="text-align: center;">Fix</td>
-            <td style="text-align: center;">[Fix-3333][server] Fix xxx</td>
+            <td style="text-align: center;">[Fix-3333][ui] Fix xxx</td>
         </tr>
         <tr>
             <td style="text-align: center;">Improvement</td>
@@ -44,9 +44,24 @@ The corresponding relationship between `Pull Request Type` and `Issue Type` is a
             <td style="text-align: center;">[Test-3333][api] Add the e2e test of xxx</td>
         </tr>
         <tr>
-            <td style="text-align: center;">Sub-Task</td>
-            <td style="text-align: center;">(Parent type corresponding to Sub-Task)</td>
-            <td style="text-align: center;">[Feature-3333][server] Implement xxx</td>
+            <td style="text-align: center;">Doc</td>
+            <td style="text-align: center;">Doc</td>
+            <td style="text-align: center;">[Doc-3333] Improve xxx</td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">E2E</td>
+            <td style="text-align: center;">E2E</td>
+            <td style="text-align: center;">[E2E-3333] Implement xxx</td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">CI</td>
+            <td style="text-align: center;">CI</td>
+            <td style="text-align: center;">[CI] Improve xxx</td>
+        </tr>
+        <tr>
+            <td style="text-align: center;">Chore</td>
+            <td style="text-align: center;">Chore</td>
+            <td style="text-align: center;">[Chore] Improve xxx</td>
         </tr>
     </tbody>
 </table>

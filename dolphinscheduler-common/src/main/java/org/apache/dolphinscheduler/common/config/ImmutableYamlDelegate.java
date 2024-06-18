@@ -43,6 +43,10 @@ public class ImmutableYamlDelegate implements IPropertyDelegate {
         // read from classpath
         for (String fileName : yamlAbsolutePath) {
             try (InputStream fis = ImmutableYamlDelegate.class.getResourceAsStream(fileName)) {
+                if (fis == null) {
+                    log.warn("Cannot find the file: {} under classpath", fileName);
+                    continue;
+                }
                 YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
                 factory.setResources(new InputStreamResource(fis));
                 factory.afterPropertiesSet();
