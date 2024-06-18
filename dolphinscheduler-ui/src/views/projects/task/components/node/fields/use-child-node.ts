@@ -101,7 +101,7 @@ export function useChildNode({
       type: 'select',
       field: 'childNodeProjectCode',
       span: 24,
-      name: t('project.node.child_node_project'),
+      name: t('project.workflow.project_name'),
       props: {
         'label-field': 'name',
         'value-field': 'code',
@@ -111,7 +111,7 @@ export function useChildNode({
         },
         filterable: true,
         clearable: true,
-        placeholder: t('project.node.child_node_project_tips')
+        placeholder: t('project.workflow.project_tips')
       },
       options: accessibleProjectList,
       class: 'select-project-name'

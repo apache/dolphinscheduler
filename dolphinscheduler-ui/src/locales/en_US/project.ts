@@ -388,9 +388,6 @@ export default {
     task_type_tips: 'Please select a task type (required)',
     workflow_name: 'Workflow Name',
     workflow_name_tips: 'Please select a workflow (required)',
-    child_node_project: 'Child Node Project',
-    child_node_project_tips:
-      'Select this field for choose different project child node',
     child_node: 'Child Node',
     child_node_tips: 'Please select a child node (required)',
     run_flag: 'Run flag',

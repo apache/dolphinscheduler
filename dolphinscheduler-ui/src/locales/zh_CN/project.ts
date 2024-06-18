@@ -383,8 +383,6 @@ export default {
     task_type_tips: '请选择任务类型(必选)',
     workflow_name: '工作流名称',
     workflow_name_tips: '请选择工作流(必选)',
-    child_node_project: '子节点项目名',
-    child_node_project_tips: '选择项目名，获取目标项目中的子节点',
     child_node: '子节点',
     child_node_tips: '请选择子节点(必选)',
     run_flag: '运行标志',
