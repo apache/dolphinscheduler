@@ -27,9 +27,6 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.File;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -45,8 +42,8 @@ class LocalStorageOperatorTest {
 
     private StorageOperator storageOperator;
 
-    private static final String resourceBaseDir = StringUtils
-            .substringBeforeLast(FileUtils.getClassPathAbsolutePath(LocalStorageOperatorTest.class), File.separator);
+    private static final String resourceBaseDir =
+            Paths.get(LocalStorageOperatorTest.class.getResource("/").getFile(), "localStorage").toString();
     private static final String tenantCode = "default";
     private static final String baseDir =
             Paths.get(resourceBaseDir, tenantCode, Constants.RESOURCE_TYPE_FILE).toString();
@@ -54,6 +51,7 @@ class LocalStorageOperatorTest {
     @SneakyThrows
     @BeforeEach
     public void setup() {
+        Files.createDirectories(Paths.get(resourceBaseDir));
         System.setProperty(Constants.RESOURCE_UPLOAD_PATH, resourceBaseDir);
 
         LocalStorageOperatorFactory localStorageOperatorFactory = new LocalStorageOperatorFactory();
