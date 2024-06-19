@@ -31,13 +31,9 @@ public class ConditionsParameters extends AbstractParameters {
 
     // depend node list and state, only need task name
     private List<DependentTaskModel> dependTaskList;
-    private DependentRelation dependRelation;
+    private DependentRelation relation;
 
-    // node list to run when success
-    private List<Long> successNode;
-
-    // node list to run when failed
-    private List<Long> failedNode;
+    private boolean conditionSuccess;
 
     @Override
     public boolean checkParameters() {
@@ -49,11 +45,11 @@ public class ConditionsParameters extends AbstractParameters {
         return new ArrayList<>();
     }
 
-    public String getConditionResult() {
-        return "{"
-                + "\"successNode\": [\"" + successNode.get(0)
-                + "\"],\"failedNode\": [\"" + failedNode.get(0)
-                + "\"]}";
+    @Data
+    public static class ConditionResult {
+
+        private List<Long> successNode;
+        private List<Long> failedNode;
     }
 
 }
