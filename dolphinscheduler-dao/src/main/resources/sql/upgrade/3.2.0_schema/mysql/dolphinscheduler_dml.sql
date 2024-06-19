@@ -30,6 +30,9 @@ END IF;
 END;
 d//
 
+-- If the admin account is not associated with a tenant, the admin's tenant will be set to the default tenant.
+UPDATE `t_ds_user` SET `tenant_id` = '-1' WHERE (`user_name` = 'admin') AND (`tenant_id` = '0');
+
 delimiter ;
 CALL dolphin_t_ds_tenant_insert_default();
 DROP PROCEDURE dolphin_t_ds_tenant_insert_default;
