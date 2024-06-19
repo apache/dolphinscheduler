@@ -38,9 +38,11 @@ import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WOR
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.*;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
@@ -165,6 +167,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -1544,7 +1547,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return true;
     }
 
-    protected void rebuildConditionTaskDefinition(List<TaskDefinitionLog> taskDefinitionLogList, Map<Long, Long> taskCodeMap) {
+    protected void rebuildConditionTaskDefinition(List<TaskDefinitionLog> taskDefinitionLogList,
+                                                  Map<Long, Long> taskCodeMap) {
 
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
             if (TASK_TYPE_CONDITIONS.equals(taskDefinitionLog.getTaskType())) {
@@ -1553,11 +1557,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
     }
 
-    private void rebuildSingleConditionTaskDefinition(TaskDefinitionLog taskDefinitionLog, Map<Long, Long> taskCodeMap) {
+    private void rebuildSingleConditionTaskDefinition(TaskDefinitionLog taskDefinitionLog,
+                                                      Map<Long, Long> taskCodeMap) {
 
-        Map<String, Object> taskParamsMap = JSONUtils.parseObject(taskDefinitionLog.getTaskParams(), new TypeReference<Map<String, Object>>() {
-        });
-        String dependentParametersStr = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.DEPENDENCE);
+        Map<String, Object> taskParamsMap =
+                JSONUtils.parseObject(taskDefinitionLog.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                });
+        String dependentParametersStr =
+                JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.DEPENDENCE);
         DependentParameters dependency = JSONUtils.parseObject(dependentParametersStr, DependentParameters.class);
 
         for (DependentTaskModel dependentTaskModel : dependency.getDependTaskList()) {
@@ -1568,8 +1575,10 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         }
         taskParamsMap.put(Constants.DEPENDENCE, dependency);
 
-        String conditionsParametersStr = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.CONDITION_RESULT);
-        ConditionsParameters conditionResult = JSONUtils.parseObject(conditionsParametersStr, ConditionsParameters.class);
+        String conditionsParametersStr =
+                JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.CONDITION_RESULT);
+        ConditionsParameters conditionResult =
+                JSONUtils.parseObject(conditionsParametersStr, ConditionsParameters.class);
         if (conditionResult != null) {
 
             List<Long> successNode = conditionResult.getSuccessNode();
