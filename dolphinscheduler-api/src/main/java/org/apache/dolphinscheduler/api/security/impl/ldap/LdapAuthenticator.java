@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import lombok.NonNull;
-
 import org.springframework.beans.factory.annotation.Autowired;
+
+import lombok.NonNull;
 
 public class LdapAuthenticator extends AbstractAuthenticator {
 
