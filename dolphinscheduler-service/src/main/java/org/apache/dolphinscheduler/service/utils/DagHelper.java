@@ -76,10 +76,10 @@ public class DagHelper {
     /**
      * generate task nodes needed by dag
      *
-     * @param taskNodeList taskNodeList
-     * @param startNodeNameList startNodeNameList
+     * @param taskNodeList         taskNodeList
+     * @param startNodeNameList    startNodeNameList
      * @param recoveryNodeCodeList recoveryNodeCodeList
-     * @param taskDependType taskDependType
+     * @param taskDependType       taskDependType
      * @return task node list
      */
     public static List<TaskNode> generateFlowNodeListByStartNode(List<TaskNode> taskNodeList,
@@ -139,7 +139,7 @@ public class DagHelper {
     /**
      * find all the nodes that depended on the start node
      *
-     * @param startNode startNode
+     * @param startNode    startNode
      * @param taskNodeList taskNodeList
      * @return task node list
      */
@@ -166,9 +166,9 @@ public class DagHelper {
     /**
      * find all nodes that start nodes depend on.
      *
-     * @param startNode startNode
+     * @param startNode            startNode
      * @param recoveryNodeCodeList recoveryNodeCodeList
-     * @param taskNodeList taskNodeList
+     * @param taskNodeList         taskNodeList
      * @return task node list
      */
     private static List<TaskNode> getFlowNodeListPre(TaskNode startNode,
@@ -204,10 +204,10 @@ public class DagHelper {
     /**
      * generate dag by start nodes and recovery nodes
      *
-     * @param totalTaskNodeList totalTaskNodeList
-     * @param startNodeNameList startNodeNameList
+     * @param totalTaskNodeList    totalTaskNodeList
+     * @param startNodeNameList    startNodeNameList
      * @param recoveryNodeCodeList recoveryNodeCodeList
-     * @param depNodeType depNodeType
+     * @param depNodeType          depNodeType
      * @return process dag
      * @throws Exception if error throws Exception
      */
@@ -232,7 +232,7 @@ public class DagHelper {
      * find node by node name
      *
      * @param nodeDetails nodeDetails
-     * @param nodeName nodeName
+     * @param nodeName    nodeName
      * @return task node
      */
     public static TaskNode findNodeByName(List<TaskNode> nodeDetails, String nodeName) {
@@ -248,7 +248,7 @@ public class DagHelper {
      * find node by node code
      *
      * @param nodeDetails nodeDetails
-     * @param nodeCode nodeCode
+     * @param nodeCode    nodeCode
      * @return task node
      */
     public static TaskNode findNodeByCode(List<TaskNode> nodeDetails, Long nodeCode) {
@@ -263,8 +263,8 @@ public class DagHelper {
     /**
      * the task can be submit when  all the depends nodes are forbidden or complete
      *
-     * @param taskNode taskNode
-     * @param dag dag
+     * @param taskNode         taskNode
+     * @param dag              dag
      * @param completeTaskList completeTaskList
      * @return can submit
      */
@@ -369,22 +369,20 @@ public class DagHelper {
             return conditionTaskList;
         }
         TaskInstance taskInstance = completeTaskList.get(nodeCode);
-        ConditionsParameters conditionsParameters =
-                JSONUtils.parseObject(taskNode.getConditionResult(), ConditionsParameters.class);
+        ConditionsParameters conditionsParameters = taskInstance.getConditionsParameters();
+        ConditionsParameters.ConditionResult conditionResult = taskInstance.getConditionResult();
+
         List<Long> skipNodeList = new ArrayList<>();
-        if (taskInstance.getState().isSuccess()) {
-            conditionTaskList = conditionsParameters.getSuccessNode();
-            skipNodeList = conditionsParameters.getFailedNode();
-        } else if (taskInstance.getState().isFailure()) {
-            conditionTaskList = conditionsParameters.getFailedNode();
-            skipNodeList = conditionsParameters.getSuccessNode();
+        if (conditionsParameters.isConditionSuccess()) {
+            conditionTaskList = conditionResult.getSuccessNode();
+            skipNodeList = conditionResult.getFailedNode();
         } else {
-            conditionTaskList.add(nodeCode);
+            conditionTaskList = conditionResult.getFailedNode();
+            skipNodeList = conditionResult.getSuccessNode();
         }
-        // the skipNodeList maybe null if no next task
-        skipNodeList = Optional.ofNullable(skipNodeList).orElse(new ArrayList<>());
-        for (Long failedNode : skipNodeList) {
-            setTaskNodeSkip(failedNode, dag, completeTaskList, skipTaskNodeList);
+
+        if (CollectionUtils.isNotEmpty(skipNodeList)) {
+            skipNodeList.forEach(skipNode -> setTaskNodeSkip(skipNode, dag, completeTaskList, skipTaskNodeList));
         }
         // the conditionTaskList maybe null if no next task
         conditionTaskList = Optional.ofNullable(conditionTaskList).orElse(new ArrayList<>());
@@ -447,6 +445,7 @@ public class DagHelper {
 
     /**
      * get all downstream nodes of the branch that the switch node needs to execute
+     *
      * @param taskCode
      * @param dag
      * @param switchNeedWorkCodes
@@ -480,6 +479,7 @@ public class DagHelper {
             }
         }
     }
+
     /**
      * set task node and the post nodes skip flag
      */
