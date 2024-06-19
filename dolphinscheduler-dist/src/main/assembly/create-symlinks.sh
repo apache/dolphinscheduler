@@ -56,6 +56,7 @@ for module in api-server master-server worker-server alert-server tools; do
     cd - > /dev/null
   fi
 done
+
 #Recompress the package
 cd ..
 tar -zcf $package_file $decompress_dirname
