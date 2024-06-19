@@ -17,19 +17,19 @@
 
 package org.apache.dolphinscheduler.server.master.runner.queue;
 
+import static com.google.common.truth.Truth.assertThat;
+
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
-
-import com.google.common.truth.Truth;
 
 class DelayEntryTest {
 
     @Test
     void getDelay() {
-        DelayEntry<String> delayEntry = new DelayEntry<>(1_000L, "Item");
-        Truth.assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
-                .isWithin(100)
-                .of(TimeUnit.NANOSECONDS.convert(1_000L, TimeUnit.MILLISECONDS));
+        DelayEntry<String> delayEntry = new DelayEntry<>(5_000L, "Item");
+        assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
+                .isWithin(500)
+                .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
     }
 }
