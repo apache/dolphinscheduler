@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.condition;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -43,7 +44,15 @@ public class ConditionLogicTaskPluginFactory implements ILogicTaskPluginFactory<
 
     @Override
     public ConditionLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        return new ConditionLogicTask(taskExecutionContext, processInstanceExecCacheManager, taskInstanceDao,
+        TaskInstance taskInstance =
+                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
+                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
+                        .orElseThrow(() -> new LogicTaskInitializeException(
+                                "Cannot find the task instance in workflow execute runnable"));
+        return new ConditionLogicTask(
+                taskExecutionContext,
+                taskInstance,
+                taskInstanceDao,
                 processInstanceDao);
     }
 

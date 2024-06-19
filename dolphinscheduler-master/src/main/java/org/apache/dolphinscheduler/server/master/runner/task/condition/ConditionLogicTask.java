@@ -25,10 +25,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
-import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
-import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 
 import java.util.List;
@@ -40,37 +38,34 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ConditionLogicTask extends BaseSyncLogicTask<DependentParameters> {
+public class ConditionLogicTask extends BaseSyncLogicTask<ConditionsParameters> {
 
     public static final String TASK_TYPE = "CONDITIONS";
 
     private final TaskInstanceDao taskInstanceDao;
     private final ProcessInstanceDao workflowInstanceDao;
 
+    private final TaskInstance taskInstance;
+
     public ConditionLogicTask(TaskExecutionContext taskExecutionContext,
-                              ProcessInstanceExecCacheManager processInstanceExecCacheManager,
+                              TaskInstance taskInstance,
                               TaskInstanceDao taskInstanceDao,
-                              ProcessInstanceDao workflowInstanceDao) throws LogicTaskInitializeException {
+                              ProcessInstanceDao workflowInstanceDao) {
         // todo: we need to change the parameter in front-end, so that we can directly use json to parse
-        super(taskExecutionContext,
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
-                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                        .orElseThrow(() -> new LogicTaskInitializeException(
-                                "Cannot find the task instance in workflow execute runnable"))
-                        .getDependency());
-        // todo：check the parameters, why we don't use conditionTask? taskInstance.getDependency();
+        super(taskExecutionContext, taskInstance.getConditionsParameters());
         this.taskInstanceDao = taskInstanceDao;
         this.workflowInstanceDao = workflowInstanceDao;
+        this.taskInstance = taskInstance;
     }
 
     @Override
     public void handle() {
         // calculate the conditionResult
         DependResult conditionResult = calculateConditionResult();
-        TaskExecutionStatus taskExecutionStatus =
-                (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
-        log.info("The condition result is {}, task instance statue will be: {}", conditionResult, taskExecutionStatus);
-        taskExecutionContext.setCurrentExecutionStatus(taskExecutionStatus);
+        log.info("The condition result is {}", conditionResult);
+        taskParameters.setConditionSuccess(conditionResult == DependResult.SUCCESS);
+        taskInstance.setConditionsParameters(taskParameters);
+        taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
     }
 
     private DependResult calculateConditionResult() {

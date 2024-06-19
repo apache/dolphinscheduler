@@ -385,18 +385,19 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 // retry task
                 log.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
                 retryTaskInstance(taskInstance);
-            } else if (taskInstance.getState().isFailure()) {
+            } else if (taskInstance.getState().isFailure() || taskInstance.getState().isKill()
+                    || taskInstance.getState().isStop()) {
                 completeTaskSet.add(taskInstance.getTaskCode());
-                ProjectUser projectUser =
-                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-                listenerEventAlertManager.publishTaskFailListenerEvent(workflowInstance, taskInstance, projectUser);
+                listenerEventAlertManager.publishTaskFailListenerEvent(workflowInstance, taskInstance);
+                if (isTaskNeedPutIntoErrorMap(taskInstance)) {
+                    errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                }
                 // There are child nodes and the failure policy is: CONTINUE
                 if (workflowInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
                         taskInstance.getTaskCode(),
                         workflowExecuteContext.getWorkflowGraph().getDag())) {
                     submitPostNode(taskInstance.getTaskCode());
                 } else {
-                    errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                     if (workflowInstance.getFailureStrategy() == FailureStrategy.END) {
                         killAllTasks();
                     }
@@ -805,10 +806,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         completeTaskSet.add(task.getTaskCode());
                         continue;
                     }
-                    if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getTaskCode(),
-                            workflowExecuteContext.getWorkflowGraph().getDag())) {
-                        continue;
-                    }
+
                     if (task.taskCanRetry()) {
                         if (task.getState().isNeedFaultTolerance()) {
                             log.info("TaskInstance needs fault tolerance, will be added to standby list.");
@@ -824,7 +822,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         }
                         continue;
                     }
-                    if (task.getState().isFailure()) {
+                    if (isTaskNeedPutIntoErrorMap(task)) {
                         errorTaskMap.put(task.getTaskCode(), task.getId());
                     }
                 } finally {
@@ -2013,6 +2011,24 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 log.error("update task instance cache key failed", e);
             }
         }
+    }
+
+    /**
+     * Whether the task instance need to put into {@link #errorTaskMap}.
+     * Only the task instance is failed or killed, and it is parent of condition task.
+     * Then it should be put into {@link #errorTaskMap}.
+     * <p> Once a task instance is put into {@link #errorTaskMap}, it will be thought as failed and make the workflow be failed.
+     */
+    private boolean isTaskNeedPutIntoErrorMap(TaskInstance taskInstance) {
+        if (!taskInstance.getState().isFailure() && !taskInstance.getState().isStop()
+                && !taskInstance.getState().isKill()) {
+            return false;
+        }
+        TaskNode taskNode = workflowExecuteContext.getWorkflowGraph().getTaskNodeByCode(taskInstance.getTaskCode());
+        if (DagHelper.haveConditionsAfterNode(taskNode.getCode(), workflowExecuteContext.getWorkflowGraph().getDag())) {
+            return false;
+        }
+        return true;
     }
 
     private enum WorkflowRunnableStatus {
