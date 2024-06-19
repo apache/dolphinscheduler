@@ -45,7 +45,7 @@ for module in api-server master-server worker-server alert-server tools; do
   if [ -d "$MODULE_LIB_DIR" ]; then
     cd $MODULE_LIB_DIR
 
-    for jar in `ls *.jar`; do
+    for jar in *.jar; do
       # Move jar file to share lib directory
       mv $jar ../../$SHARED_LIB_DIR/
 
