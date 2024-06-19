@@ -26,6 +26,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -177,7 +179,8 @@ public class FlinkMaterializedTableTask extends AbstractRemoteTask {
     protected void refreshTable() throws IOException {
 
         String url = String.format("%s/v3/sessions/%s/materialized-tables/%s/refresh",
-            gatewayEndpoint, sessionHandle, identifier);
+            gatewayEndpoint, sessionHandle, URLEncoder.encode(
+                identifier, StandardCharsets.UTF_8.toString()));
 
         HttpPost post = new HttpPost(url);
         String refreshTableOperationHandle = null;
