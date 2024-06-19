@@ -16,12 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import {
-  ListReq,
-  ListIdReq,
-  ProjectsReq,
-  UserIdReq
-} from './types'
+import { ListReq, ListIdReq, ProjectsReq, UserIdReq } from './types'
 
 export function queryProjectListPaging(params: ListReq): any {
   return axios({

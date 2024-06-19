@@ -17,30 +17,87 @@
 
 package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.time.Duration;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
+@Slf4j
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Configuration
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 @ConfigurationProperties(prefix = "registry")
-public class ZookeeperRegistryProperties {
+class ZookeeperRegistryProperties implements Validator {
 
     private ZookeeperProperties zookeeper = new ZookeeperProperties();
 
-    public ZookeeperProperties getZookeeper() {
-        return zookeeper;
+    private String type;
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return ZookeeperRegistryProperties.class.isAssignableFrom(clazz);
     }
 
-    public void setZookeeper(ZookeeperProperties zookeeper) {
-        this.zookeeper = zookeeper;
+    @Override
+    public void validate(Object target, Errors errors) {
+        ZookeeperRegistryProperties zookeeperRegistryProperties = (ZookeeperRegistryProperties) target;
+        if (zookeeperRegistryProperties.getZookeeper() == null) {
+            errors.rejectValue("zookeeper", "zookeeper", "zookeeper properties is required");
+        }
+
+        ZookeeperProperties zookeeper = zookeeperRegistryProperties.getZookeeper();
+        if (StringUtils.isEmpty(zookeeper.getNamespace())) {
+            errors.rejectValue("zookeeper.namespace", "", "zookeeper.namespace cannot be null");
+        }
+        if (StringUtils.isEmpty(zookeeper.getConnectString())) {
+            errors.rejectValue("zookeeper.connectString", "", "zookeeper.connectString cannot be null");
+        }
+        if (zookeeper.getRetryPolicy() == null) {
+            errors.rejectValue("zookeeper.retryPolicy", "", "zookeeper.retryPolicy cannot be null");
+        }
+        if (zookeeper.getSessionTimeout() == null || zookeeper.getSessionTimeout().isZero()
+                || zookeeper.getSessionTimeout().isNegative()) {
+            errors.rejectValue("zookeeper.sessionTimeout", "", "zookeeper.sessionTimeout should be positive");
+        }
+        if (zookeeper.getConnectionTimeout() == null || zookeeper.getConnectionTimeout().isZero()
+                || zookeeper.getConnectionTimeout().isNegative()) {
+            errors.rejectValue("zookeeper.connectionTimeout", "", "zookeeper.connectionTimeout should be positive");
+        }
+        if (zookeeper.getBlockUntilConnected() == null || zookeeper.getBlockUntilConnected().isZero()
+                || zookeeper.getBlockUntilConnected().isNegative()) {
+            errors.rejectValue("zookeeper.blockUntilConnected", "", "zookeeper.blockUntilConnected should be positive");
+        }
+        printConfig();
     }
 
+    private void printConfig() {
+        String config =
+                "\n****************************ZookeeperRegistryProperties**************************************" +
+                        "\n  namespace -> " + zookeeper.getNamespace() +
+                        "\n  connectString -> " + zookeeper.getConnectString() +
+                        "\n  retryPolicy -> " + zookeeper.getRetryPolicy() +
+                        "\n  digest -> " + zookeeper.getDigest() +
+                        "\n  sessionTimeout -> " + zookeeper.getSessionTimeout() +
+                        "\n  connectionTimeout -> " + zookeeper.getConnectionTimeout() +
+                        "\n  blockUntilConnected -> " + zookeeper.getBlockUntilConnected() +
+                        "\n****************************ZookeeperRegistryProperties**************************************";
+        log.info(config);
+    }
+
+    @Data
     public static final class ZookeeperProperties {
 
-        private String namespace;
+        private String namespace = "dolphinscheduler";
         private String connectString;
         private RetryPolicy retryPolicy = new RetryPolicy();
         private String digest;
@@ -48,91 +105,13 @@ public class ZookeeperRegistryProperties {
         private Duration connectionTimeout = Duration.ofSeconds(9);
         private Duration blockUntilConnected = Duration.ofMillis(600);
 
-        public String getNamespace() {
-            return namespace;
-        }
-
-        public void setNamespace(String namespace) {
-            this.namespace = namespace;
-        }
-
-        public String getConnectString() {
-            return connectString;
-        }
-
-        public void setConnectString(String connectString) {
-            this.connectString = connectString;
-        }
-
-        public RetryPolicy getRetryPolicy() {
-            return retryPolicy;
-        }
-
-        public void setRetryPolicy(RetryPolicy retryPolicy) {
-            this.retryPolicy = retryPolicy;
-        }
-
-        public String getDigest() {
-            return digest;
-        }
-
-        public void setDigest(String digest) {
-            this.digest = digest;
-        }
-
-        public Duration getSessionTimeout() {
-            return sessionTimeout;
-        }
-
-        public void setSessionTimeout(Duration sessionTimeout) {
-            this.sessionTimeout = sessionTimeout;
-        }
-
-        public Duration getConnectionTimeout() {
-            return connectionTimeout;
-        }
-
-        public void setConnectionTimeout(Duration connectionTimeout) {
-            this.connectionTimeout = connectionTimeout;
-        }
-
-        public Duration getBlockUntilConnected() {
-            return blockUntilConnected;
-        }
-
-        public void setBlockUntilConnected(Duration blockUntilConnected) {
-            this.blockUntilConnected = blockUntilConnected;
-        }
-
+        @Data
         public static final class RetryPolicy {
 
             private Duration baseSleepTime = Duration.ofMillis(60);
             private int maxRetries;
             private Duration maxSleep = Duration.ofMillis(300);
 
-            public Duration getBaseSleepTime() {
-                return baseSleepTime;
-            }
-
-            public void setBaseSleepTime(Duration baseSleepTime) {
-                this.baseSleepTime = baseSleepTime;
-            }
-
-            public int getMaxRetries() {
-                return maxRetries;
-            }
-
-            public void setMaxRetries(int maxRetries) {
-                this.maxRetries = maxRetries;
-            }
-
-            public Duration getMaxSleep() {
-                return maxSleep;
-            }
-
-            public void setMaxSleep(Duration maxSleep) {
-                this.maxSleep = maxSleep;
-            }
         }
     }
 

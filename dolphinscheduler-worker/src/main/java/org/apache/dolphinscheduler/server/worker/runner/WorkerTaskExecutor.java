@@ -33,7 +33,7 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
@@ -53,6 +53,7 @@ import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -75,8 +76,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
     protected final WorkerMessageSender workerMessageSender;
-    protected final TaskPluginManager taskPluginManager;
-    protected final @Nullable StorageOperate storageOperate;
+    protected final @Nullable StorageOperator storageOperator;
     protected final WorkerRegistryClient workerRegistryClient;
 
     protected @Nullable AbstractTask task;
@@ -85,14 +85,12 @@ public abstract class WorkerTaskExecutor implements Runnable {
                                  @NonNull TaskExecutionContext taskExecutionContext,
                                  @NonNull WorkerConfig workerConfig,
                                  @NonNull WorkerMessageSender workerMessageSender,
-                                 @NonNull TaskPluginManager taskPluginManager,
-                                 @Nullable StorageOperate storageOperate,
+                                 @Nullable StorageOperator storageOperator,
                                  @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.taskPluginManager = taskPluginManager;
-        this.storageOperate = storageOperate;
+        this.storageOperator = storageOperator;
         this.workerRegistryClient = workerRegistryClient;
         SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
     }
@@ -212,26 +210,25 @@ public abstract class WorkerTaskExecutor implements Runnable {
         // In most of case the origin tenant is the same as the current tenant
         // Except `default` tenant. The originTenant is used to download the resources
         String originTenant = taskExecutionContext.getTenantCode();
-        String tenant = TaskExecutionContextUtils.getOrCreateTenant(workerConfig, taskExecutionContext);
-        taskExecutionContext.setTenantCode(tenant);
+        taskExecutionContext.setTenantCode(TenantUtils.getOrCreateActualTenant(workerConfig, taskExecutionContext));
         log.info("TenantCode: {} check successfully", taskExecutionContext.getTenantCode());
 
         TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
         log.info("WorkflowInstanceExecDir: {} check successfully", taskExecutionContext.getExecutePath());
 
         TaskChannel taskChannel =
-                Optional.ofNullable(taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
+                Optional.ofNullable(TaskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
                         .orElseThrow(() -> new TaskPluginException(taskExecutionContext.getTaskType()
                                 + " task plugin not found, please check the task type is correct."));
 
         log.info("Create TaskChannel: {} successfully", taskChannel.getClass().getName());
 
-        ResourceContext resourceContext = TaskExecutionContextUtils.downloadResourcesIfNeeded(originTenant, taskChannel,
-                storageOperate, taskExecutionContext);
+        ResourceContext resourceContext = TaskExecutionContextUtils.downloadResourcesIfNeeded(taskChannel,
+                storageOperator, taskExecutionContext);
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: \n{}", taskExecutionContext.getResourceContext());
 
-        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
+        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperator);
         log.info("Download upstream files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN));
 
@@ -285,7 +282,8 @@ public abstract class WorkerTaskExecutor implements Runnable {
         taskExecutionContext.setEndTime(System.currentTimeMillis());
 
         // upload out files and modify the "OUT FILE" property in VarPool
-        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperator);
+
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 

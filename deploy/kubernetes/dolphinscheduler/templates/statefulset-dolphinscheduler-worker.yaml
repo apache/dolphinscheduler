@@ -111,9 +111,12 @@ spec:
               name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+            - name: worker-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
-              subPath: common_properties
+              subPath: common.properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
@@ -139,6 +142,9 @@ spec:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
           emptyDir: {}
         {{- end }}
+        - name: worker-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-worker
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs

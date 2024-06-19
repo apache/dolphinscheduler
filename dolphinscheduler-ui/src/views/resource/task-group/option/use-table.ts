@@ -125,36 +125,38 @@ export function useTable(
   const getTableData = (params: any) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    Promise.all([queryTaskGroupListPaging(params), queryProjectCreatedAndAuthorizedByUser()]).then(
-      (values: any[]) => {
-        variables.totalPage = values[0].totalPage
-        variables.tableData = values[0].totalList.map(
-          (item: any, unused: number) => {
-            let projectName = ''
-            if (values[1]) {
-              const project = _.find(values[1], { code: item.projectCode })
-              if (project) {
-                projectName = project.name
-              }
-            }
-
-            item.projectName = projectName
-            item.createTime = format(
-              parseTime(item.createTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            item.updateTime = format(
-              parseTime(item.updateTime),
-              'yyyy-MM-dd HH:mm:ss'
-            )
-            return {
-              ...item
+    Promise.all([
+      queryTaskGroupListPaging(params),
+      queryProjectCreatedAndAuthorizedByUser()
+    ]).then((values: any[]) => {
+      variables.totalPage = values[0].totalPage
+      variables.tableData = values[0].totalList.map(
+        (item: any, unused: number) => {
+          let projectName = ''
+          if (values[1]) {
+            const project = _.find(values[1], { code: item.projectCode })
+            if (project) {
+              projectName = project.name
             }
           }
-        )
-        variables.loadingRef = false
-      }
-    )
+
+          item.projectName = projectName
+          item.createTime = format(
+            parseTime(item.createTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          item.updateTime = format(
+            parseTime(item.updateTime),
+            'yyyy-MM-dd HH:mm:ss'
+          )
+          item.status = item.status == 'YES' ? 1 : 0
+          return {
+            ...item
+          }
+        }
+      )
+      variables.loadingRef = false
+    })
   }
 
   return { getTableData, variables, columns }

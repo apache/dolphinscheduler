@@ -25,6 +25,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_EXECUTING_WORKF
 import static org.apache.dolphinscheduler.api.enums.Status.START_PROCESS_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.START_TASK_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
@@ -42,6 +44,8 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -132,6 +136,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_START)
     public Result startProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                        @RequestParam(value = "processDefinitionCode") long processDefinitionCode,
@@ -160,10 +165,8 @@ public class ExecutorController extends BaseController {
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
-        Map<String, String> startParamMap = null;
-        if (startParams != null) {
-            startParamMap = JSONUtils.toMap(startParams);
-        }
+
+        List<Property> startParamList = PropertyUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             complementDependentMode = ComplementDependentMode.OFF_MODE;
@@ -172,7 +175,7 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                workerGroup, tenantCode, environmentCode, timeout, startParamList, expectedParallelismNumber, dryRun,
                 testFlag,
                 complementDependentMode, version, allLevelDependent, executionOrder);
         return returnDataList(result);
@@ -229,6 +232,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "batch-start-process-instance")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_START_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_BATCH_START)
     public Result batchStartProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                             @RequestParam(value = "processDefinitionCodes") String processDefinitionCodes,
@@ -258,10 +262,7 @@ public class ExecutorController extends BaseController {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
 
-        Map<String, String> startParamMap = null;
-        if (startParams != null) {
-            startParamMap = JSONUtils.toMap(startParams);
-        }
+        List<Property> startParamList = PropertyUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             log.debug("Parameter complementDependentMode set to {} due to null.", ComplementDependentMode.OFF_MODE);
@@ -279,7 +280,8 @@ public class ExecutorController extends BaseController {
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime,
                     execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                    workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                    workerGroup, tenantCode, environmentCode, timeout, startParamList, expectedParallelismNumber,
+                    dryRun,
                     testFlag,
                     complementDependentMode, null, allLevelDependent, executionOrder);
 
@@ -318,6 +320,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_EXECUTE)
     public Result execute(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                           @RequestParam("processInstanceId") Integer processInstanceId,
@@ -344,6 +347,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/batch-execute")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_EXECUTE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_BATCH_RERUN)
     public Result batchExecute(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                @PathVariable long projectCode,
                                @RequestParam("processInstanceIds") String processInstanceIds,
@@ -440,6 +444,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/task-instance/{code}/start")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(START_TASK_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.TASK_START)
     public Result<Boolean> startStreamTaskInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                    @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
@@ -482,6 +487,7 @@ public class ExecutorController extends BaseController {
     @PostMapping(value = "/execute-task")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(EXECUTE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_EXECUTE)
     public Result executeTask(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                               @RequestParam("processInstanceId") Integer processInstanceId,

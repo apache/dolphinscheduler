@@ -72,9 +72,9 @@ public interface TaskInstanceService {
      * @param taskInstanceId task instance id
      * @return the result code and msg
      */
-    Result forceTaskSuccess(User loginUser,
-                            long projectCode,
-                            Integer taskInstanceId);
+    void forceTaskSuccess(User loginUser,
+                          long projectCode,
+                          Integer taskInstanceId);
 
     /**
      * task savepoint

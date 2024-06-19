@@ -18,10 +18,8 @@
 package org.apache.dolphinscheduler.server.master.runner.task.switchtask;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
@@ -34,7 +32,6 @@ import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -47,7 +44,7 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
 
     public static final String TASK_TYPE = "SWITCH";
 
-    private final ProcessInstance processInstance;
+    private final WorkflowExecuteRunnable workflowExecuteRunnable;
     private final TaskInstance taskInstance;
 
     public SwitchLogicTask(TaskExecutionContext taskExecutionContext,
@@ -59,94 +56,112 @@ public class SwitchLogicTask extends BaseSyncLogicTask<SwitchParameters> {
                         .orElseThrow(() -> new LogicTaskInitializeException(
                                 "Cannot find the task instance in workflow execute runnable"))
                         .getSwitchDependency());
-        WorkflowExecuteRunnable workflowExecuteRunnable =
+        this.workflowExecuteRunnable =
                 processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId());
-        this.processInstance = workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowInstance();
         this.taskInstance = workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId())
                 .orElseThrow(() -> new LogicTaskInitializeException(
                         "Cannot find the task instance in workflow execute runnable"));
+        // Since the default branch is not in the dependTaskList, we need to add it to the end
+        // otherwise the default branch will never be skipped in DAGHelper
+        addDefaultBranchToEnd();
     }
 
     @Override
     public void handle() throws MasterTaskExecuteException {
-        DependResult conditionResult = calculateConditionResult();
-        TaskExecutionStatus status =
-                (conditionResult == DependResult.SUCCESS) ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE;
-        log.info("Switch task execute finished, condition result is: {}, task status is: {}", conditionResult,
-                status.name());
-        taskExecutionContext.setCurrentExecutionStatus(status);
+        if (CollectionUtils.isEmpty(taskParameters.getDependTaskList())) {
+            // If the branch is empty then will go into the default branch
+            // This case shouldn't happen, we can directly throw exception and forbid the user to set branch
+            moveToDefaultBranch();
+        } else {
+            calculateSwitchBranch();
+        }
+        taskInstance.setSwitchDependency(taskParameters);
+        taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
+        log.info("Switch task execute finished: {}", taskExecutionContext.getCurrentExecutionStatus().name());
     }
 
-    // todo: don't use depend result, use switch result
-    private DependResult calculateConditionResult() {
-        DependResult conditionResult = DependResult.SUCCESS;
-
+    private void moveToDefaultBranch() {
         List<SwitchResultVo> switchResultVos = taskParameters.getDependTaskList();
+        SwitchResultVo defaultSwitchResultVo = getDefaultSwitchResultVo();
+        checkIfBranchExist(defaultSwitchResultVo.getNextNode());
 
-        SwitchResultVo switchResultVo = new SwitchResultVo();
-        switchResultVo.setNextNode(taskParameters.getNextNode());
-        switchResultVos.add(switchResultVo);
-        // todo: refactor these calculate code
-        int finalConditionLocation = switchResultVos.size() - 1;
-        int i = 0;
+        taskParameters.setResultConditionLocation(switchResultVos.size() - 1);
 
-        Map<String, Property> globalParams = JSONUtils
-                .toList(processInstance.getGlobalParams(), Property.class)
-                .stream()
-                .collect(Collectors.toMap(Property::getProp, Property -> Property));
+        log.info("The condition is not satisfied, move to the default branch: {}",
+                taskParameters.getNextNode().stream().map(node -> workflowExecuteRunnable.getWorkflowExecuteContext()
+                        .getWorkflowGraph().getDag().getNode(node).getName()).collect(Collectors.toList()));
+    }
+
+    private void calculateSwitchBranch() {
+        List<SwitchResultVo> switchResultVos = taskParameters.getDependTaskList();
+        Map<String, Property> globalParams = taskExecutionContext.getPrepareParamsMap();
         Map<String, Property> varParams = JSONUtils
                 .toList(taskInstance.getVarPool(), Property.class)
                 .stream()
                 .collect(Collectors.toMap(Property::getProp, Property -> Property));
 
-        for (SwitchResultVo info : switchResultVos) {
-            log.info("Begin to execute {} condition: {} ", (i + 1), info.getCondition());
-            if (StringUtils.isEmpty(info.getCondition())) {
-                finalConditionLocation = i;
-                break;
-            }
-            String content =
-                    SwitchTaskUtils.generateContentWithTaskParams(info.getCondition(), globalParams, varParams);
+        int finalConditionLocation = -1;
+        // The last one is the default branch, no need to calculate
+        for (int i = 0; i < switchResultVos.size() - 1; i++) {
+            SwitchResultVo switchResultVo = switchResultVos.get(i);
+            log.info("Begin to execute {} condition: {} ", i, switchResultVo.getCondition());
+            String content = SwitchTaskUtils.generateContentWithTaskParams(switchResultVo.getCondition(), globalParams,
+                    varParams);
             log.info("Format condition sentence::{} successfully", content);
-            Boolean result;
+            boolean result;
             try {
                 result = SwitchTaskUtils.evaluate(content);
                 log.info("Execute condition sentence: {} successfully: {}", content, result);
+                if (result) {
+                    // If matched, break the loop
+                    finalConditionLocation = i;
+                    break;
+                }
             } catch (Exception e) {
                 log.info("Execute condition sentence: {} failed", content, e);
-                conditionResult = DependResult.FAILED;
-                break;
             }
-            if (result) {
-                finalConditionLocation = i;
-                break;
-            }
-            i++;
         }
-        taskParameters.setDependTaskList(switchResultVos);
-        taskParameters.setResultConditionLocation(finalConditionLocation);
-        taskInstance.setSwitchDependency(taskParameters);
-
-        if (!isValidSwitchResult(switchResultVos.get(finalConditionLocation))) {
-            conditionResult = DependResult.FAILED;
-            log.error("The switch task depend result is invalid, result:{}, switch branch:{}", conditionResult,
-                    finalConditionLocation);
+        // If the finalConditionLocation is -1, then the default branch will be executed
+        if (finalConditionLocation >= 0) {
+            List<Long> nextNodes = switchResultVos.get(finalConditionLocation).getNextNode();
+            checkIfBranchExist(nextNodes);
+            log.info("The condition is satisfied, move to the branch: {}",
+                    switchResultVos.get(finalConditionLocation).getNextNode().stream()
+                            .map(node -> workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowGraph().getDag()
+                                    .getNode(node).getName())
+                            .collect(Collectors.toList()));
+            taskParameters.setResultConditionLocation(finalConditionLocation);
+        } else {
+            moveToDefaultBranch();
         }
-
-        log.info("The switch task depend result:{}, switch branch:{}", conditionResult, finalConditionLocation);
-        return conditionResult;
     }
 
-    private boolean isValidSwitchResult(SwitchResultVo switchResult) {
-        if (CollectionUtils.isEmpty(switchResult.getNextNode())) {
-            return false;
+    private void checkIfBranchExist(List<Long> branchNode) {
+        if (CollectionUtils.isEmpty(branchNode)) {
+            throw new IllegalArgumentException("The branchNode is empty, please check the switch task configuration");
         }
-        for (Long nextNode : switchResult.getNextNode()) {
-            if (nextNode == null) {
-                return false;
+        for (Long branch : branchNode) {
+            if (branch == null) {
+                throw new IllegalArgumentException("The branch is empty, please check the switch task configuration");
+            }
+            if (!workflowExecuteRunnable.getWorkflowExecuteContext().getWorkflowGraph().getDag().containsNode(branch)) {
+                throw new IllegalArgumentException(
+                        "The branch(code= " + branchNode
+                                + ") is not in the dag, please check the switch task configuration");
             }
         }
-        return true;
+    }
+
+    private void addDefaultBranchToEnd() {
+        SwitchResultVo switchResultVo = new SwitchResultVo(null, taskParameters.getNextNode());
+        List<SwitchResultVo> dependTaskList = taskParameters.getDependTaskList();
+        if (!dependTaskList.contains(switchResultVo)) {
+            dependTaskList.add(switchResultVo);
+        }
+    }
+
+    private SwitchResultVo getDefaultSwitchResultVo() {
+        return taskParameters.getDependTaskList().get(taskParameters.getDependTaskList().size() - 1);
     }
 
 }

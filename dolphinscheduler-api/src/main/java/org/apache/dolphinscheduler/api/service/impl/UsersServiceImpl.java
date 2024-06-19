@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 
-import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
@@ -50,7 +49,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -110,7 +109,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private ProjectMapper projectMapper;
 
     @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -170,9 +169,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
-
-        Tenant tenant = tenantMapper.queryById(tenantId);
-        storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
 
         log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
@@ -556,6 +552,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
+            return result;
+        }
+
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
@@ -603,11 +605,17 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             putMsg(result, Status.FUNCTION_DISABLED);
             return result;
         }
+
         // check exist
         User tempUser = userMapper.selectById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -760,6 +768,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (user == null) {
             log.error("User does not exist, userId:{}.", userId);
             putMsg(result, Status.USER_NOT_EXIST, userId);
+            return result;
+        }
+
+        if (!isAdmin(loginUser)) {
+            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
             return result;
         }
 
@@ -1109,54 +1122,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         return msg;
-    }
-
-    /**
-     * copy resource files
-     * xxx unchecked
-     *
-     * @param resourceComponent resource component
-     * @param srcBasePath       src base path
-     * @param dstBasePath       dst base path
-     * @throws IOException io exception
-     */
-    private void copyResourceFiles(String oldTenantCode, String newTenantCode, ResourceComponent resourceComponent,
-                                   String srcBasePath, String dstBasePath) {
-        List<ResourceComponent> components = resourceComponent.getChildren();
-
-        try {
-            if (CollectionUtils.isNotEmpty(components)) {
-                for (ResourceComponent component : components) {
-                    // verify whether exist
-                    if (!storageOperate.exists(
-                            String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
-                        log.error("Resource file: {} does not exist, copy error.", component.getFullName());
-                        throw new ServiceException(Status.RESOURCE_NOT_EXIST);
-                    }
-
-                    if (!component.isDirctory()) {
-                        // copy it to dst
-                        storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()),
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true);
-                        continue;
-                    }
-
-                    if (CollectionUtils.isEmpty(component.getChildren())) {
-                        // if not exist,need create it
-                        if (!storageOperate
-                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
-                            storageOperate.mkdir(newTenantCode,
-                                    String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
-                        }
-                    } else {
-                        copyResourceFiles(oldTenantCode, newTenantCode, component, srcBasePath, dstBasePath);
-                    }
-                }
-
-            }
-        } catch (IOException e) {
-            log.error("copy the resources failed,the error message  is {}", e.getMessage());
-        }
     }
 
     /**

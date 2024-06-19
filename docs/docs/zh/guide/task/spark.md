@@ -23,6 +23,7 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 - 程序类型：支持 Java、Scala、Python 和 SQL 四种语言。
 - 主函数的 Class：Spark 程序的入口 Main class 的全路径。
 - 主程序包：执行 Spark 程序的 jar 包（通过资源中心上传）。
+- Master：执行 Spark 集群的 Master Url。
 - SQL脚本：Spark sql 运行的 .sql 文件中的 SQL 语句。
 - 部署方式：(1) spark submit 支持 cluster、client 和 local 三种模式。
   (2) spark sql 支持 client 和 local 两种模式。

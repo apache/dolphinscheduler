@@ -37,6 +37,7 @@
         <druid.version>1.2.20</druid.version>
         <curator-test.version>2.12.0</curator-test.version>
         <jetcd.version>0.5.11</jetcd.version>
+        <!-- todo: Should upgrade the jetcd.test, 0.7.1 doesn't support arm -->
         <jetcd.test.version>0.7.1</jetcd.test.version>
         <io.grpc.version>1.41.0</io.grpc.version>
         <commons-codec.version>1.11</commons-codec.version>
@@ -123,6 +124,7 @@
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
+        <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
     </properties>
 
     <dependencyManagement>
@@ -944,6 +946,13 @@
             <!-- test dependencies on TestContainers -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
                 <artifactId>mysql</artifactId>
                 <version>${testcontainer.version}</version>
                 <scope>test</scope>
@@ -957,6 +966,13 @@
             </dependency>
 
             <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>minio</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>${checker-qual.version}</version>
@@ -965,6 +981,12 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>dyvmsapi20170525</artifactId>
                 <version>${aliyun-voice.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javadelight</groupId>
+                <artifactId>delight-nashorn-sandbox</artifactId>
+                <version>${nashorn-sandbox.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

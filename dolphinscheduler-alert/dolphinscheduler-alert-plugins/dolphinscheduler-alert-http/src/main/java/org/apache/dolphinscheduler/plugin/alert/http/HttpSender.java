@@ -39,6 +39,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +59,6 @@ public final class HttpSender {
      * request type get
      */
     private static final String REQUEST_TYPE_GET = "GET";
-    private static final String DEFAULT_CHARSET = "utf-8";
     private final String headerParams;
     private final String bodyParams;
     private final String contentField;
@@ -92,18 +92,18 @@ public final class HttpSender {
         }
 
         if (httpRequest == null) {
-            alertResult.setStatus("false");
+            alertResult.setSuccess(false);
             alertResult.setMessage("Request types are not supported");
             return alertResult;
         }
 
         try {
             String resp = this.getResponseString(httpRequest);
-            alertResult.setStatus("true");
+            alertResult.setSuccess(true);
             alertResult.setMessage(resp);
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());
-            alertResult.setStatus("false");
+            alertResult.setSuccess(false);
             alertResult.setMessage(
                     String.format("Send http request alert failed: %s", e.getMessage()));
         }
@@ -124,7 +124,7 @@ public final class HttpSender {
 
         CloseableHttpResponse response = httpClient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
-        return EntityUtils.toString(entity, DEFAULT_CHARSET);
+        return EntityUtils.toString(entity, StandardCharsets.UTF_8);
     }
 
     private void createHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
@@ -157,7 +157,8 @@ public final class HttpSender {
                 type = URL_SPLICE_CHAR;
             }
             try {
-                url = String.format("%s%s%s=%s", url, type, contentField, URLEncoder.encode(msg, DEFAULT_CHARSET));
+                url = String.format("%s%s%s=%s", url, type, contentField,
+                        URLEncoder.encode(msg, StandardCharsets.UTF_8.name()));
             } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
@@ -190,7 +191,7 @@ public final class HttpSender {
             }
             // set msg content field
             objectNode.put(contentField, msg);
-            StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), DEFAULT_CHARSET);
+            StringEntity entity = new StringEntity(JSONUtils.toJsonString(objectNode), StandardCharsets.UTF_8);
             ((HttpPost) httpRequest).setEntity(entity);
         } catch (Exception e) {
             log.error("send http alert msg  exception : {}", e.getMessage());

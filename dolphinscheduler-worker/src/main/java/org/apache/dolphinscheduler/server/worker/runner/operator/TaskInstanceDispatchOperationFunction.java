@@ -48,6 +48,15 @@ public class TaskInstanceDispatchOperationFunction
     @Autowired
     private WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool;
 
+    public TaskInstanceDispatchOperationFunction(
+                                                 WorkerConfig workerConfig,
+                                                 WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder,
+                                                 WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool) {
+        this.workerConfig = workerConfig;
+        this.workerTaskExecutorFactoryBuilder = workerTaskExecutorFactoryBuilder;
+        this.workerTaskExecutorThreadPool = workerTaskExecutorThreadPool;
+    }
+
     @Override
     public TaskInstanceDispatchResponse operate(TaskInstanceDispatchRequest taskInstanceDispatchRequest) {
         log.info("Receive TaskInstanceDispatchRequest: {}", taskInstanceDispatchRequest);
@@ -70,7 +79,6 @@ public class TaskInstanceDispatchOperationFunction
 
             WorkerTaskExecutor workerTaskExecutor = workerTaskExecutorFactoryBuilder
                     .createWorkerTaskExecutorFactory(taskExecutionContext).createWorkerTaskExecutor();
-            // todo: hold the workerTaskExecutor
             if (!workerTaskExecutorThreadPool.submitWorkerTaskExecutor(workerTaskExecutor)) {
                 log.info("Submit task: {} to wait queue failed", taskExecutionContext.getTaskName());
                 return TaskInstanceDispatchResponse.failed(taskExecutionContext.getTaskInstanceId(),

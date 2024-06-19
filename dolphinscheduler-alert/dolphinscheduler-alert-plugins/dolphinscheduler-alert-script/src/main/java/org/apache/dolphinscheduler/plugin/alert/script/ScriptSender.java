@@ -56,7 +56,7 @@ public final class ScriptSender {
         }
         // If it is another type of alarm script can be added here, such as python
 
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
         log.error("script type error: {}", scriptType);
         alertResult.setMessage("script type error : " + scriptType);
         return alertResult;
@@ -64,11 +64,16 @@ public final class ScriptSender {
 
     private AlertResult executeShellScript(String title, String content) {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
         if (Boolean.TRUE.equals(OSUtils.isWindows())) {
             alertResult.setMessage("shell script not support windows os");
             return alertResult;
         }
+        if (!scriptPath.endsWith(".sh")) {
+            alertResult.setMessage("shell script is invalid, only support .sh file");
+            return alertResult;
+        }
+
         // validate script path in case of injections
         File shellScriptFile = new File(scriptPath);
         // validate existence
@@ -106,7 +111,7 @@ public final class ScriptSender {
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {
-            alertResult.setStatus("true");
+            alertResult.setSuccess(true);
             alertResult.setMessage("send script alert msg success");
             return alertResult;
         }

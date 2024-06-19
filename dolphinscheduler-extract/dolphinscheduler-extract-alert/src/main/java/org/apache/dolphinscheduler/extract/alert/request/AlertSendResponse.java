@@ -37,6 +37,14 @@ public class AlertSendResponse {
 
     private List<AlertSendResponseResult> resResults;
 
+    public static AlertSendResponse success(List<AlertSendResponseResult> resResults) {
+        return new AlertSendResponse(true, resResults);
+    }
+
+    public static AlertSendResponse fail(List<AlertSendResponseResult> resResults) {
+        return new AlertSendResponse(false, resResults);
+    }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -45,6 +53,14 @@ public class AlertSendResponse {
         private boolean success;
 
         private String message;
+
+        public static AlertSendResponseResult success() {
+            return new AlertSendResponseResult(true, null);
+        }
+
+        public static AlertSendResponseResult fail(String message) {
+            return new AlertSendResponseResult(false, message);
+        }
 
     }
 

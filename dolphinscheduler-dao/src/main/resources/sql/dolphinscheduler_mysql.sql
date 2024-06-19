@@ -15,7 +15,70 @@
  * limitations under the License.
 */
 
-SET FOREIGN_KEY_CHECKS=0;
+-- ----------------------------
+-- Table structure for QRTZ_JOB_DETAILS
+-- ----------------------------
+DROP TABLE IF EXISTS `QRTZ_JOB_DETAILS`;
+CREATE TABLE `QRTZ_JOB_DETAILS` (
+    `SCHED_NAME` varchar(120) NOT NULL,
+    `JOB_NAME` varchar(200) NOT NULL,
+    `JOB_GROUP` varchar(200) NOT NULL,
+    `DESCRIPTION` varchar(250) DEFAULT NULL,
+    `JOB_CLASS_NAME` varchar(250) NOT NULL,
+    `IS_DURABLE` varchar(1) NOT NULL,
+    `IS_NONCONCURRENT` varchar(1) NOT NULL,
+    `IS_UPDATE_DATA` varchar(1) NOT NULL,
+    `REQUESTS_RECOVERY` varchar(1) NOT NULL,
+    `JOB_DATA` blob,
+    PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+    KEY `IDX_QRTZ_J_REQ_RECOVERY` (`SCHED_NAME`,`REQUESTS_RECOVERY`),
+    KEY `IDX_QRTZ_J_GRP` (`SCHED_NAME`,`JOB_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of QRTZ_JOB_DETAILS
+-- ----------------------------
+
+-- ----------------------------
+-- Table structure for QRTZ_TRIGGERS
+-- ----------------------------
+DROP TABLE IF EXISTS `QRTZ_TRIGGERS`;
+CREATE TABLE `QRTZ_TRIGGERS` (
+     `SCHED_NAME` varchar(120) NOT NULL,
+     `TRIGGER_NAME` varchar(200) NOT NULL,
+     `TRIGGER_GROUP` varchar(200) NOT NULL,
+     `JOB_NAME` varchar(200) NOT NULL,
+     `JOB_GROUP` varchar(200) NOT NULL,
+     `DESCRIPTION` varchar(250) DEFAULT NULL,
+     `NEXT_FIRE_TIME` bigint(13) DEFAULT NULL,
+     `PREV_FIRE_TIME` bigint(13) DEFAULT NULL,
+     `PRIORITY` int(11) DEFAULT NULL,
+     `TRIGGER_STATE` varchar(16) NOT NULL,
+     `TRIGGER_TYPE` varchar(8) NOT NULL,
+     `START_TIME` bigint(13) NOT NULL,
+     `END_TIME` bigint(13) DEFAULT NULL,
+     `CALENDAR_NAME` varchar(200) DEFAULT NULL,
+     `MISFIRE_INSTR` smallint(2) DEFAULT NULL,
+     `JOB_DATA` blob,
+     PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
+     KEY `IDX_QRTZ_T_J` (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
+     KEY `IDX_QRTZ_T_JG` (`SCHED_NAME`,`JOB_GROUP`),
+     KEY `IDX_QRTZ_T_C` (`SCHED_NAME`,`CALENDAR_NAME`),
+     KEY `IDX_QRTZ_T_G` (`SCHED_NAME`,`TRIGGER_GROUP`),
+     KEY `IDX_QRTZ_T_STATE` (`SCHED_NAME`,`TRIGGER_STATE`),
+     KEY `IDX_QRTZ_T_N_STATE` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+     KEY `IDX_QRTZ_T_N_G_STATE` (`SCHED_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+     KEY `IDX_QRTZ_T_NEXT_FIRE_TIME` (`SCHED_NAME`,`NEXT_FIRE_TIME`),
+     KEY `IDX_QRTZ_T_NFT_ST` (`SCHED_NAME`,`TRIGGER_STATE`,`NEXT_FIRE_TIME`),
+     KEY `IDX_QRTZ_T_NFT_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`),
+     KEY `IDX_QRTZ_T_NFT_ST_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_STATE`),
+     KEY `IDX_QRTZ_T_NFT_ST_MISFIRE_GRP` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
+     CONSTRAINT `QRTZ_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `QRTZ_JOB_DETAILS` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
+
+-- ----------------------------
+-- Records of QRTZ_TRIGGERS
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for QRTZ_BLOB_TRIGGERS
@@ -97,30 +160,6 @@ CREATE TABLE `QRTZ_FIRED_TRIGGERS` (
 
 -- ----------------------------
 -- Records of QRTZ_FIRED_TRIGGERS
--- ----------------------------
-
--- ----------------------------
--- Table structure for QRTZ_JOB_DETAILS
--- ----------------------------
-DROP TABLE IF EXISTS `QRTZ_JOB_DETAILS`;
-CREATE TABLE `QRTZ_JOB_DETAILS` (
-  `SCHED_NAME` varchar(120) NOT NULL,
-  `JOB_NAME` varchar(200) NOT NULL,
-  `JOB_GROUP` varchar(200) NOT NULL,
-  `DESCRIPTION` varchar(250) DEFAULT NULL,
-  `JOB_CLASS_NAME` varchar(250) NOT NULL,
-  `IS_DURABLE` varchar(1) NOT NULL,
-  `IS_NONCONCURRENT` varchar(1) NOT NULL,
-  `IS_UPDATE_DATA` varchar(1) NOT NULL,
-  `REQUESTS_RECOVERY` varchar(1) NOT NULL,
-  `JOB_DATA` blob,
-  PRIMARY KEY (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
-  KEY `IDX_QRTZ_J_REQ_RECOVERY` (`SCHED_NAME`,`REQUESTS_RECOVERY`),
-  KEY `IDX_QRTZ_J_GRP` (`SCHED_NAME`,`JOB_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Records of QRTZ_JOB_DETAILS
 -- ----------------------------
 
 -- ----------------------------
@@ -211,47 +250,6 @@ CREATE TABLE `QRTZ_SIMPROP_TRIGGERS` (
 
 -- ----------------------------
 -- Records of QRTZ_SIMPROP_TRIGGERS
--- ----------------------------
-
--- ----------------------------
--- Table structure for QRTZ_TRIGGERS
--- ----------------------------
-DROP TABLE IF EXISTS `QRTZ_TRIGGERS`;
-CREATE TABLE `QRTZ_TRIGGERS` (
-  `SCHED_NAME` varchar(120) NOT NULL,
-  `TRIGGER_NAME` varchar(200) NOT NULL,
-  `TRIGGER_GROUP` varchar(200) NOT NULL,
-  `JOB_NAME` varchar(200) NOT NULL,
-  `JOB_GROUP` varchar(200) NOT NULL,
-  `DESCRIPTION` varchar(250) DEFAULT NULL,
-  `NEXT_FIRE_TIME` bigint(13) DEFAULT NULL,
-  `PREV_FIRE_TIME` bigint(13) DEFAULT NULL,
-  `PRIORITY` int(11) DEFAULT NULL,
-  `TRIGGER_STATE` varchar(16) NOT NULL,
-  `TRIGGER_TYPE` varchar(8) NOT NULL,
-  `START_TIME` bigint(13) NOT NULL,
-  `END_TIME` bigint(13) DEFAULT NULL,
-  `CALENDAR_NAME` varchar(200) DEFAULT NULL,
-  `MISFIRE_INSTR` smallint(2) DEFAULT NULL,
-  `JOB_DATA` blob,
-  PRIMARY KEY (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`),
-  KEY `IDX_QRTZ_T_J` (`SCHED_NAME`,`JOB_NAME`,`JOB_GROUP`),
-  KEY `IDX_QRTZ_T_JG` (`SCHED_NAME`,`JOB_GROUP`),
-  KEY `IDX_QRTZ_T_C` (`SCHED_NAME`,`CALENDAR_NAME`),
-  KEY `IDX_QRTZ_T_G` (`SCHED_NAME`,`TRIGGER_GROUP`),
-  KEY `IDX_QRTZ_T_STATE` (`SCHED_NAME`,`TRIGGER_STATE`),
-  KEY `IDX_QRTZ_T_N_STATE` (`SCHED_NAME`,`TRIGGER_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
-  KEY `IDX_QRTZ_T_N_G_STATE` (`SCHED_NAME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
-  KEY `IDX_QRTZ_T_NEXT_FIRE_TIME` (`SCHED_NAME`,`NEXT_FIRE_TIME`),
-  KEY `IDX_QRTZ_T_NFT_ST` (`SCHED_NAME`,`TRIGGER_STATE`,`NEXT_FIRE_TIME`),
-  KEY `IDX_QRTZ_T_NFT_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`),
-  KEY `IDX_QRTZ_T_NFT_ST_MISFIRE` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_STATE`),
-  KEY `IDX_QRTZ_T_NFT_ST_MISFIRE_GRP` (`SCHED_NAME`,`MISFIRE_INSTR`,`NEXT_FIRE_TIME`,`TRIGGER_GROUP`,`TRIGGER_STATE`),
-  CONSTRAINT `QRTZ_TRIGGERS_ibfk_1` FOREIGN KEY (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`) REFERENCES `QRTZ_JOB_DETAILS` (`SCHED_NAME`, `JOB_NAME`, `JOB_GROUP`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Records of QRTZ_TRIGGERS
 -- ----------------------------
 
 -- ----------------------------
@@ -670,9 +668,11 @@ CREATE TABLE `t_ds_project_parameter` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
   `param_name` varchar(255) NOT NULL COMMENT 'project parameter name',
   `param_value` text NOT NULL COMMENT 'project parameter value',
+  `param_data_type` varchar(50) DEFAULT 'VARCHAR' COMMENT 'project parameter data type',
   `code` bigint(20) NOT NULL COMMENT 'encoding',
   `project_code` bigint(20) NOT NULL COMMENT 'project code',
   `user_id` int(11) DEFAULT NULL COMMENT 'creator id',
+  `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `create_time` datetime NOT NULL COMMENT 'create time',
   `update_time` datetime DEFAULT NULL COMMENT 'update time',
   PRIMARY KEY (`id`),
@@ -1065,8 +1065,6 @@ VALUES ('1', 'admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '',
 -- ----------------------------
 -- Table structure for t_ds_plugin_define
 -- ----------------------------
-SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY','') into @new_sql_mode;
-SET sql_mode=@new_sql_mode;
 DROP TABLE IF EXISTS `t_ds_plugin_define`;
 CREATE TABLE `t_ds_plugin_define` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -2010,10 +2008,14 @@ DROP TABLE IF EXISTS `t_ds_audit_log`;
 CREATE TABLE `t_ds_audit_log` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
-  `resource_type` int(11) NOT NULL COMMENT 'resource type',
-  `operation` int(11) NOT NULL COMMENT 'operation',
-  `time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-  `resource_id` int(11) NULL DEFAULT NULL COMMENT 'resource id',
+  `model_id` bigint(20) DEFAULT NULL COMMENT 'model id',
+  `model_name` varchar(100) DEFAULT NULL COMMENT 'model name',
+  `model_type` varchar(100) NOT NULL COMMENT 'model type',
+  `operation_type` varchar(100) NOT NULL COMMENT 'operation type',
+  `description` varchar(100) DEFAULT NULL COMMENT 'api description',
+  `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',
+  `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'operation time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 

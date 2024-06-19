@@ -595,9 +595,11 @@ CREATE TABLE t_ds_project_parameter (
   id int NOT NULL  ,
   param_name varchar(255) NOT NULL ,
   param_value text NOT NULL ,
+  param_data_type varchar(50) DEFAULT 'VARCHAR',
   code bigint NOT NULL,
   project_code bigint NOT NULL,
   user_id int DEFAULT NULL ,
+  operator int DEFAULT NULL ,
   create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (id)
@@ -1992,11 +1994,15 @@ CREATE TABLE t_ds_task_group (
 DROP TABLE IF EXISTS t_ds_audit_log;
 CREATE TABLE t_ds_audit_log (
     id serial NOT NULL,
-    user_id int NOT NULL,
-    resource_type int NOT NULL,
-    operation int NOT NULL,
-    time timestamp DEFAULT NULL ,
-    resource_id int NOT NULL,
+    user_id         int NOT NULL,
+    model_id        bigint NOT NULL,
+    model_name      VARCHAR(255) NOT NULL,
+    model_type      VARCHAR(255) NOT NULL,
+    operation_type  VARCHAR(255) NOT NULL,
+    description     VARCHAR(255) NOT NULL,
+    latency         int NOT NULL,
+    detail          VARCHAR(255) DEFAULT NULL,
+    create_time     timestamp DEFAULT NULL ,
     PRIMARY KEY (id)
 );
 

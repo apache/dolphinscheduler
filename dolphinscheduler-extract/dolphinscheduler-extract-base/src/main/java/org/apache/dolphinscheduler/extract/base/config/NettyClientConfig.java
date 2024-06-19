@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.extract.base.config;
 
+import java.time.Duration;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,5 +65,15 @@ public class NettyClientConfig {
      */
     @Builder.Default
     private int connectTimeoutMillis = 3000;
+
+    /**
+     * Will send {@link org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter} to netty server every
+     * heartBeatIntervalMillis, used to keep the {@link io.netty.channel.Channel} active.
+     */
+    @Builder.Default
+    private long heartBeatIntervalMillis = Duration.ofSeconds(10).toMillis();
+
+    @Builder.Default
+    private int defaultRpcTimeoutMillis = 10_000;
 
 }

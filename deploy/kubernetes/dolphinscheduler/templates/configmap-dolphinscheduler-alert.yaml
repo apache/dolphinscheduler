@@ -1,0 +1,115 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if and .Values.alert.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-alert
+  labels:
+    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-alert
+    {{- include "dolphinscheduler.alert.labels" . | nindent 4 }}
+data:
+  application.yaml: |
+    spring:
+      profiles:
+        active: {{ .Values.datasource.profile }}
+      jackson:
+        time-zone: UTC
+        date-format: "yyyy-MM-dd HH:mm:ss"
+      banner:
+        charset: UTF-8
+      datasource:
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://127.0.0.1:5432/dolphinscheduler
+        username: root
+        password: root
+        hikari:
+          connection-test-query: select 1
+          pool-name: DolphinScheduler
+    
+    # Mybatis-plus configuration, you don't need to change it
+    mybatis-plus:
+      mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
+      type-aliases-package: org.apache.dolphinscheduler.dao.entity
+      configuration:
+        cache-enabled: false
+        call-setters-on-nulls: true
+        map-underscore-to-camel-case: true
+        jdbc-type-for-null: NULL
+      global-config:
+        db-config:
+          id-type: auto
+        banner: false
+    
+    server:
+      port: 50053
+    
+    management:
+      endpoints:
+        web:
+          exposure:
+            include: health,metrics,prometheus
+      endpoint:
+        health:
+          enabled: true
+          show-details: always
+      health:
+        db:
+          enabled: true
+        defaults:
+          enabled: false
+      metrics:
+        tags:
+          application: ${spring.application.name}
+    
+    alert:
+      port: 50052
+      # Mark each alert of alert server if late after x milliseconds as failed.
+      # Define value is (0 = infinite), and alert server would be waiting alert result.
+      wait-timeout: 0
+      max-heartbeat-interval: 60s
+      query_alert_threshold: 100
+    
+    registry:
+      type: zookeeper
+      zookeeper:
+        namespace: dolphinscheduler
+        connect-string: localhost:2181
+        retry-policy:
+          base-sleep-time: 60ms
+          max-sleep: 300ms
+          max-retries: 5
+        session-timeout: 30s
+        connection-timeout: 9s
+        block-until-connected: 600ms
+        digest: ~
+    
+    metrics:
+      enabled: true
+    
+    # Override by profile
+    ---
+    spring:
+      config:
+        activate:
+          on-profile: mysql
+      datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:3306/dolphinscheduler
+        username: root
+        password: root
+{{- end }}

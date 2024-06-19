@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.StandardRpcRequest;
+import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterHeader;
@@ -29,9 +29,9 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import java.lang.reflect.Method;
 
-public class SyncClientMethodInvoker extends BaseRemoteMethodInvoker {
+class SyncClientMethodInvoker extends AbstractClientMethodInvoker {
 
-    public SyncClientMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
+    SyncClientMethodInvoker(Host serverHost, Method localMethod, NettyRemotingClient nettyRemotingClient) {
         super(serverHost, localMethod, nettyRemotingClient);
     }
 
@@ -42,8 +42,12 @@ public class SyncClientMethodInvoker extends BaseRemoteMethodInvoker {
         transporter.setBody(JsonSerializer.serialize(StandardRpcRequest.of(args)));
         transporter.setHeader(TransporterHeader.of(methodIdentifier));
 
-        IRpcResponse iRpcResponse =
-                nettyRemotingClient.sendSync(serverHost, transporter, sync.timeout());
+        SyncRequestDto syncRequestDto = SyncRequestDto.builder()
+                .timeoutMillis(sync.timeout())
+                .transporter(transporter)
+                .serverHost(serverHost)
+                .build();
+        IRpcResponse iRpcResponse = nettyRemotingClient.sendSync(syncRequestDto);
         if (!iRpcResponse.isSuccess()) {
             throw MethodInvocationException.of(iRpcResponse.getMessage());
         }

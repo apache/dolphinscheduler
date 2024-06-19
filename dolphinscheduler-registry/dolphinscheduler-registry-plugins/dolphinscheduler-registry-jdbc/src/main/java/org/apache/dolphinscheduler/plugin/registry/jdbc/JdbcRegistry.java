@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.task.EphemeralDateManager;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.task.RegistryLockManager;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.task.SubscribeDataManager;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryData;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -30,31 +28,24 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.Collection;
 
-import javax.annotation.PostConstruct;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 /**
  * This is one of the implementation of {@link Registry}, with this implementation, you need to rely on mysql database to
  * store the DolphinScheduler master/worker's metadata and do the server registry/unRegistry.
  */
-@Component
-@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "jdbc")
 @Slf4j
-public class JdbcRegistry implements Registry {
+public final class JdbcRegistry implements Registry {
 
     private final JdbcRegistryProperties jdbcRegistryProperties;
     private final EphemeralDateManager ephemeralDateManager;
     private final SubscribeDataManager subscribeDataManager;
     private final RegistryLockManager registryLockManager;
-    private JdbcOperator jdbcOperator;
+    private final JdbcOperator jdbcOperator;
 
-    public JdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties,
-                        JdbcOperator jdbcOperator) {
+    JdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties,
+                 JdbcOperator jdbcOperator) {
         this.jdbcOperator = jdbcOperator;
         jdbcOperator.clearExpireLock();
         jdbcOperator.clearExpireEphemeralDate();
@@ -65,7 +56,7 @@ public class JdbcRegistry implements Registry {
         log.info("Initialize Jdbc Registry...");
     }
 
-    @PostConstruct
+    @Override
     public void start() {
         log.info("Starting Jdbc Registry...");
         // start a jdbc connect check
@@ -103,10 +94,9 @@ public class JdbcRegistry implements Registry {
     }
 
     @Override
-    public boolean subscribe(String path, SubscribeListener listener) {
+    public void subscribe(String path, SubscribeListener listener) {
         // new a schedule thread to query the path, if the path
         subscribeDataManager.addListener(path, listener);
-        return true;
     }
 
     @Override
@@ -122,8 +112,18 @@ public class JdbcRegistry implements Registry {
 
     @Override
     public String get(String key) {
-        // get the key value
-        return subscribeDataManager.getData(key);
+        try {
+            // get the key value
+            JdbcRegistryData data = jdbcOperator.getData(key);
+            if (data == null) {
+                throw new RegistryException("key: " + key + " not exist");
+            }
+            return data.getDataValue();
+        } catch (RegistryException registryException) {
+            throw registryException;
+        } catch (Exception e) {
+            throw new RegistryException(String.format("Get key: %s error", key), e);
+        }
     }
 
     @Override
@@ -172,6 +172,17 @@ public class JdbcRegistry implements Registry {
         try {
             registryLockManager.acquireLock(key);
             return true;
+        } catch (RegistryException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RegistryException(String.format("Acquire lock: %s error", key), e);
+        }
+    }
+
+    @Override
+    public boolean acquireLock(String key, long timeout) {
+        try {
+            return registryLockManager.acquireLock(key, timeout);
         } catch (RegistryException e) {
             throw e;
         } catch (Exception e) {

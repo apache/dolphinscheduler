@@ -32,7 +32,7 @@ export function useEdit(state: any) {
   const getResourceView = (fullName: string, tenantCode: string) => {
     const params = {
       skipLineNum: 0,
-      limit: 3000,
+      limit: -1,
       fullName: fullName,
       tenantCode: tenantCode
     }
@@ -63,10 +63,10 @@ export function useEdit(state: any) {
   }
 }
 
-export const useIsDetailPageStore = defineStore("isDetailPage", {
-  state:() => {
+export const useIsDetailPageStore = defineStore('isDetailPage', {
+  state: () => {
     return {
-      isDetailPage:false
+      isDetailPage: false
     }
   },
   getters: {
@@ -82,9 +82,9 @@ export const useIsDetailPageStore = defineStore("isDetailPage", {
 })
 
 export const isEmpty = (string: any): boolean => {
-    if(string === '' || string === undefined || string === null){
-        return true
-    }else{
-        return false
-    }
+  if (string === '' || string === undefined || string === null) {
+    return true
+  } else {
+    return false
+  }
 }

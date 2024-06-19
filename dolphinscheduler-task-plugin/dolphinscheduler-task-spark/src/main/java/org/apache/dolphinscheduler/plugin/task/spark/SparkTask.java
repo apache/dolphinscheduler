@@ -124,22 +124,31 @@ public class SparkTask extends AbstractYarnTask {
      */
     private List<String> populateSparkOptions() {
         List<String> args = new ArrayList<>();
-        args.add(SparkConstants.MASTER);
 
+        // see https://spark.apache.org/docs/latest/submitting-applications.html
+        // TODO remove the option 'local' from deploy-mode
         String deployMode = StringUtils.isNotEmpty(sparkParameters.getDeployMode()) ? sparkParameters.getDeployMode()
                 : SparkConstants.DEPLOY_MODE_LOCAL;
 
+        boolean onLocal = SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode);
         boolean onNativeKubernetes = StringUtils.isNotEmpty(sparkParameters.getNamespace());
 
-        String masterUrl = onNativeKubernetes ? SPARK_ON_K8S_MASTER_PREFIX +
-                Config.fromKubeconfig(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml()).getMasterUrl()
-                : SparkConstants.SPARK_ON_YARN;
+        String masterUrl = StringUtils.isNotEmpty(sparkParameters.getMaster()) ? sparkParameters.getMaster()
+                : onLocal ? deployMode
+                        : onNativeKubernetes
+                                ? SPARK_ON_K8S_MASTER_PREFIX + Config
+                                        .fromKubeconfig(
+                                                taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml())
+                                        .getMasterUrl()
+                                : SparkConstants.SPARK_ON_YARN;
 
-        if (!SparkConstants.DEPLOY_MODE_LOCAL.equals(deployMode)) {
-            args.add(masterUrl);
+        args.add(SparkConstants.MASTER);
+        args.add(masterUrl);
+
+        if (!onLocal) {
             args.add(SparkConstants.DEPLOY_MODE);
+            args.add(deployMode);
         }
-        args.add(deployMode);
 
         ProgramType programType = sparkParameters.getProgramType();
         String mainClass = sparkParameters.getMainClass();

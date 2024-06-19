@@ -25,10 +25,10 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
 import org.apache.commons.beanutils.BeanUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import lombok.Data;
+import lombok.SneakyThrows;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -107,7 +107,8 @@ public class TaskUpdateRequest {
      * @param taskDefinition exists task definition object
      * @return task definition
      */
-    public TaskDefinition mergeIntoTaskDefinition(TaskDefinition taskDefinition) throws InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchMethodException {
+    @SneakyThrows
+    public TaskDefinition mergeIntoTaskDefinition(TaskDefinition taskDefinition) {
         TaskDefinition taskDefinitionDeepCopy = (TaskDefinition) BeanUtils.cloneBean(taskDefinition);
         assert taskDefinitionDeepCopy != null;
         if (this.name != null) {

@@ -84,6 +84,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -141,9 +142,6 @@ public class ProcessInstanceServiceTest {
     TenantMapper tenantMapper;
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    TaskPluginManager taskPluginManager;
 
     @Mock
     ScheduleMapper scheduleMapper;
@@ -625,21 +623,27 @@ public class ProcessInstanceServiceTest {
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         when(processDefinitionService.checkProcessNodeList(taskRelationJson, taskDefinitionLogs)).thenReturn(result);
         putMsg(result, Status.SUCCESS, projectCode);
-        when(taskPluginManager.checkTaskParameters(Mockito.any())).thenReturn(true);
-        Map<String, Object> processInstanceFinishRes =
-                processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-                        taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
-        Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
 
-        // success
-        when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
-        putMsg(result, Status.SUCCESS, projectCode);
+        try (
+                MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
+                        Mockito.mockStatic(TaskPluginManager.class)) {
+            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+                    .thenReturn(true);
+            Map<String, Object> processInstanceFinishRes =
+                    processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
+                            taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
+            Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
 
-        when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE))
-                .thenReturn(1);
-        Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
-                taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+            // success
+            when(processDefineMapper.queryByCode(46L)).thenReturn(processDefinition);
+            putMsg(result, Status.SUCCESS, projectCode);
+
+            when(processService.saveProcessDefine(loginUser, processDefinition, Boolean.FALSE, Boolean.FALSE))
+                    .thenReturn(1);
+            Map<String, Object> successRes = processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
+                    taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
+            Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        }
     }
 
     @Test

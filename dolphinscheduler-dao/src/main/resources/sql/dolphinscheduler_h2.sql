@@ -667,9 +667,11 @@ CREATE TABLE t_ds_project_parameter
     id              int(11) NOT NULL AUTO_INCREMENT,
     param_name      varchar(255) NOT NULL,
     param_value     text NOT NULL,
+    param_data_type varchar(50) DEFAULT 'VARCHAR',
     code            bigint(20) NOT NULL,
     project_code    bigint(20) NOT NULL,
     user_id         int(11) DEFAULT NULL,
+    operator        int(11) DEFAULT NULL,
     create_time     datetime NOT NULL,
     update_time     datetime     DEFAULT NULL,
     PRIMARY KEY (id),
@@ -2019,10 +2021,14 @@ CREATE TABLE t_ds_audit_log
 (
     id                  int(11) NOT NULL AUTO_INCREMENT,
     user_id             int(11) NOT NULL,
-    resource_type       int(11) NOT NULL,
-    operation           int(11) NOT NULL,
-    time                timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-    resource_id         int(11) NOT NULL,
+    model_id            bigint(20) NOT NULL,
+    model_name          varchar(255) NOT NULL,
+    model_type          varchar(255) NOT NULL,
+    operation_type      varchar(255) NOT NULL,
+    description         varchar(255) NOT NULL,
+    latency             int(11) NOT NULL,
+    detail              varchar(255) DEFAULT NULL,
+    create_time         timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
 

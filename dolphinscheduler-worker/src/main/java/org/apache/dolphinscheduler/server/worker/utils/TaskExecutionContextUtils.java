@@ -17,10 +17,9 @@
 
 package org.apache.dolphinscheduler.server.worker.utils;
 
-import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.OSUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -28,12 +27,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
-import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -44,43 +40,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TaskExecutionContextUtils {
-
-    public static String getOrCreateTenant(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
-        try {
-            TenantConfig tenantConfig = workerConfig.getTenantConfig();
-
-            String tenantCode = taskExecutionContext.getTenantCode();
-            if (TenantConstants.DEFAULT_TENANT_CODE.equals(tenantCode) && tenantConfig.isDefaultTenantEnabled()) {
-                log.info("Current tenant is default tenant, will use bootstrap user: {} to execute the task",
-                        TenantConstants.BOOTSTRAPT_SYSTEM_USER);
-                return TenantConstants.BOOTSTRAPT_SYSTEM_USER;
-            }
-            boolean osUserExistFlag;
-            // if Using distributed is true and Currently supported systems are linux,Should not let it
-            // automatically
-            // create tenants,so TenantAutoCreate has no effect
-            if (tenantConfig.isDistributedTenantEnabled() && SystemUtils.IS_OS_LINUX) {
-                // use the id command to judge in linux
-                osUserExistFlag = OSUtils.existTenantCodeInLinux(tenantCode);
-            } else if (OSUtils.isSudoEnable() && tenantConfig.isAutoCreateTenantEnabled()) {
-                // if not exists this user, then create
-                OSUtils.createUserIfAbsent(tenantCode);
-                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
-            } else {
-                osUserExistFlag = OSUtils.getUserList().contains(tenantCode);
-            }
-            if (!osUserExistFlag) {
-                throw new TaskException(
-                        String.format("TenantCode: %s doesn't exist", tenantCode));
-            }
-            return tenantCode;
-        } catch (TaskException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new TaskException(
-                    String.format("TenantCode: %s doesn't exist", taskExecutionContext.getTenantCode()));
-        }
-    }
 
     public static void createTaskInstanceWorkingDirectory(TaskExecutionContext taskExecutionContext) throws TaskException {
         // local execute path
@@ -107,9 +66,8 @@ public class TaskExecutionContextUtils {
         }
     }
 
-    public static ResourceContext downloadResourcesIfNeeded(String tenant,
-                                                            TaskChannel taskChannel,
-                                                            StorageOperate storageOperate,
+    public static ResourceContext downloadResourcesIfNeeded(TaskChannel taskChannel,
+                                                            StorageOperator storageOperator,
                                                             TaskExecutionContext taskExecutionContext) {
         AbstractParameters abstractParameters = taskChannel.parseParameters(
                 ParametersNode.builder()
@@ -128,14 +86,15 @@ public class TaskExecutionContextUtils {
 
         for (ResourceInfo resourceInfo : resourceFilesList) {
             String resourceAbsolutePathInStorage = resourceInfo.getResourceName();
-            String resourceRelativePath = storageOperate.getResourceFileName(tenant, resourceAbsolutePathInStorage);
-            String resourceAbsolutePathInLocal = Paths.get(taskWorkingDirectory, resourceRelativePath).toString();
+            ResourceMetadata resourceMetaData = storageOperator.getResourceMetaData(resourceAbsolutePathInStorage);
+            String resourceAbsolutePathInLocal =
+                    Paths.get(taskWorkingDirectory, resourceMetaData.getResourceRelativePath()).toString();
             File file = new File(resourceAbsolutePathInLocal);
             if (!file.exists()) {
                 try {
                     long resourceDownloadStartTime = System.currentTimeMillis();
-                    storageOperate.download(resourceAbsolutePathInStorage, resourceAbsolutePathInLocal, true);
-                    log.debug("Download resource file {} under: {} successfully", resourceAbsolutePathInStorage,
+                    storageOperator.download(resourceAbsolutePathInStorage, resourceAbsolutePathInLocal, true);
+                    log.info("Download resource file {} -> {} successfully", resourceAbsolutePathInStorage,
                             resourceAbsolutePathInLocal);
                     FileUtils.setFileTo755(file);
                     WorkerServerMetrics
@@ -151,7 +110,6 @@ public class TaskExecutionContextUtils {
             }
             ResourceContext.ResourceItem resourceItem = ResourceContext.ResourceItem.builder()
                     .resourceAbsolutePathInStorage(resourceAbsolutePathInStorage)
-                    .resourceRelativePath(resourceRelativePath)
                     .resourceAbsolutePathInLocal(resourceAbsolutePathInLocal)
                     .build();
             resourceContext.addResourceItem(resourceItem);
