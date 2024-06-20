@@ -26,8 +26,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARA
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.PROCESS_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
@@ -77,11 +76,10 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -498,7 +496,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
-        if (!taskInstance.isDynamic()) {
+        if (!TaskTypeUtils.isDynamicTask(taskInstance.getTaskType())) {
             putMsg(result, Status.TASK_INSTANCE_NOT_DYNAMIC_TASK, taskInstance.getName());
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
@@ -548,7 +546,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      */
     private void addDependResultForTaskList(User loginUser, List<TaskInstance> taskInstanceList) throws IOException {
         for (TaskInstance taskInstance : taskInstanceList) {
-            if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
+            if (TaskTypeUtils.isDependentTask(taskInstance.getTaskType())) {
                 log.info("DEPENDENT type task instance need to set dependent result, taskCode:{}, taskInstanceId:{}",
                         taskInstance.getTaskCode(), taskInstance.getId());
                 // TODO The result of dependent item should not be obtained from the log, waiting for optimization.
@@ -628,9 +626,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        if (!taskInstance.isSubProcess()) {
-            log.warn("Task instance is not {} type instance, projectCode:{}, taskInstanceId:{}.",
-                    TASK_TYPE_SUB_PROCESS, projectCode, taskId);
+        if (!TaskTypeUtils.isSubWorkflowTask(taskInstance.getTaskType())) {
             putMsg(result, Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, taskInstance.getName());
             return result;
         }
@@ -714,11 +710,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-            if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
-                    .taskType(taskDefinitionLog.getTaskType())
-                    .taskParams(taskDefinitionLog.getTaskParams())
-                    .dependence(taskDefinitionLog.getDependence())
-                    .build())) {
+            if (!checkTaskParameters(taskDefinitionLog.getTaskType(), taskDefinitionLog.getTaskParams())) {
                 log.error("Task parameters are invalid,  taskDefinitionName:{}.", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;

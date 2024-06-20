@@ -176,8 +176,6 @@ public interface ProcessService {
 
     DqComparisonType getComparisonTypeById(int id);
 
-    void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status);
-
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
                                             String taskName,
                                             Integer groupId,

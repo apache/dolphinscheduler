@@ -19,12 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.pigeon;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.params.base.Validate;
-import org.apache.dolphinscheduler.spi.params.input.InputParam;
-
-import java.util.Arrays;
-import java.util.List;
 
 import com.google.auto.service.AutoService;
 
@@ -41,12 +35,4 @@ public class PigeonTaskChannelFactory implements TaskChannelFactory {
         return "PIGEON";
     }
 
-    @Override
-    public List<PluginParams> getParams() {
-        InputParam webHookParam =
-                InputParam.newBuilder(PigeonParamsConstants.NAME_TARGET_JOB_NAME, PigeonParamsConstants.TARGET_JOB_NAME)
-                        .addValidate(Validate.newBuilder().setRequired(true).build())
-                        .build();
-        return Arrays.asList(webHookParam);
-    }
 }

@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.builder.TaskExecutionContextBuilder;
@@ -40,7 +41,6 @@ import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteThreadPool;
-import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.utils.ProcessUtils;
 
@@ -167,7 +167,7 @@ public class WorkerFailoverService {
 
         taskInstance.setProcessInstance(processInstance);
 
-        if (!TaskUtils.isMasterTask(taskInstance.getTaskType())) {
+        if (!TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
             killYarnTask(taskInstance, processInstance);
         } else {
             log.info("The failover taskInstance is a master task, no need to failover in worker failover");

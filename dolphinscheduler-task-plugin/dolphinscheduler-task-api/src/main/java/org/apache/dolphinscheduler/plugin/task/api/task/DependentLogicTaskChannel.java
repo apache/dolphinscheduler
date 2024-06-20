@@ -15,21 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.api.task;
 
-public enum BlockingOpportunity {
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 
-    BLOCKING_ON_SUCCESS("BlockingOnSuccess"),
-    BLOCKING_ON_FAILED("BlockingOnFailed");
+public class DependentLogicTaskChannel extends AbstractLogicTaskChannel {
 
-    private final String desc;
-
-    BlockingOpportunity(String desc) {
-        this.desc = desc;
+    @Override
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, DependentParameters.class);
     }
-
-    public String getDesc() {
-        return desc;
-    }
-
 }

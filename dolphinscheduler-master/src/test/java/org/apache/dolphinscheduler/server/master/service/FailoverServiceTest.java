@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.service;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.COMMON_TASK_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 
@@ -31,6 +29,8 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.shell.ShellTaskChannelFactory;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
@@ -139,13 +139,13 @@ public class FailoverServiceTest {
         masterTaskInstance.setId(1);
         masterTaskInstance.setStartTime(new Date());
         masterTaskInstance.setHost(testMasterHost);
-        masterTaskInstance.setTaskType(TASK_TYPE_SWITCH);
+        masterTaskInstance.setTaskType(SwitchLogicTaskChannelFactory.NAME);
 
         workerTaskInstance = new TaskInstance();
         workerTaskInstance.setId(2);
         workerTaskInstance.setStartTime(new Date());
         workerTaskInstance.setHost(testWorkerHost);
-        workerTaskInstance.setTaskType(COMMON_TASK_TYPE);
+        workerTaskInstance.setTaskType(ShellTaskChannelFactory.NAME);
 
         given(processService.queryNeedFailoverProcessInstances(Mockito.anyString()))
                 .willReturn(Arrays.asList(processInstance));

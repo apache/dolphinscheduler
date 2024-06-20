@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.chunjun;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.List;
 
 import com.google.auto.service.AutoService;
 
@@ -47,13 +44,4 @@ public class ChunJunTaskChannelFactory implements TaskChannelFactory {
         return "CHUNJUN";
     }
 
-    /**
-     * Returns the configurable parameters that this plugin needs to display on the web ui
-     *
-     * @return this plugin params
-     */
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
 }

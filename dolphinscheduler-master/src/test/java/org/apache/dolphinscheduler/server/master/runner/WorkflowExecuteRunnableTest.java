@@ -392,7 +392,6 @@ public class WorkflowExecuteRunnableTest {
         // task instance already finished, not dispatch
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.PAUSE);
-        Mockito.when(processInstance.isBlocked()).thenReturn(true);
         TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
         workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
         Mockito.verify(taskExecuteRunnable, Mockito.never()).dispatch();

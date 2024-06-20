@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.master.runner.task.dynamic;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -42,8 +43,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
 class DynamicLogicTaskTest {
@@ -74,14 +73,11 @@ class DynamicLogicTaskTest {
 
     private DynamicLogicTask dynamicLogicTask;
 
-    private ObjectMapper objectMapper;
-
     @BeforeEach
     public void setUp() {
         // Set up your test environment before each test.
         dynamicParameters = new DynamicParameters();
         taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        objectMapper = new ObjectMapper();
         processInstance = new ProcessInstance();
         Mockito.when(processInstanceDao.queryById(Mockito.any())).thenReturn(processInstance);
         dynamicLogicTask = new DynamicLogicTask(
@@ -95,7 +91,7 @@ class DynamicLogicTaskTest {
     }
 
     @Test
-    void testGenerateParameterGroup() throws Exception {
+    void testGenerateParameterGroup() {
         DynamicInputParameter dynamicInputParameter1 = new DynamicInputParameter();
         dynamicInputParameter1.setName("param1");
         dynamicInputParameter1.setValue("a,b,c");
@@ -113,7 +109,7 @@ class DynamicLogicTaskTest {
 
         Mockito.when(taskExecutionContext.getPrepareParamsMap()).thenReturn(new HashMap<>());
         Mockito.when(taskExecutionContext.getTaskParams())
-                .thenReturn(objectMapper.writeValueAsString(dynamicParameters));
+                .thenReturn(JSONUtils.toJsonString(dynamicParameters));
 
         dynamicLogicTask = new DynamicLogicTask(
                 taskExecutionContext,

@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.jupyter;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.List;
 
 import com.google.auto.service.AutoService;
 
@@ -31,11 +28,6 @@ public class JupyterTaskChannelFactory implements TaskChannelFactory {
     @Override
     public String getName() {
         return "JUPYTER";
-    }
-
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
     }
 
     @Override

@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.openmldb;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.List;
 
 import com.google.auto.service.AutoService;
 
@@ -38,8 +35,4 @@ public class OpenmldbTaskChannelFactory implements TaskChannelFactory {
         return "OPENMLDB";
     }
 
-    @Override
-    public List<PluginParams> getParams() {
-        return null;
-    }
 }

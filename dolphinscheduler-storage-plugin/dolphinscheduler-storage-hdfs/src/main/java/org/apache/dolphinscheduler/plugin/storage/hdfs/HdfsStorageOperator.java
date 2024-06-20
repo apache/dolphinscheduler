@@ -78,8 +78,11 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     private void initHdfsPath() {
         Path path = new Path(resourceBaseAbsolutePath);
         if (!fs.exists(path)) {
-            fs.mkdirs(path);
-            log.info("Create hdfs path: {}", path);
+            if (!fs.mkdirs(path)) {
+                log.info("Create hdfs path: {} failed", path);
+            } else {
+                log.error("Create hdfs path: {} success", path);
+            }
         }
     }
 

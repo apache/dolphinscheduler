@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 
@@ -69,11 +68,7 @@ public class TaskExecutionContextUtils {
     public static ResourceContext downloadResourcesIfNeeded(TaskChannel taskChannel,
                                                             StorageOperator storageOperator,
                                                             TaskExecutionContext taskExecutionContext) {
-        AbstractParameters abstractParameters = taskChannel.parseParameters(
-                ParametersNode.builder()
-                        .taskType(taskExecutionContext.getTaskType())
-                        .taskParams(taskExecutionContext.getTaskParams())
-                        .build());
+        AbstractParameters abstractParameters = taskChannel.parseParameters(taskExecutionContext.getTaskParams());
 
         List<ResourceInfo> resourceFilesList = abstractParameters.getResourceFilesList();
         if (CollectionUtils.isEmpty(resourceFilesList)) {

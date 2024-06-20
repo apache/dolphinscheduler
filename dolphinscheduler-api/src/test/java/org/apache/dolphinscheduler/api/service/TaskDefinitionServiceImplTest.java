@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessTaskRelationLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.shell.ShellTaskChannelFactory;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 
@@ -165,7 +166,8 @@ public class TaskDefinitionServiceImplTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
             Project project = getProject();
             when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
@@ -194,7 +196,8 @@ public class TaskDefinitionServiceImplTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
             String taskDefinitionJson = getTaskDefinitionJson();
 
@@ -441,7 +444,8 @@ public class TaskDefinitionServiceImplTest {
                 () -> taskDefinitionService.createTaskDefinitionV2(user, taskCreateRequest));
 
         // error task definition
-        taskCreateRequest.setTaskParams(TASK_PARAMETER);
+        taskCreateRequest.setTaskType(ShellTaskChannelFactory.NAME);
+        taskCreateRequest.setTaskParams(JSONUtils.toJsonString(new HashMap<>()));
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION_CREATE);
         assertThrowsServiceException(Status.PROCESS_NODE_S_PARAMETER_INVALID,
                 () -> taskDefinitionService.createTaskDefinitionV2(user, taskCreateRequest));
@@ -449,7 +453,8 @@ public class TaskDefinitionServiceImplTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
 
             // error create task definition object
@@ -502,7 +507,8 @@ public class TaskDefinitionServiceImplTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(false);
             assertThrowsServiceException(Status.PROCESS_NODE_S_PARAMETER_INVALID,
                     () -> taskDefinitionService.updateTaskDefinitionV2(user, TASK_CODE, taskUpdateRequest));
@@ -511,7 +517,8 @@ public class TaskDefinitionServiceImplTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
             // error task definition nothing update
             when(processService.isTaskOnline(TASK_CODE)).thenReturn(false);
@@ -616,7 +623,8 @@ public class TaskDefinitionServiceImplTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
             String taskDefinitionJson = getTaskDefinitionJson();
             TaskDefinition taskDefinition = getTaskDefinition();

@@ -21,9 +21,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.DynamicInputParameter;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DynamicParameters extends AbstractParameters {
 
     /**

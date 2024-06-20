@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.master.runner.task.subworkflow;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +39,15 @@ public class SubWorkflowLogicTaskPluginFactory implements ILogicTaskPluginFactor
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @Override
-    public SubWorkflowLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) {
-        return new SubWorkflowLogicTask(taskExecutionContext, processInstanceExecCacheManager, processInstanceDao);
+    public SubWorkflowLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
+        int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        WorkflowExecuteRunnable workflowExecuteRunnable =
+                processInstanceExecCacheManager.getByProcessInstanceId(workflowInstanceId);
+        if (workflowExecuteRunnable == null) {
+            throw new LogicTaskInitializeException(
+                    "Cannot find the WorkflowExecuteRunnable by : " + workflowInstanceId);
+        }
+        return new SubWorkflowLogicTask(taskExecutionContext, workflowExecuteRunnable, processInstanceDao);
     }
 
     @Override

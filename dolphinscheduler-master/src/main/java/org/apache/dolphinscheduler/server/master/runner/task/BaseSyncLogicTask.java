@@ -18,9 +18,12 @@
 package org.apache.dolphinscheduler.server.master.runner.task;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,10 +31,20 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseSyncLogicTask<T extends AbstractParameters> implements ISyncLogicTask {
 
     protected final TaskExecutionContext taskExecutionContext;
+
+    protected final WorkflowExecuteRunnable workflowExecuteRunnable;
+    protected final TaskInstance taskInstance;
     protected final T taskParameters;
 
-    protected BaseSyncLogicTask(TaskExecutionContext taskExecutionContext, T taskParameters) {
+    protected BaseSyncLogicTask(WorkflowExecuteRunnable workflowExecuteRunnable,
+                                TaskExecutionContext taskExecutionContext,
+                                T taskParameters) throws LogicTaskInitializeException {
         this.taskExecutionContext = taskExecutionContext;
+        this.workflowExecuteRunnable = workflowExecuteRunnable;
+        this.taskInstance =
+                workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId()).orElseThrow(
+                        () -> new LogicTaskInitializeException(
+                                "Cannot find the task instance in workflow execute runnable"));
         this.taskParameters = taskParameters;
         log.info("Success initialize task parameters: \n{}", JSONUtils.toPrettyJsonString(taskParameters));
     }
