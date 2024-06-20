@@ -343,8 +343,6 @@ zeppelin-client-0.10.1.jar
 zeppelin-common-0.10.1.jar
 zjsonpatch-0.4.11.jar
 zt-zip-1.15.jar
-jna-5.5.0.jar
-jna-platform-5.6.0.jar
 grpc-api-1.41.0.jar
 grpc-context-1.41.0.jar
 grpc-core-1.41.0.jar

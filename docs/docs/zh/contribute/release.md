@@ -347,7 +347,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查源码包的文件内容
 
-解压缩`apache-dolphinscheduler-3.2.2-src.tar.gz`，进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-src.tar.gz`，进行如下检查:
 
 - 检查源码包是否包含由于包含不必要文件，致使 tarball 过于庞大
 - 存在`LICENSE`和`NOTICE`文件
@@ -359,7 +359,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 #### 检查二进制包的文件内容
 
-解压缩`apache-dolphinscheduler-3.2.2-bin.tar.gz`进行如下检查:
+解压缩`apache-dolphinscheduler-<VERSION>-bin.tar.gz`进行如下检查:
 
 - 存在`LICENSE`和`NOTICE`文件
 - 所有文本文件开头都有 ASF 许可证
@@ -394,7 +394,7 @@ DolphinScheduler 社区投票，发起投票邮件到`dev@dolphinscheduler.apach
 标题：
 
 ```txt
-[VOTE] Release Apache DolphinScheduler 3.2.2
+[VOTE] Release Apache DolphinScheduler <VERSION>
 ```
 
 正文：
@@ -402,15 +402,15 @@ DolphinScheduler 社区投票，发起投票邮件到`dev@dolphinscheduler.apach
 ```txt
 Hello DolphinScheduler Community,
 
-This is a call for vote to release Apache DolphinScheduler version 3.2.2
+This is a call for vote to release Apache DolphinScheduler version <VERSION>
 
-Release notes: https://github.com/apache/dolphinscheduler/releases/tag/3.2.2
+Release notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
-The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/3.2.2/
+The release candidates: https://dist.apache.org/repos/dist/dev/dolphinscheduler/<VERSION>/
 
 Maven 2 staging repository: https://repository.apache.org/content/repositories/<STAGING.REPOSITORY>/org/apache/dolphinscheduler/
 
-Git tag for the release: https://github.com/apache/dolphinscheduler/tree/3.2.2
+Git tag for the release: https://github.com/apache/dolphinscheduler/tree/<VERSION>
 
 Release Commit ID: https://github.com/apache/dolphinscheduler/commit/<SHA-VALUE>
 
@@ -441,11 +441,11 @@ Checklist for reference:
 Title：
 
 ```txt
-[RESULT][VOTE] Release Apache DolphinScheduler 3.2.2
+[RESULT][VOTE] Release Apache DolphinScheduler <VERSION>
 ```
 
 ```txt
-The vote to release Apache DolphinScheduler 3.2.2 has passed.Here is the vote result,
+The vote to release Apache DolphinScheduler <VERSION> has passed.Here is the vote result,
 
 4 PMC member +1 votes:
 
@@ -480,17 +480,17 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 
 ### 更新文档
 
-官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `3.2.2`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
+官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
-  - `config/download.json`: 增加 `3.2.2` 版本发布包的下载
-  - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `3.2.2` 的新键值对
+  - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
+  - `scripts/conf.sh`: 在变量 `DEV_RELEASE_DOCS_VERSIONS` 中增加版本为 `<VERSION>` 的新键值对
 - **apache/dolphinscheduler** 仓库 (dev 分支)：
   - `docs/configs/site.js`:
-    - `docsLatest`: 更新为 `3.2.2`
-    - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(3.2.2)`
-  - `docs/configs/index.md.jsx`: 增加 `'3.2.2': docsxyzConfig,` 以及新的 `import`
-  - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `3.2.2` 的链接
+    - `docsLatest`: 更新为 `<VERSION>`
+    - `docs0`: 两处 `en-us/zh-cn` 的 `text` 更新为 `latest(<VERSION>)`
+  - `docs/configs/index.md.jsx`: 增加 `'<VERSION>': docsxyzConfig,` 以及新的 `import`
+  - `docs/docs/en/history-versions.md` 和 `docs/docs/zh/history-versions.md`: 增加新的发版版本 `<VERSION>` 的链接
   - `.github/ISSUE_TEMPLATE/bug-report.yml`: DolphinScheduler 在 GitHub bug report 的 issue 中有版本选择，当有新的版本发版后，需要更新
     [bug-report](https://github.com/apache/dolphinscheduler/blob/dev/.github/ISSUE_TEMPLATE/bug-report.yml) 中的 **Version** 部分。
 
@@ -510,7 +510,7 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 标题：
 
 ```txt
-[ANNOUNCE] Release Apache DolphinScheduler 3.2.2
+[ANNOUNCE] Release Apache DolphinScheduler <VERSION>
 ```
 
 正文：
@@ -518,7 +518,7 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```txt
 Hi all,
 
-We are glad to announce the release of Apache DolphinScheduler 3.2.2. Once again I would like to express my thanks to your help.
+We are glad to announce the release of Apache DolphinScheduler <VERSION>. Once again I would like to express my thanks to your help.
 
 Dolphin Scheduler is a distributed and easy-to-extend visual workflow scheduler system,
 dedicated to solving the complex task dependencies in data processing, making the scheduler system out of the box for data processing.
@@ -526,14 +526,14 @@ dedicated to solving the complex task dependencies in data processing, making th
 
 Download Links: https://dolphinscheduler.apache.org/zh-cn/download
 
-Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/3.2.2
+Release Notes: https://github.com/apache/dolphinscheduler/releases/tag/<VERSION>
 
 Website: https://dolphinscheduler.apache.org/
 
 DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
-- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/3.2.2/about/introduction
+- Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
 ```
 
 ## News

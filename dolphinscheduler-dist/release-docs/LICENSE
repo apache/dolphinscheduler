@@ -313,8 +313,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jetty-xml 9.4.48.v20220622: https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-xml/9.4.48.v20220622, Apache 2.0 and EPL 1.0
     jna 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.10.0,  Apache 2.0 and LGPL 2.1
     jna-platform 5.10.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.10.0, Apache 2.0 and LGPL 2.1
-    jna 5.5.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna/5.5.0,  Apache 2.0 and LGPL 2.1
-    jna-platform 5.6.0: https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform/5.6.0, Apache 2.0 and LGPL 2.1
     joda-time 2.10.13: https://github.com/JodaOrg/joda-time, Apache 2.0
     jose4j 0.7.8: https://mvnrepository.com/artifact/org.bitbucket.b_c/jose4j, Apache 2.0
     jpam 1.1: https://mvnrepository.com/artifact/net.sf.jpam/jpam/1.1, Apache 2.0
@@ -511,7 +509,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     third-party-jackson-core 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/third-party-jackson-core/2.17.282, Apache 2.0
     utils 2.17.282: https://mvnrepository.com/artifact/software.amazon.awssdk/utils/2.17.282, Apache 2.0
     zt-zip 1.15: https://github.com/zeroturnaround/zt-zip/blob/master/LICENSE, Apache 2.0
-
     content-type 2.2: https://mvnrepository.com/artifact/com.nimbusds/content-type/2.2, Apache 2.0
     jackson-dataformat-xml 2.13.3: https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-xml/2.13.3, Apache 2.0
     lang-tag 1.6: https://mvnrepository.com/artifact/com.nimbusds/lang-tag/1.6, Apache 2.0

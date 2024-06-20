@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler-task-plugin</artifactId>
-        <version>3.2.3-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
 
     <artifactId>dolphinscheduler-task-sagemaker</artifactId>
@@ -51,7 +51,6 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-datasource-all</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
 
     </dependencies>
