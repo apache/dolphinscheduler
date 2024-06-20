@@ -31,11 +31,15 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -192,6 +196,9 @@ public class TaskInstance implements Serializable {
     @TableField(exist = false)
     private DependentParameters dependency;
 
+    @TableField(exist = false)
+    private ConditionsParameters conditionsParameters;
+
     /**
      * switch dependency
      */
@@ -316,6 +323,43 @@ public class TaskInstance implements Serializable {
 
     public void setDependency(DependentParameters dependency) {
         this.dependency = dependency;
+    }
+
+    public ConditionsParameters getConditionsParameters() {
+        if (this.conditionsParameters == null) {
+            Map<String, Object> taskParamsMap =
+                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                    });
+            this.conditionsParameters =
+                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), ConditionsParameters.class);
+        }
+        return conditionsParameters;
+    }
+
+    public ConditionsParameters.ConditionResult getConditionResult() {
+        Map<String, Object> taskParamsMap =
+                JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                });
+        String conditionResult = (String) taskParamsMap.getOrDefault(Constants.CONDITION_RESULT, "");
+        if (StringUtils.isNotEmpty(conditionResult)) {
+            return JSONUtils.parseObject(conditionResult, new TypeReference<ConditionsParameters.ConditionResult>() {
+            });
+        }
+        return null;
+    }
+
+    public void setConditionResult(ConditionsParameters conditionsParameters) {
+        if (conditionsParameters == null) {
+            return;
+        }
+        Map<String, Object> taskParamsMap =
+                JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
+                });
+        if (taskParamsMap == null) {
+            taskParamsMap = new HashMap<>();
+        }
+        taskParamsMap.put(Constants.CONDITION_RESULT, JSONUtils.toJsonString(conditionsParameters));
+        this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
     }
 
     public SwitchParameters getSwitchDependency() {

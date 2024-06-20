@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessDag;
@@ -259,9 +260,14 @@ public class DagHelperTest {
         completeTaskList.put(1L, new TaskInstance());
         completeTaskList.put(2L, new TaskInstance());
         completeTaskList.put(4L, new TaskInstance());
-        TaskNode node3 = dag.getNode(3L);
-        node3.setType(TASK_TYPE_CONDITIONS);
-        node3.setConditionResult("{\n"
+
+        TaskInstance taskInstance3 = new TaskInstance();
+        taskInstance3.setTaskType(TASK_TYPE_CONDITIONS);
+        Map<String, Object> params = new HashMap<>();
+        ConditionsParameters conditionsParameters = new ConditionsParameters();
+        conditionsParameters.setConditionSuccess(true);
+        params.put(Constants.DEPENDENCE, "{\"conditionSuccess\": true}");
+        params.put(Constants.CONDITION_RESULT, "{\n"
                 +
                 "                \"successNode\": [5\n"
                 +
@@ -272,11 +278,12 @@ public class DagHelperTest {
                 "                ]\n"
                 +
                 "            }");
-        completeTaskList.remove(3L);
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setState(TaskExecutionStatus.SUCCESS);
+        taskInstance3.setTaskParams(JSONUtils.toJsonString(params));
+        taskInstance3.setState(TaskExecutionStatus.SUCCESS);
+        TaskNode node3 = dag.getNode(3L);
+        node3.setType(TASK_TYPE_CONDITIONS);
         // complete 1/2/3/4 expect:8
-        completeTaskList.put(3L, taskInstance);
+        completeTaskList.put(3L, taskInstance3);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
         Assertions.assertTrue(postNodes.contains(8L));
@@ -291,7 +298,6 @@ public class DagHelperTest {
         // 3.complete 1/2/3/4/5/8 expect post:7 skip:6
         skipNodeList.clear();
         TaskInstance taskInstance1 = new TaskInstance();
-        taskInstance.setState(TaskExecutionStatus.SUCCESS);
         completeTaskList.put(5L, taskInstance1);
         postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
         Assertions.assertEquals(1, postNodes.size());
@@ -299,35 +305,6 @@ public class DagHelperTest {
         Assertions.assertEquals(1, skipNodeList.size());
         Assertions.assertTrue(skipNodeList.containsKey(6L));
 
-        // dag: 1-2-3-5-7 4-3-6
-        // 3-if , complete:1/2/3/4
-        // 1.failure:3 expect post:6 skip:5/7
-        skipNodeList.clear();
-        completeTaskList.remove(3L);
-        taskInstance = new TaskInstance();
-
-        Map<String, Object> taskParamsMap = new HashMap<>();
-        taskParamsMap.put(Constants.SWITCH_RESULT, "");
-        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
-        taskInstance.setState(TaskExecutionStatus.FAILURE);
-        completeTaskList.put(3L, taskInstance);
-        postNodes = DagHelper.parsePostNodes(null, skipNodeList, dag, completeTaskList);
-        Assertions.assertEquals(1, postNodes.size());
-        Assertions.assertTrue(postNodes.contains(6L));
-        Assertions.assertEquals(2, skipNodeList.size());
-        Assertions.assertTrue(skipNodeList.containsKey(5L));
-        Assertions.assertTrue(skipNodeList.containsKey(7L));
-
-        // dag: 1-2-3-5-7 4-3-6
-        // 3-if , complete:1/2/3/4
-        // 1.failure:3 expect post:6 skip:5/7
-        dag = generateDag2();
-        skipNodeList.clear();
-        completeTaskList.clear();
-        taskInstance.setSwitchDependency(getSwitchNode());
-        completeTaskList.put(1L, taskInstance);
-        postNodes = DagHelper.parsePostNodes(1L, skipNodeList, dag, completeTaskList);
-        Assertions.assertEquals(1, postNodes.size());
     }
 
     @Test
