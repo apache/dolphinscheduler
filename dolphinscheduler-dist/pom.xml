@@ -124,7 +124,7 @@
                         <version>${exec-maven-plugin.version}</version>
                         <executions>
                             <execution>
-                                <id>create-symlinks</id>
+                                <id>docker-build</id>
                                 <goals>
                                     <goal>exec</goal>
                                 </goals>
