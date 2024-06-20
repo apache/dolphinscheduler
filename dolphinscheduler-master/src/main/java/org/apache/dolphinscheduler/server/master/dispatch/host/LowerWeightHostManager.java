@@ -87,6 +87,7 @@ public class LowerWeightHostManager extends CommonHostManager {
 
         @Override
         public void notify(Map<String, Set<String>> workerGroups, Map<String, WorkerHeartBeat> workerNodeInfo) {
+            log.info("WorkerWeightListener for groups {}, weights {}", workerGroups, workerNodeInfo);
             syncWorkerResources(workerGroups, workerNodeInfo);
         }
 
@@ -137,7 +138,7 @@ public class LowerWeightHostManager extends CommonHostManager {
         }
         if (ServerStatus.BUSY == heartBeat.getServerStatus()) {
             log.warn("Worker {} in workerGroup {} is Busy, heartbeat is {}", workerAddress, workerGroup, heartBeat);
-            return Optional.empty();
+            // return Optional.empty();
         }
         return Optional.of(
                 new HostWeight(
@@ -154,7 +155,8 @@ public class LowerWeightHostManager extends CommonHostManager {
         try {
             Set<HostWeight> hostWeights = workerHostWeightsMap.get(workerGroup);
             if (hostWeights == null) {
-                throw new WorkerGroupNotFoundException("Can not find worker group " + workerGroup);
+                throw new WorkerGroupNotFoundException("Can not find worker group " + workerGroup + " current groups "
+                        + workerHostWeightsMap.keySet());
             }
             return hostWeights;
         } finally {

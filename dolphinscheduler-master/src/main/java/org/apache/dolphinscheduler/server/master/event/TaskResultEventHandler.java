@@ -71,20 +71,29 @@ public class TaskResultEventHandler implements TaskEventHandler {
                 processInstanceId);
         if (workflowExecuteRunnable == null) {
             sendAckToWorker(taskEvent);
-            throw new TaskEventHandleError(
+            // throw new TaskEventHandleError(
+            // "Handle task result event error, cannot find related workflow instance from cache, will discard this
+            // event");
+            log.warn(
                     "Handle task result event error, cannot find related workflow instance from cache, will discard this event");
+            return;
         }
         Optional<TaskInstance> taskInstanceOptional = workflowExecuteRunnable.getTaskInstance(taskInstanceId);
         if (!taskInstanceOptional.isPresent()) {
             sendAckToWorker(taskEvent);
-            throw new TaskEventHandleError(
+            // throw new TaskEventHandleError(
+            // "Handle task result event error, cannot find the taskInstance from cache, will discord this event");
+            log.warn(
                     "Handle task result event error, cannot find the taskInstance from cache, will discord this event");
+            return;
         }
         TaskInstance taskInstance = taskInstanceOptional.get();
         if (taskInstance.getState().isFinished()) {
             sendAckToWorker(taskEvent);
-            throw new TaskEventHandleError(
-                    "Handle task result event error, the task instance is already finished, will discord this event");
+            // throw new TaskEventHandleError(
+            // "Handle task result event error, the task instance is already finished, will discord this event");
+            log.warn("Handle task result event error, the task instance is already finished, will discord this event");
+            return;
         }
         dataQualityResultOperator.operateDqExecuteResult(taskEvent, taskInstance);
 

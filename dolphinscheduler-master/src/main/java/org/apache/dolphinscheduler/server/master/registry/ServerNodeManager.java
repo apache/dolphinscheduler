@@ -248,6 +248,7 @@ public class ServerNodeManager implements InitializingBean {
         workerGroupWriteLock.lock();
         try {
             Map<String, String> workerNodeMaps = registryClient.getServerMaps(RegistryNodeType.WORKER);
+            log.info("worker nodes from zk {}", workerNodeMaps);
             for (Map.Entry<String, String> entry : workerNodeMaps.entrySet()) {
                 workerNodeInfo.put(entry.getKey(), JSONUtils.parseObject(entry.getValue(), WorkerHeartBeat.class));
             }
@@ -258,6 +259,7 @@ public class ServerNodeManager implements InitializingBean {
 
     private void updateWorkerGroupMappings() {
         List<WorkerGroup> workerGroups = workerGroupMapper.queryAllWorkerGroup();
+        log.info("worker groups from db {}", workerGroups);
         Map<String, Set<String>> tmpWorkerGroupMappings = new HashMap<>();
         try {
             workerNodeInfoReadLock.lock();

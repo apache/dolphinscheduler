@@ -66,23 +66,27 @@ public class WorkflowInstanceUtils {
         int titleLength = 40;
         int leftSpaces = (horizontalLineLength - titleLength) / 2;
         String centeredTitle = String.format("%" + leftSpaces + "s%s", "", "Task Instance Detail");
-        logBuilder.append("\n").append(Strings.repeat("*", horizontalLineLength)).append("\n")
-                .append(centeredTitle).append("\n")
-                .append(Strings.repeat("*", horizontalLineLength)).append("\n")
-                .append("Task Name:              ").append(taskInstance.getName()).append("\n")
-                .append("Workflow Instance Name: ").append(taskInstance.getProcessInstance().getName()).append("\n")
-                .append("Task Execute Type:      ").append(taskInstance.getTaskExecuteType().getDesc()).append("\n")
-                .append("Execute State:          ").append(taskInstance.getState().getDesc()).append("\n")
-                .append("Host:                   ").append(taskInstance.getHost()).append("\n")
-                .append("Task Type:              ").append(taskInstance.getTaskType()).append("\n")
-                .append("Priority:               ").append(taskInstance.getTaskInstancePriority().getDescp())
-                .append("\n")
-                .append("Tenant:                 ").append(taskInstance.getProcessInstance().getTenantCode())
-                .append("\n")
-                .append("First Submit Time:      ").append(taskInstance.getFirstSubmitTime()).append("\n")
-                .append("Submit Time:            ").append(taskInstance.getSubmitTime()).append("\n")
-                .append("Start Time:             ").append(taskInstance.getStartTime()).append("\n")
-                .append("End Time:               ").append(taskInstance.getEndTime()).append("\n");
+        try {
+            logBuilder.append("\n").append(Strings.repeat("*", horizontalLineLength)).append("\n")
+                    .append(centeredTitle).append("\n")
+                    .append(Strings.repeat("*", horizontalLineLength)).append("\n")
+                    .append("Task Name:              ").append(taskInstance.getName()).append("\n")
+                    .append("Workflow Instance Name: ").append(taskInstance.getProcessInstance().getName()).append("\n")
+                    .append("Task Execute Type:      ").append(taskInstance.getTaskExecuteType().getDesc()).append("\n")
+                    .append("Execute State:          ").append(taskInstance.getState().getDesc()).append("\n")
+                    .append("Host:                   ").append(taskInstance.getHost()).append("\n")
+                    .append("Task Type:              ").append(taskInstance.getTaskType()).append("\n")
+                    .append("Priority:               ").append(taskInstance.getTaskInstancePriority().getDescp())
+                    .append("\n")
+                    .append("Tenant:                 ").append(taskInstance.getProcessInstance().getTenantCode())
+                    .append("\n")
+                    .append("First Submit Time:      ").append(taskInstance.getFirstSubmitTime()).append("\n")
+                    .append("Submit Time:            ").append(taskInstance.getSubmitTime()).append("\n")
+                    .append("Start Time:             ").append(taskInstance.getStartTime()).append("\n")
+                    .append("End Time:               ").append(taskInstance.getEndTime()).append("\n");
+        } catch (Exception e) {
+            logBuilder.append(e.getMessage());
+        }
         return logBuilder.toString();
     }
 }

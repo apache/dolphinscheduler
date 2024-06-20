@@ -67,7 +67,7 @@ public class TaskStateEventHandler implements StateEventHandler {
                     task.getState().name(),
                     taskStateEvent.getStatus().name());
             log.warn(errorMessage);
-            throw new StateEventHandleError(errorMessage);
+            // throw new StateEventHandleError(errorMessage);
         }
 
         if (task.getState().isFinished()) {
