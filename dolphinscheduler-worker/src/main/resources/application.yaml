@@ -23,6 +23,7 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+  cloud.discovery.client.composite-indicator.enabled: false
 
 registry:
   type: zookeeper
