@@ -75,6 +75,8 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
     static-path-pattern: /static/**
+  cloud.discovery.client.composite-indicator.enabled: false
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

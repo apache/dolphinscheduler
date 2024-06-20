@@ -64,6 +64,7 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  cloud.discovery.client.composite-indicator.enabled: false
 
 mybatis-plus:
   mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml
