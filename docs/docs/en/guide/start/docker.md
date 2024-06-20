@@ -19,7 +19,7 @@ Start DolphinScheduler with standalone-server Docker images is the easiest way t
 you can learn DolphinScheduler's concepts and usage, with minimal cost.
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.2.2
+$ DOLPHINSCHEDULER_VERSION=<version>
 $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:25333 -d apache/dolphinscheduler-standalone-server:"${DOLPHINSCHEDULER_VERSION}"
 ```
 
@@ -37,11 +37,11 @@ be stored on disks after you change docker-compose configuration, and it is robu
 DolphinScheduler in a long term. You have to install [docker-compose](https://docs.docker.com/compose/install/) before you
 start servers.
 
-After complete the installation, get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/en-us/download/3.2.2)
+After complete the installation, get the `docker-compose.yaml` file from [download page](https://dolphinscheduler.apache.org/en-us/download/<version>)
 form its source package, and make sure you get the right version. After download the package, you can run the commands as below.
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.2.2
+$ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Going to docker-compose's location
 # For Mac or Linux users
@@ -68,7 +68,7 @@ $ docker-compose --profile all up -d
 container when it up. You could start DolphinScheduler server separately if you want to reuse your exists services.
 
 ```shell
-$ DOLPHINSCHEDULER_VERSION=3.2.2
+$ DOLPHINSCHEDULER_VERSION=<version>
 # Initialize the database, make sure database <DATABASE> already exists
 $ docker run -d --name dolphinscheduler-tools \
     -e DATABASE="postgresql" \
@@ -134,5 +134,5 @@ and use `admin` and `dolphinscheduler123` as default username and password in th
 
 You can modify some environment variables to change configurations when you are starting servers through Docker. We have
 an example in [using exists PostgreSQL ZooKeeper](#using-exists-postgresql-zookeeper) to change database and ZooKeeper configurations,
-and you could find all environment variables in [all environment variables](https://github.com/apache/dolphinscheduler/blob/3.2.2/script/env/dolphinscheduler_env.sh) <!-- markdown-link-check-disable-line -->
+and you could find all environment variables in [all environment variables](https://github.com/apache/dolphinscheduler/blob/<version>/script/env/dolphinscheduler_env.sh) <!-- markdown-link-check-disable-line -->
 and change them if you want.

@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler-dao-plugin</artifactId>
-        <version>3.2.3-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
 
     <artifactId>dolphinscheduler-dao-plugin-all</artifactId>

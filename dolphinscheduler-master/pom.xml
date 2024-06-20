@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler</artifactId>
-        <version>3.2.3-SNAPSHOT</version>
+        <version>dev-SNAPSHOT</version>
     </parent>
 
     <artifactId>dolphinscheduler-master</artifactId>
@@ -57,7 +57,21 @@
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-registry-all</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-scheduler-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-task-all</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-storage-all</artifactId>
         </dependency>
 
         <dependency>
@@ -324,52 +338,6 @@
                     </plugin>
                 </plugins>
             </build>
-        </profile>
-        <profile>
-            <id>task-pure</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-task-pure</artifactId>
-                    <exclusions>
-                        <exclusion>
-                            <groupId>org.apache.dolphinscheduler</groupId>
-                            <artifactId>dolphinscheduler-datasource-all</artifactId>
-                        </exclusion>
-                    </exclusions>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-registry-pure</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-storage-pure</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>task-all</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-task-all</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-registry-all</artifactId>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.dolphinscheduler</groupId>
-                    <artifactId>dolphinscheduler-storage-all</artifactId>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 </project>
