@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.commons.lang3.RandomUtils;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -37,8 +35,6 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import com.google.common.collect.Lists;
-
 @ActiveProfiles("mysql")
 class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
 
@@ -55,11 +51,11 @@ class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withExposedPorts(3306)
                 .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
-        int exposedPort = RandomUtils.nextInt(10000, 65535);
-        mysqlContainer.setPortBindings(Lists.newArrayList(exposedPort + ":3306"));
         Startables.deepStart(Stream.of(mysqlContainer)).join();
 
-        String jdbcUrl = "jdbc:mysql://localhost:" + exposedPort + "/dolphinscheduler?useSSL=false&serverTimezone=UTC";
+        String jdbcUrl = "jdbc:mysql://localhost:" + mysqlContainer.getMappedPort(3306)
+                + "/dolphinscheduler?useSSL=false&serverTimezone=UTC";
+        System.clearProperty("spring.datasource.url");
         System.setProperty("spring.datasource.url", jdbcUrl);
 
         try (
