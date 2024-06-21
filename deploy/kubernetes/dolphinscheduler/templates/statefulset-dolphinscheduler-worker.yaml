@@ -111,9 +111,11 @@ spec:
               name: {{ include "dolphinscheduler.fullname" . }}-worker-data
             - mountPath: "/opt/dolphinscheduler/logs"
               name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
+            {{- if .Values.worker.enableCustomizedConfig }}
             - name: worker-config-volume
               mountPath: /opt/dolphinscheduler/conf/application.yaml
               subPath: application.yaml
+            {{- end }}
             - name: config-volume
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common.properties
@@ -142,9 +144,11 @@ spec:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-logs
           emptyDir: {}
         {{- end }}
+        {{- if .Values.worker.enableCustomizedConfig }}
         - name: worker-config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-worker
+        {{- end }}
         - name: config-volume
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
