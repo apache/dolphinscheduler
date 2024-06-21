@@ -101,16 +101,16 @@ class ZookeeperRegistryProperties implements Validator {
         private String connectString;
         private RetryPolicy retryPolicy = new RetryPolicy();
         private String digest;
-        private Duration sessionTimeout = Duration.ofSeconds(30);
-        private Duration connectionTimeout = Duration.ofSeconds(9);
-        private Duration blockUntilConnected = Duration.ofMillis(600);
+        private Duration sessionTimeout = Duration.ofSeconds(60);
+        private Duration connectionTimeout = Duration.ofSeconds(15);
+        private Duration blockUntilConnected = Duration.ofSeconds(15);
 
         @Data
         public static final class RetryPolicy {
 
-            private Duration baseSleepTime = Duration.ofMillis(60);
-            private int maxRetries;
-            private Duration maxSleep = Duration.ofMillis(300);
+            private Duration baseSleepTime = Duration.ofSeconds(1);
+            private int maxRetries = 3;
+            private Duration maxSleep = Duration.ofSeconds(3);
 
         }
     }

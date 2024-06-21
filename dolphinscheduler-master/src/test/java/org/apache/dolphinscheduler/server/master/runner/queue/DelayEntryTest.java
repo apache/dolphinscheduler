@@ -29,7 +29,7 @@ class DelayEntryTest {
     void getDelay() {
         DelayEntry<String> delayEntry = new DelayEntry<>(5_000L, "Item");
         assertThat(delayEntry.getDelay(TimeUnit.NANOSECONDS))
-                .isWithin(500)
+                .isWithin(TimeUnit.NANOSECONDS.convert(500, TimeUnit.MILLISECONDS))
                 .of(TimeUnit.NANOSECONDS.convert(5_000L, TimeUnit.MILLISECONDS));
     }
 }

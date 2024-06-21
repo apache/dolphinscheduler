@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +63,9 @@ class CommandDaoImplTest extends BaseDaoTest {
         // Generate commandSize commands
         int id = 0;
         for (int j = 0; j < commandSize; j++) {
+            id += idStep;
             Command command = generateCommand(CommandType.START_PROCESS, 0);
             command.setId(id);
-            id += idStep;
             commandDao.insert(command);
         }
 
@@ -75,7 +76,8 @@ class CommandDaoImplTest extends BaseDaoTest {
                         ", idStep: " + idStep +
                         ", fetchSize: " + fetchSize +
                         ", total command size: " + commandSize +
-                        ", total commands: " + commandDao.queryAll());
+                        ", total commands: "
+                        + commandDao.queryAll().stream().map(Command::getId).collect(Collectors.toList()));
         assertThat(commands.size())
                 .isEqualTo(commandDao.queryAll()
                         .stream()
