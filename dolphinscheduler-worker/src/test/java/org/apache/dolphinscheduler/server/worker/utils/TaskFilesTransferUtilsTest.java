@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.worker.utils;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -99,8 +99,8 @@ public class TaskFilesTransferUtilsTest {
 
         List<Property> oriProperties = TaskFilesTransferUtils.getVarPools(taskExecutionContext);
 
-        StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
-        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+        StorageOperator storageOperator = Mockito.mock(StorageOperator.class);
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperator);
         System.out.println(taskExecutionContext.getVarPool());
 
         String exceptFolder =
@@ -154,10 +154,10 @@ public class TaskFilesTransferUtilsTest {
                 .endTime(endTime)
                 .build();
 
-        StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
+        StorageOperator storageOperator = Mockito.mock(StorageOperator.class);
         Mockito.mockStatic(ZipUtil.class);
         Assertions.assertDoesNotThrow(
-                () -> TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate));
+                () -> TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperator));
     }
 
     @Test

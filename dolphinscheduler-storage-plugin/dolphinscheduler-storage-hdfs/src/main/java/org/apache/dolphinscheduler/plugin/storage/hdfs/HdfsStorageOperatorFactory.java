@@ -17,20 +17,36 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperateFactory;
+import static org.apache.dolphinscheduler.common.constants.Constants.FS_DEFAULT_FS;
+import static org.apache.dolphinscheduler.common.constants.Constants.HDFS_ROOT_USER;
+
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+
+import java.util.Map;
 
 import com.google.auto.service.AutoService;
 
-@AutoService(StorageOperateFactory.class)
-public class HdfsStorageOperatorFactory implements StorageOperateFactory {
+@AutoService(StorageOperatorFactory.class)
+public class HdfsStorageOperatorFactory implements StorageOperatorFactory {
 
     @Override
-    public StorageOperate createStorageOperate() {
-        HdfsStorageOperator hdfsOperator = new HdfsStorageOperator();
-        hdfsOperator.init();
-        return hdfsOperator;
+    public StorageOperator createStorageOperate() {
+        final HdfsStorageProperties hdfsStorageProperties = getHdfsStorageProperties();
+        return new HdfsStorageOperator(hdfsStorageProperties);
+    }
+
+    private HdfsStorageProperties getHdfsStorageProperties() {
+        Map<String, String> configurationProperties = PropertyUtils.getByPrefix("fs.");
+        return HdfsStorageProperties.builder()
+                .user(PropertyUtils.getString(HDFS_ROOT_USER))
+                .defaultFS(PropertyUtils.getString(FS_DEFAULT_FS))
+                .configurationProperties(configurationProperties)
+                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .build();
     }
 
     @Override
