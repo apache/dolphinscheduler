@@ -51,6 +51,7 @@ public class EtcdRegistryTestCase extends RegistryTestCase<EtcdRegistry> {
                 .build()
                 .cluster();
         etcdCluster.start();
+        System.clearProperty("registry.endpoints");
         System.setProperty("registry.endpoints",
                 etcdCluster.clientEndpoints().stream().map(URI::toString).collect(Collectors.joining(",")));
     }
