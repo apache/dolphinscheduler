@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -303,7 +303,7 @@ public class CommandMapperTest extends BaseDaoTest {
         command.setProcessInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
-        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(0);
         commandMapper.insert(command);
