@@ -17,16 +17,14 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
@@ -93,8 +91,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
-        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP
-                : schedule.getWorkerGroup();
+        String workerGroup = WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup());
         command.setWorkerGroup(workerGroup);
         command.setTenantCode(schedule.getTenantCode());
         command.setEnvironmentCode(schedule.getEnvironmentCode());
