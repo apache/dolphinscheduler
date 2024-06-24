@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectWorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -118,7 +119,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
                 workerGroupMapper.queryAllWorkerGroup().stream().map(WorkerGroup::getName).collect(
                         Collectors.toSet());
 
-        workerGroupNames.add(Constants.DEFAULT_WORKER_GROUP);
+        workerGroupNames.add(WorkerGroupUtils.getDefaultWorkerGroup());
 
         Set<String> assignedWorkerGroupNames = new HashSet<>(workerGroups);
 

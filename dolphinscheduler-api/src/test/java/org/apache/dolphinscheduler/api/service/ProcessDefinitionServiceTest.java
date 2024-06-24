@@ -72,6 +72,7 @@ import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -1143,7 +1144,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setProcessInstancePriority(Priority.MEDIUM);
         schedule.setWarningType(WarningType.NONE);
         schedule.setWarningGroupId(1);
-        schedule.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        schedule.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         return schedule;
     }
 
