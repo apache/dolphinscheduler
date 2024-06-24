@@ -92,8 +92,8 @@ public class WorkflowJavaTaskE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20))
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)

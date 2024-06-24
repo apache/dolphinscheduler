@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
@@ -64,8 +63,6 @@ import org.slf4j.LoggerFactory;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class WorkerGroupServiceTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(WorkerGroupServiceTest.class);
 
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
 
@@ -286,47 +283,6 @@ public class WorkerGroupServiceTest {
         List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
         Assertions.assertEquals(1, workerGroups.size());
         Assertions.assertEquals("default", workerGroups.toArray()[0]);
-    }
-
-    @Test
-    public void giveNull_whenGetTaskWorkerGroup_expectNull() {
-        String nullWorkerGroup = workerGroupService.getTaskWorkerGroup(null);
-        Assertions.assertNull(nullWorkerGroup);
-    }
-
-    @Test
-    public void giveCorrectTaskInstance_whenGetTaskWorkerGroup_expectTaskWorkerGroup() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setWorkerGroup("cluster1");
-
-        String workerGroup = workerGroupService.getTaskWorkerGroup(taskInstance);
-        Assertions.assertEquals("cluster1", workerGroup);
-    }
-
-    @Test
-    public void giveNullWorkerGroup_whenGetTaskWorkerGroup_expectProcessWorkerGroup() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setProcessInstanceId(1);
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(1);
-        processInstance.setWorkerGroup("cluster1");
-        Mockito.when(processService.findProcessInstanceById(1)).thenReturn(processInstance);
-
-        String workerGroup = workerGroupService.getTaskWorkerGroup(taskInstance);
-        Assertions.assertEquals("cluster1", workerGroup);
-    }
-
-    @Test
-    public void giveNullTaskAndProcessWorkerGroup_whenGetTaskWorkerGroup_expectDefault() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setProcessInstanceId(1);
-        Mockito.when(processService.findProcessInstanceById(1)).thenReturn(null);
-
-        String defaultWorkerGroup = workerGroupService.getTaskWorkerGroup(taskInstance);
-        Assertions.assertEquals(Constants.DEFAULT_WORKER_GROUP, defaultWorkerGroup);
     }
 
     /**

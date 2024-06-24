@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.api.dto.task;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.VERSION_FIRST;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
 import java.util.Date;
@@ -107,7 +107,7 @@ public class TaskCreateRequest {
         taskDefinition.setProjectCode(this.projectCode);
         taskDefinition.setTaskType(this.taskType);
         taskDefinition.setTaskParams(this.taskParams);
-        taskDefinition.setWorkerGroup(this.workerGroup == null ? Constants.DEFAULT_WORKER_GROUP : this.workerGroup);
+        taskDefinition.setWorkerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(workerGroup));
         taskDefinition.setEnvironmentCode(this.environmentCode);
         taskDefinition.setFailRetryTimes(this.failRetryTimes);
         taskDefinition.setFailRetryInterval(this.failRetryInterval);

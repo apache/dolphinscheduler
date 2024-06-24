@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.sql.Date;
@@ -52,7 +53,7 @@ public class WorkflowInstanceUtilsTest {
         workflowInstance.setDryRun(0);
         workflowInstance.setTenantCode("default");
         workflowInstance.setRestartTime(Date.valueOf("2023-08-01"));
-        workflowInstance.setWorkerGroup("default");
+        workflowInstance.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         workflowInstance.setStartTime(Date.valueOf("2023-08-01"));
         workflowInstance.setEndTime(Date.valueOf("2023-08-01"));
         Assertions.assertEquals("\n"
