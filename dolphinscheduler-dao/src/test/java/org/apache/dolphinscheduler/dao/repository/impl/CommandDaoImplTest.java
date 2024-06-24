@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -29,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.lang3.RandomUtils;
 
@@ -80,7 +80,7 @@ class CommandDaoImplTest extends BaseDaoTest {
         command.setProcessInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
-        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(0);
         commandDao.insert(command);
