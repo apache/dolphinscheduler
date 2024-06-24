@@ -377,7 +377,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             processTaskRelationLogList.add(processTaskRelationLog);
         }
         int insertResult = processService.saveTaskRelation(loginUser, projectCode, processDefinition.getCode(),
-                processDefinition.getVersion(),
+                processDefinition.getVersion()+1,
                 processTaskRelationLogList, Lists.newArrayList(), Boolean.TRUE);
         if (insertResult != Constants.EXIT_CODE_SUCCESS) {
             log.error(
@@ -400,6 +400,14 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         } else
             log.info("Save task definition complete, projectCode:{}, taskDefinitionCode:{}.", projectCode,
                     taskDefinition.getCode());
+        
+        int insertVersion = processService.saveProcessDefine(loginUser, processDefinition, Boolean.TRUE, Boolean.TRUE);
+        if (insertVersion == 0) {
+            throw new ServiceException(Status.CREATE_PROCESS_DEFINITION_ERROR);
+        } else
+            log.info("Save process definition complete, processCode:{}, processVersion:{}.",
+                    processDefinition.getCode(), insertVersion);
+        
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, taskDefinition);
         return result;
