@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Event.Type;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -36,7 +37,6 @@ import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -273,8 +273,8 @@ public class ServerNodeManager implements InitializingBean {
                         .filter(workerNodeInfo::containsKey).collect(Collectors.toSet());
                 tmpWorkerGroupMappings.put(workerGroupName, activeWorkerNodes);
             }
-            if (!tmpWorkerGroupMappings.containsKey(Constants.DEFAULT_WORKER_GROUP)) {
-                tmpWorkerGroupMappings.put(Constants.DEFAULT_WORKER_GROUP, workerNodeInfo.keySet());
+            if (!tmpWorkerGroupMappings.containsKey(WorkerGroupUtils.getDefaultWorkerGroup())) {
+                tmpWorkerGroupMappings.put(WorkerGroupUtils.getDefaultWorkerGroup(), workerNodeInfo.keySet());
             }
         } finally {
             workerNodeInfoReadLock.unlock();
@@ -307,9 +307,7 @@ public class ServerNodeManager implements InitializingBean {
     public Set<String> getWorkerGroupNodes(String workerGroup) throws WorkerGroupNotFoundException {
         workerGroupReadLock.lock();
         try {
-            if (StringUtils.isEmpty(workerGroup)) {
-                workerGroup = Constants.DEFAULT_WORKER_GROUP;
-            }
+            workerGroup = WorkerGroupUtils.getWorkerGroupOrDefault(workerGroup);
             Set<String> nodes = workerGroupNodes.get(workerGroup);
             if (nodes == null) {
                 throw new WorkerGroupNotFoundException(String.format("WorkerGroup: %s is invalidated", workerGroup));
