@@ -51,6 +51,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+  cloud.discovery.client.composite-indicator.enabled: false
 
 # Mybatis-plus configuration, you don't need to change it
 mybatis-plus:
