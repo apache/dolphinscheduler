@@ -35,10 +35,7 @@ import { defineStore } from 'pinia'
 const goSubFolder = (router: Router, item: any) => {
   if (item.directory) {
     router.push({
-      name:
-        item.type === 'UDF'
-          ? 'resource-sub-manage'
-          : 'resource-file-subdirectory',
+      name: 'resource-file-subdirectory',
       query: { prefix: item.fullName, tenantCode: item.user_name }
     })
   } else if (item.type === 'FILE') {
@@ -160,9 +157,7 @@ export function useTable() {
               renameResource(name, description, fullName, user_name),
             onUpdateList: () => updateList()
           }),
-        ...COLUMN_WIDTH_CONFIG['operation'](
-          variables.resourceType === 'UDF' ? 4 : 5
-        )
+        ...COLUMN_WIDTH_CONFIG['operation']((variables.resourceType = 0))
       }
     ]
   }

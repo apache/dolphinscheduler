@@ -17,11 +17,15 @@
 
 package org.apache.dolphinscheduler.spi.enums;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * resource type
  */
+@Getter
 public enum ResourceType {
 
     /**
@@ -37,16 +41,9 @@ public enum ResourceType {
     }
 
     @EnumValue
+    @JsonValue
     private final int code;
     private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 
     public static ResourceType getResourceType(int code) {
         for (ResourceType resourceType : ResourceType.values()) {
