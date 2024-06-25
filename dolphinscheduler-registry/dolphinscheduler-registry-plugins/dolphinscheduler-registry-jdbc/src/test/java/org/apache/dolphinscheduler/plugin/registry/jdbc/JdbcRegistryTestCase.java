@@ -17,8 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.RegistryTestCase;
+import static com.google.common.truth.Truth.assertThat;
 
+import org.apache.dolphinscheduler.plugin.registry.RegistryTestCase;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
+
+import lombok.SneakyThrows;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +38,18 @@ public abstract class JdbcRegistryTestCase extends RegistryTestCase<JdbcRegistry
 
     @Autowired
     private JdbcOperator jdbcOperator;
+
+    @Test
+    @SneakyThrows
+    public void testTryToAcquireLock_lockIsAlreadyBeenAcquired() {
+        final String lockKey = "testTryToAcquireLock_lockIsAlreadyBeenAcquired";
+        // acquire success
+        JdbcRegistryLock jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey);
+        // acquire failed
+        assertThat(jdbcOperator.tryToAcquireLock(lockKey)).isNull();
+        // release
+        jdbcOperator.releaseLock(jdbcRegistryLock.getId());
+    }
 
     @Override
     public JdbcRegistry createRegistry() {
