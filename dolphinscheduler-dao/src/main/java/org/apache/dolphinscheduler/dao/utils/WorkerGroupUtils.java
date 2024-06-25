@@ -15,37 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.parameters;
+package org.apache.dolphinscheduler.dao.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class BlockingParameters extends AbstractParameters {
+public class WorkerGroupUtils {
 
-    // condition of blocking: BlockingOnFailed or BlockingOnSuccess
-    private String blockingOpportunity;
+    private static final String DEFAULT_WORKER_GROUP = "default";
 
-    // if true, alert when blocking, otherwise do nothing
-
-    private boolean isAlertWhenBlocking;
-
-    @Override
-    public boolean checkParameters() {
-        return !StringUtils.isEmpty(blockingOpportunity);
+    /**
+     * Check if the worker group is empty, if the worker group is default, it is considered empty
+     */
+    public static boolean isWorkerGroupEmpty(String workerGroup) {
+        return StringUtils.isEmpty(workerGroup) || getDefaultWorkerGroup().equals(workerGroup);
     }
 
-    public String getBlockingOpportunity() {
-        return blockingOpportunity;
+    public static String getWorkerGroupOrDefault(String workerGroup) {
+        return getWorkerGroupOrDefault(workerGroup, getDefaultWorkerGroup());
     }
 
-    public void setBlockingCondition(String blockingOpportunity) {
-        this.blockingOpportunity = blockingOpportunity;
+    public static String getWorkerGroupOrDefault(String workerGroup, String defaultWorkerGroup) {
+        return isWorkerGroupEmpty(workerGroup) ? defaultWorkerGroup : workerGroup;
     }
 
-    public boolean isAlertWhenBlocking() {
-        return isAlertWhenBlocking;
+    public static String getDefaultWorkerGroup() {
+        return DEFAULT_WORKER_GROUP;
     }
 
-    public void setAlertWhenBlocking(boolean alertWhenBlocking) {
-        isAlertWhenBlocking = alertWhenBlocking;
-    }
 }

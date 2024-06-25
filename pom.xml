@@ -86,7 +86,7 @@
         <jacoco.skip>false</jacoco.skip>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
-        <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
+        <owasp-dependency-check-maven.version>9.2.0</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
         <awaitility.version>4.2.0</awaitility.version>
         <truth.version>1.4.2</truth.version>

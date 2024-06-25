@@ -19,23 +19,17 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.List;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(TaskChannelFactory.class)
 public class SqlTaskChannelFactory implements TaskChannelFactory {
 
-    @Override
-    public String getName() {
-        return "SQL";
-    }
+    public static final String NAME = "SQL";
 
     @Override
-    public List<PluginParams> getParams() {
-        return null;
+    public String getName() {
+        return NAME;
     }
 
     @Override
