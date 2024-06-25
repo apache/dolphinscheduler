@@ -71,31 +71,7 @@ Go to the ZooKeeper installation directory, copy configure file `zoo_sample.cfg`
 ## Modify Configuration
 
 After completing the preparation of the basic environment, you need to modify the configuration file according to the
-environment you used. Change the environment configurations via `export <ENV_NAME>=<VALUE>`. The configuration files are located in directory `bin/env` as `install_env.sh` and `dolphinscheduler_env.sh`.
-
-### Modify `install_env.sh`
-
-File `install_env.sh` describes which machines will be installed DolphinScheduler and what server will be installed on
-each machine. You could find this file in the path `bin/env/install_env.sh` and the detail of the configuration as below.
-
-```shell
-# ---------------------------------------------------------
-# INSTALL MACHINE
-# ---------------------------------------------------------
-# Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
-ips="localhost"
-sshPort="22"
-masters="localhost"
-workers="localhost:default"
-alertServer="localhost"
-apiServers="localhost"
-
-# DolphinScheduler installation path, it will auto-create if not exists
-installPath=~/dolphinscheduler
-
-# Deploy user, use the user you create in section **Configure machine SSH password-free login**
-deployUser="dolphinscheduler"
-```
+environment you used. Change the environment configurations via `export <ENV_NAME>=<VALUE>`. The configuration files are located in directory `bin/env` as `dolphinscheduler_env.sh`.
 
 ### Modify `dolphinscheduler_env.sh`
 
@@ -146,11 +122,7 @@ Follow the instructions in [datasource-setting](../howto/datasource-setting.md) 
 
 ## Start DolphinScheduler
 
-Use **deployment user** you created above, running the following command to complete the deployment, and the server log will be stored in the logs folder.
-
-```shell
-bash ./bin/install.sh
-```
+Use **deployment user** you created above, running the command to complete the deployment, and the server log will be stored in the logs folder.
 
 > **_Note:_** For the first time deployment, there maybe occur five times of `sh: bin/dolphinscheduler-daemon.sh: No such file or directory` in the terminal,
 > this is non-important information that you can ignore.
