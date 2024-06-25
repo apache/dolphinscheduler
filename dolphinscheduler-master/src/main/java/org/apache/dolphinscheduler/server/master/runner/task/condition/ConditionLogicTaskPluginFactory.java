@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.condition;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,28 +36,19 @@ public class ConditionLogicTaskPluginFactory implements ILogicTaskPluginFactory<
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
-    @Autowired
-    private ProcessInstanceDao processInstanceDao;
 
     @Autowired
     private ProcessInstanceExecCacheManager processInstanceExecCacheManager;
 
     @Override
     public ConditionLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        TaskInstance taskInstance =
-                processInstanceExecCacheManager.getByProcessInstanceId(taskExecutionContext.getProcessInstanceId())
-                        .getTaskInstance(taskExecutionContext.getTaskInstanceId())
-                        .orElseThrow(() -> new LogicTaskInitializeException(
-                                "Cannot find the task instance in workflow execute runnable"));
-        return new ConditionLogicTask(
-                taskExecutionContext,
-                taskInstance,
-                taskInstanceDao,
-                processInstanceDao);
+        WorkflowExecuteRunnable workflowExecuteRunnable = processInstanceExecCacheManager.getByProcessInstanceId(
+                taskExecutionContext.getProcessInstanceId());
+        return new ConditionLogicTask(workflowExecuteRunnable, taskExecutionContext, taskInstanceDao);
     }
 
     @Override
     public String getTaskType() {
-        return ConditionLogicTask.TASK_TYPE;
+        return ConditionsLogicTaskChannelFactory.NAME;
     }
 }

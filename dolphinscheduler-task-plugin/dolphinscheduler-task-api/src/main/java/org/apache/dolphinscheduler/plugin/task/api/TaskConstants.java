@@ -362,23 +362,9 @@ public class TaskConstants {
      */
     public static final String DATA_QUALITY_JAR_DIR = "data-quality.jar.dir";
 
-    public static final String TASK_TYPE_CONDITIONS = "CONDITIONS";
-
-    public static final String TASK_TYPE_SWITCH = "SWITCH";
-
-    public static final String TASK_TYPE_SUB_PROCESS = "SUB_PROCESS";
-
-    public static final String TASK_TYPE_DYNAMIC = "DYNAMIC";
-
-    public static final String TASK_TYPE_DEPENDENT = "DEPENDENT";
-
-    public static final String TASK_TYPE_SQL = "SQL";
-
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
     public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
-
-    public static final String TASK_TYPE_BLOCKING = "BLOCKING";
 
     /**
      * azure config
@@ -388,13 +374,6 @@ public class TaskConstants {
     public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
     public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
     public static final String QUERY_INTERVAL = "resource.query.interval";
-
-    /**
-     * aws config
-     */
-    public static final String AWS_ACCESS_KEY_ID = "resource.aws.access.key.id";
-    public static final String AWS_SECRET_ACCESS_KEY = "resource.aws.secret.access.key";
-    public static final String AWS_REGION = "resource.aws.region";
 
     /**
      * alibaba cloud config

@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -89,8 +88,6 @@ public class StreamTaskExecuteRunnable implements Runnable {
 
     protected ProcessTaskRelationMapper processTaskRelationMapper;
 
-    protected TaskPluginManager taskPluginManager;
-
     private StreamTaskInstanceExecCacheManager streamTaskInstanceExecCacheManager;
 
     protected TaskDefinition taskDefinition;
@@ -115,7 +112,6 @@ public class StreamTaskExecuteRunnable implements Runnable {
         this.processService = SpringApplicationContext.getBean(ProcessService.class);
         this.masterConfig = SpringApplicationContext.getBean(MasterConfig.class);
         this.workerTaskDispatcher = SpringApplicationContext.getBean(WorkerTaskDispatcher.class);
-        this.taskPluginManager = SpringApplicationContext.getBean(TaskPluginManager.class);
         this.processTaskRelationMapper = SpringApplicationContext.getBean(ProcessTaskRelationMapper.class);
         this.taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
         this.streamTaskInstanceExecCacheManager =
@@ -311,14 +307,11 @@ public class StreamTaskExecuteRunnable implements Runnable {
             return null;
         }
 
-        TaskChannel taskChannel = taskPluginManager.getTaskChannel(taskInstance.getTaskType());
-        ResourceParametersHelper resources = taskChannel.getResources(taskInstance.getTaskParams());
+        TaskChannel taskChannel = TaskPluginManager.getTaskChannel(taskInstance.getTaskType());
+        ResourceParametersHelper resources = taskChannel.parseParameters(taskInstance.getTaskParams()).getResources();
 
-        AbstractParameters baseParam = taskPluginManager.getParameters(
-                ParametersNode.builder()
-                        .taskType(taskInstance.getTaskType())
-                        .taskParams(taskInstance.getTaskParams())
-                        .build());
+        AbstractParameters baseParam =
+                TaskPluginManager.parseTaskParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
         Map<String, Property> propertyMap = paramParsingPreparation(taskInstance, baseParam);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
                 .buildWorkflowInstanceHost(masterConfig.getMasterAddress())

@@ -202,12 +202,6 @@ public class ProcessInstance {
     private Date restartTime;
 
     /**
-     * workflow block flag
-     */
-    @TableField(exist = false)
-    private boolean isBlocked;
-
-    /**
      * test flag
      */
     private int testFlag;

@@ -39,7 +39,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFF
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SQL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
@@ -109,12 +109,12 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.plugin.task.sql.SqlTaskChannelFactory;
 import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -421,11 +421,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJson);
             }
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-                if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
-                        .taskType(taskDefinitionLog.getTaskType())
-                        .taskParams(taskDefinitionLog.getTaskParams())
-                        .dependence(taskDefinitionLog.getDependence())
-                        .build())) {
+                if (!checkTaskParameters(taskDefinitionLog.getTaskType(), taskDefinitionLog.getTaskParams())) {
                     log.error(
                             "Generate task definition list failed, the given task definition parameter is invalided, taskName: {}, taskDefinition: {}",
                             taskDefinitionLog.getName(), taskDefinitionLog);
@@ -1386,7 +1382,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         sqlParameters.setLocalParams(Collections.emptyList());
         taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
         taskDefinition.setCode(CodeGenerateUtils.genCode());
-        taskDefinition.setTaskType(TASK_TYPE_SQL);
+        taskDefinition.setTaskType(SqlTaskChannelFactory.NAME);
         taskDefinition.setFailRetryTimes(0);
         taskDefinition.setFailRetryInterval(0);
         taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
@@ -1615,13 +1611,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
             // check whether the process definition json is normal
             for (TaskNode taskNode : taskNodes) {
-                if (!TaskPluginManager.checkTaskParameters(ParametersNode.builder()
-                        .taskType(taskNode.getType())
-                        .taskParams(taskNode.getTaskParams())
-                        .dependence(taskNode.getDependence())
-                        .switchResult(taskNode.getSwitchResult())
-                        .build())) {
-                    log.error("Task node {} parameter invalid.", taskNode.getName());
+                if (!checkTaskParameters(taskNode.getType(), taskNode.getParams())) {
                     putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskNode.getName());
                     return result;
                 }
@@ -1891,7 +1881,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
                         long subProcessCode = 0L;
                         // if process is sub process, the return sub id, or sub id=0
-                        if (taskInstance.isSubProcess()) {
+                        if (TaskTypeUtils.isSubWorkflowTask(taskInstance.getTaskType())) {
                             TaskDefinition taskDefinition = taskDefinitionMap.get(taskInstance.getTaskCode());
                             subProcessCode = Long.parseLong(JSONUtils.parseObject(
                                     taskDefinition.getTaskParams()).path(CMD_PARAM_SUB_PROCESS_DEFINE_CODE).asText());

@@ -217,7 +217,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         log.info("WorkflowInstanceExecDir: {} check successfully", taskExecutionContext.getExecutePath());
 
         TaskChannel taskChannel =
-                Optional.ofNullable(TaskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
+                Optional.ofNullable(TaskPluginManager.getTaskChannel(taskExecutionContext.getTaskType()))
                         .orElseThrow(() -> new TaskPluginException(taskExecutionContext.getTaskType()
                                 + " task plugin not found, please check the task type is correct."));
 

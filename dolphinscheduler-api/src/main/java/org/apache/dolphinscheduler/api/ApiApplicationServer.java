@@ -19,22 +19,14 @@ package org.apache.dolphinscheduler.api;
 
 import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
-import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.dao.PluginDao;
-import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
-import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-
-import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -68,17 +60,7 @@ public class ApiApplicationServer {
     @EventListener
     public void run(ApplicationReadyEvent readyEvent) {
         log.info("Received spring application context ready event will load taskPlugin and write to DB");
-        // install task plugin
-        TaskPluginManager.loadPlugin();
         DataSourceProcessorProvider.initialize();
-        for (Map.Entry<String, TaskChannelFactory> entry : TaskPluginManager.getTaskChannelFactoryMap().entrySet()) {
-            String taskPluginName = entry.getKey();
-            TaskChannelFactory taskChannelFactory = entry.getValue();
-            List<PluginParams> params = taskChannelFactory.getParams();
-            String paramsJson = PluginParamsTransfer.transferParamsToJson(params);
-
-            PluginDefine pluginDefine = new PluginDefine(taskPluginName, PluginType.TASK.getDesc(), paramsJson);
-            pluginDao.addOrUpdatePluginDefine(pluginDefine);
-        }
+        TaskPluginManager.loadTaskPlugin();
     }
 }

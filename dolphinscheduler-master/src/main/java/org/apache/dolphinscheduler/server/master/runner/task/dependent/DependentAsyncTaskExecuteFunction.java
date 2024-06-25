@@ -122,10 +122,12 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
 
     private List<DependentExecute> initializeDependentTaskList() {
         log.info("Begin to initialize dependent task list");
+        List<DependentTaskModel> dependTaskList = dependentParameters.getDependence().getDependTaskList();
+
         final Set<Long> projectCodes = new HashSet<>();
         final Set<Long> processDefinitionCodes = new HashSet<>();
         final Set<Long> taskDefinitionCodes = new HashSet<>();
-        for (DependentTaskModel taskModel : dependentParameters.getDependTaskList()) {
+        for (DependentTaskModel taskModel : dependTaskList) {
             for (DependentItem dependentItem : taskModel.getDependItemList()) {
                 projectCodes.add(dependentItem.getProjectCode());
                 processDefinitionCodes.add(dependentItem.getDefinitionCode());
@@ -142,7 +144,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
                 .collect(Collectors.toMap(TaskDefinition::getCode, Function.identity()));
         final TaskInstance taskInstance =
                 taskInstanceDao.queryById(taskExecutionContext.getTaskInstanceId());
-        List<DependentExecute> dependentExecutes = dependentParameters.getDependTaskList()
+        List<DependentExecute> dependentExecutes = dependTaskList
                 .stream()
                 .map(dependentTaskModel -> {
                     for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
@@ -210,7 +212,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
             }
             dependResultList.add(dependResult);
         }
-        return DependentUtils.getDependResultForRelation(this.dependentParameters.getRelation(),
+        return DependentUtils.getDependResultForRelation(dependentParameters.getDependence().getRelation(),
                 dependResultList);
     }
 
@@ -218,7 +220,8 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
         boolean isAllDependentTaskFinished = true;
         for (DependentExecute dependentExecute : dependentTaskList) {
             if (!dependentExecute.finish(dependentDate, processInstance.getTestFlag(),
-                    dependentParameters.getFailurePolicy(), dependentParameters.getFailureWaitingTime())) {
+                    dependentParameters.getDependence().getFailurePolicy(),
+                    dependentParameters.getDependence().getFailureWaitingTime())) {
                 isAllDependentTaskFinished = false;
             }
             dependentExecute.getDependResultMap().forEach((dependentKey, dependResult) -> {
@@ -238,7 +241,7 @@ public class DependentAsyncTaskExecuteFunction implements AsyncTaskExecuteFuncti
 
     @Override
     public @NonNull Duration getAsyncTaskStateCheckInterval() {
-        return dependentParameters.getCheckInterval() == null ? DEFAULT_STATE_CHECK_INTERVAL
-                : Duration.ofSeconds(dependentParameters.getCheckInterval());
+        return dependentParameters.getDependence().getCheckInterval() == null ? DEFAULT_STATE_CHECK_INTERVAL
+                : Duration.ofSeconds(dependentParameters.getDependence().getCheckInterval());
     }
 }

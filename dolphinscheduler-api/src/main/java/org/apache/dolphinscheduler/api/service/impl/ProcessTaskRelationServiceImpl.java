@@ -18,9 +18,6 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static java.util.stream.Collectors.toSet;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
 
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationCreateRequest;
 import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationFilterRequest;
@@ -46,6 +43,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -354,9 +352,9 @@ public class ProcessTaskRelationServiceImpl extends BaseServiceImpl implements P
         }
         updateProcessDefiniteVersion(loginUser, result, processDefinition);
         updateRelation(loginUser, result, processDefinition, processTaskRelationList);
-        if (TASK_TYPE_CONDITIONS.equals(taskDefinition.getTaskType())
-                || TASK_TYPE_DEPENDENT.equals(taskDefinition.getTaskType())
-                || TASK_TYPE_SUB_PROCESS.equals(taskDefinition.getTaskType())) {
+        if (TaskTypeUtils.isConditionTask(taskDefinition.getTaskType())
+                || TaskTypeUtils.isSubWorkflowTask(taskDefinition.getTaskType())
+                || TaskTypeUtils.isDependentTask(taskDefinition.getTaskType())) {
             int deleteTaskDefinition = taskDefinitionMapper.deleteByCode(taskCode);
             if (0 == deleteTaskDefinition) {
                 log.error("Delete task definition error, taskDefinitionCode:{}.", taskCode);

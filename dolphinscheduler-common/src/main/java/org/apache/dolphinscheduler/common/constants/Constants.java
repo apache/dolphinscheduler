@@ -272,8 +272,6 @@ public final class Constants {
      */
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
-    public static final String COMMON_TASK_TYPE = "common";
-
     public static final String DEFAULT = "default";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";

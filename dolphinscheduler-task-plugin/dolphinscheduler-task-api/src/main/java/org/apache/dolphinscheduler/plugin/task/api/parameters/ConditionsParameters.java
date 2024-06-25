@@ -19,36 +19,59 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 
-import java.util.ArrayList;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ConditionsParameters extends AbstractParameters {
 
-    // depend node list and state, only need task name
-    private List<DependentTaskModel> dependTaskList;
-    private DependentRelation relation;
+    private ConditionDependency dependence;
 
-    private boolean conditionSuccess;
+    private ConditionResult conditionResult;
 
     @Override
     public boolean checkParameters() {
+        if (dependence == null || CollectionUtils.isEmpty(dependence.getDependTaskList())) {
+            return false;
+        }
+        if (conditionResult == null || CollectionUtils.isEmpty(conditionResult.getSuccessNode())
+                || CollectionUtils.isEmpty(conditionResult.getFailedNode())) {
+            return false;
+        }
         return true;
     }
 
-    @Override
-    public List<ResourceInfo> getResourceFilesList() {
-        return new ArrayList<>();
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ConditionDependency {
+
+        private List<DependentTaskModel> dependTaskList;
+
+        private DependentRelation relation;
     }
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ConditionResult {
 
+        private boolean conditionSuccess;
+
         private List<Long> successNode;
+
         private List<Long> failedNode;
     }
 

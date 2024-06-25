@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.runner.task.switchtask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.ILogicTaskPluginFactory;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,14 @@ public class SwitchLogicTaskPluginFactory implements ILogicTaskPluginFactory<Swi
 
     @Override
     public SwitchLogicTask createLogicTask(TaskExecutionContext taskExecutionContext) throws LogicTaskInitializeException {
-        return new SwitchLogicTask(taskExecutionContext, processInstanceExecCacheManager);
+        int workflowInstanceId = taskExecutionContext.getProcessInstanceId();
+        WorkflowExecuteRunnable workflowExecuteRunnable =
+                processInstanceExecCacheManager.getByProcessInstanceId(workflowInstanceId);
+        if (workflowExecuteRunnable == null) {
+            throw new LogicTaskInitializeException(
+                    "Cannot find the WorkflowExecuteRunnable by : " + workflowInstanceId);
+        }
+        return new SwitchLogicTask(workflowExecuteRunnable, taskExecutionContext);
     }
 
     @Override

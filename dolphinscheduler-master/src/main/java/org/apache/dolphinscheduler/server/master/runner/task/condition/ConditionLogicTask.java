@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner.task.condition;
 
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -27,6 +26,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
+import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
+import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseSyncLogicTask;
 
 import java.util.List;
@@ -37,47 +38,42 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 @Slf4j
 public class ConditionLogicTask extends BaseSyncLogicTask<ConditionsParameters> {
 
     public static final String TASK_TYPE = "CONDITIONS";
 
     private final TaskInstanceDao taskInstanceDao;
-    private final ProcessInstanceDao workflowInstanceDao;
 
-    private final TaskInstance taskInstance;
-
-    public ConditionLogicTask(TaskExecutionContext taskExecutionContext,
-                              TaskInstance taskInstance,
-                              TaskInstanceDao taskInstanceDao,
-                              ProcessInstanceDao workflowInstanceDao) {
-        // todo: we need to change the parameter in front-end, so that we can directly use json to parse
-        super(taskExecutionContext, taskInstance.getConditionsParameters());
+    public ConditionLogicTask(WorkflowExecuteRunnable workflowExecuteRunnable,
+                              TaskExecutionContext taskExecutionContext,
+                              TaskInstanceDao taskInstanceDao) throws LogicTaskInitializeException {
+        super(workflowExecuteRunnable, taskExecutionContext,
+                JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<ConditionsParameters>() {
+                }));
         this.taskInstanceDao = taskInstanceDao;
-        this.workflowInstanceDao = workflowInstanceDao;
-        this.taskInstance = taskInstance;
     }
 
     @Override
     public void handle() {
-        // calculate the conditionResult
         DependResult conditionResult = calculateConditionResult();
         log.info("The condition result is {}", conditionResult);
-        taskParameters.setConditionSuccess(conditionResult == DependResult.SUCCESS);
-        taskInstance.setConditionsParameters(taskParameters);
+        taskParameters.getConditionResult().setConditionSuccess(conditionResult == DependResult.SUCCESS);
+        taskInstance.setTaskParams(JSONUtils.toJsonString(taskParameters));
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
     }
 
     private DependResult calculateConditionResult() {
-        final ProcessInstance processInstance =
-                workflowInstanceDao.queryById(taskExecutionContext.getProcessInstanceId());
-        final List<TaskInstance> taskInstances =
-                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processInstance.getId(),
-                        processInstance.getTestFlag());
-        final Map<Long, TaskInstance> taskInstanceMap =
-                taskInstances.stream().collect(Collectors.toMap(TaskInstance::getTaskCode, Function.identity()));
+        final List<TaskInstance> taskInstances = taskInstanceDao.queryValidTaskListByWorkflowInstanceId(
+                taskExecutionContext.getProcessInstanceId(), taskExecutionContext.getTestFlag());
+        final Map<Long, TaskInstance> taskInstanceMap = taskInstances.stream()
+                .collect(Collectors.toMap(TaskInstance::getTaskCode, Function.identity()));
 
-        List<DependResult> dependResults = taskParameters.getDependTaskList().stream()
+        ConditionsParameters.ConditionDependency dependence = taskParameters.getDependence();
+        List<DependResult> dependResults = dependence.getDependTaskList()
+                .stream()
                 .map(dependentTaskModel -> DependentUtils.getDependResultForRelation(
                         dependentTaskModel.getRelation(),
                         dependentTaskModel.getDependItemList()
@@ -85,7 +81,7 @@ public class ConditionLogicTask extends BaseSyncLogicTask<ConditionsParameters> 
                                 .map(dependentItem -> getDependResultForItem(dependentItem, taskInstanceMap))
                                 .collect(Collectors.toList())))
                 .collect(Collectors.toList());
-        return DependentUtils.getDependResultForRelation(taskParameters.getRelation(), dependResults);
+        return DependentUtils.getDependResultForRelation(dependence.getRelation(), dependResults);
     }
 
     private DependResult getDependResultForItem(DependentItem item, Map<Long, TaskInstance> taskInstanceMap) {
@@ -96,8 +92,9 @@ public class ConditionLogicTask extends BaseSyncLogicTask<ConditionsParameters> 
             return DependResult.FAILED;
         }
 
-        DependResult dependResult =
-                Objects.equals(item.getStatus(), taskInstance.getState()) ? DependResult.SUCCESS : DependResult.FAILED;
+        DependResult dependResult = Objects.equals(item.getStatus(), taskInstance.getState())
+                ? DependResult.SUCCESS
+                : DependResult.FAILED;
         log.info("The depend item: {}", item);
         log.info("Expect status: {}", item.getStatus());
         log.info("Actual status: {}", taskInstance.getState());
