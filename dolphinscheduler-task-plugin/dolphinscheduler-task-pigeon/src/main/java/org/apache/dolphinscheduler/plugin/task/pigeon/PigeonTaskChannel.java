@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,22 +29,13 @@ import lombok.extern.slf4j.Slf4j;
 public class PigeonTaskChannel implements TaskChannel {
 
     @Override
-    public void cancelApplication(boolean status) {
-        log.info("pigeon task cancel");
-    }
-
-    @Override
     public AbstractTask createTask(TaskExecutionContext taskRequest) {
         return new PigeonTask(taskRequest);
     }
 
     @Override
-    public AbstractParameters parseParameters(ParametersNode parametersNode) {
-        return JSONUtils.parseObject(parametersNode.getTaskParams(), PigeonParameters.class);
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, PigeonParameters.class);
     }
 
-    @Override
-    public ResourceParametersHelper getResources(String parameters) {
-        return null;
-    }
 }
