@@ -25,8 +25,9 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
+import static org.apache.dolphinscheduler.dao.utils.EnvironmentUtils.getEnvironmentCodeOrDefault;
+import static org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils.getWorkerGroupOrDefault;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -51,7 +52,9 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
@@ -1112,25 +1115,22 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
         }
 
-        String processWorkerGroup = processInstance.getWorkerGroup();
-        processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
-        String taskWorkerGroup =
-                StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
+        String processWorkerGroup = getWorkerGroupOrDefault(processInstance.getWorkerGroup());
+        String taskWorkerGroup = getWorkerGroupOrDefault(taskNode.getWorkerGroup());
 
-        Long processEnvironmentCode =
-                Objects.isNull(processInstance.getEnvironmentCode()) ? -1 : processInstance.getEnvironmentCode();
-        Long taskEnvironmentCode =
-                Objects.isNull(taskNode.getEnvironmentCode()) ? processEnvironmentCode : taskNode.getEnvironmentCode();
+        Long processEnvironmentCode = getEnvironmentCodeOrDefault(processInstance.getEnvironmentCode());
+        Long taskEnvironmentCode = getEnvironmentCodeOrDefault(taskNode.getEnvironmentCode());
 
-        if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
+        if (WorkerGroupUtils.isWorkerGroupEmpty(taskWorkerGroup)) {
+            // If the task workerGroup is empty, then use the workflow workerGroup/environment
             taskInstance.setWorkerGroup(processWorkerGroup);
-            taskInstance.setEnvironmentCode(processEnvironmentCode);
+            taskInstance.setEnvironmentCode(getEnvironmentCodeOrDefault(taskEnvironmentCode, processEnvironmentCode));
         } else {
             taskInstance.setWorkerGroup(taskWorkerGroup);
-            taskInstance.setEnvironmentCode(taskEnvironmentCode);
+            taskInstance.setEnvironmentCode(getEnvironmentCodeOrDefault(taskEnvironmentCode, processEnvironmentCode));
         }
 
-        if (!taskInstance.getEnvironmentCode().equals(-1L)) {
+        if (!EnvironmentUtils.isEnvironmentCodeEmpty(taskInstance.getEnvironmentCode())) {
             Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
             if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
                 taskInstance.setEnvironmentConfig(environment.getConfig());
