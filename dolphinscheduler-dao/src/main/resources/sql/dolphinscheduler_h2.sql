@@ -804,6 +804,21 @@ CREATE TABLE t_ds_relation_resources_user
 -- ----------------------------
 
 -- ----------------------------
+-- Table structure for t_ds_relation_udfs_user
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_relation_udfs_user CASCADE;
+CREATE TABLE t_ds_relation_udfs_user
+(
+    id          int(11) NOT NULL AUTO_INCREMENT,
+    user_id     int(11) NOT NULL,
+    udf_id      int(11) DEFAULT NULL,
+    perm        int(11) DEFAULT '1',
+    create_time datetime DEFAULT NULL,
+    update_time datetime DEFAULT NULL,
+    PRIMARY KEY (id)
+);
+
+-- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
 -- Deprecated
@@ -951,6 +966,32 @@ CREATE TABLE t_ds_tenant
 -- ----------------------------
 INSERT IGNORE INTO `t_ds_tenant`
 VALUES ('-1', 'default', 'default tenant', '1', current_timestamp, current_timestamp);
+
+-- ----------------------------
+-- Table structure for t_ds_udfs
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_udfs CASCADE;
+CREATE TABLE t_ds_udfs
+(
+    id            int(11)      NOT NULL AUTO_INCREMENT,
+    user_id       int(11)      NOT NULL,
+    func_name     varchar(100) NOT NULL,
+    class_name    varchar(255) NOT NULL,
+    type          tinyint(4)   NOT NULL,
+    arg_types     varchar(255) DEFAULT NULL,
+    database      varchar(255) DEFAULT NULL,
+    description   varchar(255) DEFAULT NULL,
+    resource_id   int(11)      NOT NULL,
+    resource_name varchar(255) NOT NULL,
+    create_time   datetime     NOT NULL,
+    update_time   datetime     NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY unique_func_name (func_name)
+);
+
+-- ----------------------------
+-- Records of t_ds_udfs
+-- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_user
@@ -1941,35 +1982,35 @@ CREATE TABLE t_ds_environment_worker_group_relation
 DROP TABLE IF EXISTS t_ds_task_group_queue;
 CREATE TABLE t_ds_task_group_queue
 (
-   id           int(11) NOT NULL AUTO_INCREMENT ,
-   task_id      int(11) DEFAULT NULL ,
-   task_name    VARCHAR(255) DEFAULT NULL ,
-   group_id     int(11) DEFAULT NULL ,
-   process_id   int(11) DEFAULT NULL ,
-   priority     int(8) DEFAULT '0' ,
-   status       int(4) DEFAULT '-1' ,
-   force_start  int(4) DEFAULT '0' ,
-   in_queue     int(4) DEFAULT '0' ,
-   create_time  datetime DEFAULT NULL ,
-   update_time  datetime DEFAULT NULL ,
-   KEY idx_t_ds_task_group_queue_in_queue (in_queue) ,
-   PRIMARY KEY (id)
+    id           int(11) NOT NULL AUTO_INCREMENT ,
+    task_id      int(11) DEFAULT NULL ,
+    task_name    VARCHAR(255) DEFAULT NULL ,
+    group_id     int(11) DEFAULT NULL ,
+    process_id   int(11) DEFAULT NULL ,
+    priority     int(8) DEFAULT '0' ,
+    status       int(4) DEFAULT '-1' ,
+    force_start  int(4) DEFAULT '0' ,
+    in_queue     int(4) DEFAULT '0' ,
+    create_time  datetime DEFAULT NULL ,
+    update_time  datetime DEFAULT NULL ,
+    KEY idx_t_ds_task_group_queue_in_queue (in_queue) ,
+    PRIMARY KEY (id)
 );
 
 DROP TABLE IF EXISTS t_ds_task_group;
 CREATE TABLE t_ds_task_group
 (
-   id          int(11)  NOT NULL AUTO_INCREMENT ,
-   name        varchar(255) DEFAULT NULL ,
-   description varchar(255) DEFAULT NULL ,
-   group_size  int(11) NOT NULL ,
-   project_code  bigint(20) DEFAULT '0',
-   use_size    int(11) DEFAULT '0' ,
-   user_id     int(11) DEFAULT NULL ,
-   status      int(4) DEFAULT '1'  ,
-   create_time datetime DEFAULT NULL ,
-   update_time datetime DEFAULT NULL ,
-   PRIMARY KEY(id)
+    id          int(11)  NOT NULL AUTO_INCREMENT ,
+    name        varchar(255) DEFAULT NULL ,
+    description varchar(255) DEFAULT NULL ,
+    group_size  int(11) NOT NULL ,
+    project_code  bigint(20) DEFAULT '0',
+    use_size    int(11) DEFAULT '0' ,
+    user_id     int(11) DEFAULT NULL ,
+    status      int(4) DEFAULT '1'  ,
+    create_time datetime DEFAULT NULL ,
+    update_time datetime DEFAULT NULL ,
+    PRIMARY KEY(id)
 );
 
 -- ----------------------------
@@ -2005,15 +2046,15 @@ CREATE TABLE t_ds_k8s
 
 DROP TABLE IF EXISTS t_ds_k8s_namespace;
 CREATE TABLE t_ds_k8s_namespace (
-    id                 int(11) NOT NULL AUTO_INCREMENT ,
-    code               bigint(20) NOT NULL,
-    namespace          varchar(255) DEFAULT NULL,
-    user_id            int(11) DEFAULT NULL,
-    cluster_code       bigint(20) NOT NULL,
-    create_time        datetime DEFAULT NULL ,
-    update_time        datetime DEFAULT NULL ,
-    PRIMARY KEY (id) ,
-    UNIQUE KEY k8s_namespace_unique (namespace,cluster_code)
+                                    id                 int(11) NOT NULL AUTO_INCREMENT ,
+                                    code               bigint(20) NOT NULL,
+                                    namespace          varchar(255) DEFAULT NULL,
+                                    user_id            int(11) DEFAULT NULL,
+                                    cluster_code       bigint(20) NOT NULL,
+                                    create_time        datetime DEFAULT NULL ,
+                                    update_time        datetime DEFAULT NULL ,
+                                    PRIMARY KEY (id) ,
+                                    UNIQUE KEY k8s_namespace_unique (namespace,cluster_code)
 );
 -- ----------------------------
 -- Records of t_ds_k8s_namespace
@@ -2035,14 +2076,14 @@ VALUES (3, 990003, 'auth_test', 3, 0, '2020-03-03 11:31:24.0', '2020-03-03 11:31
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_relation_namespace_user;
 CREATE TABLE t_ds_relation_namespace_user (
-    id                int(11) NOT NULL AUTO_INCREMENT ,
-    user_id           int(11) NOT NULL ,
-    namespace_id      int(11) NOT NULL ,
-    perm              int(11) DEFAULT '1' ,
-    create_time       datetime DEFAULT NULL ,
-    update_time       datetime DEFAULT NULL ,
-    PRIMARY KEY (id) ,
-    UNIQUE KEY namespace_user_unique (user_id,namespace_id)
+                                              id                int(11) NOT NULL AUTO_INCREMENT ,
+                                              user_id           int(11) NOT NULL ,
+                                              namespace_id      int(11) NOT NULL ,
+                                              perm              int(11) DEFAULT '1' ,
+                                              create_time       datetime DEFAULT NULL ,
+                                              update_time       datetime DEFAULT NULL ,
+                                              PRIMARY KEY (id) ,
+                                              UNIQUE KEY namespace_user_unique (user_id,namespace_id)
 );
 
 -- ----------------------------
@@ -2116,14 +2157,14 @@ CREATE TABLE t_ds_trigger_relation
 
 DROP TABLE IF EXISTS t_ds_relation_sub_workflow;
 CREATE TABLE t_ds_relation_sub_workflow (
-    id BIGINT AUTO_INCREMENT NOT NULL,
-    parent_workflow_instance_id BIGINT NOT NULL,
-    parent_task_code BIGINT NOT NULL,
-    sub_workflow_instance_id BIGINT NOT NULL,
-    PRIMARY KEY (id),
-    INDEX idx_parent_workflow_instance_id (parent_workflow_instance_id),
-    INDEX idx_parent_task_code (parent_task_code),
-    INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
+                                            id BIGINT AUTO_INCREMENT NOT NULL,
+                                            parent_workflow_instance_id BIGINT NOT NULL,
+                                            parent_task_code BIGINT NOT NULL,
+                                            sub_workflow_instance_id BIGINT NOT NULL,
+                                            PRIMARY KEY (id),
+                                            INDEX idx_parent_workflow_instance_id (parent_workflow_instance_id),
+                                            INDEX idx_parent_task_code (parent_task_code),
+                                            INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
