@@ -120,6 +120,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubProcessParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -1051,7 +1052,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     private void initTaskInstance(TaskInstance taskInstance) {
 
-        if (!taskInstance.isSubProcess()
+        if (!TaskTypeUtils.isSubWorkflowTask(taskInstance.getTaskType())
                 && (taskInstance.getState().isKill() || taskInstance.getState().isFailure())) {
             taskInstance.setFlag(Flag.NO);
             taskInstanceDao.updateById(taskInstance);
@@ -1169,7 +1170,7 @@ public class ProcessServiceImpl implements ProcessService {
      */
     @Override
     public void createSubWorkProcess(ProcessInstance parentProcessInstance, TaskInstance task) {
-        if (!task.isSubProcess()) {
+        if (!TaskTypeUtils.isSubWorkflowTask(task.getTaskType())) {
             return;
         }
         // check create sub work flow firstly
@@ -1940,13 +1941,7 @@ public class ProcessServiceImpl implements ProcessService {
                         : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
                 taskNode.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
                 taskNode.setRetryInterval(taskDefinitionLog.getFailRetryInterval());
-                Map<String, Object> taskParamsMap = taskNode.taskParamsToJsonObj(taskDefinitionLog.getTaskParams());
-                taskNode.setConditionResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.CONDITION_RESULT)));
-                taskNode.setSwitchResult(JSONUtils.toJsonString(taskParamsMap.get(Constants.SWITCH_RESULT)));
-                taskNode.setDependence(JSONUtils.toJsonString(taskParamsMap.get(Constants.DEPENDENCE)));
-                taskParamsMap.remove(Constants.CONDITION_RESULT);
-                taskParamsMap.remove(Constants.DEPENDENCE);
-                taskNode.setParams(JSONUtils.toJsonString(taskParamsMap));
+                taskNode.setParams(taskDefinitionLog.getTaskParams());
                 taskNode.setTaskInstancePriority(taskDefinitionLog.getTaskPriority());
                 taskNode.setWorkerGroup(taskDefinitionLog.getWorkerGroup());
                 taskNode.setEnvironmentCode(taskDefinitionLog.getEnvironmentCode());
@@ -2037,22 +2032,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public DqComparisonType getComparisonTypeById(int id) {
         return dqComparisonTypeMapper.selectById(id);
-    }
-
-    /**
-     * release the TGQ resource when the corresponding task is finished.
-     *
-     * @param taskId task id
-     * @return the result code and msg
-     */
-
-    @Override
-    public void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status) {
-        TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.queryByTaskId(taskId);
-        taskGroupQueue.setInQueue(Flag.NO.getCode());
-        taskGroupQueue.setStatus(status);
-        taskGroupQueue.setUpdateTime(new Date(System.currentTimeMillis()));
-        taskGroupQueueMapper.updateById(taskGroupQueue);
     }
 
     @Override

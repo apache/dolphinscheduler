@@ -17,69 +17,56 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 
-import java.util.ArrayList;
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class SwitchParameters extends AbstractParameters {
 
-    private DependentRelation dependRelation;
-    private String relation;
-    private List<Long> nextNode;
+    // due to history reasons, the field name is switchResult
+    private SwitchResult switchResult;
+
+    // The next branch which should be executed after the switch logic task executed.
+    private Long nextBranch;
 
     @Override
     public boolean checkParameters() {
+        if (switchResult == null) {
+            return false;
+        }
+        if (CollectionUtils.isEmpty(switchResult.getDependTaskList()) && switchResult.getNextNode() == null) {
+            return false;
+        }
+        for (SwitchResultVo switchResultVo : switchResult.getDependTaskList()) {
+            if (switchResultVo == null || switchResultVo.getNextNode() == null) {
+                return false;
+            }
+        }
         return true;
     }
 
-    private int resultConditionLocation;
-    private List<SwitchResultVo> dependTaskList;
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SwitchResult {
 
-    public DependentRelation getDependRelation() {
-        return dependRelation;
+        // switch condition
+        private List<SwitchResultVo> dependTaskList;
+
+        // default branch node code in switch task
+        private Long nextNode;
     }
 
-    public void setDependRelation(DependentRelation dependRelation) {
-        this.dependRelation = dependRelation;
-    }
-
-    public int getResultConditionLocation() {
-        return resultConditionLocation;
-    }
-
-    public void setResultConditionLocation(int resultConditionLocation) {
-        this.resultConditionLocation = resultConditionLocation;
-    }
-
-    public String getRelation() {
-        return relation;
-    }
-
-    public void setRelation(String relation) {
-        this.relation = relation;
-    }
-
-    public List<SwitchResultVo> getDependTaskList() {
-        return dependTaskList;
-    }
-
-    public void setDependTaskList(List<SwitchResultVo> dependTaskList) {
-        this.dependTaskList = dependTaskList;
-    }
-
-    public List<Long> getNextNode() {
-        return nextNode;
-    }
-
-    public void setNextNode(Object nextNode) {
-        if (nextNode instanceof Long) {
-            List<Long> nextNodeList = new ArrayList<>();
-            nextNodeList.add((Long) nextNode);
-            this.nextNode = nextNodeList;
-        } else {
-            this.nextNode = (ArrayList) nextNode;
-        }
-    }
 }

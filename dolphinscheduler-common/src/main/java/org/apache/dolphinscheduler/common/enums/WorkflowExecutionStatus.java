@@ -38,8 +38,6 @@ public enum WorkflowExecutionStatus {
     SUCCESS(7, "success"),
     DELAY_EXECUTION(12, "delay execution"),
     SERIAL_WAIT(14, "serial wait"),
-    READY_BLOCK(15, "ready block"),
-    BLOCK(16, "block"),
     WAIT_TO_RUN(17, "wait to run"),
     ;
 
@@ -59,7 +57,6 @@ public enum WorkflowExecutionStatus {
             READY_PAUSE.getCode(),
             READY_STOP.getCode(),
             SERIAL_WAIT.getCode(),
-            READY_BLOCK.getCode(),
             WAIT_TO_RUN.getCode()
     };
 
@@ -91,7 +88,7 @@ public enum WorkflowExecutionStatus {
 
     public boolean isFinished() {
         // todo: do we need to remove pause/block in finished judge?
-        return isSuccess() || isFailure() || isStop() || isPause() || isBlock();
+        return isSuccess() || isFailure() || isStop() || isPause();
     }
 
     /**
@@ -117,10 +114,6 @@ public enum WorkflowExecutionStatus {
 
     public boolean isStop() {
         return this == STOP;
-    }
-
-    public boolean isBlock() {
-        return this == BLOCK;
     }
 
     public static int[] getNeedFailoverWorkflowInstanceState() {
