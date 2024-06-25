@@ -804,21 +804,6 @@ CREATE TABLE t_ds_relation_resources_user
 -- ----------------------------
 
 -- ----------------------------
--- Table structure for t_ds_relation_udfs_user
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_relation_udfs_user CASCADE;
-CREATE TABLE t_ds_relation_udfs_user
-(
-    id          int(11) NOT NULL AUTO_INCREMENT,
-    user_id     int(11) NOT NULL,
-    udf_id      int(11) DEFAULT NULL,
-    perm        int(11) DEFAULT '1',
-    create_time datetime DEFAULT NULL,
-    update_time datetime DEFAULT NULL,
-    PRIMARY KEY (id)
-);
-
--- ----------------------------
 -- Table structure for t_ds_resources
 -- ----------------------------
 -- Deprecated
@@ -966,32 +951,6 @@ CREATE TABLE t_ds_tenant
 -- ----------------------------
 INSERT IGNORE INTO `t_ds_tenant`
 VALUES ('-1', 'default', 'default tenant', '1', current_timestamp, current_timestamp);
-
--- ----------------------------
--- Table structure for t_ds_udfs
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_udfs CASCADE;
-CREATE TABLE t_ds_udfs
-(
-    id            int(11)      NOT NULL AUTO_INCREMENT,
-    user_id       int(11)      NOT NULL,
-    func_name     varchar(100) NOT NULL,
-    class_name    varchar(255) NOT NULL,
-    type          tinyint(4)   NOT NULL,
-    arg_types     varchar(255) DEFAULT NULL,
-    database      varchar(255) DEFAULT NULL,
-    description   varchar(255) DEFAULT NULL,
-    resource_id   int(11)      NOT NULL,
-    resource_name varchar(255) NOT NULL,
-    create_time   datetime     NOT NULL,
-    update_time   datetime     NOT NULL,
-    PRIMARY KEY (id),
-    UNIQUE KEY unique_func_name (func_name)
-);
-
--- ----------------------------
--- Records of t_ds_udfs
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_user

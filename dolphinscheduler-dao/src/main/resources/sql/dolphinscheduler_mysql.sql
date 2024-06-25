@@ -796,50 +796,6 @@ CREATE TABLE `t_ds_relation_resources_user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
--- Records of t_ds_relation_resources_user
--- ----------------------------
-
--- ----------------------------
--- Table structure for t_ds_relation_udfs_user
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_relation_udfs_user`;
-CREATE TABLE `t_ds_relation_udfs_user` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `user_id` int(11) NOT NULL COMMENT 'userid',
-  `udf_id` int(11) DEFAULT NULL COMMENT 'udf id',
-  `perm` int(11) DEFAULT '1' COMMENT 'limits of authority',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Table structure for t_ds_resources
--- ----------------------------
--- Deprecated
-DROP TABLE IF EXISTS `t_ds_resources`;
-CREATE TABLE `t_ds_resources` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `alias` varchar(64) DEFAULT NULL COMMENT 'alias',
-  `file_name` varchar(64) DEFAULT NULL COMMENT 'file name',
-  `description` varchar(255) DEFAULT NULL,
-  `user_id` int(11) DEFAULT NULL COMMENT 'user id',
-  `type` tinyint(4) DEFAULT NULL COMMENT 'resource type,0:FILE，1:UDF',
-  `size` bigint(20) DEFAULT NULL COMMENT 'resource size',
-  `create_time` datetime DEFAULT NULL COMMENT 'create time',
-  `update_time` datetime DEFAULT NULL COMMENT 'update time',
-  `pid` int(11) DEFAULT NULL,
-  `full_name` varchar(128) DEFAULT NULL,
-  `is_directory` tinyint(4) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `t_ds_resources_un` (`full_name`,`type`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Records of t_ds_resources
--- ----------------------------
-
--- ----------------------------
 -- Table structure for t_ds_schedules
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_schedules`;
@@ -960,31 +916,6 @@ CREATE TABLE `t_ds_tenant` (
 
 INSERT IGNORE INTO `t_ds_tenant`
 VALUES ('-1', 'default', 'default tenant', '1', current_timestamp, current_timestamp);
-
--- ----------------------------
--- Table structure for t_ds_udfs
--- ----------------------------
-DROP TABLE IF EXISTS `t_ds_udfs`;
-CREATE TABLE `t_ds_udfs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'key',
-  `user_id` int(11) NOT NULL COMMENT 'user id',
-  `func_name` varchar(255) NOT NULL COMMENT 'UDF function name',
-  `class_name` varchar(255) NOT NULL COMMENT 'class of udf',
-  `type` tinyint(4) NOT NULL COMMENT 'Udf function type',
-  `arg_types` varchar(255) DEFAULT NULL COMMENT 'arguments types',
-  `database` varchar(255) DEFAULT NULL COMMENT 'data base',
-  `description` varchar(255) DEFAULT NULL,
-  `resource_id` int(11) NOT NULL COMMENT 'resource id',
-  `resource_name` varchar(255) NOT NULL COMMENT 'resource name',
-  `create_time` datetime NOT NULL COMMENT 'create time',
-  `update_time` datetime NOT NULL COMMENT 'update time',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unique_func_name`(`func_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
-
--- ----------------------------
--- Records of t_ds_udfs
--- ----------------------------
 
 -- ----------------------------
 -- Table structure for t_ds_user

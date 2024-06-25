@@ -710,44 +710,6 @@ CREATE TABLE t_ds_relation_resources_user (
 ) ;
 
 --
--- Table structure for table t_ds_relation_udfs_user
---
-
-DROP TABLE IF EXISTS t_ds_relation_udfs_user;
-CREATE TABLE t_ds_relation_udfs_user (
-  id int NOT NULL  ,
-  user_id int NOT NULL ,
-  udf_id int DEFAULT NULL ,
-  perm int DEFAULT '1' ,
-  create_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
-  PRIMARY KEY (id)
-) ;
-;
-
---
--- Table structure for table t_ds_resources
---
--- Deprecated
-DROP TABLE IF EXISTS t_ds_resources;
-CREATE TABLE t_ds_resources (
-  id int NOT NULL  ,
-  alias varchar(64) DEFAULT NULL ,
-  file_name varchar(64) DEFAULT NULL ,
-  description varchar(255) DEFAULT NULL ,
-  user_id int DEFAULT NULL ,
-  type int DEFAULT NULL ,
-  size bigint DEFAULT NULL ,
-  create_time timestamp DEFAULT NULL ,
-  update_time timestamp DEFAULT NULL ,
-  pid int,
-  full_name varchar(128),
-  is_directory boolean DEFAULT FALSE,
-  PRIMARY KEY (id),
-  CONSTRAINT t_ds_resources_un UNIQUE (full_name, type)
-) ;
-
---
 -- Table structure for table t_ds_schedules
 --
 
@@ -854,29 +816,6 @@ CREATE TABLE t_ds_tenant (
 ) ;
 -- add unique key to t_ds_tenant
 CREATE UNIQUE INDEX unique_tenant_code on t_ds_tenant (tenant_code);
-
---
--- Table structure for table t_ds_udfs
---
-
-DROP TABLE IF EXISTS t_ds_udfs;
-CREATE TABLE t_ds_udfs (
-  id int NOT NULL  ,
-  user_id int NOT NULL ,
-  func_name varchar(255) NOT NULL ,
-  class_name varchar(255) NOT NULL ,
-  type int NOT NULL ,
-  arg_types varchar(255) DEFAULT NULL ,
-  database varchar(255) DEFAULT NULL ,
-  description varchar(255) DEFAULT NULL ,
-  resource_id int NOT NULL ,
-  resource_name varchar(255) NOT NULL ,
-  create_time timestamp NOT NULL ,
-  update_time timestamp NOT NULL ,
-  PRIMARY KEY (id)
-) ;
--- add unique key to t_ds_udfs
-CREATE UNIQUE INDEX unique_func_name on t_ds_udfs (func_name);
 
 --
 -- Table structure for table t_ds_user
@@ -1002,9 +941,6 @@ ALTER TABLE t_ds_relation_project_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds
 DROP SEQUENCE IF EXISTS t_ds_relation_resources_user_id_sequence;
 CREATE SEQUENCE  t_ds_relation_resources_user_id_sequence;
 ALTER TABLE t_ds_relation_resources_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_resources_user_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_relation_udfs_user_id_sequence;
-CREATE SEQUENCE  t_ds_relation_udfs_user_id_sequence;
-ALTER TABLE t_ds_relation_udfs_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_udfs_user_id_sequence');
 
 DROP SEQUENCE IF EXISTS t_ds_resources_id_sequence;
 CREATE SEQUENCE  t_ds_resources_id_sequence;
@@ -1018,9 +954,6 @@ ALTER TABLE t_ds_task_instance ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_task_in
 DROP SEQUENCE IF EXISTS t_ds_tenant_id_sequence;
 CREATE SEQUENCE  t_ds_tenant_id_sequence;
 ALTER TABLE t_ds_tenant ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_tenant_id_sequence');
-DROP SEQUENCE IF EXISTS t_ds_udfs_id_sequence;
-CREATE SEQUENCE  t_ds_udfs_id_sequence;
-ALTER TABLE t_ds_udfs ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_udfs_id_sequence');
 DROP SEQUENCE IF EXISTS t_ds_user_id_sequence;
 CREATE SEQUENCE  t_ds_user_id_sequence;
 ALTER TABLE t_ds_user ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_user_id_sequence');

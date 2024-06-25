@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.spi.enums;
 import lombok.Getter;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * resource type
@@ -32,18 +31,16 @@ public enum ResourceType {
      * 0 file, 1 udf
      */
     FILE(0, "file"),
-    UDF(1, "udf"),
     ALL(2, "all");
 
-    ResourceType(int code, String descp) {
+    ResourceType(int code, String desc) {
         this.code = code;
-        this.descp = descp;
+        this.desc = desc;
     }
 
     @EnumValue
-    @JsonValue
     private final int code;
-    private final String descp;
+    private final String desc;
 
     public static ResourceType getResourceType(int code) {
         for (ResourceType resourceType : ResourceType.values()) {

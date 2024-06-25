@@ -157,7 +157,7 @@ export function useTable() {
               renameResource(name, description, fullName, user_name),
             onUpdateList: () => updateList()
           }),
-        ...COLUMN_WIDTH_CONFIG['operation']((variables.resourceType = 0))
+        ...COLUMN_WIDTH_CONFIG['operation'](5)
       }
     ]
   }
