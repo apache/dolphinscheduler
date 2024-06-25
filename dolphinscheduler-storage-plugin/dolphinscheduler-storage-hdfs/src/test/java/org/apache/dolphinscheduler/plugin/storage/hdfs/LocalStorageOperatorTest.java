@@ -52,6 +52,7 @@ class LocalStorageOperatorTest {
     @BeforeEach
     public void setup() {
         Files.createDirectories(Paths.get(resourceBaseDir));
+        System.clearProperty(Constants.RESOURCE_UPLOAD_PATH);
         System.setProperty(Constants.RESOURCE_UPLOAD_PATH, resourceBaseDir);
 
         LocalStorageOperatorFactory localStorageOperatorFactory = new LocalStorageOperatorFactory();

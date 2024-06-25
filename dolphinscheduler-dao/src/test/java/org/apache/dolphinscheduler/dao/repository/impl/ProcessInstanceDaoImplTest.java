@@ -66,10 +66,8 @@ class ProcessInstanceDaoImplTest extends BaseDaoTest {
         processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.SERIAL_WAIT));
         processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
-                WorkflowExecutionStatus.READY_BLOCK));
-        processInstanceDao.insert(createWorkflowInstance(workflowDefinitionCode, workflowDefinitionVersion,
                 WorkflowExecutionStatus.WAIT_TO_RUN));
-        assertEquals(8, processInstanceDao
+        assertEquals(7, processInstanceDao
                 .queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion, status).size());
     }
 

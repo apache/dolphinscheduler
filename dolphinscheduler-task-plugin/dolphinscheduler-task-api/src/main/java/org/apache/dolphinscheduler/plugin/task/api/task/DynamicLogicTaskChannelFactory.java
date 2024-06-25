@@ -15,47 +15,24 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.plugin.task.api.task;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 
-import lombok.Data;
+import com.google.auto.service.AutoService;
 
-@Data
-public class WorkerServer {
+@AutoService(TaskChannelFactory.class)
+public class DynamicLogicTaskChannelFactory implements TaskChannelFactory {
 
-    /**
-     * id
-     */
-    private int id;
+    public static final String NAME = "DYNAMIC";
+    @Override
+    public String getName() {
+        return NAME;
+    }
 
-    /**
-     * host
-     */
-    private String host;
-
-    /**
-     * port
-     */
-    private int port;
-
-    /**
-     * zookeeper directory
-     */
-    private String zkDirectory;
-
-    /**
-     * resource info
-     */
-    private String resInfo;
-
-    /**
-     * create time
-     */
-    private Date createTime;
-
-    /**
-     * last heart beat time
-     */
-    private Date lastHeartbeatTime;
+    @Override
+    public TaskChannel create() {
+        return new DynamicLogicTaskChannel();
+    }
 }

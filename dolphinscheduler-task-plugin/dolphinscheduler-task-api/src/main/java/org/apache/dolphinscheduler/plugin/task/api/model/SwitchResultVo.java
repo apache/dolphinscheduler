@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,15 +27,5 @@ import lombok.NoArgsConstructor;
 public class SwitchResultVo {
 
     private String condition;
-    private List<Long> nextNode;
-
-    public void setNextNode(Object nextNode) {
-        if (nextNode instanceof Long) {
-            List<Long> nextNodeList = new ArrayList<>();
-            nextNodeList.add((Long) nextNode);
-            this.nextNode = nextNodeList;
-        } else {
-            this.nextNode = (ArrayList) nextNode;
-        }
-    }
+    private Long nextNode;
 }

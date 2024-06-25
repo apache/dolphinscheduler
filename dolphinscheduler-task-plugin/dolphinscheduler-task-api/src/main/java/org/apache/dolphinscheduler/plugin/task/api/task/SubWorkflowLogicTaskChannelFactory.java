@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.common;
+package org.apache.dolphinscheduler.plugin.task.api.task;
 
-import org.apache.dolphinscheduler.spi.params.base.PluginParams;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 
-import java.util.List;
+import com.google.auto.service.AutoService;
 
-public interface UiChannelFactory {
+@AutoService(TaskChannelFactory.class)
+public class SubWorkflowLogicTaskChannelFactory implements TaskChannelFactory {
 
-    /**
-     * plugin name
-     * Must be UNIQUE .
-     * This alert plugin name eg: email , message ...
-     * Name can often be displayed on the page ui eg : email , message , MR , spark , hive ...
-     *
-     * @return this alert plugin name
-     */
-    String getName();
+    public static final String NAME = "SUB_PROCESS";
 
-    /**
-     * Returns the configurable parameters that this plugin needs to display on the web ui
-     *
-     * @return this alert plugin params
-     */
-    List<PluginParams> getParams();
+    @Override
+    public String getName() {
+        return NAME;
+    }
 
+    @Override
+    public TaskChannel create() {
+        return new SubWorkflowLogicTaskChannel();
+    }
 }

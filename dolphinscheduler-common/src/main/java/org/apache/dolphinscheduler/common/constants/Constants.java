@@ -272,8 +272,6 @@ public final class Constants {
      */
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
-    public static final String COMMON_TASK_TYPE = "common";
-
     public static final String DEFAULT = "default";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
@@ -508,14 +506,9 @@ public final class Constants {
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
-    public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
     public static final String UDF = "UDF";
     public static final String CLASS = "class";
 
-    /**
-     * default worker group
-     */
-    public static final String DEFAULT_WORKER_GROUP = "default";
     /**
      * authorize writable perm
      */

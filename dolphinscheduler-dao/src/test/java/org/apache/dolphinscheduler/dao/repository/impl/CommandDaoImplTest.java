@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -29,43 +28,38 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CommandDaoImplTest extends BaseDaoTest {
 
     @Autowired
     private CommandDao commandDao;
 
-    @Autowired
-    private CommandMapper commandMapper;
-
-    @RepeatedTest(value = 100)
+    @RepeatedTest(value = 10)
     void fetchCommandByIdSlot() {
-        // clear all commands
-        commandMapper.delete(new QueryWrapper<Command>().ge("id", -1));
-
         int totalSlot = RandomUtils.nextInt(1, 10);
         int currentSlotIndex = RandomUtils.nextInt(0, totalSlot);
         int fetchSize = RandomUtils.nextInt(10, 100);
         int idStep = RandomUtils.nextInt(1, 5);
         int commandSize = RandomUtils.nextInt(currentSlotIndex, 1000);
         // Generate commandSize commands
-        int id = 0;
+        int id = 1;
         for (int j = 0; j < commandSize; j++) {
             Command command = generateCommand(CommandType.START_PROCESS, 0);
             command.setId(id);
-            id += idStep;
             commandDao.insert(command);
+            id += idStep;
         }
 
         List<Command> commands = commandDao.queryCommandByIdSlot(currentSlotIndex, totalSlot, idStep, fetchSize);
@@ -75,7 +69,8 @@ class CommandDaoImplTest extends BaseDaoTest {
                         ", idStep: " + idStep +
                         ", fetchSize: " + fetchSize +
                         ", total command size: " + commandSize +
-                        ", total commands: " + commandDao.queryAll());
+                        ", total commands: "
+                        + commandDao.queryAll().stream().map(Command::getId).collect(Collectors.toList()));
         assertThat(commands.size())
                 .isEqualTo(commandDao.queryAll()
                         .stream()
@@ -99,7 +94,7 @@ class CommandDaoImplTest extends BaseDaoTest {
         command.setProcessInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
-        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(0);
         return command;

@@ -89,8 +89,8 @@ import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -361,7 +361,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         // find out the process definition code
         Set<Long> processDefinitionCodeSet = new HashSet<>();
         taskDefinitions.stream()
-                .filter(task -> TaskConstants.TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(task.getTaskType())).forEach(
+                .filter(task -> TaskTypeUtils.isSubWorkflowTask(task.getTaskType())).forEach(
                         taskDefinition -> processDefinitionCodeSet.add(Long.valueOf(
                                 JSONUtils.getNodeString(taskDefinition.getTaskParams(),
                                         CMD_PARAM_SUB_PROCESS_DEFINE_CODE))));
