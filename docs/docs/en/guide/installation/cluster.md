@@ -14,21 +14,7 @@ Configure all the configurations refer to [pseudo-cluster deployment](pseudo-clu
 
 ### Modify Configuration
 
-This step differs quite a lot from [pseudo-cluster deployment](pseudo-cluster.md), because the deployment script transfers the required resources for installation to each deployment machine by using `scp`. So we only need to modify the configuration of the machine that runs `install.sh` script and configurations will dispatch to cluster by `scp`. The configuration file is under the path `bin/env/install_env.sh`, here we only need to modify section **INSTALL MACHINE**, **DolphinScheduler ENV, Database, Registry Server** and keep other sections the same as [pseudo-cluster deployment](pseudo-cluster .md), the following describes the parameters that must be modified:
-
-```shell
-# ---------------------------------------------------------
-# INSTALL MACHINE
-# ---------------------------------------------------------
-# Using IP or machine hostname for the server going to deploy master, worker, API server, the IP of the server
-# If you using a hostname, make sure machines could connect each other by hostname
-# As below, the hostname of the machine deploying DolphinScheduler is ds1, ds2, ds3, ds4, ds5, where ds1, ds2 install the master server, ds3, ds4, and ds5 installs worker server, the alert server is installed in ds4, and the API server is installed in ds5
-ips="ds1,ds2,ds3,ds4,ds5"
-masters="ds1,ds2"
-workers="ds3:default,ds4:default,ds5:default"
-alertServer="ds4"
-apiServers="ds5"
-```
+This step differs quite a lot from [pseudo-cluster deployment](pseudo-cluster.md), please use `scp` or other methods to distribute the configuration files to each machine, then modify the configuration files.
 
 ## Start and Login DolphinScheduler
 

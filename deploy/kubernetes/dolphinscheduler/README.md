@@ -14,6 +14,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 |-----|------|---------|-------------|
 | alert.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | alert.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| alert.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml |
+| alert.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | alert.enabled | bool | `true` | Enable or disable the Alert-Server component |
 | alert.env.JAVA_OPTS | string | `"-Xms512m -Xmx512m -Xmn256m"` | The jvm options for alert server |
 | alert.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
@@ -52,6 +54,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | alert.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
 | api.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | api.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| api.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-api/src/main/resources/application.yaml |
+| api.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | api.enabled | bool | `true` | Enable or disable the API-Server component |
 | api.env.JAVA_OPTS | string | `"-Xms512m -Xmx512m -Xmn256m"` | The jvm options for api server |
 | api.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
@@ -158,6 +162,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."yarn.application.status.address" | string | `"http://ds1:%s/ws/v1/cluster/apps/%s"` | if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname |
 | conf.common."yarn.job.history.status.address" | string | `"http://ds1:19888/ws/v1/history/mapreduce/jobs/%s"` | job history status url when application number threshold is reached(default 10000, maybe it was set to 1000) |
 | conf.common."yarn.resourcemanager.ha.rm.ids" | string | `"192.168.xx.xx,192.168.xx.xx"` | if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty |
+| datasource.profile | string | `"postgresql"` | The profile of datasource |
 | externalDatabase.database | string | `"dolphinscheduler"` | The database of external database |
 | externalDatabase.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName of external database |
 | externalDatabase.enabled | bool | `false` | If exists external database, and set postgresql.enable value to false. external database will be used, otherwise Dolphinscheduler's internal database will be used. |
@@ -189,6 +194,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | initImage.pullPolicy | string | `"IfNotPresent"` | Image pull policy. Options: Always, Never, IfNotPresent |
 | master.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | master.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| master.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-master/src/main/resources/application.yaml |
+| master.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | master.enabled | bool | `true` | Enable or disable the Master component |
 | master.env.JAVA_OPTS | string | `"-Xms1g -Xmx1g -Xmn512m"` | The jvm options for master server |
 | master.env.MASTER_DISPATCH_TASK_NUM | string | `"3"` | Master dispatch task number per batch |
@@ -295,6 +302,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | timezone | string | `"Asia/Shanghai"` | World time and date for cities in all time zones |
 | worker.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | worker.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| worker.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-worker/src/main/resources/application.yaml |
+| worker.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | worker.enabled | bool | `true` | Enable or disable the Worker component |
 | worker.env.DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
 | worker.env.WORKER_EXEC_THREADS | string | `"100"` | Worker execute thread number to limit task instances |
@@ -314,7 +323,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.keda.minReplicaCount | int | `0` | Minimum number of workers created by keda |
 | worker.keda.namespaceLabels | object | `{}` | Keda namespace labels |
 | worker.keda.pollingInterval | int | `5` | How often KEDA polls the DolphinScheduler DB to report new scale requests to the HPA |
-| worker.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
 | worker.livenessProbe.enabled | bool | `true` | Turn on and off liveness probe |
 | worker.livenessProbe.failureThreshold | string | `"3"` | Minimum consecutive failures for the probe |
 | worker.livenessProbe.initialDelaySeconds | string | `"30"` | Delay before liveness probe is initiated |
