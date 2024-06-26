@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.io.Serializable;
 
-import lombok.Data;
 import lombok.Value;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
