@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
@@ -39,6 +37,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -147,7 +146,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
                                                                    List<Long> processDefinitionCodes) {
         for (DependentProcessDefinition dependentProcessDefinition : dependentDefinitionList) {
             for (DependentTaskModel dependentTaskModel : dependentProcessDefinition.getDependentParameters()
-                    .getDependTaskList()) {
+                    .getDependence().getDependTaskList()) {
                 for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
                     if (!processDefinitionCodes.contains(dependentItem.getDefinitionCode())) {
                         processDefinitionCodes.add(dependentItem.getDefinitionCode());
@@ -220,12 +219,12 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList);
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (taskDefinitionLog.getProjectCode() == projectCode) {
-                if (taskDefinitionLog.getTaskType().equals(TASK_TYPE_DEPENDENT)) {
+                if (TaskTypeUtils.isDependentTask(taskDefinitionLog.getTaskType())) {
                     DependentParameters dependentParameters =
                             JSONUtils.parseObject(taskDefinitionLog.getDependence(), DependentParameters.class);
                     if (dependentParameters != null) {
                         List<DependentTaskModel> dependTaskList =
-                                dependentParameters.getDependTaskList();
+                                dependentParameters.getDependence().getDependTaskList();
                         if (!CollectionUtils.isEmpty(dependTaskList)) {
                             for (DependentTaskModel taskModel : dependTaskList) {
                                 List<DependentItem> dependItemList = taskModel.getDependItemList();
@@ -247,9 +246,9 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     /**
      * Query and return tasks dependence with string format, is a wrapper of queryTaskDepOnTask and task query method.
      *
-     * @param projectCode Project code want to query tasks dependence
+     * @param projectCode           Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
-     * @param taskCode Task code want to query tasks dependence
+     * @param taskCode              Task code want to query tasks dependence
      * @return Optional of formatter message
      */
     @Override
@@ -271,7 +270,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
     /**
      * Query tasks depend on process definition, include upstream or downstream
      *
-     * @param projectCode Project code want to query tasks dependence
+     * @param projectCode           Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
      * @return Set of TaskMainInfo
      */
@@ -291,7 +290,7 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
      * Query downstream tasks depend on a process definition or a task
      *
      * @param processDefinitionCode Process definition code want to query tasks dependence
-     * @param taskCode Task code want to query tasks dependence
+     * @param taskCode              Task code want to query tasks dependence
      * @return downstream dependent tasks
      */
     @Override

@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 public class SubProcessParameters extends AbstractParameters {
 
-    /**
-     * process definition id
-     */
     private long processDefinitionCode;
 
     public void setProcessDefinitionCode(long processDefinitionCode) {
@@ -34,7 +31,7 @@ public class SubProcessParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return this.processDefinitionCode != 0;
+        return this.processDefinitionCode > 0;
     }
 
 }

@@ -32,11 +32,10 @@ import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -83,7 +82,7 @@ public class UdfFuncServiceTest {
     private UDFUserMapper udfUserMapper;
 
     @Mock
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @BeforeEach
     public void setUp() {
@@ -111,11 +110,7 @@ public class UdfFuncServiceTest {
         logger.info(result.toString());
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST.getMsg(), result.getMsg());
         // success
-        try {
-            Mockito.when(storageOperate.exists("String")).thenReturn(true);
-        } catch (IOException e) {
-            logger.error("AmazonServiceException when checking resource: String");
-        }
+        Mockito.when(storageOperator.exists("String")).thenReturn(true);
 
         result = udfFuncService.createUdfFunction(getLoginUser(), "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",
@@ -176,11 +171,7 @@ public class UdfFuncServiceTest {
         // success
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.UDF, 1,
                 ApiFuncIdentificationConstant.UDF_FUNCTION_UPDATE, serviceLogger)).thenReturn(true);
-        try {
-            Mockito.when(storageOperate.exists("")).thenReturn(true);
-        } catch (IOException e) {
-            logger.error("AmazonServiceException when checking resource: ");
-        }
+        Mockito.when(storageOperator.exists("")).thenReturn(true);
 
         result = udfFuncService.updateUdfFunc(getLoginUser(), 11, "UdfFuncServiceTest",
                 "org.apache.dolphinscheduler.api.service.UdfFuncServiceTest", "String",

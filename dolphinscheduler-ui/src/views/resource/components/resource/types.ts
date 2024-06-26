@@ -133,7 +133,6 @@ export interface IUploadDefaultValue {
     name: string
     file: string
     type: ResourceType
-    pid: number
     currentDir: string
   }
 }

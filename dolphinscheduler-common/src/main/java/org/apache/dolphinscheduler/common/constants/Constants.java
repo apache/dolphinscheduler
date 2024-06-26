@@ -60,28 +60,6 @@ public final class Constants {
     public static final String HDFS_DEFAULT_FS = "fs.defaultFS";
 
     /**
-     * hadoop configuration
-     */
-    public static final String HADOOP_RM_STATE_ACTIVE = "ACTIVE";
-
-    public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "resource.manager.httpaddress.port";
-
-    /**
-     * yarn.resourcemanager.ha.rm.ids
-     */
-    public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
-
-    /**
-     * yarn.application.status.address
-     */
-    public static final String YARN_APPLICATION_STATUS_ADDRESS = "yarn.application.status.address";
-
-    /**
-     * yarn.job.history.status.address
-     */
-    public static final String YARN_JOB_HISTORY_STATUS_ADDRESS = "yarn.job.history.status.address";
-
-    /**
      * hdfs configuration
      * resource.hdfs.root.user
      */
@@ -294,8 +272,6 @@ public final class Constants {
      */
     public static final String FLOWNODE_RUN_FLAG_NORMAL = "NORMAL";
 
-    public static final String COMMON_TASK_TYPE = "common";
-
     public static final String DEFAULT = "default";
     public static final String PASSWORD = "password";
     public static final String XXXXXX = "******";
@@ -392,8 +368,6 @@ public final class Constants {
     public static final String QUEUE_NAME = "queueName";
     public static final int LOG_QUERY_SKIP_LINE_NUMBER = 0;
     public static final int LOG_QUERY_LIMIT = 4096;
-    public static final String ALIAS = "alias";
-    public static final String CONTENT = "content";
     public static final String DEPENDENT_SPLIT = ":||";
     public static final long DEPENDENT_ALL_TASK_CODE = -1;
     public static final long DEPENDENT_WORKFLOW_CODE = 0;
@@ -532,14 +506,9 @@ public final class Constants {
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
-    public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
     public static final String UDF = "UDF";
     public static final String CLASS = "class";
 
-    /**
-     * default worker group
-     */
-    public static final String DEFAULT_WORKER_GROUP = "default";
     /**
      * authorize writable perm
      */
