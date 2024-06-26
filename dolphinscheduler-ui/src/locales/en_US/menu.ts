@@ -34,7 +34,6 @@ export default {
   task_instance: 'Task Instance',
   task_definition: 'Task Definition',
   file_manage: 'File Manage',
-  udf_manage: 'UDF Manage',
   resource_manage: 'Resource Manage',
   function_manage: 'Function Manage',
   service_manage: 'Service Manage',

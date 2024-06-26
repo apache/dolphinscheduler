@@ -49,10 +49,7 @@ import {
   NGrid,
   NGridItem
 } from 'naive-ui'
-import {
-  ArrowDownOutlined,
-  ArrowUpOutlined
-} from '@vicons/antd'
+import { ArrowDownOutlined, ArrowUpOutlined } from '@vicons/antd'
 import { IDefinitionData } from '../types'
 import styles from '../index.module.scss'
 import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
@@ -581,63 +578,68 @@ export default defineComponent({
             path='startup_parameter'
           >
             <NDynamicInput
-                v-model:value={this.startParamsList}
-                onCreate={() => {
-                  return {
-                    key: '',
-                    direct: 'IN',
-                    type: 'VARCHAR',
-                    value: ''
-                  }
-                }}
-                class='input-startup-params'
+              v-model:value={this.startParamsList}
+              onCreate={() => {
+                return {
+                  key: '',
+                  direct: 'IN',
+                  type: 'VARCHAR',
+                  value: ''
+                }
+              }}
+              class='input-startup-params'
             >
               {{
                 default: (param: {
-                  value: { prop: string; direct: string; type: string; value: string }
+                  value: {
+                    prop: string
+                    direct: string
+                    type: string
+                    value: string
+                  }
                 }) => (
-                    <NGrid xGap={12} cols={24}>
-                      <NGridItem span={6}>
-                        <NInput
-                            v-model:value={param.value.prop}
-                            placeholder={t('project.dag.key')}
-                        />
-                      </NGridItem>
-                      <NGridItem span={5}>
-                        <NSelect
-                            options={[
-                              { value: 'IN', label: 'IN' },
-                              { value: 'OUT', label: 'OUT' }
-                            ]}
-                            v-model:value={param.value.direct}
-                            defaultValue={'IN'}
-                        />
-                      </NGridItem>
-                      <NGridItem span={7}>
-                        <NSelect
-                            options={[
-                              { value: 'VARCHAR', label: 'VARCHAR' },
-                              { value: 'INTEGER', label: 'INTEGER' },
-                              { value: 'LONG', label: 'LONG' },
-                              { value: 'FLOAT', label: 'FLOAT' },
-                              { value: 'DOUBLE', label: 'DOUBLE' },
-                              { value: 'DATE', label: 'DATE' },
-                              { value: 'TIME', label: 'TIME' },
-                              { value: 'BOOLEAN', label: 'BOOLEAN' },
-                              { value: 'LIST', label: 'LIST' },
-                              { value: 'FILE', label: 'FILE' }
-                            ]}
-                            v-model:value={param.value.type}
-                            defaultValue={'VARCHAR'}
-                        />
-                      </NGridItem>
-                      <NGridItem span={6}>
-                        <NInput
-                            v-model:value={param.value.value}
-                            placeholder={t('project.dag.value')}
-                        />
-                      </NGridItem>
-                    </NGrid>
+                  <NGrid xGap={12} cols={24}>
+                    <NGridItem span={6}>
+                      <NInput
+                        v-model:value={param.value.prop}
+                        placeholder={t('project.dag.key')}
+                      />
+                    </NGridItem>
+                    <NGridItem span={5}>
+                      <NSelect
+                        options={[
+                          { value: 'IN', label: 'IN' },
+                          { value: 'OUT', label: 'OUT' }
+                        ]}
+                        v-model:value={param.value.direct}
+                        defaultValue={'IN'}
+                      />
+                    </NGridItem>
+                    <NGridItem span={7}>
+                      <NSelect
+                        options={[
+                          { value: 'VARCHAR', label: 'VARCHAR' },
+                          { value: 'INTEGER', label: 'INTEGER' },
+                          { value: 'LONG', label: 'LONG' },
+                          { value: 'FLOAT', label: 'FLOAT' },
+                          { value: 'DOUBLE', label: 'DOUBLE' },
+                          { value: 'DATE', label: 'DATE' },
+                          { value: 'TIME', label: 'TIME' },
+                          { value: 'BOOLEAN', label: 'BOOLEAN' },
+                          { value: 'LIST', label: 'LIST' },
+                          { value: 'FILE', label: 'FILE' }
+                        ]}
+                        v-model:value={param.value.type}
+                        defaultValue={'VARCHAR'}
+                      />
+                    </NGridItem>
+                    <NGridItem span={6}>
+                      <NInput
+                        v-model:value={param.value.value}
+                        placeholder={t('project.dag.value')}
+                      />
+                    </NGridItem>
+                  </NGrid>
                 )
               }}
             </NDynamicInput>

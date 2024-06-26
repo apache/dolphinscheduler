@@ -46,7 +46,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -59,7 +58,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -198,32 +196,6 @@ public class ResourcePermissionCheckServiceImpl
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
             return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
-        }
-    }
-
-    @Component
-    public static class UdfFuncPermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
-
-        private final UdfFuncMapper udfFuncMapper;
-
-        public UdfFuncPermissionCheck(UdfFuncMapper udfFuncMapper) {
-            this.udfFuncMapper = udfFuncMapper;
-        }
-
-        @Override
-        public List<AuthorizationType> authorizationTypes() {
-            return Collections.singletonList(AuthorizationType.UDF);
-        }
-
-        @Override
-        public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<UdfFunc> udfFuncList = udfFuncMapper.listAuthorizedUdfByUserId(userId);
-            return udfFuncList.stream().map(UdfFunc::getId).collect(toSet());
-        }
-
-        @Override
-        public boolean permissionCheck(int userId, String permissionKey, Logger logger) {
-            return true;
         }
     }
 
@@ -481,6 +453,7 @@ public class ResourcePermissionCheckServiceImpl
 
         /**
          * authorization types
+         *
          * @return
          */
         List<AuthorizationType> authorizationTypes();
@@ -495,6 +468,7 @@ public class ResourcePermissionCheckServiceImpl
 
         /**
          * permission check
+         *
          * @param userId
          * @return
          */

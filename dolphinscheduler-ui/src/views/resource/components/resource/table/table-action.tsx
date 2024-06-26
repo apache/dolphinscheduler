@@ -121,7 +121,7 @@ export default defineComponent({
     const { t } = useI18n()
     return (
       <NSpace>
-        {this.row.type !== 'UDF' && (
+        {
           <NTooltip trigger={'hover'}>
             {{
               default: () => t('resource.file.edit'),
@@ -149,7 +149,7 @@ export default defineComponent({
               )
             }}
           </NTooltip>
-        )}
+        }
         <NTooltip trigger={'hover'}>
           {{
             default: () => t('resource.file.reupload'),

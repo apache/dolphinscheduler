@@ -72,7 +72,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
@@ -98,7 +97,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UdfFuncMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
@@ -212,9 +210,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ScheduleMapper scheduleMapper;
-
-    @Autowired
-    private UdfFuncMapper udfFuncMapper;
 
     @Autowired
     private TenantMapper tenantMapper;
@@ -1502,17 +1497,6 @@ public class ProcessServiceImpl implements ProcessService {
     }
 
     /**
-     * find udf function list by id list string
-     *
-     * @param ids ids
-     * @return udf function list
-     */
-    @Override
-    public List<UdfFunc> queryUdfFunListByIds(Integer[] ids) {
-        return udfFuncMapper.queryUdfByIdStr(ids, null);
-    }
-
-    /**
      * query project name and user name by processInstanceId.
      *
      * @param processInstanceId processInstanceId
@@ -1521,41 +1505,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId) {
         return projectMapper.queryProjectWithUserByProcessInstanceId(processInstanceId);
-    }
-
-    /**
-     * list unauthorized udf function
-     *
-     * @param userId     user id
-     * @param needChecks data source id array
-     * @return unauthorized udf function list
-     */
-    @Override
-    public <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType) {
-        List<T> resultList = new ArrayList<>();
-
-        if (Objects.nonNull(needChecks) && needChecks.length > 0) {
-            Set<T> originResSet = new HashSet<>(Arrays.asList(needChecks));
-
-            switch (authorizationType) {
-                case DATASOURCE:
-                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks)
-                            .stream().map(DataSource::getId).collect(toSet());
-                    originResSet.removeAll(authorizedDatasources);
-                    break;
-                case UDF:
-                    Set<Integer> authorizedUdfs = udfFuncMapper.listAuthorizedUdfFunc(userId, needChecks).stream()
-                            .map(UdfFunc::getId).collect(toSet());
-                    originResSet.removeAll(authorizedUdfs);
-                    break;
-                default:
-                    break;
-            }
-
-            resultList.addAll(originResSet);
-        }
-
-        return resultList;
     }
 
     /**
@@ -1584,6 +1533,36 @@ public class ProcessServiceImpl implements ProcessService {
             return "";
         }
         return String.format("%s_%s_%s", definition.getId(), processInstance.getId(), taskInstance.getId());
+    }
+
+    /**
+     * list unauthorized
+     *
+     * @param userId     user id
+     * @param needChecks data source id array
+     * @return unauthorized
+     */
+    @Override
+    public <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType) {
+        List<T> resultList = new ArrayList<>();
+
+        if (Objects.nonNull(needChecks) && needChecks.length > 0) {
+            Set<T> originResSet = new HashSet<>(Arrays.asList(needChecks));
+
+            switch (authorizationType) {
+                case DATASOURCE:
+                    Set<Integer> authorizedDatasources = dataSourceMapper.listAuthorizedDataSource(userId, needChecks)
+                            .stream().map(DataSource::getId).collect(toSet());
+                    originResSet.removeAll(authorizedDatasources);
+                    break;
+                default:
+                    break;
+            }
+
+            resultList.addAll(originResSet);
+        }
+
+        return resultList;
     }
 
     /**

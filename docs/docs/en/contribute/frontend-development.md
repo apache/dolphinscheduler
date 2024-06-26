@@ -163,9 +163,6 @@ Resource Management => `http://localhost:8888/#/resource/file`
 
 ```
 | File Management
-| udf Management
-  - Resource Management
-  - Function management
 ```
 
 Data Source Management => `http://localhost:8888/#/datasource/list`

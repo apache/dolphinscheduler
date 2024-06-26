@@ -51,7 +51,6 @@ public enum AuthorizationType {
     @Deprecated
     UDF_FILE(2, "udf file"),
     DATASOURCE(3, "data source"),
-    UDF(4, "udf function"),
     PROJECTS(5, "projects"),
     WORKER_GROUP(6, "worker group"),
     ALERT_GROUP(7, "alert group"),

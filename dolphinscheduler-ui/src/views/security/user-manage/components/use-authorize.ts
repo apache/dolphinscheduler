@@ -21,26 +21,17 @@ import {
   unAuthDatasource
 } from '@/service/modules/data-source'
 import {
-  authorizedFile,
-  authorizeResourceTree,
-  authUDFFunc,
-  unAuthUDFFunc
-} from '@/service/modules/resources'
-import {
   authNamespaceFunc,
   unAuthNamespaceFunc
 } from '@/service/modules/k8s-namespace'
 import {
-  grantProject,
-  grantResource,
-  grantProjectWithReadPerm,
   grantDataSource,
-  grantUDFFunc,
   grantNamespaceFunc,
+  grantProject,
+  grantProjectWithReadPerm,
   revokeProjectById
 } from '@/service/modules/users'
-import utils from '@/utils'
-import type { TAuthType, IResourceOption, IOption, IRecord } from '../types'
+import type { IOption, IRecord, IResourceOption, TAuthType } from '../types'
 
 export function useAuthorize() {
   const state = reactive({
@@ -53,15 +44,10 @@ export function useAuthorize() {
     unauthorizedProjects: [] as IOption[],
     authorizedDatasources: [] as number[],
     unauthorizedDatasources: [] as IOption[],
-    authorizedUdfs: [] as number[],
-    unauthorizedUdfs: [] as IOption[],
     authorizedNamespaces: [] as number[],
     unauthorizedNamespaces: [] as IOption[],
     resourceType: 'file',
     fileResources: [] as IResourceOption[],
-    udfResources: [] as IResourceOption[],
-    authorizedFileResources: [] as number[],
-    authorizedUdfResources: [] as number[],
     pagination: {
       pageSize: 5,
       page: 1,
@@ -151,52 +137,6 @@ export function useAuthorize() {
     )
   }
 
-  const getUdfs = async (userId: number) => {
-    if (state.loading) return
-    state.loading = true
-    const udfs = await Promise.all([
-      authUDFFunc({ userId }),
-      unAuthUDFFunc({ userId })
-    ])
-    state.loading = false
-    state.authorizedUdfs = udfs[0].map(
-      (item: { funcName: string; id: number }) => item.id
-    )
-    state.unauthorizedUdfs = [...udfs[0], ...udfs[1]].map(
-      (item: { funcName: string; id: number }) => ({
-        label: item.funcName,
-        value: item.id
-      })
-    )
-  }
-
-  const getResources = async (userId: number) => {
-    if (state.loading) return
-    state.loading = true
-    const resources = await Promise.all([
-      authorizeResourceTree({ userId }),
-      authorizedFile({ userId })
-    ])
-    state.loading = false
-    utils.removeUselessChildren(resources[0])
-    const udfResources = [] as IResourceOption[]
-    const fileResources = [] as IResourceOption[]
-    resources[0].forEach((item: IResourceOption) => {
-      item.type === 'FILE' ? fileResources.push(item) : udfResources.push(item)
-    })
-    const udfTargets = [] as number[]
-    const fileTargets = [] as number[]
-    resources[1].forEach((item: { type: string; id: number }) => {
-      item.type === 'FILE'
-        ? fileTargets.push(item.id)
-        : udfTargets.push(item.id)
-    })
-    state.fileResources = fileResources
-    state.udfResources = udfResources
-    state.authorizedFileResources = fileTargets
-    state.authorizedUdfResources = udfTargets
-  }
-
   const getNamespaces = async (userId: number) => {
     if (state.loading) return
     state.loading = true
@@ -223,12 +163,6 @@ export function useAuthorize() {
     if (type === 'authorize_datasource') {
       getDatasources(userId)
     }
-    if (type === 'authorize_udf') {
-      getUdfs(userId)
-    }
-    if (type === 'authorize_resource') {
-      getResources(userId)
-    }
     if (type === 'authorize_namespace') {
       getNamespaces(userId)
     }
@@ -237,33 +171,6 @@ export function useAuthorize() {
   /*
     getParent
   */
-  const getParent = (data2: Array<number>, nodeId2: number) => {
-    let arrRes: Array<any> = []
-    if (data2.length === 0) {
-      if (nodeId2) {
-        arrRes.unshift(data2)
-      }
-      return arrRes
-    }
-    const rev = (data: Array<any>, nodeId: number) => {
-      for (let i = 0, length = data.length; i < length; i++) {
-        const node = data[i]
-        if (node.id === nodeId) {
-          arrRes.unshift(node)
-          rev(data2, node.pid)
-          break
-        } else {
-          if (node.children) {
-            rev(node.children, nodeId)
-          }
-        }
-      }
-      return arrRes
-    }
-    arrRes = rev(data2, nodeId2)
-    return arrRes
-  }
-
   const onSave = async (type: TAuthType, userId: number) => {
     if (state.saving) return false
     state.saving = true
@@ -271,49 +178,6 @@ export function useAuthorize() {
       await grantDataSource({
         userId,
         datasourceIds: state.authorizedDatasources.join(',')
-      })
-    }
-    if (type === 'authorize_udf') {
-      await grantUDFFunc({
-        userId,
-        udfIds: state.authorizedUdfs.join(',')
-      })
-    }
-    if (type === 'authorize_resource') {
-      let fullPathFileId = []
-      const pathFileId: Array<string> = []
-      state.authorizedFileResources.forEach((v: number) => {
-        state.fileResources.forEach((v1: any) => {
-          const arr = []
-          arr[0] = v1
-          if (getParent(arr, v).length > 0) {
-            fullPathFileId = getParent(arr, v).map((v2: any) => {
-              return v2.id
-            })
-            pathFileId.push(fullPathFileId.join('-'))
-          }
-        })
-      })
-
-      let fullPathUdfId = []
-      const pathUdfId: Array<string> = []
-      state.authorizedUdfResources.forEach((v: number) => {
-        state.udfResources.forEach((v1: any) => {
-          const arr = []
-          arr[0] = v1
-          if (getParent(arr, v).length > 0) {
-            fullPathUdfId = getParent(arr, v).map((v2: any) => {
-              return v2.id
-            })
-            pathUdfId.push(fullPathUdfId.join('-'))
-          }
-        })
-      })
-
-      const allPathId = pathFileId.concat(pathUdfId)
-      await grantResource({
-        userId,
-        resourceIds: allPathId.join(',')
       })
     }
     if (type === 'authorize_namespace') {

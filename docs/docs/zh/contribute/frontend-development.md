@@ -163,9 +163,6 @@ npm install node-sass --unsafe-perm #单独安装node-sass依赖
 
 ```
 | 文件管理
-| UDF管理
-  - 资源管理
-  - 函数管理
 ```
 
 数据源管理 => `http://localhost:8888/#/datasource/list`

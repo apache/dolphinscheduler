@@ -24,7 +24,6 @@ import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.ENVIRONMENT_CODE;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.FILE_NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.FULL_NAME;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.FUNC_NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.NAME;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PRIORITY;
@@ -34,7 +33,6 @@ import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.PROCESS_INSTANCE_IDS;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.QUEUE_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.TYPE;
-import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.UDF_FUNC_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.USER_ID;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.VERSION;
 import static org.apache.dolphinscheduler.api.audit.constants.AuditLogConstants.WORKFLOW_DEFINITION_CODE;
@@ -55,7 +53,6 @@ import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK_GROUP
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TASK_INSTANCE;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TENANT;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.TOKEN;
-import static org.apache.dolphinscheduler.common.enums.AuditModelType.UDF_FUNCTION;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.USER;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.enums.AuditModelType.YARN_QUEUE;
@@ -96,7 +93,6 @@ import org.apache.dolphinscheduler.api.audit.operator.impl.TaskGroupAuditOperato
 import org.apache.dolphinscheduler.api.audit.operator.impl.TaskInstancesAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TenantAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.TokenAuditOperatorImpl;
-import org.apache.dolphinscheduler.api.audit.operator.impl.UdfFunctionAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.UserAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.WorkerGroupAuditOperatorImpl;
 import org.apache.dolphinscheduler.api.audit.operator.impl.YarnQueueAuditOperatorImpl;
@@ -162,13 +158,6 @@ public enum AuditType {
     FILE_CREATE(FILE, CREATE, ResourceAuditOperatorImpl.class, new String[]{TYPE, FILE_NAME, ALIAS}, new String[]{}),
     FILE_UPDATE(FILE, UPDATE, ResourceAuditOperatorImpl.class, new String[]{TYPE, FILE_NAME, ALIAS}, new String[]{}),
     FILE_DELETE(FILE, DELETE, ResourceAuditOperatorImpl.class, new String[]{FULL_NAME}, new String[]{}),
-
-    UDF_FUNCTION_CREATE(UDF_FUNCTION, CREATE, UdfFunctionAuditOperatorImpl.class, new String[]{FUNC_NAME},
-            new String[]{}),
-    UDF_FUNCTION_UPDATE(UDF_FUNCTION, UPDATE, UdfFunctionAuditOperatorImpl.class, new String[]{FUNC_NAME},
-            new String[]{}),
-    UDF_FUNCTION_DELETE(UDF_FUNCTION, DELETE, UdfFunctionAuditOperatorImpl.class, new String[]{UDF_FUNC_ID},
-            new String[]{}),
 
     TASK_GROUP_CREATE(TASK_GROUP, CREATE, TaskGroupAuditOperatorImpl.class, new String[]{NAME}, new String[]{}),
     TASK_GROUP_UPDATE(TASK_GROUP, UPDATE, TaskGroupAuditOperatorImpl.class, new String[]{}, new String[]{ID}),

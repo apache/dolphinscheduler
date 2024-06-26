@@ -19,21 +19,14 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.CREATE_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_UDF_FUNCTION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_RESOURCE_FILE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.EDIT_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATASOURCE_BY_TYPE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RESOURCES_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_RESOURCES_LIST_PAGING;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UDF_FUNCTION_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.RESOURCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_RESOURCE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_UDF_FUNCTION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_UDF_FUNCTION_NAME_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VIEW_RESOURCE_FILE_ON_LINE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.VIEW_UDF_FUNCTION_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
@@ -51,13 +44,11 @@ import org.apache.dolphinscheduler.api.dto.resources.UpdateFileFromContentReques
 import org.apache.dolphinscheduler.api.dto.resources.UpdateFileRequest;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ResourcesService;
-import org.apache.dolphinscheduler.api.service.UdfFuncService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.ResourceItemVO;
 import org.apache.dolphinscheduler.api.vo.resources.FetchFileContentResponse;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.UdfType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -74,7 +65,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -101,9 +91,6 @@ public class ResourcesController extends BaseController {
 
     @Autowired
     private ResourcesService resourceService;
-
-    @Autowired
-    private UdfFuncService udfFuncService;
 
     @Operation(summary = "createDirectory", description = "CREATE_RESOURCE_NOTES")
     @Parameters({
@@ -273,19 +260,6 @@ public class ResourcesController extends BaseController {
         return Result.success(resourceService.pagingResourceItem(pagingResourceItemRequest));
     }
 
-    // todo: this api is used for udf, we should remove it
-    @Operation(summary = "queryResourceList", description = "QUERY_RESOURCE_LIST_NOTES")
-    @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
-            @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class))})
-    @GetMapping(value = "/list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_RESOURCES_LIST_ERROR)
-    public Result<List<ResourceComponent>> queryResourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                             @RequestParam(value = "type") ResourceType type) {
-        return Result.success(resourceService.queryResourceFiles(loginUser, type));
-    }
-
     @Operation(summary = "deleteResource", description = "DELETE_RESOURCE_BY_ID_NOTES")
     @Parameters({
             @Parameter(name = "fullName", description = "RESOURCE_FULLNAME", required = true, schema = @Schema(implementation = String.class, example = "file:////tmp/dolphinscheduler/storage/default/resources/demo.sql"))
@@ -352,173 +326,6 @@ public class ResourcesController extends BaseController {
                 .build();
 
         resourceService.downloadResource(response, downloadFileRequest);
-    }
-
-    @Operation(summary = "createUdfFunc", description = "CREATE_UDF_FUNCTION_NOTES")
-    @Parameters({
-            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class)),
-            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "argTypes", description = "ARG_TYPES", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "database", description = "DATABASE_NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "resourceId", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
-
-    })
-    @PostMapping(value = "/udf-func")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiException(CREATE_UDF_FUNCTION_ERROR)
-    @OperatorLog(auditType = AuditType.UDF_FUNCTION_CREATE)
-    public Result createUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam(value = "type") UdfType type,
-                                @RequestParam(value = "funcName") String funcName,
-                                @RequestParam(value = "className") String className,
-                                @RequestParam(value = "fullName") String fullName,
-                                @RequestParam(value = "argTypes", required = false) String argTypes,
-                                @RequestParam(value = "database", required = false) String database,
-                                @RequestParam(value = "description", required = false) String description) {
-        // todo verify the sourceName
-        return udfFuncService.createUdfFunction(loginUser, funcName, className, fullName, argTypes, database,
-                description, type);
-    }
-
-    /**
-     * view udf function
-     *
-     * @param loginUser login user
-     * @param id        udf function id
-     * @return udf function detail
-     */
-    @Operation(summary = "viewUIUdfFunction", description = "VIEW_UDF_FUNCTION_NOTES")
-    @Parameters({
-            @Parameter(name = "id", description = "RESOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
-
-    })
-    @GetMapping(value = "/{id}/udf-func")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(VIEW_UDF_FUNCTION_ERROR)
-    public Result viewUIUdfFunction(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @PathVariable("id") int id) {
-        return udfFuncService.queryUdfFuncDetail(loginUser, id);
-    }
-
-    /**
-     * update udf function
-     *
-     * @param loginUser   login user
-     * @param type        resource type
-     * @param funcName    function name
-     * @param argTypes    argument types
-     * @param database    data base
-     * @param description description
-     * @param className   class name
-     * @param udfFuncId   udf function id
-     * @return update result code
-     */
-    @Operation(summary = "updateUdfFunc", description = "UPDATE_UDF_FUNCTION_NOTES")
-    @Parameters({
-            @Parameter(name = "id", description = "UDF_ID", required = true, schema = @Schema(implementation = int.class)),
-            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class)),
-            @Parameter(name = "funcName", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "className", description = "CLASS_NAME", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "argTypes", description = "ARG_TYPES", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "database", description = "DATABASE_NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "description", description = "UDF_DESC", schema = @Schema(implementation = String.class))})
-    @PutMapping(value = "/udf-func/{id}")
-    @ApiException(UPDATE_UDF_FUNCTION_ERROR)
-    @OperatorLog(auditType = AuditType.UDF_FUNCTION_UPDATE)
-    public Result updateUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable(value = "id") int udfFuncId, @RequestParam(value = "type") UdfType type,
-                                @RequestParam(value = "funcName") String funcName,
-                                @RequestParam(value = "className") String className,
-                                @RequestParam(value = "argTypes", required = false) String argTypes,
-                                @RequestParam(value = "database", required = false) String database,
-                                @RequestParam(value = "description", required = false) String description,
-                                @RequestParam(value = "fullName") String fullName) {
-        return udfFuncService.updateUdfFunc(loginUser, udfFuncId, funcName, className, argTypes, database, description,
-                type, fullName);
-    }
-
-    /**
-     * query udf function list paging
-     *
-     * @param loginUser login user
-     * @param searchVal search value
-     * @param pageNo    page number
-     * @param pageSize  page size
-     * @return udf function list page
-     */
-    @Operation(summary = "queryUdfFuncListPaging", description = "QUERY_UDF_FUNCTION_LIST_PAGING_NOTES")
-    @Parameters({
-            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
-            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))})
-    @GetMapping(value = "/udf-func")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_UDF_FUNCTION_LIST_PAGING_ERROR)
-    public Result<Object> queryUdfFuncListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @RequestParam("pageNo") Integer pageNo,
-                                                 @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                 @RequestParam("pageSize") Integer pageSize) {
-        checkPageParams(pageNo, pageSize);
-        return udfFuncService.queryUdfFuncListPaging(loginUser, searchVal, pageNo, pageSize);
-    }
-
-    /**
-     * query udf func list by type
-     *
-     * @param loginUser login user
-     * @param type      resource type
-     * @return resource list
-     */
-    @Operation(summary = "queryUdfFuncList", description = "QUERY_UDF_FUNC_LIST_NOTES")
-    @Parameters({
-            @Parameter(name = "type", description = "UDF_TYPE", required = true, schema = @Schema(implementation = UdfType.class))})
-    @GetMapping(value = "/udf-func/list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_DATASOURCE_BY_TYPE_ERROR)
-    public Result<Object> queryUdfFuncList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @RequestParam("type") UdfType type) {
-        return udfFuncService.queryUdfFuncList(loginUser, type.getCode());
-    }
-
-    /**
-     * verify udf function name can use or not
-     *
-     * @param loginUser login user
-     * @param name      name
-     * @return true if the name can user, otherwise return false
-     */
-    @Operation(summary = "verifyUdfFuncName", description = "VERIFY_UDF_FUNCTION_NAME_NOTES")
-    @Parameters({
-            @Parameter(name = "name", description = "FUNC_NAME", required = true, schema = @Schema(implementation = String.class))
-
-    })
-    @GetMapping(value = "/udf-func/verify-name")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(VERIFY_UDF_FUNCTION_NAME_ERROR)
-    public Result verifyUdfFuncName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam(value = "name") String name) {
-        return udfFuncService.verifyUdfFuncByName(loginUser, name);
-    }
-
-    /**
-     * delete udf function
-     *
-     * @param loginUser login user
-     * @param udfFuncId udf function id
-     * @return delete result code
-     */
-    @Operation(summary = "deleteUdfFunc", description = "DELETE_UDF_FUNCTION_NOTES")
-    @Parameters({
-            @Parameter(name = "id", description = "UDF_FUNC_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))})
-    @DeleteMapping(value = "/udf-func/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_UDF_FUNCTION_ERROR)
-    @OperatorLog(auditType = AuditType.UDF_FUNCTION_DELETE)
-    public Result deleteUdfFunc(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @PathVariable(value = "id") int udfFuncId) {
-        return udfFuncService.delete(loginUser, udfFuncId);
     }
 
     @Operation(summary = "queryResourceBaseDir", description = "QUERY_RESOURCE_BASE_DIR")

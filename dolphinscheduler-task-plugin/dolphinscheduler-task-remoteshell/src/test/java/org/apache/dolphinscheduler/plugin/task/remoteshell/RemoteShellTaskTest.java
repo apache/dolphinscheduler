@@ -68,7 +68,7 @@ public class RemoteShellTaskTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskAppId("1");
         taskExecutionContext
-                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo 1\",\"resourceList\":[],\"udfList\":[]}");
+                .setTaskParams("{\"localParams\":[],\"rawScript\":\"echo 1\",\"resourceList\":[]}");
         taskExecutionContext.setExecutePath("/tmp");
         taskExecutionContext.setEnvironmentConfig("export PATH=/opt/anaconda3/bin:$PATH");
         RemoteShellTask remoteShellTask = spy(new RemoteShellTask(taskExecutionContext));

@@ -62,10 +62,6 @@ interface ProjectCodeReq {
   projectCode: string
 }
 
-interface GrantUDFReq {
-  udfIds: string
-}
-
 interface GrantNamespaceReq {
   namespaceIds: string
 }
@@ -130,7 +126,6 @@ export {
   GrantResourceReq,
   GrantProject,
   ProjectCodeReq,
-  GrantUDFReq,
   GrantNamespaceReq,
   ListAllReq,
   ListReq,

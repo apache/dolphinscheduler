@@ -48,11 +48,7 @@ export function useLogin(state: any) {
         const baseResDir = await queryBaseDir({
           type: 'FILE'
         })
-        const baseUdfDir = await queryBaseDir({
-          type: 'UDF'
-        })
         await userStore.setBaseResDir(baseResDir)
-        await userStore.setBaseUdfDir(baseUdfDir)
 
         const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
         await timezoneStore.setTimezone(timezone)

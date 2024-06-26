@@ -51,7 +51,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
                 .resourceBaseDirectory(storageBaseDirectory)
                 .isDirectory(Files.getFileExtension(resourceAbsolutePath).isEmpty())
                 .tenant(segments[0])
-                .resourceType(segments[1].equals(FILE_FOLDER_NAME) ? ResourceType.FILE : ResourceType.UDF)
+                .resourceType(ResourceType.FILE)
                 .resourceRelativePath(segments.length == 2 ? "/" : segments[2])
                 .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, File.separator))
                 .build();
@@ -82,9 +82,6 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         switch (resourceType) {
             case FILE:
                 resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, FILE_FOLDER_NAME);
-                break;
-            case UDF:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, UDF_FOLDER_NAME);
                 break;
             case ALL:
                 resourceBaseDirectory = tenantBaseDirectory;

@@ -248,7 +248,12 @@ export default defineComponent({
             >
               {{
                 default: (param: {
-                  value: { key: string; direct: string; type: string; value: string }
+                  value: {
+                    key: string
+                    direct: string
+                    type: string
+                    value: string
+                  }
                 }) => (
                   <NGrid xGap={12} cols={24}>
                     <NGridItem span={6}>
@@ -269,20 +274,20 @@ export default defineComponent({
                     </NGridItem>
                     <NGridItem span={7}>
                       <NSelect
-                          options={[
-                            { value: 'VARCHAR', label: 'VARCHAR' },
-                            { value: 'INTEGER', label: 'INTEGER' },
-                            { value: 'LONG', label: 'LONG' },
-                            { value: 'FLOAT', label: 'FLOAT' },
-                            { value: 'DOUBLE', label: 'DOUBLE' },
-                            { value: 'DATE', label: 'DATE' },
-                            { value: 'TIME', label: 'TIME' },
-                            { value: 'BOOLEAN', label: 'BOOLEAN' },
-                            { value: 'LIST', label: 'LIST' },
-                            { value: 'FILE', label: 'FILE' }
-                          ]}
-                          v-model:value={param.value.type}
-                          defaultValue={'VARCHAR'}
+                        options={[
+                          { value: 'VARCHAR', label: 'VARCHAR' },
+                          { value: 'INTEGER', label: 'INTEGER' },
+                          { value: 'LONG', label: 'LONG' },
+                          { value: 'FLOAT', label: 'FLOAT' },
+                          { value: 'DOUBLE', label: 'DOUBLE' },
+                          { value: 'DATE', label: 'DATE' },
+                          { value: 'TIME', label: 'TIME' },
+                          { value: 'BOOLEAN', label: 'BOOLEAN' },
+                          { value: 'LIST', label: 'LIST' },
+                          { value: 'FILE', label: 'FILE' }
+                        ]}
+                        v-model:value={param.value.type}
+                        defaultValue={'VARCHAR'}
                       />
                     </NGridItem>
                     <NGridItem span={6}>

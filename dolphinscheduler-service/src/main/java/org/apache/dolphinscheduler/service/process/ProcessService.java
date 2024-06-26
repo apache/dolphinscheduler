@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -119,8 +118,6 @@ public interface ProcessService {
     void processNeedFailoverProcessInstances(ProcessInstance processInstance);
 
     DataSource findDataSourceById(int id);
-
-    List<UdfFunc> queryUdfFunListByIds(Integer[] ids);
 
     ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId);
 

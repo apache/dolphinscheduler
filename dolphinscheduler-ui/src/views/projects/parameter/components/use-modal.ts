@@ -27,7 +27,7 @@ import {
   UpdateProjectParameterReq
 } from '@/service/modules/projects-parameter/types'
 import { useRouter } from 'vue-router'
-import { DEFAULT_DATA_TYPE } from "@/views/projects/parameter/data_type";
+import { DEFAULT_DATA_TYPE } from '@/views/projects/parameter/data_type'
 
 export function useModal(
   props: any,

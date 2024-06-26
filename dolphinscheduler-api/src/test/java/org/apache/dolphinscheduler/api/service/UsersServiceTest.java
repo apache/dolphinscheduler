@@ -46,7 +46,6 @@ import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
@@ -106,9 +105,6 @@ public class UsersServiceTest {
 
     @Mock
     private MetricsCleanUpService metricsCleanUpService;
-
-    @Mock
-    private UDFUserMapper udfUserMapper;
 
     @Mock
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -530,33 +526,6 @@ public class UsersServiceTest {
         result = this.usersService.revokeProjectById(loginUser, 1, projectId);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
-    @Test
-    public void testGrantUDFFunction() {
-        String udfIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-
-        // success
-        when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
-        result = usersService.grantUDFFunction(loginUser, 1, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-        // ERROR: NO_CURRENT_OPERATING_PERMISSION
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        when(userMapper.selectById(2)).thenReturn(loginUser);
-        result = this.usersService.grantUDFFunction(loginUser, 2, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test

@@ -50,7 +50,6 @@ export function useSql({
     sqlType: '0',
     preStatements: [],
     postStatements: [],
-    udfs: [],
     timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 

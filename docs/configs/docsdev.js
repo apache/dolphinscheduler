@@ -433,10 +433,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/resource/file-manage.html'
                             },
                             {
-                                title: 'UDF Manage',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/udf-manage.html'
-                            },
-                            {
                                 title: 'Task Group Manage',
                                 link: '/en-us/docs/dev/user_doc/guide/resource/task-group.html'
                             },
@@ -1152,10 +1148,6 @@ export default {
                             {
                                 title: '文件管理',
                                 link: '/zh-cn/docs/dev/user_doc/guide/resource/file-manage.html'
-                            },
-                            {
-                                title: 'UDF 管理',
-                                link: '/zh-cn/docs/dev/user_doc/guide/resource/udf-manage.html'
                             },
                             {
                                 title: '任务组管理',

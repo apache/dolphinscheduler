@@ -22,8 +22,6 @@ see sql files in `dolphinscheduler/dolphinscheduler-dao/src/main/resources/sql`
 
 - User can have multiple projects, user project authorization completes the relationship binding using `project_id` and `user_id` in `t_ds_relation_project_user` table.
 - The `user_id` in the `t_ds_projcet` table represents the user who create the project, and the `user_id` in the `t_ds_relation_project_user` table represents users who have permission to the project.
-- The `user_id` in the `t_ds_resources` table represents the user who create the resource, and the `user_id` in `t_ds_relation_resources_user` represents the user who has permissions to the resource.
-- The `user_id` in the `t_ds_udfs` table represents the user who create the UDF, and the `user_id` in the `t_ds_relation_udfs_user` table represents a user who has permission to the UDF.
 
 ### Project - Tenant - ProcessDefinition - Schedule
 
