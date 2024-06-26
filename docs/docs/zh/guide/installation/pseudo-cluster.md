@@ -70,30 +70,7 @@ chmod 600 ~/.ssh/authorized_keys
 
 ## 修改相关配置
 
-完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env` 中找到，他们分别是 并命名为 `install_env.sh` 和 `dolphinscheduler_env.sh`。
-
-### 修改 `install_env.sh` 文件
-
-文件 `install_env.sh` 描述了哪些机器将被安装 DolphinScheduler 以及每台机器对应安装哪些服务。您可以在路径 `bin/env/install_env.sh` 中找到此文件，可通过以下方式更改 env 变量,export <ENV_NAME>=<VALUE>，配置详情如下。
-
-```shell
-# ---------------------------------------------------------
-# INSTALL MACHINE
-# ---------------------------------------------------------
-# Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
-ips="localhost"
-sshPort="22"
-masters="localhost"
-workers="localhost:default"
-alertServer="localhost"
-apiServers="localhost"
-
-# DolphinScheduler installation path, it will auto-create if not exists
-installPath=~/dolphinscheduler
-
-# Deploy user, use the user you create in section **Configure machine SSH password-free login**
-deployUser="dolphinscheduler"
-```
+完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env/dolphinscheduler_env.sh` 中找到。
 
 ### 修改 `dolphinscheduler_env.sh` 文件
 
@@ -141,11 +118,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HI
 
 ## 启动 DolphinScheduler
 
-使用上面创建的**部署用户**运行以下命令完成部署，部署后的运行日志将存放在 logs 文件夹内
-
-```shell
-bash ./bin/install.sh
-```
+使用上面创建的**部署用户**运行命令完成部署，部署后的运行日志将存放在 logs 文件夹内
 
 > **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，此为非重要信息直接忽略即可
 
