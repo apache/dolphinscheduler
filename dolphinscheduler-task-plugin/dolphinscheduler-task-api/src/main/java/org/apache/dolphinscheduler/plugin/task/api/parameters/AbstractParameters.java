@@ -73,16 +73,6 @@ public abstract class AbstractParameters implements IParameters {
         return localParametersMaps;
     }
 
-    public K8sTaskExecutionContext generateK8sTaskExecutionContext(ResourceParametersHelper parametersHelper,
-                                                                   int datasource) {
-        DataSourceParameters dataSourceParameters =
-                (DataSourceParameters) parametersHelper.getResourceParameters(ResourceType.DATASOURCE, datasource);
-        K8sTaskExecutionContext k8sTaskExecutionContext = new K8sTaskExecutionContext();
-        k8sTaskExecutionContext.setConnectionParams(
-                Objects.nonNull(dataSourceParameters) ? dataSourceParameters.getConnectionParams() : null);
-        return k8sTaskExecutionContext;
-    }
-
     /**
      * get input local parameters map if the param direct is IN
      *
