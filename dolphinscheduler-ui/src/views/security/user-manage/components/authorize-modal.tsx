@@ -23,9 +23,6 @@ import {
   NIcon,
   NTransfer,
   NSpace,
-  NRadioGroup,
-  NRadioButton,
-  NTreeSelect,
   NDataTable,
   NPagination
 } from 'naive-ui'
@@ -200,51 +197,6 @@ export const AuthorizeModal = defineComponent({
             v-model:value={this.authorizedDatasources}
             class={styles.transfer}
           />
-        )}
-        {type === 'authorize_udf' && (
-          <NTransfer
-            virtualScroll
-            options={this.unauthorizedUdfs}
-            filterable
-            v-model:value={this.authorizedUdfs}
-            class={styles.transfer}
-          />
-        )}
-        {type === 'authorize_resource' && (
-          <NSpace vertical>
-            <NRadioGroup v-model:value={this.resourceType}>
-              <NRadioButton key='file' value='file'>
-                {t('security.user.file_resource')}
-              </NRadioButton>
-              <NRadioButton key='udf' value='udf'>
-                {t('security.user.udf_resource')}
-              </NRadioButton>
-            </NRadioGroup>
-            <NTreeSelect
-              v-show={this.resourceType === 'file'}
-              filterable
-              multiple
-              cascade
-              checkable
-              checkStrategy='child'
-              key-field='id'
-              label-field='fullName'
-              options={this.fileResources}
-              v-model:value={this.authorizedFileResources}
-            />
-            <NTreeSelect
-              v-show={this.resourceType === 'udf'}
-              filterable
-              multiple
-              cascade
-              checkable
-              checkStrategy='child'
-              key-field='id'
-              label-field='fullName'
-              options={this.udfResources}
-              v-model:value={this.authorizedUdfResources}
-            />
-          </NSpace>
         )}
         {type === 'authorize_namespace' && (
           <NTransfer

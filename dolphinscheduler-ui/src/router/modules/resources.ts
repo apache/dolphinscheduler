@@ -101,40 +101,6 @@ export default {
       }
     },
     {
-      path: '/resource/resource-manage',
-      name: 'resource-manage',
-      component: components['resource-udf-resource'],
-      meta: {
-        title: '资源管理',
-        activeMenu: 'resource',
-        showSide: true,
-        auth: []
-      }
-    },
-    {
-      path: '/resource/resource-manage',
-      name: 'resource-sub-manage',
-      component: components['resource-udf-resource'],
-      meta: {
-        title: '资源管理',
-        activeMenu: 'resource',
-        activeSide: '/resource/resource-manage',
-        showSide: true,
-        auth: []
-      }
-    },
-    {
-      path: '/resource/function-manage',
-      name: 'function-manage',
-      component: components['resource-udf-function'],
-      meta: {
-        title: '函数管理',
-        activeMenu: 'resource',
-        showSide: true,
-        auth: []
-      }
-    },
-    {
       path: '/resource/task-group-option',
       name: 'task-group-option',
       component: components['resource-task-group-option'],

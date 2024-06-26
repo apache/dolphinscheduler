@@ -250,7 +250,8 @@ export default {
       'The downstream dependent tasks exists. You can not delete the task.',
     warning_delete_scheduler_dependent_tasks_desc:
       'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
-    warning_too_large_parallelism_number: 'The parallelism number is too large. It is better not to be over 10.'
+    warning_too_large_parallelism_number:
+      'The parallelism number is too large. It is better not to be over 10.'
   },
   task: {
     on_line: 'Online',
@@ -839,7 +840,6 @@ export default {
     integer_tips: 'Please enter a positive integer',
     sql_parameter: 'SQL Parameter',
     format_tips: 'Please enter format',
-    udf_function: 'UDF Function',
     unlimited: 'unlimited',
     please_select_source_connector_type: 'Please select source connector type',
     please_select_source_datasource_id: 'Please select source datasource id',

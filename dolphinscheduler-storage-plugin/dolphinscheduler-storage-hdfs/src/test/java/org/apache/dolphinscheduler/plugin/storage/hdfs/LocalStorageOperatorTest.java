@@ -119,13 +119,6 @@ class LocalStorageOperatorTest {
     }
 
     @Test
-    public void testGetStorageBaseDirectory_withTenant_withResourceTypeUdf() {
-        String storageBaseDirectory = storageOperator.getStorageBaseDirectory("default", ResourceType.UDF);
-        assertThat(storageBaseDirectory)
-                .isEqualTo("file:" + Paths.get(resourceBaseDir, tenantCode, Constants.RESOURCE_TYPE_UDF));
-    }
-
-    @Test
     public void testGetStorageBaseDirectory_withTenant_withResourceTypeAll() {
         String storageBaseDirectory = storageOperator.getStorageBaseDirectory("default", ResourceType.ALL);
         assertThat(storageBaseDirectory).isEqualTo("file:" + Paths.get(resourceBaseDir, tenantCode));
