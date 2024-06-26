@@ -35,7 +35,8 @@ import java.util.stream.Collectors;
 
 @Getter
 public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
-    @FindBy(className = "items-task-instances")
+
+    @FindBy(className = "batch-task-instance-items")
     private List<WebElement> instanceList;
 
     public TaskInstanceTab(RemoteWebDriver driver) {
@@ -47,7 +48,6 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
             .stream()
             .filter(WebElement::isDisplayed)
             .map(Row::new)
-            .filter(row -> !row.name().isEmpty())
             .collect(Collectors.toList());
     }
 
@@ -55,12 +55,25 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
     public static class Row {
         private final WebElement row;
 
-        public String state() {
-            return row.findElement(By.className("task-instance-state")).getText();
+        public String taskInstanceName() {
+            return row.findElement(By.cssSelector("td[data-col-key=name]")).getText();
         }
 
-        public String name() {
-            return row.findElement(By.className("task-instance-name")).getText();
+        public String workflowInstanceName() {
+            return row.findElement(By.cssSelector("td[data-col-key=processInstanceName]")).getText();
         }
+
+        public int retryTimes() {
+            return Integer.parseInt(row.findElement(By.cssSelector("td[data-col-key=retryTimes]")).getText());
+        }
+
+        public boolean isSuccess() {
+            return !row.findElements(By.className("success")).isEmpty();
+        }
+
+        public boolean isFailed() {
+            return !row.findElements(By.className("failed")).isEmpty();
+        }
+
     }
 }

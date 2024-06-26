@@ -67,59 +67,60 @@ public class SecurityPage extends NavBarPage implements NavBarItem {
     }
 
     public <T extends SecurityPage.Tab> T goToTab(Class<T> tab) {
+
         if (tab == TenantPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuTenantManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuTenantManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/tenant-manage"));
             return tab.cast(new TenantPage(driver));
         }
 
         if (tab == UserPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menUserManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menUserManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/user-manage"));
             return tab.cast(new UserPage(driver));
         }
 
         if (tab == WorkerGroupPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menWorkerGroupManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menWorkerGroupManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/worker-group-manage"));
             return tab.cast(new WorkerGroupPage(driver));
         }
 
         if (tab == QueuePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuQueueManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuQueueManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/yarn-queue-manage"));
             return tab.cast(new QueuePage(driver));
         }
 
         if (tab == EnvironmentPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuEnvironmentManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuEnvironmentManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/environment-manage"));
             return tab.cast(new EnvironmentPage(driver));
         }
 
         if (tab == ClusterPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuClusterManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuClusterManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/cluster-manage"));
             return tab.cast(new ClusterPage(driver));
         }
 
         if (tab == TokenPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuTokenManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuTokenManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/token-manage"));
             return tab.cast(new TokenPage(driver));
         }
 
         if (tab == NamespacePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security"));
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(menuNamespaceManage));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", menuNamespaceManage());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/k8s-namespace-manage"));
             return tab.cast(new NamespacePage(driver));
         }
 

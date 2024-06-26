@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.time.Duration;
@@ -84,7 +85,19 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
         return this;
     }
 
-    public UserPage update(String user, String editUser, String editEmail, String editPhone,
+    public UserPage update(IUser user) {
+        return update(
+                user.getUserName(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getTenant());
+    }
+
+    public UserPage update(String user,
+                           String editUser,
+                           String editEmail,
+                           String editPhone,
                            String tenant) {
         userList().stream()
             .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))

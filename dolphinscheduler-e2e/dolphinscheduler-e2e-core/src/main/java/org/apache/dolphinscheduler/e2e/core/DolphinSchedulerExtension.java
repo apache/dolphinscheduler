@@ -115,6 +115,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
               .filter(it -> Modifier.isStatic(it.getModifiers()))
               .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
               .forEach(it -> setDriver(clazz, it));
+        WebDriverHolder.setWebDriver(driver);
     }
 
     private void runInLocal() {

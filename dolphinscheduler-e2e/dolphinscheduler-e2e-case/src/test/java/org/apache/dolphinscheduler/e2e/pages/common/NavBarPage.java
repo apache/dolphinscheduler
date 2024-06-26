@@ -66,24 +66,28 @@ public class NavBarPage {
         if (nav == ProjectPage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(projectTab));
             projectTab.click();
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/projects/list"));
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(securityTab));
             securityTab.click();
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/security/tenant-manage"));
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(resourceTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", resourceTab());
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/resource/file-manage"));
             return nav.cast(new ResourcePage(driver));
         }
 
         if (nav == DataSourcePage.class) {
             new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
             dataSourceTab.click();
+            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/datasource"));
             return nav.cast(new DataSourcePage(driver));
         }
 

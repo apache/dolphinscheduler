@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages;
 
+import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
@@ -59,17 +60,20 @@ public final class LoginPage extends NavBarPage {
     }
 
     @SneakyThrows
+    public NavBarPage login(IUser user) {
+        return login(user.getUserName(), user.getPassword());
+    }
+
+    @SneakyThrows
     public NavBarPage login(String username, String password) {
         new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
-
         buttonSwitchLanguage().click();
 
         inputUsername().sendKeys(username);
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30))
-            .until(ExpectedConditions.urlContains("/home"));
+        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.urlContains("/home"));
 
         return new NavBarPage(driver);
     }
