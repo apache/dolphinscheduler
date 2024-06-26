@@ -40,7 +40,7 @@ public class K8sTaskChannel implements TaskChannel {
 
     @Override
     public ResourceParametersHelper getResources(String parameters) {
-        return JSONUtils.parseObject(parameters, K8sTaskParameters.class).getResources();
+        return null;
     }
 
     @Override

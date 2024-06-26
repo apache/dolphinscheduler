@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,11 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * k8s task parameters
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Slf4j
 public class K8sTaskParameters extends AbstractParameters {
@@ -48,9 +48,7 @@ public class K8sTaskParameters extends AbstractParameters {
     private double minMemorySpace;
     private List<Label> customizedLabels;
     private List<NodeSelectorExpression> nodeSelectors;
-    private String kubeConfig;
-    private int datasource;
-    private String type;
+
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(image);
@@ -59,12 +57,5 @@ public class K8sTaskParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public ResourceParametersHelper getResources() {
-        ResourceParametersHelper resources = super.getResources();
-        resources.put(ResourceType.DATASOURCE, datasource);
-        return resources;
     }
 }
