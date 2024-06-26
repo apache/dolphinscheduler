@@ -24,3 +24,7 @@
 
 * 在 /datasources/tables && /datasources/tableColumns 接口中添加了必选字段`database` [#14406](https://github.com/apache/dolphinscheduler/pull/14406)
 
+## 3.3.0
+
+* 从 `任务插件` 中移除了 `Pigeon` 类型 ([#16218])
+

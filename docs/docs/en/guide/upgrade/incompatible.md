@@ -26,3 +26,7 @@ This document records the incompatible updates between each version. You need to
 
 * Add required field `database` in /datasources/tables && /datasources/tableColumns Api [#14406](https://github.com/apache/dolphinscheduler/pull/14406)
 
+## 3.3.0
+
+* Remove the `Pigeon` from the `Task Plugin` ([#16218])
+
