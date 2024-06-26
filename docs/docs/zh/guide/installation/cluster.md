@@ -14,21 +14,7 @@
 
 ### 修改相关配置
 
-这个是与[伪集群部署](pseudo-cluster.md)差异较大的一步，因为部署脚本会通过 `scp` 的方式将安装需要的资源传输到各个机器上，所以这一步我们仅需要修改运行`install.sh`脚本的所在机器的配置即可。配置文件在路径在`bin/env/install_env.sh`下，此处我们仅需修改**INSTALL MACHINE**，**DolphinScheduler ENV、Database、Registry Server**与伪集群部署保持一致，下面对必须修改参数进行说明
-
-```shell
-# ---------------------------------------------------------
-# INSTALL MACHINE
-# ---------------------------------------------------------
-# 需要配置master、worker、API server，所在服务器的IP均为机器IP或者localhost
-# 如果是配置hostname的话，需要保证机器间可以通过hostname相互链接
-# 如下图所示，部署 DolphinScheduler 机器的 hostname 为 ds1,ds2,ds3,ds4,ds5，其中 ds1,ds2 安装 master 服务，ds3,ds4,ds5安装 worker 服务，alert server安装在ds4中，api server 安装在ds5中
-ips="ds1,ds2,ds3,ds4,ds5"
-masters="ds1,ds2"
-workers="ds3:default,ds4:default,ds5:default"
-alertServer="ds4"
-apiServers="ds5"
-```
+这个是与[伪集群部署](pseudo-cluster.md)差异较大的一步，请使用 scp 等方式将配置文件分发到各台机器上，然后修改配置文件
 
 ## 启动 DolphinScheduler && 登录 DolphinScheduler && 启停服务
 
