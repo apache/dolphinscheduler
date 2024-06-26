@@ -47,9 +47,9 @@ jobs:
             } else {
               core.setFailed(`A maintainer needs to set the milestone for this pull request.`);
             }
-            const labeledFlag = false;
+            let labeledFlag = false;
             for (const label of data.labels) {
-              if (['feature', 'bug', 'improvement', 'document', 'chore', 'DSIP', 'CI/CD', 'revert'].includes(label.name)) {
+              if (['feature', 'bug', 'improvement', 'document', 'chore', 'DSIP', 'CI&CD', 'revert'].includes(label.name)) {
                 core.info(`This pull request has a valid label: ${label.name}`);
                 labeledFlag = true;
                 break;
