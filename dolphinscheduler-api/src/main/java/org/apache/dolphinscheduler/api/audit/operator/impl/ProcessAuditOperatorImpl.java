@@ -46,14 +46,14 @@ public class ProcessAuditOperatorImpl extends BaseAuditOperator {
     }
 
     @Override
-    protected void setObjectByParma(String[] paramNameArr, Map<String, Object> paramsMap,
+    protected void setObjectByParam(String[] paramNameArr, Map<String, Object> paramsMap,
                                     List<AuditLog> auditLogList) {
         if (paramNameArr[0].equals(AuditLogConstants.CODES)
                 || paramNameArr[0].equals(AuditLogConstants.PROCESS_DEFINITION_CODES)
                 || paramNameArr[0].equals(AuditLogConstants.PROCESS_INSTANCE_IDS)) {
-            super.setObjectByParmaArr(paramNameArr, paramsMap, auditLogList);
+            super.setObjectByParamArr(paramNameArr, paramsMap, auditLogList);
         } else {
-            super.setObjectByParma(paramNameArr, paramsMap, auditLogList);
+            super.setObjectByParam(paramNameArr, paramsMap, auditLogList);
         }
         if (paramsMap.containsKey(AuditLogConstants.VERSION)) {
             if (paramsMap.get(AuditLogConstants.VERSION) != null) {
@@ -65,7 +65,7 @@ public class ProcessAuditOperatorImpl extends BaseAuditOperator {
     }
 
     @Override
-    protected String getObjectNameFromReturnIdentity(Object identity) {
+    protected String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";

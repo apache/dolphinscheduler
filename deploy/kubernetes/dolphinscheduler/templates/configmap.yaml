@@ -37,7 +37,7 @@ data:
   {{- range $key, $value := index .Values.conf "common" }}
     {{- if and $.Values.minio.enabled }}
     {{- if eq $key "resource.storage.type" }}{{ $value = "S3" }}{{- end }}
-    {{- if eq $key "resource.aws.s3.endpoint" }}{{ $value = print "http://" (include "dolphinscheduler.minio.fullname" $) ":9000" }}{{- end }}
+    {{- if eq $key "aws.s3.endpoint" }}{{ $value = print "http://" (include "dolphinscheduler.minio.fullname" $) ":9000" }}{{- end }}
     {{- end }}
     {{ $key }}={{ $value }}
   {{- end }}

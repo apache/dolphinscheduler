@@ -57,7 +57,7 @@ export function useDetail(getFormValues: Function) {
         pluginInstanceParams: formatParams(json, values)
       })
       window.$message.success(
-        res
+        res && res.msg
           ? res.msg
           : `${t('security.alarm_instance.test_send')} ${t('home.success')}`
       )

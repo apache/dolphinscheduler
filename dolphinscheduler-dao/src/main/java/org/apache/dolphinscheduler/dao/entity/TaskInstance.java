@@ -17,26 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DYNAMIC;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SWITCH;
-
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import lombok.Data;
@@ -46,7 +35,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 /**
  * task instance
@@ -187,18 +175,6 @@ public class TaskInstance implements Serializable {
     private String cacheKey;
 
     /**
-     * dependency
-     */
-    @TableField(exist = false)
-    private DependentParameters dependency;
-
-    /**
-     * switch dependency
-     */
-    @TableField(exist = false)
-    private SwitchParameters switchDependency;
-
-    /**
      * duration
      */
     @TableField(exist = false)
@@ -303,73 +279,12 @@ public class TaskInstance implements Serializable {
         this.executePath = executePath;
     }
 
-    public DependentParameters getDependency() {
-        if (this.dependency == null) {
-            Map<String, Object> taskParamsMap =
-                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                    });
-            this.dependency =
-                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.DEPENDENCE), DependentParameters.class);
-        }
-        return this.dependency;
-    }
-
-    public void setDependency(DependentParameters dependency) {
-        this.dependency = dependency;
-    }
-
-    public SwitchParameters getSwitchDependency() {
-        // todo: We need to directly use Jackson to deserialize the taskParam, rather than parse the map and get from
-        // field.
-        if (this.switchDependency == null) {
-            Map<String, Object> taskParamsMap =
-                    JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                    });
-            this.switchDependency =
-                    JSONUtils.parseObject((String) taskParamsMap.get(Constants.SWITCH_RESULT), SwitchParameters.class);
-        }
-        return this.switchDependency;
-    }
-
-    public void setSwitchDependency(SwitchParameters switchDependency) {
-        Map<String, Object> taskParamsMap =
-                JSONUtils.parseObject(this.getTaskParams(), new TypeReference<Map<String, Object>>() {
-                });
-        taskParamsMap.put(Constants.SWITCH_RESULT, JSONUtils.toJsonString(switchDependency));
-        this.switchDependency = switchDependency;
-        this.setTaskParams(JSONUtils.toJsonString(taskParamsMap));
-    }
-
     public boolean isTaskComplete() {
 
         return this.getState().isSuccess()
                 || this.getState().isKill()
                 || (this.getState().isFailure() && !taskCanRetry())
                 || this.getState().isForceSuccess();
-    }
-
-    public boolean isSubProcess() {
-        return TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(this.taskType);
-    }
-
-    public boolean isDependTask() {
-        return TASK_TYPE_DEPENDENT.equalsIgnoreCase(this.taskType);
-    }
-
-    public boolean isDynamic() {
-        return TASK_TYPE_DYNAMIC.equalsIgnoreCase(this.taskType);
-    }
-
-    public boolean isConditionsTask() {
-        return TASK_TYPE_CONDITIONS.equalsIgnoreCase(this.taskType);
-    }
-
-    public boolean isSwitchTask() {
-        return TASK_TYPE_SWITCH.equalsIgnoreCase(this.taskType);
-    }
-
-    public boolean isBlockingTask() {
-        return TASK_TYPE_BLOCKING.equalsIgnoreCase(this.taskType);
     }
 
     public boolean isFirstRun() {
@@ -383,7 +298,7 @@ public class TaskInstance implements Serializable {
      * @return can try result
      */
     public boolean taskCanRetry() {
-        if (this.isSubProcess()) {
+        if (TaskTypeUtils.isSubWorkflowTask(getTaskType())) {
             return false;
         }
         if (this.getState() == TaskExecutionStatus.NEED_FAULT_TOLERANCE) {

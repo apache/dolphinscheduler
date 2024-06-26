@@ -17,12 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_CONDITIONS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
-
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependentRelation;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
@@ -30,34 +25,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TaskInstanceTest {
-
-    /**
-     * task instance sub process
-     */
-    @Test
-    public void testTaskInstanceIsSubProcess() {
-        TaskInstance taskInstance = new TaskInstance();
-
-        // sub process
-        taskInstance.setTaskType(TASK_TYPE_SUB_PROCESS);
-        Assertions.assertTrue(taskInstance.isSubProcess());
-
-        // not sub process
-        taskInstance.setTaskType("HTTP");
-        Assertions.assertFalse(taskInstance.isSubProcess());
-
-        // sub process
-        taskInstance.setTaskType(TASK_TYPE_CONDITIONS);
-        Assertions.assertTrue(taskInstance.isConditionsTask());
-
-        // sub process
-        taskInstance.setTaskType(TASK_TYPE_DEPENDENT);
-        Assertions.assertTrue(taskInstance.isDependTask());
-    }
 
     /**
      * test for TaskInstance.getDependence
@@ -66,7 +36,6 @@ public class TaskInstanceTest {
     public void testTaskInstanceGetDependence() {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setTaskParams(JSONUtils.toJsonString(getDependentParameters()));
-        taskInstance.getDependency();
     }
 
     /**
@@ -82,8 +51,6 @@ public class TaskInstanceTest {
         dependentItem.setDefinitionCode(222L);
         dependentItem.setCycle("today");
         dependentItems.add(dependentItem);
-        dependentParameters.setDependTaskList(dependTaskList);
-        dependentParameters.setRelation(DependentRelation.AND);
         return dependentParameters;
     }
 }

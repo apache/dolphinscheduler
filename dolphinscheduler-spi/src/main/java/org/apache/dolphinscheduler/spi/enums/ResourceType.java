@@ -47,4 +47,13 @@ public enum ResourceType {
     public String getDescp() {
         return descp;
     }
+
+    public static ResourceType getResourceType(int code) {
+        for (ResourceType resourceType : ResourceType.values()) {
+            if (resourceType.getCode() == code) {
+                return resourceType;
+            }
+        }
+        return null;
+    }
 }

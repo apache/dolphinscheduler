@@ -2,7 +2,7 @@
 
 The purpose of the pseudo-cluster deployment is to deploy the DolphinScheduler service on a single machine. In this mode, DolphinScheduler's master, worker, API server, are all on the same machine.
 
-If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow[pseudo-cluster deployment. If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
+If you are a new hand and want to experience DolphinScheduler functions, we recommend you install follow [Standalone deployment](standalone.md). If you want to experience more complete functions and schedule massive tasks, we recommend you install follow [pseudo-cluster deployment](pseudo-cluster.md). If you want to deploy DolphinScheduler in production, we recommend you follow [cluster deployment](cluster.md) or [Kubernetes deployment](kubernetes.md).
 
 ## Preparation
 
@@ -71,31 +71,7 @@ Go to the ZooKeeper installation directory, copy configure file `zoo_sample.cfg`
 ## Modify Configuration
 
 After completing the preparation of the basic environment, you need to modify the configuration file according to the
-environment you used. Change the environment configurations via `export <ENV_NAME>=<VALUE>`. The configuration files are located in directory `bin/env` as `install_env.sh` and `dolphinscheduler_env.sh`.
-
-### Modify `install_env.sh`
-
-File `install_env.sh` describes which machines will be installed DolphinScheduler and what server will be installed on
-each machine. You could find this file in the path `bin/env/install_env.sh` and the detail of the configuration as below.
-
-```shell
-# ---------------------------------------------------------
-# INSTALL MACHINE
-# ---------------------------------------------------------
-# Due to the master, worker, and API server being deployed on a single node, the IP of the server is the machine IP or localhost
-ips="localhost"
-sshPort="22"
-masters="localhost"
-workers="localhost:default"
-alertServer="localhost"
-apiServers="localhost"
-
-# DolphinScheduler installation path, it will auto-create if not exists
-installPath=~/dolphinscheduler
-
-# Deploy user, use the user you create in section **Configure machine SSH password-free login**
-deployUser="dolphinscheduler"
-```
+environment you used. Change the environment configurations via `export <ENV_NAME>=<VALUE>`. The configuration files are located in directory `bin/env` as `dolphinscheduler_env.sh`.
 
 ### Modify `dolphinscheduler_env.sh`
 
@@ -146,11 +122,7 @@ Follow the instructions in [datasource-setting](../howto/datasource-setting.md) 
 
 ## Start DolphinScheduler
 
-Use **deployment user** you created above, running the following command to complete the deployment, and the server log will be stored in the logs folder.
-
-```shell
-bash ./bin/install.sh
-```
+Use **deployment user** you created above, running the command to complete the deployment, and the server log will be stored in the logs folder.
 
 > **_Note:_** For the first time deployment, there maybe occur five times of `sh: bin/dolphinscheduler-daemon.sh: No such file or directory` in the terminal,
 > this is non-important information that you can ignore.

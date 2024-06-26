@@ -966,6 +966,13 @@
             </dependency>
 
             <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>minio</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.checkerframework</groupId>
                 <artifactId>checker-qual</artifactId>
                 <version>${checker-qual.version}</version>

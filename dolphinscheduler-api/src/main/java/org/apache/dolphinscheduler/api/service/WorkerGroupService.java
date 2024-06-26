@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -76,13 +75,6 @@ public interface WorkerGroupService {
      * @return all worker address list
      */
     Map<String, Object> getWorkerAddressList();
-
-    /**
-     * Get task instance's worker group
-     * @param taskInstance task instance
-     * @return worker group
-     */
-    String getTaskWorkerGroup(TaskInstance taskInstance);
 
     /**
      * Query worker group by process definition codes

@@ -627,7 +627,8 @@ public class ProcessInstanceServiceTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
             Map<String, Object> processInstanceFinishRes =
                     processInstanceService.updateProcessInstance(loginUser, projectCode, 1,
