@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check milestone and labels
-        uses: actions/github-script@v5
+        uses: actions/github-script@v7
         with:
           script: |
             const { data } = await github.request("GET /repos/{owner}/{repo}/pulls/{pr}", {
