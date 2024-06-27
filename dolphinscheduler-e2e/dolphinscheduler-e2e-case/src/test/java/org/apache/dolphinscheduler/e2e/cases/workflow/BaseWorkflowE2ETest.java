@@ -46,7 +46,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @Slf4j
 public abstract class BaseWorkflowE2ETest {
 
-    protected static String projectName = UUID.randomUUID().toString();
+    protected static final String projectName = UUID.randomUUID().toString();
 
     protected static final AdminUser adminUser = new AdminUser();
 
@@ -112,7 +112,7 @@ public abstract class BaseWorkflowE2ETest {
                             .stream()
                             .filter(it -> it.workflowInstanceName().startsWith(workflowName))
                             .findFirst()
-                            .orElse(null);
+                            .orElseThrow(null);
                 }, Objects::nonNull);
     }
 
