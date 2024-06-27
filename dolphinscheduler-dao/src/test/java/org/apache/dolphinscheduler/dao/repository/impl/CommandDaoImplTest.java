@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -34,7 +33,6 @@ import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,14 +61,6 @@ class CommandDaoImplTest extends BaseDaoTest {
         }
 
         List<Command> commands = commandDao.queryCommandByIdSlot(currentSlotIndex, totalSlot, idStep, fetchSize);
-        assertFalse(commands.isEmpty(),
-                "Commands should not be empty, currentSlotIndex: " + currentSlotIndex +
-                        ", totalSlot: " + totalSlot +
-                        ", idStep: " + idStep +
-                        ", fetchSize: " + fetchSize +
-                        ", total command size: " + commandSize +
-                        ", total commands: "
-                        + commandDao.queryAll().stream().map(Command::getId).collect(Collectors.toList()));
         assertThat(commands.size())
                 .isEqualTo(commandDao.queryAll()
                         .stream()

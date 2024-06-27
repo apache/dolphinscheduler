@@ -24,6 +24,7 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
+import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
@@ -49,6 +51,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         if (!localMode) {
             compose = createDockerCompose(context);
             compose.start();
+            compose.getContainerByServiceName(serviceName)
+                    .map(ContainerState::isHealthy)
+                    .orElseThrow(() -> new IllegalStateException("DolphinScheduler service is not healthy"));
         }
     }
 
@@ -63,17 +68,17 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
-            .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
-            .filter(Objects::nonNull)
-            .map(URL::getPath)
-            .map(File::new)
-            .collect(Collectors.toList());
+                .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
+                .filter(Objects::nonNull)
+                .map(URL::getPath)
+                .map(File::new)
+                .collect(Collectors.toList());
 
         compose = new DockerComposeContainer<>(files)
-            .withPull(true)
-            .withTailChildContainers(true)
-            .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
-            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
+                .withPull(true)
+                .withTailChildContainers(true)
+                .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
+                .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
 
         return compose;
     }
