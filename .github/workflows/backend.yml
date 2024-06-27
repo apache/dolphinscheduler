@@ -44,7 +44,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -63,7 +63,7 @@ jobs:
         java: [ '8', '11' ]
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK ${{ matrix.java }}
@@ -115,7 +115,7 @@ jobs:
           - name: cluster-test-postgresql-with-postgresql-registry
             script: .github/workflows/cluster-test/postgresql_with_postgresql_registry/start-job.sh
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - uses: actions/download-artifact@v2

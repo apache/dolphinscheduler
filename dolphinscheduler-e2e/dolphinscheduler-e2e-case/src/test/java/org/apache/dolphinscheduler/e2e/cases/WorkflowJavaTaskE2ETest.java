@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.cases;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
@@ -92,7 +93,7 @@ public class WorkflowJavaTaskE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20))
+        WebDriverWaitFactory.createWebDriverWait(userPage.driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)

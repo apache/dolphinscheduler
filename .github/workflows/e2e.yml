@@ -35,7 +35,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Sanity Check
@@ -125,7 +125,7 @@ jobs:
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Cache local Maven repository
@@ -169,7 +169,7 @@ jobs:
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Cache local Maven repository

@@ -129,7 +129,7 @@ public abstract class TaskNodeForm {
 
         final By optionsLocator = By.className("n-base-selection-input__content");
 
-        new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements = parent.driver().findElements(optionsLocator);
@@ -148,7 +148,7 @@ public abstract class TaskNodeForm {
 
         final By optionsLocator = By.className("option-pre-tasks");
 
-        new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
+        WebDriverWaitFactory.createWebDriverWait(parent.driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements = parent.driver().findElements(optionsLocator);

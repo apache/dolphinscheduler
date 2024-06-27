@@ -27,18 +27,20 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTa
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
+import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.WebElement;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
-    @Order(0)
     void testRunShellTasks_SuccessCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -74,7 +76,6 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    @Order(1)
     void testRunShellTasks_WorkflowParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -111,7 +112,6 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    @Order(2)
     void testRunShellTasks_LocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -147,7 +147,6 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    @Order(3)
     void testRunShellTasks_GlobalParamsOverrideLocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -184,7 +183,6 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    @Order(4)
     void testRunShellTasks_UsingResourceFile() {
         String testFileName = "echo";
         new ResourcePage(browser)
@@ -226,7 +224,6 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    @Order(5)
     void testRunShellTasks_FailedCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)

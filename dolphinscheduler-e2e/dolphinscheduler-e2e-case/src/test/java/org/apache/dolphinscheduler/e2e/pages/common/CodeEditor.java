@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.common;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -49,7 +50,7 @@ public final class CodeEditor {
     }
 
     public CodeEditor content(String content) {
-        new WebDriverWait(this.driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(editor));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editor));
 
         editor.click();
 
