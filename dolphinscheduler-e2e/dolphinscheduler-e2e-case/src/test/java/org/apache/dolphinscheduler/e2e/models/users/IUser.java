@@ -15,39 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.enums;
+package org.apache.dolphinscheduler.e2e.models.users;
 
-import lombok.Getter;
+import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+public interface IUser {
 
-/**
- * resource type
- */
-@Getter
-public enum ResourceType {
+    String getUserName();
 
-    /**
-     * 0 file
-     */
-    FILE(0, "file"),
-    ALL(2, "all");
+    String getPassword();
 
-    ResourceType(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
-    }
+    String getEmail();
 
-    @EnumValue
-    private final int code;
-    private final String desc;
+    String getPhone();
 
-    public static ResourceType getResourceType(int code) {
-        for (ResourceType resourceType : ResourceType.values()) {
-            if (resourceType.getCode() == code) {
-                return resourceType;
-            }
-        }
-        return null;
-    }
+    String getTenant();
+
+
 }

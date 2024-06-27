@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
@@ -93,7 +94,7 @@ public final class WorkflowForm {
     }
 
     public WebElement getTask(String taskName) {
-        List<WebElement> tasks = new WebDriverWait(driver, Duration.ofSeconds(20))
+        List<WebElement> tasks = WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
 
         WebElement task = tasks.stream()

@@ -23,6 +23,7 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 
@@ -82,7 +83,7 @@ public class MysqlDataSourceE2ETest {
 
         page.createDataSource(dataSourceType, dataSourceName, dataSourceDescription, ip, port, userName, mysqlPassword, database, jdbcParams);
 
-        new WebDriverWait(page.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.invisibilityOfElementLocated(
+        WebDriverWaitFactory.createWebDriverWait(page.driver()).until(ExpectedConditions.invisibilityOfElementLocated(
                 new By.ByClassName("dialog-create-data-source")));
 
         Awaitility.await().untilAsserted(() -> assertThat(page.dataSourceItemsList())

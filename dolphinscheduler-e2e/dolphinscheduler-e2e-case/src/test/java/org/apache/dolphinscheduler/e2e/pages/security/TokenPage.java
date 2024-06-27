@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage.Tab;
 
@@ -69,9 +70,9 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create(String userName) {
         buttonCreateToken().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
         createTokenForm().selectUserNameDropdown().click();
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
         createTokenForm().selectUserNameList()
                 .stream()
@@ -81,7 +82,7 @@ public final class TokenPage extends NavBarPage implements Tab {
                         userName)))
                 .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
         createTokenForm().buttonGenerateToken().click();
 
         createTokenForm().buttonSubmit().click();
@@ -98,9 +99,9 @@ public final class TokenPage extends NavBarPage implements Tab {
             .orElseThrow(() -> new RuntimeException("No edit button in token list"))
             .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
         editTokenForm().buttonGenerateToken().click();
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
 
         editTokenForm().buttonSubmit().click();
 

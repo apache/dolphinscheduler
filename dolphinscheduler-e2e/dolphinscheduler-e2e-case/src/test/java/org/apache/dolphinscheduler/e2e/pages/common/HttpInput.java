@@ -22,6 +22,7 @@
 package org.apache.dolphinscheduler.e2e.pages.common;
 
 import lombok.Getter;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -50,7 +51,7 @@ public class HttpInput {
     }
 
     public HttpInput content(String content) {
-        new WebDriverWait(this.driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(urlInput));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(urlInput));
         urlInput().sendKeys(content);
         return this;
     }

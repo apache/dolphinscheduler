@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import lombok.Getter;
@@ -54,11 +55,11 @@ public final class SubWorkflowTaskForm extends TaskNodeForm {
     }
 
     public SubWorkflowTaskForm childNode(String node) {
-        new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(btnSelectChildNodeDropdown));
         
         btnSelectChildNodeDropdown().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(5)).until(ExpectedConditions.visibilityOfElementLocated(By.className(
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(By.className(
                 "n-base-select-option__content")));
 
         selectChildNode()

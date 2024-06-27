@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
@@ -44,7 +45,7 @@ public final class WorkflowRunDialog {
     }
 
     public WorkflowDefinitionTab submit() {
-        new WebDriverWait(parent().driver(), Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
+        WebDriverWaitFactory.createWebDriverWait(parent.driver()).until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
 
         buttonSubmit().click();
 

@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import lombok.Getter;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -54,7 +55,7 @@ public final class SwitchTaskForm extends TaskNodeForm {
 
         final By optionsLocator = By.className("option-else-branches");
 
-        new WebDriverWait(parent().driver(), Duration.ofSeconds(10))
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements =  parent().driver().findElements(optionsLocator);
@@ -79,7 +80,7 @@ public final class SwitchTaskForm extends TaskNodeForm {
 
         final By optionsLocator = By.className("option-if-branches");
 
-        new WebDriverWait(parent().driver(), Duration.ofSeconds(10))
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements =  parent().driver().findElements(optionsLocator);

@@ -80,7 +80,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
-        Awaitility.setDefaultPollInterval(Duration.ofSeconds(2));
+        Awaitility.setDefaultPollInterval(Duration.ofMillis(500));
 
         setRecordPath();
 
@@ -115,6 +115,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
               .filter(it -> Modifier.isStatic(it.getModifiers()))
               .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
               .forEach(it -> setDriver(clazz, it));
+        WebDriverHolder.setWebDriver(driver);
     }
 
     private void runInLocal() {
