@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
@@ -98,7 +99,7 @@ public class FileManageE2ETest {
         UserPage userPage = tenantPage.goToNav(SecurityPage.class)
             .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
+        WebDriverWaitFactory.createWebDriverWait(userPage.driver()).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
@@ -285,7 +286,7 @@ public class FileManageE2ETest {
 
         page.uploadFile(testUnder1GBFilePath.toFile().getAbsolutePath());
 
-        new WebDriverWait(browser, Duration.ofSeconds(20)).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
+        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.invisibilityOfElementLocated(By.id("fileUpdateDialog")));
 
         Awaitility.await().untilAsserted(() -> {
             assertThat(page.fileList())

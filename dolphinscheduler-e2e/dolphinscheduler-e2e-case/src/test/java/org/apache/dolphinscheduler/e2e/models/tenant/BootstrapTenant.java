@@ -15,39 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.enums;
+package org.apache.dolphinscheduler.e2e.models.tenant;
 
-import lombok.Getter;
+public class BootstrapTenant implements ITenant {
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
-/**
- * resource type
- */
-@Getter
-public enum ResourceType {
-
-    /**
-     * 0 file
-     */
-    FILE(0, "file"),
-    ALL(2, "all");
-
-    ResourceType(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
+    @Override
+    public String getTenantCode() {
+        return System.getProperty("user.name");
     }
 
-    @EnumValue
-    private final int code;
-    private final String desc;
-
-    public static ResourceType getResourceType(int code) {
-        for (ResourceType resourceType : ResourceType.values()) {
-            if (resourceType.getCode() == code) {
-                return resourceType;
-            }
-        }
-        return null;
+    @Override
+    public String getDescription() {
+        return "bootstrap tenant";
     }
 }

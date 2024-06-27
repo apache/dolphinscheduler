@@ -15,39 +15,20 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.enums;
+package org.apache.dolphinscheduler.e2e.core;
 
-import lombok.Getter;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+public class WebDriverHolder {
 
-/**
- * resource type
- */
-@Getter
-public enum ResourceType {
+    public static RemoteWebDriver browser;
 
-    /**
-     * 0 file
-     */
-    FILE(0, "file"),
-    ALL(2, "all");
-
-    ResourceType(int code, String desc) {
-        this.code = code;
-        this.desc = desc;
+    public static void setWebDriver(RemoteWebDriver driver) {
+        browser = driver;
     }
 
-    @EnumValue
-    private final int code;
-    private final String desc;
-
-    public static ResourceType getResourceType(int code) {
-        for (ResourceType resourceType : ResourceType.values()) {
-            if (resourceType.getCode() == code) {
-                return resourceType;
-            }
-        }
-        return null;
+    public static RemoteWebDriver getWebDriver() {
+        return browser;
     }
+
 }

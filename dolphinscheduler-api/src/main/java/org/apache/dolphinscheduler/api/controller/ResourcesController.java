@@ -92,6 +92,16 @@ public class ResourcesController extends BaseController {
     @Autowired
     private ResourcesService resourceService;
 
+    @Operation(summary = "queryResourceList", description = "QUERY_RESOURCE_LIST_NOTES")
+    @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
+    @GetMapping(value = "/list")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_RESOURCES_LIST_ERROR)
+    public Result<List<ResourceComponent>> queryResourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @RequestParam(value = "type") ResourceType type) {
+        return Result.success(resourceService.queryResourceFiles(loginUser, type));
+    }
+
     @Operation(summary = "createDirectory", description = "CREATE_RESOURCE_NOTES")
     @Parameters({
             @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class)),
