@@ -93,8 +93,7 @@ public class ResourcesController extends BaseController {
     private ResourcesService resourceService;
 
     @Operation(summary = "queryResourceList", description = "QUERY_RESOURCE_LIST_NOTES")
-    @Parameters({
-            @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))})
+    @Parameter(name = "type", description = "RESOURCE_TYPE", required = true, schema = @Schema(implementation = ResourceType.class))
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_RESOURCES_LIST_ERROR)

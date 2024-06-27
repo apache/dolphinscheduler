@@ -23,7 +23,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WebDriverWaitFactory {
 
-    private static final Duration DEFAULT_INTERVAL = Duration.ofMillis(100);
+    private static final Duration DEFAULT_INTERVAL = Duration.ofMillis(500);
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
 

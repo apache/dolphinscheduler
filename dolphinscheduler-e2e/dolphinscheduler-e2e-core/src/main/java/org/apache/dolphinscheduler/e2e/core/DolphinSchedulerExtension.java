@@ -80,7 +80,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     @SuppressWarnings("UnstableApiUsage")
     public void beforeAll(ExtensionContext context) throws IOException {
         Awaitility.setDefaultTimeout(Duration.ofSeconds(60));
-        Awaitility.setDefaultPollInterval(Duration.ofMillis(100));
+        Awaitility.setDefaultPollInterval(Duration.ofMillis(500));
 
         setRecordPath();
 

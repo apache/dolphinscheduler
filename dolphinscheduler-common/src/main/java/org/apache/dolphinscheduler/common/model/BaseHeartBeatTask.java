@@ -73,7 +73,7 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
                 try {
                     Thread.sleep(DEFAULT_HEARTBEAT_SCAN_INTERVAL);
                 } catch (InterruptedException e) {
-                    ignoreInterruptException(e);
+                    handleInterruptException(e);
                 }
             }
         }
@@ -84,8 +84,9 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
         log.warn("{} finished...", threadName);
     }
 
-    private void ignoreInterruptException(InterruptedException ex) {
-        log.warn("{} has been interrupted, but this will be ignore", threadName, ex);
+    private void handleInterruptException(InterruptedException ex) {
+        log.warn("{} has been interrupted", threadName, ex);
+        Thread.currentThread().interrupt();
     }
 
     public abstract T getHeartBeat();
