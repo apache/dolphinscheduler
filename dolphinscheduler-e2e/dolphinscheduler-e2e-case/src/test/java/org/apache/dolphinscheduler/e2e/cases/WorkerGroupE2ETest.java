@@ -23,6 +23,7 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
@@ -59,7 +60,7 @@ class WorkerGroupE2ETest {
     void testCreateWorkerGroup() {
         final WorkerGroupPage page = new WorkerGroupPage(browser);
 
-        new WebDriverWait(page.driver(), Duration.ofSeconds(20))
+        WebDriverWaitFactory.createWebDriverWait(page.driver())
             .until(ExpectedConditions.urlContains("/security/worker-group-manage"));
 
         page.create(workerGroupName);
