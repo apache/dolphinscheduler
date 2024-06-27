@@ -91,7 +91,7 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.java == '8' }}
         name: Upload Binary Package
         with:
@@ -118,7 +118,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Download Binary Package
         with:
           # Only run cluster test on jdk8
@@ -165,7 +165,7 @@ jobs:
           mkdir -p dolphinscheduler/dev dolphinscheduler/${{ matrix.version }}
           curl -sSf https://atlasgo.sh | sh
       - name: Download Tarball
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: binary-package-8
           path: dolphinscheduler/dev

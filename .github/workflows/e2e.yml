@@ -74,7 +74,7 @@ jobs:
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
           && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
           name: standalone-image
@@ -134,7 +134,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
           name: standalone-image
@@ -147,7 +147,7 @@ jobs:
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
             -DfailIfNoTests=false \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         name: Upload Recording
         with:
@@ -178,7 +178,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
           name: standalone-image
@@ -191,7 +191,7 @@ jobs:
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
             -DfailIfNoTests=false \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         name: Upload Recording
         with:
