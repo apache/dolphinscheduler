@@ -55,10 +55,11 @@ public abstract class BaseTaskDispatcher implements TaskDispatcher {
             taskInstanceDispatchHost = getTaskInstanceDispatchHost(taskExecuteRunnable)
                     .orElseThrow(() -> new TaskDispatchException("Cannot find the host to execute task."));
         } catch (WorkerGroupNotFoundException workerGroupNotFoundException) {
-            log.error("Dispatch task: {} failed, worker group not found.",
-                    taskExecuteRunnable.getTaskExecutionContext().getTaskName(), workerGroupNotFoundException);
-            addDispatchFailedEvent(taskExecuteRunnable);
-            return;
+            // todo: this is a temporary solution, we should refactor the ServerNodeManager to make sure there won't
+            // throw WorkerGroupNotFoundException unless the worker group is not exist in database
+            throw new TaskDispatchException(
+                    "Dispatch task: " + taskExecuteRunnable.getTaskExecutionContext().getTaskName() + " failed",
+                    workerGroupNotFoundException);
         }
         taskExecuteRunnable.getTaskExecutionContext().setHost(taskInstanceDispatchHost.getAddress());
         doDispatch(taskExecuteRunnable);
