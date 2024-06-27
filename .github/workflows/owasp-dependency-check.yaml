@@ -31,7 +31,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK 8
@@ -42,7 +42,7 @@ jobs:
       - name: Run OWASP Dependency Check
         run: ./mvnw -B clean install verify dependency-check:check -DskipDepCheck=false -Dmaven.test.skip=true -Dspotless.skip=true
       - name: Upload report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: ${{ cancelled() || failure() }}
         continue-on-error: true
         with:

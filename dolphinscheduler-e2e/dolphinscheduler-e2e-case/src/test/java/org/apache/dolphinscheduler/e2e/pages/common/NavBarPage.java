@@ -20,6 +20,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.common;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.datasource.DataSourcePage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
@@ -64,26 +65,30 @@ public class NavBarPage {
 
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(projectTab));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(projectTab));
             projectTab.click();
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/projects/list"));
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(securityTab));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(securityTab));
             securityTab.click();
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/security/tenant-manage"));
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(resourceTab));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(resourceTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", resourceTab());
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file-manage"));
             return nav.cast(new ResourcePage(driver));
         }
 
         if (nav == DataSourcePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
             dataSourceTab.click();
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/datasource"));
             return nav.cast(new DataSourcePage(driver));
         }
 

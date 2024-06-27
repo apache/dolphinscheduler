@@ -178,8 +178,8 @@ class WorkflowSwitchE2ETest {
 
         Awaitility.await().untilAsserted(() -> {
             assertThat(taskInstances.size()).isEqualTo(3);
-            assertThat(taskInstances.stream().filter(row -> row.name().contains(ifBranchName)).count()).isEqualTo(1);
-            assertThat(taskInstances.stream().noneMatch(row -> row.name().contains(elseBranchName))).isTrue();
+            assertThat(taskInstances.stream().filter(row -> row.taskInstanceName().contains(ifBranchName)).count()).isEqualTo(1);
+            assertThat(taskInstances.stream().noneMatch(row -> row.taskInstanceName().contains(elseBranchName))).isTrue();
         });
     }
 }

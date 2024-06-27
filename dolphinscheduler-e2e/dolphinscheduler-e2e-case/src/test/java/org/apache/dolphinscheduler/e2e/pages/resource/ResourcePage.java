@@ -19,6 +19,7 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.time.Duration;
@@ -27,6 +28,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -38,39 +40,19 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
     private WebElement fileManageTab;
 
-    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) > .n-submenu-children > .n-menu-item:nth-of-type(1) > .n-menu-item-content")
-    private WebElement udfManageTab;
-
-    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) > .n-submenu-children > .n-menu-item:nth-of-type(2) > .n-menu-item-content")
-    private WebElement functionManageTab;
-
     public ResourcePage(RemoteWebDriver driver) {
         super(driver);
+
+        PageFactory.initElements(driver, this);
     }
 
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/resource"));
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(fileManageTab));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource"));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(fileManageTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fileManageTab());
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/file-manage"));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/file-manage"));
             return tab.cast(new FileManagePage(driver));
-        }
-
-        if (tab == UdfManagePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/resource"));
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(udfManageTab));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", udfManageTab());
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/resource-manage"));
-            return tab.cast(new UdfManagePage(driver));
-        }
-
-        if (tab == FunctionManagePage.class) {
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/resource"));
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(functionManageTab));
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", functionManageTab());
-            new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/function-manage"));
-            return tab.cast(new FunctionManagePage(driver));
         }
 
         throw new UnsupportedOperationException("Unknown tab: " + tab.getName());

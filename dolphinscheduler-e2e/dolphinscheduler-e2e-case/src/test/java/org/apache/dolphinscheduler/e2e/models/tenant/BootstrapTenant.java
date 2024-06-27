@@ -15,13 +15,17 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
-import ResourceListModal from '../../components/resource'
+package org.apache.dolphinscheduler.e2e.models.tenant;
 
-export default defineComponent({
-  name: 'resource-manage',
-  setup() {},
-  render() {
-    return <ResourceListModal resourceType={'UDF'} />
-  }
-})
+public class BootstrapTenant implements ITenant {
+
+    @Override
+    public String getTenantCode() {
+        return System.getProperty("user.name");
+    }
+
+    @Override
+    public String getDescription() {
+        return "bootstrap tenant";
+    }
+}

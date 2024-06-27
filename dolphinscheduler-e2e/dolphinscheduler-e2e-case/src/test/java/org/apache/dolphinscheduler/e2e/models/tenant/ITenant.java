@@ -14,48 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Date;
+package org.apache.dolphinscheduler.e2e.models.tenant;
 
-import lombok.Data;
+public interface ITenant {
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+    String getTenantCode();
 
-@Data
-@TableName("t_ds_relation_udfs_user")
-public class UDFUser {
+    String getDescription();
 
-    /**
-     * id
-     */
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    /**
-     * id
-     */
-    private int userId;
-
-    /**
-     * udf id
-     */
-    private int udfId;
-
-    /**
-     * permission
-     */
-    private int perm;
-
-    /**
-     * create time
-     */
-    private Date createTime;
-
-    /**
-     * update time
-     */
-    private Date updateTime;
 }

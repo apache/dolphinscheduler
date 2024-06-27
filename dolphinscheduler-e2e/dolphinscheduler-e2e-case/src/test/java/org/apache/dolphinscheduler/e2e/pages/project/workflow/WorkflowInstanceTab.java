@@ -86,12 +86,20 @@ public final class WorkflowInstanceTab extends NavBarPage implements ProjectDeta
     public static class Row {
         private final WebElement row;
 
+        public String workflowInstanceName() {
+            return row.findElement(By.className("workflow-name")).getText();
+        }
+
         public WebElement rerunButton() {
             return row.findElement(By.className("btn-rerun"));
         }
 
         public boolean isSuccess() {
             return !row.findElements(By.className("success")).isEmpty();
+        }
+
+        public boolean isFailed() {
+            return !row.findElements(By.className("failed")).isEmpty();
         }
 
         public int executionTime() {

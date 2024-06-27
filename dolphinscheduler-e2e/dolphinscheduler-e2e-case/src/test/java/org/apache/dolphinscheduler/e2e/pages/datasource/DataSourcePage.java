@@ -22,6 +22,7 @@ package org.apache.dolphinscheduler.e2e.pages.datasource;
 
 import lombok.Getter;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.security.Key;
@@ -74,12 +75,12 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
             new By.ByClassName("dialog-source-modal")));
 
         dataSourceModal().findElement(By.className(dataSourceType.toUpperCase()+"-box")).click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);

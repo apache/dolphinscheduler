@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
-
 import java.io.Serializable;
-import java.util.List;
 
 /**
- *  SQL Task ExecutionContext
+ * SQL Task ExecutionContext
  */
 public class SQLTaskExecutionContext implements Serializable {
 
@@ -37,8 +34,6 @@ public class SQLTaskExecutionContext implements Serializable {
      */
     private String connectionParams;
 
-    private List<UdfFuncParameters> udfFuncParametersList;
-
     /**
      * DefaultFS
      */
@@ -50,14 +45,6 @@ public class SQLTaskExecutionContext implements Serializable {
 
     public void setWarningGroupId(int warningGroupId) {
         this.warningGroupId = warningGroupId;
-    }
-
-    public List<UdfFuncParameters> getUdfFuncParametersList() {
-        return udfFuncParametersList;
-    }
-
-    public void setUdfFuncParametersList(List<UdfFuncParameters> udfFuncParametersList) {
-        this.udfFuncParametersList = udfFuncParametersList;
     }
 
     public String getConnectionParams() {
@@ -81,7 +68,6 @@ public class SQLTaskExecutionContext implements Serializable {
         return "SQLTaskExecutionContext{"
                 + "warningGroupId=" + warningGroupId
                 + ", connectionParams='" + connectionParams + '\''
-                + ", udfFuncParametersList=" + udfFuncParametersList
                 + ", defaultFS='" + defaultFS + '\'' + '}';
     }
 }

@@ -35,7 +35,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Sanity Check
@@ -74,7 +74,7 @@ jobs:
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
           && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
           name: standalone-image
@@ -114,20 +114,18 @@ jobs:
 #            class: org.apache.dolphinscheduler.e2e.cases.WorkflowSwitchE2ETest
           - name: FileManage
             class: org.apache.dolphinscheduler.e2e.cases.FileManageE2ETest
-          - name: UdfManage
-            class: org.apache.dolphinscheduler.e2e.cases.UdfManageE2ETest
-          - name: FunctionManage
-            class: org.apache.dolphinscheduler.e2e.cases.FunctionManageE2ETest
           - name: MysqlDataSource
             class: org.apache.dolphinscheduler.e2e.cases.MysqlDataSourceE2ETest
           - name: ClickhouseDataSource
             class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
           - name: PostgresDataSource
             class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
+          - name: ShellTaskE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.tasks.ShellTaskE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Cache local Maven repository
@@ -136,7 +134,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
           name: standalone-image
@@ -149,7 +147,7 @@ jobs:
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
             -DfailIfNoTests=false \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         name: Upload Recording
         with:
@@ -171,7 +169,7 @@ jobs:
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Cache local Maven repository
@@ -180,7 +178,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
           name: standalone-image
@@ -193,7 +191,7 @@ jobs:
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
             -DfailIfNoTests=false \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         name: Upload Recording
         with:

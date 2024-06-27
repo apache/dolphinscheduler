@@ -15,42 +15,48 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.enums;
+package org.apache.dolphinscheduler.e2e.models.users;
 
-/**
- * UDF type
- */
-public enum UdfType {
+import lombok.Data;
+import org.apache.dolphinscheduler.e2e.models.tenant.BootstrapTenant;
+import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
 
-    /**
-     * 0 hive; 1 spark
-     */
-    HIVE(0, "hive"),
-    SPARK(1, "spark");
+@Data
+public class AdminUser implements IUser {
 
-    UdfType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
+    private String userName;
+
+    private String password;
+
+    private String email;
+
+    private String phone;
+
+    private ITenant tenant;
+
+    @Override
+    public String getUserName() {
+        return "admin";
     }
 
-    private final int code;
-    private final String descp;
-
-    public int getCode() {
-        return code;
+    @Override
+    public String getPassword() {
+        return "dolphinscheduler123";
     }
 
-    public String getDescp() {
-        return descp;
+    @Override
+    public String getEmail() {
+        return "admin@gmail.com";
     }
 
-    public static UdfType of(int type) {
-        for (UdfType ut : values()) {
-            if (ut.getCode() == type) {
-                return ut;
-            }
-        }
-        throw new IllegalArgumentException("invalid type : " + type);
+    @Override
+    public String getPhone() {
+        return "15800000000";
+    }
+
+    @Override
+    public String getTenant() {
+        return new BootstrapTenant().getTenantCode();
     }
 
 }

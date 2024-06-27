@@ -370,7 +370,6 @@ interface ITaskParams {
     successNode?: number[]
     failedNode?: number[]
   }
-  udfs?: string
   connParams?: string
   targetJobName?: string
   cluster?: string
@@ -466,7 +465,6 @@ interface INodeData
       | 'dependence'
       | 'sparkParameters'
       | 'conditionResult'
-      | 'udfs'
       | 'customConfig'
     >,
     ISqoopTargetData,
@@ -507,7 +505,6 @@ interface INodeData
   definition?: object
   successBranch?: number
   failedBranch?: number
-  udfs?: string[]
   customConfig?: boolean
   mapping_columns?: object[]
   taskExecuteType?: TaskExecuteType

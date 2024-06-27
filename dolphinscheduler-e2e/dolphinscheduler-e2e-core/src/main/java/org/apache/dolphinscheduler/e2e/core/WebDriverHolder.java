@@ -15,25 +15,20 @@
  * limitations under the License.
  */
 
-export interface IUdfFunctionParam {
-  fullName: string
-  id: number
-  pageSize: number
-  pageNo: number
-  searchVal: string | undefined
-}
+package org.apache.dolphinscheduler.e2e.core;
 
-export interface IUdf {
-  id: number
-  userId: number
-  type: 'HIVE'
-  funcName: string
-  className: string
-  resourceId: number
-  resourceName: string
-  argTypes: string
-  database: string
-  description: string
-  createTime: string
-  updateTime: string
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+public class WebDriverHolder {
+
+    public static RemoteWebDriver browser;
+
+    public static void setWebDriver(RemoteWebDriver driver) {
+        browser = driver;
+    }
+
+    public static RemoteWebDriver getWebDriver() {
+        return browser;
+    }
+
 }

@@ -15,45 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.e2e.models.users;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
+import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
 
-/**
- * UDF type
- */
-public enum UdfType {
+public interface IUser {
 
-    /**
-     * 0 hive; 1 spark
-     */
-    HIVE(0, "hive"),
-    SPARK(1, "spark");
+    String getUserName();
 
-    UdfType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
+    String getPassword();
 
-    @EnumValue
-    private final int code;
-    private final String descp;
+    String getEmail();
 
-    public int getCode() {
-        return code;
-    }
+    String getPhone();
 
-    public String getDescp() {
-        return descp;
-    }
+    String getTenant();
 
-    public static UdfType of(int type) {
-        for (UdfType ut : values()) {
-            if (ut.getCode() == type) {
-                return ut;
-            }
-        }
-        throw new IllegalArgumentException("invalid type : " + type);
-    }
 
 }

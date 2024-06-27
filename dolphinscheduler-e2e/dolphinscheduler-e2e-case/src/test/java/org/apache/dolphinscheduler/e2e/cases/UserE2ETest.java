@@ -23,6 +23,7 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
@@ -119,7 +120,7 @@ class UserE2ETest {
     void testEditUser() {
         UserPage page = new UserPage(browser);
 
-        new WebDriverWait(browser, Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
+        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
         browser.navigate().refresh();
