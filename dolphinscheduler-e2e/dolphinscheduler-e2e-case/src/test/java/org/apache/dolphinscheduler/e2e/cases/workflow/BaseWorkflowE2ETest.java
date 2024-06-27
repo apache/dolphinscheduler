@@ -61,7 +61,7 @@ public abstract class BaseWorkflowE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class);
 
-        if (tenantPage.tenants().stream().noneMatch(tenant -> tenant.name().equals(adminUser.getTenant()))) {
+        if (tenantPage.tenants().stream().noneMatch(tenant -> tenant.tenantCode().equals(adminUser.getTenant()))) {
             tenantPage
                     .create(adminUser.getTenant())
                     .goToNav(SecurityPage.class)

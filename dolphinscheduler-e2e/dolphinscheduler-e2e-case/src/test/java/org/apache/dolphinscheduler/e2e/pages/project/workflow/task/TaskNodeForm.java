@@ -20,6 +20,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import lombok.Getter;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -28,13 +29,11 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Getter
 public abstract class TaskNodeForm {
@@ -48,14 +47,14 @@ public abstract class TaskNodeForm {
     private WebElement buttonSubmit;
 
     @FindBys({
-        @FindBy(className = "input-param-key"),
-        @FindBy(tagName = "input"),
+            @FindBy(className = "input-param-key"),
+            @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamKey;
 
     @FindBys({
-        @FindBy(className = "input-param-value"),
-        @FindBy(tagName = "input"),
+            @FindBy(className = "input-param-value"),
+            @FindBy(tagName = "input"),
     })
     private List<WebElement> inputParamValue;
 
@@ -79,6 +78,13 @@ public abstract class TaskNodeForm {
 
     @FindBy(className = "btn-create-custom-parameter")
     private WebElement buttonCreateCustomParameters;
+
+    @FindBys({
+            @FindBy(className = "resource-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectResource;
+
 
     private final WorkflowForm parent;
 
@@ -118,15 +124,15 @@ public abstract class TaskNodeForm {
         return this;
     }
 
-    public TaskNodeForm selectEnv(String envName){
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectEnv);
+    public TaskNodeForm selectEnv(String envName) {
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectEnv);
 
         final By optionsLocator = By.className("n-base-selection-input__content");
 
         new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
-        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+        List<WebElement> webElements = parent.driver().findElements(optionsLocator);
 
         webElements.stream()
                 .filter(it -> it.getText().contains(envName))
@@ -138,14 +144,14 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm preTask(String preTaskName) {
-        ((JavascriptExecutor)parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
 
         final By optionsLocator = By.className("option-pre-tasks");
 
         new WebDriverWait(parent.driver(), Duration.ofSeconds(20))
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
-        List<WebElement> webElements =  parent.driver().findElements(optionsLocator);
+        List<WebElement> webElements = parent.driver().findElements(optionsLocator);
         webElements.stream()
                 .filter(it -> it.getText().contains(preTaskName))
                 .findFirst()
@@ -154,6 +160,23 @@ public abstract class TaskNodeForm {
 
         inputNodeName().click();
 
+        return this;
+    }
+
+    public TaskNodeForm selectResource(String resourceName) {
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectResource);
+
+        final By optionsLocator = By.className("n-tree-node-content__text");
+
+        WebDriverWaitFactory.createWebDriverWait(parent().driver()).until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        parent().driver()
+                .findElements(optionsLocator)
+                .stream()
+                .filter(it -> it.getText().startsWith(resourceName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such resource: " + resourceName))
+                .click();
         return this;
     }
 

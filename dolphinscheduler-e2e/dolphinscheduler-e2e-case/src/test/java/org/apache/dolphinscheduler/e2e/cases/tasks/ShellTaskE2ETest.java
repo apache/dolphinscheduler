@@ -25,13 +25,20 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinition
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
+import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.WebElement;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
+    @Order(0)
     void testRunShellTasks_SuccessCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -67,6 +74,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
+    @Order(1)
     void testRunShellTasks_WorkflowParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -103,6 +111,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
+    @Order(2)
     void testRunShellTasks_LocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -138,6 +147,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
+    @Order(3)
     void testRunShellTasks_GlobalParamsOverrideLocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
@@ -174,6 +184,49 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
+    @Order(4)
+    void testRunShellTasks_UsingResourceFile() {
+        String testFileName = "echo";
+        new ResourcePage(browser)
+                .goToNav(ResourcePage.class)
+                .goToTab(FileManagePage.class)
+                .createFileUntilSuccess(testFileName, "echo 123");
+
+        final WorkflowDefinitionTab workflowDefinitionPage =
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
+
+        String workflowName = "UsingResourceFile";
+        String taskName = "ShellSuccess";
+        workflowDefinitionPage
+                .createWorkflow()
+                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
+                .script("cat " + testFileName + ".sh")
+                .name(taskName)
+                .selectResource(testFileName)
+                .submit()
+
+                .submit()
+                .name(workflowName)
+                .submit();
+
+        untilWorkflowDefinitionExist(workflowName);
+
+        workflowDefinitionPage.publish(workflowName);
+
+        runWorkflow(workflowName);
+        untilWorkflowInstanceExist(workflowName);
+        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceSuccess(workflowName);
+        assertThat(workflowInstance.executionTime()).isEqualTo(1);
+
+        TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
+        assertThat(taskInstance.retryTimes()).isEqualTo(0);
+    }
+
+    @Test
+    @Order(5)
     void testRunShellTasks_FailedCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)

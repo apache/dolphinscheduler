@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.e2e.pages.project;
 
 import java.time.Duration;
 import lombok.SneakyThrows;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
@@ -54,17 +55,17 @@ public final class ProjectDetailPage extends NavBarPage {
     public <T extends Tab> T goToTab(Class<T> tab) {
         if (tab == WorkflowDefinitionTab.class) {
             menuProcessDefinition().click();
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/workflow-definition"));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/workflow-definition"));
             return tab.cast(new WorkflowDefinitionTab(driver));
         }
         if (tab == WorkflowInstanceTab.class) {
             menuProcessInstances().click();
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/workflow/instances"));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/workflow/instances"));
             return tab.cast(new WorkflowInstanceTab(driver));
         }
         if (tab == TaskInstanceTab.class) {
             menuTaskInstances().click();
-            new WebDriverWait(driver, Duration.ofSeconds(60)).until(ExpectedConditions.urlContains("/task/instances"));
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/task/instances"));
             return tab.cast(new TaskInstanceTab(driver));
         }
 

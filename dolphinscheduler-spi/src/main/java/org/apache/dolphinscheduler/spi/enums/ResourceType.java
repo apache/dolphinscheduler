@@ -28,7 +28,7 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 public enum ResourceType {
 
     /**
-     * 0 file, 1 udf
+     * 0 file
      */
     FILE(0, "file"),
     ALL(2, "all");

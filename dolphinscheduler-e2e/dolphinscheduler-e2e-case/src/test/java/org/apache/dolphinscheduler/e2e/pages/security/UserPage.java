@@ -19,6 +19,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
@@ -68,7 +69,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         createUserForm().btnSelectTenantDropdown().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
 
         createUserForm().selectTenant()
@@ -113,7 +114,7 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         createUserForm().btnSelectTenantDropdown().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
                 "n-base-select-option__content")));
 
         createUserForm().selectTenant()

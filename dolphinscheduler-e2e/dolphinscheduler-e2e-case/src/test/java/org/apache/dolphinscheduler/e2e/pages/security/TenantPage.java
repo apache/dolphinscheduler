@@ -75,7 +75,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
                 .collect(Collectors.toList());
     }
 
-    public boolean containTenant(String tenant) {
+    public boolean containsTenant(String tenant) {
         return tenantList.stream()
                 .anyMatch(it -> it.findElement(By.className("tenant-code")).getText().contains(tenant));
     }
@@ -162,7 +162,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
     public static class Row {
         private final WebElement row;
 
-        public String name() {
+        public String tenantCode() {
             return row.findElement(By.cssSelector("td[data-col-key=tenantCode]")).getText();
         }
 
