@@ -56,7 +56,11 @@
         <module>dolphinscheduler-datasource-sagemaker</module>
         <module>dolphinscheduler-datasource-k8s</module>
         <module>dolphinscheduler-datasource-hana</module>
+<<<<<<< HEAD
         <module>dolphinscheduler-datasource-aliyunserverlessspark</module>
+=======
+        <module>dolphinscheduler-datasource-aliyunadbspark</module>
+>>>>>>> 7389fa51e (datasource done)
     </modules>
 
     <dependencyManagement>
