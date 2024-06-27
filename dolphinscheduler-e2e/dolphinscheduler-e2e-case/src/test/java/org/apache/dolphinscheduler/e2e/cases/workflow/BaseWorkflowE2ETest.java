@@ -112,7 +112,7 @@ public abstract class BaseWorkflowE2ETest {
                             .stream()
                             .filter(it -> it.workflowInstanceName().startsWith(workflowName))
                             .findFirst()
-                            .orElseThrow(null);
+                            .orElse(null);
                 }, Objects::nonNull);
     }
 
