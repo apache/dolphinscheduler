@@ -60,4 +60,8 @@ public class AliyunAdbSparkClientWrapper implements AutoCloseable {
     public void close() throws Exception {
         // No need implement
     }
+
+    public Client getAliyunAdbSparkClient() {
+        return aliyunAdbSparkClient;
+    }
 }

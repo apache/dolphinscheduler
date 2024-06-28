@@ -21,14 +21,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-datasource-plugin</artifactId>
+        <artifactId>dolphinscheduler-task-plugin</artifactId>
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <artifactId>dolphinscheduler-datasource-aliyunadbspark</artifactId>
+    <artifactId>dolphinscheduler-task-aliyunadbspark</artifactId>
     <packaging>jar</packaging>
-    <name>${project.artifactId}</name>
-
 
     <dependencies>
         <dependency>
@@ -47,11 +45,29 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-spi</artifactId>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.aliyun.oss</groupId>
+                    <artifactId>aliyun-sdk-oss</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-api</artifactId>
+            <artifactId>dolphinscheduler-task-api</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.aliyun.oss</groupId>
+                    <artifactId>aliyun-sdk-oss</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-datasource-all</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
