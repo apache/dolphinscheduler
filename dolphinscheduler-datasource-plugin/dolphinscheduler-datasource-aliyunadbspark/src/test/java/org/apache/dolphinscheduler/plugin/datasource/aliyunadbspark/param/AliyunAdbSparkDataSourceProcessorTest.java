@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.param;
 
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ public class AliyunAdbSparkDataSourceProcessorTest {
         // check AccessKeyId
         IllegalArgumentException exceptionWithoutAccessKeyId =
                 Assertions.assertThrows(IllegalArgumentException.class,
-                () -> processor.checkDatasourceParam(datasourceParamDTO));
+                        () -> processor.checkDatasourceParam(datasourceParamDTO));
         Assertions.assertEquals("accessKeyId in param is not valid",
                 exceptionWithoutAccessKeyId.getMessage());
 
@@ -53,7 +54,7 @@ public class AliyunAdbSparkDataSourceProcessorTest {
         // check AccessKeySecret
         IllegalArgumentException exceptionWithoutAccessKeySecret =
                 Assertions.assertThrows(IllegalArgumentException.class,
-                () -> processor.checkDatasourceParam(datasourceParamDTO));
+                        () -> processor.checkDatasourceParam(datasourceParamDTO));
         Assertions.assertEquals("accessKeySecret in param is not valid",
                 exceptionWithoutAccessKeySecret.getMessage());
 
@@ -62,7 +63,7 @@ public class AliyunAdbSparkDataSourceProcessorTest {
         // check RegionId
         IllegalArgumentException exceptionWithoutRegionId =
                 Assertions.assertThrows(IllegalArgumentException.class,
-                () -> processor.checkDatasourceParam(datasourceParamDTO));
+                        () -> processor.checkDatasourceParam(datasourceParamDTO));
         Assertions.assertEquals("regionId in param is not valid",
                 exceptionWithoutRegionId.getMessage());
     }

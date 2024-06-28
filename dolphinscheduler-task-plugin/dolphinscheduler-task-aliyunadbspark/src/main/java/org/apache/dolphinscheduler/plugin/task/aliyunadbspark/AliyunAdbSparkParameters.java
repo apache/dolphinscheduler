@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.aliyunadbspark;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
+import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;

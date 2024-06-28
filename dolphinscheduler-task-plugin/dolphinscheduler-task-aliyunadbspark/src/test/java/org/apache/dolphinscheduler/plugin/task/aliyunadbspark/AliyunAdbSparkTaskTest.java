@@ -17,6 +17,32 @@
 
 package org.apache.dolphinscheduler.plugin.task.aliyunadbspark;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.AliyunAdbSparkClientWrapper;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+
 import com.aliyun.adb20211201.Client;
 import com.aliyun.adb20211201.models.GetSparkAppStateRequest;
 import com.aliyun.adb20211201.models.GetSparkAppStateResponse;
@@ -25,33 +51,6 @@ import com.aliyun.adb20211201.models.KillSparkAppRequest;
 import com.aliyun.adb20211201.models.SubmitSparkAppRequest;
 import com.aliyun.adb20211201.models.SubmitSparkAppResponse;
 import com.aliyun.adb20211201.models.SubmitSparkAppResponseBody;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.AliyunAdbSparkClientWrapper;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.spi.enums.DbType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -97,30 +96,29 @@ public class AliyunAdbSparkTaskTest {
 
     private final String mockConnectionJson =
             "{\n" +
-            "    \"accessKeyId\":\"mockAccessKeyId\",\n" +
-            "    \"accessKeySecret\":\"mockAccessKeySecret\",\n" +
-            "    \"regionId\":\"cn-beijing\"\n" +
-            "}";
+                    "    \"accessKeyId\":\"mockAccessKeyId\",\n" +
+                    "    \"accessKeySecret\":\"mockAccessKeySecret\",\n" +
+                    "    \"regionId\":\"cn-beijing\"\n" +
+                    "}";
 
     private final String taskParamJson =
             "{\n" +
-            "    \"dbClusterId\":\"amv-xxx\",\n" +
-            "    \"resourceGroupName\":\"spark\",\n" +
-            "    \"appName\":\"sparkpi\",\n" +
-            "    \"appType\":\"Batch\",\n" +
-            "    \"data\":{\n" +
-            "        \"file\":\"local:///tmp/spark-examples.jar\",\n" +
-            "        \"className\":\"org.apache.spark.examples.SparkPi\",\n" +
-            "        \"conf\":{\n" +
-            "            \"spark.driver.resourceSpec\":\"medium\",\n" +
-            "            \"spark.executor.instances\":2,\n" +
-            "            \"spark.executor.resourceSpec\":\"medium\"\n" +
-            "        }\n" +
-            "    },\n" +
-            "    \"datasource\":1,\n" +
-            "    \"type\":\"ALIYUN_ADB_SPARK\"\n" +
-            "}";
-
+                    "    \"dbClusterId\":\"amv-xxx\",\n" +
+                    "    \"resourceGroupName\":\"spark\",\n" +
+                    "    \"appName\":\"sparkpi\",\n" +
+                    "    \"appType\":\"Batch\",\n" +
+                    "    \"data\":{\n" +
+                    "        \"file\":\"local:///tmp/spark-examples.jar\",\n" +
+                    "        \"className\":\"org.apache.spark.examples.SparkPi\",\n" +
+                    "        \"conf\":{\n" +
+                    "            \"spark.driver.resourceSpec\":\"medium\",\n" +
+                    "            \"spark.executor.instances\":2,\n" +
+                    "            \"spark.executor.resourceSpec\":\"medium\"\n" +
+                    "        }\n" +
+                    "    },\n" +
+                    "    \"datasource\":1,\n" +
+                    "    \"type\":\"ALIYUN_ADB_SPARK\"\n" +
+                    "}";
 
     @BeforeEach
     public void setUp() {
@@ -128,7 +126,8 @@ public class AliyunAdbSparkTaskTest {
         DataSourceParameters dataSourceParameters = new DataSourceParameters();
         dataSourceParameters.setConnectionParams(mockConnectionJson);
         dataSourceParameters.setType(DbType.ALIYUN_ADB_SPARK);
-        when(mockResourceParametersHelper.getResourceParameters(any(ResourceType.class), anyInt())).thenReturn(dataSourceParameters);
+        when(mockResourceParametersHelper.getResourceParameters(any(ResourceType.class), anyInt()))
+                .thenReturn(dataSourceParameters);
         when(mockTaskExecutionContext.getResourceParametersHelper()).thenReturn(mockResourceParametersHelper);
         when(mockAliyunAdbSparkClientWrapper.getAliyunAdbSparkClient()).thenReturn(mockAliyunAdbSparkClient);
     }
@@ -146,12 +145,14 @@ public class AliyunAdbSparkTaskTest {
         aliyunAdbSparkTask.init();
 
         // mock
-        when(mockAliyunAdbSparkClient.submitSparkApp(any(SubmitSparkAppRequest.class))).thenReturn(mockSubmitSparkAppResponse);
+        when(mockAliyunAdbSparkClient.submitSparkApp(any(SubmitSparkAppRequest.class)))
+                .thenReturn(mockSubmitSparkAppResponse);
         when(mockSubmitSparkAppResponse.getBody()).thenReturn(mockSubmitSparkAppResponseBody);
         when(mockSubmitSparkAppResponseBody.getData()).thenReturn(mockSubmitSparkAppResponseBodyData);
         when(mockSubmitSparkAppResponseBodyData.getAppId()).thenReturn(mockAppId);
 
-        when(mockAliyunAdbSparkClient.getSparkAppState(any(GetSparkAppStateRequest.class))).thenReturn(mockGetSparkAppStateResponse);
+        when(mockAliyunAdbSparkClient.getSparkAppState(any(GetSparkAppStateRequest.class)))
+                .thenReturn(mockGetSparkAppStateResponse);
         when(mockGetSparkAppStateResponse.getBody()).thenReturn(mockGetSparkAppStateResponseBody);
         when(mockGetSparkAppStateResponseBody.getData()).thenReturn(mockGetSparkAppStateResponseBodyData);
         when(mockGetSparkAppStateResponseBodyData.getState()).thenReturn("SUBMITTED");
@@ -171,7 +172,8 @@ public class AliyunAdbSparkTaskTest {
         aliyunAdbSparkTask.setAppIds(mockAppId);
 
         // mock
-        when(mockAliyunAdbSparkClient.getSparkAppState(any(GetSparkAppStateRequest.class))).thenReturn(mockGetSparkAppStateResponse);
+        when(mockAliyunAdbSparkClient.getSparkAppState(any(GetSparkAppStateRequest.class)))
+                .thenReturn(mockGetSparkAppStateResponse);
         when(mockGetSparkAppStateResponse.getBody()).thenReturn(mockGetSparkAppStateResponseBody);
         when(mockGetSparkAppStateResponseBody.getData()).thenReturn(mockGetSparkAppStateResponseBodyData);
         when(mockGetSparkAppStateResponseBodyData.getState()).thenReturn("COMPLETED");

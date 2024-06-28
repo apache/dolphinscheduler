@@ -3,6 +3,7 @@ package org.apache.dolphinscheduler.plugin.task.aliyunadbspark;
 import org.apache.commons.lang3.StringUtils;
 
 public enum AliyunAdbSparkState {
+
     SUBMITTED("SUBMITTED"),
     STARTING("STARTING"),
     RUNNING("RUNNING"),

@@ -17,11 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.aliyunadbspark;
 
-import com.aliyun.adb20211201.models.GetSparkAppStateRequest;
-import com.aliyun.adb20211201.models.GetSparkAppStateResponse;
-import com.aliyun.adb20211201.models.KillSparkAppRequest;
-import com.google.common.collect.Sets;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.AliyunAdbSparkClientWrapper;
 import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.param.AliyunAdbSparkConnectionParam;
@@ -36,17 +31,22 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import com.aliyun.adb20211201.Client;
-import com.aliyun.adb20211201.models.SubmitSparkAppRequest;
-import com.aliyun.adb20211201.models.SubmitSparkAppResponse;
-
-
-import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import lombok.extern.slf4j.Slf4j;
+
+import com.aliyun.adb20211201.Client;
+import com.aliyun.adb20211201.models.GetSparkAppStateRequest;
+import com.aliyun.adb20211201.models.GetSparkAppStateResponse;
+import com.aliyun.adb20211201.models.KillSparkAppRequest;
+import com.aliyun.adb20211201.models.SubmitSparkAppRequest;
+import com.aliyun.adb20211201.models.SubmitSparkAppResponse;
+import com.google.common.collect.Sets;
 
 @Slf4j
 public class AliyunAdbSparkTask extends AbstractRemoteTask {
@@ -75,8 +75,7 @@ public class AliyunAdbSparkTask extends AbstractRemoteTask {
             AliyunAdbSparkState.RUNNING.toString(),
             AliyunAdbSparkState.FAILING.toString(),
             AliyunAdbSparkState.SUCCEEDING.toString(),
-            AliyunAdbSparkState.KILLING.toString()
-    );
+            AliyunAdbSparkState.KILLING.toString());
 
     protected AliyunAdbSparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
