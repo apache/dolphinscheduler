@@ -202,12 +202,6 @@ public class TaskInstance implements Serializable {
     private Priority processInstancePriority;
 
     /**
-     * dependent state
-     */
-    @TableField(exist = false)
-    private String dependentResult;
-
-    /**
      * workerGroup
      */
     private String workerGroup;
