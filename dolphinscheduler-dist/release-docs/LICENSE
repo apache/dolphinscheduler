@@ -666,7 +666,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT
     checker-qual 3.12.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.12.0, MIT + GPLv2
     checker-qual 3.19.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.19.0, MIT + GPLv2
-    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket,  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT

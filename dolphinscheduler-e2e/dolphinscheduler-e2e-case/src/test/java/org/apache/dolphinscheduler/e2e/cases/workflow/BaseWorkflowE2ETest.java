@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.e2e.cases.workflow;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -46,7 +47,7 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 @Slf4j
 public abstract class BaseWorkflowE2ETest {
 
-    protected static String projectName = UUID.randomUUID().toString();
+    protected static final String projectName = UUID.randomUUID().toString();
 
     protected static final AdminUser adminUser = new AdminUser();
 

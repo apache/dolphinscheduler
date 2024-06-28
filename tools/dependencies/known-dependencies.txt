@@ -1,6 +1,5 @@
 HdrHistogram-2.1.12.jar
 HikariCP-4.0.3.jar
-Java-WebSocket-1.5.1.jar
 LatencyUtils-2.0.3.jar
 SparseBitSet-1.2.jar
 accessors-smart-2.4.8.jar

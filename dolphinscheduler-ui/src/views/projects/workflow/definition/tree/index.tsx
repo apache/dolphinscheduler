@@ -128,11 +128,6 @@ export default defineComponent({
         image: `${import.meta.env.BASE_URL}images/task-icons/datax.png`
       },
       {
-        taskType: 'PIGEON',
-        color: '#5EC459',
-        image: `${import.meta.env.BASE_URL}images/task-icons/pigeon.png`
-      },
-      {
         taskType: 'SQOOP',
         color: '#f98b3d',
         image: `${import.meta.env.BASE_URL}images/task-icons/sqoop.png`

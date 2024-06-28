@@ -42,19 +42,19 @@ import java.time.Duration;
 public class NavBarPage {
     protected final RemoteWebDriver driver;
 
-    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(2) > .n-menu-item-content")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Project')]")
     private WebElement projectTab;
 
-    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(3) > .n-menu-item-content")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Resources')]")
     private WebElement resourceTab;
 
-    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(4) > .n-menu-item-content")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Data Quality')]")
     private WebElement dataQualityTab;
 
-    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(5) > .n-menu-item-content")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Datasource')]")
     private WebElement dataSourceTab;
 
-    @FindBy(css = ".tab-horizontal .n-menu-item:nth-child(7) > .n-menu-item-content")
+    @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Security')]")
     private WebElement securityTab;
 
     public NavBarPage(RemoteWebDriver driver) {
@@ -66,14 +66,14 @@ public class NavBarPage {
     public <T extends NavBarItem> T goToNav(Class<T> nav) {
         if (nav == ProjectPage.class) {
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(projectTab));
-            projectTab.click();
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", projectTab());
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/projects/list"));
             return nav.cast(new ProjectPage(driver));
         }
 
         if (nav == SecurityPage.class) {
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(securityTab));
-            securityTab.click();
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", securityTab());
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/security/tenant-manage"));
             return nav.cast(new SecurityPage(driver));
         }
@@ -87,7 +87,7 @@ public class NavBarPage {
 
         if (nav == DataSourcePage.class) {
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
-            dataSourceTab.click();
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", dataSourceTab());
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/datasource"));
             return nav.cast(new DataSourcePage(driver));
         }

@@ -146,10 +146,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
                             },
                             {
-                                title: 'Pigeon',
-                                link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
-                            },
-                            {
                                 title: 'Conditions',
                                 link: '/en-us/docs/dev/user_doc/guide/task/conditions.html',
                             },
@@ -876,10 +872,6 @@ export default {
                             {
                                 title: 'Sqoop',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
-                            },
-                            {
-                                title: 'Pigeon',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/pigeon.html',
                             },
                             {
                                 title: 'Conditions',

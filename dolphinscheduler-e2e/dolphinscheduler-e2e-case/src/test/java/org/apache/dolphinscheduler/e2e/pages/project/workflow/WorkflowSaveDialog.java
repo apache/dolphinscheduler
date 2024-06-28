@@ -20,7 +20,11 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import lombok.Getter;
+
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -44,7 +48,7 @@ public final class WorkflowSaveDialog {
     })
     private WebElement inputName;
 
-    @FindBy(className = "btn-submit")
+    @FindBy(xpath = "//div[contains(text(), 'Basic Information')]/../following-sibling::div[contains(@class, 'n-card__footer')]//button[contains(@class, 'btn-submit')]")
     private WebElement buttonSubmit;
 
     @FindBys({
@@ -72,8 +76,6 @@ public final class WorkflowSaveDialog {
     public WorkflowSaveDialog addGlobalParam(String key, String value) {
         final int len = globalParamsItems().findElements(By.tagName("input")).size();
 
-        final WebDriver driver = parent().driver();
-
         if (len == 0) {
             buttonGlobalCustomParameters().click();
 
@@ -90,8 +92,9 @@ public final class WorkflowSaveDialog {
     }
 
     public WorkflowForm submit() {
-        buttonSubmit().click();
-
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(buttonSubmit));
+        buttonSubmit.click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("workflow-definition"));
         return parent;
     }
 }

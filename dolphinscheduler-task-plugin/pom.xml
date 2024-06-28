@@ -40,7 +40,6 @@
         <module>dolphinscheduler-task-sql</module>
         <module>dolphinscheduler-task-sqoop</module>
         <module>dolphinscheduler-task-procedure</module>
-        <module>dolphinscheduler-task-pigeon</module>
         <module>dolphinscheduler-task-dataquality</module>
         <module>dolphinscheduler-task-seatunnel</module>
         <module>dolphinscheduler-task-emr</module>

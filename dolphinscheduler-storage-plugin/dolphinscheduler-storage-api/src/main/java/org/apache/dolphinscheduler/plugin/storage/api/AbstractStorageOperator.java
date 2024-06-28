@@ -26,11 +26,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 
 public abstract class AbstractStorageOperator implements StorageOperator {
 
+    private static final Logger log = LoggerFactory.getLogger(AbstractStorageOperator.class);
     protected final String resourceBaseAbsolutePath;
 
     public AbstractStorageOperator(String resourceBaseAbsolutePath) {
@@ -60,7 +64,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler");
     }
 
     @Override
