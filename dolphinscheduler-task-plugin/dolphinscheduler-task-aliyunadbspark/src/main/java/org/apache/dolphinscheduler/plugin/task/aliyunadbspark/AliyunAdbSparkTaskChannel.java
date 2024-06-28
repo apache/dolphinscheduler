@@ -27,11 +27,20 @@ public class AliyunAdbSparkTaskChannel implements TaskChannel {
 
     @Override
     public AbstractTask createTask(TaskExecutionContext taskRequest) {
-        return new AliyunAdbSparkTask(taskRequest);
+        AliyunAdbSparkBaseParameters params = JSONUtils.parseObject(taskRequest.getTaskParams(),
+                AliyunAdbSparkBaseParameters.class);
+        assert params != null;
+        if ("Batch".equals(params.getAppType())) {
+            return new AliyunAdbSparkBatchTask(taskRequest);
+        } else if ("SQL".equals(params.getAppType())) {
+            return new AliyunAdbSparkSqlTask(taskRequest);
+        } else {
+            throw new IllegalArgumentException("Unsupported program type: " + params.getAppType());
+        }
     }
 
     @Override
     public AbstractParameters parseParameters(String taskParams) {
-        return JSONUtils.parseObject(taskParams, AliyunAdbSparkParameters.class);
+        return JSONUtils.parseObject(taskParams, AliyunAdbSparkBaseParameters.class);
     }
 }

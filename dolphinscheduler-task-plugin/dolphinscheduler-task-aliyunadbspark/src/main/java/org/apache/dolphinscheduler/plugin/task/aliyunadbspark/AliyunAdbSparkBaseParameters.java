@@ -21,53 +21,39 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 
 @Data
-@Slf4j
-public class AliyunAdbSparkParameters extends AbstractParameters {
+public class AliyunAdbSparkBaseParameters extends AbstractParameters {
 
-    // spark application configurations
+    // spark application base configurations
     /**
      * ADB Cluster ID
      */
-    private String dbClusterId;
+    public String dbClusterId;
 
     /**
      * ADB Resource Group Name, which type is Job
      */
-    private String resourceGroupName;
+    public String resourceGroupName;
 
     /**
      * Spark Application Name
      */
-    private String appName;
+    public String appName;
 
     /**
      * Spark Application Type, such as Batch, SQL
      */
-    private String appType;
+    public String appType;
 
-    /**
-     * Spark Application Configurations
-     */
-    private String data;
-    private int datasource;
-    private String type;
+    public int datasource;
 
-    /**
-     * Checks whether the database cluster ID, resource group name, and data are all not empty or blank.
-     *
-     * @return boolean Returns true if all parameters are not blank; otherwise, returns false.
-     */
+    public String type;
+
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotBlank(dbClusterId) &&
-                StringUtils.isNotBlank(resourceGroupName) &&
-                StringUtils.isNotBlank(data);
+        return true;
     }
 
     @Override

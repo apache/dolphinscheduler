@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.aliyunadbspark;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.AliyunAdbSparkClientWrapper;
 import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.param.AliyunAdbSparkConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -49,15 +48,11 @@ import com.aliyun.adb20211201.models.SubmitSparkAppResponse;
 import com.google.common.collect.Sets;
 
 @Slf4j
-public class AliyunAdbSparkTask extends AbstractRemoteTask {
+public class AliyunAdbSparkBaseTask extends AbstractRemoteTask {
 
-    private final TaskExecutionContext taskExecutionContext;
+    public final TaskExecutionContext taskExecutionContext;
 
     private Client aliyunAdbSparkClient;
-
-    private AliyunAdbSparkClientWrapper adbSparkClientWrapper;
-
-    private AliyunAdbSparkParameters aliyunAdbSparkParameters;
 
     private AliyunAdbSparkConnectionParam aliyunAdbSparkConnectionParam;
 
@@ -77,7 +72,7 @@ public class AliyunAdbSparkTask extends AbstractRemoteTask {
             AliyunAdbSparkState.SUCCEEDING.toString(),
             AliyunAdbSparkState.KILLING.toString());
 
-    protected AliyunAdbSparkTask(TaskExecutionContext taskExecutionContext) {
+    protected AliyunAdbSparkBaseTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
     }
@@ -89,45 +84,19 @@ public class AliyunAdbSparkTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        final String taskParams = taskExecutionContext.getTaskParams();
-        aliyunAdbSparkParameters = JSONUtils.parseObject(taskParams, AliyunAdbSparkParameters.class);
-
-        if (this.aliyunAdbSparkParameters == null || !this.aliyunAdbSparkParameters.checkParameters()) {
-            throw new AliyunAdbSparkTaskException("Task parameters for aliyun adb spark are invalid");
-        }
-
-        ResourceParametersHelper resourceParametersHelper = taskExecutionContext.getResourceParametersHelper();
-        DataSourceParameters dataSourceParameters =
-                (DataSourceParameters) resourceParametersHelper.getResourceParameters(ResourceType.DATASOURCE,
-                        aliyunAdbSparkParameters.getDatasource());
-        aliyunAdbSparkConnectionParam = (AliyunAdbSparkConnectionParam) DataSourceUtils.buildConnectionParams(
-                DbType.valueOf(aliyunAdbSparkParameters.getType()),
-                dataSourceParameters.getConnectionParams());
-
-        accessKeyId = aliyunAdbSparkConnectionParam.getAccessKeyId();
-        accessKeySecret = aliyunAdbSparkConnectionParam.getAccessKeySecret();
-        regionId = aliyunAdbSparkConnectionParam.getRegionId();
-
-        try {
-            adbSparkClientWrapper = new AliyunAdbSparkClientWrapper(accessKeyId, accessKeySecret, regionId);
-            aliyunAdbSparkClient = adbSparkClientWrapper.getAliyunAdbSparkClient();
-        } catch (Exception e) {
-            log.error("Failed to initialize Aliyun ADB Spark Client", e);
-            throw new AliyunAdbSparkTaskException(e.getMessage(), e.getCause());
-        }
+        super.init();
     }
 
     @Override
     public AbstractParameters getParameters() {
-        return aliyunAdbSparkParameters;
+        return null;
     }
 
     @Override
     public void submitApplication() throws TaskException {
         String appState = null;
 
-        SubmitSparkAppRequest submitSparkAppRequest =
-                buildSubmitSparkAppRequest(aliyunAdbSparkParameters);
+        SubmitSparkAppRequest submitSparkAppRequest = buildSubmitSparkAppRequest();
 
         SubmitSparkAppResponse submitSparkAppResponse;
         try {
@@ -208,30 +177,35 @@ public class AliyunAdbSparkTask extends AbstractRemoteTask {
         }
     }
 
-    /**
-     * Builds and returns a SubmitSparkAppRequest object.
-     * This method is used to configure the necessary and optional parameters for submitting a Spark application.
-     *
-     * @param aliyunAdbSparkParameters Contains parameters related to Aliyun ADB Spark, used to populate the request.
-     * @return SubmitSparkAppRequest The configured Spark application submission request.
-     */
-    private SubmitSparkAppRequest buildSubmitSparkAppRequest(AliyunAdbSparkParameters aliyunAdbSparkParameters) {
-        SubmitSparkAppRequest submitSparkAppRequest = new SubmitSparkAppRequest();
+    protected <T extends AliyunAdbSparkBaseParameters> void init2(T params) {
+        ResourceParametersHelper resourceParametersHelper = taskExecutionContext.getResourceParametersHelper();
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) resourceParametersHelper.getResourceParameters(ResourceType.DATASOURCE,
+                        params.getDatasource());
+        aliyunAdbSparkConnectionParam = (AliyunAdbSparkConnectionParam) DataSourceUtils.buildConnectionParams(
+                DbType.valueOf(params.getType()),
+                dataSourceParameters.getConnectionParams());
 
-        // Set necessary parameters
-        submitSparkAppRequest.setDBClusterId(aliyunAdbSparkParameters.getDbClusterId());
-        submitSparkAppRequest.setResourceGroupName(aliyunAdbSparkParameters.getResourceGroupName());
-        submitSparkAppRequest.setData(aliyunAdbSparkParameters.getData());
+        accessKeyId = aliyunAdbSparkConnectionParam.getAccessKeyId();
+        accessKeySecret = aliyunAdbSparkConnectionParam.getAccessKeySecret();
+        regionId = aliyunAdbSparkConnectionParam.getRegionId();
 
-        // Set optional parameters if they are not empty
-        if (StringUtils.isNotBlank(aliyunAdbSparkParameters.getAppName())) {
-            submitSparkAppRequest.setAppName(aliyunAdbSparkParameters.getAppName());
+        aliyunAdbSparkClient = createClient(accessKeyId, accessKeySecret, regionId);
+    }
+
+    protected Client createClient(String accessKeyId, String accessKeySecret, String regionId) {
+        try (
+                AliyunAdbSparkClientWrapper wrapper =
+                        new AliyunAdbSparkClientWrapper(accessKeyId, accessKeySecret, regionId);) {
+            return wrapper.getAliyunAdbSparkClient();
+        } catch (Exception e) {
+            log.error("Failed to initialize Aliyun ADB Spark Client", e);
+            throw new AliyunAdbSparkTaskException(e.getMessage(), e.getCause());
         }
-        if (StringUtils.isNotBlank(aliyunAdbSparkParameters.getAppType())) {
-            submitSparkAppRequest.setAppType(aliyunAdbSparkParameters.getAppType());
-        }
+    }
 
-        return submitSparkAppRequest;
+    protected SubmitSparkAppRequest buildSubmitSparkAppRequest() {
+        return null;
     }
 
     /**

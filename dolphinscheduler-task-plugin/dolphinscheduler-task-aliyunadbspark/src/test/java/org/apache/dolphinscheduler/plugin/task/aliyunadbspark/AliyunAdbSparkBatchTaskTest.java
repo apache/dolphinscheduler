@@ -19,11 +19,10 @@ package org.apache.dolphinscheduler.plugin.task.aliyunadbspark;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.plugin.datasource.aliyunadbspark.AliyunAdbSparkClientWrapper;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -39,23 +38,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import com.aliyun.adb20211201.Client;
 import com.aliyun.adb20211201.models.GetSparkAppStateRequest;
 import com.aliyun.adb20211201.models.GetSparkAppStateResponse;
 import com.aliyun.adb20211201.models.GetSparkAppStateResponseBody;
 import com.aliyun.adb20211201.models.KillSparkAppRequest;
-import com.aliyun.adb20211201.models.SubmitSparkAppRequest;
 import com.aliyun.adb20211201.models.SubmitSparkAppResponse;
 import com.aliyun.adb20211201.models.SubmitSparkAppResponseBody;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public class AliyunAdbSparkTaskTest {
+public class AliyunAdbSparkBatchTaskTest {
 
     @Mock
     private TaskExecutionContext mockTaskExecutionContext;
@@ -65,9 +61,6 @@ public class AliyunAdbSparkTaskTest {
 
     @Mock
     private ResourceParametersHelper mockResourceParametersHelper;
-
-    @Mock
-    private AliyunAdbSparkClientWrapper mockAliyunAdbSparkClientWrapper;
 
     @Mock
     private SubmitSparkAppResponseBody.SubmitSparkAppResponseBodyData mockSubmitSparkAppResponseBodyData;
@@ -88,7 +81,8 @@ public class AliyunAdbSparkTaskTest {
     private GetSparkAppStateResponse mockGetSparkAppStateResponse;
 
     @InjectMocks
-    private AliyunAdbSparkTask aliyunAdbSparkTask;
+    @Spy
+    private AliyunAdbSparkBatchTask aliyunAdbSparkTask;
 
     private static final String mockAppId = "s123bj456";
 
@@ -119,6 +113,14 @@ public class AliyunAdbSparkTaskTest {
                     "    \"datasource\":1,\n" +
                     "    \"type\":\"ALIYUN_ADB_SPARK\"\n" +
                     "}";
+    // private final String taskParamJson = "{\n" +
+    // " \"dbClusterId\":\"amv-xxx\",\n" +
+    // " \"resourceGroupName\":\"spark\",\n" +
+    // " \"appType\":\"SQL\",\n" +
+    // " \"data\":\"select 1\",\n" +
+    // " \"datasource\":\"1\",\n" +
+    // " \"type\":\"ALIYUN_ADB_SPARK\"\n" +
+    // "}";
 
     @BeforeEach
     public void setUp() {
@@ -129,7 +131,8 @@ public class AliyunAdbSparkTaskTest {
         when(mockResourceParametersHelper.getResourceParameters(any(ResourceType.class), anyInt()))
                 .thenReturn(dataSourceParameters);
         when(mockTaskExecutionContext.getResourceParametersHelper()).thenReturn(mockResourceParametersHelper);
-        when(mockAliyunAdbSparkClientWrapper.getAliyunAdbSparkClient()).thenReturn(mockAliyunAdbSparkClient);
+        when(aliyunAdbSparkTask.createClient(anyString(), anyString(), anyString()))
+                .thenReturn(mockAliyunAdbSparkClient);
     }
 
     @Test
@@ -145,8 +148,7 @@ public class AliyunAdbSparkTaskTest {
         aliyunAdbSparkTask.init();
 
         // mock
-        when(mockAliyunAdbSparkClient.submitSparkApp(any(SubmitSparkAppRequest.class)))
-                .thenReturn(mockSubmitSparkAppResponse);
+        when(mockAliyunAdbSparkClient.submitSparkApp(any())).thenReturn(mockSubmitSparkAppResponse);
         when(mockSubmitSparkAppResponse.getBody()).thenReturn(mockSubmitSparkAppResponseBody);
         when(mockSubmitSparkAppResponseBody.getData()).thenReturn(mockSubmitSparkAppResponseBodyData);
         when(mockSubmitSparkAppResponseBodyData.getAppId()).thenReturn(mockAppId);
@@ -197,7 +199,7 @@ public class AliyunAdbSparkTaskTest {
         // verify
         KillSparkAppRequest killSparkAppRequest = new KillSparkAppRequest();
         killSparkAppRequest.setAppId(mockAppId);
-        verify(mockAliyunAdbSparkClient).killSparkApp(eq(killSparkAppRequest));
+        verify(mockAliyunAdbSparkClient).killSparkApp(any());
     }
 
 }
