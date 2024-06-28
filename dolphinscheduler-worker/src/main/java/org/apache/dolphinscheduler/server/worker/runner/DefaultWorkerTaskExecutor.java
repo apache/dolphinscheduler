@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
@@ -32,12 +33,12 @@ import lombok.NonNull;
 public class DefaultWorkerTaskExecutor extends WorkerTaskExecutor {
 
     public DefaultWorkerTaskExecutor(@NonNull TaskExecutionContext taskExecutionContext,
-                                     @NonNull WorkerConfig workerConfig,
+                                     @NonNull TenantConfig tenantConfig,
                                      @NonNull WorkerMessageSender workerMessageSender,
                                      @Nullable StorageOperator storageOperator,
                                      @NonNull WorkerRegistryClient workerRegistryClient) {
         super(taskExecutionContext,
-                workerConfig,
+                tenantConfig,
                 workerMessageSender,
                 storageOperator,
                 workerRegistryClient);

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
@@ -33,7 +34,7 @@ public class DefaultWorkerTaskExecutorTest {
 
     private TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
 
-    private WorkerConfig workerConfig = Mockito.mock(WorkerConfig.class);
+    private TenantConfig tenantConfig = Mockito.mock(TenantConfig.class);
 
     private String masterAddress = "localhost:5678";
 
@@ -53,7 +54,7 @@ public class DefaultWorkerTaskExecutorTest {
                 .build();
         WorkerTaskExecutor workerTaskExecutor = new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
-                workerConfig,
+                tenantConfig,
                 workerMessageSender,
                 storageOperator,
                 workerRegistryClient);
@@ -76,7 +77,7 @@ public class DefaultWorkerTaskExecutorTest {
                 .build();
         WorkerTaskExecutor workerTaskExecutor = new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
-                workerConfig,
+                tenantConfig,
                 workerMessageSender,
                 storageOperator,
                 workerRegistryClient);

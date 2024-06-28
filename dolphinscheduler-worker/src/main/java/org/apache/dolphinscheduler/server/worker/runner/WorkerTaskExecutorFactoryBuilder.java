@@ -55,7 +55,7 @@ public class WorkerTaskExecutorFactoryBuilder {
 
     public WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(TaskExecutionContext taskExecutionContext) {
         return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
-                workerConfig,
+                workerConfig.getTenantConfig(),
                 workerMessageSender,
                 storageOperator,
                 workerRegistryClient);

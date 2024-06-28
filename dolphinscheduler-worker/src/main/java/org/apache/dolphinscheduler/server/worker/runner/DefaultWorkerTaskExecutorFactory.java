@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.runner;
 
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
@@ -32,18 +33,18 @@ public class DefaultWorkerTaskExecutorFactory
             WorkerTaskExecutorFactory<DefaultWorkerTaskExecutor> {
 
     private final @NonNull TaskExecutionContext taskExecutionContext;
-    private final @NonNull WorkerConfig workerConfig;
+    private final @NonNull TenantConfig tenantConfig;
     private final @NonNull WorkerMessageSender workerMessageSender;
     private final @Nullable StorageOperator storageOperator;
     private final @NonNull WorkerRegistryClient workerRegistryClient;
 
     public DefaultWorkerTaskExecutorFactory(@NonNull TaskExecutionContext taskExecutionContext,
-                                            @NonNull WorkerConfig workerConfig,
+                                            @NonNull TenantConfig tenantConfig,
                                             @NonNull WorkerMessageSender workerMessageSender,
                                             @Nullable StorageOperator storageOperator,
                                             @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
-        this.workerConfig = workerConfig;
+        this.tenantConfig = tenantConfig;
         this.workerMessageSender = workerMessageSender;
         this.storageOperator = storageOperator;
         this.workerRegistryClient = workerRegistryClient;
@@ -53,7 +54,7 @@ public class DefaultWorkerTaskExecutorFactory
     public DefaultWorkerTaskExecutor createWorkerTaskExecutor() {
         return new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
-                workerConfig,
+                tenantConfig,
                 workerMessageSender,
                 storageOperator,
                 workerRegistryClient);

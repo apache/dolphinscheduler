@@ -46,9 +46,7 @@ public class TenantUtils {
      * <p>
      * If sudo is not enabled, will not check the tenant code.
      */
-    public static String getOrCreateActualTenant(WorkerConfig workerConfig, TaskExecutionContext taskExecutionContext) {
-        TenantConfig tenantConfig = workerConfig.getTenantConfig();
-
+    public static String getOrCreateActualTenant(TenantConfig tenantConfig, TaskExecutionContext taskExecutionContext) {
         if (!isTenantEnable()) {
             log.info("Tenant is not enabled, will use the bootstrap: {} user as tenant", getBootstrapTenant());
             return getBootstrapTenant();

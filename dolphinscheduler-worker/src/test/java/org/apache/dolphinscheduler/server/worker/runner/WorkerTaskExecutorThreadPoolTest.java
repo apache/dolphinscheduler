@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.config.TaskExecuteThreadsFullPolicy;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
@@ -146,7 +147,7 @@ class WorkerTaskExecutorThreadPoolTest {
 
         protected MockWorkerTaskExecutor(Runnable runnable) {
             super(TaskExecutionContext.builder().taskInstanceId((int) System.nanoTime()).build(),
-                    new WorkerConfig(),
+                    new TenantConfig(),
                     new WorkerMessageSender(),
                     null,
                     new WorkerRegistryClient());

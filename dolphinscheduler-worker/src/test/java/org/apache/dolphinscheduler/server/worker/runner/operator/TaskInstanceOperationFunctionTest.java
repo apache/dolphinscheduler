@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
@@ -57,6 +58,8 @@ public class TaskInstanceOperationFunctionTest {
     private MessageRetryRunner messageRetryRunner = Mockito.mock(MessageRetryRunner.class);
 
     private WorkerConfig workerConfig = Mockito.mock(WorkerConfig.class);
+
+    private TenantConfig tenantConfig = Mockito.mock(TenantConfig.class);
 
     private TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
 
@@ -182,6 +185,8 @@ public class TaskInstanceOperationFunctionTest {
 
     @Test
     public void testTaskInstanceDispatchOperationFunction() {
+        given(workerConfig.getTenantConfig()).willReturn(tenantConfig);
+
         WorkerTaskExecutorFactoryBuilder workerTaskExecutorFactoryBuilder = new WorkerTaskExecutorFactoryBuilder(
                 workerConfig,
                 workerMessageSender,

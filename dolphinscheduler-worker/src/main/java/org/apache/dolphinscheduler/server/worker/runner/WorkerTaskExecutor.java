@@ -48,6 +48,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.server.worker.config.TenantConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
@@ -74,7 +75,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
     protected static final Logger log = LoggerFactory.getLogger(WorkerTaskExecutor.class);
 
     protected final TaskExecutionContext taskExecutionContext;
-    protected final WorkerConfig workerConfig;
+    protected final TenantConfig tenantConfig;
     protected final WorkerMessageSender workerMessageSender;
     protected final @Nullable StorageOperator storageOperator;
     protected final WorkerRegistryClient workerRegistryClient;
@@ -83,12 +84,12 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     protected WorkerTaskExecutor(
                                  @NonNull TaskExecutionContext taskExecutionContext,
-                                 @NonNull WorkerConfig workerConfig,
+                                 @NonNull TenantConfig tenantConfig,
                                  @NonNull WorkerMessageSender workerMessageSender,
                                  @Nullable StorageOperator storageOperator,
                                  @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
-        this.workerConfig = workerConfig;
+        this.tenantConfig = tenantConfig;
         this.workerMessageSender = workerMessageSender;
         this.storageOperator = storageOperator;
         this.workerRegistryClient = workerRegistryClient;
@@ -207,10 +208,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         log.info("Send task status {} master: {}", TaskExecutionStatus.RUNNING_EXECUTION.name(),
                 taskExecutionContext.getHost());
 
-        // In most of case the origin tenant is the same as the current tenant
-        // Except `default` tenant. The originTenant is used to download the resources
-        String originTenant = taskExecutionContext.getTenantCode();
-        taskExecutionContext.setTenantCode(TenantUtils.getOrCreateActualTenant(workerConfig, taskExecutionContext));
+        taskExecutionContext.setTenantCode(TenantUtils.getOrCreateActualTenant(tenantConfig, taskExecutionContext));
         log.info("TenantCode: {} check successfully", taskExecutionContext.getTenantCode());
 
         TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
