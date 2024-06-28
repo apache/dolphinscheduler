@@ -933,7 +933,21 @@ export default {
     spark_submit_parameters: 'spark submit parameters',
     spark_submit_parameters_tips: 'spark submit parameters',
     is_production: 'is production',
-    is_production_tips: 'is production'
+    is_production_tips: 'is production',
+    aliyun_access_key_id: 'Aliyun Access Key ID',
+    aliyun_access_key_id_tips: 'Please input Aliyun Access Key ID',
+    aliyun_access_key_secret: 'Aliyun Access Key Secret',
+    aliyun_access_key_secret_tips: 'Please input Aliyun Access Key Secret',
+    aliyun_region_id: 'Aliyun Region ID',
+    aliyun_region_id_tips: 'Please input Aliyun Region ID',
+    adb_cluster_id: "Aliyun ADB Cluster ID",
+    adb_cluster_id_tips: "Please input Aliyun ADB Cluster ID",
+    adb_resource_group_name: "Aliyun ADB Resource Group",
+    adb_resource_group_name_tips: "Please input Aliyun ADB Resource Group Name",
+    adb_spark_app_type: "Aliyun ADB Spark App Type",
+    adb_spark_app_type_tips: "Please input Aliyun ADB Spark App Type",
+    adb_spark_data: "Aliyun ADB Spark Data",
+    adb_spark_data_tips: "Please input Aliyun ADB Spark Data"
   },
   menu: {
     fav: 'Favorites',

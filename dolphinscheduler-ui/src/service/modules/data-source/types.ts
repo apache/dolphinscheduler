@@ -43,6 +43,7 @@ type IDataBase =
   | 'SAGEMAKER'
   | 'K8S'
   | 'ALIYUN_SERVERLESS_SPARK'
+  | 'ALIYUN_ADB_SPARK'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -67,6 +68,7 @@ type IDataBaseLabel =
   | 'SAGEMAKER'
   | 'K8S'
   | 'ALIYUN_SERVERLESS_SPARK'
+  | 'ALIYUN_ADB_SPARK'
 
 interface IDataSource {
   id?: number
@@ -99,6 +101,9 @@ interface IDataSource {
   accessKeySecret?: string
   regionId?: string
   endpoint?: string
+  aliyunAccessKeyId?: string
+  aliyunAccessKeySecret?: string
+  aliyunRegionId?: string
 }
 
 interface ListReq {

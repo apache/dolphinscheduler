@@ -105,5 +105,11 @@ export default {
   region_id: 'Region Id',
   region_id_tips: 'Please enter Region Id',
   endpoint: 'Endpoint',
-  endpoint_tips: 'Please enter endpoint'
+  endpoint_tips: 'Please enter endpoint',
+  aliyun_access_key_id: 'Aliyun Access Key ID',
+  aliyun_access_key_id_tips: 'Please input Aliyun Access Key ID',
+  aliyun_access_key_secret: 'Aliyun Access Key Secret',
+  aliyun_access_key_secret_tips: 'Please input Aliyun Access Key Secret',
+  aliyun_region_id: 'Aliyun Region ID',
+  aliyun_region_id_tips: 'Please input Aliyun Region ID'
 }
