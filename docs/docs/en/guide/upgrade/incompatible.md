@@ -29,4 +29,5 @@ This document records the incompatible updates between each version. You need to
 ## 3.3.0
 
 * Remove the `udf-manage` function from the `resource center` ([#16209])
+* Remove the `Pigeon` from the `Task Plugin` ([#16218])
 

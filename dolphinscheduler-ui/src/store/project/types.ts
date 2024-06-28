@@ -33,7 +33,6 @@ type TaskType =
   | 'DEPENDENT'
   | 'HTTP'
   | 'DATAX'
-  | 'PIGEON'
   | 'SQOOP'
   | 'CONDITIONS'
   | 'DATA_QUALITY'

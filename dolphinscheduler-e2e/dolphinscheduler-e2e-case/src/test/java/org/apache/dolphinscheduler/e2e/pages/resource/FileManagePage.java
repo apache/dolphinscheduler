@@ -62,8 +62,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final RenameBox renameBox;
 
-    private final CreateFileBox createFileBox;
-
     private final UploadFileBox uploadFileBox;
 
     private final EditFileBox editFileBox;
@@ -89,8 +87,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         createDirectoryBox = new CreateDirectoryBox();
 
         renameBox = new RenameBox();
-
-        createFileBox = new CreateFileBox();
 
         uploadFileBox = new UploadFileBox();
 
@@ -175,10 +171,11 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file/create"));
 
-        createFileBox().inputFileName().sendKeys(fileName);
-        createFileBox().codeEditor().content(scripts);
-        createFileBox().buttonSubmit().click();
-        // todo: check if the operation is successful
+        CreateFileBox createFileBox = new CreateFileBox();
+        createFileBox.inputFileName().sendKeys(fileName);
+        createFileBox.codeEditor().content(scripts);
+        createFileBox.buttonSubmit().click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file-manage"));
         return this;
     }
 
