@@ -85,7 +85,7 @@ public class JavaTaskTest {
         JavaTask javaTask = runJarType();
         assertThat(javaTask.buildJarCommand())
                 .isEqualTo(
-                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
+                        "${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar -jar /tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -107,7 +107,7 @@ public class JavaTaskTest {
             }
             assertThat(javaTask.buildJavaCompileCommand(sourceCode))
                     .isEqualTo(
-                            "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java");
+                            "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java");
         } finally {
             Path path = Paths.get(fileName);
             if (Files.exists(path)) {
@@ -137,7 +137,7 @@ public class JavaTaskTest {
         }
         assertThat(javaTask.buildJavaCommand())
                 .isEqualTo(
-                        "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
+                        "${JAVA_HOME}/bin/javac -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar /tmp/dolphinscheduler/test/executepath/JavaTaskTest.java;${JAVA_HOME}/bin/java -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar JavaTaskTest -host 127.0.0.1 -port 8080 -xms:50m");
     }
 
     /**
@@ -254,15 +254,16 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskAppId("runJavaType");
         ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
         resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
-        resourceItem1.setResourceAbsolutePathInLocal("opt/share/jar/resource2.jar");
+        resourceItem1
+                .setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar");
 
         ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
         resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
-        resourceItem2.setResourceAbsolutePathInLocal("opt/share/jar/main.jar");
+        resourceItem2.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar");
 
         ResourceContext.ResourceItem resourceItem3 = new ResourceContext.ResourceItem();
         resourceItem3.setResourceAbsolutePathInStorage("/JavaTaskTest.java");
-        resourceItem3.setResourceAbsolutePathInLocal("JavaTaskTest.java");
+        resourceItem3.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/JavaTaskTest.java");
 
         ResourceContext resourceContext = new ResourceContext();
         resourceContext.addResourceItem(resourceItem1);
@@ -286,11 +287,12 @@ public class JavaTaskTest {
         taskExecutionContext.setTaskAppId("runJavaType");
         ResourceContext.ResourceItem resourceItem1 = new ResourceContext.ResourceItem();
         resourceItem1.setResourceAbsolutePathInStorage("/opt/share/jar/resource2.jar");
-        resourceItem1.setResourceAbsolutePathInLocal("opt/share/jar/resource2.jar");
+        resourceItem1
+                .setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar");
 
         ResourceContext.ResourceItem resourceItem2 = new ResourceContext.ResourceItem();
         resourceItem2.setResourceAbsolutePathInStorage("/opt/share/jar/main.jar");
-        resourceItem2.setResourceAbsolutePathInLocal("opt/share/jar/main.jar");
+        resourceItem2.setResourceAbsolutePathInLocal("/tmp/dolphinscheduler/test/executepath/opt/share/jar/main.jar");
 
         ResourceContext resourceContext = new ResourceContext();
         resourceContext.addResourceItem(resourceItem1);

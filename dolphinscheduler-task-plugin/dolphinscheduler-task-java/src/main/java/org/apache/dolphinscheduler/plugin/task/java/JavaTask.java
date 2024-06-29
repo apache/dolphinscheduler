@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
@@ -187,7 +186,6 @@ public class JavaTask extends AbstractTask {
                 .append("java").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
-                .append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
                 .append(mainJarAbsolutePathInLocal).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
