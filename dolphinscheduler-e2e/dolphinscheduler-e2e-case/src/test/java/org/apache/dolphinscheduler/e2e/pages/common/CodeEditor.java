@@ -33,6 +33,7 @@ import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 
 import java.util.List;
 
@@ -59,6 +60,7 @@ public final class CodeEditor {
         this.driver = driver;
     }
 
+    @SneakyThrows
     public CodeEditor content(String content) {
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editor.get(0)));
 
@@ -80,7 +82,6 @@ public final class CodeEditor {
                     .click()
                     .sendKeys(inputContent)
                     .sendKeys(Constants.LINE_SEPARATOR)
-                    .pause(Constants.DEFAULT_SLEEP_SECONDS)
                     .perform();
                 continue;
             } else {
@@ -93,8 +94,8 @@ public final class CodeEditor {
                         .click()
                         .sendKeys(inputContent)
                         .sendKeys(Constants.LINE_SEPARATOR)
-                        .pause(Constants.DEFAULT_SLEEP_SECONDS)
                         .perform();
+                    Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
                 } else {
                     for (int p = 0 ; p < editorLineText.strip().length(); p++) {
                         clearLine(actions, editor.get(i));
@@ -106,15 +107,15 @@ public final class CodeEditor {
                         .click()
                         .sendKeys(inputContent)
                         .sendKeys(Constants.LINE_SEPARATOR)
-                        .pause(Constants.DEFAULT_SLEEP_SECONDS)
                         .perform();
+                    Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
                 }
             } else {
                 actions.moveToElement(editor.get(i))
                     .click()
                     .sendKeys(Constants.LINE_SEPARATOR)
-                    .pause(Constants.DEFAULT_SLEEP_SECONDS)
                     .perform();
+                Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
             }
         }
 
