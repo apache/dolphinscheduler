@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -177,6 +178,8 @@ public abstract class TaskNodeForm {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such resource: " + resourceName))
                 .click();
+
+        parent.driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         return this;
     }
 

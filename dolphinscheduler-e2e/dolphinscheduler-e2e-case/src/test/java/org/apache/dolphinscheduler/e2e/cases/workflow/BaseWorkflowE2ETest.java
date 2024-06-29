@@ -17,28 +17,25 @@
 
 package org.apache.dolphinscheduler.e2e.cases.workflow;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
-import org.apache.dolphinscheduler.e2e.models.tenant.DefaultTenant;
+import org.apache.dolphinscheduler.e2e.models.environment.PythonEnvironment;
 import org.apache.dolphinscheduler.e2e.models.users.AdminUser;
-import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
-import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
+import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
-import org.junit.jupiter.api.AfterAll;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,6 +45,8 @@ import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 public abstract class BaseWorkflowE2ETest {
 
     protected static final String projectName = UUID.randomUUID().toString();
+
+    protected static final PythonEnvironment pythonEnvironment = new PythonEnvironment();
 
     protected static final AdminUser adminUser = new AdminUser();
 
@@ -69,6 +68,14 @@ public abstract class BaseWorkflowE2ETest {
                     .goToTab(UserPage.class)
                     .update(adminUser);
         }
+        tenantPage
+            .goToNav(SecurityPage.class)
+            .goToTab(EnvironmentPage.class)
+            .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
+                pythonEnvironment.getEnvironmentConfig(),
+                pythonEnvironment.getEnvironmentDesc(),
+                pythonEnvironment.getEnvironmentWorkerGroup());
+
         tenantPage
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(projectName);

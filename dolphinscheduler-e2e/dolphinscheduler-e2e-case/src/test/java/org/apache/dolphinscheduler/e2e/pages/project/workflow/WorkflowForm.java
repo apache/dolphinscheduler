@@ -21,6 +21,7 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
@@ -77,6 +78,7 @@ public final class WorkflowForm {
         final String dragAndDrop = String.join("\n",
                 Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
         js.executeScript(dragAndDrop, task, canvas);
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Current node settings')]")));
 
         switch (type) {
             case SHELL:
@@ -89,6 +91,8 @@ public final class WorkflowForm {
                 return (T) new HttpTaskForm(this);
             case JAVA:
                 return (T) new JavaTaskForm(this);
+            case PYTHON:
+                return (T) new PythonTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -126,5 +130,6 @@ public final class WorkflowForm {
         SWITCH,
         HTTP,
         JAVA,
+        PYTHON
     }
 }
