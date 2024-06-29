@@ -45,6 +45,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -142,11 +143,20 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             imageName = DockerImageName.parse("seleniarm/standalone-chromium:124.0-chromedriver-124.0")
                     .asCompatibleSubstituteFor("selenium/standalone-chrome");
 
+            if (!Files.exists(Constants.HOST_CHROME_DOWNLOAD_PATH)) {
+                try {
+                    Files.createDirectories(Constants.HOST_CHROME_DOWNLOAD_PATH);
+                } catch (IOException e) {
+                    LOGGER.error("Failed to create chrome download directory: {}", Constants.HOST_CHROME_DOWNLOAD_PATH);
+                    throw new RuntimeException(e);
+                }
+            }
+
             browser = new BrowserWebDriverContainer<>(imageName)
                     .withCapabilities(new ChromeOptions())
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH, BindMode.READ_WRITE)
                     .withRecordingMode(RECORD_ALL, record.toFile(), MP4)
                     .withStartupTimeout(Duration.ofSeconds(300));
         } else {
@@ -154,7 +164,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                     .withCapabilities(new ChromeOptions())
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH, BindMode.READ_WRITE)
                     .withRecordingMode(RECORD_ALL, record.toFile(), MP4)
                     .withStartupTimeout(Duration.ofSeconds(300));
         }
