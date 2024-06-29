@@ -138,7 +138,7 @@ jobs:
           java-version: 11
           distribution: 'adopt'
       - name: Collect Workflow Telemetry
-        uses: catchpoint/workflow-telemetry-action@v2
+        uses: ./.github/actions/workflow-telemetry-action
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
