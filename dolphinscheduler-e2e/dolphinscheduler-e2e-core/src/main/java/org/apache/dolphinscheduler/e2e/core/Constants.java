@@ -40,4 +40,6 @@ public final class Constants {
     public static final String SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH = "/home/seluser/Downloads";
 
     public static final String LINE_SEPARATOR = "\n";
+
+    public static final long DEFAULT_SLEEP_SECONDS = 500;
 }
