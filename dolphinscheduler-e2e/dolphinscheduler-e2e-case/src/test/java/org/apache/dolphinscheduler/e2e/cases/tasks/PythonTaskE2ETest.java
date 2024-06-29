@@ -40,7 +40,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
     @Order(10)
-    void testRunShellTasks_SuccessCase() {
+    void testRunPythonTasks_SuccessCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
@@ -162,7 +162,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
     @Order(40)
-    void testRunShellTasks_GlobalParamsOverrideLocalParamsCase() {
+    void testRunPythonTasks_GlobalParamsOverrideLocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
@@ -205,7 +205,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
     @Order(50)
-    void testRunShellTasks_UsingResourceFile() {
+    void testRunPythonTasks_UsingResourceFile() {
         long current_timestamp = new Date().getTime();
         String testFileName = String.format("echo_%s", current_timestamp);
         new ResourcePage(browser)
@@ -261,7 +261,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
     @Order(60)
-    void testRunShellTasks_FailedCase() {
+    void testRunPythonTasks_FailedCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
             new ProjectPage(browser)
                 .goToNav(ProjectPage.class)

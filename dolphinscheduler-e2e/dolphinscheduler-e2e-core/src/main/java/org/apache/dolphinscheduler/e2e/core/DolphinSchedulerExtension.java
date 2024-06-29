@@ -105,8 +105,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         driver = new RemoteWebDriver(browser.getSeleniumAddress(), chromeOptions);
 
         driver.manage().timeouts()
-              .implicitlyWait(Duration.ofSeconds(10))
-              .pageLoadTimeout(Duration.ofSeconds(10));
+              .implicitlyWait(Duration.ofSeconds(1))
+              .pageLoadTimeout(Duration.ofSeconds(5));
         driver.manage().window()
               .maximize();
 

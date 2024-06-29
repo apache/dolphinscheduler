@@ -81,7 +81,6 @@ public final class CodeEditor {
                     .click()
                     .sendKeys(inputContent)
                     .sendKeys(Constants.LINE_SEPARATOR)
-                    .pause(Constants.DEFAULT_SLEEP_SECONDS)
                     .perform();
                 continue;
             } else {
@@ -94,7 +93,6 @@ public final class CodeEditor {
                         .click()
                         .sendKeys(inputContent)
                         .sendKeys(Constants.LINE_SEPARATOR)
-                        .pause(Constants.DEFAULT_SLEEP_SECONDS)
                         .perform();
                 } else {
                     for (int p = 0 ; p < editorLineText.strip().length(); p++) {
@@ -107,14 +105,12 @@ public final class CodeEditor {
                         .click()
                         .sendKeys(inputContent)
                         .sendKeys(Constants.LINE_SEPARATOR)
-                        .pause(Constants.DEFAULT_SLEEP_SECONDS)
                         .perform();
                 }
             } else {
                 actions.moveToElement(editor.get(i))
                     .click()
                     .sendKeys(Constants.LINE_SEPARATOR)
-                    .pause(Constants.DEFAULT_SLEEP_SECONDS)
                     .perform();
             }
         }

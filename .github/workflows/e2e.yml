@@ -139,6 +139,8 @@ jobs:
           distribution: 'adopt'
       - name: Collect Workflow Telemetry
         uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
