@@ -97,8 +97,11 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             browser.withAccessToHost(true);
         }
         browser.start();
-
-        driver = new RemoteWebDriver(browser.getSeleniumAddress(), new ChromeOptions());
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--allow-running-insecure-content");
+        chromeOptions.addArguments(String.format("--unsafely-treat-insecure-origin-as-secure=http://%s:%s",
+            address.getHost(), address.getPort()));
+        driver = new RemoteWebDriver(browser.getSeleniumAddress(), chromeOptions);
 
         driver.manage().timeouts()
               .implicitlyWait(Duration.ofSeconds(10))
