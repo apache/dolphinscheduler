@@ -127,6 +127,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
           - name: ShellTaskE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.tasks.ShellTaskE2ETest
+          - name: PythonTaskE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.tasks.PythonTaskE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
