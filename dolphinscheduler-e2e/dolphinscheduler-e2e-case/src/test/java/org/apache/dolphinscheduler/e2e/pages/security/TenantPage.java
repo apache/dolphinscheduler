@@ -19,14 +19,15 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
-import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
 import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -36,13 +37,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
-import lombok.Getter;
-import org.openqa.selenium.support.pagefactory.ByChained;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-
 @Getter
 public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
+
     @FindBy(className = "btn-create-tenant")
     private WebElement buttonCreateTenant;
 
@@ -132,6 +129,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     @Getter
     public class TenantForm {
+
         TenantForm() {
             PageFactory.initElements(driver, this);
         }
@@ -160,6 +158,7 @@ public final class TenantPage extends NavBarPage implements SecurityPage.Tab {
 
     @RequiredArgsConstructor
     public static class Row {
+
         private final WebElement row;
 
         public String tenantCode() {

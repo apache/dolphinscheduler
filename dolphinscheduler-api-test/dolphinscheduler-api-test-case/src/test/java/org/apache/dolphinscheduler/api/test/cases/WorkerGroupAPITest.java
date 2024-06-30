@@ -33,13 +33,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
@@ -59,7 +59,8 @@ public class WorkerGroupAPITest {
     public static void setup() {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(username, password);
-        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
+        sessionId =
+                JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         workerGroupPage = new WorkerGroupPage(sessionId);
         loginUser = new User();
         loginUser.setId(123);
@@ -75,7 +76,7 @@ public class WorkerGroupAPITest {
     @Order(1)
     public void testSaveWorkerGroup() {
         HttpResponse saveWorkerGroupHttpResponse = workerGroupPage
-            .saveWorkerGroup(loginUser, 1, "test_worker_group", "10.5.0.5:1234", "test", null);
+                .saveWorkerGroup(loginUser, 1, "test_worker_group", "10.5.0.5:1234", "test", null);
         Assertions.assertTrue(saveWorkerGroupHttpResponse.getBody().getSuccess());
 
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
@@ -88,9 +89,10 @@ public class WorkerGroupAPITest {
     @Test
     @Order(2)
     public void testQueryAllWorkerGroupsPaging() {
-        HttpResponse queryAllWorkerGroupsPagingResponse = workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 2, null);
+        HttpResponse queryAllWorkerGroupsPagingResponse =
+                workerGroupPage.queryAllWorkerGroupsPaging(loginUser, 1, 2, null);
         Assertions.assertTrue(queryAllWorkerGroupsPagingResponse.getBody().getSuccess());
-        String workerGroupPageInfoData =  queryAllWorkerGroupsPagingResponse.getBody().getData().toString();
+        String workerGroupPageInfoData = queryAllWorkerGroupsPagingResponse.getBody().getData().toString();
         Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
     }
 
@@ -100,7 +102,7 @@ public class WorkerGroupAPITest {
         HttpResponse queryAllWorkerGroupsResponse = workerGroupPage.queryAllWorkerGroups(loginUser);
         Assertions.assertTrue(queryAllWorkerGroupsResponse.getBody().getSuccess());
 
-        String workerGroupPageInfoData =  queryAllWorkerGroupsResponse.getBody().getData().toString();
+        String workerGroupPageInfoData = queryAllWorkerGroupsResponse.getBody().getData().toString();
         Assertions.assertTrue(workerGroupPageInfoData.contains("test_worker_group"));
     }
 

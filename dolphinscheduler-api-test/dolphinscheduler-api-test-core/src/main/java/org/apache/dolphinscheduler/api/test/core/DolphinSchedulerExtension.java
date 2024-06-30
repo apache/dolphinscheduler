@@ -24,22 +24,21 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.slf4j.Logger;
 import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback {
+
     private final boolean localMode = Objects.equals(System.getProperty("local"), "true");
 
     private final String serviceName = "dolphinscheduler_1";
@@ -78,7 +77,8 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                 .withPull(true)
                 .withTailChildContainers(true)
                 .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
-                .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
+                .waitingFor(serviceName, Wait.forHealthcheck()
+                        .withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
 
         return compose;
     }

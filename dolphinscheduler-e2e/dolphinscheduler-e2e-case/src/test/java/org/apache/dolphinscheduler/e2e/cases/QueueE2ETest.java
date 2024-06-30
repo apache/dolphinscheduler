@@ -19,7 +19,6 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
@@ -27,13 +26,13 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.QueuePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class QueueE2ETest {
@@ -50,8 +49,7 @@ class QueueE2ETest {
         new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
-                .goToTab(QueuePage.class)
-        ;
+                .goToTab(QueuePage.class);
     }
 
     @Test
@@ -75,10 +73,8 @@ class QueueE2ETest {
         final QueuePage page = new QueuePage(browser);
         page.create(queueName, queueValue);
 
-        Awaitility.await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
-        );
+        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists"));
 
         page.createQueueForm().buttonCancel().click();
     }

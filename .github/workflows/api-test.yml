@@ -125,7 +125,7 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
-            -Dspotless.skip=false \
+            -Dspotless.skip=true \
             -Dtest=${{ matrix.case.class }} test
       - uses: actions/upload-artifact@v4
         if: always()

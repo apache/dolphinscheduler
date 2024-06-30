@@ -22,9 +22,11 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
+
 import org.openqa.selenium.WebDriver;
 
-public class JavaTaskForm extends TaskNodeForm{
+public class JavaTaskForm extends TaskNodeForm {
+
     private CodeEditor codeEditor;
 
     private WebDriver driver;

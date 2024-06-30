@@ -17,9 +17,10 @@
 
 package org.apache.dolphinscheduler.e2e.models.users;
 
-import lombok.Data;
 import org.apache.dolphinscheduler.e2e.models.tenant.BootstrapTenant;
 import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
+
+import lombok.Data;
 
 @Data
 public class AdminUser implements IUser {

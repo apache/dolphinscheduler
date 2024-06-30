@@ -26,16 +26,17 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 class TenantE2ETest {
+
     private static final String tenant = System.getProperty("user.name");
     private static final String editDescription = "This is a test";
 
@@ -44,10 +45,9 @@ class TenantE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(SecurityPage.class)
-            .goToTab(TenantPage.class)
-        ;
+                .login("admin", "dolphinscheduler123")
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class);
     }
 
     @Test
@@ -57,9 +57,9 @@ class TenantE2ETest {
         page.create(tenant);
 
         Awaitility.await().untilAsserted(() -> assertThat(page.tenantList())
-            .as("Tenant list should contain newly-created tenant")
-            .extracting(WebElement::getText)
-            .anyMatch(it -> it.contains(tenant)));
+                .as("Tenant list should contain newly-created tenant")
+                .extracting(WebElement::getText)
+                .anyMatch(it -> it.contains(tenant)));
     }
 
     @Test
@@ -69,10 +69,8 @@ class TenantE2ETest {
 
         page.create(tenant);
 
-        Awaitility.await().untilAsserted(() ->
-            assertThat(browser.findElement(By.tagName("body")).getText())
-                .contains("already exists")
-        );
+        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists"));
 
         page.tenantForm().buttonCancel().click();
     }
@@ -87,9 +85,9 @@ class TenantE2ETest {
         Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
             assertThat(page.tenantList())
-                .as("Tenant list should contain newly-modified tenant")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(tenant));
+                    .as("Tenant list should contain newly-modified tenant")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(tenant));
         });
     }
 
@@ -103,10 +101,8 @@ class TenantE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                page.tenantList()
-            ).noneMatch(
-                it -> it.getText().contains(tenant)
-            );
+                    page.tenantList()).noneMatch(
+                            it -> it.getText().contains(tenant));
         });
     }
 }

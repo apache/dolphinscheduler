@@ -19,22 +19,23 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project;
 
-import lombok.SneakyThrows;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 
+import lombok.Getter;
+import lombok.SneakyThrows;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
-
-import lombok.Getter;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class ProjectDetailPage extends NavBarPage {
+
     @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
     private WebElement menuProcessDefinition;
 
@@ -52,12 +53,14 @@ public final class ProjectDetailPage extends NavBarPage {
     public <T extends Tab> T goToTab(Class<T> tab) {
         if (tab == WorkflowDefinitionTab.class) {
             menuProcessDefinition().click();
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/workflow-definition"));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.urlContains("/workflow-definition"));
             return tab.cast(new WorkflowDefinitionTab(driver));
         }
         if (tab == WorkflowInstanceTab.class) {
             menuProcessInstances().click();
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/workflow/instances"));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.urlContains("/workflow/instances"));
             return tab.cast(new WorkflowInstanceTab(driver));
         }
         if (tab == TaskInstanceTab.class) {

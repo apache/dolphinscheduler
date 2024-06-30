@@ -19,10 +19,15 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage.NavBarItem;
 
 import java.util.List;
+
+import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -31,15 +36,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import lombok.Getter;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @Getter
 public final class ProjectPage extends NavBarPage implements NavBarItem {
+
     @FindBy(className = "btn-create-project")
     private WebElement buttonCreateProject;
 
@@ -77,7 +77,6 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         return this;
     }
 
-
     public ProjectPage delete(String project) {
         projectList()
                 .stream()
@@ -104,6 +103,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     @Getter
     public class CreateProjectForm {
+
         CreateProjectForm() {
             PageFactory.initElements(driver, this);
         }

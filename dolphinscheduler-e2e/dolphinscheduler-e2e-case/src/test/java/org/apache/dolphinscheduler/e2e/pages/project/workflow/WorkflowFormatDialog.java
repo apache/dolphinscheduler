@@ -19,22 +19,19 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import java.util.List;
+
 import lombok.Getter;
-import org.openqa.selenium.By;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.ByChained;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @Getter
 public final class WorkflowFormatDialog {
+
     private final WebDriver driver;
     private final WorkflowForm parent;
 

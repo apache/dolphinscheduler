@@ -35,13 +35,13 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 @Slf4j
@@ -67,12 +67,12 @@ public class SchedulerAPITest {
 
     private static int scheduleId;
 
-
     @BeforeAll
     public static void setup() {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(username, password);
-        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
+        sessionId =
+                JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         projectPage = new ProjectPage(sessionId);
         schedulerPage = new SchedulerPage(sessionId);
         processDefinitionPage = new ProcessDefinitionPage(sessionId);
@@ -94,17 +94,24 @@ public class SchedulerAPITest {
         HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
         Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
 
-        projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData()).get(0)).get("code");
+        projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
+                .getBody().getData()).get(0)).get("code");
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
         processDefinitionPage.importProcessDefinition(loginUser, projectCode, file);
-        HttpResponse queryAllProcessDefinitionByProjectCodeResponse = processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
+        HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
+                processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
         Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-        processDefinitionCode = (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse.getBody().getData()).get(0)).get("processDefinition")).get("code");
+        processDefinitionCode =
+                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
+                        .getBody().getData()).get(0)).get("processDefinition")).get("code");
 
-        processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode, ReleaseState.ONLINE);
-        final String schedule = "{\"startTime\":\"2019-08-08 00:00:00\",\"endTime\":\"2100-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}" ;
-        HttpResponse createScheduleResponse = schedulerPage.createSchedule(loginUser, projectCode, processDefinitionCode, schedule);
+        processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode,
+                ReleaseState.ONLINE);
+        final String schedule =
+                "{\"startTime\":\"2019-08-08 00:00:00\",\"endTime\":\"2100-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
+        HttpResponse createScheduleResponse =
+                schedulerPage.createSchedule(loginUser, projectCode, processDefinitionCode, schedule);
         Assertions.assertTrue(createScheduleResponse.getBody().getSuccess());
         Assertions.assertTrue(createScheduleResponse.getBody().getData().toString().contains("2019-08-08"));
     }
@@ -115,13 +122,15 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("2019-08-08"));
-        scheduleId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryScheduleListResponse.getBody().getData()).get(0)).get("id");
+        scheduleId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryScheduleListResponse.getBody()
+                .getData()).get(0)).get("id");
     }
 
     @Test
     @Order(3)
     public void testPublishScheduleOnline() {
-        HttpResponse publishScheduleOnlineResponse = schedulerPage.publishScheduleOnline(loginUser, projectCode, scheduleId);
+        HttpResponse publishScheduleOnlineResponse =
+                schedulerPage.publishScheduleOnline(loginUser, projectCode, scheduleId);
         Assertions.assertTrue(publishScheduleOnlineResponse.getBody().getSuccess());
 
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
@@ -137,14 +146,17 @@ public class SchedulerAPITest {
 
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
-        Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("releaseState=OFFLINE"));
+        Assertions
+                .assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("releaseState=OFFLINE"));
     }
 
     @Test
     @Order(5)
     public void testUpdateSchedule() {
-        final String schedule = "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
-        HttpResponse updateScheduleResponse = schedulerPage.updateSchedule(loginUser, projectCode, scheduleId, schedule);
+        final String schedule =
+                "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
+        HttpResponse updateScheduleResponse =
+                schedulerPage.updateSchedule(loginUser, projectCode, scheduleId, schedule);
         Assertions.assertTrue(updateScheduleResponse.getBody().getSuccess());
 
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
@@ -163,5 +175,3 @@ public class SchedulerAPITest {
         Assertions.assertFalse(queryScheduleListResponse.getBody().getData().toString().contains("1996-08-08"));
     }
 }
-
-

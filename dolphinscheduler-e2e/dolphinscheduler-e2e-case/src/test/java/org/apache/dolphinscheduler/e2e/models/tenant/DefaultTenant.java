@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.models.tenant;
 
 public class DefaultTenant implements ITenant {
+
     @Override
     public String getTenantCode() {
         return "default";

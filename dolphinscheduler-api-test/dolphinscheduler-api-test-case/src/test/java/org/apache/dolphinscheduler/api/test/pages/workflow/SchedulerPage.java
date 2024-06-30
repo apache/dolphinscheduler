@@ -30,7 +30,6 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @AllArgsConstructor
 public class SchedulerPage {
@@ -62,7 +61,6 @@ public class SchedulerPage {
         String url = String.format("/projects/%s/schedules/list", projectCode);
         return requestClient.post(url, headers, params);
     }
-
 
     public HttpResponse publishScheduleOnline(User loginUser, long projectCode, int scheduleId) {
         Map<String, Object> params = new HashMap<>();
