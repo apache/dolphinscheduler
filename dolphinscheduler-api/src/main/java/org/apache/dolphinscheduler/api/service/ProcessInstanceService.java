@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 
 import java.io.IOException;
 import java.util.List;
@@ -121,8 +120,6 @@ public interface ProcessInstanceService {
     Map<String, Object> queryTaskListByProcessId(User loginUser,
                                                  long projectCode,
                                                  Integer processId) throws IOException;
-
-    Map<String, DependResult> parseLogForDependentResult(String log) throws IOException;
 
     /**
      * query sub process instance detail info by task id
