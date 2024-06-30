@@ -22,7 +22,7 @@ package org.apache.dolphinscheduler.e2e.pages.resource;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
-import java.time.Duration;
+import lombok.Getter;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
@@ -30,13 +30,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import lombok.Getter;
-
 
 @Getter
 public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
+
     @FindBy(css = ".tab-vertical > .n-menu-item:nth-child(1) > .n-menu-item-content")
     private WebElement fileManageTab;
 
@@ -49,7 +46,8 @@ public class ResourcePage extends NavBarPage implements NavBarPage.NavBarItem {
     public <T extends ResourcePage.Tab> T goToTab(Class<T> tab) {
         if (tab == FileManagePage.class) {
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource"));
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(fileManageTab));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.elementToBeClickable(fileManageTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", fileManageTab());
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/file-manage"));
             return tab.cast(new FileManagePage(driver));

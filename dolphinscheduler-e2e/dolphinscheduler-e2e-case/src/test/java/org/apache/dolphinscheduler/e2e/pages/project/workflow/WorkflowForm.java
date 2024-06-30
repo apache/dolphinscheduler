@@ -21,15 +21,16 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
+import lombok.Getter;
+import lombok.SneakyThrows;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -38,17 +39,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import com.google.common.io.Resources;
-
-import lombok.Getter;
-import lombok.SneakyThrows;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @SuppressWarnings("UnstableApiUsage")
 @Getter
 public final class WorkflowForm {
+
     private WebDriver driver;
     private final WorkflowSaveDialog saveForm;
     private final WorkflowFormatDialog formatDialog;
@@ -95,7 +93,8 @@ public final class WorkflowForm {
 
     public WebElement getTask(String taskName) {
         List<WebElement> tasks = WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
+                .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
+                        By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
 
         WebElement task = tasks.stream()
                 .filter(t -> t.getText().contains(taskName))
@@ -110,7 +109,8 @@ public final class WorkflowForm {
 
     public WorkflowSaveDialog submit() {
         buttonSave().click();
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'Basic Information')]")));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'Basic Information')]")));
         return new WorkflowSaveDialog(this);
     }
 

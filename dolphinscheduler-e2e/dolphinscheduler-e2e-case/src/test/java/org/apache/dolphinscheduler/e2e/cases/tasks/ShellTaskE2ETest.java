@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.e2e.cases.tasks;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
@@ -27,14 +29,9 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTa
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
-import org.junit.FixMethodOrder;
-import org.junit.jupiter.api.Order;
+
 import org.junit.jupiter.api.Test;
 import org.junit.runners.MethodSorters;
-import org.openqa.selenium.WebElement;
-import org.testcontainers.shaded.org.awaitility.Awaitility;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
