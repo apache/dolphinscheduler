@@ -22,6 +22,7 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
