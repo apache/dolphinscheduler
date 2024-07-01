@@ -52,9 +52,7 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     })
     private WebElement buttonConfirm;
 
-    @FindBys({
-            @FindBy(className = "dialog-source-modal"),
-    })
+    @FindBy(className = "dialog-source-modal")
     private WebElement dataSourceModal;
 
     private final CreateDataSourceForm createDataSourceForm;
@@ -70,10 +68,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
                                            String jdbcParams) {
         buttonCreateDataSource().click();
 
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("dialog-source-modal")));
-
-        dataSourceModal().findElement(By.className(dataSourceType.toUpperCase() + "-box")).click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOf(dataSourceModal));
+        WebElement dataSourceTypeButton = By.className(dataSourceType.toUpperCase() + "-box").findElement(driver);
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(dataSourceTypeButton));
+        dataSourceTypeButton.click();
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElement(
                 driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
