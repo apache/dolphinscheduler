@@ -18,108 +18,70 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.LIST_WORKERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ZOOKEEPER_STATE_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
-import java.util.Map;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * monitor controller
  */
-@Api(tags = "MONITOR_TAG")
+@Tag(name = "MONITOR_TAG")
 @RestController
 @RequestMapping("/monitor")
 public class MonitorController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(MonitorController.class);
 
     @Autowired
     private MonitorService monitorService;
 
     /**
-     * master list
+     * server list
      *
-     * @param loginUser login user
-     * @return master list
+     * @return server list
      */
-    @ApiOperation(value = "listMaster", notes = "MASTER_LIST_NOTES")
-    @GetMapping(value = "/master/list")
+    @Operation(summary = "listServer", description = "SERVER_LIST_NOTES")
+    @GetMapping(value = "/{nodeType}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_MASTERS_ERROR)
-    public Result listMaster(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query all master", loginUser.getUserName());
-        logger.info("list master, user:{}", loginUser.getUserName());
-        Map<String, Object> result = monitorService.queryMaster(loginUser);
-        return returnDataList(result);
-    }
-
-    /**
-     * worker list
-     *
-     * @param loginUser login user
-     * @return worker information list
-     */
-    @ApiOperation(value = "listWorker", notes = "WORKER_LIST_NOTES")
-    @GetMapping(value = "/worker/list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(LIST_WORKERS_ERROR)
-    public Result listWorker(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query all workers", loginUser.getUserName());
-        Map<String, Object> result = monitorService.queryWorker(loginUser);
-        return returnDataList(result);
+    public Result<List<Server>> listServer(@PathVariable("nodeType") RegistryNodeType nodeType) {
+        List<Server> servers = monitorService.listServer(nodeType);
+        return Result.success(servers);
     }
 
     /**
      * query database state
      *
      * @param loginUser login user
-     * @return data base state
+     * @return database state
      */
-    @ApiOperation(value = "queryDatabaseState", notes = "QUERY_DATABASE_STATE_NOTES")
-    @GetMapping(value = "/database")
+    @Operation(summary = "queryDatabaseState", description = "QUERY_DATABASE_STATE_NOTES")
+    @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DATABASE_STATE_ERROR)
-    public Result queryDatabaseState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query database state", loginUser.getUserName());
-        Map<String, Object> result = monitorService.queryDatabaseState(loginUser);
-        return returnDataList(result);
-    }
-
-    /**
-     * query zookeeper state
-     *
-     * @param loginUser login user
-     * @return zookeeper information list
-     */
-    @ApiOperation(value = "queryZookeeperState", notes = "QUERY_ZOOKEEPER_STATE_NOTES")
-    @GetMapping(value = "/zookeeper/list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ZOOKEEPER_STATE_ERROR)
-    public Result queryZookeeperState(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user: {}, query zookeeper state", loginUser.getUserName());
-        Map<String, Object> result = monitorService.queryZookeeperState(loginUser);
-        return returnDataList(result);
+    public Result<List<DatabaseMetrics>> queryDatabaseState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<DatabaseMetrics> databaseMetrics = monitorService.queryDatabaseState(loginUser);
+        return Result.success(databaseMetrics);
     }
 
 }

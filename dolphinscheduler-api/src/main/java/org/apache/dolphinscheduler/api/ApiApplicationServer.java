@@ -17,21 +17,50 @@
 
 package org.apache.dolphinscheduler.api;
 
+import org.apache.dolphinscheduler.api.metrics.ApiServerMetrics;
+import org.apache.dolphinscheduler.common.CommonConfiguration;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
+import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.dao.PluginDao;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
+import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
+import org.apache.dolphinscheduler.service.ServiceConfiguration;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 
-@SpringBootApplication
+@Slf4j
+@Import({DaoConfiguration.class,
+        CommonConfiguration.class,
+        ServiceConfiguration.class,
+        StorageConfiguration.class,
+        RegistryConfiguration.class})
 @ServletComponentScan
-@ComponentScan(value = "org.apache.dolphinscheduler",
-        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.apache.dolphinscheduler.server.*"))
-public class ApiApplicationServer extends SpringBootServletInitializer {
+@SpringBootApplication
+public class ApiApplicationServer {
+
+    @Autowired
+    private PluginDao pluginDao;
 
     public static void main(String[] args) {
-        SpringApplication.run(ApiApplicationServer.class, args);
+        ApiServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
+        SpringApplication.run(ApiApplicationServer.class);
     }
 
+    @EventListener
+    public void run(ApplicationReadyEvent readyEvent) {
+        log.info("Received spring application context ready event will load taskPlugin and write to DB");
+        DataSourceProcessorProvider.initialize();
+        TaskPluginManager.loadTaskPlugin();
+    }
 }

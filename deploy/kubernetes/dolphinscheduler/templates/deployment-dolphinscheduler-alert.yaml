@@ -1,0 +1,139 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+{{- if and .Values.alert.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dolphinscheduler.fullname" . }}-alert
+  labels:
+    {{- include "dolphinscheduler.alert.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.alert.replicas }}
+  selector:
+    matchLabels:
+      {{- include "dolphinscheduler.alert.labels" . | nindent 6 }}
+  strategy:
+    type: {{ .Values.alert.strategy.type | quote }}
+    rollingUpdate:
+      maxSurge: {{ .Values.alert.strategy.rollingUpdate.maxSurge | quote }}
+      maxUnavailable: {{ .Values.alert.strategy.rollingUpdate.maxUnavailable | quote }}
+  template:
+    metadata:
+      labels:
+        {{- include "dolphinscheduler.alert.labels" . | nindent 8 }}
+      {{- if or .Values.alert.annotations .Values.conf.auto }}
+      annotations:
+        {{- if .Values.conf.auto }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- end }}
+        {{- if .Values.alert.annotations }}
+        {{- toYaml .Values.alert.annotations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{ template "dolphinscheduler.fullname" . }}
+      {{- if .Values.alert.affinity }}
+      affinity:
+        {{- toYaml .Values.alert.affinity | nindent 8 }}
+      {{- end }}
+      {{- if .Values.alert.nodeSelector }}
+      nodeSelector:
+        {{- toYaml .Values.alert.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- if .Values.alert.tolerations }}
+      tolerations:
+        {{- toYaml .Values.alert.tolerations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.image.pullSecret }}
+      {{- end }}
+      containers:
+        - name: {{ include "dolphinscheduler.fullname" . }}-alert
+          image: {{ include "dolphinscheduler.image.fullname.alert" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 50052
+              name: "alert-port"
+            - containerPort: 50053
+              name: "actuator-port"
+          env:
+            - name: TZ
+              value: {{ .Values.timezone }}
+            - name: SPRING_JACKSON_TIME_ZONE
+              value: {{ .Values.timezone }}
+            {{- include "dolphinscheduler.database.env_vars" . | nindent 12 }}
+            {{- include "dolphinscheduler.registry.env_vars" . | nindent 12 }}
+            {{ range $key, $value :=  .Values.alert.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{ end }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "dolphinscheduler.fullname" . }}-common
+          {{- if .Values.alert.resources }}
+          resources:
+            {{- toYaml .Values.alert.resources | nindent 12 }}
+          {{- end }}
+          {{- if .Values.alert.livenessProbe.enabled }}
+          livenessProbe:
+            exec:
+              command: ["curl", "-s", "http://localhost:50053/actuator/health/liveness"]
+            initialDelaySeconds: {{ .Values.alert.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.alert.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.alert.livenessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.alert.livenessProbe.successThreshold }}
+            failureThreshold: {{ .Values.alert.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.alert.readinessProbe.enabled }}
+          readinessProbe:
+            exec:
+              command: ["curl", "-s", "http://localhost:50053/actuator/health/readiness"]
+            initialDelaySeconds: {{ .Values.alert.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.alert.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.alert.readinessProbe.timeoutSeconds }}
+            successThreshold: {{ .Values.alert.readinessProbe.successThreshold }}
+            failureThreshold: {{ .Values.alert.readinessProbe.failureThreshold }}
+          {{- end }}
+          volumeMounts:
+            - mountPath: "/opt/dolphinscheduler/logs"
+              name: {{ include "dolphinscheduler.fullname" . }}-alert
+            - name: config-volume
+              mountPath: /opt/dolphinscheduler/conf/common.properties
+              subPath: common.properties
+            {{- if .Values.alert.enableCustomizedConfig }}
+            - name: alert-config-volume
+              mountPath: /opt/dolphinscheduler/conf/application.yaml
+              subPath: application.yaml
+            {{- end }}
+      volumes:
+        - name: {{ include "dolphinscheduler.fullname" . }}-alert
+          {{- if .Values.alert.persistentVolumeClaim.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "dolphinscheduler.fullname" . }}-alert
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        - name: config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-configs
+        {{- if .Values.alert.enableCustomizedConfig }}
+        - name: alert-config-volume
+          configMap:
+            name: {{ include "dolphinscheduler.fullname" . }}-alert
+        {{- end }}
+{{- end }}

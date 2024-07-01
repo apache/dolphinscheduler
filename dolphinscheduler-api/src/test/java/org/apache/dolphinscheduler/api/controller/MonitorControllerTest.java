@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -41,70 +41,67 @@ public class MonitorControllerTest extends AbstractControllerTest {
 
     @Test
     public void testListMaster() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/master/list")
-            .header(SESSION_ID, sessionId)
-           /* .param("type", ResourceType.FILE.name())*/   )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/MASTER")
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
-
 
     @Test
     public void testListWorker() throws Exception {
 
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/worker/list")
-            .header(SESSION_ID, sessionId)
-           /* .param("type", ResourceType.FILE.name())*/   )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/WORKER")
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
+    @Test
+    public void testListAlert() throws Exception {
+
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/ALERT_SERVER")
+                .header(SESSION_ID, sessionId)
+        /* .param("type", ResourceType.FILE.name()) */)
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        result.getCode().equals(Status.SUCCESS.getCode());
+
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
 
     @Test
     public void testQueryDatabaseState() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/database")
-            .header(SESSION_ID, sessionId)
-            /* .param("type", ResourceType.FILE.name())*/   )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
+        MvcResult mvcResult = mockMvc.perform(get("/monitor/databases")
+                .header(SESSION_ID, sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         result.getCode().equals(Status.SUCCESS.getCode());
 
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-
-    @Test
-    public void testQueryZookeeperState() throws Exception {
-        MvcResult mvcResult = mockMvc.perform(get("/monitor/zookeeper/list")
-            .header(SESSION_ID, sessionId)
-            /* .param("type", ResourceType.FILE.name())*/   )
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-            .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        result.getCode().equals(Status.SUCCESS.getCode());
-
-        Assert.assertEquals(Status.SUCCESS.getCode(),result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
 }

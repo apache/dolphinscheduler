@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * alert group service
@@ -29,9 +31,27 @@ public interface AlertGroupService {
     /**
      * query alert group list
      *
+     * @param loginUser
      * @return alert group list
      */
-    Map<String, Object> queryAlertgroup();
+    List<AlertGroup> queryAllAlertGroup(User loginUser);
+
+    /**
+     * query normal alert group list
+     *
+     * @param loginUser
+     * @return alert group list which is is not 2
+     */
+    List<AlertGroup> queryNormalAlertGroups(User loginUser);
+
+    /**
+     * query alert group by id
+     *
+     * @param loginUser login user
+     * @param id alert group id
+     * @return one alert group
+     */
+    AlertGroup queryAlertGroupById(User loginUser, Integer id);
 
     /**
      * paging query alarm group list
@@ -42,7 +62,7 @@ public interface AlertGroupService {
      * @param pageSize page size
      * @return alert group list page
      */
-    Map<String, Object> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    PageInfo<AlertGroup> listPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * create alert group
@@ -51,9 +71,9 @@ public interface AlertGroupService {
      * @param groupName group name
      * @param desc description
      * @param alertInstanceIds alertInstanceIds
-     * @return create result code
+     * @return alertGroup
      */
-    Map<String, Object> createAlertgroup(User loginUser, String groupName, String desc, String alertInstanceIds);
+    AlertGroup createAlertGroup(User loginUser, String groupName, String desc, String alertInstanceIds);
 
     /**
      * updateProcessInstance alert group
@@ -65,7 +85,7 @@ public interface AlertGroupService {
      * @param alertInstanceIds alertInstanceIds
      * @return update result code
      */
-    Map<String, Object> updateAlertgroup(User loginUser, int id, String groupName, String desc, String alertInstanceIds);
+    AlertGroup updateAlertGroupById(User loginUser, int id, String groupName, String desc, String alertInstanceIds);
 
     /**
      * delete alert group by id
@@ -74,7 +94,7 @@ public interface AlertGroupService {
      * @param id alert group id
      * @return delete result code
      */
-    Map<String, Object> delAlertgroupById(User loginUser, int id);
+    void deleteAlertGroupById(User loginUser, int id);
 
     /**
      * verify group name exists

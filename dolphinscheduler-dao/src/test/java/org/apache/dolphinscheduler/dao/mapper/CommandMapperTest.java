@@ -14,57 +14,70 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.Constants;
+import static com.google.common.truth.Truth.assertThat;
+
+import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.common.enums.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 /**
- *  command mapper test
+ * command mapper test
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class CommandMapperTest {
-
+public class CommandMapperTest extends BaseDaoTest {
 
     @Autowired
-    CommandMapper commandMapper;
+    private CommandMapper commandMapper;
 
     @Autowired
-    ProcessDefinitionMapper processDefinitionMapper;
-
+    private ProcessDefinitionMapper processDefinitionMapper;
 
     /**
      * test insert
      */
     @Test
-    public void testInsert(){
+    public void testInsert() {
         Command command = createCommand();
-        assertThat(command.getId(),greaterThan(0));
+        Assertions.assertTrue(command.getId() > 0);
     }
 
+    @Test
+    public void testQueryCommandPageByIds() {
+        Command expectedCommand = createCommand();
+        Page<Command> page = new Page<>(1, 10);
+        IPage<Command> commandIPage = commandMapper.queryCommandPageByIds(page,
+                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+        List<Command> commandList = commandIPage.getRecords();
+        assertThat(commandList).isNotEmpty();
+        assertThat(commandIPage.getTotal()).isEqualTo(1);
+        assertThat(commandList.get(0).getId()).isEqualTo(expectedCommand.getId());
+    }
 
     /**
      * test select by id
@@ -72,18 +85,18 @@ public class CommandMapperTest {
     @Test
     public void testSelectById() {
         Command expectedCommand = createCommand();
-        //query
+        // query
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getProcessDefinitionId(), actualCommand.getProcessDefinitionId());
+        Assertions.assertNotNull(actualCommand);
+        Assertions.assertEquals(expectedCommand.getProcessDefinitionCode(), actualCommand.getProcessDefinitionCode());
     }
 
     /**
      * test update
      */
     @Test
-    public void testUpdate(){
+    public void testUpdate() {
 
         Command expectedCommand = createCommand();
 
@@ -94,8 +107,8 @@ public class CommandMapperTest {
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNotNull(actualCommand);
-        assertEquals(expectedCommand.getUpdateTime(),actualCommand.getUpdateTime());
+        Assertions.assertNotNull(actualCommand);
+        Assertions.assertEquals(expectedCommand.getUpdateTime(), actualCommand.getUpdateTime());
 
     }
 
@@ -103,17 +116,15 @@ public class CommandMapperTest {
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Command expectedCommand = createCommand();
 
         commandMapper.deleteById(expectedCommand.getId());
 
         Command actualCommand = commandMapper.selectById(expectedCommand.getId());
 
-        assertNull(actualCommand);
+        Assertions.assertNull(actualCommand);
     }
-
-
 
     /**
      * test query all
@@ -124,10 +135,9 @@ public class CommandMapperTest {
 
         Map<Integer, Command> commandMap = createCommandMap(count);
 
-
         List<Command> actualCommands = commandMapper.selectList(null);
 
-        assertThat(actualCommands.size(), greaterThanOrEqualTo(count));
+        Assertions.assertTrue(actualCommands.size() >= count);
     }
 
     /**
@@ -138,11 +148,11 @@ public class CommandMapperTest {
 
         ProcessDefinition processDefinition = createProcessDefinition();
 
-        Command expectedCommand = createCommand(CommandType.START_PROCESS,processDefinition.getId());
+        createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
-        Command actualCommand = commandMapper.getOneToRun();
+        List<Command> actualCommand = commandMapper.selectList(new QueryWrapper<>());
 
-        assertNotNull(actualCommand);
+        Assertions.assertNotNull(actualCommand);
     }
 
     /**
@@ -154,36 +164,73 @@ public class CommandMapperTest {
 
         ProcessDefinition processDefinition = createProcessDefinition();
 
-        CommandCount expectedCommandCount = createCommandMap(count, CommandType.START_PROCESS, processDefinition.getId());
-
-        Integer[] projectIdArray = {processDefinition.getProjectId()};
+        createCommandMap(count, CommandType.START_PROCESS, processDefinition.getCode());
 
         Date startTime = DateUtils.stringToDate("2019-12-29 00:10:00");
 
         Date endTime = DateUtils.stringToDate("2019-12-29 23:59:59");
 
-        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(0, startTime, endTime, projectIdArray);
+        List<CommandCount> actualCommandCounts = commandMapper.countCommandState(startTime, endTime,
+                Lists.newArrayList(processDefinition.getProjectCode()));
 
-        assertThat(actualCommandCounts.size(),greaterThanOrEqualTo(1));
+        Assertions.assertTrue(actualCommandCounts.size() >= 1);
     }
 
+    /**
+     * test query command page by slot
+     */
+    @Test
+    public void testQueryCommandPageBySlot() {
+        int masterCount = 4;
+        int thisMasterSlot = 2;
+        // for hit or miss
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+        toTestQueryCommandPageBySlot(masterCount, thisMasterSlot);
+    }
+
+    @Test
+    void deleteByWorkflowInstanceIds() {
+        Command command = createCommand();
+        assertThat(commandMapper.selectList(null)).isNotEmpty();
+        commandMapper.deleteByWorkflowInstanceIds(Lists.newArrayList(command.getProcessInstanceId()));
+        assertThat(commandMapper.selectList(null)).isEmpty();
+    }
+
+    private boolean toTestQueryCommandPageBySlot(int masterCount, int thisMasterSlot) {
+        Command command = createCommand();
+        Integer id = command.getId();
+        boolean hit = id % masterCount == thisMasterSlot;
+        List<Command> commandList = commandMapper.queryCommandByIdSlot(thisMasterSlot, masterCount, 1, 1);
+        if (hit) {
+            Assertions.assertEquals(id, commandList.get(0).getId());
+        } else {
+            commandList.forEach(o -> {
+                Assertions.assertNotEquals(id, o.getId());
+                Assertions.assertEquals(thisMasterSlot, o.getId() % masterCount);
+            });
+        }
+        return hit;
+    }
 
     /**
      * create command map
-     * @param count map count
-     * @param commandType comman type
-     * @param processDefinitionId process definition id
+     *
+     * @param count                 map count
+     * @param commandType           comman type
+     * @param processDefinitionCode process definition code
      * @return command map
      */
     private CommandCount createCommandMap(
-            Integer count,
-            CommandType commandType,
-            Integer processDefinitionId){
+                                          Integer count,
+                                          CommandType commandType,
+                                          long processDefinitionCode) {
 
         CommandCount commandCount = new CommandCount();
 
-        for (int i = 0 ;i < count ;i++){
-            createCommand(commandType,processDefinitionId);
+        for (int i = 0; i < count; i++) {
+            createCommand(commandType, processDefinitionCode);
         }
         commandCount.setCommandType(commandType);
         commandCount.setCount(count);
@@ -192,15 +239,19 @@ public class CommandMapperTest {
     }
 
     /**
-     *  create process definition
+     * create process definition
+     *
      * @return process definition
      */
-    private ProcessDefinition createProcessDefinition(){
+    private ProcessDefinition createProcessDefinition() {
         ProcessDefinition processDefinition = new ProcessDefinition();
+        processDefinition.setCode(1L);
         processDefinition.setReleaseState(ReleaseState.ONLINE);
         processDefinition.setName("ut test");
-        processDefinition.setProjectId(1);
+        processDefinition.setProjectCode(1L);
         processDefinition.setFlag(Flag.YES);
+        processDefinition.setCreateTime(new Date());
+        processDefinition.setUpdateTime(new Date());
 
         processDefinitionMapper.insert(processDefinition);
 
@@ -209,37 +260,39 @@ public class CommandMapperTest {
 
     /**
      * create command map
+     *
      * @param count map count
      * @return command map
      */
-    private Map<Integer,Command> createCommandMap(Integer count){
-        Map<Integer,Command> commandMap = new HashMap<>();
+    private Map<Integer, Command> createCommandMap(Integer count) {
+        Map<Integer, Command> commandMap = new HashMap<>();
 
-        for (int i = 0; i < count ;i++){
+        for (int i = 0; i < count; i++) {
             Command command = createCommand();
-            commandMap.put(command.getId(),command);
+            commandMap.put(command.getId(), command);
         }
         return commandMap;
     }
 
-
     /**
      * create command
+     *
      * @return
      */
-    private Command createCommand(){
-        return createCommand(CommandType.START_PROCESS,1);
+    private Command createCommand() {
+        return createCommand(CommandType.START_PROCESS, 1);
     }
 
     /**
      * create command
+     *
      * @return Command
      */
-    private Command createCommand(CommandType commandType,Integer processDefinitionId){
+    private Command createCommand(CommandType commandType, long processDefinitionCode) {
 
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionId(processDefinitionId);
+        command.setProcessDefinitionCode(processDefinitionCode);
         command.setExecutorId(4);
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
@@ -250,12 +303,11 @@ public class CommandMapperTest {
         command.setProcessInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
-        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
+        command.setProcessInstanceId(0);
+        command.setProcessDefinitionVersion(0);
         commandMapper.insert(command);
 
         return command;
     }
-
-
-
 }

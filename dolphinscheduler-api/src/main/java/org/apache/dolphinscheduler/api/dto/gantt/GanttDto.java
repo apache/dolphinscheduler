@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto.gantt;
 
 import java.util.ArrayList;
@@ -21,9 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * gantt DTO
- */
+import lombok.Data;
+
+@Data
 public class GanttDto {
 
     /**
@@ -37,62 +38,32 @@ public class GanttDto {
     private List<Task> tasks = new ArrayList<>();
 
     /**
-     * task name list
+     * task code list
      */
-    private List<String> taskNames;
+    private List<Long> taskNames;
 
     /**
      * task status map
      */
-    private Map<String,String> taskStatus;
+    private Map<String, String> taskStatus;
 
-
-    public GanttDto(){
+    public GanttDto() {
         this.taskStatus = new HashMap<>();
-        taskStatus.put("success","success");
+        taskStatus.put("success", "success");
     }
-    public GanttDto(int height, List<Task> tasks, List<String> taskNames){
+
+    public GanttDto(int height, List<Task> tasks, List<Long> taskNames) {
         this();
         this.height = height;
         this.tasks = tasks;
         this.taskNames = taskNames;
     }
-    public GanttDto(int height, List<Task> tasks, List<String> taskNames, Map<String, String> taskStatus) {
+
+    public GanttDto(int height, List<Task> tasks, List<Long> taskNames, Map<String, String> taskStatus) {
         this.height = height;
         this.tasks = tasks;
         this.taskNames = taskNames;
         this.taskStatus = taskStatus;
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(List<Task> tasks) {
-        this.tasks = tasks;
-    }
-
-    public List<String> getTaskNames() {
-        return taskNames;
-    }
-
-    public void setTaskNames(List<String> taskNames) {
-        this.taskNames = taskNames;
-    }
-
-    public Map<String, String> getTaskStatus() {
-        return taskStatus;
-    }
-
-    public void setTaskStatus(Map<String, String> taskStatus) {
-        this.taskStatus = taskStatus;
-    }
 }

@@ -1,0 +1,9 @@
+{
+  "ParallelismConfiguration": {
+    "MaxParallelExecutionSteps": 1
+  },
+  "PipelineExecutionDescription": "test Pipeline",
+  "PipelineExecutionDisplayName": "AbalonePipeline",
+  "PipelineName": "AbalonePipeline",
+  "PipelineParameters": [ ]
+}

@@ -14,23 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
- * alert status
+ * alert sending(execution) status
  */
 public enum AlertStatus {
+
     /**
      * 0 waiting executed; 1 execute successfully，2 execute failed
      */
     WAIT_EXECUTION(0, "waiting executed"),
     EXECUTION_SUCCESS(1, "execute successfully"),
-    EXECUTION_FAILURE(2, "execute failed");
+    EXECUTION_FAILURE(2, "execute failed"),
+    EXECUTION_PARTIAL_SUCCESS(3, "execute partial successfully");
 
-
-    AlertStatus(int code, String descp){
+    AlertStatus(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

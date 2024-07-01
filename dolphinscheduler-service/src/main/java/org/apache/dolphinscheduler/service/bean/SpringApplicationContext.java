@@ -18,12 +18,14 @@
 package org.apache.dolphinscheduler.service.bean;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SpringApplicationContext implements ApplicationContextAware {
+public class SpringApplicationContext implements ApplicationContextAware, AutoCloseable {
 
     private static ApplicationContext applicationContext;
 
@@ -32,7 +34,23 @@ public class SpringApplicationContext implements ApplicationContextAware {
         SpringApplicationContext.applicationContext = applicationContext;
     }
 
+    /**
+     * Close this application context, destroying all beans in its bean factory.
+     */
+    @Override
+    public void close() {
+        ((AbstractApplicationContext) applicationContext).close();
+    }
+
     public static <T> T getBean(Class<T> requiredType) {
         return applicationContext.getBean(requiredType);
+    }
+
+    public static <T> T getBean(Class<T> requiredType, T defaultValue) {
+        try {
+            return applicationContext.getBean(requiredType);
+        } catch (NoSuchBeanDefinitionException e) {
+            return defaultValue;
+        }
     }
 }

@@ -17,7 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -25,8 +30,37 @@ import java.util.Set;
  */
 public interface WorkFlowLineageService {
 
-    Map<String, Object> queryWorkFlowLineageByName(String workFlowName, int projectId);
+    List<WorkFlowLineage> queryWorkFlowLineageByName(long projectCode, String workFlowName);
 
-    Map<String, Object> queryWorkFlowLineageByIds(Set<Integer> ids,int projectId);
+    Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long workFlowCode);
 
+    Map<String, Object> queryWorkFlowLineage(long projectCode);
+
+    /**
+     * Query tasks depend on process definition, include upstream or downstream
+     *
+     * @param projectCode Project code want to query tasks dependence
+     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @return Set of TaskMainInfo
+     */
+    Set<TaskMainInfo> queryTaskDepOnProcess(long projectCode, long processDefinitionCode);
+
+    /**
+     * Query downstream tasks depend on a process definition or a task
+     *
+     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param taskCode Task code want to query tasks dependence
+     * @return downstream dependent tasks
+     */
+    Map<String, Object> queryDownstreamDependentTasks(Long processDefinitionCode, Long taskCode);
+
+    /**
+     * Query and return tasks dependence with string format, is a wrapper of queryTaskDepOnTask and task query method.
+     *
+     * @param projectCode Project code want to query tasks dependence
+     * @param processDefinitionCode Process definition code want to query tasks dependence
+     * @param taskCode Task code want to query tasks dependence
+     * @return dependent process definition
+     */
+    Optional<String> taskDepOnTaskMsg(long projectCode, long processDefinitionCode, long taskCode);
 }

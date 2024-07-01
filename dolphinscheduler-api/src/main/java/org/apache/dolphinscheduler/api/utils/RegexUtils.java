@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.api.utils;
 
-import java.util.regex.Matcher;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Pattern;
 
 /**
@@ -25,26 +26,9 @@ import java.util.regex.Pattern;
  */
 public class RegexUtils {
 
-    /**
-     * check number regex expression
-     */
-    private static final String CHECK_NUMBER = "^-?\\d+(\\.\\d+)?$";
-
-    private static final String LINUX_USERNAME_PATTERN = "[a-z_][a-z\\d_]{0,30}";
+    private static final Pattern LINUX_USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_].{0,30}");
 
     private RegexUtils() {
-    }
-
-    /**
-     * check if the input is number
-     *
-     * @param str input
-     * @return
-     */
-    public static boolean isNumeric(String str) {
-        Pattern pattern = Pattern.compile(CHECK_NUMBER);
-        Matcher isNum = pattern.matcher(str);
-        return isNum.matches();
     }
 
     /**
@@ -53,13 +37,12 @@ public class RegexUtils {
      * @return boolean
      */
     public static boolean isValidLinuxUserName(String str) {
-        Pattern pattern = Pattern.compile(LINUX_USERNAME_PATTERN);
-        return pattern.matcher(str).matches();
+        return LINUX_USERNAME_PATTERN.matcher(str).matches();
     }
 
     public static String escapeNRT(String str) {
         // Logging should not be vulnerable to injection attacks: Replace pattern-breaking characters
-        if (str != null && !str.isEmpty()) {
+        if (!StringUtils.isEmpty(str)) {
             return str.replaceAll("[\n|\r|\t]", "_");
         }
         return null;

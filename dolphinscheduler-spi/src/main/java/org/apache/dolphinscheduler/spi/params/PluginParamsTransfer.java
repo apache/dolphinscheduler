@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.spi.params;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_FIELD;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_VALUE;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
-import org.apache.dolphinscheduler.spi.utils.JSONUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +62,7 @@ public class PluginParamsTransfer {
      * @return return plugin params value
      */
     public static List<Map<String, Object>> generatePluginParams(String paramsJsonStr, String pluginParamsTemplate) {
-        Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr);
+        Map<String, Object> paramsMap = JSONUtils.toMap(paramsJsonStr, String.class, Object.class);
         return generatePluginParams(paramsMap, pluginParamsTemplate);
     }
 
@@ -73,12 +73,16 @@ public class PluginParamsTransfer {
      * @param pluginParamsTemplate pluginParamsTemplate
      * @return return plugin params value
      */
-    public static List<Map<String, Object>> generatePluginParams(Map<String, Object> paramsMap, String pluginParamsTemplate) {
+    public static List<Map<String, Object>> generatePluginParams(Map<String, Object> paramsMap,
+                                                                 String pluginParamsTemplate) {
         if (paramsMap == null || paramsMap.isEmpty()) {
             return null;
         }
-        List<Map<String, Object>> pluginParamsList = JSONUtils.parseObject(pluginParamsTemplate, new TypeReference<List<Map<String, Object>>>() {});
-        pluginParamsList.forEach(pluginParams -> pluginParams.put(STRING_PLUGIN_PARAM_VALUE, paramsMap.get(pluginParams.get(STRING_PLUGIN_PARAM_FIELD))));
+        List<Map<String, Object>> pluginParamsList =
+                JSONUtils.parseObject(pluginParamsTemplate, new TypeReference<List<Map<String, Object>>>() {
+                });
+        pluginParamsList.forEach(pluginParams -> pluginParams.put(STRING_PLUGIN_PARAM_VALUE,
+                paramsMap.get(pluginParams.get(STRING_PLUGIN_PARAM_FIELD))));
         return pluginParamsList;
     }
 }

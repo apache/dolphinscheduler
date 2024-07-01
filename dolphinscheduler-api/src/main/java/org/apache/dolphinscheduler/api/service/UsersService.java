@@ -44,7 +44,7 @@ public interface UsersService {
      * @throws Exception exception
      */
     Map<String, Object> createUser(User loginUser, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws IOException;
+                                   int tenantId, String phone, String queue, int state) throws Exception;
 
     User createUser(String userName, String userPassword, String email,
                     int tenantId, String phone, String queue, int state);
@@ -112,25 +112,18 @@ public interface UsersService {
      * @param pageSize page size
      * @return user list page
      */
-    Map<String, Object> queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    Result queryUserList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
-    /**
-     * updateProcessInstance user
-     *
-     *
-     * @param loginUser
-     * @param userId user id
-     * @param userName user name
-     * @param userPassword user password
-     * @param email email
-     * @param tenantId tennat id
-     * @param phone phone
-     * @param queue queue
-     * @return update result code
-     * @throws Exception exception
-     */
-    Map<String, Object> updateUser(User loginUser, int userId, String userName, String userPassword, String email,
-                                   int tenantId, String phone, String queue, int state) throws IOException;
+    User updateUser(User loginUser,
+                    Integer userId,
+                    String userName,
+                    String userPassword,
+                    String email,
+                    Integer tenantId,
+                    String phone,
+                    String queue,
+                    int state,
+                    String timeZone) throws IOException;
 
     /**
      * delete user
@@ -152,28 +145,53 @@ public interface UsersService {
      */
     Map<String, Object> grantProject(User loginUser, int userId, String projectIds);
 
-
     /**
-     * grant resource
+     * grant project with read permission
      *
      * @param loginUser login user
      * @param userId user id
-     * @param resourceIds resource id array
+     * @param projectIds project id array
      * @return grant result code
      */
-    Map<String, Object> grantResources(User loginUser, int userId, String resourceIds);
-
+    Map<String, Object> grantProjectWithReadPerm(User loginUser, int userId, String projectIds);
 
     /**
-     * grant udf function
+     * grant project by code
      *
      * @param loginUser login user
      * @param userId user id
-     * @param udfIds udf id array
+     * @param projectCode project code
      * @return grant result code
      */
-    Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds);
+    Map<String, Object> grantProjectByCode(User loginUser, int userId, long projectCode);
 
+    /**
+     * revoke the project permission for specified user by id
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectIds   project id array
+     * @return
+     */
+    Map<String, Object> revokeProjectById(User loginUser, int userId, String projectIds);
+
+    /**
+     * revoke the project permission for specified user.
+     * @param loginUser     Login user
+     * @param userId        User id
+     * @param projectCode   Project Code
+     * @return
+     */
+    Map<String, Object> revokeProject(User loginUser, int userId, long projectCode);
+
+    /**
+     * grant namespace
+     *
+     * @param loginUser login user
+     * @param userId user id
+     * @param namespaceIds namespace id array
+     * @return grant result code
+     */
+    Map<String, Object> grantNamespaces(User loginUser, int userId, String namespaceIds);
 
     /**
      * grant datasource
@@ -201,7 +219,6 @@ public interface UsersService {
      */
     Map<String, Object> queryAllGeneralUsers(User loginUser);
 
-
     /**
      * query user list
      *
@@ -218,34 +235,32 @@ public interface UsersService {
      */
     Result<Object> verifyUserName(String userName);
 
-
     /**
      * unauthorized user
      *
      * @param loginUser login user
-     * @param alertgroupId alert group id
+     * @param alertGroupId alert group id
      * @return unauthorize result code
      */
-    Map<String, Object> unauthorizedUser(User loginUser, Integer alertgroupId);
-
+    Map<String, Object> unauthorizedUser(User loginUser, Integer alertGroupId);
 
     /**
      * authorized user
      *
      * @param loginUser login user
-     * @param alertgroupId alert group id
+     * @param alertGroupId alert group id
      * @return authorized result code
      */
-    Map<String, Object> authorizedUser(User loginUser, Integer alertgroupId);
+    Map<String, Object> authorizedUser(User loginUser, Integer alertGroupId);
 
     /**
-     * register user, default state is 0, default tenant_id is 1, no phone, no queue
+     * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      *
      * @param userName user name
      * @param userPassword user password
      * @param repeatPassword repeat password
      * @param email email
-     * @return register result code
+     * @return registry result code
      * @throws Exception exception
      */
     Map<String, Object> registerUser(String userName, String userPassword, String repeatPassword, String email);
@@ -267,4 +282,22 @@ public interface UsersService {
      * @return create result code
      */
     Map<String, Object> batchActivateUser(User loginUser, List<String> userNames);
+
+    /**
+     * Make sure user with given name exists, and create the user if not exists
+     * <p>
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param userName     user name
+     * @param userPassword user password
+     * @param email        user email
+     * @param phone        user phone
+     * @param tenantCode   tenant code
+     * @param queue        queue
+     * @param state        state
+     * @return create result code
+     */
+    User createUserIfNotExists(String userName, String userPassword, String email, String phone, String tenantCode,
+                               String queue,
+                               int state) throws IOException;
 }

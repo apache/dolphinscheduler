@@ -1,5 +1,5 @@
 Apache DolphinScheduler
-Copyright 2019-2021 The Apache Software Foundation
+Copyright 2019-2023 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
@@ -30,23 +30,6 @@ Jetty is dual licensed under both
 Jetty may be distributed under either license.
 
 ------
-
-plexus-cipher
-
-The code in this component contains a class - Base64 taken from http://juliusdavies.ca/svn/not-yet-commons-ssl/tags/commons-ssl-0.3.10/src/java/org/apache/commons/ssl/Base64.java
-which is Apache license: http://www.apache.org/licenses/LICENSE-2.0
-
-The PBE key processing routine PBECipher.createCipher() is adopted from http://juliusdavies.ca/svn/not-yet-commons-ssl/tags/commons-ssl-0.3.10/src/java/org/apache/commons/ssl/OpenSSL.java
- which is also Apache APL-2.0 license: http://www.apache.org/licenses/LICENSE-2.0
-
-------
-plexus-utils
-
-This product includes software developed by
-The Apache Software Foundation (http://www.apache.org/).
-
-------
-
 
 Eclipse
 
@@ -95,16 +78,6 @@ http://openjdk.java.net/legal/gplv2+ce.html
 
 
 ------
-OW2
-
-The following artifacts are licensed by the OW2 Foundation according to the
-terms of http://asm.ow2.org/license.html
-
-org.ow2.asm:asm-commons
-org.ow2.asm:asm
-
-
-------
 Apache
 
 The following artifacts are ASL2 licensed.
@@ -128,11 +101,6 @@ org.mortbay.jasper:apache-jsp
   org.apache.tomcat:tomcat-api
   org.apache.tomcat:tomcat-util-scan
   org.apache.tomcat:tomcat-util
-
-org.mortbay.jasper:apache-el
-  org.apache.tomcat:tomcat-jasper-el
-  org.apache.tomcat:tomcat-el-api
-
 
 ------
 Mortbay
@@ -364,14 +332,6 @@ can be obtained at:
   * HOMEPAGE:
     * http://logging.apache.org/log4j/
 
-This product optionally depends on 'Aalto XML', an ultra-high performance
-non-blocking XML processor, which can be obtained at:
-
-  * LICENSE:
-    * license/LICENSE.aalto-xml.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * http://wiki.fasterxml.com/AaltoHome
-
 This product contains a modified version of 'HPACK', a Java implementation of
 the HTTP/2 HPACK algorithm written by Twitter. It can be obtained at:
 
@@ -402,8 +362,8 @@ This product contains the Maven wrapper scripts from 'Maven Wrapper', that provi
 Spring Framework NOTICE
 
 ========================================================================
-Spring Framework 5.1.18.RELEASE
-Copyright (c) 2002-2020 Pivotal, Inc.
+Spring Framework 5.3.22
+Copyright (c) 2002-2022 Pivotal, Inc.
 
 This product is licensed to you under the Apache License, Version 2.0
 (the "License"). You may not use this product except in compliance with
@@ -461,12 +421,6 @@ Copyright 2009-2014 The Apache Software Foundation
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
-This product includes software components originally
-developed for Airlift (https://github.com/airlift/airlift),
-licensed under the Apache 2.0 license. The licensing terms
-for Airlift code can be found at:
-https://github.com/airlift/airlift/blob/master/LICENSE
-
 ========================================================================
 
 
@@ -481,8 +435,8 @@ This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 =========================================================================
-    NOTICE file corresponding to section 4(d) of the Apache License,   
-    Version 2.0, in this case for the Apache Xerces Java distribution. 
+    NOTICE file corresponding to section 4(d) of the Apache License,
+    Version 2.0, in this case for the Apache Xerces Java distribution.
 =========================================================================
 
    Apache Xerces Java
@@ -546,7 +500,7 @@ Spring Framework
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-   
+
 ========================================================================
 
 
@@ -560,34 +514,6 @@ This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
 --------------------------------------------------------------------------------
-
-==============================================================
- protostuff
- Copyright 2009 David Yu dyuproject@gmail.com
-==============================================================
-
-protobuf is copyright Google inc unless otherwise noted.
-It is licensed under the BSD license.
-
-jackson-core-asl is copyright FasterXml unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
-antlr is copyright Terence Parr unless otherwise noted.
-It is licensed under the BSD license.
-
-stringtemplate is copyright Terence Parr unless otherwise noted.
-It is licensed under the BSD license.
-
-velocity is licensed under the apache 2.0 license.
-
-B64Code.java is copyright Mort Bay Consulting Pty Ltd unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
-jarjar is copyright Google inc unless otherwise noted.
-It is licensed under the apache 2.0 license.
-
-guava is copyright Google inc unless otherwise noted.
-It is licensed under the apache 2.0 license.
 
 This product includes parquet-tools, initially developed at ARRIS, Inc. with
 the following copyright notice:
@@ -624,17 +550,14 @@ with the following copyright notice:
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-  
-========================================================================
-
-
-Apache POI NOTICE
 
 ========================================================================
+
+
 Apache POI
-Copyright 2003-2017 The Apache Software Foundation
+Copyright 2003-2020 The Apache Software Foundation
 
-This product includes software developed by
+This product includes software developed at
 The Apache Software Foundation (https://www.apache.org/).
 
 This product contains parts that were originally based on software from BEA.
@@ -647,13 +570,10 @@ This product contains W3C XML Schema documents. Copyright 2001-2003 (c)
 World Wide Web Consortium (Massachusetts Institute of Technology, European
 Research Consortium for Informatics and Mathematics, Keio University)
 
-This product contains the Piccolo XML Parser for Java
-(http://piccolo.sourceforge.net/). Copyright 2002 Yuval Oren.
-
 This product contains the chunks_parse_cmds.tbl file from the vsdump program.
 Copyright (C) 2006-2007 Valek Filippov (frob@df.ru)
 
-This product contains parts of the eID Applet project 
+This product contains parts of the eID Applet project
 <http://eid-applet.googlecode.com> and <https://github.com/e-Contract/eid-applet>.
 Copyright (c) 2009-2014
 FedICT (federal ICT department of Belgium), e-Contract.be BVBA (https://www.e-contract.be),
@@ -680,6 +600,14 @@ http://gcc.gnu.org/onlinedocs/libstdc++/manual/license.html
 
 ========================================================================
 
+Alibaba Druid NOTICE
+
+========================================================================
+
+Alibaba Druid
+Copyright 1999-2021 Alibaba Group Holding Ltd.
+
+========================================================================
 
 AWS SDK for Java NOTICE
 
@@ -1452,18 +1380,6 @@ This project contains annotations derived from JCIP-ANNOTATIONS
 Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
 =========================================================================
 
-
-htrace-core NOTICE
-
-
-=========================================================================
-Copyright 2015 The Apache Software Foundation
-
-This product includes software developed at
-The Apache Software Foundation (http://www.apache.org/).
-=========================================================================
-
-
 Hadoop NOTICE
 
 =========================================================================
@@ -1693,14 +1609,6 @@ can be obtained at:
   * HOMEPAGE:
     * http://logging.apache.org/log4j/
 
-This product optionally depends on 'Aalto XML', an ultra-high performance
-non-blocking XML processor, which can be obtained at:
-
-  * LICENSE:
-    * license/LICENSE.aalto-xml.txt (Apache License 2.0)
-  * HOMEPAGE:
-    * http://wiki.fasterxml.com/AaltoHome
-
 This product contains a modified version of 'HPACK', a Java implementation of
 the HTTP/2 HPACK algorithm written by Twitter. It can be obtained at:
 
@@ -1731,16 +1639,6 @@ The binary distribution of this product bundles binaries of
 Commons Lang 2.6,
 which has the following notices:
  * This product includes software from the Spring Framework,under the Apache License 2.0 (see: StringUtils.containsWhitespace())
-
-The binary distribution of this product bundles binaries of
-Apache Log4j 1.2.17,
-which has the following notices:
- * ResolverUtil.java
-    Copyright 2005-2006 Tim Fennell
-  Dumbster SMTP test server
-    Copyright 2004 Jason Paul Kitchen
-  TypeUtil.java
-    Copyright 2002-2012 Ramnivas Laddad, Juergen Hoeller, Chris Beams
 
 The binary distribution of this product bundles binaries of
 Jetty 6.1.26,
@@ -1806,16 +1704,6 @@ which has the following notices:
 
 
    ------
-   OW2
-
-   The following artifacts are licensed by the OW2 Foundation according to the
-   terms of http://asm.ow2.org/license.html
-
-   org.ow2.asm:asm-commons
-   org.ow2.asm:asm
-
-
-   ------
    Apache
 
    The following artifacts are ASL2 licensed.
@@ -1843,7 +1731,7 @@ which has the following notices:
    granted provided that the copyright notice appears in all copies./
 
 The binary distribution of this product bundles binaries of
-Snappy for Java 1.0.4.1,
+Snappy for Java 1.1.8.4,
 which has the following notices:
  * This product includes software developed by Google
     Snappy: http://code.google.com/p/snappy/ (New BSD License)
@@ -1963,3 +1851,265 @@ ANT NOTICE
 
    Please read the different LICENSE files present in the root directory of
    this distribution.
+
+=========================================================================
+
+Commons Compress NOTICE
+
+=========================================================================
+
+Apache Commons Compress
+Copyright 2002-2020 The Apache Software Foundation
+
+This product includes software developed at
+The Apache Software Foundation (https://www.apache.org/).
+
+---
+
+The files in the package org.apache.commons.compress.archivers.sevenz
+were derived from the LZMA SDK, version 9.20 (C/ and CPP/7zip/),
+which has been placed in the public domain:
+
+"LZMA SDK is placed in the public domain." (http://www.7-zip.org/sdk.html)
+
+---
+
+The test file lbzip2_32767.bz2 has been copied from libbzip2's source
+repository:
+
+This program, "bzip2", the associated library "libbzip2", and all
+documentation, are copyright (C) 1996-2019 Julian R Seward.  All
+rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. The origin of this software must not be misrepresented; you must
+   not claim that you wrote the original software.  If you use this
+   software in a product, an acknowledgment in the product
+   documentation would be appreciated but is not required.
+
+3. Altered source versions must be plainly marked as such, and must
+   not be misrepresented as being the original software.
+
+4. The name of the author may not be used to endorse or promote
+   products derived from this software without specific prior written
+   permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Julian Seward, jseward@acm.org
+
+=========================================================================
+
+Xmlbeans NOTICE
+
+=========================================================================
+
+   =========================================================================
+   ==  NOTICE file corresponding to section 4(d) of the Apache License,   ==
+   ==  Version 2.0, in this case for the Apache XmlBeans distribution.    ==
+   =========================================================================
+
+   This product includes software developed at
+   The Apache Software Foundation (http://www.apache.org/).
+
+   Portions of this software were originally based on the following:
+     - software copyright (c) 2000-2003, BEA Systems, <http://www.bea.com/>.
+
+   Aside from contributions to the Apache XMLBeans project, this
+   software also includes:
+
+    - one or more source files from the Apache Xerces-J and Apache Axis
+      products, Copyright (c) 1999-2003 Apache Software Foundation
+
+    - W3C XML Schema documents Copyright 2001-2003 (c) World Wide Web
+      Consortium (Massachusetts Institute of Technology, European Research
+      Consortium for Informatics and Mathematics, Keio University)
+
+=========================================================================
+
+jetcd NOTICE
+
+=========================================================================
+
+    CoreOS Project
+    Copyright 2018 CoreOS, Inc
+
+    This product includes software developed at CoreOS, Inc.
+    (http://www.coreos.com/).
+
+=========================================================================
+
+grpc NOTICE
+
+=========================================================================
+
+    Copyright 2014 The gRPC Authors
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    -----------------------------------------------------------------------
+
+    This product contains a modified portion of 'OkHttp', an open source
+    HTTP & SPDY client for Android and Java applications, which can be obtained
+    at:
+
+      * LICENSE:
+        * okhttp/third_party/okhttp/LICENSE (Apache License 2.0)
+      * HOMEPAGE:
+        * https://github.com/square/okhttp
+      * LOCATION_IN_GRPC:
+        * okhttp/third_party/okhttp
+
+    This product contains a modified portion of 'Envoy', an open source
+    cloud-native high-performance edge/middle/service proxy, which can be
+    obtained at:
+
+      * LICENSE:
+        * xds/third_party/envoy/LICENSE (Apache License 2.0)
+      * NOTICE:
+        * xds/third_party/envoy/NOTICE
+      * HOMEPAGE:
+        * https://www.envoyproxy.io
+      * LOCATION_IN_GRPC:
+        * xds/third_party/envoy
+
+    This product contains a modified portion of 'protoc-gen-validate (PGV)',
+    an open source protoc plugin to generate polyglot message validators,
+    which can be obtained at:
+
+      * LICENSE:
+        * xds/third_party/protoc-gen-validate/LICENSE (Apache License 2.0)
+      * NOTICE:
+          * xds/third_party/protoc-gen-validate/NOTICE
+      * HOMEPAGE:
+        * https://github.com/envoyproxy/protoc-gen-validate
+      * LOCATION_IN_GRPC:
+        * xds/third_party/protoc-gen-validate
+
+    This product contains a modified portion of 'udpa',
+    an open source universal data plane API, which can be obtained at:
+
+      * LICENSE:
+        * xds/third_party/udpa/LICENSE (Apache License 2.0)
+      * HOMEPAGE:
+        * https://github.com/cncf/udpa
+      * LOCATION_IN_GRPC:
+        * xds/third_party/udpa
+
+=========================================================================
+
+perfmark NOTICE
+
+=========================================================================
+
+    Copyright 2019 Google LLC
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+    -----------------------------------------------------------------------
+
+    This product contains a modified portion of 'Catapult', an open source
+    Trace Event viewer for Chome, Linux, and Android applications, which can
+    be obtained at:
+
+      * LICENSE:
+        * traceviewer/src/main/resources/io/perfmark/traceviewer/third_party/catapult/LICENSE (New BSD License)
+      * HOMEPAGE:
+        * https://github.com/catapult-project/catapult
+
+    This product contains a modified portion of 'Polymer', a library for Web
+    Components, which can be obtained at:
+      * LICENSE:
+        * traceviewer/src/main/resources/io/perfmark/traceviewer/third_party/polymer/LICENSE (New BSD License)
+      * HOMEPAGE:
+        * https://github.com/Polymer/polymer
+
+
+    This product contains a modified portion of 'ASM', an open source
+    Java Bytecode library, which can be obtained at:
+
+      * LICENSE:
+        * agent/src/main/resources/io/perfmark/agent/third_party/asm/LICENSE (BSD style License)
+      * HOMEPAGE:
+        * https://asm.ow2.io/
+
+========================================================================
+
+
+Dameng DmJdbcDriver18 NOTICE
+
+========================================================================
+
+Dameng DmJdbcDriver18
+Copyright 2000-2022 Dameng Group Holding Ltd.
+
+=========================================================================
+
+Oltu NOTICE
+
+=========================================================================
+
+Apache Oltu
+Copyright 2010-2017 The Apache Software Foundation
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+=========================================================================
+
+Vertica Client Driver License NOTICE
+
+=========================================================================
+
+End User License Agreement
+BY SELECTING “ACCEPT AND CONTINUE” BELOW, YOU ARE EXPRESSLY ACKNOWLEDGING AND AGREEING THAT THIS AGREEMENT, BETWEEN YOU AND MICRO FOCUS LLC (WITH ITS AFFILIATES, “MICRO FOCUS” OR “WE”), GOVERNS YOUR USE OF THE VERTICA CLIENT DRIVER SOFTWARE (TOGETHER WITH ANY UPDATES AND ENHANCEMENTS TO IT, AND ACCOMPANYING DOCUMENTATION, THE “DRIVERS”) THAT WE MAKE AVAILABLE TO YOU IN CONNECTION WITH MICRO FOCUS’ VERTICA SOFTWARE PRODUCT (OR ANY SUCCESSOR PRODUCT DESIGNATED BY US IN WRITING, THE “SOFTWARE”). THIS AGREEMENT GOVERNS THE LICENSING OF THE DRIVERS ONLY AND IF YOU WISH TO USE THE VERTICA SOFTWARE PRODUCT ITSELF, YOU WILL NEED TO LICENSE IT SEPARATELY UNDER THE APPROPRIATE COMMERCIAL OR COMMUNITY EDITION LICENSE.
+
+1. Except as stated below in this Agreement, the Drivers are governed by the Micro Focus End User License Agreement (the “EULA”) located at https://www.microfocus.com/en-us/legal/software-licensing. In the event of any conflict between the terms of this Agreement and the EULA, this Agreement will control and take precedence.
+2. This Agreement grants you a limited, nonexclusive, non-transferable, non-sublicensable license to install, use, and copy the object code of the Drivers free of charge for the sole purpose of developing a program that can use the Drivers to connect to the Software database. You may generally use the Drivers to connect to the Software. You may also distribute the Drivers, provided that (a) you distribute the Drivers as part of a software program or package that you develop; (b) you require end users to agree to terms that are consistent with, and at least as protective of Micro Focus and the Drivers as, this Agreement; (c) you retain without modification any copyright, patent, trademark, or attribution notices that are present in the Drivers; and (d) you distribute the Drivers for the sole purpose of your program connecting to the Software.
+3. Your rights under this Agreement will immediately and automatically terminate if you do not comply with any term or condition of this Agreement. In the case of termination, you must cease all use and destroy all copies of the Drivers. We may modify, suspend, discontinue, or terminate your right to use part or all of the Drivers at any time without notice to you and Micro Focus will not be liable to you should it exercise those rights. We may amend this Agreement at our sole discretion by posting the revised terms on the Micro Focus website https://www.vertica.com/download/vertica/client-drivers/ or within the Drivers. Your continued use of the Drivers after any amendment’s effective date evidence your agreement to be bound by it.
+4. The Drivers are the sole and exclusive intellectual property of Micro Focus. No support is provided for the Drivers.
+5. Some components of the Drivers may be governed by applicable open source software licenses. Your license rights with respect to these individual components are defined by the applicable open source software licenses, and nothing in this Agreement will restrict, limit, or otherwise affect any rights or obligations you may have, or conditions to which you may be subject, under such open source software licenses.
+6. The Drivers contains third party components, including any run time or other elements licensed to Micro Focus by a third party licensor (“Third Party Components”). Third Party Components are the sole and exclusive intellectual property of the applicable third party licensor. You agree that to the extent required by a third party licensor of a Third Party Component, that third party licensor is an intended third party beneficiary of this Agreement as necessary to protect its intellectual property rights software and limit certain uses thereof. You agree that any third party licensors of Third Party Components will have no liability with respect to the Third Party Components under this agreement.
+7. NOTWITHSTANDING ANYTHING TO THE CONTRARY IN THE EULA, YOU EXPRESSLY ACKNOWLEDGE AND AGREE THAT USE AND DISTRIBUTION OF THE DRIVERS IS AT YOUR SOLE RISK AND ARE DELIVERED TO YOU “AS IS” WITHOUT WARRANTY OF ANY KIND, AND MICRO FOCUS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED.
+8. You are liable for and will defend, indemnify, and hold harmless Micro Focus and its affiliates, officers, directors, agents, and employees, from and against any claims, liability, loss, damage, cost, or expense (including reasonable attorneys’ fees) arising out of (i) your distribution or use of your programs, (ii) your use of the Drivers, (iii) violation of applicable law, or (iv) violation of any right of any person or entity, including without limitation intellectual property rights.
+9. NOTWITHSTANDING ANYTHING TO THE CONTRARY IN THE EULA, TO THE EXTENT NOT PROHIBITED BY LAW, MICRO FOCUS WILL NOT BE LIABLE TO YOU FOR ANY INDIRECT, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR BREACH OF ANY EXPRESS OR IMPLIED WARRANTY, BREACH OF CONTRACT, NEGLIGENCE, STRICT LIABILITY, OR ANY OTHER LEGAL THEORY RELATED TO THE DRIVERS, INCLUDING WITHOUT LIMITATION ANY DAMAGES ARISING OUT OF LOSS OF PROFITS, REVENUE, DATA, OR USE OF THE DRIVERS. IN ANY CASE, MICRO FOCUS’ AGGREGATE LIABILITY UNDER THIS AGREEMENT WILL BE LIMITED TO $100.00.
+
+[ ] I consent and accept the terms and conditions stated in this Agreement.
+
+=========================================================================

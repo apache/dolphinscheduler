@@ -18,51 +18,53 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_QUEUE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.DELETE_QUEUE_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * queue controller
  */
-@Api(tags = "QUEUE_TAG")
+@Tag(name = "QUEUE_TAG")
 @RestController
-@RequestMapping("/queue")
+@RequestMapping("/queues")
 public class QueueController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(QueueController.class);
 
     @Autowired
     private QueueService queueService;
-
 
     /**
      * query queue list
@@ -70,14 +72,13 @@ public class QueueController extends BaseController {
      * @param loginUser login user
      * @return queue list
      */
-    @ApiOperation(value = "queryList", notes = "QUERY_QUEUE_LIST_NOTES")
+    @Operation(summary = "queryList", description = "QUERY_QUEUE_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
-    public Result queryList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query queue list", loginUser.getUserName());
-        Map<String, Object> result = queueService.queryList(loginUser);
-        return returnDataList(result);
+    public Result<List<Queue>> queryList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<Queue> queues = queueService.queryList(loginUser);
+        return Result.success(queues);
     }
 
     /**
@@ -89,28 +90,24 @@ public class QueueController extends BaseController {
      * @param pageSize  page size
      * @return queue list
      */
-    @ApiOperation(value = "queryQueueListPaging", notes = "QUERY_QUEUE_LIST_PAGING_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", dataType = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+    @Operation(summary = "queryQueueListPaging", description = "QUERY_QUEUE_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_QUEUE_LIST_ERROR)
-    public Result queryQueueListPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam("pageNo") Integer pageNo,
-                                       @RequestParam(value = "searchVal", required = false) String searchVal,
-                                       @RequestParam("pageSize") Integer pageSize) {
-        logger.info("login user {}, query queue list,search value:{}", loginUser.getUserName(), searchVal);
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
-        }
+    public Result<PageInfo<Queue>> queryQueueListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @RequestParam("pageNo") Integer pageNo,
+                                                        @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                        @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
 
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = queueService.queryList(loginUser, searchVal, pageNo, pageSize);
-        return returnDataListPaging(result);
+        PageInfo<Queue> queuePageInfo = queueService.queryList(loginUser, searchVal, pageNo, pageSize);
+        return Result.success(queuePageInfo);
     }
 
     /**
@@ -121,21 +118,19 @@ public class QueueController extends BaseController {
      * @param queueName queue name
      * @return create result
      */
-    @ApiOperation(value = "createQueue", notes = "CREATE_QUEUE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+    @Operation(summary = "createQueue", description = "CREATE_QUEUE_NOTES")
+    @Parameters({
+            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
-    public Result createQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName) {
-        logger.info("login user {}, create queue, queue: {}, queueName: {}",
-                loginUser.getUserName(), queue, queueName);
-        Map<String, Object> result = queueService.createQueue(loginUser, queue, queueName);
-        return returnDataList(result);
+    @OperatorLog(auditType = AuditType.YARN_QUEUE_CREATE)
+    public Result<Queue> createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @RequestParam(value = "queue") String queue,
+                                     @RequestParam(value = "queueName") String queueName) {
+        return Result.success(queueService.createQueue(loginUser, queue, queueName));
     }
 
     /**
@@ -147,23 +142,42 @@ public class QueueController extends BaseController {
      * @param queueName queue name
      * @return update result code
      */
-    @ApiOperation(value = "updateQueue", notes = "UPDATE_QUEUE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+    @Operation(summary = "updateQueue", description = "UPDATE_QUEUE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
-    public Result updateQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "id") int id,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName) {
-        logger.info("login user {}, update queue, id: {}, queue: {}, queueName: {}",
-                loginUser.getUserName(), id, queue, queueName);
-        Map<String, Object> result = queueService.updateQueue(loginUser, id, queue, queueName);
-        return returnDataList(result);
+    @OperatorLog(auditType = AuditType.YARN_QUEUE_UPDATE)
+    public Result<Queue> updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                     @PathVariable(value = "id") int id,
+                                     @RequestParam(value = "queue") String queue,
+                                     @RequestParam(value = "queueName") String queueName) {
+        return Result.success(queueService.updateQueue(loginUser, id, queue, queueName));
+    }
+
+    /**
+     *  delete queue by id
+     *
+     * @param loginUser login user
+     * @param id        queue id
+     * @return update result code
+     */
+    @Operation(summary = "deleteQueueById", description = "DELETE_QUEUE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "QUEUE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @DeleteMapping(value = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(DELETE_QUEUE_BY_ID_ERROR)
+    @OperatorLog(auditType = AuditType.YARN_QUEUE_DELETE)
+    public Result<Boolean> deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @PathVariable(value = "id") int id) throws Exception {
+        queueService.deleteQueueById(loginUser, id);
+        return Result.success(true);
     }
 
     /**
@@ -174,24 +188,18 @@ public class QueueController extends BaseController {
      * @param queueName queue name
      * @return true if the queue name not exists, otherwise return false
      */
-    @ApiOperation(value = "verifyQueue", notes = "VERIFY_QUEUE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "QUEUE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "queue", value = "YARN_QUEUE_NAME", required = true, dataType = "String"),
-            @ApiImplicitParam(name = "queueName", value = "QUEUE_NAME", required = true, dataType = "String")
+    @Operation(summary = "verifyQueue", description = "VERIFY_QUEUE_NOTES")
+    @Parameters({
+            @Parameter(name = "queue", description = "YARN_QUEUE_NAME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "queueName", description = "QUEUE_NAME", required = true, schema = @Schema(implementation = String.class))
     })
-    @PostMapping(value = "/verify-queue")
+    @PostMapping(value = "/verify")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_QUEUE_ERROR)
-    public Result verifyQueue(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                              @RequestParam(value = "queue") String queue,
-                              @RequestParam(value = "queueName") String queueName
-    ) {
-
-        logger.info("login user {}, verfiy queue: {} queue name: {}",
-                loginUser.getUserName(), queue, queueName);
-        return queueService.verifyQueue(queue, queueName);
+    public Result<Boolean> verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam(value = "queue") String queue,
+                                       @RequestParam(value = "queueName") String queueName) {
+        queueService.verifyQueue(queue, queueName);
+        return Result.success(true);
     }
-
-
 }

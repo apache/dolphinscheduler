@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * queue service
@@ -33,47 +34,67 @@ public interface QueueService {
      * @param loginUser login user
      * @return queue list
      */
-    Map<String, Object> queryList(User loginUser);
+    List<Queue> queryList(User loginUser);
 
     /**
      * query queue list paging
      *
      * @param loginUser login user
-     * @param pageNo page number
+     * @param pageNo    page number
      * @param searchVal search value
-     * @param pageSize page size
+     * @param pageSize  page size
      * @return queue list
      */
-    Map<String, Object> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    PageInfo<Queue> queryList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * create queue
      *
      * @param loginUser login user
-     * @param queue queue
+     * @param queue     queue
      * @param queueName queue name
      * @return create result
      */
-    Map<String, Object> createQueue(User loginUser, String queue, String queueName);
+    Queue createQueue(User loginUser, String queue, String queueName);
 
     /**
      * update queue
      *
      * @param loginUser login user
-     * @param queue queue
-     * @param id queue id
+     * @param queue     queue
+     * @param id        queue id
      * @param queueName queue name
      * @return update result code
      */
-    Map<String, Object> updateQueue(User loginUser, int id, String queue, String queueName);
+    Queue updateQueue(User loginUser, int id, String queue, String queueName);
+
+    /**
+     * delete queue
+     *
+     * @param loginUser login user
+     * @param id        queue id
+     * @return delete result code
+     * @throws Exception exception
+     */
+    void deleteQueueById(User loginUser, int id) throws Exception;
 
     /**
      * verify queue and queueName
      *
      * @param queue     queue
      * @param queueName queue name
-     * @return true if the queue name not exists, otherwise return false
      */
-    Result<Object> verifyQueue(String queue, String queueName);
+    void verifyQueue(String queue, String queueName);
+
+    /**
+     * Make sure queue with given name exists, and create the queue if not exists
+     *
+     * ONLY for python gateway server, and should not use this in web ui function
+     *
+     * @param queue queue value
+     * @param queueName queue name
+     * @return Queue object
+     */
+    Queue createQueueIfNotExists(String queue, String queueName);
 
 }

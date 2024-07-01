@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_FIELD;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_NAME;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_PROPS;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_TITLE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_TYPE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALIDATE;
-import static org.apache.dolphinscheduler.spi.utils.Constants.STRING_PLUGIN_PARAM_VALUE;
-
 import static java.util.Objects.requireNonNull;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_EMIT;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_FIELD;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_NAME;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_PROPS;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_TITLE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_TYPE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_VALIDATE;
+import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUGIN_PARAM_VALUE;
 
 import java.util.List;
 
@@ -65,6 +65,11 @@ public class PluginParams {
     protected String title;
 
     /**
+     * prompt information
+     */
+    protected String info;
+
+    /**
      * default value or value input by user in the page
      */
     @JsonProperty(STRING_PLUGIN_PARAM_VALUE)
@@ -72,6 +77,19 @@ public class PluginParams {
 
     @JsonProperty(STRING_PLUGIN_PARAM_VALIDATE)
     protected List<Validate> validateList;
+
+    @JsonProperty(STRING_PLUGIN_PARAM_EMIT)
+    protected List<String> emit;
+
+    /**
+     * whether to hide, the default value is false
+     */
+    protected Boolean hidden;
+
+    /**
+     * whether to display, the default value is true
+     */
+    protected Boolean display;
 
     protected PluginParams(Builder builder) {
 
@@ -83,6 +101,7 @@ public class PluginParams {
         this.name = builder.name;
         this.formType = builder.formType.getFormType();
         this.title = builder.title;
+
         if (null == builder.props) {
             builder.props = new ParamsProps();
         }
@@ -90,12 +109,16 @@ public class PluginParams {
         this.props = builder.props;
         this.value = builder.value;
         this.validateList = builder.validateList;
-
+        this.info = builder.info;
+        this.display = builder.display;
+        this.hidden = builder.hidden;
+        this.emit = builder.emit;
     }
 
     @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
     public static class Builder {
-        //Must have
+
+        // Must have
         protected String name;
 
         protected FormType formType;
@@ -104,12 +127,20 @@ public class PluginParams {
 
         protected String fieldName;
 
-        //option params
+        // option params
         protected ParamsProps props;
 
         protected Object value;
 
+        protected String info;
+
         protected List<Validate> validateList;
+
+        protected List<String> emit;
+
+        protected Boolean hidden;
+
+        protected Boolean display;
 
         public Builder(String name,
                        FormType formType,
@@ -123,7 +154,7 @@ public class PluginParams {
             this.fieldName = title;
         }
 
-        //for json deserialize to POJO
+        // for json deserialize to POJO
         @JsonCreator
         public Builder(@JsonProperty("field") String name,
                        @JsonProperty("type") FormType formType,
@@ -131,8 +162,11 @@ public class PluginParams {
                        @JsonProperty("props") ParamsProps props,
                        @JsonProperty("value") Object value,
                        @JsonProperty("name") String fieldName,
-                       @JsonProperty("validate") List<Validate> validateList
-        ) {
+                       @JsonProperty("validate") List<Validate> validateList,
+                       @JsonProperty("emit") List<String> emit,
+                       @JsonProperty("info") String info,
+                       @JsonProperty("hidden") Boolean hidden,
+                       @JsonProperty("display") Boolean display) {
             requireNonNull(name, "name is null");
             requireNonNull(formType, "formType is null");
             requireNonNull(title, "title is null");
@@ -143,6 +177,10 @@ public class PluginParams {
             this.value = value;
             this.validateList = validateList;
             this.fieldName = fieldName;
+            this.emit = emit;
+            this.info = info;
+            this.hidden = hidden;
+            this.display = display;
         }
 
         public PluginParams build() {
@@ -177,6 +215,9 @@ public class PluginParams {
     public void setValue(Object value) {
         this.value = value;
     }
+
+    public List<String> getEmit() {
+        return emit;
+    }
+
 }
-
-

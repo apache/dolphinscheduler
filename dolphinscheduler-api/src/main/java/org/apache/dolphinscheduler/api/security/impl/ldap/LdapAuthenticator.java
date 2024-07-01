@@ -18,26 +18,26 @@
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
-import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import lombok.NonNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class LdapAuthenticator extends AbstractAuthenticator {
-    @Autowired
-    private UsersService usersService;
+
     @Autowired
     LdapService ldapService;
 
     @Override
-    public User login(String userId, String password, String extra) {
+    public User login(@NonNull String userId, String password) {
         User user = null;
         String ldapEmail = ldapService.ldapLogin(userId, password);
         if (ldapEmail != null) {
-            //check if user exist
-            user = usersService.getUserByUserName(userId);
-            if (user == null) {
-                user = usersService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+            // check if user exist
+            user = userService.getUserByUserName(userId);
+            if (user == null && ldapService.createIfUserNotExists()) {
+                user = userService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
             }
         }
         return user;

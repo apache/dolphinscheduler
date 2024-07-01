@@ -14,42 +14,53 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
+
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 /**
  * command mapper interface
  */
 public interface CommandMapper extends BaseMapper<Command> {
 
-
-    /**
-     * get one command
-     * @return command
-     */
-    Command getOneToRun();
-
     /**
      * count command state
-     * @param userId userId
-     * @param startTime startTime
-     * @param endTime endTime
-     * @param projectIdArray projectIdArray
+     *
+     * @param startTime    startTime
+     * @param endTime      endTime
+     * @param projectCodes projectCodes
      * @return CommandCount list
      */
     List<CommandCount> countCommandState(
-            @Param("userId") int userId,
-            @Param("startTime") Date startTime,
-            @Param("endTime") Date endTime,
-            @Param("projectIdArray") Integer[] projectIdArray);
+                                         @Param("startTime") Date startTime,
+                                         @Param("endTime") Date endTime,
+                                         @Param("projectCodes") List<Long> projectCodes);
 
+    /**
+     * query command page
+     *
+     * @return
+     */
+    IPage<Command> queryCommandPage(Page<Command> page);
 
+    List<Command> queryCommandByIdSlot(@Param("currentSlotIndex") int currentSlotIndex,
+                                       @Param("totalSlot") int totalSlot,
+                                       @Param("idStep") int idStep,
+                                       @Param("fetchNumber") int fetchNum);
 
+    void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
+
+    IPage<Command> queryCommandPageByIds(Page<Command> page,
+                                         @Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 }

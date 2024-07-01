@@ -17,22 +17,17 @@
 
 package org.apache.dolphinscheduler.api.security;
 
-import org.apache.dolphinscheduler.api.ApiApplicationServer;
+import org.apache.dolphinscheduler.api.controller.AbstractControllerTest;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = ApiApplicationServer.class)
 @TestPropertySource(properties = {
         "security.authentication.type=PASSWORD",
 })
-public class SecurityConfigPasswordTest {
+public class SecurityConfigPasswordTest extends AbstractControllerTest {
 
     @Autowired
     private SecurityConfig securityConfig;
@@ -40,6 +35,6 @@ public class SecurityConfigPasswordTest {
     @Test
     public void testAuthenticator() {
         Authenticator authenticator = securityConfig.authenticator();
-        Assert.assertNotNull(authenticator);
+        Assertions.assertNotNull(authenticator);
     }
 }

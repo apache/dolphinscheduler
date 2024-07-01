@@ -17,18 +17,27 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -39,158 +48,224 @@ import org.springframework.util.MultiValueMap;
  */
 public class ProcessInstanceControllerTest extends AbstractControllerTest {
 
+    @MockBean(name = "processInstanceService")
+    private ProcessInstanceService processInstanceService;
+
     @Test
     public void testQueryProcessInstanceList() throws Exception {
+        Result mockResult = new Result<>();
+        mockResult.setCode(Status.SUCCESS.getCode());
+        Mockito.when(processInstanceService
+                .queryProcessInstanceList(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
+                        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                        Mockito.any(), Mockito.any()))
+                .thenReturn(mockResult);
+
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processDefinitionId", "91");
+        paramsMap.add("processDefineCode", "91");
         paramsMap.add("searchVal", "cxc");
-        paramsMap.add("stateType", String.valueOf(ExecutionStatus.SUCCESS));
+        paramsMap.add("stateType", WorkflowExecutionStatus.SUCCESS.name());
         paramsMap.add("host", "192.168.1.13");
         paramsMap.add("startDate", "2019-12-15 00:00:00");
         paramsMap.add("endDate", "2019-12-16 00:00:00");
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/list-paging", "cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryTaskListByProcessId() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.PROJECT_NOT_FOUND);
+        Mockito
+                .when(processInstanceService.queryTaskListByProcessId(Mockito.any(), Mockito.anyLong(), Mockito.any()))
+                .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/task-list-by-process-id", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1203"))
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}/tasks", "1113", "123")
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROJECT_NOT_FOUNT.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testUpdateProcessInstance() throws Exception {
-        String json = "{\"globalParams\":[],\"tasks\":[{\"type\":\"SHELL\",\"id\":\"tasks-36196\",\"name\":\"ssh_test1\",\"params\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"aa=\\\"1234\\\"\\necho ${aa}\"},\"desc\":\"\",\"runFlag\":\"NORMAL\",\"dependence\":{},\"maxRetryTimes\":\"0\",\"retryInterval\":\"1\",\"timeout\":{\"strategy\":\"\",\"interval\":null,\"enable\":false},\"taskInstancePriority\":\"MEDIUM\",\"workerGroupId\":-1,\"preTasks\":[]}],\"tenantId\":-1,\"timeout\":0}";
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(processInstanceService
+                .updateProcessInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
+                        Mockito.anyString(), Mockito.anyInt()))
+                .thenReturn(mockResult);
+
+        String json =
+                "[{\"name\":\"\",\"pre_task_code\":0,\"pre_task_version\":0,\"post_task_code\":123456789,\"post_task_version\":1,"
+                        + "\"condition_type\":0,\"condition_params\":\"{}\"},{\"name\":\"\",\"pre_task_code\":123456789,\"pre_task_version\":1,"
+                        + "\"post_task_code\":123451234,\"post_task_version\":1,\"condition_type\":0,\"condition_params\":\"{}\"}]";
+
         String locations = "{\"tasks-36196\":{\"name\":\"ssh_test1\",\"targetarr\":\"\",\"x\":141,\"y\":70}}";
 
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("processInstanceJson", json);
+        paramsMap.add("taskRelationJson", json);
+        paramsMap.add("taskDefinitionJson", "");
         paramsMap.add("processInstanceId", "91");
         paramsMap.add("scheduleTime", "2019-12-15 00:00:00");
         paramsMap.add("syncDefine", "false");
         paramsMap.add("locations", locations);
-        paramsMap.add("connects", "[]");
+        paramsMap.add("tenantCode", "123");
 
-        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectName}/instance/update", "cxc_1113")
+        MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/process-instances/{id}", "1113", "123")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryProcessInstanceById() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-by-id", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1203"))
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(
+                processInstanceService.queryProcessInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(mockResult);
+        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/process-instances/{id}", "1113", "123")
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
-
 
     @Test
     public void testQuerySubProcessInstanceByTaskId() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.TASK_INSTANCE_NOT_EXISTS);
+        Mockito.when(processInstanceService.querySubProcessInstanceByTaskId(Mockito.any(), Mockito.anyLong(),
+                Mockito.anyInt())).thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-sub-process", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("taskId", "1203"))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-instances/query-sub-by-parent", "1113")
+                        .header(SESSION_ID, sessionId)
+                        .param("taskId", "1203"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryParentInstanceBySubId() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE);
+        Mockito.when(
+                processInstanceService.queryParentInstanceBySubId(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
+                .thenReturn(mockResult);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/select-parent-process", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("subId", "1204"))
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-instances/query-parent-by-sub", "1113")
+                        .header(SESSION_ID, sessionId)
+                        .param("subId", "1204"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.PROCESS_INSTANCE_NOT_SUB_PROCESS_INSTANCE.getCode(),
+                result.getCode().intValue());
     }
-
 
     @Test
     public void testViewVariables() throws Exception {
-
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/view-variables", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1204"))
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.when(processInstanceService.viewVariables(1113L, 123)).thenReturn(mockResult);
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/process-instances/{id}/view-variables", "1113", "123")
+                        .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
-
 
     @Test
     public void testDeleteProcessInstanceById() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        Mockito.doNothing().when(processInstanceService).deleteProcessInstanceById(Mockito.any(), Mockito.anyInt());
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/delete", "cxc_1113")
-                .header(SESSION_ID, sessionId)
-                .param("processInstanceId", "1204"))
+        MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/process-instances/{id}", "1113", "123")
+                .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testBatchDeleteProcessInstanceByIds() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.PROCESS_INSTANCE_NOT_EXIST);
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/{projectName}/instance/batch-delete", "cxc_1113")
+        Mockito.doNothing().when(processInstanceService).deleteProcessInstanceById(Mockito.any(), Mockito.anyInt());
+        MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/process-instances/batch-delete", "1113")
                 .header(SESSION_ID, sessionId)
-                .param("processInstanceIds", "1205，1206"))
+                .param("processInstanceIds", "1205,1206"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assert.assertNotNull(result);
-        Assert.assertEquals(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR.getCode(), result.getCode().intValue());
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void queryProcessInstancesByTriggerCode() throws Exception {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put(Constants.STATUS, Status.SUCCESS);
+
+        Mockito.when(processInstanceService
+                .queryByTriggerCode(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
+                .thenReturn(mockResult);
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/1113/process-instances/trigger")
+                .header("sessionId", sessionId)
+                .param("triggerCode", "12051206"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertNotNull(result);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 }

@@ -49,6 +49,7 @@ public class ServerAlertContent {
     }
 
     public static class Builder {
+
         private String type;
 
         private String host;

@@ -14,43 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProjectUserMapperTest {
-
+public class ProjectUserMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProjectUserMapper projectUserMapper;
+    private ProjectUserMapper projectUserMapper;
 
     /**
      * insert
+     *
      * @return ProjectUser
      */
-    private ProjectUser insertOne(){
-        //insertOne
+    private ProjectUser insertOne() {
+        // insertOne
         ProjectUser projectUser = new ProjectUser();
         projectUser.setProjectId(1010);
         projectUser.setUserId(111);
@@ -62,23 +50,23 @@ public class ProjectUserMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         ProjectUser projectUser = insertOne();
         projectUser.setCreateTime(new Date());
-        //update
+        // update
         int update = projectUserMapper.updateById(projectUser);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         ProjectUser projectUserMap = insertOne();
         int delete = projectUserMapper.deleteById(projectUserMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -87,9 +75,9 @@ public class ProjectUserMapperTest {
     @Test
     public void testQuery() {
         ProjectUser projectUser = insertOne();
-        //query
+        // query
         List<ProjectUser> projectUsers = projectUserMapper.selectList(null);
-        Assert.assertNotEquals(projectUsers.size(), 0);
+        Assertions.assertNotEquals(0, projectUsers.size());
     }
 
     /**
@@ -98,10 +86,9 @@ public class ProjectUserMapperTest {
     @Test
     public void testDeleteProjectRelation() {
 
-
         ProjectUser projectUser = insertOne();
         int delete = projectUserMapper.deleteProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        assertThat(delete,greaterThanOrEqualTo(1));
+        Assertions.assertTrue(delete >= 1);
 
     }
 
@@ -111,8 +98,9 @@ public class ProjectUserMapperTest {
     @Test
     public void testQueryProjectRelation() {
         ProjectUser projectUser = insertOne();
-        ProjectUser projectUser1 = projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
-        Assert.assertNotEquals(projectUser1, null);
+        ProjectUser projectUser1 =
+                projectUserMapper.queryProjectRelation(projectUser.getProjectId(), projectUser.getUserId());
+        Assertions.assertNotEquals(null, projectUser1);
 
     }
 }

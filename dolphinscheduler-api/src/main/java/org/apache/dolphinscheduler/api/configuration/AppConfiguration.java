@@ -37,7 +37,6 @@ import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 
-
 /**
  * application configuration
  */
@@ -45,13 +44,13 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 public class AppConfiguration implements WebMvcConfigurer {
 
     public static final String LOGIN_INTERCEPTOR_PATH_PATTERN = "/**/*";
-    public static final String LOGIN_PATH_PATTERN = "/login";
+    public static final String LOGIN_PATH_PATTERN = "/login/**";
     public static final String REGISTER_PATH_PATTERN = "/users/register";
     public static final String PATH_PATTERN = "/**";
     public static final String LOCALE_LANGUAGE_COOKIE = "language";
 
     @Autowired
-    private TrafficConfiguration trafficConfiguration;
+    private ApiConfig apiConfig;
 
     @Bean
     public CorsFilter corsFilter() {
@@ -91,36 +90,37 @@ public class AppConfiguration implements WebMvcConfigurer {
 
     @Bean
     public RateLimitInterceptor createRateLimitInterceptor() {
-        return new RateLimitInterceptor(trafficConfiguration);
+        return new RateLimitInterceptor(apiConfig.getTrafficControl());
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // i18n
         registry.addInterceptor(localeChangeInterceptor());
-        if (trafficConfiguration.isTrafficGlobalControlSwitch() || trafficConfiguration.isTrafficTenantControlSwitch()) {
+        ApiConfig.TrafficConfiguration trafficControl = apiConfig.getTrafficControl();
+        if (trafficControl.isGlobalSwitch() || trafficControl.isTenantSwitch()) {
             registry.addInterceptor(createRateLimitInterceptor());
         }
         registry.addInterceptor(loginInterceptor())
                 .addPathPatterns(LOGIN_INTERCEPTOR_PATH_PATTERN)
                 .excludePathPatterns(LOGIN_PATH_PATTERN, REGISTER_PATH_PATTERN,
-                        "/swagger-resources/**", "/webjars/**", "/v2/**",
-                        "/doc.html", "/swagger-ui.html", "*.html", "/ui/**");
+                        "/swagger-resources/**", "/webjars/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html",
+                        "/doc.html", "/swagger-ui/**", "*.html", "/ui/**", "/error", "/oauth2-provider",
+                        "/redirect/login/oauth2", "/cookies");
     }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
         registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
-        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
         registry.addResourceHandler("/ui/**").addResourceLocations("file:ui/");
     }
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("redirect:/ui/");
         registry.addViewController("/ui/").setViewName("forward:/ui/index.html");
-        registry.addViewController("/").setViewName("forward:/ui/index.html");
     }
 
     /**

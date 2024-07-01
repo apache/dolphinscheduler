@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.enums.DbConnectType;
-import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
+import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import org.apache.dolphinscheduler.spi.enums.DbType;
+import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 
-import java.util.Map;
+import java.util.List;
 
 /**
  * data source service
@@ -33,26 +36,19 @@ public interface DataSourceService {
      * create data source
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
-     * @param parameter datasource parameters
+     * @param datasourceParam datasource parameter
      * @return create result code
      */
-    Result<Object> createDataSource(User loginUser, String name, String desc, DbType type, String parameter);
+    DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
     /**
      * updateProcessInstance datasource
      *
      * @param loginUser login user
-     * @param name      data source name
-     * @param desc      data source description
-     * @param type      data source type
-     * @param parameter datasource parameters
-     * @param id        data source id
+     * @param dataSourceParam data source params
      * @return update result code
      */
-    Result<Object> updateDataSource(int id, User loginUser, String name, String desc, DbType type, String parameter);
+    DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 
     /**
      * updateProcessInstance datasource
@@ -60,7 +56,7 @@ public interface DataSourceService {
      * @param id datasource id
      * @return data source detail
      */
-    Map<String, Object> queryDataSource(int id);
+    BaseDataSourceParamDTO queryDataSource(int id, User loginUser);
 
     /**
      * query datasource list by keyword
@@ -71,7 +67,7 @@ public interface DataSourceService {
      * @param pageSize  page size
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
+    PageInfo<DataSource> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
      * query data resource list
@@ -80,7 +76,7 @@ public interface DataSourceService {
      * @param type      data source type
      * @return data source list page
      */
-    Map<String, Object> queryDataSourceList(User loginUser, Integer type);
+    List<DataSource> queryDataSourceList(User loginUser, Integer type);
 
     /**
      * verify datasource exists
@@ -88,7 +84,7 @@ public interface DataSourceService {
      * @param name      datasource name
      * @return true if data datasource not exists, otherwise return false
      */
-    Result<Object> verifyDataSourceName(String name);
+    void verifyDataSourceName(String name);
 
     /**
      * check connection
@@ -97,7 +93,7 @@ public interface DataSourceService {
      * @param parameter data source parameters
      * @return true if connect successfully, otherwise false
      */
-    Result<Object> checkConnection(DbType type, String parameter);
+    void checkConnection(DbType type, ConnectionParam parameter);
 
     /**
      * test connection
@@ -105,25 +101,7 @@ public interface DataSourceService {
      * @param id datasource id
      * @return connect result code
      */
-    Result<Object> connectionTest(int id);
-
-    /**
-     * build paramters
-     *
-     * @param type      data source  type
-     * @param host      data source  host
-     * @param port      data source port
-     * @param database  data source database name
-     * @param userName  user name
-     * @param password  password
-     * @param other     other parameters
-     * @param principal principal
-     * @return datasource parameter
-     */
-    String buildParameter(DbType type, String host,
-                          String port, String database, String principal, String userName,
-                          String password, DbConnectType connectType, String other,
-                          String javaSecurityKrb5Conf, String loginUserKeytabUsername, String loginUserKeytabPath);
+    void connectionTest(int id);
 
     /**
      * delete datasource
@@ -132,7 +110,7 @@ public interface DataSourceService {
      * @param datasourceId data source id
      * @return delete result code
      */
-    Result<Object> delete(User loginUser, int datasourceId);
+    void delete(User loginUser, int datasourceId);
 
     /**
      * unauthorized datasource
@@ -141,7 +119,7 @@ public interface DataSourceService {
      * @param userId    user id
      * @return unauthed data source result code
      */
-    Map<String, Object> unauthDatasource(User loginUser, Integer userId);
+    List<DataSource> unAuthDatasource(User loginUser, Integer userId);
 
     /**
      * authorized datasource
@@ -150,5 +128,29 @@ public interface DataSourceService {
      * @param userId    user id
      * @return authorized result code
      */
-    Map<String, Object> authedDatasource(User loginUser, Integer userId);
+    List<DataSource> authedDatasource(User loginUser, Integer userId);
+
+    /**
+     * get tables
+     * @param datasourceId
+     * @param database
+     * @return
+     */
+    List<ParamsOptions> getTables(Integer datasourceId, String database);
+
+    /**
+     * get table columns
+     * @param datasourceId
+     * @param database
+     * @param tableName
+     * @return
+     */
+    List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName);
+
+    /**
+     * get databases
+     * @param datasourceId
+     * @return
+     */
+    List<ParamsOptions> getDatabases(Integer datasourceId);
 }

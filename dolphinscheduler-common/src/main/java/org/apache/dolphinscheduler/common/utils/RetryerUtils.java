@@ -17,14 +17,11 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.common.constants.Constants;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
@@ -32,11 +29,8 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 
-/**
- * The Retryer util.
- */
 public class RetryerUtils {
-    private static final Logger logger = LoggerFactory.getLogger(RetryerUtils.class);
+
     private static Retryer<Boolean> defaultRetryerResultCheck;
     private static Retryer<Boolean> defaultRetryerResultNoCheck;
 
@@ -99,7 +93,8 @@ public class RetryerUtils {
      * @throws ExecutionException the execution exception
      * @throws RetryException     the retry exception
      */
-    public static Boolean retryCall(final Callable<Boolean> callable, boolean checkResult) throws ExecutionException, RetryException {
+    public static Boolean retryCall(final Callable<Boolean> callable,
+                                    boolean checkResult) throws ExecutionException, RetryException {
         return getDefaultRetryer(checkResult).call(callable);
     }
 
@@ -113,32 +108,5 @@ public class RetryerUtils {
      */
     public static Boolean retryCall(final Callable<Boolean> callable) throws ExecutionException, RetryException {
         return retryCall(callable, true);
-    }
-
-    /**
-     * Retry call silent without exceptions thrown
-     *
-     * @param callable    the callable
-     * @param checkResult whether check result
-     * @return if no exceptions ,it's result returned by callable ,else always false
-     */
-    public static boolean retryCallSilent(final Callable<Boolean> callable, boolean checkResult) {
-        boolean result = false;
-        try {
-            result = getDefaultRetryer(checkResult).call(callable);
-        } catch (ExecutionException | RetryException e) {
-            logger.warn("Retry call {} failed {}", callable, e.getMessage(), e);
-        }
-        return result;
-    }
-
-    /**
-     * Retry call silent without exceptions thrown
-     *
-     * @param callable the callable
-     * @return if no exceptions ,it's result returned by callable ,else always false
-     */
-    public static boolean retryCallSilent(final Callable<Boolean> callable) {
-        return retryCallSilent(callable, true);
     }
 }

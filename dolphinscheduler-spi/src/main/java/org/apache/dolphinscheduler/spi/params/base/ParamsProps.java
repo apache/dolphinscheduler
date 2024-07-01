@@ -26,7 +26,15 @@ public class ParamsProps {
 
     private String placeholder;
 
+    /**
+     * input box size, optional value medium/small/mini
+     */
     private String size = "small";
+
+    /**
+     * whether to disable, the default value is false
+     */
+    private Boolean disabled;
 
     public void setSize(String size) {
         this.size = size;
@@ -47,4 +55,11 @@ public class ParamsProps {
         return this;
     }
 
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
 }

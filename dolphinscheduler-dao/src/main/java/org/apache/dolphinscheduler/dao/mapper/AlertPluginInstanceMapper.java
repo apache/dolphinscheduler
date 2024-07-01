@@ -24,6 +24,8 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstance> {
 
@@ -35,6 +37,13 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
     List<AlertPluginInstance> queryAllAlertPluginInstanceList();
 
     /**
+     * query all global alert plugin instance
+     *
+     * @return global AlertPluginInstance list
+     */
+    List<AlertPluginInstance> queryAllGlobalAlertPluginInstanceList();
+
+    /**
      * query by alert group id
      *
      * @param ids
@@ -42,7 +51,13 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      */
     List<AlertPluginInstance> queryByIds(@Param("ids") List<Integer> ids);
 
-    List<AlertPluginInstance> queryByInstanceName(@Param("instanceName")String instanceName);
+    /**
+     * Query alert plugin instance by given name
+     * @param page                page
+     * @param instanceName         Alert plugin name
+     * @return alertPluginInstance Ipage
+     */
+    IPage<AlertPluginInstance> queryByInstanceNamePage(Page page, @Param("instanceName") String instanceName);
 
     /**
      *
@@ -50,5 +65,4 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
      * @return if exist return true else return null
      */
     Boolean existInstanceName(@Param("instanceName") String instanceName);
-
 }

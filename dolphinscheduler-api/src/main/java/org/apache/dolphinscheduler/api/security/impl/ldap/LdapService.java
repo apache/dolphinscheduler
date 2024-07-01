@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import org.apache.dolphinscheduler.api.security.LdapUserNotExistActionType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Properties;
 
@@ -31,37 +34,50 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.ldap.filter.EqualsFilter;
 import org.springframework.stereotype.Component;
 
 @Component
 @Configuration
+@Slf4j
 public class LdapService {
-    private static final Logger logger = LoggerFactory.getLogger(LdapService.class);
 
-    @Value("${security.authentication.ldap.user.admin:null}")
+    @Value("${security.authentication.ldap.user.admin:#{null}}")
     private String adminUserId;
 
-    @Value("${ldap.urls:null}")
+    @Value("${security.authentication.ldap.urls:#{null}}")
     private String ldapUrls;
 
-    @Value("${ldap.base.dn:null}")
+    @Value("${security.authentication.ldap.base-dn:#{null}}")
     private String ldapBaseDn;
 
-    @Value("${ldap.username:null}")
+    @Value("${security.authentication.ldap.username:#{null}}")
     private String ldapSecurityPrincipal;
 
-    @Value("${ldap.password:null}")
+    @Value("${security.authentication.ldap.password:#{null}}")
     private String ldapPrincipalPassword;
 
-    @Value("${ldap.user.identity.attribute:null}")
+    @Value("${security.authentication.ldap.user.identity-attribute:#{null}}")
     private String ldapUserIdentifyingAttribute;
 
-    @Value("${ldap.user.email.attribute:null}")
+    @Value("${security.authentication.ldap.user.email-attribute:#{null}}")
     private String ldapEmailAttribute;
+
+    @Value("${security.authentication.ldap.user.not-exist-action:CREATE}")
+    private String ldapUserNotExistAction;
+
+    @Value("${security.authentication.ldap.ssl.enable:false}")
+    private Boolean sslEnable;
+
+    @Value("${security.authentication.ldap.ssl.trust-store:#{null}}")
+    private String trustStore;
+
+    @Value("${security.authentication.ldap.ssl.trust-store-password:#{null}}")
+    private String trustStorePassword;
 
     /***
      * get user type by configured admin userId
@@ -81,39 +97,48 @@ public class LdapService {
      */
     public String ldapLogin(String userId, String userPwd) {
         Properties searchEnv = getManagerLdapEnv();
+        LdapContext ctx = null;
         try {
-            //Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
-            LdapContext ctx = new InitialLdapContext(searchEnv, null);
+            // Connect to the LDAP server and Authenticate with a service user of whom we know the DN and credentials
+            ctx = new InitialLdapContext(searchEnv, null);
             SearchControls sc = new SearchControls();
             sc.setReturningAttributes(new String[]{ldapEmailAttribute});
             sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            String searchFilter = String.format("(%s=%s)", ldapUserIdentifyingAttribute, userId);
-            //Search for the user you want to authenticate, search him with some attribute
-            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, searchFilter, sc);
+            EqualsFilter filter = new EqualsFilter(ldapUserIdentifyingAttribute, userId);
+            NamingEnumeration<SearchResult> results = ctx.search(ldapBaseDn, filter.toString(), sc);
             if (results.hasMore()) {
                 // get the users DN (distinguishedName) from the result
                 SearchResult result = results.next();
-                NamingEnumeration attrs = result.getAttributes().getAll();
+                NamingEnumeration<? extends Attribute> attrs = result.getAttributes().getAll();
                 while (attrs.hasMore()) {
-                    //Open another connection to the LDAP server with the found DN and the password
+                    // Open another connection to the LDAP server with the found DN and the password
                     searchEnv.put(Context.SECURITY_PRINCIPAL, result.getNameInNamespace());
                     searchEnv.put(Context.SECURITY_CREDENTIALS, userPwd);
                     try {
                         new InitialDirContext(searchEnv);
                     } catch (Exception e) {
-                        logger.warn("invalid ldap credentials or ldap search error", e);
+                        log.warn("invalid ldap credentials or ldap search error", e);
                         return null;
                     }
-                    Attribute attr = (Attribute) attrs.next();
+                    Attribute attr = attrs.next();
                     if (attr.getID().equals(ldapEmailAttribute)) {
                         return (String) attr.get();
                     }
                 }
             }
         } catch (NamingException e) {
-            logger.error("ldap search error", e);
+            log.error("ldap search error", e);
             return null;
+        } finally {
+            try {
+                if (ctx != null) {
+                    ctx.close();
+                }
+            } catch (NamingException e) {
+                log.error("ldap context close error", e);
+            }
         }
+
         return null;
     }
 
@@ -128,6 +153,28 @@ public class LdapService {
         env.put(Context.SECURITY_PRINCIPAL, ldapSecurityPrincipal);
         env.put(Context.SECURITY_CREDENTIALS, ldapPrincipalPassword);
         env.put(Context.PROVIDER_URL, ldapUrls);
+
+        if (sslEnable) {
+            env.put(Context.SECURITY_PROTOCOL, "ssl");
+            System.setProperty("javax.net.ssl.trustStore", trustStore);
+            if (StringUtils.isNotEmpty(trustStorePassword)) {
+                System.setProperty("javax.net.ssl.trustStorePassword", trustStorePassword);
+            }
+        }
         return env;
+    }
+
+    public LdapUserNotExistActionType getLdapUserNotExistAction() {
+        if (StringUtils.isBlank(ldapUserNotExistAction)) {
+            log.info(
+                    "security.authentication.ldap.user.not.exist.action configuration is empty, the default value 'CREATE'");
+            return LdapUserNotExistActionType.CREATE;
+        }
+
+        return LdapUserNotExistActionType.valueOf(ldapUserNotExistAction);
+    }
+
+    public boolean createIfUserNotExists() {
+        return getLdapUserNotExistAction() == LdapUserNotExistActionType.CREATE;
     }
 }

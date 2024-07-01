@@ -18,82 +18,137 @@
 package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_LINEAGE_ERROR;
-import static org.apache.dolphinscheduler.common.Constants.SESSION_USER;
+import static org.apache.dolphinscheduler.api.enums.Status.TASK_WITH_DEPENDENT_ERROR;
+import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USER;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * work flow lineage controller
  */
-@Api(tags = "WORK_FLOW_LINEAGE_TAG")
+@Tag(name = "WORK_FLOW_LINEAGE_TAG")
 @RestController
-@RequestMapping("lineages/{projectId}")
+@RequestMapping("projects/{projectCode}/lineages")
+@Slf4j
 public class WorkFlowLineageController extends BaseController {
-    private static final Logger logger = LoggerFactory.getLogger(WorkFlowLineageController.class);
 
     @Autowired
     private WorkFlowLineageService workFlowLineageService;
 
-    @GetMapping(value = "/list-name")
+    @Operation(summary = "queryLineageByWorkFlowName", description = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
+    @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
-    public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                    @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
-                                                                    @ApiIgnore @RequestParam(value = "searchVal", required = false) String searchVal) {
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+    public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                    @RequestParam(value = "workFlowName", required = false) String workFlowName) {
+        workFlowName = ParameterUtils.handleEscapes(workFlowName);
+        List<WorkFlowLineage> workFlowLineages =
+                workFlowLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
+        return Result.success(workFlowLineages);
+    }
+
+    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
+    @GetMapping(value = "/{workFlowCode}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+    public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                  @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
+        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        return Result.success(result);
+    }
+
+    @Operation(summary = "queryWorkFlowList", description = "QUERY_WORKFLOW_LINEAGE_NOTES")
+    @GetMapping(value = "/list")
+    @ResponseStatus(HttpStatus.OK)
+    public Result<Map<String, Object>> queryWorkFlowLineage(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
-            searchVal = ParameterUtils.handleEscapes(searchVal);
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByName(searchVal,projectId);
+            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
             return returnDataList(result);
         } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
+            log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
         }
     }
 
-    @GetMapping(value = "/list-ids")
+    /**
+     * Whether task can be deleted or not, avoiding task depend on other task of process definition delete by accident.
+     *
+     * @param loginUser login user
+     * @param projectCode project codes which taskCode belong
+     * @param processDefinitionCode project code which taskCode belong
+     * @param taskCode task definition code
+     * @return Result of task can be deleted or not
+     */
+    @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "processDefinitionCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "123456789")),
+    })
+    @PostMapping(value = "/tasks/verify-delete")
     @ResponseStatus(HttpStatus.OK)
-    public Result<Map<String, Object>> queryWorkFlowLineageByIds(@ApiIgnore @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                 @ApiParam(name = "projectId", value = "PROJECT_ID", required = true, example = "1") @PathVariable int projectId,
-                                                                 @ApiIgnore @RequestParam(value = "ids", required = false) String ids) {
-        try {
-            ids = ParameterUtils.handleEscapes(ids);
-            Set<Integer> idsSet = new HashSet<>();
-            if (ids != null) {
-                String[] idsStr = ids.split(",");
-                for (String id : idsStr) {
-                    idsSet.add(Integer.parseInt(id));
-                }
-            }
-
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByIds(idsSet, projectId);
-            return returnDataList(result);
-        } catch (Exception e) {
-            logger.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(),e);
-            return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
+    @ApiException(TASK_WITH_DEPENDENT_ERROR)
+    public Result verifyTaskCanDelete(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                      @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
+                                      @RequestParam(value = "taskCode", required = true) long taskCode) {
+        Result result = new Result();
+        Optional<String> taskDepMsg =
+                workFlowLineageService.taskDepOnTaskMsg(projectCode, processDefinitionCode, taskCode);
+        if (taskDepMsg.isPresent()) {
+            throw new ServiceException(taskDepMsg.get());
         }
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Operation(summary = "queryDownstreamDependentTaskList", description = "QUERY_DOWNSTREAM_DEPENDENT_TASK_NOTES")
+    @Parameters({
+            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class)),
+            @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = false, schema = @Schema(implementation = Long.class, example = "123456789")),
+    })
+    @GetMapping(value = "/query-dependent-tasks")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+    public Result<Map<String, Object>> queryDownstreamDependentTaskList(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                        @RequestParam(value = "workFlowCode") Long workFlowCode,
+                                                                        @RequestParam(value = "taskCode", required = false, defaultValue = "0") Long taskCode) {
+        Map<String, Object> result =
+                workFlowLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
+        return returnDataList(result);
     }
 }

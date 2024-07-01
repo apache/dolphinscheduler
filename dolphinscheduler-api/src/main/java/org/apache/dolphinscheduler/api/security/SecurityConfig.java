@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.api.security;
 
 import org.apache.dolphinscheduler.api.security.impl.ldap.LdapAuthenticator;
 import org.apache.dolphinscheduler.api.security.impl.pwd.PasswordAuthenticator;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.api.security.impl.sso.CasdoorAuthenticator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -30,8 +32,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Slf4j
 public class SecurityConfig {
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
     @Value("${security.authentication.type:PASSWORD}")
     private String type;
@@ -46,7 +48,7 @@ public class SecurityConfig {
 
     private void setAuthenticationType(String type) {
         if (StringUtils.isBlank(type)) {
-            logger.info("security.authentication.type configuration is empty, the default value 'PASSWORD'");
+            log.info("security.authentication.type configuration is empty, the default value 'PASSWORD'");
             this.authenticationType = AuthenticationType.PASSWORD;
             return;
         }
@@ -65,10 +67,17 @@ public class SecurityConfig {
             case LDAP:
                 authenticator = new LdapAuthenticator();
                 break;
+            case CASDOOR_SSO:
+                authenticator = new CasdoorAuthenticator();
+                break;
             default:
                 throw new IllegalStateException("Unexpected value: " + authenticationType);
         }
         beanFactory.autowireBean(authenticator);
         return authenticator;
+    }
+
+    public String getType() {
+        return type;
     }
 }

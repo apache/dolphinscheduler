@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.dto.treeview;
 
 import java.util.ArrayList;
@@ -34,6 +35,21 @@ public class TreeViewDto {
      */
     private String type;
 
+    /**
+     * code
+     */
+    private long code;
+
+    /**
+     * instances list
+     */
+
+    private List<Instance> instances = new ArrayList<>();
+
+    /**
+     * children
+     */
+    private List<TreeViewDto> children = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -51,17 +67,13 @@ public class TreeViewDto {
         this.type = type;
     }
 
-    /**
-     * instances list
-     */
+    public long getCode() {
+        return code;
+    }
 
-    private List<Instance> instances = new ArrayList<>();
-
-    /**
-     * children
-     */
-    private List<TreeViewDto> children = new ArrayList<>();
-
+    public void setCode(long code) {
+        this.code = code;
+    }
 
     public List<Instance> getInstances() {
         return instances;
@@ -78,6 +90,4 @@ public class TreeViewDto {
     public void setChildren(List<TreeViewDto> children) {
         this.children = children;
     }
-
-
 }

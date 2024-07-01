@@ -1,0 +1,37 @@
+{
+  "Name": "SparkPi",
+  "ReleaseLabel": "emr-5.34.0",
+  "Applications": [
+    {
+      "Name": "Spark"
+    }
+  ],
+  "Instances": {
+    "InstanceGroups": [
+      {
+        "Name": "Primary node",
+        "InstanceRole": "MASTER",
+        "InstanceType": "m4.xlarge",
+        "InstanceCount": 1
+      }
+    ],
+    "KeepJobFlowAliveWhenNoSteps": false,
+    "TerminationProtected": false
+  },
+  "Steps": [
+    {
+      "Name": "calculate_pi",
+      "ActionOnFailure": "CONTINUE",
+      "HadoopJarStep": {
+        "Jar": "command-runner.jar",
+        "Args": [
+          "/usr/lib/spark/bin/run-example",
+          "SparkPi",
+          "15"
+        ]
+      }
+    }
+  ],
+  "JobFlowRole": "EMR_EC2_DefaultRole",
+  "ServiceRole": "EMR_DefaultRole"
+}

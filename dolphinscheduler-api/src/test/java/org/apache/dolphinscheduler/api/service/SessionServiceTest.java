@@ -18,37 +18,33 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.SessionMapper;
+import org.apache.dolphinscheduler.dao.repository.SessionDao;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.mock.web.MockCookie;
-import org.springframework.mock.web.MockHttpServletRequest;
 
 /**
  * session service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SessionServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
@@ -57,46 +53,25 @@ public class SessionServiceTest {
     private SessionServiceImpl sessionService;
 
     @Mock
-    private SessionMapper sessionMapper;
+    private SessionDao sessionDao;
 
-    private String sessionId ="aaaaaaaaaaaaaaaaaa";
+    private String sessionId = "aaaaaaaaaaaaaaaaaa";
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
-    @After
-    public void after(){
+    @AfterEach
+    public void after() {
     }
 
-    /**
-     * create session
-     */
     @Test
-    public void testGetSession(){
+    public void testGetSession() {
 
-
-        Mockito.when(sessionMapper.selectById(sessionId)).thenReturn(getSession());
-        // get sessionId from  header
-        MockHttpServletRequest mockHttpServletRequest = new MockHttpServletRequest();
-        mockHttpServletRequest.addHeader(Constants.SESSION_ID,sessionId);
-        mockHttpServletRequest.addHeader("HTTP_X_FORWARDED_FOR","127.0.0.1");
-        //query
-        Session session = sessionService.getSession(mockHttpServletRequest);
-        Assert.assertNotNull(session);
-        logger.info("session ip {}",session.getIp());
-
-        // get sessionId from cookie
-        mockHttpServletRequest = new MockHttpServletRequest();
-        mockHttpServletRequest.addHeader("HTTP_X_FORWARDED_FOR","127.0.0.1");
-        MockCookie mockCookie = new MockCookie(Constants.SESSION_ID,sessionId);
-        mockHttpServletRequest.setCookies(mockCookie);
-        //query
-        session = sessionService.getSession(mockHttpServletRequest);
-        Assert.assertNotNull(session);
-        logger.info("session ip {}",session.getIp());
-        Assert.assertEquals(session.getIp(),"127.0.0.1");
-
+        Mockito.when(sessionDao.queryById(sessionId)).thenReturn(getSession());
+        // query
+        Session session = sessionService.getSession(sessionId);
+        Assertions.assertNotNull(session);
 
     }
 
@@ -104,37 +79,35 @@ public class SessionServiceTest {
      * create session
      */
     @Test
-    public void testCreateSession(){
-
+    public void testCreateSession() {
         String ip = "127.0.0.1";
         User user = new User();
         user.setUserType(UserType.GENERAL_USER);
         user.setId(1);
-        Mockito.when(sessionMapper.queryByUserId(1)).thenReturn(getSessions());
-        String sessionId = sessionService.createSession(user, ip);
-        logger.info("createSessionId is "+sessionId);
-        Assert.assertTrue(StringUtils.isNotEmpty(sessionId));
+        Mockito.when(sessionDao.queryByUserId(1)).thenReturn(getSessions());
+        Session session = sessionService.createSessionIfAbsent(user);
+        Assertions.assertNotNull(session);
+        Assertions.assertNotNull(session.getId());
     }
+
     /**
      * sign out
      * remove ip restrictions
      */
     @Test
-    public void testSignOut(){
-
+    public void testExpireSession() {
         int userId = 88888888;
         String ip = "127.0.0.1";
         User user = new User();
         user.setId(userId);
 
-        Mockito.when(sessionMapper.queryByUserIdAndIp(userId,ip)).thenReturn(getSession());
+        Mockito.doNothing().when(sessionDao).deleteByUserId(userId);
 
-        sessionService.signOut(ip ,user);
+        sessionService.expireSession(userId);
 
     }
 
-    private Session getSession(){
-
+    private Session getSession() {
         Session session = new Session();
         session.setId(sessionId);
         session.setIp("127.0.0.1");
@@ -143,11 +116,9 @@ public class SessionServiceTest {
         return session;
     }
 
-    private List<Session> getSessions(){
+    private List<Session> getSessions() {
         List<Session> sessionList = new ArrayList<>();
-       sessionList.add(getSession());
+        sessionList.add(getSession());
         return sessionList;
     }
-
-
 }

@@ -14,47 +14,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
-
+import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@Transactional
-@Rollback(true)
-public class ProjectMapperTest {
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+public class ProjectMapperTest extends BaseDaoTest {
 
     @Autowired
-    ProjectMapper projectMapper;
+    private ProjectMapper projectMapper;
 
     @Autowired
-    UserMapper userMapper;
+    private UserMapper userMapper;
 
+    @Autowired
+    private ProjectUserMapper projectUserMapper;
 
     /**
      * insert
+     *
      * @return Project
      */
-    private Project insertOne(){
-        //insertOne
+    private Project insertOne() {
+        // insertOne
         Project project = new Project();
         project.setName("ut project");
         project.setUserId(111);
+        project.setCode(1L);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
         projectMapper.insert(project);
         return project;
     }
@@ -63,23 +64,23 @@ public class ProjectMapperTest {
      * test update
      */
     @Test
-    public void testUpdate(){
-        //insertOne
+    public void testUpdate() {
+        // insertOne
         Project project = insertOne();
         project.setCreateTime(new Date());
-        //update
+        // update
         int update = projectMapper.updateById(project);
-        Assert.assertEquals(update, 1);
+        Assertions.assertEquals(update, 1);
     }
 
     /**
      * test delete
      */
     @Test
-    public void testDelete(){
+    public void testDelete() {
         Project projectMap = insertOne();
         int delete = projectMapper.deleteById(projectMap.getId());
-        Assert.assertEquals(delete, 1);
+        Assertions.assertEquals(delete, 1);
     }
 
     /**
@@ -88,9 +89,9 @@ public class ProjectMapperTest {
     @Test
     public void testQuery() {
         Project project = insertOne();
-        //query
+        // query
         List<Project> projects = projectMapper.selectList(null);
-        Assert.assertNotEquals(projects.size(), 0);
+        Assertions.assertNotEquals(0, projects.size());
     }
 
     /**
@@ -108,8 +109,8 @@ public class ProjectMapperTest {
         projectMapper.updateById(project);
         Project project1 = projectMapper.queryDetailById(project.getId());
 
-        Assert.assertNotEquals(project1, null);
-        Assert.assertEquals(project1.getUserName(), user.getUserName());
+        Assertions.assertNotEquals(null, project1);
+        Assertions.assertEquals(project1.getUserName(), user.getUserName());
     }
 
     /**
@@ -126,7 +127,7 @@ public class ProjectMapperTest {
         projectMapper.updateById(project);
         Project project1 = projectMapper.queryByName(project.getName());
 
-        Assert.assertNotEquals(project1, null);
+        Assertions.assertNotEquals(null, project1);
     }
 
     /**
@@ -135,7 +136,6 @@ public class ProjectMapperTest {
     @Test
     public void testQueryProjectListPaging() {
         Project project = insertOne();
-        Project project1 = insertOne();
 
         User user = new User();
         user.setUserName("ut user");
@@ -143,19 +143,17 @@ public class ProjectMapperTest {
         project.setUserId(user.getId());
         projectMapper.updateById(project);
 
-        Page<Project> page = new Page(1,3);
+        Page<Project> page = new Page(1, 3);
         IPage<Project> projectIPage = projectMapper.queryProjectListPaging(
                 page,
-                project.getUserId(),
-                null
-        );
+                null,
+                null);
         IPage<Project> projectIPage1 = projectMapper.queryProjectListPaging(
                 page,
-                project.getUserId(),
-                project.getName()
-        );
-        Assert.assertNotEquals(projectIPage.getTotal(), 0);
-        Assert.assertNotEquals(projectIPage1.getTotal(), 0);
+                null,
+                project.getName());
+        Assertions.assertEquals(1, projectIPage.getTotal());
+        Assertions.assertEquals(1, projectIPage1.getTotal());
     }
 
     /**
@@ -167,12 +165,12 @@ public class ProjectMapperTest {
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(project.getUserId());
 
-        Assert.assertNotEquals(projects.size(), 0);
+        Assertions.assertNotEquals(0, projects.size());
 
     }
 
     /**
-     * test query authed prject list by userId
+     * test query authed project list by userId
      */
     @Test
     public void testQueryAuthedProjectListByUserId() {
@@ -180,7 +178,7 @@ public class ProjectMapperTest {
 
         List<Project> projects = projectMapper.queryProjectCreatedByUser(project.getUserId());
 
-        Assert.assertNotEquals(projects.size(), 0);
+        Assertions.assertNotEquals(0, projects.size());
     }
 
     /**
@@ -191,9 +189,68 @@ public class ProjectMapperTest {
         Project project = insertOne();
 
         List<Project> projects = projectMapper.queryProjectExceptUserId(
-                100000
-        );
+                100000);
 
-        Assert.assertNotEquals(projects.size(), 0);
+        Assertions.assertNotEquals(0, projects.size());
     }
+
+    @Test
+    public void testQueryAllProject() {
+        User user = new User();
+        user.setUserName("ut user");
+        userMapper.insert(user);
+
+        Project project = insertOne();
+        project.setUserId(user.getId());
+        projectMapper.updateById(project);
+
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setProjectId(project.getId());
+        projectUser.setUserId(user.getId());
+        projectUser.setCreateTime(new Date());
+        projectUser.setUpdateTime(new Date());
+        projectUserMapper.insert(projectUser);
+
+        List<Project> allProject = projectMapper.queryAllProject(user.getId());
+
+        Assertions.assertNotEquals(0, allProject.size());
+    }
+
+    private Project insertProject(long projectCode, String projectName, int userId) {
+        Project project = new Project();
+        project.setName(projectName);
+        project.setUserId(userId);
+        project.setCode(projectCode);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+        return project;
+    }
+
+    @Test
+    public void testListAuthorizedProjects() {
+        User user = new User();
+        user.setUserName("ut user");
+        userMapper.insert(user);
+
+        // project1: created by user
+        insertProject(1, "project 1", user.getId());
+
+        // project2: not created by user
+        insertProject(2, "project 2", user.getId() + 1);
+
+        // project3: not created by user but is authorized to user
+        Project project3 = insertProject(3, "project 3", user.getId() + 1);
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setProjectId(project3.getId());
+        projectUser.setUserId(user.getId());
+        projectUser.setCreateTime(new Date());
+        projectUser.setUpdateTime(new Date());
+        projectUserMapper.insert(projectUser);
+
+        List<Project> projects = projectMapper.listAuthorizedProjects(user.getId(), null);
+
+        Assertions.assertEquals(2, projects.size());
+    }
+
 }

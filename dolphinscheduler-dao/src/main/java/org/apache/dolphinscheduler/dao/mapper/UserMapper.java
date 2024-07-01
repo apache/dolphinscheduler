@@ -14,15 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * user mapper interface
@@ -30,13 +35,30 @@ import java.util.List;
 public interface UserMapper extends BaseMapper<User> {
 
     /**
+     * select by user id
+     */
+    User selectById(int id);
+
+    /**
+     * delete by id
+     */
+    int deleteById(int id);
+
+    /**
+     * update
+     */
+    int updateById(@Param("et") User user);
+
+    /**
      * query all general user
+     *
      * @return user list
      */
     List<User> queryAllGeneralUser();
 
     /**
      * query user by name
+     *
      * @param userName userName
      * @return user
      */
@@ -44,16 +66,17 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query user by userName and password
+     *
      * @param userName userName
      * @param password password
      * @return user
      */
     User queryUserByNamePassword(@Param("userName") String userName, @Param("password") String password);
 
-
     /**
      * user page
-     * @param page page
+     *
+     * @param page     page
      * @param userName userName
      * @return user IPage
      */
@@ -62,6 +85,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query user detail by id
+     *
      * @param userId userId
      * @return user
      */
@@ -69,6 +93,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query user list by alertgroupId
+     *
      * @param alertgroupId alertgroupId
      * @return user list
      */
@@ -76,6 +101,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query user list by tenantId
+     *
      * @param tenantId tenantId
      * @return user list
      */
@@ -83,6 +109,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query user by userId
+     *
      * @param userId userId
      * @return user
      */
@@ -90,13 +117,16 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * query user by token
+     *
      * @param token token
+     * @param now   now date
      * @return user
      */
-    User queryUserByToken(@Param("token") String token);
+    User queryUserByToken(@Param("token") String token, @Param("now") Date now);
 
     /**
      * query user by queue name
+     *
      * @param queueName queue name
      * @return user list
      */
@@ -104,13 +134,15 @@ public interface UserMapper extends BaseMapper<User> {
 
     /**
      * check the user exist
-     * @param queueName queue name
+     *
+     * @param queue queue name
      * @return true if exist else return null
      */
     Boolean existUser(@Param("queue") String queue);
 
     /**
      * update user with old queue
+     *
      * @param oldQueue old queue name
      * @param newQueue new queue name
      * @return update rows
@@ -124,4 +156,27 @@ public interface UserMapper extends BaseMapper<User> {
      * @return user list
      */
     List<User> selectByIds(@Param("ids") List<Integer> ids);
+
+    /**
+     * query authed user list by projectId
+     *
+     * @param projectId projectId
+     * @return user list
+     */
+    List<User> queryAuthedUserListByProjectId(@Param("projectId") int projectId);
+
+    /**
+     * query enabled users
+     * @return
+     */
+    List<User> queryEnabledUsers();
+
+    /**
+     * query User and task flow binding relationship
+     *
+     * @param processDefinitionCodes processDefinitionCodes
+     * @return user with process definition code
+     */
+    List<UserWithProcessDefinitionCode> queryUserWithProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
+
 }

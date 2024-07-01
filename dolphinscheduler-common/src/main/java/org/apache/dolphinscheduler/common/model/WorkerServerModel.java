@@ -14,17 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.dolphinscheduler.common.model;
 
+package org.apache.dolphinscheduler.common.model;
 
 import java.util.Date;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
-/**
- * server
- */
+@Data
 public class WorkerServerModel {
 
     /**
@@ -55,68 +53,10 @@ public class WorkerServerModel {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**
      * last heart beat time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastHeartbeatTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Set<String> getZkDirectories() {
-        return zkDirectories;
-    }
-
-    public void setZkDirectories(Set<String> zkDirectories) {
-        this.zkDirectories = zkDirectories;
-    }
-
-    public Date getLastHeartbeatTime() {
-        return lastHeartbeatTime;
-    }
-
-    public void setLastHeartbeatTime(Date lastHeartbeatTime) {
-        this.lastHeartbeatTime = lastHeartbeatTime;
-    }
-
-    public String getResInfo() {
-        return resInfo;
-    }
-
-    public void setResInfo(String resInfo) {
-        this.resInfo = resInfo;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
 }

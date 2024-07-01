@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 /**
@@ -25,5 +26,5 @@ public enum HttpParametersType {
      * 1 body;
      * 2 headers;
      */
-    PARAMETER,BODY,HEADERS
+    PARAMETER, BODY, HEADERS
 }

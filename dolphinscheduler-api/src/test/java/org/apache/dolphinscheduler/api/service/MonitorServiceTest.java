@@ -17,33 +17,48 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
+
+import org.apache.dolphinscheduler.api.AssertionsHelper;
+import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
+import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.DbType;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.utils.CollectionUtils;
-import org.apache.dolphinscheduler.dao.MonitorDBDao;
-import org.apache.dolphinscheduler.dao.entity.MonitorRecord;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.baomidou.mybatisplus.annotation.DbType;
 
 /**
  * monitor service test
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class MonitorServiceTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorServiceTest.class);
@@ -52,55 +67,77 @@ public class MonitorServiceTest {
     private MonitorServiceImpl monitorService;
 
     @Mock
-    private MonitorDBDao monitorDBDao;
+    private DatabaseMonitor databaseMonitor;
 
-    @Test
-    public  void testQueryDatabaseState(){
+    @Mock
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
-        Mockito.when(monitorDBDao.queryDatabaseState()).thenReturn(getList());
-        Map<String,Object> result = monitorService.queryDatabaseState(null);
-        logger.info(result.toString());
-        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-        List<MonitorRecord> monitorRecordList = (List<MonitorRecord>) result.get(Constants.DATA_LIST);
-        Assert.assertTrue(CollectionUtils.isNotEmpty(monitorRecordList));
-    }
-    @Test
-    public  void testQueryMaster(){
-        //TODO need zk
-//        Map<String,Object> result = monitorService.queryMaster(null);
-//        logger.info(result.toString());
-//        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
-    }
-    @Test
-    public  void testQueryZookeeperState(){
-        //TODO need zk
-//        Map<String,Object> result = monitorService.queryZookeeperState(null);
-//        logger.info(result.toString());
-//        Assert.assertEquals(Status.SUCCESS,result.get(Constants.STATUS));
+    @Mock
+    private RegistryClient registryClient;
+
+    private User user;
+
+    public static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+    @BeforeEach
+    public void init() {
+        user = new User();
+        user.setUserType(UserType.ADMIN_USER);
+        user.setId(1);
     }
 
     @Test
-    public  void testGetServerListFromZK(){
-        //TODO need zk
-//        List<Server> serverList = monitorService.getServerListFromZK(true);
-//        logger.info(serverList.toString());
+    public void testQueryDatabaseState() {
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_DATABASES_VIEW, true);
+        Mockito.when(databaseMonitor.getDatabaseMetrics()).thenReturn(getDatabaseMetrics());
+        List<DatabaseMetrics> databaseMetrics = monitorService.queryDatabaseState(user);
+        Assertions.assertTrue(CollectionUtils.isNotEmpty(databaseMetrics));
     }
 
-    private List<MonitorRecord> getList(){
-        List<MonitorRecord> monitorRecordList = new ArrayList<>();
-        monitorRecordList.add(getEntity());
-        return monitorRecordList;
+    @Test
+    public void testQueryMaster() {
+        mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
+        Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(getServerList());
+        assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.MASTER));
     }
 
-    private MonitorRecord getEntity(){
-        MonitorRecord monitorRecord = new  MonitorRecord();
+    @Test
+    public void testQueryWorker() {
+        Mockito.when(registryClient.getServerList(RegistryNodeType.WORKER)).thenReturn(getServerList());
+        AssertionsHelper.assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.WORKER));
+    }
+
+    @Test
+    public void testGetServerListFromZK() {
+        // TODO need zk
+        /* List<Server> serverList = monitorService.getServerListFromZK(true); */
+        /* logger.info(serverList.toString()); */
+    }
+
+    private void mockPermissionCheck(String permissionKey, boolean result) {
+        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.MONITOR, 1,
+                permissionKey, serviceLogger)).thenReturn(result);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.MONITOR, null, 0,
+                serviceLogger)).thenReturn(true);
+    }
+
+    private DatabaseMetrics getDatabaseMetrics() {
+        DatabaseMetrics monitorRecord = new DatabaseMetrics();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
     }
 
-    private List<Server> getServerList(){
+    private List<Server> getServerList() {
+        Server server = new Server();
+        server.setId(1);
+        server.setHost("127.0.0.1");
+        server.setZkDirectory("ws/server");
+        server.setPort(123);
+        server.setCreateTime(new Date());
+        server.setLastHeartbeatTime(new Date());
+
         List<Server> servers = new ArrayList<>();
-        servers.add(new Server());
+        servers.add(server);
         return servers;
     }
 

@@ -17,13 +17,21 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.utils.CheckUtils.checkDesc;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
@@ -31,17 +39,31 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -50,7 +72,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * project service impl
  **/
 @Service
+@Slf4j
 public class ProjectServiceImpl extends BaseServiceImpl implements ProjectService {
+
+    @Lazy
+    @Autowired
+    private TaskGroupService taskGroupService;
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -61,67 +88,115 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
     /**
      * create project
      *
      * @param loginUser login user
-     * @param name project name
-     * @param desc description
+     * @param name      project name
+     * @param desc      description
      * @return returns an error if it exists
      */
     @Override
-    public Map<String, Object> createProject(User loginUser, String name, String desc) {
+    @Transactional
+    public Result createProject(User loginUser, String name, String desc) {
+        Result result = new Result();
 
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> descCheck = checkDesc(desc);
-        if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
-            return descCheck;
+        checkDesc(result, desc);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
+            return result;
+        }
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.PROJECTS, PROJECT_CREATE)) {
+            putMsg(result, Status.USER_NO_OPERATION_PERM);
+            return result;
         }
 
         Project project = projectMapper.queryByName(name);
         if (project != null) {
+            log.warn("Project {} already exists.", project.getName());
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, name);
             return result;
         }
 
         Date now = new Date();
 
-        project = Project
-                .newBuilder()
-                .name(name)
-                .description(desc)
-                .userId(loginUser.getId())
-                .userName(loginUser.getUserName())
-                .createTime(now)
-                .updateTime(now)
-                .build();
+        try {
+            project = Project
+                    .builder()
+                    .name(name)
+                    .code(CodeGenerateUtils.genCode())
+                    .description(desc)
+                    .userId(loginUser.getId())
+                    .userName(loginUser.getUserName())
+                    .createTime(now)
+                    .updateTime(now)
+                    .build();
+        } catch (CodeGenerateException e) {
+            log.error("Generate process definition code error.", e);
+            putMsg(result, Status.CREATE_PROJECT_ERROR);
+            return result;
+        }
 
         if (projectMapper.insert(project) > 0) {
-            result.put(Constants.DATA_LIST, project.getId());
+            log.info("Project is created and id is :{}", project.getId());
+            result.setData(project);
             putMsg(result, Status.SUCCESS);
         } else {
+            log.error("Project create error, projectName:{}.", project.getName());
             putMsg(result, Status.CREATE_PROJECT_ERROR);
         }
         return result;
     }
 
     /**
-     * query project details by id
+     * check project description
      *
-     * @param projectId project id
+     * @param result
+     * @param desc   desc
+     */
+    public static void checkDesc(Result result, String desc) {
+        if (!StringUtils.isEmpty(desc) && desc.codePointCount(0, desc.length()) > 255) {
+            result.setCode(Status.DESCRIPTION_TOO_LONG_ERROR.getCode());
+            result.setMsg(Status.DESCRIPTION_TOO_LONG_ERROR.getMsg());
+        } else {
+            result.setCode(Status.SUCCESS.getCode());
+        }
+    }
+
+    /**
+     * query project details by code
+     *
+     * @param projectCode project code
      * @return project detail information
      */
     @Override
-    public Map<String, Object> queryById(Integer projectId) {
+    public Result queryByCode(User loginUser, long projectCode) {
+        Result result = new Result();
+        Project project = projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result, PROJECT);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
+        if (project != null) {
+            result.setData(project);
+            putMsg(result, Status.SUCCESS);
+        }
+        return result;
+    }
 
+    @Override
+    public Map<String, Object> queryByName(User loginUser, String projectName) {
         Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.selectById(projectId);
-
+        Project project = projectMapper.queryByName(projectName);
+        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result, PROJECT);
+        if (!hasProjectAndPerm) {
+            return result;
+        }
         if (project != null) {
             result.put(Constants.DATA_LIST, project);
             putMsg(result, Status.SUCCESS);
-        } else {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectId);
         }
         return result;
     }
@@ -129,31 +204,158 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check project and authorization
      *
-     * @param loginUser login user
-     * @param project project
-     * @param projectName project name
+     * @param loginUser   login user
+     * @param project     project
+     * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
     @Override
-    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName) {
+    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,
+                                                   String permission) {
         Map<String, Object> result = new HashMap<>();
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, projectName);
-        } else if (!checkReadPermission(loginUser, project)) {
+            log.error("Project does not exist, projectCode:{}.", projectCode);
+            putMsg(result, Status.PROJECT_NOT_EXIST);
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
+                permission)) {
             // check read permission
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectName);
+            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
+                    permission, loginUser.getUserName(), projectCode);
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
         } else {
             putMsg(result, Status.SUCCESS);
         }
         return result;
     }
 
+    public void checkProjectAndAuthThrowException(@NonNull User loginUser, @Nullable Project project,
+                                                  String permission) {
+        // todo: throw a permission exception
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
+        if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS, permission)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
+                    project.getCode());
+        }
+    }
+
     @Override
-    public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result) {
+    public void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) {
+        if (projectCode == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
+        Project project = projectMapper.queryByCode(projectCode);
+        checkProjectAndAuthThrowException(loginUser, project, permission);
+    }
+
+    @Override
+    public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String permission) {
         boolean checkResult = false;
         if (project == null) {
-            putMsg(result, Status.PROJECT_NOT_FOUNT, "");
-        } else if (!checkReadPermission(loginUser, project)) {
+            log.error("Project does not exist.");
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
+                permission)) {
+            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
+                    permission, loginUser.getUserName(), project.getCode());
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+        } else {
+            checkResult = true;
+        }
+        return checkResult;
+    }
+
+    @Override
+    public boolean hasProjectAndWritePerm(User loginUser, Project project, Result result) {
+        boolean checkResult = false;
+        if (project == null) {
+            log.error("Project does not exist.");
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+        } else {
+            // case 1: user is admin
+            if (loginUser.getUserType() == UserType.ADMIN_USER) {
+                return true;
+            }
+            // case 2: user is project owner
+            if (project.getUserId().equals(loginUser.getId())) {
+                return true;
+            }
+            // case 3: check user permission level
+            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+                checkResult = false;
+            } else {
+                checkResult = true;
+            }
+        }
+        return checkResult;
+    }
+
+    @Override
+    public boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result) {
+        boolean checkResult = false;
+        if (project == null) {
+            log.error("Project does not exist.");
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+        } else {
+            // case 1: user is admin
+            if (loginUser.getUserType() == UserType.ADMIN_USER) {
+                return true;
+            }
+            // case 2: user is project owner
+            if (project.getUserId().equals(loginUser.getId())) {
+                return true;
+            }
+            // case 3: check user permission level
+            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+                checkResult = false;
+            } else {
+                checkResult = true;
+            }
+        }
+        return checkResult;
+    }
+
+    @Override
+    public void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode) {
+        Project project = projectMapper.queryByCode(projectCode);
+        checkHasProjectWritePermissionThrowException(loginUser, project);
+    }
+
+    @Override
+    public void checkHasProjectWritePermissionThrowException(User loginUser, Project project) {
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, null);
+        }
+        // case 1: user is admin
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            return;
+        }
+        // case 2: user is project owner
+        if (project.getUserId().equals(loginUser.getId())) {
+            return;
+        }
+        // case 3: check user permission level
+        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+        if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
+            throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
+        }
+    }
+
+    @Override
+    public boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission) {
+        boolean checkResult = false;
+        if (project == null) {
+            log.error("Project does not exist.");
+            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
+                permission)) {
+            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
+                    permission, loginUser.getUserName(), project.getCode());
             putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
         } else {
             checkResult = true;
@@ -166,66 +368,131 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      *
      * @param loginUser login user
      * @param searchVal search value
-     * @param pageSize page size
-     * @param pageNo page number
+     * @param pageSize  page size
+     * @param pageNo    page number
      * @return project list which the login user have permission to see
      */
     @Override
-    public Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal) {
+        Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
-
         Page<Project> page = new Page<>(pageNo, pageSize);
-
-        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
-        IPage<Project> projectIPage = projectMapper.queryProjectListPaging(page, userId, searchVal);
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (projectIds.isEmpty()) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        IPage<Project> projectIPage =
+                projectMapper.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
-        if (userId != 0) {
+        if (loginUser.getUserType() != UserType.ADMIN_USER) {
             for (Project project : projectList) {
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
         }
-        pageInfo.setTotalCount((int) projectIPage.getTotal());
-        pageInfo.setLists(projectList);
-        result.put(Constants.COUNT, (int) projectIPage.getTotal());
-        result.put(Constants.DATA_LIST, pageInfo);
+        pageInfo.setTotal((int) projectIPage.getTotal());
+        pageInfo.setTotalList(projectList);
+        result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
     /**
-     * delete project by id
+     * admin can view all projects
      *
+     * @param userId    user id
      * @param loginUser login user
-     * @param projectId project id
+     * @param searchVal search value
+     * @param pageSize  page size
+     * @param pageNo    page number
+     * @return project list which with the login user's authorized level
+     */
+    @Override
+    public Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize,
+                                                            Integer pageNo, String searchVal) {
+        Result result = new Result();
+        PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<Project> page = new Page<>(pageNo, pageSize);
+        Set<Integer> allProjectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        Set<Integer> userProjectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, log);
+        if (allProjectIds.isEmpty()) {
+            result.setData(pageInfo);
+            putMsg(result, Status.SUCCESS);
+            return result;
+        }
+        IPage<Project> projectIPage =
+                projectMapper.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
+
+        List<Project> projectList = projectIPage.getRecords();
+
+        for (Project project : projectList) {
+            if (userProjectIds.contains(project.getId())) {
+                ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
+                if (projectUser == null) {
+                    // in this case, the user is the project owner, maybe it's better to set it to ALL_PERMISSION.
+                    project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
+                } else {
+                    project.setPerm(projectUser.getPerm());
+                }
+            } else {
+                project.setPerm(0);
+            }
+        }
+
+        pageInfo.setTotal((int) projectIPage.getTotal());
+        pageInfo.setTotalList(projectList);
+        result.setData(pageInfo);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    /**
+     * delete project by code
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
      * @return delete result code
      */
     @Override
-    public Map<String, Object> deleteProject(User loginUser, Integer projectId) {
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.selectById(projectId);
-        Map<String, Object> checkResult = getCheckResult(loginUser, project);
-        if (checkResult != null) {
-            return checkResult;
-        }
+    public Result deleteProject(User loginUser, Long projectCode) {
+        Result result = new Result();
+        Project project = projectMapper.queryByCode(projectCode);
 
-        if (!hasPerm(loginUser, project.getUserId())) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
+        boolean hasProjectAndWritePerm = hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
 
-        List<ProcessDefinition> processDefinitionList = processDefinitionMapper.queryAllDefinitionList(projectId);
+        checkProjectAndAuth(result, loginUser, project, project == null ? 0L : project.getCode(), PROJECT_DELETE);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
+            return result;
+        }
+
+        assert project != null;
+
+        List<ProcessDefinition> processDefinitionList =
+                processDefinitionMapper.queryAllDefinitionList(project.getCode());
 
         if (!processDefinitionList.isEmpty()) {
+            log.warn("Please delete the process definitions in project first! project code:{}.", projectCode);
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
-        int delete = projectMapper.deleteById(projectId);
+        // delete the task group
+        taskGroupService.deleteTaskGroupByProjectCode(project.getCode());
+
+        int delete = projectMapper.deleteById(project.getId());
         if (delete > 0) {
+            log.info("Project is deleted and id is :{}.", project.getId());
+            result.setData(Boolean.TRUE);
             putMsg(result, Status.SUCCESS);
         } else {
+            log.error("Project delete error, project code:{}, project name:{}.", projectCode, project.getName());
             putMsg(result, Status.DELETE_PROJECT_ERROR);
         }
         return result;
@@ -235,12 +502,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * get check result
      *
      * @param loginUser login user
-     * @param project project
+     * @param project   project
      * @return check result
      */
-    private Map<String, Object> getCheckResult(User loginUser, Project project) {
-        String projectName = project == null ? null : project.getName();
-        Map<String, Object> checkResult = checkProjectAndAuth(loginUser, project, projectName);
+    private Map<String, Object> getCheckResult(User loginUser, Project project, String perm) {
+        Map<String, Object> checkResult =
+                checkProjectAndAuth(loginUser, project, project == null ? 0L : project.getCode(), perm);
         Status status = (Status) checkResult.get(Constants.STATUS);
         if (status != Status.SUCCESS) {
             return checkResult;
@@ -251,64 +518,119 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * updateProcessInstance project
      *
-     * @param loginUser login user
-     * @param projectId project id
+     * @param loginUser   login user
+     * @param projectCode project code
      * @param projectName project name
-     * @param desc description
+     * @param desc        description
      * @return update result code
      */
     @Override
-    public Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc) {
-        Map<String, Object> result = new HashMap<>();
+    public Result update(User loginUser, Long projectCode, String projectName, String desc) {
+        Result result = new Result();
 
-        Map<String, Object> descCheck = checkDesc(desc);
-        if (descCheck.get(Constants.STATUS) != Status.SUCCESS) {
-            return descCheck;
+        checkDesc(result, desc);
+        if (result.getCode() != Status.SUCCESS.getCode()) {
+            return result;
         }
 
-        Project project = projectMapper.selectById(projectId);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result);
-        if (!hasProjectAndPerm) {
+        Project project = projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndWritePerm = hasProjectAndWritePerm(loginUser, project, result);
+        if (!hasProjectAndWritePerm) {
             return result;
         }
         Project tempProject = projectMapper.queryByName(projectName);
-        if (tempProject != null && tempProject.getId() != projectId) {
+        if (tempProject != null && tempProject.getCode() != project.getCode()) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
+            return result;
+        }
+        User user = userMapper.selectById(loginUser.getId());
+        if (user == null) {
+            log.error("user {} not exists", loginUser.getId());
+            putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
             return result;
         }
         project.setName(projectName);
         project.setDescription(desc);
         project.setUpdateTime(new Date());
-
+        project.setUserId(user.getId());
         int update = projectMapper.updateById(project);
         if (update > 0) {
+            log.info("Project is updated and id is :{}", project.getId());
+            result.setData(project);
             putMsg(result, Status.SUCCESS);
         } else {
+            log.error("Project update error, projectCode:{}, projectName:{}.", project.getCode(), project.getName());
             putMsg(result, Status.UPDATE_PROJECT_ERROR);
         }
         return result;
     }
 
+    /**
+     * query all project with authorized level
+     *
+     * @param loginUser login user
+     * @return project list
+     */
+    @Override
+    public Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId) {
+        Result result = new Result();
+
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        List<Project> projectList = projectMapper.listAuthorizedProjects(
+                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
+                new ArrayList<>(projectIds));
+
+        List<Project> unauthorizedProjectsList = new ArrayList<>();
+        List<Project> authedProjectList = new ArrayList<>();
+        Set<Project> projectSet;
+        if (projectList != null && !projectList.isEmpty()) {
+            projectSet = new HashSet<>(projectList);
+            authedProjectList = projectMapper.queryAuthedProjectListByUserId(userId);
+            unauthorizedProjectsList = getUnauthorizedProjects(projectSet, authedProjectList);
+        }
+
+        for (int i = 0; i < authedProjectList.size(); i++) {
+            authedProjectList.get(i).setPerm(7);
+        }
+
+        for (int i = 0; i < unauthorizedProjectsList.size(); i++) {
+            unauthorizedProjectsList.get(i).setPerm(0);
+        }
+
+        List<Project> joined = new ArrayList<>();
+        joined.addAll(authedProjectList);
+        joined.addAll(unauthorizedProjectsList);
+
+        result.setData(joined);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
 
     /**
      * query unauthorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return the projects which user have not permission to see
      */
     @Override
-    public Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
+    public Result queryUnauthorizedProject(User loginUser, Integer userId) {
+        Result result = new Result();
+
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (projectIds.isEmpty()) {
+            result.setData(Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
             return result;
         }
-        /**
-         * query all project list except specified userId
-         */
-        List<Project> projectList = projectMapper.queryProjectExceptUserId(userId);
+        List<Project> projectList = projectMapper.listAuthorizedProjects(
+                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
+                new ArrayList<>(projectIds));
+
         List<Project> resultList = new ArrayList<>();
-        Set<Project> projectSet = null;
+        Set<Project> projectSet;
         if (projectList != null && !projectList.isEmpty()) {
             projectSet = new HashSet<>(projectList);
 
@@ -316,7 +638,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
             resultList = getUnauthorizedProjects(projectSet, authedProjectList);
         }
-        result.put(Constants.DATA_LIST, resultList);
+        result.setData(resultList);
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -324,42 +646,61 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * get unauthorized project
      *
-     * @param projectSet project set
+     * @param projectSet        project set
      * @param authedProjectList authed project list
-     * @return project list that authorization
+     * @return project list that unauthorized
      */
     private List<Project> getUnauthorizedProjects(Set<Project> projectSet, List<Project> authedProjectList) {
         List<Project> resultList;
-        Set<Project> authedProjectSet = null;
+        Set<Project> authedProjectSet;
         if (authedProjectList != null && !authedProjectList.isEmpty()) {
             authedProjectSet = new HashSet<>(authedProjectList);
             projectSet.removeAll(authedProjectSet);
-
         }
         resultList = new ArrayList<>(projectSet);
         return resultList;
     }
 
-
     /**
      * query authorized project
      *
      * @param loginUser login user
-     * @param userId user id
+     * @param userId    user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
     @Override
-    public Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryAuthorizedProject(User loginUser, Integer userId) {
+        Result result = new Result();
 
-        if (loginUser.getId() != userId && isNotAdmin(loginUser, result)) {
+        List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
+        result.setData(projects);
+        putMsg(result, Status.SUCCESS);
+
+        return result;
+    }
+
+    /**
+     * query authorized user
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @return users        who have permission for the specified project
+     */
+    @Override
+    public Result queryAuthorizedUser(User loginUser, Long projectCode) {
+        Result result = new Result();
+
+        // 1. check read permission
+        Project project = this.projectMapper.queryByCode(projectCode);
+        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result, PROJECT);
+        if (!hasProjectAndPerm) {
             return result;
         }
 
-        List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
-        result.put(Constants.DATA_LIST, projects);
-        putMsg(result, Status.SUCCESS);
-
+        // 2. query authorized user list
+        List<User> users = this.userMapper.queryAuthedUserListByProjectId(project.getId());
+        result.setData(users);
+        this.putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -384,20 +725,22 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * query authorized and user create project list by user
      *
      * @param loginUser login user
-     * @return
+     * @return project list
      */
     @Override
-    public Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public Result queryProjectCreatedAndAuthorizedByUser(User loginUser) {
+        Result result = new Result();
 
-        List<Project> projects = null;
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            projects = projectMapper.selectList(null);
-        } else {
-            projects = projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId());
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (projectIds.isEmpty()) {
+            result.setData(Collections.emptyList());
+            putMsg(result, Status.SUCCESS);
+            return result;
         }
+        List<Project> projects = projectMapper.selectBatchIds(projectIds);
 
-        result.put(Constants.DATA_LIST, projects);
+        result.setData(projects);
         putMsg(result, Status.SUCCESS);
 
         return result;
@@ -406,7 +749,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * check whether have read permission
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return true if the user have permission to see the project, otherwise return false
      */
@@ -418,7 +761,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query permission id
      *
-     * @param user user
+     * @param user    user
      * @param project project
      * @return permission
      */
@@ -427,7 +770,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return Constants.READ_PERMISSION;
         }
 
-        if (project.getUserId() == user.getId()) {
+        if (Objects.equals(project.getUserId(), user.getId())) {
             return Constants.ALL_PERMISSIONS;
         }
 
@@ -444,16 +787,72 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     /**
      * query all project list
      *
+     * @param user
      * @return project list
      */
     @Override
-    public Map<String, Object> queryAllProjectList() {
-        Map<String, Object> result = new HashMap<>();
-        List<Project> projects = projectMapper.queryAllProject();
+    public Result queryAllProjectList(User user) {
+        Result result = new Result();
+        List<Project> projects =
+                projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
 
-        result.put(Constants.DATA_LIST, projects);
+        result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
     }
 
+    /**
+     * check project and authorization
+     *
+     * @param result      result
+     * @param loginUser   login user
+     * @param project     project
+     * @param projectCode project code
+     * @return true if the login user have permission to see the project
+     */
+    @Override
+    public void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode,
+                                    String permission) {
+        if (project == null) {
+            log.error("Project does not exist, project code:{}.", projectCode);
+            putMsg(result, Status.PROJECT_NOT_EXIST);
+        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
+                permission)) {
+            // check read permission
+            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
+        } else {
+            putMsg(result, Status.SUCCESS);
+        }
+    }
+
+    /**
+     * query all project for dependent node
+     *
+     * @return project list
+     */
+    @Override
+    public Result queryAllProjectListForDependent() {
+        Result result = new Result<>();
+        List<Project> projects =
+                projectMapper.queryAllProjectForDependent();
+        result.setData(projects);
+        putMsg(result, Status.SUCCESS);
+        return result;
+    }
+
+    @Override
+    public List<Long> getAuthorizedProjectCodes(User loginUser) {
+        if (loginUser == null) {
+            throw new IllegalArgumentException("loginUser can not be null");
+        }
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return Collections.emptyList();
+        }
+        return projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
+    }
 }

@@ -14,99 +14,67 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.utils;
 
-import java.io.IOException;
+import org.apache.commons.lang3.SystemUtils;
+
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+@Slf4j
 public class OSUtilsTest {
-    private static final Logger logger = LoggerFactory.getLogger(OSUtilsTest.class);
 
     @Test
-    public void getUserList() {
-        List<String> userList = OSUtils.getUserList();
-        Assert.assertNotEquals("System user list should not be empty", userList.size(), 0);
-        logger.info("OS user list : {}", userList.toString());
-    }
-
-    @Test
-    public void testOSMetric() {
-        if (!OSUtils.isWindows()) {
-            double availablePhysicalMemorySize = OSUtils.availablePhysicalMemorySize();
-            Assert.assertTrue(availablePhysicalMemorySize >= 0.0d);
-            double totalPhysicalMemorySize = OSUtils.totalPhysicalMemorySize();
-            Assert.assertTrue(totalPhysicalMemorySize >= 0.0d);
-            double loadAverage = OSUtils.loadAverage();
-            logger.info("loadAverage {}", loadAverage);
-            double memoryUsage = OSUtils.memoryUsage();
-            Assert.assertTrue(memoryUsage >= 0.0d);
-            double cpuUsage = OSUtils.cpuUsage();
-            Assert.assertTrue(cpuUsage >= 0.0d || cpuUsage == -1.0d);
+    public void existTenantCodeInLinux() {
+        if (SystemUtils.IS_OS_LINUX) {
+            boolean test = OSUtils.existTenantCodeInLinux("root");
+            Assertions.assertTrue(test);
+            boolean test1 = OSUtils.existTenantCodeInLinux("xxxtt");
+            Assertions.assertFalse(test1);
         } else {
-            // TODO window ut
+            Assertions.assertFalse(false, "system must be linux");
         }
+
     }
 
     @Test
-    public void getGroup() {
-        try {
-            String group = OSUtils.getGroup();
-            Assert.assertNotNull(group);
-        } catch (IOException e) {
-            Assert.fail("get group failed " + e.getMessage());
-        }
-    }
-
-    @Test
-    public void createUser() {
-        boolean result = OSUtils.createUser("test123");
-        if (result) {
-            Assert.assertTrue("create user test123 success", true);
+    public void existOSTenandCode() {
+        if (SystemUtils.IS_OS_LINUX) {
+            List<String> userList = OSUtils.getUserList();
+            Assertions.assertTrue(userList.contains("root"));
+            Assertions.assertFalse(userList.contains("xxxtt"));
         } else {
-            Assert.assertTrue("create user test123 fail", true);
+            Assertions.assertFalse(false, "system must be linux");
         }
     }
 
     @Test
-    public void createUserIfAbsent() {
-        OSUtils.createUserIfAbsent("test123");
-        Assert.assertTrue("create user test123 success", true);
+    void getTotalSystemMemory() throws InterruptedException {
+        double totalSystemMemory = OSUtils.getTotalSystemMemory();
+        Assertions.assertTrue(totalSystemMemory > 0);
+        // Assert that the memory is not changed
+        Thread.sleep(1000L);
+        Assertions.assertEquals(totalSystemMemory, OSUtils.getTotalSystemMemory());
     }
 
     @Test
-    public void testGetSudoCmd() {
-        String cmd = "kill -9 1234";
-        String sudoCmd = OSUtils.getSudoCmd("test123", cmd);
-        Assert.assertEquals("sudo -u test123 " + cmd, sudoCmd);
+    void getSystemMemoryAvailable() {
+        long systemAvailableMemoryUsed = OSUtils.getSystemAvailableMemoryUsed();
+        Assertions.assertTrue(systemAvailableMemoryUsed > 0);
     }
 
     @Test
-    public void exeCmd() {
-        if (OSUtils.isMacOS() || !OSUtils.isWindows()) {
-            try {
-                String result = OSUtils.exeCmd("echo helloWorld");
-                Assert.assertEquals("helloWorld\n",result);
-            } catch (IOException e) {
-                Assert.fail("exeCmd " + e.getMessage());
-            }
-        }
-    }
-    @Test
-    public void getProcessID() {
-        int processId = OSUtils.getProcessID();
-        Assert.assertNotEquals(0, processId);
-    }
-    @Test
-    public void checkResource() {
-        boolean resource = OSUtils.checkResource(100,0);
-        Assert.assertTrue(resource);
-        resource = OSUtils.checkResource(0,Double.MAX_VALUE);
-        Assert.assertFalse(resource);
-    }
+    void getSystemMemoryUsedPercentage() {
+        long totalSystemMemory = OSUtils.getTotalSystemMemory();
+        long systemMemoryAvailable = OSUtils.getSystemAvailableMemoryUsed();
+        double systemAvailableMemoryUsedPercentage =
+                (double) (totalSystemMemory - systemMemoryAvailable) / totalSystemMemory;
 
+        Assertions.assertTrue(systemAvailableMemoryUsedPercentage > 0);
+    }
 }

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.exceptions;
 
 import org.apache.dolphinscheduler.api.controller.AccessTokenController;
@@ -21,14 +22,12 @@ import org.apache.dolphinscheduler.api.controller.ProcessDefinitionController;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.junit.Assert;
-import org.junit.Test;
-import org.springframework.web.method.HandlerMethod;
 
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.method.HandlerMethod;
 
 public class ApiExceptionHandlerTest {
 
@@ -36,19 +35,21 @@ public class ApiExceptionHandlerTest {
     public void exceptionHandler() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
         AccessTokenController controller = new AccessTokenController();
-        Method method = controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
+        Method method =
+                controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void exceptionHandlerRuntime() throws NoSuchMethodException {
         ApiExceptionHandler handler = new ApiExceptionHandler();
         ProcessDefinitionController controller = new ProcessDefinitionController();
-        Method method = controller.getClass().getMethod("batchExportProcessDefinitionByIds", User.class, String.class, String.class, HttpServletResponse.class);
+        Method method =
+                controller.getClass().getMethod("queryAllProcessDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
         Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assert.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(),result.getCode().intValue());
+        Assertions.assertEquals(Status.QUERY_PROCESS_DEFINITION_LIST.getCode(), result.getCode().intValue());
     }
 }

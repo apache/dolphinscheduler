@@ -17,12 +17,11 @@
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.util.HashMap;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ResultTest {
 
@@ -31,18 +30,18 @@ public class ResultTest {
         HashMap<String, String> map = new HashMap<>();
         map.put("testdata", "test");
         Result ret = Result.success(map);
-        Assert.assertEquals(Status.SUCCESS.getCode(), ret.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), ret.getCode().intValue());
     }
 
     @Test
     public void error() {
         Result ret = Result.error(Status.ACCESS_TOKEN_NOT_EXIST);
-        Assert.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST.getCode(), ret.getCode().intValue());
+        Assertions.assertEquals(Status.ACCESS_TOKEN_NOT_EXIST.getCode(), ret.getCode().intValue());
     }
 
     @Test
     public void errorWithArgs() {
         Result ret = Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, "test internal server error");
-        Assert.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), ret.getCode().intValue());
+        Assertions.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), ret.getCode().intValue());
     }
 }

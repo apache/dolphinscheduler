@@ -17,251 +17,228 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_PROCESS_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
+import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProcessInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.dolphinscheduler.common.enums.ExecutionStatus;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.utils.ParameterUtils;
-import org.apache.dolphinscheduler.common.utils.StringUtils;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.text.ParseException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * process instance controller
  */
-@Api(tags = "PROCESS_INSTANCE_TAG")
+@Tag(name = "PROCESS_INSTANCE_TAG")
 @RestController
-@RequestMapping("projects/{projectName}/instance")
+@RequestMapping("/projects/{projectCode}/process-instances")
+@Slf4j
 public class ProcessInstanceController extends BaseController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProcessInstanceController.class);
-
-
     @Autowired
-    ProcessInstanceService processInstanceService;
+    private ProcessInstanceService processInstanceService;
 
     /**
      * query process instance list paging
      *
-     * @param loginUser           login user
-     * @param projectName         project name
-     * @param pageNo              page number
-     * @param pageSize            page size
-     * @param processDefinitionId process definition id
-     * @param searchVal           search value
-     * @param stateType           state type
-     * @param host                host
-     * @param startTime           start time
-     * @param endTime             end time
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param pageNo page number
+     * @param pageSize page size
+     * @param processDefineCode process definition code
+     * @param searchVal search value
+     * @param stateType state type
+     * @param host host
+     * @param startTime start time
+     * @param endTime end time
+     * @param otherParamsJson otherParamsJson handle other params
      * @return process instance list
      */
-    @ApiOperation(value = "queryProcessInstanceList", notes = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processDefinitionId", value = "PROCESS_DEFINITION_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "searchVal", value = "SEARCH_VAL", type = "String"),
-            @ApiImplicitParam(name = "executorName", value = "EXECUTOR_NAME", type = "String"),
-            @ApiImplicitParam(name = "stateType", value = "EXECUTION_STATUS", type = "ExecutionStatus"),
-            @ApiImplicitParam(name = "host", value = "HOST", type = "String"),
-            @ApiImplicitParam(name = "startDate", value = "START_DATE", type = "String"),
-            @ApiImplicitParam(name = "endDate", value = "END_DATE", type = "String"),
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "100")
+    @Operation(summary = "queryProcessInstanceListPaging", description = "QUERY_PROCESS_INSTANCE_LIST_NOTES")
+    @Parameters({
+            @Parameter(name = "processDefineCode", description = "PROCESS_DEFINITION_CODE", schema = @Schema(implementation = long.class, example = "100")),
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "executorName", description = "EXECUTOR_NAME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "stateType", description = "EXECUTION_STATUS", schema = @Schema(implementation = WorkflowExecutionStatus.class)),
+            @Parameter(name = "host", description = "HOST", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "startDate", description = "START_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endDate", description = "END_DATE", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10"))
     })
-    @GetMapping(value = "list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
-    public Result queryProcessInstanceList(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                           @RequestParam(value = "processDefinitionId", required = false, defaultValue = "0") Integer processDefinitionId,
+    @ApiException(Status.QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    public Result queryProcessInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                           @RequestParam(value = "processDefineCode", required = false, defaultValue = "0") long processDefineCode,
                                            @RequestParam(value = "searchVal", required = false) String searchVal,
                                            @RequestParam(value = "executorName", required = false) String executorName,
-                                           @RequestParam(value = "stateType", required = false) ExecutionStatus stateType,
+                                           @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
                                            @RequestParam(value = "host", required = false) String host,
                                            @RequestParam(value = "startDate", required = false) String startTime,
                                            @RequestParam(value = "endDate", required = false) String endTime,
+                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                            @RequestParam("pageNo") Integer pageNo,
                                            @RequestParam("pageSize") Integer pageSize) {
-        logger.info("query all process instance list, login user:{},project name:{}, define id:{}," +
-                        "search value:{},executor name:{},state type:{},host:{},start time:{}, end time:{},page number:{}, page size:{}",
-                loginUser.getUserName(), projectName, processDefinitionId, searchVal, executorName, stateType, host,
-                startTime, endTime, pageNo, pageSize);
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
-        }
+
+        checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        result = processInstanceService.queryProcessInstanceList(
-                loginUser, projectName, processDefinitionId, startTime, endTime, searchVal, executorName, stateType, host, pageNo, pageSize);
-        return returnDataListPaging(result);
+        return processInstanceService.queryProcessInstanceList(loginUser, projectCode, processDefineCode, startTime,
+                endTime,
+                searchVal, executorName, stateType, host, otherParamsJson, pageNo, pageSize);
     }
 
     /**
      * query task list by process instance id
      *
-     * @param loginUser         login user
-     * @param projectName       project name
-     * @param processInstanceId process instance id
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param id process instance id
      * @return task list for the process instance
      */
-    @ApiOperation(value = "queryTaskListByProcessId", notes = "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
+    @Operation(summary = "queryTaskListByProcessId", description = "QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/task-list-by-process-id")
+    @GetMapping(value = "/{id}/tasks")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR)
-    public Result queryTaskListByProcessId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                           @RequestParam("processInstanceId") Integer processInstanceId
-    ) throws IOException {
-        logger.info("query task instance list by process instance id, login user:{}, project name:{}, process instance id:{}",
-                loginUser.getUserName(), projectName, processInstanceId);
-        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectName, processInstanceId);
+    @ApiException(Status.QUERY_TASK_LIST_BY_PROCESS_INSTANCE_ID_ERROR)
+    public Result queryTaskListByProcessId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                           @PathVariable("id") Integer id) throws IOException {
+        Map<String, Object> result = processInstanceService.queryTaskListByProcessId(loginUser, projectCode, id);
         return returnDataList(result);
     }
 
     /**
      * update process instance
      *
-     * @param loginUser           login user
-     * @param projectName         project name
-     * @param processInstanceJson process instance json
-     * @param processInstanceId   process instance id
-     * @param scheduleTime        schedule time
-     * @param syncDefine          sync define
-     * @param flag                flag
-     * @param locations           locations
-     * @param connects            connects
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskRelationJson process task relation json
+     * @param taskDefinitionJson taskDefinitionJson
+     * @param id process instance id
+     * @param scheduleTime schedule time
+     * @param syncDefine sync define
+     * @param locations locations
+     * @param tenantCode tenantCode
      * @return update result code
      */
-    @ApiOperation(value = "updateProcessInstance", notes = "UPDATE_PROCESS_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceJson", value = "PROCESS_INSTANCE_JSON", type = "String"),
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "scheduleTime", value = "SCHEDULE_TIME", type = "String"),
-            @ApiImplicitParam(name = "syncDefine", value = "SYNC_DEFINE", type = "Boolean"),
-            @ApiImplicitParam(name = "locations", value = "PROCESS_INSTANCE_LOCATIONS", type = "String"),
-            @ApiImplicitParam(name = "connects", value = "PROCESS_INSTANCE_CONNECTS", type = "String"),
-            @ApiImplicitParam(name = "flag", value = "RECOVERY_PROCESS_INSTANCE_FLAG", type = "Flag"),
+    @Operation(summary = "updateProcessInstance", description = "UPDATE_PROCESS_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "taskRelationJson", description = "TASK_RELATION_JSON", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "taskDefinitionJson", description = "TASK_DEFINITION_JSON", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "scheduleTime", description = "SCHEDULE_TIME", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "syncDefine", description = "SYNC_DEFINE", required = true, schema = @Schema(implementation = boolean.class, example = "false")),
+            @Parameter(name = "globalParams", description = "PROCESS_GLOBAL_PARAMS", schema = @Schema(implementation = String.class, example = "[]")),
+            @Parameter(name = "locations", description = "PROCESS_INSTANCE_LOCATIONS", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "timeout", description = "PROCESS_TIMEOUT", schema = @Schema(implementation = int.class, example = "0")),
     })
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_PROCESS_INSTANCE_ERROR)
-    public Result updateProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                        @RequestParam(value = "processInstanceJson", required = false) String processInstanceJson,
-                                        @RequestParam(value = "processInstanceId") Integer processInstanceId,
+    @ApiException(Status.UPDATE_PROCESS_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_INSTANCE_UPDATE)
+    public Result updateProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                        @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
+                                        @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                        @PathVariable(value = "id") Integer id,
                                         @RequestParam(value = "scheduleTime", required = false) String scheduleTime,
                                         @RequestParam(value = "syncDefine", required = true) Boolean syncDefine,
+                                        @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
                                         @RequestParam(value = "locations", required = false) String locations,
-                                        @RequestParam(value = "connects", required = false) String connects,
-                                        @RequestParam(value = "flag", required = false) Flag flag
-    ) throws ParseException {
-        logger.info("updateProcessInstance process instance, login user:{}, project name:{}, process instance json:{}," +
-                        "process instance id:{}, schedule time:{}, sync define:{}, flag:{}, locations:{}, connects:{}",
-                loginUser.getUserName(), projectName, processInstanceJson, processInstanceId, scheduleTime,
-                syncDefine, flag, locations, connects);
-        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectName,
-                processInstanceId, processInstanceJson, scheduleTime, syncDefine, flag, locations, connects);
+                                        @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout) {
+        Map<String, Object> result = processInstanceService.updateProcessInstance(loginUser, projectCode, id,
+                taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout);
         return returnDataList(result);
     }
 
     /**
      * query process instance by id
      *
-     * @param loginUser         login user
-     * @param projectName       project name
-     * @param processInstanceId process instance id
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param id process instance id
      * @return process instance detail
      */
-    @ApiOperation(value = "queryProcessInstanceById", notes = "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
+    @Operation(summary = "queryProcessInstanceById", description = "QUERY_PROCESS_INSTANCE_BY_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/select-by-id")
+    @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result queryProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                           @RequestParam("processInstanceId") Integer processInstanceId
-    ) {
-        logger.info("query process instance detail by id, login user:{},project name:{}, process instance id:{}",
-                loginUser.getUserName(), projectName, processInstanceId);
-        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectName, processInstanceId);
+    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
+    public Result queryProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                           @PathVariable("id") Integer id) {
+        Map<String, Object> result = processInstanceService.queryProcessInstanceById(loginUser, projectCode, id);
         return returnDataList(result);
     }
 
     /**
      * query top n process instance order by running duration
      *
-     * @param loginUser     login user
-     * @param projectName   project name
-     * @param size          number of process instance
-     * @param startTime     start time
-     * @param endTime       end time
-     * @return              list of process instance
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param size number of process instance
+     * @param startTime start time
+     * @param endTime end time
+     * @return list of process instance
      */
-    @ApiOperation(value = "queryTopNLongestRunningProcessInstance", notes = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "size", value = "PROCESS_INSTANCE_SIZE", dataType = "Int", example = "10"),
-            @ApiImplicitParam(name = "startTime", value = "PROCESS_INSTANCE_START_TIME", dataType = "String"),
-            @ApiImplicitParam(name = "endTime", value = "PROCESS_INSTANCE_END_TIME", dataType = "String"),
+    @Operation(summary = "queryTopNLongestRunningProcessInstance", description = "QUERY_TOPN_LONGEST_RUNNING_PROCESS_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "size", description = "PROCESS_INSTANCE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
+            @Parameter(name = "startTime", description = "PROCESS_INSTANCE_START_TIME", required = true, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "endTime", description = "PROCESS_INSTANCE_END_TIME", required = true, schema = @Schema(implementation = String.class)),
     })
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                         @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                                         @RequestParam("size") Integer size,
-                                                         @RequestParam(value = "startTime",required = true) String startTime,
-                                                         @RequestParam(value = "endTime",required = true) String endTime
-
-    ) {
-        projectName=ParameterUtils.handleEscapes(projectName);
-        logger.info("query top {} SUCCESS process instance order by running time whprojectNameich started between {} and {} ,login user:{},project name:{}", size, startTime, endTime,
-                loginUser.getUserName(), projectName);
-        Map<String,Object> result=processInstanceService.queryTopNLongestRunningProcessInstance(loginUser, projectName, size, startTime, endTime);
+    @ApiException(Status.QUERY_PROCESS_INSTANCE_BY_ID_ERROR)
+    public Result<ProcessInstance> queryTopNLongestRunningProcessInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                          @RequestParam("size") Integer size,
+                                                                          @RequestParam(value = "startTime", required = true) String startTime,
+                                                                          @RequestParam(value = "endTime", required = true) String endTime) {
+        Map<String, Object> result = processInstanceService.queryTopNLongestRunningProcessInstance(loginUser,
+                projectCode, size, startTime, endTime);
         return returnDataList(result);
     }
 
@@ -269,112 +246,132 @@ public class ProcessInstanceController extends BaseController {
      * delete process instance by id, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser         login user
-     * @param projectName       project name
-     * @param processInstanceId process instance id
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param id process instance id
      * @return delete result code
      */
-    @ApiOperation(value = "deleteProcessInstanceById", notes = "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
+    @Operation(summary = "deleteProcessInstanceById", description = "DELETE_PROCESS_INSTANCE_BY_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
-    public Result<ProcessInstance> deleteProcessInstanceById(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                                                             @RequestParam("processInstanceId") Integer processInstanceId
-    ) {
-        logger.info("delete process instance by id, login user:{}, project name:{}, process instance id:{}",
-                loginUser.getUserName(), projectName, processInstanceId);
-        // task queue
-        Map<String, Object> result = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
-        return returnDataList(result);
+    @ApiException(Status.DELETE_PROCESS_INSTANCE_BY_ID_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_INSTANCE_DELETE)
+    public Result<Void> deleteProcessInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                  @PathVariable("id") Integer id) {
+        processInstanceService.deleteProcessInstanceById(loginUser, id);
+        return Result.success();
     }
 
     /**
      * query sub process instance detail info by task id
      *
-     * @param loginUser   login user
-     * @param projectName project name
-     * @param taskId      task id
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param taskId task id
      * @return sub process instance detail
      */
-    @ApiOperation(value = "querySubProcessInstanceByTaskId", notes = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskId", value = "TASK_ID", dataType = "Int", example = "100")
+    @Operation(summary = "querySubProcessInstanceByTaskCode", description = "QUERY_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
+    @Parameters({
+            @Parameter(name = "taskCode", description = "TASK_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
     })
-    @GetMapping(value = "/select-sub-process")
+    @GetMapping(value = "/query-sub-by-parent")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
-    public Result querySubProcessInstanceByTaskId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
+    public Result querySubProcessInstanceByTaskId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                   @RequestParam("taskId") Integer taskId) {
-        Map<String, Object> result = processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectName, taskId);
+        Map<String, Object> result =
+                processInstanceService.querySubProcessInstanceByTaskId(loginUser, projectCode, taskId);
         return returnDataList(result);
     }
 
     /**
      * query parent process instance detail info by sub process instance id
      *
-     * @param loginUser   login user
-     * @param projectName project name
-     * @param subId       sub process id
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param subId sub process id
      * @return parent instance detail
      */
-    @ApiOperation(value = "queryParentInstanceBySubId", notes = "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "subId", value = "SUB_PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
+    @Operation(summary = "queryParentInstanceBySubId", description = "QUERY_PARENT_PROCESS_INSTANCE_BY_SUB_PROCESS_INSTANCE_ID_NOTES")
+    @Parameters({
+            @Parameter(name = "subId", description = "SUB_PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/select-parent-process")
+    @GetMapping(value = "/query-parent-by-sub")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR)
-    public Result queryParentInstanceBySubId(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
+    @ApiException(Status.QUERY_PARENT_PROCESS_INSTANCE_DETAIL_INFO_BY_SUB_PROCESS_INSTANCE_ID_ERROR)
+    public Result queryParentInstanceBySubId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                              @RequestParam("subId") Integer subId) {
-        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectName, subId);
+        Map<String, Object> result = processInstanceService.queryParentInstanceBySubId(loginUser, projectCode, subId);
         return returnDataList(result);
+    }
+
+    /**
+     * query dynamic sub process instance detail info by task id
+     *
+     * @param loginUser login user
+     * @param taskId task id
+     * @return sub process instance detail
+     */
+    @Operation(summary = "queryDynamicSubWorkflowInstances", description = "QUERY_DYNAMIC_SUBPROCESS_INSTANCE_BY_TASK_CODE_NOTES")
+    @Parameters({
+            @Parameter(name = "taskId", description = "taskInstanceId", required = true, schema = @Schema(implementation = int.class, example = "100"))
+    })
+    @GetMapping(value = "/query-dynamic-sub-workflows")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(Status.QUERY_SUB_PROCESS_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
+    public Result<List<DynamicSubWorkflowDto>> queryDynamicSubWorkflowInstances(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                @RequestParam("taskId") Integer taskId) {
+        List<DynamicSubWorkflowDto> dynamicSubWorkflowDtos =
+                processInstanceService.queryDynamicSubWorkflowInstances(loginUser, taskId);
+        return new Result(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg(), dynamicSubWorkflowDtos);
     }
 
     /**
      * query process instance global variables and local variables
      *
-     * @param loginUser         login user
-     * @param processInstanceId process instance id
+     * @param loginUser login user
+     * @param id process instance id
      * @return variables data
      */
-    @ApiOperation(value = "viewVariables", notes = "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
+    @Operation(summary = "viewVariables", description = "QUERY_PROCESS_INSTANCE_GLOBAL_VARIABLES_AND_LOCAL_VARIABLES_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/view-variables")
+    @GetMapping(value = "/{id}/view-variables")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
-    public Result viewVariables(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @RequestParam("processInstanceId") Integer processInstanceId) throws Exception {
-        Map<String, Object> result = processInstanceService.viewVariables(processInstanceId);
+    @ApiException(Status.QUERY_PROCESS_INSTANCE_ALL_VARIABLES_ERROR)
+    public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                @PathVariable("id") Integer id) {
+        Map<String, Object> result = processInstanceService.viewVariables(projectCode, id);
         return returnDataList(result);
     }
 
     /**
      * encapsulation gantt structure
      *
-     * @param loginUser         login user
-     * @param projectName       project name
-     * @param processInstanceId process instance id
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param id process instance id
      * @return gantt tree data
      */
-    @ApiOperation(value = "vieGanttTree", notes = "VIEW_GANTT_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "processInstanceId", value = "PROCESS_INSTANCE_ID", dataType = "Int", example = "100")
+    @Operation(summary = "vieGanttTree", description = "VIEW_GANTT_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "PROCESS_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/view-gantt")
+    @GetMapping(value = "/{id}/view-gantt")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR)
-    public Result viewTree(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                           @ApiParam(name = "projectName", value = "PROJECT_NAME", required = true) @PathVariable String projectName,
-                           @RequestParam("processInstanceId") Integer processInstanceId) throws Exception {
-        Map<String, Object> result = processInstanceService.viewGantt(processInstanceId);
+    @ApiException(Status.ENCAPSULATION_PROCESS_INSTANCE_GANTT_STRUCTURE_ERROR)
+    public Result viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                           @PathVariable("id") Integer id) throws Exception {
+        Map<String, Object> result = processInstanceService.viewGantt(projectCode, id);
         return returnDataList(result);
     }
 
@@ -382,45 +379,60 @@ public class ProcessInstanceController extends BaseController {
      * batch delete process instance by ids, at the same time,
      * delete task instance and their mapping relation data
      *
-     * @param loginUser          login user
-     * @param projectName        project name
+     * @param loginUser login user
+     * @param projectCode project code
      * @param processInstanceIds process instance id
      * @return delete result code
      */
-    @GetMapping(value = "/batch-delete")
+    @Operation(summary = "batchDeleteProcessInstanceByIds", description = "BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = int.class)),
+            @Parameter(name = "processInstanceIds", description = "PROCESS_INSTANCE_IDS", required = true, schema = @Schema(implementation = String.class)),
+    })
+    @PostMapping(value = "/batch-delete")
     @ResponseStatus(HttpStatus.OK)
-    @ApiException(BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
+    @ApiException(Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR)
+    @OperatorLog(auditType = AuditType.PROCESS_INSTANCE_BATCH_DELETE)
     public Result batchDeleteProcessInstanceByIds(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @PathVariable String projectName,
-                                                  @RequestParam("processInstanceIds") String processInstanceIds
-    ) {
-        logger.info("delete process instance by ids, login user:{}, project name:{}, process instance ids :{}",
-                loginUser.getUserName(), projectName, processInstanceIds);
+                                                  @PathVariable long projectCode,
+                                                  @RequestParam("processInstanceIds") String processInstanceIds) {
         // task queue
         Map<String, Object> result = new HashMap<>();
         List<String> deleteFailedIdList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(processInstanceIds)) {
-            String[] processInstanceIdArray = processInstanceIds.split(",");
+        if (!StringUtils.isEmpty(processInstanceIds)) {
+            String[] processInstanceIdArray = processInstanceIds.split(Constants.COMMA);
 
             for (String strProcessInstanceId : processInstanceIdArray) {
                 int processInstanceId = Integer.parseInt(strProcessInstanceId);
                 try {
-                    Map<String, Object> deleteResult = processInstanceService.deleteProcessInstanceById(loginUser, projectName, processInstanceId);
-                    if (!Status.SUCCESS.equals(deleteResult.get(Constants.STATUS))) {
-                        deleteFailedIdList.add(strProcessInstanceId);
-                        logger.error((String) deleteResult.get(Constants.MSG));
-                    }
+                    processInstanceService.deleteProcessInstanceById(loginUser, processInstanceId);
                 } catch (Exception e) {
-                    deleteFailedIdList.add(strProcessInstanceId);
+                    log.error("Delete workflow instance: {} error", strProcessInstanceId, e);
+                    deleteFailedIdList
+                            .add(MessageFormat.format(Status.PROCESS_INSTANCE_ERROR.getMsg(), strProcessInstanceId));
                 }
             }
         }
         if (!deleteFailedIdList.isEmpty()) {
-            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join(",", deleteFailedIdList));
+            putMsg(result, Status.BATCH_DELETE_PROCESS_INSTANCE_BY_IDS_ERROR, String.join("\n", deleteFailedIdList));
         } else {
             putMsg(result, Status.SUCCESS);
         }
+        return returnDataList(result);
+    }
 
+    @Operation(summary = "queryProcessInstanceListByTrigger", description = "QUERY_PROCESS_INSTANCE_BY_TRIGGER_NOTES")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = Long.class)),
+            @Parameter(name = "triggerCode", description = "TRIGGER_CODE", required = true, schema = @Schema(implementation = Long.class))
+    })
+    @GetMapping("/trigger")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_PROCESS_INSTANCE_LIST_PAGING_ERROR)
+    public Result queryProcessInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @PathVariable long projectCode,
+                                                     @RequestParam(value = "triggerCode") Long triggerCode) {
+        Map<String, Object> result = processInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return returnDataList(result);
     }
 }

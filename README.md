@@ -1,102 +1,78 @@
-Dolphin Scheduler Official Website
-[dolphinscheduler.apache.org](https://dolphinscheduler.apache.org)
-============
+# Apache Dolphinscheduler
 
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
-[![Total Lines](https://tokei.rs/b1/github/apache/dolphinscheduler?category=lines)](https://github.com/apache/dolphinscheduler)
-[![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)](https://codecov.io/gh/apache/dolphinscheduler/branch/dev)
+![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
-[![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule)
-[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw)
-
-
-
-[![Stargazers over time](https://starchart.cc/apache/dolphinscheduler.svg)](https://starchart.cc/apache/dolphinscheduler)
-
-[![EN doc](https://img.shields.io/badge/document-English-blue.svg)](README.md)
+[![Twitter Follow](https://img.shields.io/twitter/follow/dolphinschedule.svg?style=social&label=Follow)](https://twitter.com/dolphinschedule) <!-- markdown-link-check-disable-line -->
+[![Slack Status](https://img.shields.io/badge/slack-join_chat-white.svg?logo=slack&style=social)](https://s.apache.org/dolphinscheduler-slack)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](README_zh_CN.md)
 
-## Design Features
+## About
 
-DolphinScheduler is a distributed and extensible workflow scheduler platform with powerful DAG visual interfaces, dedicated to solving complex job dependencies in the data pipeline and providing various types of jobs available `out of the box`.
+Apache DolphinScheduler is the modern data orchestration platform. Agile to create high performance workflow with low-code. It is also provided powerful user interface,
+dedicated to solving complex task dependencies in the data pipeline and providing various types of jobs available **out of the box**
 
-Its main objectives are as follows:
+The key features for DolphinScheduler are as follows:
 
- - Associate the tasks according to the dependencies of the tasks in a DAG graph, which can visualize the running state of the task in real-time.
- - Support various task types: Shell, MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Sub_Process, Procedure, etc.
- - Support scheduling of workflows and dependencies, manual scheduling to pause/stop/recover task, support failure task retry/alarm, recover specified nodes from failure, kill task, etc.
- - Support the priority of workflows & tasks, task failover, and task timeout alarm or failure.
- - Support workflow global parameters and node customized parameter settings.
- - Support online upload/download/management of resource files, etc. Support online file creation and editing.
- - Support task log online viewing and scrolling and downloading, etc.
- - Have implemented cluster HA, decentralize Master cluster and Worker cluster through Zookeeper.
- - Support the viewing of Master/Worker CPU load, memory, and CPU usage metrics.
- - Support displaying workflow history in tree/Gantt chart, as well as statistical analysis on the task status & process status in each workflow.
- - Support back-filling data.
- - Support multi-tenant.
- - Support internationalization.
- - More features waiting for partners to explore...
+- Easy to deploy, provide four ways to deploy which including Standalone, Cluster, Docker and Kubernetes.
+- Easy to use, workflow can be created and managed by four ways, which including Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html), Yaml file and Open API
+- Highly reliable and high availability, decentralized architecture with multi-master and multi-worker, native supports horizontal scaling.
+- High performance, its performance is N times faster than other orchestration platform and it can support tens of millions of tasks per day
+- Cloud Native, DolphinScheduler supports orchestrating multi-cloud/data center workflow, and supports custom task type
+- Versioning both workflow and workflow instance(including tasks)
+- Various state control of workflow and task, support pause/stop/recover them in any time
+- Multi-tenancy support
+- Others like backfill support(Web UI native), permission control including project, resource and data source
 
-## What's in DolphinScheduler
+## QuickStart
 
- Stability | Accessibility | Features | Scalability |
- -- | -- | -- | --
-Decentralized multi-master and multi-worker | Visualization of workflow key information, such as task status, task type, retry times, task operation machine information, visual variables, and so on at a glance.  |  Support pause, recover operation | Support customized task types
-support HA | Visualization of all workflow operations, dragging tasks to draw DAGs, configuring data sources and resources. At the same time, for third-party systems, provide API mode operations. | Users on DolphinScheduler can achieve many-to-one or one-to-one mapping relationship through tenants and Hadoop users, which is very important for scheduling large data jobs.  | The scheduler supports distributed scheduling, and the overall scheduling capability will increase linearly with the scale of the cluster. Master and Worker support dynamic adjustment.
-Overload processing: By using the task queue mechanism, the number of schedulable tasks on a single machine can be flexibly configured. Machine jam can be avoided with high tolerance to numbers of tasks cached in task queue. | One-click deployment | Support traditional shell tasks, and big data platform task scheduling: MR, Spark, SQL (MySQL, PostgreSQL, hive, spark SQL), Python, Procedure, Sub_Process |  |
+- For quick experience
+  - Want to [start with standalone](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/standalone)
+  - Want to [start with Docker](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/start/docker)
+- For Kubernetes
+  - [Start with Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/guide/installation/kubernetes)
+- For Terraform
+  - [Start with Terraform](deploy/terraform/README.md) 
 
 ## User Interface Screenshots
 
-![home page](https://user-images.githubusercontent.com/15833811/75218288-bf286400-57d4-11ea-8263-d639c6511d5f.jpg)
-![dag](https://user-images.githubusercontent.com/15833811/75236750-3374fe80-57f9-11ea-857d-62a66a5a559d.png)
-![process definition list page](https://user-images.githubusercontent.com/15833811/75216886-6f479e00-57d0-11ea-92dd-66e7640a186f.png)
-![view task log online](https://user-images.githubusercontent.com/15833811/75216924-9900c500-57d0-11ea-91dc-3522a76bdbbe.png)
-![resource management](https://user-images.githubusercontent.com/15833811/75216984-be8dce80-57d0-11ea-840d-58546edc8788.png)
-![monitor](https://user-images.githubusercontent.com/59273635/75625839-c698a480-5bfc-11ea-8bbe-895b561b337f.png)
-![security](https://user-images.githubusercontent.com/15833811/75236441-bfd2f180-57f8-11ea-88bd-f24311e01b7e.png)
-![treeview](https://user-images.githubusercontent.com/15833811/75217191-3fe56100-57d1-11ea-8856-f19180d9a879.png)
+* **Homepage:** Project and workflow overview, including the latest workflow instance and task instance status statistics.
+![home](images/home.png)
 
-## QuickStart in Docker
+* **Workflow Definition:** Create and manage workflow by drag and drop, easy to build and maintain complex workflow, support [bulk of tasks](https://dolphinscheduler.apache.org/en-us/docs/3.1.5/introduction-to-functions_menu/task_menu) out of box.
+![workflow-definition](images/workflow-definition.png)
 
-Please referer the official website document: [QuickStart in Docker](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/docker-deployment.html)
+* **Workflow Tree View:** Abstract tree structure could clearer understanding of the relationship between tasks
+![workflow-tree](images/workflow-tree.png)
 
-## QuickStart in Kubernetes
+* **Data source:** Manage support multiple external data sources, provide unified data access capabilities for such as MySQL, PostgreSQL, Hive, Trino, etc.
+![data-source](images/data-source.png)
 
-Please referer the official website document: [QuickStart in Kubernetes](https://dolphinscheduler.apache.org/en-us/docs/latest/user_doc/kubernetes-deployment.html)
+* **Monitor:** View the status of the master, worker and database in real time, including server resource usage and load, do quick health check without logging in to the server.
+![monitor](images/monitor.png)
 
-## How to Build
+## Suggestions & Bug Reports
 
-```bash
-./mvnw clean install -Prelease
-```
+Follow [this guide](https://github.com/apache/dolphinscheduler/issues/new/choose) to report your suggestions or bugs.
 
-Artifact:
+## Contributing
 
-```
-dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-dolphinscheduler-bin.tar.gz: Binary package of DolphinScheduler
-dolphinscheduler-dist/target/apache-dolphinscheduler-${latest.release.version}-src.zip: Source code package of DolphinScheduler
-```
-
-## Thanks
-
-DolphinScheduler is based on a lot of excellent open-source projects, such as Google guava, guice, grpc, netty, ali bonecp, quartz, and many open-source projects of Apache and so on.
-We would like to express our deep gratitude to all the open-source projects used in Dolphin Scheduler. We hope that we are not only the beneficiaries of open-source, but also give back to the community. Besides, we hope everyone who have the same enthusiasm and passion for open source could join in and contribute to the open-source community!
-
-## Get Help
-
-1. Submit an [issue](https://github.com/apache/dolphinscheduler/issues/new/choose)
-1. Subscribe to this mailing list: https://dolphinscheduler.apache.org/en-us/community/development/subscribe.html, then email dev@dolphinscheduler.apache.org
+The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](docs/docs/en/contribute/join/contribute.md),
+find the good first issue in [here](https://github.com/apache/dolphinscheduler/contribute) if you are new to DolphinScheduler.
 
 ## Community
 
-You are very welcome to communicate with the developers and users of Dolphin Scheduler. There are two ways to find them:
-1. Join the Slack channel by [this invitation link](https://join.slack.com/t/asf-dolphinscheduler/shared_invite/zt-omtdhuio-_JISsxYhiVsltmC5h38yfw).
-2. Follow the [Twitter account of Dolphin Scheduler](https://twitter.com/dolphinschedule) and get the latest news on time.
+Welcome to join the Apache DolphinScheduler community by:
 
-## How to Contribute
+- Join the [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack) to keep in touch with the community
+- Follow the [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) and get the latest news <!-- markdown-link-check-disable-line -->
+- Subscribe DolphinScheduler mail list, [users@dolphinscheduler.apache.org](mailto:users-subscribe@dolphinscheduler.apache.org) for user and [dev@dolphinscheduler.apache.org](mailto:dev-subscribe@dolphinscheduler.apache.org) for developer
 
-The community welcomes everyone to contribute, please refer to this page to find out more: [How to contribute](https://dolphinscheduler.apache.org/en-us/community/development/contribute.html).
+# Landscapes
 
-## License
-
-Please refer to the [LICENSE](https://github.com/apache/dolphinscheduler/blob/dev/LICENSE) file.
+<p align="center">
+<br/><br/>
+<img src="./images/cncf-landscape-white-bg.jpg" width="175" alt="cncf-landscape"/>&nbsp;&nbsp;<img src="./images/cncf-white-bg.jpg" width="200" alt="cncf-logo"/>
+<br/><br/>
+DolphinScheduler enriches the <a href="https://landscape.cncf.io/?item=orchestration-management--scheduling-orchestration--dolphinscheduler">CNCF CLOUD NATIVE Landscape.</a >
+</p >

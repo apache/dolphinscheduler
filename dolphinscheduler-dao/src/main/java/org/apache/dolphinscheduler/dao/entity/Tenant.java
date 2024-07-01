@@ -16,26 +16,24 @@
  */
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
+
+import lombok.Data;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonFormat;
 
-import java.util.Date;
-import java.util.Objects;
-
-/**
- * tenant
- */
+@Data
 @TableName("t_ds_tenant")
 public class Tenant {
 
     /**
      * id
      */
-    @TableId(value="id", type=IdType.AUTO)
-    private int id;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
     /**
      * tenant code
@@ -67,108 +65,32 @@ public class Tenant {
     /**
      * create time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date createTime;
     /**
      * update time
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date updateTime;
 
-
-    public int getId() {
-        return id;
+    public Tenant() {
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public void setTenantCode(String tenantCode) {
+    public Tenant(String tenantCode, String description, int queueId) {
+        Date now = new Date();
         this.tenantCode = tenantCode;
-    }
-
-    public int getQueueId() {
-        return queueId;
-    }
-
-    public void setQueueId(int queueId) {
-        this.queueId = queueId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
-
-    public String getQueueName() {
-        return queueName;
-    }
-
-    public void setQueueName(String queueName) {
-        this.queueName = queueName;
-    }
-
-    public String getQueue() {
-        return queue;
-    }
-
-    public void setQueue(String queue) {
-        this.queue = queue;
-    }
-
-    @Override
-    public String toString() {
-        return "Tenant{" +
-                "id=" + id +
-                ", tenantCode='" + tenantCode + '\'' +
-                ", queueId=" + queueId +
-                ", queueName='" + queueName + '\'' +
-                ", queue='" + queue + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
+        this.queueId = queueId;
+        this.createTime = now;
+        this.updateTime = now;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        Tenant tenant = (Tenant) o;
-
-        return id == tenant.id;
+    public Tenant(int id, String tenantCode, String description, int queueId) {
+        Date now = new Date();
+        this.id = id;
+        this.tenantCode = tenantCode;
+        this.description = description;
+        this.queueId = queueId;
+        this.createTime = now;
+        this.updateTime = now;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

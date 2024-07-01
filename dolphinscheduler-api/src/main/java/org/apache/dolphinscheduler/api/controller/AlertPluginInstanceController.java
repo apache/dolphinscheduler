@@ -22,49 +22,58 @@ import static org.apache.dolphinscheduler.api.enums.Status.DELETE_ALERT_PLUGIN_I
 import static org.apache.dolphinscheduler.api.enums.Status.GET_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
-import org.apache.dolphinscheduler.api.utils.RegexUtils;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.Constants;
+import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import springfox.documentation.annotations.ApiIgnore;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * alert plugin instance controller
  */
-@Api(tags = "ALERT_PLUGIN_INSTANCE_TAG")
+@Tag(name = "ALERT_PLUGIN_INSTANCE_TAG")
 @RestController
-@RequestMapping("alert-plugin-instance")
+@RequestMapping("alert-plugin-instances")
+@Slf4j
 public class AlertPluginInstanceController extends BaseController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AlertPluginInstanceController.class);
 
     @Autowired
     private AlertPluginInstanceService alertPluginInstanceService;
-
 
     /**
      * create alert plugin instance
@@ -75,51 +84,68 @@ public class AlertPluginInstanceController extends BaseController {
      * @param pluginInstanceParams instance params
      * @return result
      */
-    @ApiOperation(value = "createAlertPluginInstance", notes = "CREATE_ALERT_PLUGIN_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "pluginDefineId", value = "ALERT_PLUGIN_DEFINE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "instanceName", value = "ALERT_PLUGIN_INSTANCE_NAME", required = true, dataType = "String", example = "DING TALK"),
-            @ApiImplicitParam(name = "pluginInstanceParams", value = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, dataType = "String", example = "ALERT_PLUGIN_INSTANCE_PARAMS")
+    @Operation(summary = "createAlertPluginInstance", description = "CREATE_ALERT_PLUGIN_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "pluginDefineId", description = "ALERT_PLUGIN_DEFINE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "instanceName", description = "ALERT_PLUGIN_INSTANCE_NAME", required = true, schema = @Schema(implementation = String.class, example = "DING TALK")),
+            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema = @Schema(implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
     })
-    @PostMapping(value = "/create")
+    @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result createAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestParam(value = "pluginDefineId") int pluginDefineId,
-                                            @RequestParam(value = "instanceName") String instanceName,
-                                            @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        logger.info("login user {},create alert plugin instance, instanceName:{} ",
-                RegexUtils.escapeNRT(loginUser.getUserName()),
-                RegexUtils.escapeNRT(instanceName));
-        Map<String, Object> result = alertPluginInstanceService.create(loginUser, pluginDefineId, instanceName, pluginInstanceParams);
-        return returnDataList(result);
+    @OperatorLog(auditType = AuditType.ALARM_INSTANCE_CREATE)
+    public Result<AlertPluginInstance> createAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @RequestParam(value = "pluginDefineId") int pluginDefineId,
+                                                                 @RequestParam(value = "instanceName") String instanceName,
+                                                                 @RequestParam(value = "instanceType") AlertPluginInstanceType instanceType,
+                                                                 @RequestParam(value = "warningType") WarningType warningType,
+                                                                 @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
+        AlertPluginInstance alertPluginInstance = alertPluginInstanceService.create(loginUser, pluginDefineId,
+                instanceName, instanceType, warningType, pluginInstanceParams);
+        return Result.success(alertPluginInstance);
+    }
+
+    @Operation(summary = "testSendAlertPluginInstance", description = "TEST_SEND_ALERT_PLUGIN_INSTANCE")
+    @Parameters({
+            @Parameter(name = "pluginDefineId", description = "ALERT_PLUGIN_DEFINE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema = @Schema(implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
+    })
+    @PostMapping(value = "/test-send")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR)
+    public Result<Boolean> testSendAlertPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
+                                                       @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
+        alertPluginInstanceService.testSend(pluginDefineId, pluginInstanceParams);
+        return Result.success(true);
     }
 
     /**
      * updateAlertPluginInstance
      *
      * @param loginUser login user
-     * @param alertPluginInstanceId alert plugin instance id
+     * @param id alert plugin instance id
      * @param instanceName instance name
      * @param pluginInstanceParams instance params
      * @return result
      */
-    @ApiOperation(value = "update", notes = "UPDATE_ALERT_PLUGIN_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "alertPluginInstanceId", value = "ALERT_PLUGIN_INSTANCE_ID", required = true, dataType = "Int", example = "100"),
-            @ApiImplicitParam(name = "instanceName", value = "ALERT_PLUGIN_INSTANCE_NAME", required = true, dataType = "String", example = "DING TALK"),
-            @ApiImplicitParam(name = "pluginInstanceParams", value = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, dataType = "String", example = "ALERT_PLUGIN_INSTANCE_PARAMS")
+    @Operation(summary = "updateAlertPluginInstance", description = "UPDATE_ALERT_PLUGIN_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "alertPluginInstanceId", description = "ALERT_PLUGIN_INSTANCE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
+            @Parameter(name = "instanceName", description = "ALERT_PLUGIN_INSTANCE_NAME", required = true, schema = @Schema(implementation = String.class, example = "DING TALK")),
+            @Parameter(name = "pluginInstanceParams", description = "ALERT_PLUGIN_INSTANCE_PARAMS", required = true, schema = @Schema(implementation = String.class, example = "ALERT_PLUGIN_INSTANCE_PARAMS"))
     })
-    @GetMapping(value = "/update")
+    @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result updateAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestParam(value = "alertPluginInstanceId") int alertPluginInstanceId,
-                                            @RequestParam(value = "instanceName") String instanceName,
-                                            @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        logger.info("login user {},update alert plugin instance id {}", RegexUtils.escapeNRT(loginUser.getUserName()), alertPluginInstanceId);
-        Map<String, Object> result = alertPluginInstanceService.update(loginUser, alertPluginInstanceId, instanceName, pluginInstanceParams);
-        return returnDataList(result);
+    @OperatorLog(auditType = AuditType.ALARM_INSTANCE_UPDATE)
+    public Result<AlertPluginInstance> updateAlertPluginInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                     @PathVariable(value = "id") int id,
+                                                                     @RequestParam(value = "instanceName") String instanceName,
+                                                                     @RequestParam(value = "warningType") WarningType warningType,
+                                                                     @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
+        AlertPluginInstance alertPluginInstance =
+                alertPluginInstanceService.updateById(loginUser, id, instanceName, warningType, pluginInstanceParams);
+        return Result.success(alertPluginInstance);
     }
 
     /**
@@ -129,19 +155,19 @@ public class AlertPluginInstanceController extends BaseController {
      * @param id id
      * @return result
      */
-    @ApiOperation(value = "delete", notes = "DELETE_ALERT_PLUGIN_INSTANCE_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", value = "ALERT_PLUGIN_ID", required = true, dataType = "Int", example = "100")
+    @Operation(summary = "deleteAlertPluginInstance", description = "DELETE_ALERT_PLUGIN_INSTANCE_NOTES")
+    @Parameters({
+            @Parameter(name = "id", description = "ALERT_PLUGIN_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
     })
-    @GetMapping(value = "/delete")
+    @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result deleteAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @RequestParam(value = "id") int id) {
-        logger.info("login user {},delete alert plugin instance id {}", RegexUtils.escapeNRT(loginUser.getUserName()), id);
+    @OperatorLog(auditType = AuditType.ALARM_INSTANCE_DELETE)
+    public Result<Boolean> deleteAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @PathVariable(value = "id") int id) {
 
-        Map<String, Object> result = alertPluginInstanceService.delete(loginUser, id);
-        return returnDataList(result);
+        alertPluginInstanceService.deleteById(loginUser, id);
+        return Result.success(true);
     }
 
     /**
@@ -151,15 +177,14 @@ public class AlertPluginInstanceController extends BaseController {
      * @param id alert plugin instance id
      * @return result
      */
-    @ApiOperation(value = "get", notes = "GET_ALERT_PLUGIN_INSTANCE_NOTES")
-    @PostMapping(value = "/get")
+    @Operation(summary = "getAlertPluginInstance", description = "GET_ALERT_PLUGIN_INSTANCE_NOTES")
+    @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result getAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam(value = "id") int id) {
-        logger.info("login user {},get alert plugin instance, id {}", RegexUtils.escapeNRT(loginUser.getUserName()), id);
-        Map<String, Object> result = alertPluginInstanceService.get(loginUser, id);
-        return returnDataList(result);
+    public Result<AlertPluginInstance> getAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                              @PathVariable(value = "id") int id) {
+        AlertPluginInstance alertPluginInstance = alertPluginInstanceService.getById(loginUser, id);
+        return Result.success(alertPluginInstance);
     }
 
     /**
@@ -168,14 +193,13 @@ public class AlertPluginInstanceController extends BaseController {
      * @param loginUser login user
      * @return result
      */
-    @ApiOperation(value = "/queryAll", notes = "QUERY_ALL_ALERT_PLUGIN_INSTANCE_NOTES")
-    @PostMapping(value = "/queryAll")
+    @Operation(summary = "queryAlertPluginInstanceList", description = "QUERY_ALL_ALERT_PLUGIN_INSTANCE_NOTES")
+    @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result getAlertPluginInstance(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        logger.info("login user {}, query all alert plugin instance", RegexUtils.escapeNRT(loginUser.getUserName()));
-        Map<String, Object> result = alertPluginInstanceService.queryAll();
-        return returnDataList(result);
+    public Result<List<AlertPluginInstanceVO>> getAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<AlertPluginInstanceVO> alertPluginInstanceVOS = alertPluginInstanceService.queryAll();
+        return Result.success(alertPluginInstanceVOS);
     }
 
     /**
@@ -185,56 +209,51 @@ public class AlertPluginInstanceController extends BaseController {
      * @param alertInstanceName alert instance name
      * @return check result code
      */
-    @ApiOperation(value = "verifyAlertInstanceName", notes = "VERIFY_ALERT_INSTANCE_NAME_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "groupName", value = "GROUP_NAME", required = true, dataType = "String"),
+    @Operation(summary = "verifyAlertInstanceName", description = "VERIFY_ALERT_INSTANCE_NAME_NOTES")
+    @Parameters({
+            @Parameter(name = "alertInstanceName", description = "ALERT_INSTANCE_NAME", required = true, schema = @Schema(implementation = String.class)),
     })
-    @GetMapping(value = "/verify-alert-instance-name")
+    @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
-    public Result verifyGroupName(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result verifyGroupName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "alertInstanceName") String alertInstanceName) {
-        logger.info("login user {},verify alert instance name: {}", RegexUtils.escapeNRT(loginUser.getUserName()), RegexUtils.escapeNRT(alertInstanceName));
 
         boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(alertInstanceName);
-        Result result = new Result();
         if (exist) {
-            logger.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
-            result.setCode(Status.PLUGIN_INSTANCE_ALREADY_EXIT.getCode());
-            result.setMsg(Status.PLUGIN_INSTANCE_ALREADY_EXIT.getMsg());
+            log.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
+            return Result.error(Status.PLUGIN_INSTANCE_ALREADY_EXISTS);
         } else {
-            result.setCode(Status.SUCCESS.getCode());
-            result.setMsg(Status.SUCCESS.getMsg());
+            return Result.success();
         }
-        return result;
     }
 
     /**
      * paging query alert plugin instance group list
      *
      * @param loginUser login user
+     * @param searchVal search value
      * @param pageNo page number
      * @param pageSize page size
      * @return alert plugin instance list page
      */
-    @ApiOperation(value = "queryAlertPluginInstanceListPaging", notes = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "pageNo", value = "PAGE_NO", dataType = "Int", example = "1"),
-            @ApiImplicitParam(name = "pageSize", value = "PAGE_SIZE", dataType = "Int", example = "20")
+    @Operation(summary = "queryAlertPluginInstanceListPaging", description = "QUERY_ALERT_PLUGIN_INSTANCE_LIST_PAGING_NOTES")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "20"))
     })
-    @GetMapping(value = "/list-paging")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_PAGING_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result listPaging(@ApiIgnore @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                             @RequestParam("pageNo") Integer pageNo,
-                             @RequestParam("pageSize") Integer pageSize) {
-        logger.info("login user {}, list paging, pageNo: {}, pageSize: {}", RegexUtils.escapeNRT(loginUser.getUserName()), pageNo, pageSize);
-        Map<String, Object> result = checkPageParams(pageNo, pageSize);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataListPaging(result);
-        }
-
-        result = alertPluginInstanceService.queryPluginPage(pageNo, pageSize);
-        return returnDataListPaging(result);
+    public Result<PageInfo<AlertPluginInstanceVO>> listPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                              @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                              @RequestParam("pageNo") Integer pageNo,
+                                                              @RequestParam("pageSize") Integer pageSize) {
+        checkPageParams(pageNo, pageSize);
+        searchVal = ParameterUtils.handleEscapes(searchVal);
+        PageInfo<AlertPluginInstanceVO> alertPluginInstanceVOPageInfo =
+                alertPluginInstanceService.listPaging(loginUser, searchVal, pageNo, pageSize);
+        return Result.success(alertPluginInstanceVOPageInfo);
     }
 
 }

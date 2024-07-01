@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
@@ -21,7 +22,8 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 /**
  * complement data run mode
  */
-public enum  RunMode {
+public enum RunMode {
+
     /**
      * 0 serial run
      * 1 parallel run
@@ -29,7 +31,7 @@ public enum  RunMode {
     RUN_MODE_SERIAL(0, "serial run"),
     RUN_MODE_PARALLEL(1, "parallel run");
 
-    RunMode(int code, String descp){
+    RunMode(int code, String descp) {
         this.code = code;
         this.descp = descp;
     }

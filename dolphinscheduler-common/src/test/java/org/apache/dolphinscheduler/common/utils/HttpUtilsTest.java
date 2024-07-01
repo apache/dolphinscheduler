@@ -16,71 +16,46 @@
  */
 package org.apache.dolphinscheduler.common.utils;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import org.apache.dolphinscheduler.common.Constants;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * HttpClient utils test
- */
 public class HttpUtilsTest {
 
-    public static final Logger logger = LoggerFactory.getLogger(HttpUtilsTest.class);
-    private HadoopUtils hadoopUtils = HadoopUtils.getInstance();
-
     @Test
-    public void testGetTest() {
-	// success
-	String result = HttpUtils.get("https://github.com/manifest.json");
-	Assert.assertNotNull(result);
-	ObjectNode jsonObject = JSONUtils.parseObject(result);
-	Assert.assertEquals("GitHub", jsonObject.path("name").asText());
-	result = HttpUtils.get("https://123.333.111.33/ccc");
-	Assert.assertNull(result);
+    void testGetRequest() {
+        // test HTTP URL
+        String response1 = HttpUtils.get("http://www.bing.com/");
+        assertNotNull(response1, "Response should not be null for a http URL");
     }
 
+    /**
+     * test invalid certification HTTPS URL
+     */
     @Test
-    public void testGetByKerberos() {
-	try {
-	    String applicationUrl = hadoopUtils.getApplicationUrl("application_1542010131334_0029");
-	    String responseContent;
-	    responseContent = HttpUtils.get(applicationUrl);
-	    Assert.assertNull(responseContent);
-
-	} catch (Exception e) {
-	    logger.error(e.getMessage(), e);
-	}
-
+    void testGetInvalidRequest() {
+        // test invalid certification HTTPS URL
+        String response2 = HttpUtils.get("https://poc.bzzt.net");
+        assertNull(response2,
+                "Response should be null for an invalid certification https URL and throw exception in console");
     }
 
+    /**
+     * test valid certification HTTPS URL
+     */
     @Test
-    public void testGetResponseContentString() {
-	CloseableHttpClient httpclient = HttpClients.createDefault();
-	HttpGet httpget = new HttpGet("https://github.com/manifest.json");
-	/** set timeout、request time、socket timeout */
-	RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
-		.setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
-		.setSocketTimeout(Constants.SOCKET_TIMEOUT).setRedirectsEnabled(true).build();
-	httpget.setConfig(requestConfig);
-	String responseContent = HttpUtils.getResponseContentString(httpget, httpclient);
-	Assert.assertNotNull(responseContent);
+    void testGetValidRequest() {
+        String response3 = HttpUtils.get("https://www.google.com/");
+        assertNotNull(response3, "Response should not be null for a valid certification https URL");
     }
 
-
-	@Test
-	public void testGetHttpClient() {
-		CloseableHttpClient httpClient1 = HttpUtils.getInstance();
-		CloseableHttpClient httpClient2 = HttpUtils.getInstance();
-		Assert.assertEquals(httpClient1, httpClient2);
-	}
-
+    /**
+     * test wrong URL
+     */
+    @Test
+    void testGetWrongRequest() {
+        String response4 = HttpUtils.get("/abc/22");
+        assertNull(response4, "Response should be null for a wrong url");
+    }
 }

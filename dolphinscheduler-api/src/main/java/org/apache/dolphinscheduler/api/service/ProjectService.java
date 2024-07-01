@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,27 +38,64 @@ public interface ProjectService {
      * @param desc description
      * @return returns an error if it exists
      */
-    Map<String, Object> createProject(User loginUser, String name, String desc);
+    Result createProject(User loginUser, String name, String desc);
 
     /**
-     * query project details by id
+     * query project details by code
      *
-     * @param projectId project id
+     * @param projectCode project code
      * @return project detail information
      */
-    Map<String, Object> queryById(Integer projectId);
+    Result queryByCode(User loginUser, long projectCode);
+
+    /**
+     * query project details by name
+     *
+     * @param loginUser login user
+     * @param projectName project name
+     * @return project detail information
+     */
+    Map<String, Object> queryByName(User loginUser, String projectName);
 
     /**
      * check project and authorization
      *
      * @param loginUser login user
      * @param project project
-     * @param projectName project name
+     * @param projectCode project code
+     * @param perm String
      * @return true if the login user have permission to see the project
      */
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, String projectName);
+    @Deprecated
+    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
 
-    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result);
+    void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
+
+    void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) throws ServiceException;
+
+    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String perm);
+
+    /**
+     * has project and permission
+     *
+     * @param loginUser  login user
+     * @param project    project
+     * @param result     result
+     * @param permission String
+     * @return true if the login user have permission to the project
+     */
+    @Deprecated
+    boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
+
+    @Deprecated
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Result result);
+
+    @Deprecated
+    boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
+
+    void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode);
+
+    void checkHasProjectWritePermissionThrowException(User loginUser, Project project);
 
     /**
      * admin can view all projects
@@ -66,27 +106,40 @@ public interface ProjectService {
      * @param pageNo page number
      * @return project list which the login user have permission to see
      */
-    Map<String, Object> queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
+    Result queryProjectListPaging(User loginUser, Integer pageSize, Integer pageNo, String searchVal);
 
     /**
-     * delete project by id
+     * admin can view all projects
+     *
+     * @param userId user id
+     * @param loginUser login user
+     * @param searchVal search value
+     * @param pageSize page size
+     * @param pageNo page number
+     * @return project list which with the login user's authorized level
+     */
+    Result queryProjectWithAuthorizedLevelListPaging(Integer userId, User loginUser, Integer pageSize, Integer pageNo,
+                                                     String searchVal);
+
+    /**
+     * delete project by code
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @return delete result code
      */
-    Map<String, Object> deleteProject(User loginUser, Integer projectId);
+    Result deleteProject(User loginUser, Long projectCode);
 
     /**
      * updateProcessInstance project
      *
      * @param loginUser login user
-     * @param projectId project id
+     * @param projectCode project code
      * @param projectName project name
      * @param desc description
      * @return update result code
      */
-    Map<String, Object> update(User loginUser, Integer projectId, String projectName, String desc);
+    Result update(User loginUser, Long projectCode, String projectName, String desc);
 
     /**
      * query unauthorized project
@@ -95,7 +148,7 @@ public interface ProjectService {
      * @param userId user id
      * @return the projects which user have not permission to see
      */
-    Map<String, Object> queryUnauthorizedProject(User loginUser, Integer userId);
+    Result queryUnauthorizedProject(User loginUser, Integer userId);
 
     /**
      * query authorized project
@@ -104,7 +157,23 @@ public interface ProjectService {
      * @param userId user id
      * @return projects which the user have permission to see, Except for items created by this user
      */
-    Map<String, Object> queryAuthorizedProject(User loginUser, Integer userId);
+    Result queryAuthorizedProject(User loginUser, Integer userId);
+
+    /**
+     * query all project with authorized level
+     * @param loginUser login user
+     * @return project list
+     */
+    Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId);
+
+    /**
+     * query authorized user
+     *
+     * @param loginUser     login user
+     * @param projectCode   project code
+     * @return users        who have permission for the specified project
+     */
+    Result queryAuthorizedUser(User loginUser, Long projectCode);
 
     /**
      * query authorized project
@@ -116,16 +185,35 @@ public interface ProjectService {
 
     /**
      * query all project list that have one or more process definitions.
-     *
+     * @param loginUser
      * @return project list
      */
-    Map<String, Object> queryAllProjectList();
+    Result queryAllProjectList(User loginUser);
 
     /**
      * query authorized and user create project list by user id
-     * @param loginUser
-     * @return
+     * @param loginUser login user
+     * @return project list
      */
-    Map<String, Object> queryProjectCreatedAndAuthorizedByUser(User loginUser);
+    Result queryProjectCreatedAndAuthorizedByUser(User loginUser);
 
+    /**
+     * check project and authorization
+     *
+     * @param result result
+     * @param loginUser login user
+     * @param project project
+     * @param projectCode project code
+     * @param perm String
+     * @return true if the login user have permission to see the project
+     */
+    void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm);
+
+    /**
+     * the project list in dependent node's permissions should not be restricted
+     * @return project list
+     */
+    Result queryAllProjectListForDependent();
+
+    List<Long> getAuthorizedProjectCodes(User loginUser);
 }

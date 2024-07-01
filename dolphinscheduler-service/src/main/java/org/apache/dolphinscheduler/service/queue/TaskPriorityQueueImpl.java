@@ -25,29 +25,24 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Service;
 
 /**
- * A singleton of a task queue implemented with zookeeper
- * tasks queue implementation
+ * A singleton of a task queue implemented using PriorityBlockingQueue
  */
 @Service
 public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
-    /**
-     * queue size
-     */
-    private static final Integer QUEUE_MAX_SIZE = 3000;
 
     /**
-     * queue
+     * Task queue, this queue is unbounded, this means it will cause OutOfMemoryError.
+     * The master will stop to generate the task if memory is too high.
      */
-    private PriorityBlockingQueue<TaskPriority> queue = new PriorityBlockingQueue<>(QUEUE_MAX_SIZE);
+    private final PriorityBlockingQueue<TaskPriority> queue = new PriorityBlockingQueue<>(3000);
 
     /**
      * put task takePriorityInfo
      *
      * @param taskPriorityInfo takePriorityInfo
-     * @throws TaskPriorityQueueException
      */
     @Override
-    public void put(TaskPriority taskPriorityInfo) throws TaskPriorityQueueException {
+    public void put(TaskPriority taskPriorityInfo) {
         queue.put(taskPriorityInfo);
     }
 
@@ -73,7 +68,7 @@ public class TaskPriorityQueueImpl implements TaskPriorityQueue<TaskPriority> {
      */
     @Override
     public TaskPriority poll(long timeout, TimeUnit unit) throws TaskPriorityQueueException, InterruptedException {
-        return queue.poll(timeout,unit);
+        return queue.poll(timeout, unit);
     }
 
     /**

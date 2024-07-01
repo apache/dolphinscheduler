@@ -14,19 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.microbench.base;
 
-import org.junit.Test;
-import org.openjdk.jmh.annotations.*;
+import java.io.File;
+import java.io.IOException;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.junit.jupiter.api.Test;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Measurement;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * BaseBenchMark
@@ -36,6 +41,7 @@ import java.io.IOException;
 @Measurement(iterations = AbstractBaseBenchmark.DEFAULT_MEASURE_ITERATIONS)
 @State(Scope.Thread)
 @Fork(AbstractBaseBenchmark.DEFAULT_FORKS)
+@Slf4j
 public abstract class AbstractBaseBenchmark {
 
     static final int DEFAULT_WARMUP_ITERATIONS = 10;
@@ -43,9 +49,6 @@ public abstract class AbstractBaseBenchmark {
     static final int DEFAULT_MEASURE_ITERATIONS = 10;
 
     static final int DEFAULT_FORKS = 2;
-
-    private static Logger logger = LoggerFactory.getLogger(AbstractBaseBenchmark.class);
-
 
     private ChainedOptionsBuilder newOptionsBuilder() {
 
@@ -76,13 +79,12 @@ public abstract class AbstractBaseBenchmark {
             if (file.exists()) {
                 writeFileStatus = file.delete();
 
-
             } else {
                 writeFileStatus = file.getParentFile().mkdirs();
                 try {
                     writeFileStatus = file.createNewFile();
                 } catch (IOException e) {
-                    logger.warn("jmh test create file error" + e);
+                    log.warn("jmh test create file error" + e);
                 }
             }
             if (writeFileStatus) {
@@ -114,10 +116,17 @@ public abstract class AbstractBaseBenchmark {
     }
 
     private static int getForks() {
-        String value = System.getProperty("forkCount");
-        return null != value ? Integer.parseInt(value) : -1;
+        String forkCount = System.getProperty("forkCount");
+        if (forkCount == null) {
+            return -1;
+        }
+
+        try {
+            return Integer.parseInt(forkCount);
+        } catch (NumberFormatException e) {
+            log.error("fail to convert forkCount into int", e);
+        }
+
+        return -1;
     }
-
-
 }
-
