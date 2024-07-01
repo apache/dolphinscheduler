@@ -15,20 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
-
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
-
+public enum WorkerLoadBalancerType {
+    RANDOM,
+    ROUND_ROBIN,
+    FIXED_WEIGHTED_ROUND_ROBIN,
+    DYNAMIC_WEIGHTED_ROUND_ROBIN,
 }

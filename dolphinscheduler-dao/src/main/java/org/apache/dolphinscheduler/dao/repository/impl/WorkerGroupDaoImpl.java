@@ -15,20 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.dao.repository.impl;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.BaseDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
+import lombok.NonNull;
 
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
+import org.springframework.stereotype.Repository;
+
+@Repository
+public class WorkerGroupDaoImpl extends BaseDao<WorkerGroup, WorkerGroupMapper> implements WorkerGroupDao {
+
+    public WorkerGroupDaoImpl(@NonNull WorkerGroupMapper workerGroupMapper) {
+        super(workerGroupMapper);
+    }
 
 }

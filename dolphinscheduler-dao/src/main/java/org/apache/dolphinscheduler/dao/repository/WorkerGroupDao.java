@@ -15,20 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.dao.repository;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
-
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
-
+public interface WorkerGroupDao extends IDao<WorkerGroup> {
 }

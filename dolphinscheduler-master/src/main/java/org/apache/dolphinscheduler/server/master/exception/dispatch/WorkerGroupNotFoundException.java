@@ -15,20 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.exception.dispatch;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+public class WorkerGroupNotFoundException extends TaskDispatchException {
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
-
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
-
+    public WorkerGroupNotFoundException(String workerGroup) {
+        super("Cannot find worker group: " + workerGroup);
+    }
 }

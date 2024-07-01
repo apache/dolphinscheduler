@@ -15,20 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.utils;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
+public class MasterThreadFactory {
 
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
+    public static ScheduledExecutorService getDefaultSchedulerThreadExecutor() {
+        return Executors.newSingleThreadScheduledExecutor();
+    }
 
 }

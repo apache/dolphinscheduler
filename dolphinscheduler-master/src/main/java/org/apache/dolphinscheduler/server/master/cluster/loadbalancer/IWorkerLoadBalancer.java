@@ -15,20 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
+import java.util.Optional;
 
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
+import lombok.NonNull;
+
+/**
+ * The worker load balancer used to select a worker from the {@link WorkerClusters} by load balancer algorithm.
+ */
+public interface IWorkerLoadBalancer {
+
+    /**
+     * Select a worker address under the given worker group.
+     *
+     * @param workerGroup worker group cannot be null.
+     * @return the selected worker address, or empty if no worker is available.
+     */
+    Optional<String> select(@NonNull String workerGroup);
+
+    WorkerLoadBalancerType getType();
 
 }

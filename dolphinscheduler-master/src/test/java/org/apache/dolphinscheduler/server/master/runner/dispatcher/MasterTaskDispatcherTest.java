@@ -38,8 +38,7 @@ public class MasterTaskDispatcherTest {
         Mockito.when(masterConfig.getMasterAddress()).thenReturn("localhost:5678");
         TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
 
-        MasterTaskDispatcher masterTaskDispatcher =
-                new MasterTaskDispatcher(taskEventService, masterConfig);
+        MasterTaskDispatcher masterTaskDispatcher = new MasterTaskDispatcher(masterConfig);
         Host taskInstanceDispatchHost = masterTaskDispatcher.getTaskInstanceDispatchHost(taskExecuteRunnable)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot get the "));
         Assertions.assertEquals(masterConfig.getMasterAddress(), taskInstanceDispatchHost.getAddress());

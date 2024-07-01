@@ -15,20 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.cluster;
+
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
+@EqualsAndHashCode(callSuper = true)
+public class MasterServer extends BaseServer implements Comparable<MasterServer> {
 
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
+    public static MasterServer parseFromHeartBeat(MasterHeartBeat masterHeartBeat) {
+        return MasterServer.builder()
+                .address(masterHeartBeat.getHost() + ":" + masterHeartBeat.getPort())
+                .cpuUsage(masterHeartBeat.getCpuUsage())
+                .memoryUsage(masterHeartBeat.getMemoryUsage())
+                .serverStatus(masterHeartBeat.getServerStatus())
+                .build();
+    }
+
+    // Use the master address to sort the master server
+    @Override
+    public int compareTo(MasterServer o) {
+        return this.getAddress().compareTo(o.getAddress());
+    }
 
 }

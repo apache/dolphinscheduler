@@ -15,43 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.server.master.cluster;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-@TableName("t_ds_worker_group")
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkerGroup {
+@SuperBuilder
+public abstract class BaseServer implements IClusters.IServer {
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private final String address;
 
-    private String name;
+    private final double cpuUsage;
 
-    private String addrList;
+    private final double memoryUsage;
 
-    private Date createTime;
+    private final ServerStatus serverStatus;
 
-    private Date updateTime;
+    @Override
+    public String getAddress() {
+        return address;
+    }
 
-    private String description;
-
-    @TableField(exist = false)
-    private boolean systemDefault;
-
-    private String otherParamsJson;
+    @Override
+    public ServerStatus getServerStatus() {
+        return serverStatus;
+    }
 
 }

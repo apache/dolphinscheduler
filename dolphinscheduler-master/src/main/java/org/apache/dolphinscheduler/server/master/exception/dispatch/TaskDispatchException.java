@@ -15,20 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
+package org.apache.dolphinscheduler.server.master.exception.dispatch;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import org.apache.dolphinscheduler.server.master.exception.MasterException;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@SuperBuilder
-@NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
+public class TaskDispatchException extends MasterException {
 
-    private int workerHostWeight; // worker host weight
-    private double threadPoolUsage; // worker waiting task count
+    public TaskDispatchException(String message) {
+        super(message);
+    }
 
+    public TaskDispatchException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

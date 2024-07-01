@@ -15,43 +15,31 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.server.master.cluster.IClusters;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-@TableName("t_ds_worker_group")
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class WorkerGroup {
+@NoArgsConstructor
+public class WeightedServer<T extends IClusters.IServer> {
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private T server;
 
-    private String name;
+    private double weight;
 
-    private String addrList;
+    private double currentWeight;
 
-    private Date createTime;
-
-    private Date updateTime;
-
-    private String description;
-
-    @TableField(exist = false)
-    private boolean systemDefault;
-
-    private String otherParamsJson;
+    public WeightedServer(T server, double weight) {
+        this.server = server;
+        this.weight = weight;
+        this.currentWeight = 0; // Initialize currentWeight is 0
+    }
 
 }
