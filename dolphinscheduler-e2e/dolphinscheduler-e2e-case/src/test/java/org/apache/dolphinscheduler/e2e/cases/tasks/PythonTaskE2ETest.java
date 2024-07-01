@@ -22,27 +22,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
+import org.apache.dolphinscheduler.e2e.models.environment.PythonEnvironment;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
+import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import java.util.Date;
 
-@TestMethodOrder(MethodOrderer.MethodName.class)
-@DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
-public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+
+@DolphinScheduler(composeFiles = "docker/python-task/docker-compose.yaml")
+public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
+
+    private static final PythonEnvironment pythonEnvironment = new PythonEnvironment();
 
     @BeforeAll
     public static void setup() {
@@ -60,6 +64,13 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                     .goToTab(UserPage.class)
                     .update(adminUser);
         }
+        tenantPage
+                .goToNav(SecurityPage.class)
+                .goToTab(EnvironmentPage.class)
+                .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
+                        pythonEnvironment.getEnvironmentConfig(),
+                        pythonEnvironment.getEnvironmentDesc(),
+                        pythonEnvironment.getEnvironmentWorkerGroup());
 
         tenantPage
                 .goToNav(ProjectPage.class)
@@ -67,7 +78,8 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_SuccessCase() {
+    @Order(10)
+    void testRunPythonTasks_SuccessCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -75,12 +87,13 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
-        String workflowName = "SuccessCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "PythonSuccessCase";
+        String taskName = "PythonSuccessTask";
+        String pythonScripts = "print(\"success\")";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("echo hello world\n")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .submit()
 
@@ -102,7 +115,8 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_WorkflowParamsCase() {
+    @Order(20)
+    void testRunPythonTasks_WorkflowParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
@@ -110,12 +124,18 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
-        String workflowName = "WorkflowParamsCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "PythonWorkflowParamsCase";
+        String taskName = "PythonWorkflowParamsTask";
+        String pythonScripts = "import sys\n"
+                + "\n"
+                + "if '${name}' == 'tom':\n"
+                + "    print('success')\n"
+                + "else:\n"
+                + "    sys.exit(2)";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .submit()
 
@@ -138,19 +158,26 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_LocalParamsCase() {
+    @Order(30)
+    void testRunPythonTasks_LocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "LocalParamsCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "PythonLocalParamsCase";
+        String taskName = "PythonLocalParamsSuccess";
+        String pythonScripts = "import sys\n"
+                + "\n"
+                + "if '${name}' == 'tom':\n"
+                + "    print('success')\n"
+                + "else:\n"
+                + "    sys.exit(2)";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .addParam("name", "tom")
                 .submit()
@@ -173,19 +200,26 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_GlobalParamsOverrideLocalParamsCase() {
+    @Order(40)
+    void testRunPythonTasks_GlobalParamsOverrideLocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "LocalParamsOverrideWorkflowParamsCase";
-        String taskName = "ShellSuccess";
+        String workflowName = "PythonLocalParamsOverrideWorkflowParamsCase";
+        String taskName = "PythonLocalParamsOverrideWorkflowParamsSuccess";
+        String pythonScripts = "import sys\n"
+                + "\n"
+                + "if '${name}' == 'jerry':\n"
+                + "    print('success')\n"
+                + "else:\n"
+                + "    sys.exit(2)";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("[ \"${name}\" = \"jerry\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .addParam("name", "tom")
                 .submit()
@@ -209,8 +243,10 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_UsingResourceFile() {
-        String testFileName = "echo";
+    @Order(50)
+    void testRunPythonTasks_UsingResourceFile() {
+        long current_timestamp = new Date().getTime();
+        String testFileName = String.format("echo_%s", current_timestamp);
         new ResourcePage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
@@ -222,14 +258,27 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "UsingResourceFile";
-        String taskName = "ShellSuccess";
+        String workflowName = "PythonUsingResourceFileWorkflowCase";
+        String taskName = "PythonUsingResourceFileSuccessTask";
+        String pythonScripts = "import sys\n"
+                + "\n"
+                + "file_content = \"\"\n"
+                + "\n"
+                + "with open('${file_name}', 'r', encoding='UTF8') as f:\n"
+                + "    file_content = f.read()\n"
+                + "\n"
+                + "if len(file_content) != 0:\n"
+                + "    print(f'file_content: {file_content}')\n"
+                + "else:\n"
+                + "    sys.exit(2)\n"
+                + "    ";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("cat " + testFileName + ".sh")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .selectResource(testFileName)
+                .addParam("file_name", String.format("%s.sh", testFileName))
                 .submit()
 
                 .submit()
@@ -250,19 +299,22 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     @Test
-    void testRunShellTasks_FailedCase() {
+    @Order(60)
+    void testRunPythonTasks_FailedCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
                 new ProjectPage(browser)
                         .goToNav(ProjectPage.class)
                         .goTo(projectName)
                         .goToTab(WorkflowDefinitionTab.class);
 
-        String workflowName = "FailedCase";
-        String taskName = "ShellFailed";
+        String workflowName = "PythonFailedWorkflowCase";
+        String taskName = "PythonFailedTask";
+        String pythonScripts = "import sys\n"
+                + "sys.exit(1)";
         workflowDefinitionPage
                 .createWorkflow()
-                .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
-                .script("echo 'I am failed'\n exit1\n")
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
                 .name(taskName)
                 .submit()
 

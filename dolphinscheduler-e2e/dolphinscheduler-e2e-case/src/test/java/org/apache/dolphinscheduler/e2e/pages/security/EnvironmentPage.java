@@ -19,6 +19,9 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
@@ -79,6 +82,14 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
                 .click();
 
         createEnvironmentForm().buttonSubmit().click();
+        return this;
+    }
+
+    public EnvironmentPage createEnvironmentUntilSuccess(String name, String config, String desc, String workerGroup) {
+        create(name, config, desc, workerGroup);
+        await().untilAsserted(() -> assertThat(environmentList())
+                .as("environment list should contain newly-created environment")
+                .anyMatch(it -> it.getText().contains(name)));
         return this;
     }
 
