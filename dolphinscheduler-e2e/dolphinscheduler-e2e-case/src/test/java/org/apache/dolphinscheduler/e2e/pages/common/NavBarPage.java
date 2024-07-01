@@ -26,20 +26,18 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
+import lombok.Getter;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import lombok.Getter;
-
-import java.time.Duration;
 
 @Getter
 public class NavBarPage {
+
     protected final RemoteWebDriver driver;
 
     @FindBy(xpath = "//div[contains(@class, 'tab-horizontal')]//div[contains(@role,'menubar')]//span[contains(text(), 'Project')]")
@@ -72,21 +70,26 @@ public class NavBarPage {
         }
 
         if (nav == SecurityPage.class) {
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(securityTab));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.elementToBeClickable(securityTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", securityTab());
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/security/tenant-manage"));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.urlContains("/security/tenant-manage"));
             return nav.cast(new SecurityPage(driver));
         }
 
         if (nav == ResourcePage.class) {
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(resourceTab));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.elementToBeClickable(resourceTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", resourceTab());
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file-manage"));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.urlContains("/resource/file-manage"));
             return nav.cast(new ResourcePage(driver));
         }
 
         if (nav == DataSourcePage.class) {
-            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(dataSourceTab));
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.elementToBeClickable(dataSourceTab));
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", dataSourceTab());
             WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/datasource"));
             return nav.cast(new DataSourcePage(driver));

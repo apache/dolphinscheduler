@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.core;
 
 import java.time.Duration;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 

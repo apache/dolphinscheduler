@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.e2e.cases.workflow;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
-import org.apache.dolphinscheduler.e2e.models.environment.PythonEnvironment;
 import org.apache.dolphinscheduler.e2e.models.users.AdminUser;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
@@ -36,10 +33,15 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 @Slf4j
 public abstract class BaseWorkflowE2ETest {
@@ -90,8 +92,7 @@ public abstract class BaseWorkflowE2ETest {
         await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow: %s", workflowName)
                 .anyMatch(
-                        it -> it.getText().contains(workflowName)
-                ));
+                        it -> it.getText().contains(workflowName)));
     }
 
     protected void runWorkflow(String workflowName) {
@@ -162,7 +163,8 @@ public abstract class BaseWorkflowE2ETest {
                     if (workflowInstances.size() > 1) {
                         throw new RuntimeException("More than one failed workflow instance found: " +
                                 workflowInstances.stream()
-                                        .map(WorkflowInstanceTab.Row::workflowInstanceName).collect(Collectors.joining(", ")));
+                                        .map(WorkflowInstanceTab.Row::workflowInstanceName)
+                                        .collect(Collectors.joining(", ")));
                     }
                     return workflowInstances.get(0);
                 }, Objects::nonNull);

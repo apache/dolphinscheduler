@@ -22,31 +22,22 @@ package org.apache.dolphinscheduler.e2e.pages.common;
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 
-import org.junit.platform.commons.util.StringUtils;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
+import lombok.Getter;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-
-import lombok.Getter;
-import lombok.SneakyThrows;
-
-import java.util.List;
-
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 public final class CodeEditor {
-    private static final Logger log = LoggerFactory.getLogger(CodeEditor.class);
+
     @FindBys({
-        @FindBy(className = "monaco-editor"),
-        @FindBy(className = "view-line"),
+            @FindBy(className = "monaco-editor"),
+            @FindBy(className = "view-line"),
     })
     private List<WebElement> editor;
 
