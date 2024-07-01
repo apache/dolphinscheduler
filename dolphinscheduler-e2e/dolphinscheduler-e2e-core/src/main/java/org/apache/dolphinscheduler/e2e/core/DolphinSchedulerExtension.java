@@ -47,6 +47,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.ComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -98,12 +99,15 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             browser.withAccessToHost(true);
         }
         browser.start();
-
-        driver = new RemoteWebDriver(browser.getSeleniumAddress(), new ChromeOptions());
+        ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.addArguments("--allow-running-insecure-content");
+        chromeOptions.addArguments(String.format("--unsafely-treat-insecure-origin-as-secure=http://%s:%s",
+                address.getHost(), address.getPort()));
+        driver = new RemoteWebDriver(browser.getSeleniumAddress(), chromeOptions);
 
         driver.manage().timeouts()
-                .implicitlyWait(Duration.ofSeconds(10))
-                .pageLoadTimeout(Duration.ofSeconds(10));
+                .implicitlyWait(Duration.ofSeconds(1))
+                .pageLoadTimeout(Duration.ofSeconds(5));
         driver.manage().window()
                 .maximize();
 
@@ -141,11 +145,20 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             imageName = DockerImageName.parse("seleniarm/standalone-chromium:124.0-chromedriver-124.0")
                     .asCompatibleSubstituteFor("selenium/standalone-chrome");
 
+            if (!Files.exists(Constants.HOST_CHROME_DOWNLOAD_PATH)) {
+                try {
+                    Files.createDirectories(Constants.HOST_CHROME_DOWNLOAD_PATH);
+                } catch (IOException e) {
+                    log.error("Failed to create chrome download directory: {}", Constants.HOST_CHROME_DOWNLOAD_PATH);
+                    throw new RuntimeException(e);
+                }
+            }
+
             browser = new BrowserWebDriverContainer<>(imageName)
                     .withCapabilities(new ChromeOptions())
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH, BindMode.READ_WRITE)
                     .withRecordingMode(RECORD_ALL, record.toFile(), MP4)
                     .withStartupTimeout(Duration.ofSeconds(300));
         } else {
@@ -153,7 +166,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                     .withCapabilities(new ChromeOptions())
                     .withCreateContainerCmdModifier(cmd -> cmd.withUser("root"))
                     .withFileSystemBind(Constants.HOST_CHROME_DOWNLOAD_PATH.toFile().getAbsolutePath(),
-                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH)
+                            Constants.SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH, BindMode.READ_WRITE)
                     .withRecordingMode(RECORD_ALL, record.toFile(), MP4)
                     .withStartupTimeout(Duration.ofSeconds(300));
         }
@@ -194,7 +207,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             field.setAccessible(true);
             field.set(object, driver);
         } catch (IllegalAccessException e) {
-            LOGGER.error("Failed to inject web driver to field: {}", field.getName(), e);
+            log.error("Failed to inject web driver to field: {}", field.getName(), e);
         }
     }
 
@@ -215,7 +228,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                 .withExposedService(
                         serviceName,
                         DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
-                .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+                .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;

@@ -15,32 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.core;
+package org.apache.dolphinscheduler.e2e.models.environment;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+public interface IEnvironment {
 
-import lombok.experimental.UtilityClass;
+    String getEnvironmentName();
 
-@UtilityClass
-public final class Constants {
+    String getEnvironmentConfig();
 
-    /**
-     * tmp directory path
-     */
-    public static final Path HOST_TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
+    String getEnvironmentDesc();
 
-    /**
-     * chrome download path in host
-     */
-    public static final Path HOST_CHROME_DOWNLOAD_PATH = HOST_TMP_PATH.resolve("download");
+    String getEnvironmentWorkerGroup();
 
-    /**
-     * chrome download path in selenium/standalone-chrome-debug container
-     */
-    public static final String SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH = "/home/seluser/Downloads";
-
-    public static final String LINE_SEPARATOR = "\n";
-
-    public static final long DEFAULT_SLEEP_MILLISECONDS = 500;
 }

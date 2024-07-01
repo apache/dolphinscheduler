@@ -15,32 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.core;
+package org.apache.dolphinscheduler.e2e.models.environment;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import lombok.Data;
 
-import lombok.experimental.UtilityClass;
+@Data
+public class PythonEnvironment implements IEnvironment {
 
-@UtilityClass
-public final class Constants {
+    private String environmentName;
 
-    /**
-     * tmp directory path
-     */
-    public static final Path HOST_TMP_PATH = Paths.get(System.getProperty("java.io.tmpdir"));
+    private String environmentConfig;
 
-    /**
-     * chrome download path in host
-     */
-    public static final Path HOST_CHROME_DOWNLOAD_PATH = HOST_TMP_PATH.resolve("download");
+    private String environmentDesc;
 
-    /**
-     * chrome download path in selenium/standalone-chrome-debug container
-     */
-    public static final String SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH = "/home/seluser/Downloads";
+    private String environmentWorkerGroup;
 
-    public static final String LINE_SEPARATOR = "\n";
+    @Override
+    public String getEnvironmentName() {
+        return "python-e2e";
+    }
 
-    public static final long DEFAULT_SLEEP_MILLISECONDS = 500;
+    @Override
+    public String getEnvironmentConfig() {
+        return "export PYTHON_LAUNCHER=/usr/bin/python3";
+    }
+
+    @Override
+    public String getEnvironmentDesc() {
+        return "pythonEnvDesc";
+    }
+
+    @Override
+    public String getEnvironmentWorkerGroup() {
+        return "default";
+    }
 }
