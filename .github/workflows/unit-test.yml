@@ -24,7 +24,8 @@ on:
       - '**/*.md'
       - 'dolphinscheduler-ui'
     branches:
-      - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 env:
   LOG_DIR: /tmp/dolphinscheduler

@@ -20,6 +20,8 @@ on:
   push:
     branches:
       - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 name: E2E-K8S
 
