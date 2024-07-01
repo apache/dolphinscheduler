@@ -65,7 +65,7 @@ public final class CodeEditor {
 
         Actions actions = new Actions(this.driver);
 
-        List<String> contantList = List.of(content.split(Constants.LINE_SEPARATOR));
+        List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
 
         try {
             ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBar);
@@ -73,9 +73,9 @@ public final class CodeEditor {
             log.warn("scroll bar not found, skipping...");
         }
 
-        for (int i = 0; i < contantList.size(); i++) {
+        for (int i = 0; i < contentList.size(); i++) {
             String editorLineText;
-            String inputContent = contantList.get(i);
+            String inputContent = contentList.get(i);
             if (i == 0) {
                 actions.moveToElement(editor.get(i))
                         .click()
