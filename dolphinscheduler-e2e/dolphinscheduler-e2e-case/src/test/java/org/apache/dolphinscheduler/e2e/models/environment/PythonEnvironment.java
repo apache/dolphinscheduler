@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.e2e.models.environment;
 
-import org.apache.dolphinscheduler.e2e.models.tenant.BootstrapTenant;
-import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
-
 import lombok.Data;
 
 @Data

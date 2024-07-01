@@ -22,12 +22,13 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
-import org.openqa.selenium.WebDriver;
-
 import lombok.Getter;
+
+import org.openqa.selenium.WebDriver;
 
 @Getter
 public final class PythonTaskForm extends TaskNodeForm {
+
     private CodeEditor codeEditor;
 
     private WebDriver driver;

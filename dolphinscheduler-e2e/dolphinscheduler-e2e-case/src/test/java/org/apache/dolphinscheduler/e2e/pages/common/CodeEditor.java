@@ -70,10 +70,10 @@ public final class CodeEditor {
             String inputContent = contantList.get(i);
             if (i == 0) {
                 actions.moveToElement(editor.get(i))
-                    .click()
-                    .sendKeys(inputContent)
-                    .sendKeys(Constants.LINE_SEPARATOR)
-                    .perform();
+                        .click()
+                        .sendKeys(inputContent)
+                        .sendKeys(Constants.LINE_SEPARATOR)
+                        .perform();
                 continue;
             } else {
                 editorLineText = editor.get(i).getText();
@@ -82,30 +82,30 @@ public final class CodeEditor {
             if (StringUtils.isNotBlank(inputContent)) {
                 if (editorLineText.isEmpty()) {
                     actions.moveToElement(editor.get(i))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
+                            .click()
+                            .sendKeys(inputContent)
+                            .sendKeys(Constants.LINE_SEPARATOR)
+                            .perform();
                     Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
                 } else {
-                    for (int p = 0 ; p < editorLineText.strip().length(); p++) {
+                    for (int p = 0; p < editorLineText.strip().length(); p++) {
                         clearLine(actions, editor.get(i));
                     }
                     if (!editorLineText.isEmpty()) {
                         clearLine(actions, editor.get(i));
                     }
                     actions.moveToElement(editor.get(i))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
+                            .click()
+                            .sendKeys(inputContent)
+                            .sendKeys(Constants.LINE_SEPARATOR)
+                            .perform();
                     Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
                 }
             } else {
                 actions.moveToElement(editor.get(i))
-                    .click()
-                    .sendKeys(Constants.LINE_SEPARATOR)
-                    .perform();
+                        .click()
+                        .sendKeys(Constants.LINE_SEPARATOR)
+                        .perform();
                 Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
             }
         }
@@ -115,8 +115,8 @@ public final class CodeEditor {
 
     private void clearLine(Actions actions, WebElement element) {
         actions.moveToElement(element)
-            .click()
-            .sendKeys(Keys.BACK_SPACE)
-            .perform();
+                .click()
+                .sendKeys(Keys.BACK_SPACE)
+                .perform();
     }
 }

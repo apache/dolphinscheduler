@@ -71,12 +71,12 @@ public abstract class BaseWorkflowE2ETest {
                     .update(adminUser);
         }
         tenantPage
-            .goToNav(SecurityPage.class)
-            .goToTab(EnvironmentPage.class)
-            .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
-                pythonEnvironment.getEnvironmentConfig(),
-                pythonEnvironment.getEnvironmentDesc(),
-                pythonEnvironment.getEnvironmentWorkerGroup());
+                .goToNav(SecurityPage.class)
+                .goToTab(EnvironmentPage.class)
+                .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
+                        pythonEnvironment.getEnvironmentConfig(),
+                        pythonEnvironment.getEnvironmentDesc(),
+                        pythonEnvironment.getEnvironmentWorkerGroup());
 
         tenantPage
                 .goToNav(ProjectPage.class)

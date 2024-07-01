@@ -42,25 +42,25 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
     @Order(10)
     void testRunPythonTasks_SuccessCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(projectName)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
         String workflowName = "PythonSuccessCase";
         String taskName = "PythonSuccessTask";
         String pythonScripts = "print(\"success\")";
         workflowDefinitionPage
-            .createWorkflow()
-            .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
-            .script(pythonScripts)
-            .name(taskName)
-            .submit()
+                .createWorkflow()
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
+                .name(taskName)
+                .submit()
 
-            .submit()
-            .name(workflowName)
-            .submit();
+                .submit()
+                .name(workflowName)
+                .submit();
 
         untilWorkflowDefinitionExist(workflowName);
 
@@ -79,31 +79,31 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
     @Order(20)
     void testRunPythonTasks_WorkflowParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(projectName)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         // todo: use yaml to define the workflow
         String workflowName = "PythonWorkflowParamsCase";
         String taskName = "PythonWorkflowParamsTask";
         String pythonScripts = "import sys\n"
-            + "\n"
-            + "if '${name}' == 'tom':\n"
-            + "    print('success')\n"
-            + "else:\n"
-            + "    sys.exit(2)";
+                + "\n"
+                + "if '${name}' == 'tom':\n"
+                + "    print('success')\n"
+                + "else:\n"
+                + "    sys.exit(2)";
         workflowDefinitionPage
-            .createWorkflow()
-            .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
-            .script(pythonScripts)
-            .name(taskName)
-            .submit()
+                .createWorkflow()
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
+                .name(taskName)
+                .submit()
 
-            .submit()
-            .name(workflowName)
-            .addGlobalParam("name", "tom")
-            .submit();
+                .submit()
+                .name(workflowName)
+                .addGlobalParam("name", "tom")
+                .submit();
 
         untilWorkflowDefinitionExist(workflowName);
 
@@ -122,30 +122,30 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
     @Order(30)
     void testRunPythonTasks_LocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(projectName)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         String workflowName = "PythonLocalParamsCase";
         String taskName = "PythonLocalParamsSuccess";
         String pythonScripts = "import sys\n"
-            + "\n"
-            + "if '${name}' == 'tom':\n"
-            + "    print('success')\n"
-            + "else:\n"
-            + "    sys.exit(2)";
+                + "\n"
+                + "if '${name}' == 'tom':\n"
+                + "    print('success')\n"
+                + "else:\n"
+                + "    sys.exit(2)";
         workflowDefinitionPage
-            .createWorkflow()
-            .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
-            .script(pythonScripts)
-            .name(taskName)
-            .addParam("name", "tom")
-            .submit()
+                .createWorkflow()
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
+                .name(taskName)
+                .addParam("name", "tom")
+                .submit()
 
-            .submit()
-            .name(workflowName)
-            .submit();
+                .submit()
+                .name(workflowName)
+                .submit();
 
         untilWorkflowDefinitionExist(workflowName);
 
@@ -164,31 +164,31 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
     @Order(40)
     void testRunPythonTasks_GlobalParamsOverrideLocalParamsCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(projectName)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         String workflowName = "PythonLocalParamsOverrideWorkflowParamsCase";
         String taskName = "PythonLocalParamsOverrideWorkflowParamsSuccess";
         String pythonScripts = "import sys\n"
-            + "\n"
-            + "if '${name}' == 'jerry':\n"
-            + "    print('success')\n"
-            + "else:\n"
-            + "    sys.exit(2)";
+                + "\n"
+                + "if '${name}' == 'jerry':\n"
+                + "    print('success')\n"
+                + "else:\n"
+                + "    sys.exit(2)";
         workflowDefinitionPage
-            .createWorkflow()
-            .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
-            .script(pythonScripts)
-            .name(taskName)
-            .addParam("name", "tom")
-            .submit()
+                .createWorkflow()
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
+                .name(taskName)
+                .addParam("name", "tom")
+                .submit()
 
-            .submit()
-            .name(workflowName)
-            .addGlobalParam("name", "jerry")
-            .submit();
+                .submit()
+                .name(workflowName)
+                .addGlobalParam("name", "jerry")
+                .submit();
 
         untilWorkflowDefinitionExist(workflowName);
 
@@ -209,42 +209,42 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
         long current_timestamp = new Date().getTime();
         String testFileName = String.format("echo_%s", current_timestamp);
         new ResourcePage(browser)
-            .goToNav(ResourcePage.class)
-            .goToTab(FileManagePage.class)
-            .createFileUntilSuccess(testFileName, "echo 123");
+                .goToNav(ResourcePage.class)
+                .goToTab(FileManagePage.class)
+                .createFileUntilSuccess(testFileName, "echo 123");
 
         final WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(projectName)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         String workflowName = "PythonUsingResourceFileWorkflowCase";
         String taskName = "PythonUsingResourceFileSuccessTask";
         String pythonScripts = "import sys\n"
-            + "\n"
-            + "file_content = \"\"\n"
-            + "\n"
-            + "with open('${file_name}', 'r', encoding='UTF8') as f:\n"
-            + "    file_content = f.read()\n"
-            + "\n"
-            + "if len(file_content) != 0:\n"
-            + "    print(f'file_content: {file_content}')\n"
-            + "else:\n"
-            + "    sys.exit(2)\n"
-            + "    ";
+                + "\n"
+                + "file_content = \"\"\n"
+                + "\n"
+                + "with open('${file_name}', 'r', encoding='UTF8') as f:\n"
+                + "    file_content = f.read()\n"
+                + "\n"
+                + "if len(file_content) != 0:\n"
+                + "    print(f'file_content: {file_content}')\n"
+                + "else:\n"
+                + "    sys.exit(2)\n"
+                + "    ";
         workflowDefinitionPage
-            .createWorkflow()
-            .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
-            .script(pythonScripts)
-            .name(taskName)
-            .selectResource(testFileName)
-            .addParam("file_name", String.format("%s.sh", testFileName))
-            .submit()
+                .createWorkflow()
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
+                .name(taskName)
+                .selectResource(testFileName)
+                .addParam("file_name", String.format("%s.sh", testFileName))
+                .submit()
 
-            .submit()
-            .name(workflowName)
-            .submit();
+                .submit()
+                .name(workflowName)
+                .submit();
 
         untilWorkflowDefinitionExist(workflowName);
 
@@ -263,25 +263,25 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
     @Order(60)
     void testRunPythonTasks_FailedCase() {
         WorkflowDefinitionTab workflowDefinitionPage =
-            new ProjectPage(browser)
-                .goToNav(ProjectPage.class)
-                .goTo(projectName)
-                .goToTab(WorkflowDefinitionTab.class);
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
 
         String workflowName = "PythonFailedWorkflowCase";
         String taskName = "PythonFailedTask";
         String pythonScripts = "import sys\n"
-            + "sys.exit(1)";
+                + "sys.exit(1)";
         workflowDefinitionPage
-            .createWorkflow()
-            .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
-            .script(pythonScripts)
-            .name(taskName)
-            .submit()
+                .createWorkflow()
+                .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
+                .script(pythonScripts)
+                .name(taskName)
+                .submit()
 
-            .submit()
-            .name(workflowName)
-            .submit();
+                .submit()
+                .name(workflowName)
+                .submit();
 
         untilWorkflowDefinitionExist(workflowName);
 

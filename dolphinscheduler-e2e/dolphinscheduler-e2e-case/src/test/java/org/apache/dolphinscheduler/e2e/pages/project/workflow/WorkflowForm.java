@@ -75,7 +75,8 @@ public final class WorkflowForm {
         final String dragAndDrop = String.join("\n",
                 Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
         js.executeScript(dragAndDrop, task, canvas);
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Current node settings')]")));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
+                .visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Current node settings')]")));
 
         switch (type) {
             case SHELL:

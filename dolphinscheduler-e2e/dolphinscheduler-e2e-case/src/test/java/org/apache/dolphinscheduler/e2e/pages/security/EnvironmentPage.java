@@ -21,7 +21,6 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 
 import java.util.List;
 
@@ -86,8 +85,8 @@ public final class EnvironmentPage extends NavBarPage implements SecurityPage.Ta
     public EnvironmentPage createEnvironmentUntilSuccess(String name, String config, String desc, String workerGroup) {
         create(name, config, desc, workerGroup);
         await().untilAsserted(() -> assertThat(environmentList())
-            .as("environment list should contain newly-created environment")
-            .anyMatch(it -> it.getText().contains(name)));
+                .as("environment list should contain newly-created environment")
+                .anyMatch(it -> it.getText().contains(name)));
         return this;
     }
 

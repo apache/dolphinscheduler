@@ -36,8 +36,8 @@ public final class WorkflowRunDialog {
     private final WorkflowDefinitionTab parent;
 
     @FindBys({
-        @FindBy(xpath = "//div[contains(text(), 'Please set the parameters before starting')]/../.."),
-        @FindBy(className = "btn-submit")
+            @FindBy(xpath = "//div[contains(text(), 'Please set the parameters before starting')]/../.."),
+            @FindBy(className = "btn-submit")
     })
     private WebElement buttonSubmit;
 
@@ -56,7 +56,8 @@ public final class WorkflowRunDialog {
                 .until(ExpectedConditions.elementToBeClickable(buttonSubmit()));
 
         buttonSubmit().click();
-        WebDriverWaitFactory.createWebDriverWait(parent.driver()).until(ExpectedConditions.invisibilityOfElementLocated(runDialogTitleXpath));
+        WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .until(ExpectedConditions.invisibilityOfElementLocated(runDialogTitleXpath));
         return parent();
     }
 }
