@@ -36,6 +36,7 @@ task:
     - 'DMS'
     - 'DATA_FACTORY'
     - 'ALIYUN_SERVERLESS_SPARK'
+    - 'ALIYUN_ADB_SPARK'
   logic:
     - 'SUB_PROCESS'
     - 'DEPENDENT'

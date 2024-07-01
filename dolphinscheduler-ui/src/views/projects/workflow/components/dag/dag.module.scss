@@ -213,6 +213,9 @@ $bgLight: #ffffff;
     &.icon-icon-aliyun_serverless_spark {
       background-image: url('/images/task-icons/aliyun_serverless_spark.png');
     }
+    &.icon-aliyun_adb_spark {
+      background-image: url("/images/task-icons/aliyun_adb_spark.png");
+    }
   }
 
   &:hover {
@@ -328,6 +331,9 @@ $bgLight: #ffffff;
       }
       &.icon-aliyun_serverless_spark {
         background-image: url('/images/task-icons/aliyun_serverless_spark_hover.png');
+      }
+      &.icon-aliyun_adb_spark {
+        background-image: url("/images/task-icons/aliyun_adb_spark_hover.png");
       }
     }
   }

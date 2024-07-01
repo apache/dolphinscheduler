@@ -464,6 +464,9 @@ interface ITaskParams {
   yarnQueue?: string
   awsRegion?: string
   kubeConfig?: string
+  dbClusterId?: string
+  appType?: string
+  data?: string
 }
 
 interface INodeData
