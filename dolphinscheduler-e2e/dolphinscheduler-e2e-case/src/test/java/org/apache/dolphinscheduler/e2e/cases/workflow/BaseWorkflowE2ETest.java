@@ -20,19 +20,12 @@ package org.apache.dolphinscheduler.e2e.cases.workflow;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
-import org.apache.dolphinscheduler.e2e.models.environment.PythonEnvironment;
 import org.apache.dolphinscheduler.e2e.models.users.AdminUser;
-import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
-import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
-import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
-import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,7 +34,6 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 @Slf4j
@@ -49,40 +41,9 @@ public abstract class BaseWorkflowE2ETest {
 
     protected static final String projectName = UUID.randomUUID().toString();
 
-    protected static final PythonEnvironment pythonEnvironment = new PythonEnvironment();
-
     protected static final AdminUser adminUser = new AdminUser();
 
     protected static RemoteWebDriver browser;
-
-    @BeforeAll
-    public static void setup() {
-        browser = WebDriverHolder.getWebDriver();
-
-        TenantPage tenantPage = new LoginPage(browser)
-                .login(adminUser)
-                .goToNav(SecurityPage.class)
-                .goToTab(TenantPage.class);
-
-        if (tenantPage.tenants().stream().noneMatch(tenant -> tenant.tenantCode().equals(adminUser.getTenant()))) {
-            tenantPage
-                    .create(adminUser.getTenant())
-                    .goToNav(SecurityPage.class)
-                    .goToTab(UserPage.class)
-                    .update(adminUser);
-        }
-        tenantPage
-                .goToNav(SecurityPage.class)
-                .goToTab(EnvironmentPage.class)
-                .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
-                        pythonEnvironment.getEnvironmentConfig(),
-                        pythonEnvironment.getEnvironmentDesc(),
-                        pythonEnvironment.getEnvironmentWorkerGroup());
-
-        tenantPage
-                .goToNav(ProjectPage.class)
-                .createProjectUntilSuccess(projectName);
-    }
 
     protected void untilWorkflowDefinitionExist(String workflowName) {
         WorkflowDefinitionTab workflowDefinitionPage = new ProjectPage(browser)

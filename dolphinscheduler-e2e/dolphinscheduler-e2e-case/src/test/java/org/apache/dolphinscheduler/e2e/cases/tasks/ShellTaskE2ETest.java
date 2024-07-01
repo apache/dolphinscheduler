@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.cases.workflow.BaseWorkflowE2ETest;
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
+import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
@@ -29,7 +31,11 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTa
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.resource.FileManagePage;
 import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
+import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
+import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -37,6 +43,28 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(MethodOrderer.MethodName.class)
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
+
+    @BeforeAll
+    public static void setup() {
+        browser = WebDriverHolder.getWebDriver();
+
+        TenantPage tenantPage = new LoginPage(browser)
+                .login(adminUser)
+                .goToNav(SecurityPage.class)
+                .goToTab(TenantPage.class);
+
+        if (tenantPage.tenants().stream().noneMatch(tenant -> tenant.tenantCode().equals(adminUser.getTenant()))) {
+            tenantPage
+                    .create(adminUser.getTenant())
+                    .goToNav(SecurityPage.class)
+                    .goToTab(UserPage.class)
+                    .update(adminUser);
+        }
+
+        tenantPage
+                .goToNav(ProjectPage.class)
+                .createProjectUntilSuccess(projectName);
+    }
 
     @Test
     void testRunShellTasks_SuccessCase() {
