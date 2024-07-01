@@ -19,15 +19,15 @@
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
+
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
 
 import lombok.Getter;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
