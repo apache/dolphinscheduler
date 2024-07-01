@@ -38,7 +38,7 @@ public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
 
     @Update({"<script>",
             "update t_ds_jdbc_registry_lock",
-            "set last_term = #{term}, last_update_time = #{lastUpdateTime}",
+            "set last_term = #{term}",
             "where id IN ",
             "<foreach item='id' index='index' collection='ids' open='(' separator=',' close=')'>",
             "   #{id}",
