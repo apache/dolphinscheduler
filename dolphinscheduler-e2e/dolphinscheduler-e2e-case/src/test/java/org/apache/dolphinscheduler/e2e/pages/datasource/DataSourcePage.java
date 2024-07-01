@@ -35,7 +35,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
@@ -71,7 +70,8 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOf(dataSourceModal));
         WebElement dataSourceTypeButton = By.className(dataSourceType.toUpperCase() + "-box").findElement(driver);
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(dataSourceTypeButton));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(dataSourceTypeButton));
         dataSourceTypeButton.click();
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElement(
