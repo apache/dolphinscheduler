@@ -42,5 +42,5 @@ public final class Constants {
 
     public static final String LINE_SEPARATOR = "\n";
 
-    public static final long DEFAULT_SLEEP_SECONDS = 500;
+    public static final long DEFAULT_SLEEP_MILLISECONDS = 500;
 }

@@ -149,7 +149,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                 try {
                     Files.createDirectories(Constants.HOST_CHROME_DOWNLOAD_PATH);
                 } catch (IOException e) {
-                    LOGGER.error("Failed to create chrome download directory: {}", Constants.HOST_CHROME_DOWNLOAD_PATH);
+                    log.error("Failed to create chrome download directory: {}", Constants.HOST_CHROME_DOWNLOAD_PATH);
                     throw new RuntimeException(e);
                 }
             }
@@ -207,7 +207,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
             field.setAccessible(true);
             field.set(object, driver);
         } catch (IllegalAccessException e) {
-            LOGGER.error("Failed to inject web driver to field: {}", field.getName(), e);
+            log.error("Failed to inject web driver to field: {}", field.getName(), e);
         }
     }
 
@@ -228,7 +228,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
                 .withExposedService(
                         serviceName,
                         DOCKER_PORT, Wait.forListeningPort().withStartupTimeout(Duration.ofSeconds(300)))
-                .withLogConsumer(serviceName, outputFrame -> LOGGER.info(outputFrame.getUtf8String()))
+                .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
                 .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
         return compose;

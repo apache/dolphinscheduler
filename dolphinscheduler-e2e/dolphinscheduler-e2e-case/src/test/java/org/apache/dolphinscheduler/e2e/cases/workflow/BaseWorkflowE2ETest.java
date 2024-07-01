@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverHolder;
+import org.apache.dolphinscheduler.e2e.models.environment.PythonEnvironment;
 import org.apache.dolphinscheduler.e2e.models.users.AdminUser;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;

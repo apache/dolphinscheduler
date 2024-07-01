@@ -22,8 +22,15 @@ package org.apache.dolphinscheduler.e2e.pages.common;
 import org.apache.dolphinscheduler.e2e.core.Constants;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 
-import lombok.Getter;
+import java.util.List;
 
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+
+import org.junit.platform.commons.util.StringUtils;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -33,6 +40,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
+@Slf4j
 public final class CodeEditor {
 
     @FindBys({
@@ -86,7 +94,7 @@ public final class CodeEditor {
                             .sendKeys(inputContent)
                             .sendKeys(Constants.LINE_SEPARATOR)
                             .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
+                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
                 } else {
                     for (int p = 0; p < editorLineText.strip().length(); p++) {
                         clearLine(actions, editor.get(i));
@@ -99,14 +107,14 @@ public final class CodeEditor {
                             .sendKeys(inputContent)
                             .sendKeys(Constants.LINE_SEPARATOR)
                             .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
+                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
                 }
             } else {
                 actions.moveToElement(editor.get(i))
                         .click()
                         .sendKeys(Constants.LINE_SEPARATOR)
                         .perform();
-                Thread.sleep(Constants.DEFAULT_SLEEP_SECONDS);
+                Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
             }
         }
 
