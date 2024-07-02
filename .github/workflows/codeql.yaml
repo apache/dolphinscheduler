@@ -23,6 +23,8 @@ on:
   pull_request:
     branches:
       - 'dev'
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 concurrency:
   group: codeql-${{ github.event.pull_request.number || github.ref }}

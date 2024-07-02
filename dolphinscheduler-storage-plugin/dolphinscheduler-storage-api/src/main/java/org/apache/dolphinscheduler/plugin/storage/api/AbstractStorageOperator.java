@@ -26,11 +26,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
 
 public abstract class AbstractStorageOperator implements StorageOperator {
 
+    private static final Logger log = LoggerFactory.getLogger(AbstractStorageOperator.class);
     protected final String resourceBaseAbsolutePath;
 
     public AbstractStorageOperator(String resourceBaseAbsolutePath) {
@@ -51,7 +55,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
                 .resourceBaseDirectory(storageBaseDirectory)
                 .isDirectory(Files.getFileExtension(resourceAbsolutePath).isEmpty())
                 .tenant(segments[0])
-                .resourceType(segments[1].equals(FILE_FOLDER_NAME) ? ResourceType.FILE : ResourceType.UDF)
+                .resourceType(ResourceType.FILE)
                 .resourceRelativePath(segments.length == 2 ? "/" : segments[2])
                 .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, File.separator))
                 .build();
@@ -60,7 +64,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/tmp/dolphinscheduler");
     }
 
     @Override
@@ -82,9 +86,6 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         switch (resourceType) {
             case FILE:
                 resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, FILE_FOLDER_NAME);
-                break;
-            case UDF:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, UDF_FOLDER_NAME);
                 break;
             case ALL:
                 resourceBaseDirectory = tenantBaseDirectory;

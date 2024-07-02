@@ -64,7 +64,6 @@ import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -482,23 +481,6 @@ public class ProcessInstanceServiceTest {
     }
 
     @Test
-    public void testParseLogForDependentResult() throws IOException {
-        String logString =
-                "[INFO] 2019-03-19 17:11:08.475 org.apache.dolphinscheduler.server.worker.log.TaskLogger:[172]"
-                        + " - [taskAppId=TASK_223_10739_452334] dependent item complete, :|| dependentKey: 223-ALL-day-last1Day, result: SUCCESS, dependentDate: Wed Mar 19 17:10:36 CST 2019\n"
-                        + "[INFO] 2019-03-19 17:11:08.476 org.apache.dolphinscheduler.server.worker.runner.TaskScheduleThread:[172]"
-                        + " - task : 223_10739_452334 exit status code : 0\n"
-                        + "[root@node2 current]# ";
-        Map<String, DependResult> resultMap =
-                processInstanceService.parseLogForDependentResult(logString);
-        Assertions.assertEquals(1, resultMap.size());
-
-        resultMap.clear();
-        resultMap = processInstanceService.parseLogForDependentResult("");
-        Assertions.assertEquals(0, resultMap.size());
-    }
-
-    @Test
     public void testQuerySubProcessInstanceByTaskId() {
         long projectCode = 1L;
         User loginUser = getAdminUser();
@@ -627,7 +609,8 @@ public class ProcessInstanceServiceTest {
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
                         Mockito.mockStatic(TaskPluginManager.class)) {
-            taskPluginManagerMockedStatic.when(() -> TaskPluginManager.checkTaskParameters(Mockito.any()))
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
             Map<String, Object> processInstanceFinishRes =
                     processInstanceService.updateProcessInstance(loginUser, projectCode, 1,

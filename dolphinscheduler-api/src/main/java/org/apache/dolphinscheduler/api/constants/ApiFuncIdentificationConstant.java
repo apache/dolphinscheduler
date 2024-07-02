@@ -128,18 +128,6 @@ public class ApiFuncIdentificationConstant {
     public static final String FILE_DOWNLOAD = "resources:file:download";
     public static final String FILE_DELETE = "resources:file:delete";
 
-    public static final String UDF_FILE_VIEW = "resources:udf:view";
-    public static final String UDF_FOLDER_ONLINE_CREATE = "resources:udf:create";
-    public static final String UDF_UPLOAD = "resources:udf:upload";
-    public static final String UDF_UPDATE = "resources:udf:edit";
-    public static final String UDF_DOWNLOAD = "resources:udf:download";
-    public static final String UDF_DELETE = "resources:udf:delete";
-
-    public static final String UDF_FUNCTION_VIEW = "resources:udf-func:view";
-    public static final String UDF_FUNCTION_CREATE = "resources:udf-func:create";
-    public static final String UDF_FUNCTION_UPDATE = "resources:udf-func:update";
-    public static final String UDF_FUNCTION_DELETE = "resources:udf-func:delete";
-
     public static final String TASK_GROUP_VIEW = "resources:task-group:view";
     public static final String TASK_GROUP_CREATE = "resources:task-group:create";
     public static final String TASK_GROUP_CLOSE = "resources:task-group:close";

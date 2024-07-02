@@ -67,6 +67,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -271,7 +272,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 10, null, null,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 10, null, null,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
@@ -298,7 +299,7 @@ public class ExecuteFunctionServiceTest {
                 null, "123456789,987654321",
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, null,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, null,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
@@ -323,7 +324,7 @@ public class ExecuteFunctionServiceTest {
                     null, "1123456789,987654321",
                     null, null, null,
                     RunMode.RUN_MODE_SERIAL,
-                    Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 0,
+                    Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, 0,
                     Constants.DRY_RUN_FLAG_NO,
                     Constants.TEST_FLAG_NO,
                     ComplementDependentMode.OFF_MODE, null,
@@ -354,14 +355,14 @@ public class ExecuteFunctionServiceTest {
         dependentProcessDefinition.setProcessDefinitionCode(2);
         dependentProcessDefinition.setProcessDefinitionVersion(1);
         dependentProcessDefinition.setTaskDefinitionCode(1);
-        dependentProcessDefinition.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        dependentProcessDefinition.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         dependentProcessDefinition.setTaskParams(
                 "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":2,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
         Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode))
                 .thenReturn(Lists.newArrayList(dependentProcessDefinition));
 
         Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
-        processDefinitionWorkerGroupMap.put(1L, Constants.DEFAULT_WORKER_GROUP);
+        processDefinitionWorkerGroupMap.put(1L, WorkerGroupUtils.getDefaultWorkerGroup());
         Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
                 .thenReturn(processDefinitionWorkerGroupMap);
 
@@ -370,7 +371,7 @@ public class ExecuteFunctionServiceTest {
         command.setCommandType(CommandType.COMPLEMENT_DATA);
         command.setCommandParam(
                 "{\"StartNodeList\":\"1\",\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}");
-        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         command.setProcessDefinitionCode(processDefinitionCode);
         command.setExecutorId(1);
 
@@ -383,7 +384,7 @@ public class ExecuteFunctionServiceTest {
         childDependent.setProcessDefinitionCode(3);
         childDependent.setProcessDefinitionVersion(1);
         childDependent.setTaskDefinitionCode(4);
-        childDependent.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        childDependent.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         childDependent.setTaskParams(
                 "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
         Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(
@@ -409,7 +410,8 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 2, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, 2,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
@@ -434,7 +436,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_SERIAL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, null,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, null,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
@@ -460,7 +462,8 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 2, Constants.DRY_RUN_FLAG_NO,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, 2,
+                Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
                 false,
@@ -486,7 +489,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, null,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, 15,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_NO,
                 ComplementDependentMode.OFF_MODE, null,
@@ -514,7 +517,7 @@ public class ExecuteFunctionServiceTest {
                 null,
                 RunMode.RUN_MODE_PARALLEL,
                 Priority.LOW,
-                Constants.DEFAULT_WORKER_GROUP,
+                WorkerGroupUtils.getDefaultWorkerGroup(),
                 tenantCode,
                 100L,
                 110,
@@ -553,7 +556,7 @@ public class ExecuteFunctionServiceTest {
                 null, null,
                 null, null, 0,
                 RunMode.RUN_MODE_PARALLEL,
-                Priority.LOW, Constants.DEFAULT_WORKER_GROUP, tenantCode, 100L, 110, null, 15,
+                Priority.LOW, WorkerGroupUtils.getDefaultWorkerGroup(), tenantCode, 100L, 110, null, 15,
                 Constants.DRY_RUN_FLAG_NO,
                 Constants.TEST_FLAG_YES,
                 ComplementDependentMode.OFF_MODE, null,

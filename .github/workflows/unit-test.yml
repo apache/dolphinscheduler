@@ -24,7 +24,8 @@ on:
       - '**/*.md'
       - 'dolphinscheduler-ui'
     branches:
-      - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 env:
   LOG_DIR: /tmp/dolphinscheduler
@@ -40,7 +41,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -57,7 +58,7 @@ jobs:
         java: ['8', '11']
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Sanity Check
