@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class TenantPage {
+
     public HttpResponse createTenant(String sessionId, String tenant, Integer queueId, String description) {
         Map<String, Object> params = new HashMap<>();
         params.put("tenantCode", tenant);

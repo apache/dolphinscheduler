@@ -27,14 +27,14 @@ public class FlinkConstants {
      * flink command
      * usage: flink run [OPTIONS] <jar-file> <arguments>
      */
-    public static final String FLINK_COMMAND = "flink";
+    public static final String FLINK_COMMAND = "${FLINK_HOME}/bin/flink";
     public static final String FLINK_RUN = "run";
 
     /**
      * flink sql command
      * usage: sql-client.sh -i <initialization file>, -f <script file>
      */
-    public static final String FLINK_SQL_COMMAND = "sql-client.sh";
+    public static final String FLINK_SQL_COMMAND = "${FLINK_HOME}/bin/sql-client.sh";
 
     /**
      * flink run options

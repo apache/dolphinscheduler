@@ -32,13 +32,13 @@ import org.springframework.context.annotation.Configuration;
 public class StorageConfiguration {
 
     @Bean
-    public StorageOperate storageOperate() {
+    public StorageOperator storageOperate() {
         Optional<StorageType> storageTypeOptional =
                 StorageType.getStorageType(PropertyUtils.getUpperCaseString(RESOURCE_STORAGE_TYPE));
-        Optional<StorageOperate> storageOperate = storageTypeOptional.map(storageType -> {
-            ServiceLoader<StorageOperateFactory> storageOperateFactories =
-                    ServiceLoader.load(StorageOperateFactory.class);
-            for (StorageOperateFactory storageOperateFactory : storageOperateFactories) {
+        Optional<StorageOperator> storageOperate = storageTypeOptional.map(storageType -> {
+            ServiceLoader<StorageOperatorFactory> storageOperateFactories =
+                    ServiceLoader.load(StorageOperatorFactory.class);
+            for (StorageOperatorFactory storageOperateFactory : storageOperateFactories) {
                 if (storageOperateFactory.getStorageOperate() == storageType) {
                     return storageOperateFactory.createStorageOperate();
                 }

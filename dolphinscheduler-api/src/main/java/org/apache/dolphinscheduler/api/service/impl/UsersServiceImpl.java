@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.USER_MANAGER;
 
-import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
@@ -39,7 +38,6 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.entity.UDFUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
@@ -48,9 +46,8 @@ import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -101,16 +98,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private DataSourceUserMapper datasourceUserMapper;
 
     @Autowired
-    private UDFUserMapper udfUserMapper;
-
-    @Autowired
     private AlertGroupMapper alertGroupMapper;
 
     @Autowired
     private ProjectMapper projectMapper;
 
     @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -170,9 +164,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         User user = createUser(userName, userPassword, email, tenantId, phone, queue, state);
-
-        Tenant tenant = tenantMapper.queryById(tenantId);
-        storageOperate.createTenantDirIfNotExists(tenant.getTenantCode());
 
         log.info("User is created and id is {}.", user.getId());
         result.put(Constants.DATA_LIST, user);
@@ -496,9 +487,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     /**
      * revoke the project permission for specified user by id
-     * @param loginUser     Login user
-     * @param userId        User id
-     * @param projectIds   project id array
+     *
+     * @param loginUser  Login user
+     * @param userId     User id
+     * @param projectIds project id array
      * @return
      */
     @Override
@@ -541,8 +533,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     /**
      * grant project with read permission
      *
-     * @param loginUser login user
-     * @param userId user id
+     * @param loginUser  login user
+     * @param userId     user id
      * @param projectIds project id array
      * @return grant result code
      */
@@ -748,62 +740,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
         log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
         this.putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * grant udf function
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @param udfIds    udf id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional
-    public Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds) {
-        Map<String, Object> result = new HashMap<>();
-
-        if (resourcePermissionCheckService.functionDisabled()) {
-            putMsg(result, Status.FUNCTION_DISABLED);
-            return result;
-        }
-        User user = userMapper.selectById(userId);
-        if (user == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            putMsg(result, Status.USER_NOT_EXIST, userId);
-            return result;
-        }
-
-        if (!isAdmin(loginUser)) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
-        }
-
-        udfUserMapper.deleteByUserId(userId);
-
-        if (check(result, StringUtils.isEmpty(udfIds), Status.SUCCESS)) {
-            log.warn("Parameter udfIds is empty.");
-            return result;
-        }
-
-        String[] resourcesIdArr = udfIds.split(",");
-
-        for (String udfId : resourcesIdArr) {
-            Date now = new Date();
-            UDFUser udfUser = new UDFUser();
-            udfUser.setUserId(userId);
-            udfUser.setUdfId(Integer.parseInt(udfId));
-            udfUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            udfUser.setCreateTime(now);
-            udfUser.setUpdateTime(now);
-            udfUserMapper.insert(udfUser);
-        }
-
-        log.info("User is granted permission for UDF, userName:{}.", user.getUserName());
-
-        putMsg(result, Status.SUCCESS);
-
         return result;
     }
 
@@ -1126,54 +1062,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         return msg;
-    }
-
-    /**
-     * copy resource files
-     * xxx unchecked
-     *
-     * @param resourceComponent resource component
-     * @param srcBasePath       src base path
-     * @param dstBasePath       dst base path
-     * @throws IOException io exception
-     */
-    private void copyResourceFiles(String oldTenantCode, String newTenantCode, ResourceComponent resourceComponent,
-                                   String srcBasePath, String dstBasePath) {
-        List<ResourceComponent> components = resourceComponent.getChildren();
-
-        try {
-            if (CollectionUtils.isNotEmpty(components)) {
-                for (ResourceComponent component : components) {
-                    // verify whether exist
-                    if (!storageOperate.exists(
-                            String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()))) {
-                        log.error("Resource file: {} does not exist, copy error.", component.getFullName());
-                        throw new ServiceException(Status.RESOURCE_NOT_EXIST);
-                    }
-
-                    if (!component.isDirctory()) {
-                        // copy it to dst
-                        storageOperate.copy(String.format(Constants.FORMAT_S_S, srcBasePath, component.getFullName()),
-                                String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()), false, true);
-                        continue;
-                    }
-
-                    if (CollectionUtils.isEmpty(component.getChildren())) {
-                        // if not exist,need create it
-                        if (!storageOperate
-                                .exists(String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()))) {
-                            storageOperate.mkdir(newTenantCode,
-                                    String.format(Constants.FORMAT_S_S, dstBasePath, component.getFullName()));
-                        }
-                    } else {
-                        copyResourceFiles(oldTenantCode, newTenantCode, component, srcBasePath, dstBasePath);
-                    }
-                }
-
-            }
-        } catch (IOException e) {
-            log.error("copy the resources failed,the error message  is {}", e.getMessage());
-        }
     }
 
     /**

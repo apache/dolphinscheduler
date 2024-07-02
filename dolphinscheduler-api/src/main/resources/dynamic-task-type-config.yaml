@@ -28,5 +28,3 @@ dynamic-task:
     - {name: DATA_QUALITY,icon: shell-icon.png,hover: shell-hover.png}
   machineLearning:
     - {name: JUPYTER,icon: shell-icon.png,hover: shell-hover.png}
-  other:
-    - {name: PIGEON,icon: shell-icon.png,hover: shell-hover.png}
