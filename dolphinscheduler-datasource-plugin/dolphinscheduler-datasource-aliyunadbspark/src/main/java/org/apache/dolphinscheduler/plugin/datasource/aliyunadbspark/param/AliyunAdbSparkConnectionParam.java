@@ -27,9 +27,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AliyunAdbSparkConnectionParam implements ConnectionParam {
 
-    protected String accessKeyId;
+    protected String aliyunAccessKeyId;
 
-    protected String accessKeySecret;
+    protected String aliyunAccessKeySecret;
 
-    protected String regionId;
+    protected String aliyunRegionId;
 }

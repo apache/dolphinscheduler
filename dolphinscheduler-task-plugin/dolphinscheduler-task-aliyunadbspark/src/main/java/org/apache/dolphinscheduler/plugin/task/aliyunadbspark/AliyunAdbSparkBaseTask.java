@@ -186,9 +186,9 @@ public class AliyunAdbSparkBaseTask extends AbstractRemoteTask {
                 DbType.valueOf(params.getType()),
                 dataSourceParameters.getConnectionParams());
 
-        accessKeyId = aliyunAdbSparkConnectionParam.getAccessKeyId();
-        accessKeySecret = aliyunAdbSparkConnectionParam.getAccessKeySecret();
-        regionId = aliyunAdbSparkConnectionParam.getRegionId();
+        accessKeyId = aliyunAdbSparkConnectionParam.getAliyunAccessKeyId();
+        accessKeySecret = aliyunAdbSparkConnectionParam.getAliyunAccessKeySecret();
+        regionId = aliyunAdbSparkConnectionParam.getAliyunRegionId();
 
         aliyunAdbSparkClient = createClient(accessKeyId, accessKeySecret, regionId);
     }

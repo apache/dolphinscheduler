@@ -113,14 +113,6 @@ public class AliyunAdbSparkBatchTaskTest {
                     "    \"datasource\":1,\n" +
                     "    \"type\":\"ALIYUN_ADB_SPARK\"\n" +
                     "}";
-    // private final String taskParamJson = "{\n" +
-    // " \"dbClusterId\":\"amv-xxx\",\n" +
-    // " \"resourceGroupName\":\"spark\",\n" +
-    // " \"appType\":\"SQL\",\n" +
-    // " \"data\":\"select 1\",\n" +
-    // " \"datasource\":\"1\",\n" +
-    // " \"type\":\"ALIYUN_ADB_SPARK\"\n" +
-    // "}";
 
     @BeforeEach
     public void setUp() {

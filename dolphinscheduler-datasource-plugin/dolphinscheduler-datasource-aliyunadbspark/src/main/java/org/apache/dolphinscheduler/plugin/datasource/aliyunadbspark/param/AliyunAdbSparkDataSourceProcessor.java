@@ -50,15 +50,15 @@ public class AliyunAdbSparkDataSourceProcessor extends AbstractDataSourceProcess
         AliyunAdbSparkDataSourceParamDTO aliyunAdbSparkDataSourceParamDTO =
                 (AliyunAdbSparkDataSourceParamDTO) baseDataSourceParamDTO;
 
-        if (StringUtils.isEmpty(aliyunAdbSparkDataSourceParamDTO.getAccessKeyId())) {
+        if (StringUtils.isEmpty(aliyunAdbSparkDataSourceParamDTO.getAliyunAccessKeyId())) {
             throw new IllegalArgumentException("accessKeyId in param is not valid");
         }
 
-        if (StringUtils.isEmpty(aliyunAdbSparkDataSourceParamDTO.getAccessKeySecret())) {
+        if (StringUtils.isEmpty(aliyunAdbSparkDataSourceParamDTO.getAliyunAccessKeySecret())) {
             throw new IllegalArgumentException("accessKeySecret in param is not valid");
         }
 
-        if (StringUtils.isEmpty(aliyunAdbSparkDataSourceParamDTO.getRegionId())) {
+        if (StringUtils.isEmpty(aliyunAdbSparkDataSourceParamDTO.getAliyunRegionId())) {
             throw new IllegalArgumentException("regionId in param is not valid");
         }
     }
@@ -70,9 +70,9 @@ public class AliyunAdbSparkDataSourceProcessor extends AbstractDataSourceProcess
         AliyunAdbSparkDataSourceParamDTO aliyunAdbSparkDataSourceParamDTO =
                 new AliyunAdbSparkDataSourceParamDTO();
 
-        aliyunAdbSparkDataSourceParamDTO.setAccessKeyId(connectionParams.getAccessKeyId());
-        aliyunAdbSparkDataSourceParamDTO.setAccessKeySecret(connectionParams.getAccessKeySecret());
-        aliyunAdbSparkDataSourceParamDTO.setRegionId(connectionParams.getRegionId());
+        aliyunAdbSparkDataSourceParamDTO.setAliyunAccessKeyId(connectionParams.getAliyunAccessKeyId());
+        aliyunAdbSparkDataSourceParamDTO.setAliyunAccessKeySecret(connectionParams.getAliyunAccessKeySecret());
+        aliyunAdbSparkDataSourceParamDTO.setAliyunRegionId(connectionParams.getAliyunRegionId());
         return aliyunAdbSparkDataSourceParamDTO;
     }
 
@@ -84,10 +84,10 @@ public class AliyunAdbSparkDataSourceProcessor extends AbstractDataSourceProcess
         AliyunAdbSparkConnectionParam aliyunAdbSparkConnectionParam =
                 new AliyunAdbSparkConnectionParam();
 
-        aliyunAdbSparkConnectionParam.setAccessKeyId(aliyunAdbSparkDataSourceParamDTO.getAccessKeyId());
+        aliyunAdbSparkConnectionParam.setAliyunAccessKeyId(aliyunAdbSparkDataSourceParamDTO.getAliyunAccessKeyId());
         aliyunAdbSparkConnectionParam
-                .setAccessKeySecret(aliyunAdbSparkDataSourceParamDTO.getAccessKeySecret());
-        aliyunAdbSparkConnectionParam.setRegionId(aliyunAdbSparkDataSourceParamDTO.getRegionId());
+                .setAliyunAccessKeySecret(aliyunAdbSparkDataSourceParamDTO.getAliyunAccessKeySecret());
+        aliyunAdbSparkConnectionParam.setAliyunRegionId(aliyunAdbSparkDataSourceParamDTO.getAliyunRegionId());
 
         return aliyunAdbSparkConnectionParam;
     }
@@ -110,9 +110,9 @@ public class AliyunAdbSparkDataSourceProcessor extends AbstractDataSourceProcess
         return MessageFormat.format(
                 "{0}@{1}@{2}@{3}",
                 dbType.getName(),
-                baseConnectionParam.getRegionId(),
-                PasswordUtils.encodePassword(baseConnectionParam.getAccessKeyId()),
-                PasswordUtils.encodePassword(baseConnectionParam.getAccessKeySecret()));
+                baseConnectionParam.getAliyunRegionId(),
+                PasswordUtils.encodePassword(baseConnectionParam.getAliyunAccessKeyId()),
+                PasswordUtils.encodePassword(baseConnectionParam.getAliyunAccessKeySecret()));
     }
 
     @Override

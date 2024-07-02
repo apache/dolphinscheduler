@@ -31,7 +31,7 @@ public class AliyunAdbSparkDataSourceProcessorTest {
     private AliyunAdbSparkDataSourceProcessor processor;
 
     private final String connectionJson =
-            "{\"accessKeyId\":\"mockAccessKeyId\",\"accessKeySecret\":\"mockAccessKeySecret\",\"regionId\":\"cn-beijing\"}";
+            "{\"aliyunAccessKeyId\":\"mockAccessKeyId\",\"aliyunAccessKeySecret\":\"mockAccessKeySecret\",\"aliyunRegionId\":\"cn-beijing\"}";
 
     @BeforeEach
     public void before() {
@@ -49,7 +49,7 @@ public class AliyunAdbSparkDataSourceProcessorTest {
         Assertions.assertEquals("accessKeyId in param is not valid",
                 exceptionWithoutAccessKeyId.getMessage());
 
-        datasourceParamDTO.setAccessKeyId("mockAccessKeyId");
+        datasourceParamDTO.setAliyunAccessKeyId("mockAccessKeyId");
 
         // check AccessKeySecret
         IllegalArgumentException exceptionWithoutAccessKeySecret =
@@ -58,7 +58,7 @@ public class AliyunAdbSparkDataSourceProcessorTest {
         Assertions.assertEquals("accessKeySecret in param is not valid",
                 exceptionWithoutAccessKeySecret.getMessage());
 
-        datasourceParamDTO.setAccessKeySecret("mockAccessKeySecret");
+        datasourceParamDTO.setAliyunAccessKeySecret("mockAccessKeySecret");
 
         // check RegionId
         IllegalArgumentException exceptionWithoutRegionId =
@@ -73,17 +73,17 @@ public class AliyunAdbSparkDataSourceProcessorTest {
         AliyunAdbSparkDataSourceParamDTO datasourceParamDTO =
                 (AliyunAdbSparkDataSourceParamDTO) processor.createDatasourceParamDTO(connectionJson);
 
-        Assertions.assertEquals("mockAccessKeyId", datasourceParamDTO.getAccessKeyId());
-        Assertions.assertEquals("mockAccessKeySecret", datasourceParamDTO.getAccessKeySecret());
-        Assertions.assertEquals("cn-beijing", datasourceParamDTO.getRegionId());
+        Assertions.assertEquals("mockAccessKeyId", datasourceParamDTO.getAliyunAccessKeyId());
+        Assertions.assertEquals("mockAccessKeySecret", datasourceParamDTO.getAliyunAccessKeySecret());
+        Assertions.assertEquals("cn-beijing", datasourceParamDTO.getAliyunRegionId());
     }
 
     @Test
     public void testGetDatasourceUniqueId() {
         AliyunAdbSparkConnectionParam connectionParam = new AliyunAdbSparkConnectionParam();
-        connectionParam.setAccessKeyId("mockAccessKeyId");
-        connectionParam.setAccessKeySecret("mockAccessKeySecret");
-        connectionParam.setRegionId("cn-beijing");
+        connectionParam.setAliyunAccessKeyId("mockAccessKeyId");
+        connectionParam.setAliyunAccessKeySecret("mockAccessKeySecret");
+        connectionParam.setAliyunRegionId("cn-beijing");
 
         Assertions.assertEquals("aliyun_adb_spark@cn-beijing@mockAccessKeyId@mockAccessKeySecret",
                 processor.getDatasourceUniqueId(connectionParam, DbType.ALIYUN_ADB_SPARK));

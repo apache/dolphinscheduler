@@ -25,11 +25,11 @@ import lombok.Data;
 @Data
 public class AliyunAdbSparkDataSourceParamDTO extends BaseDataSourceParamDTO {
 
-    protected String accessKeyId;
+    protected String aliyunAccessKeyId;
 
-    protected String accessKeySecret;
+    protected String aliyunAccessKeySecret;
 
-    protected String regionId;
+    protected String aliyunRegionId;
 
     @Override
     public DbType getType() {

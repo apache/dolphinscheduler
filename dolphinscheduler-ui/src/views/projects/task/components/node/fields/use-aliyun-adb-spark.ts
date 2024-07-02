@@ -15,10 +15,14 @@
  * limitations under the License.
  */
 import { useI18n } from 'vue-i18n'
-import { useCustomParams } from '.'
+import {useCustomParams, useResources} from '.'
 import type { IJsonItem } from '../types'
+import {ref} from "vue";
 
 export function useAliyunAdbSpark(model: { [field: string]: any}): IJsonItem[] {
+    const appTypeSpan = ref(0)
+    const dataSpan = ref(0)
+
     const { t } = useI18n()
 
     return [
@@ -60,41 +64,37 @@ export function useAliyunAdbSpark(model: { [field: string]: any}): IJsonItem[] {
         },
 
         {
-            type: 'input',
+            type: 'select',
             field: 'appType',
             name: t('project.node.adb_spark_app_type'),
-            props: {
-                placeholder: t('project.node.adb_spark_app_type_tips')
-            },
+            options: APP_TYPE,
             validate: {
                 trigger: ['input', 'blur'],
-                required: false,
-                validator(validate: any, value: string) {
-                    if (!value) {
-                        return new Error(t('project.node.adb_spark_app_type_tips'))
-                    }
-                }
-           }
+                required: true,
+                message: t('project.node.adb_spark_app_type_tips')
+            },
+            value: 'Batch'
         },
 
         {
-            type: 'input',
+            type: 'editor',
             field: 'data',
             name: t('project.node.adb_spark_data'),
             props: {
                 placeholder: t('project.node.adb_spark_data_tips')
-            },
-            validate: {
-                trigger: ['input', 'blur'],
-                required: true,
-                validator(validate: any, value: string) {
-                    if (!value) {
-                        return new Error(t('project.node.adb_spark_data_tips'))
-                    }
-                }
             }
         },
-
         ...useCustomParams({ model, field: 'localParams', isSimple: false })
     ]
 }
+
+export const APP_TYPE = [
+    {
+        value: 'Batch',
+        label: 'Batch'
+    },
+    {
+        value: 'SQL',
+        label: 'SQL'
+    }
+]
