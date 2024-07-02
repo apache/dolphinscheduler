@@ -179,7 +179,7 @@ master:
   server-load-protection:
     enabled: true
     # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.
-    max-system-cpu-usage-percentage-thresholds: 0.9
+    max-system-cpu-usage-percentage-thresholds: 1
     # Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow.
     max-jvm-cpu-usage-percentage-thresholds: 0.9
     # Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow.

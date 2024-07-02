@@ -17,40 +17,33 @@
  * under the License.
  *
  */
+package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-package org.apache.dolphinscheduler.e2e.pages.common;
-
-import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import lombok.Getter;
 
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
-public class HttpInput {
+public final class PythonTaskForm extends TaskNodeForm {
 
-    @FindBys({
-            @FindBy(className = "input-url-name"),
-            @FindBy(tagName = "input")
-    })
-    private WebElement urlInput;
+    private CodeEditor codeEditor;
 
     private WebDriver driver;
 
-    public HttpInput(WebDriver driver) {
-        PageFactory.initElements(driver, this);
-        this.driver = driver;
+    public PythonTaskForm(WorkflowForm parent) {
+        super(parent);
+
+        this.codeEditor = new CodeEditor(parent.driver());
+
+        this.driver = parent.driver();
     }
 
-    public HttpInput content(String content) {
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(urlInput));
-        urlInput().sendKeys(content);
+    public PythonTaskForm script(String script) {
+        codeEditor.content(script);
+
         return this;
     }
-
 }

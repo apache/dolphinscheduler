@@ -15,18 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.models.users;
+package org.apache.dolphinscheduler.e2e.models.environment;
 
-public interface IUser {
+public interface IEnvironment {
 
-    String getUserName();
+    String getEnvironmentName();
 
-    String getPassword();
+    String getEnvironmentConfig();
 
-    String getEmail();
+    String getEnvironmentDesc();
 
-    String getPhone();
-
-    String getTenant();
+    String getEnvironmentWorkerGroup();
 
 }

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.core;
 
 import java.time.Duration;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -25,7 +26,7 @@ public class WebDriverWaitFactory {
 
     private static final Duration DEFAULT_INTERVAL = Duration.ofMillis(500);
 
-    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(60);
+    private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
 
     /**
      * Create a WebDriverWait instance with default timeout 60s and interval 100ms.

@@ -15,18 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.e2e.models.users;
+package org.apache.dolphinscheduler.e2e.models.environment;
 
-public interface IUser {
+import lombok.Data;
 
-    String getUserName();
+@Data
+public class PythonEnvironment implements IEnvironment {
 
-    String getPassword();
+    private String environmentName;
 
-    String getEmail();
+    private String environmentConfig;
 
-    String getPhone();
+    private String environmentDesc;
 
-    String getTenant();
+    private String environmentWorkerGroup;
 
+    @Override
+    public String getEnvironmentName() {
+        return "python-e2e";
+    }
+
+    @Override
+    public String getEnvironmentConfig() {
+        return "export PYTHON_LAUNCHER=/usr/bin/python3";
+    }
+
+    @Override
+    public String getEnvironmentDesc() {
+        return "pythonEnvDesc";
+    }
+
+    @Override
+    public String getEnvironmentWorkerGroup() {
+        return "default";
+    }
 }

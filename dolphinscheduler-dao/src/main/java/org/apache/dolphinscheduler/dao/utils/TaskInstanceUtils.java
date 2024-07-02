@@ -62,7 +62,6 @@ public class TaskInstanceUtils {
         target.setMaxRetryTimes(source.getMaxRetryTimes());
         target.setRetryInterval(source.getRetryInterval());
         target.setTaskInstancePriority(source.getTaskInstancePriority());
-        target.setDependentResult(source.getDependentResult());
         target.setWorkerGroup(source.getWorkerGroup());
         target.setEnvironmentCode(source.getEnvironmentCode());
         target.setEnvironmentConfig(source.getEnvironmentConfig());

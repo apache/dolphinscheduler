@@ -19,24 +19,26 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
+
+import java.util.List;
+
+import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
-import java.util.List;
 
 @Getter
 public abstract class TaskNodeForm {
+
     @FindBys({
             @FindBy(className = "input-node-name"),
             @FindBy(tagName = "input")
@@ -84,7 +86,6 @@ public abstract class TaskNodeForm {
             @FindBy(className = "n-base-selection"),
     })
     private WebElement selectResource;
-
 
     private final WorkflowForm parent;
 
@@ -168,7 +169,8 @@ public abstract class TaskNodeForm {
 
         final By optionsLocator = By.className("n-tree-node-content__text");
 
-        WebDriverWaitFactory.createWebDriverWait(parent().driver()).until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         parent().driver()
                 .findElements(optionsLocator)
@@ -177,6 +179,8 @@ public abstract class TaskNodeForm {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such resource: " + resourceName))
                 .click();
+
+        parent.driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         return this;
     }
 
