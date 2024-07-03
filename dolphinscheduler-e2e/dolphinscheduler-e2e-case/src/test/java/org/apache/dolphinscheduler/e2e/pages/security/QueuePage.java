@@ -21,8 +21,9 @@ package org.apache.dolphinscheduler.e2e.pages.security;
 
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
-import java.security.Key;
 import java.util.List;
+
+import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
@@ -32,10 +33,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 
-import lombok.Getter;
-
 @Getter
 public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
+
     @FindBy(className = "btn-create-queue")
     private WebElement buttonCreateQueue;
 
@@ -84,13 +84,14 @@ public final class QueuePage extends NavBarPage implements SecurityPage.Tab {
 
     @Getter
     public class QueueForm {
+
         QueueForm() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-            @FindBy(className = "input-queue-name"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-queue-name"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputQueueName;
 

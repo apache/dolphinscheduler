@@ -133,10 +133,8 @@ public class BaseServiceImpl implements BaseService {
     // @Override
     // public void createTenantDirIfNotExists(String tenantCode) throws IOException {
     // String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-    // String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-    // // init resource path and udf path
+    // // init resource path
     // HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
-    // HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
     // }
 
     /**

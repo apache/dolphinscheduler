@@ -19,7 +19,6 @@ import { useFlink } from './use-flink'
 import { useFlinkStream } from './use-flink-stream'
 import { useShell } from './use-shell'
 import { useSubProcess } from './use-sub-process'
-import { usePigeon } from './use-pigeon'
 import { usePython } from './use-python'
 import { useSpark } from './use-spark'
 import { useMr } from './use-mr'
@@ -63,7 +62,6 @@ export default {
   MR: useMr,
   FLINK: useFlink,
   HTTP: useHttp,
-  PIGEON: usePigeon,
   SQL: useSql,
   PROCEDURE: useProcedure,
   SQOOP: useSqoop,

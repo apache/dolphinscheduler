@@ -36,7 +36,6 @@ const Sidebar = defineComponent({
     const defaultExpandedKeys = [
       'workflow',
       'task',
-      'udf-manage',
       'service-manage',
       'statistical-manage',
       'task-group-manage'

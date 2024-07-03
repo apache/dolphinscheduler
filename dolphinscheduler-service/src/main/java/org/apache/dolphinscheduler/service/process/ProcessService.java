@@ -43,7 +43,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -120,8 +119,6 @@ public interface ProcessService {
 
     DataSource findDataSourceById(int id);
 
-    List<UdfFunc> queryUdfFunListByIds(Integer[] ids);
-
     ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId);
 
     <T> List<T> listUnauthorized(int userId, T[] needChecks, AuthorizationType authorizationType);
@@ -175,8 +172,6 @@ public interface ProcessService {
     List<DqRuleExecuteSql> getDqExecuteSql(int ruleId);
 
     DqComparisonType getComparisonTypeById(int id);
-
-    void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status);
 
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
                                             String taskName,

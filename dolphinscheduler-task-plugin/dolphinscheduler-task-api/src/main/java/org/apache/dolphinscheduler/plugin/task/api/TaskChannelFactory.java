@@ -17,16 +17,19 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.spi.common.UiChannelFactory;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPI;
 import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
 
-public interface TaskChannelFactory extends UiChannelFactory, PrioritySPI {
-
-    TaskChannel create();
+public interface TaskChannelFactory extends PrioritySPI {
 
     default SPIIdentify getIdentify() {
-        return SPIIdentify.builder().name(getName()).build();
+        return SPIIdentify.builder()
+                .name(getName())
+                .build();
     }
+
+    String getName();
+
+    TaskChannel create();
 
 }

@@ -20,32 +20,31 @@
 
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
-import lombok.Getter;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
+
+import java.util.List;
+
+import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.io.File;
-import java.time.Duration;
-import java.util.List;
-
 
 @Getter
 public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
+
     @FindBy(className = "btn-create-directory")
     private WebElement buttonCreateDirectory;
 
@@ -59,8 +58,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final RenameBox renameBox;
 
-    private final CreateFileBox createFileBox;
-
     private final UploadFileBox uploadFileBox;
 
     private final EditFileBox editFileBox;
@@ -69,8 +66,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     private List<WebElement> fileList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -87,11 +84,10 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         renameBox = new RenameBox();
 
-        createFileBox = new CreateFileBox();
-
         uploadFileBox = new UploadFileBox();
 
         editFileBox = new EditFileBox();
+
     }
 
     public FileManagePage createDirectory(String name) {
@@ -114,13 +110,13 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FileManagePage rename(String currentName, String AfterName) {
         fileList()
-            .stream()
-            .filter(it -> it.getText().contains(currentName))
-            .flatMap(it -> it.findElements(By.className("btn-rename")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No rename button in file manage list"))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(currentName))
+                .flatMap(it -> it.findElements(By.className("btn-rename")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No rename button in file manage list"))
+                .click();
 
         renameBox().inputName().sendKeys(Keys.CONTROL + "a");
         renameBox().inputName().sendKeys(Keys.BACK_SPACE);
@@ -132,12 +128,12 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FileManagePage createSubDirectory(String directoryName, String subDirectoryName) {
         fileList()
-            .stream()
-            .filter(it -> it.getText().contains(directoryName))
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in file manage list", directoryName)))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(directoryName))
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in file manage list", directoryName)))
+                .click();
 
         buttonCreateDirectory().click();
 
@@ -149,42 +145,63 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FileManagePage delete(String name) {
         fileList()
-            .stream()
-            .filter(it -> it.getText().contains(name))
-            .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(name))
+                .flatMap(it -> it.findElements(By.className("btn-delete")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No delete button in file manage list"))
+                .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
     }
 
+    // todo: add file type
     public FileManagePage createFile(String fileName, String scripts) {
+
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(buttonCreateFile()));
+
         buttonCreateFile().click();
 
-        createFileBox().inputFileName().sendKeys(fileName);
-        createFileBox().codeEditor().content(scripts);
-        createFileBox().buttonSubmit().click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file/create"));
 
+        CreateFileBox createFileBox = new CreateFileBox();
+        createFileBox.inputFileName().sendKeys(fileName);
+        createFileBox.codeEditor().content(scripts);
+        createFileBox.buttonSubmit().click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file-manage"));
+        return this;
+    }
+
+    public FileManagePage createFileUntilSuccess(String fileName, String scripts) {
+
+        createFile(fileName, scripts);
+
+        await()
+                .untilAsserted(() -> assertThat(fileList())
+                        .as("File list should contain newly-created file: " + fileName)
+                        .extracting(WebElement::getText)
+                        .anyMatch(it -> it.contains(fileName)));
         return this;
     }
 
     public FileManagePage editFile(String fileName, String scripts) {
         fileList()
-            .stream()
-            .filter(it -> it.getText().contains(fileName))
-            .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(fileName))
+                .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No edit button in file manage list"))
+                .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.urlContains("/edit"));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/edit"));
 
-        new WebDriverWait(driver, Duration.ofSeconds(20)).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.tagName("body")), fileName));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.tagName("body")), fileName));
 
         editFileBox().codeEditor().content(scripts);
         editFileBox().buttonSubmit().click();
@@ -205,19 +222,20 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FileManagePage downloadFile(String fileName) {
         fileList()
-            .stream()
-            .filter(it -> it.getText().contains(fileName))
-            .flatMap(it -> it.findElements(By.className("btn-download")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No download button in file manage list"))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(fileName))
+                .flatMap(it -> it.findElements(By.className("btn-download")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No download button in file manage list"))
+                .click();
 
         return this;
     }
 
     @Getter
     public class CreateDirectoryBox {
+
         CreateDirectoryBox() {
             PageFactory.initElements(driver, this);
         }
@@ -237,6 +255,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class RenameBox {
+
         RenameBox() {
             PageFactory.initElements(driver, this);
         }
@@ -256,6 +275,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class CreateFileBox {
+
         CreateFileBox() {
             PageFactory.initElements(driver, this);
         }
@@ -277,6 +297,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class EditFileBox {
+
         EditFileBox() {
             PageFactory.initElements(driver, this);
         }
@@ -292,6 +313,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class UploadFileBox {
+
         UploadFileBox() {
             PageFactory.initElements(driver, this);
         }

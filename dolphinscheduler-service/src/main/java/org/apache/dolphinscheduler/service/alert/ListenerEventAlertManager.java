@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.dao.entity.event.TaskFailListenerEvent;
 import org.apache.dolphinscheduler.dao.entity.event.TaskStartListenerEvent;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.CollectionUtils;
@@ -70,6 +71,9 @@ public class ListenerEventAlertManager {
 
     @Autowired
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
+
+    @Autowired
+    private ProcessService processService;
 
     public void publishServerDownListenerEvent(String host, String type) {
         ServerDownListenerEvent event = new ServerDownListenerEvent();
@@ -214,8 +218,9 @@ public class ListenerEventAlertManager {
     }
 
     public void publishTaskFailListenerEvent(ProcessInstance processInstance,
-                                             TaskInstance taskInstance,
-                                             ProjectUser projectUser) {
+                                             TaskInstance taskInstance) {
+        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(processInstance.getId());
+
         TaskFailListenerEvent event = new TaskFailListenerEvent();
         event.setProjectCode(projectUser.getProjectCode());
         event.setProjectName(projectUser.getProjectName());

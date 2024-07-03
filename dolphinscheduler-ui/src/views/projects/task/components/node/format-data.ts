@@ -194,14 +194,6 @@ export function formatParams(data: INodeData): {
       taskParams.title = data.title
       taskParams.groupId = data.groupId
     }
-    if (data.type === 'HIVE') {
-      if (data.udfs) taskParams.udfs = data.udfs.join(',')
-      taskParams.connParams = data.connParams
-    }
-
-    if (data.type === 'KYUUBI') {
-      if (data.udfs) taskParams.udfs = data.udfs.join(',')
-    }
   }
 
   if (data.taskType === 'PROCEDURE') {
@@ -438,10 +430,6 @@ export function formatParams(data: INodeData): {
     taskParams.json = data.json
     taskParams.deployMode = data.deployMode
     taskParams.others = data.others
-  }
-
-  if (data.taskType === 'PIGEON') {
-    taskParams.targetJobName = data.targetJobName
   }
 
   if (data.taskType === 'HIVECLI') {
@@ -742,9 +730,6 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.conditionResult?.failedNode?.length) {
     params.failedBranch = data.taskParams.conditionResult.failedNode[0]
-  }
-  if (data.taskParams?.udfs) {
-    params.udfs = data.taskParams.udfs?.split(',')
   }
   if (data.taskParams?.customConfig !== void 0) {
     params.customConfig = data.taskParams.customConfig === 1 ? true : false

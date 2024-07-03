@@ -27,7 +27,6 @@ import {
   GrantResourceReq,
   GrantProject,
   ProjectCodeReq,
-  GrantUDFReq,
   GrantNamespaceReq,
   ListAllReq,
   ListReq,
@@ -124,14 +123,6 @@ export function grantProjectWithReadPerm(data: GrantProject) {
 export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   return axios({
     url: '/users/grant-project-by-code',
-    method: 'post',
-    data
-  })
-}
-
-export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
-  return axios({
-    url: '/users/grant-udf-func',
     method: 'post',
     data
   })

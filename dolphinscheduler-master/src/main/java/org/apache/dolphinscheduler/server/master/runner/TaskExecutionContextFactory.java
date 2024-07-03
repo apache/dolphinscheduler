@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.dao.entity.DqRuleExecuteSql;
 import org.apache.dolphinscheduler.dao.entity.DqRuleInputEntry;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -49,12 +48,10 @@ import org.apache.dolphinscheduler.plugin.task.api.model.JdbcInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.dataquality.DataQualityParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.AbstractResourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.JdbcUrlParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
@@ -74,7 +71,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -102,16 +98,15 @@ public class TaskExecutionContextFactory {
     public TaskExecutionContext createTaskExecutionContext(TaskInstance taskInstance) throws TaskExecutionContextCreateException {
         ProcessInstance workflowInstance = taskInstance.getProcessInstance();
 
-        ResourceParametersHelper resources =
-                Optional.ofNullable(TaskPluginManager.getTaskChannel(taskInstance.getTaskType()))
-                        .map(taskChannel -> taskChannel.getResources(taskInstance.getTaskParams()))
-                        .orElse(null);
+        ResourceParametersHelper resources = TaskPluginManager.getTaskChannel(taskInstance.getTaskType())
+                .parseParameters(taskInstance.getTaskParams())
+                .getResources();
         setTaskResourceInfo(resources);
 
         Map<String, Property> businessParamsMap = curingParamsService.preBuildBusinessParams(workflowInstance);
 
-        AbstractParameters baseParam = TaskPluginManager.getParameters(ParametersNode.builder()
-                .taskType(taskInstance.getTaskType()).taskParams(taskInstance.getTaskParams()).build());
+        AbstractParameters baseParam =
+                TaskPluginManager.parseTaskParameters(taskInstance.getTaskType(), taskInstance.getTaskParams());
         Map<String, Property> propertyMap =
                 curingParamsService.paramParsingPreparation(taskInstance, baseParam, workflowInstance);
         TaskExecutionContext taskExecutionContext = TaskExecutionContextBuilder.get()
@@ -155,9 +150,6 @@ public class TaskExecutionContextFactory {
                 case DATASOURCE:
                     setTaskDataSourceResourceInfo(map);
                     break;
-                case UDF:
-                    setTaskUdfFuncResourceInfo(map);
-                    break;
                 default:
                     break;
             }
@@ -178,19 +170,6 @@ public class TaskExecutionContextFactory {
             dataSourceParameters.setType(datasource.getType());
             dataSourceParameters.setConnectionParams(datasource.getConnectionParams());
             map.put(code, dataSourceParameters);
-        });
-    }
-
-    private void setTaskUdfFuncResourceInfo(Map<Integer, AbstractResourceParameters> map) {
-        if (MapUtils.isEmpty(map)) {
-            return;
-        }
-        List<UdfFunc> udfFuncList = processService.queryUdfFunListByIds(map.keySet().toArray(new Integer[map.size()]));
-
-        udfFuncList.forEach(udfFunc -> {
-            UdfFuncParameters udfFuncParameters =
-                    JSONUtils.parseObject(JSONUtils.toJsonString(udfFunc), UdfFuncParameters.class);
-            map.put(udfFunc.getId(), udfFuncParameters);
         });
     }
 
@@ -409,6 +388,7 @@ public class TaskExecutionContextFactory {
     /**
      * The StatisticsValueWriterConfig will be used in DataQualityApplication that
      * writes the statistics value into dolphin scheduler datasource
+     *
      * @param dataQualityTaskExecutionContext
      */
     private void setStatisticsValueWriterConfig(DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {

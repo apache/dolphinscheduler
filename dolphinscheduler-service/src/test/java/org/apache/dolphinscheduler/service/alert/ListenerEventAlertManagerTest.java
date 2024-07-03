@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.service.alert;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -30,6 +31,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ListenerEventMapper;
+import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,16 +42,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ProcessAlertManager Test
  */
 @ExtendWith(MockitoExtension.class)
 public class ListenerEventAlertManagerTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(ListenerEventAlertManagerTest.class);
 
     @InjectMocks
     ListenerEventAlertManager listenerEventAlertManager;
@@ -60,6 +58,9 @@ public class ListenerEventAlertManagerTest {
     @Mock
     ListenerEventMapper listenerEventMapper;
 
+    @Mock
+    ProcessService processService;
+
     @Test
     public void sendServerDownListenerEventTest() {
         String host = "127.0.0.1";
@@ -67,7 +68,7 @@ public class ListenerEventAlertManagerTest {
         List<AlertPluginInstance> globalPluginInstanceList = new ArrayList<>();
         AlertPluginInstance instance = new AlertPluginInstance(1, "instanceParams", "instanceName");
         globalPluginInstanceList.add(instance);
-        Mockito.when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList())
+        when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList())
                 .thenReturn(globalPluginInstanceList);
         Mockito.doNothing().when(listenerEventMapper).insertServerDownEvent(any(), any());
         listenerEventAlertManager.publishServerDownListenerEvent(host, type);
@@ -82,9 +83,9 @@ public class ListenerEventAlertManagerTest {
         AlertPluginInstance instance = new AlertPluginInstance(1, "instanceParams", "instanceName");
         List<AlertPluginInstance> globalPluginInstanceList = new ArrayList<>();
         globalPluginInstanceList.add(instance);
-        Mockito.when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList())
+        when(alertPluginInstanceMapper.queryAllGlobalAlertPluginInstanceList())
                 .thenReturn(globalPluginInstanceList);
-        Mockito.when(listenerEventMapper.insert(any())).thenReturn(1);
+        when(listenerEventMapper.insert(any())).thenReturn(1);
         listenerEventAlertManager.publishProcessDefinitionCreatedListenerEvent(user, processDefinition,
                 taskDefinitionLogs, processTaskRelationLogs);
     }
@@ -142,7 +143,8 @@ public class ListenerEventAlertManagerTest {
     public void sendTaskFailListenerEvent() {
         ProcessInstance processInstance = Mockito.mock(ProcessInstance.class);
         TaskInstance taskInstance = Mockito.mock(TaskInstance.class);
-        ProjectUser projectUser = Mockito.mock(ProjectUser.class);
-        listenerEventAlertManager.publishTaskFailListenerEvent(processInstance, taskInstance, projectUser);
+        when(processService.queryProjectWithUserByProcessInstanceId(processInstance.getId()))
+                .thenReturn(new ProjectUser());
+        listenerEventAlertManager.publishTaskFailListenerEvent(processInstance, taskInstance);
     }
 }

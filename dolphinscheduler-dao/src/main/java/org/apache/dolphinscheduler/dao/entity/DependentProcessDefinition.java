@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -67,7 +66,7 @@ public class DependentProcessDefinition {
      */
     public CycleEnum getDependentCycle(long upstreamProcessDefinitionCode) {
         DependentParameters dependentParameters = this.getDependentParameters();
-        List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependTaskList();
+        List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependence().getDependTaskList();
 
         for (DependentTaskModel dependentTaskModel : dependentTaskModelList) {
             List<DependentItem> dependentItemList = dependentTaskModel.getDependItemList();
@@ -104,11 +103,7 @@ public class DependentProcessDefinition {
     }
 
     public DependentParameters getDependentParameters() {
-        return JSONUtils.parseObject(getDependence(), DependentParameters.class);
-    }
-
-    public String getDependence() {
-        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
+        return JSONUtils.parseObject(taskParams, DependentParameters.class);
     }
 
     public String getProcessDefinitionName() {

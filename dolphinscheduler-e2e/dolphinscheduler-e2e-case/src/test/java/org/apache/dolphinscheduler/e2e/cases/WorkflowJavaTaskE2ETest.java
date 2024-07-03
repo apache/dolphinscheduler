@@ -19,7 +19,10 @@
 
 package org.apache.dolphinscheduler.e2e.cases;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
@@ -32,23 +35,19 @@ import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
 public class WorkflowJavaTaskE2ETest {
+
     private static final String project = "test-workflow-1";
 
     private static final String workflow = "test-workflow-1";
@@ -92,13 +91,12 @@ public class WorkflowJavaTaskE2ETest {
                 .goToNav(SecurityPage.class)
                 .goToTab(UserPage.class);
 
-        new WebDriverWait(userPage.driver(), Duration.ofSeconds(20)).until(ExpectedConditions.visibilityOfElementLocated(
-                new By.ByClassName("name")));
+        WebDriverWaitFactory.createWebDriverWait(userPage.driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("name")));
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project)
-        ;
+                .create(project);
     }
 
     @AfterAll
@@ -121,8 +119,6 @@ public class WorkflowJavaTaskE2ETest {
                 .delete(tenant);
     }
 
-
-
     @Test
     @Order(1)
     void testCreateWorkflow() {
@@ -133,7 +129,7 @@ public class WorkflowJavaTaskE2ETest {
 
         workflowDefinitionPage
                 .createWorkflow()
-                .<JavaTaskForm> addTask(WorkflowForm.TaskType.JAVA)
+                .<JavaTaskForm>addTask(WorkflowForm.TaskType.JAVA)
                 .script(javaContent)
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
@@ -142,17 +138,14 @@ public class WorkflowJavaTaskE2ETest {
                 .submit()
                 .name(workflow)
                 .addGlobalParam("global_param", "hello world")
-                .submit()
-        ;
+                .submit();
 
         Awaitility.await().untilAsserted(() -> assertThat(workflowDefinitionPage.workflowList())
                 .as("Workflow list should contain newly-created workflow")
                 .anyMatch(
-                        it -> it.getText().contains(workflow)
-                ));
+                        it -> it.getText().contains(workflow)));
         workflowDefinitionPage.publish(workflow);
     }
-
 
     @Test
     @Order(30)
