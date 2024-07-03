@@ -165,7 +165,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-aliyunadbspark</artifactId>
+            <artifactId>dolphinscheduler-datasource-adbspark</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

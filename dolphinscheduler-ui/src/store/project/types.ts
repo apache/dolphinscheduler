@@ -59,7 +59,7 @@ type TaskType =
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
   | 'ALIYUN_SERVERLESS_SPARK'
-  | 'ALIYUN_ADB_SPARK'
+  | 'ADBSPARK'
 
 type ProgramType = 'JAVA' | 'SCALA' | 'PYTHON'
 

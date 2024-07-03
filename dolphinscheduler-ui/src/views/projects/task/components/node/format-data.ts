@@ -503,7 +503,7 @@ export function formatParams(data: INodeData): {
     taskParams.listParameters = data.listParameters
   }
 
-  if (data.type === 'ALIYUN_ADB_SPARK') {
+  if (data.type === 'ADBSPARK') {
     taskParams.dbClusterId = data.dbClusterId
     taskParams.resourceGroupName = data.resourceGroupName
     taskParams.appType = data.appType

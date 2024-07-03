@@ -160,7 +160,7 @@ export function useDatasource(
     },
     {
       id: 26,
-      code: 'ALIYUN_ADB_SPARK',
+      code: 'ADBSPARK',
       disabled: false
     },
     {

@@ -19,9 +19,7 @@ import {useCustomParams, useResources} from '.'
 import type { IJsonItem } from '../types'
 import {ref} from "vue";
 
-export function useAliyunAdbSpark(model: { [field: string]: any}): IJsonItem[] {
-    const appTypeSpan = ref(0)
-    const dataSpan = ref(0)
+export function useADBSPARK(model: { [field: string]: any}): IJsonItem[] {
 
     const { t } = useI18n()
 

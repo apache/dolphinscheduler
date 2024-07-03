@@ -162,8 +162,8 @@ export const TASK_TYPES_MAP = {
     alias: 'REMOTESHELL',
     helperLinkDisable: true
   },
-  ALIYUN_ADB_SPARK: {
-    alias: 'ALIYUN_ADB_SPARK',
+  ADBSPARK: {
+    alias: 'ADBSPARK',
     helperLinkDisable: true
   }
 } as {

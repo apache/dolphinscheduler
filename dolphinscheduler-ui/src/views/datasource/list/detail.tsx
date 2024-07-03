@@ -207,9 +207,9 @@ const DetailModal = defineComponent({
                 label-align='left'
               >
                 <NFormItem
-                  label={t('datasource.datasource')}
-                  path='type'
-                  show-require-mark
+                    label={t('datasource.datasource')}
+                    path='type'
+                    show-require-mark
                 >
                   <div class={[styles.typeBox, !!id && styles.disabledBox]}>
                     <div v-model={[detailForm.type, 'value']}>
@@ -337,7 +337,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showAliyunAccessKeyId}
+                  v-show={showAliyunAccessKeyId && detailForm.type === 'ADBSPARK'}
                   label={t('datasource.aliyun_access_key_id')}
                   path='aliyunAccessKeyId'
                   show-require-mark
@@ -352,7 +352,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showAliyunAccessKeySecret}
+                  v-show={showAliyunAccessKeySecret && detailForm.type === 'ADBSPARK'}
                   label={t('datasource.aliyun_access_key_secret')}
                   path='aliyunAccessKey'
                   show-require-mark
@@ -367,7 +367,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                    v-show={showAliyunRegionId}
+                    v-show={showAliyunRegionId && detailForm.type === 'ADBSPARK'}
                     label={t('datasource.aliyun_region_id')}
                     path='aliyunRegionId'
                     show-require-mark
@@ -659,7 +659,7 @@ const DetailModal = defineComponent({
                     (!showMode || detailForm.mode === 'password') &&
                     detailForm.type != 'K8S' &&
                     detailForm.type != 'ALIYUN_SERVERLESS_SPARK' &&
-                    detailForm.type != 'ALIYUN_ADB_SPARK'
+                    detailForm.type != 'ADBSPARK'
                   }
                   label={t('datasource.user_name')}
                   path='userName'
@@ -679,7 +679,7 @@ const DetailModal = defineComponent({
                     (!showMode || detailForm.mode === 'password') &&
                     detailForm.type != 'K8S' &&
                     detailForm.type != 'ALIYUN_SERVERLESS_SPARK' &&
-                    detailForm.type != 'ALIYUN_ADB_SPARK'
+                    detailForm.type != 'ADBSPARK'
                   }
                   label={t('datasource.user_password')}
                   path='password'

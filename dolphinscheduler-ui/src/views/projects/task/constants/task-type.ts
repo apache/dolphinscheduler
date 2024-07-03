@@ -53,7 +53,7 @@ export type TaskType =
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
   | 'ALIYUN_SERVERLESS_SPARK'
-  | 'ALIYUN_ADB_SPARK'
+  | 'ADBSPARK'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -197,8 +197,8 @@ export const TASK_TYPES_MAP = {
     alias: 'ALIYUN_SERVERLESS_SPARK',
     helperLinkDisable: true
   },
-  ALIYUN_ADB_SPARK: {
-    alias: 'ALIYUN_ADB_SPARK',
+  ADBSPARK: {
+    alias: 'ADBSPARK',
     helperLinkDisable: true
   }
 } as {

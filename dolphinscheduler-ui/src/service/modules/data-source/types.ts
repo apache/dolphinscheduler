@@ -43,7 +43,7 @@ type IDataBase =
   | 'SAGEMAKER'
   | 'K8S'
   | 'ALIYUN_SERVERLESS_SPARK'
-  | 'ALIYUN_ADB_SPARK'
+  | 'ADBSPARK'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -68,7 +68,7 @@ type IDataBaseLabel =
   | 'SAGEMAKER'
   | 'K8S'
   | 'ALIYUN_SERVERLESS_SPARK'
-  | 'ALIYUN_ADB_SPARK'
+  | 'ADBSPARK'
 
 interface IDataSource {
   id?: number

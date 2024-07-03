@@ -19,7 +19,7 @@ import { reactive } from 'vue'
 import * as Fields from '../fields/index'
 import type { IJsonItem, INodeData, ITaskData } from '../types'
 
-export function useAliyunAdbSpark({
+export function useADBSPARK({
     projectCode,
     from = 0,
     readonly,
@@ -32,7 +32,7 @@ export function useAliyunAdbSpark({
 }) {
     const model = reactive({
         name: '',
-        taskType: 'ALIYUN_ADB_SPARK',
+        taskType: 'ADBSPARK',
         flag: 'YES',
         description: '',
         timeoutFlag: false,
@@ -43,7 +43,7 @@ export function useAliyunAdbSpark({
         workerGroup: 'default',
         delayTime: 0,
         timeout: 30,
-        type: 'ALIYUN_ADB_SPARK',
+        type: 'ADBSPARK',
         displayRows: 10,
         timeoutNotifyStrategy: ['WARN'],
         restEndpoint: '',
@@ -66,7 +66,7 @@ export function useAliyunAdbSpark({
             Fields.useDelayTime(model),
             ...Fields.useTimeoutAlarm(model),
             ...Fields.useDatasource(model),
-            ...Fields.useAliyunAdbSpark(model),
+            ...Fields.useADBSPARK(model),
             Fields.usePreTasks()
         ] as IJsonItem[],
         model

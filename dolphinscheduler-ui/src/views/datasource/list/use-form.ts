@@ -130,7 +130,7 @@ export function useForm(id?: number) {
             state.detailForm.type !== 'AZURESQL' &&
             state.detailForm.type !== 'K8S' &&
             state.detailForm.type !== 'ALIYUN_SERVERLESS_SPARK' &&
-            state.detailForm.type !== 'ALIYUN_ADB_SPARK'
+            state.detailForm.type !== 'ADBSPARK'
           ) {
             return new Error(t('datasource.user_name_tips'))
           }
@@ -279,7 +279,7 @@ export function useForm(id?: number) {
       type === 'SAGEMAKER' ||
       type === 'K8S' ||
       type === 'ALIYUN_SERVERLESS_SPARK' ||
-      type === 'ALIYUN_ADB_SPARK'
+      type === 'ADBSPARK'
     ) {
       state.showDataBaseName = false
       state.requiredDataBase = false
@@ -297,7 +297,7 @@ export function useForm(id?: number) {
         type === 'SAGEMAKER' ||
         type === 'K8S' ||
         type == 'ALIYUN_SERVERLESS_SPARK' ||
-        type === 'ALIYUN_ADB_SPARK'
+        type === 'ADBSPARK'
       ) {
         state.showHost = false
         state.showPort = false
@@ -312,7 +312,7 @@ export function useForm(id?: number) {
         state.showRegionId = true
         state.showEndpoint = true
       }
-      if (type === 'ALIYUN_ADB_SPARK') {
+      if (type === 'ADBSPARK') {
         state.showAliyunAccessKeyId = true
         state.showAliyunAccessKeySecret = true
         state.showAliyunRegionId = true
@@ -491,9 +491,9 @@ export const datasourceType: IDataBaseOptionKeys = {
     label: 'ALIYUN_SERVERLESS_SPARK',
     defaultPort: 0
   },
-  ALIYUN_ADB_SPARK: {
-    value: 'ALIYUN_ADB_SPARK',
-    label: 'ALIYUN_ADB_SPARK',
+  ADBSPARK: {
+    value: 'ADBSPARK',
+    label: 'ADBSPARK',
     defaultPort: 0
   }
 }

@@ -63,7 +63,7 @@
         <module>dolphinscheduler-task-datafactory</module>
         <module>dolphinscheduler-task-remoteshell</module>
         <module>dolphinscheduler-task-aliyunserverlessspark</module>
-        <module>dolphinscheduler-task-aliyunadbspark</module>
+        <module>dolphinscheduler-task-adbspark</module>
     </modules>
 
     <dependencyManagement>

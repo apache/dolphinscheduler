@@ -58,7 +58,7 @@ public enum DbType {
     K8S(26, "k8s", "k8s"),
 
     ALIYUN_SERVERLESS_SPARK(27, "aliyun_serverless_spark", "aliyun serverless spark"),
-    ALIYUN_ADB_SPARK(28, "aliyun_adb_spark", "aliyun adb spark");
+    ADBSPARK(28, "adbspark", "adbspark");
 
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));

@@ -53,7 +53,8 @@ import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
 import { useDynamic } from './use-dynamic'
 import { useAliyunServerlessSpark } from './use-aliyun-serverless-spark'
-import { useAliyunAdbSpark } from './use-aliyun-adb-spark'
+import { useADBSPARK } from './use-aliyun-adb-spark'
+
 
 export default {
   SHELL: useShell,
@@ -94,5 +95,5 @@ export default {
   DATA_FACTORY: useDataFactory,
   REMOTESHELL: useRemoteShell,
   ALIYUN_SERVERLESS_SPARK: useAliyunServerlessSpark,
-  ALIYUN_ADB_SPARK: useAliyunAdbSpark
+  ADBSPARK: useADBSPARK
 }
