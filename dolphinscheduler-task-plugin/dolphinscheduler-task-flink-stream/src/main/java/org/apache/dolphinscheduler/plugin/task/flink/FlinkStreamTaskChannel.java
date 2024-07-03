@@ -18,19 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTaskChannel;
 
 public class FlinkStreamTaskChannel implements StreamTaskChannel {
-
-    @Override
-    public void cancelApplication(boolean status) {
-
-    }
 
     @Override
     public FlinkStreamTask createTask(TaskExecutionContext taskRequest) {
@@ -38,22 +30,8 @@ public class FlinkStreamTaskChannel implements StreamTaskChannel {
     }
 
     @Override
-    public AbstractParameters parseParameters(ParametersNode parametersNode) {
-        return JSONUtils.parseObject(parametersNode.getTaskParams(), FlinkStreamParameters.class);
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, FlinkStreamParameters.class);
     }
 
-    @Override
-    public ResourceParametersHelper getResources(String parameters) {
-        return null;
-    }
-
-    @Override
-    public AbstractTask pauseTask(TaskExecutionContext taskExecutionContext) {
-        return null;
-    }
-
-    @Override
-    public AbstractTask recoverTask(TaskExecutionContext taskExecutionContext) {
-        return null;
-    }
 }

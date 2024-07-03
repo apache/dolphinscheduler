@@ -123,6 +123,7 @@ export function useResources(
   return {
     type: 'tree-select',
     field: 'resourceList',
+    class: 'resource-select',
     name: t('project.node.resources'),
     span: span,
     options: resourcesOptions,

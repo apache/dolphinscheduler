@@ -39,9 +39,6 @@ public enum AuditModelType {
     RESOURCE("Resource", null),
     FOLDER("Folder", RESOURCE),
     FILE("File", FOLDER),
-    UDF_FOLDER("UDFFolder", RESOURCE),
-    UDF_FILE("UDFFile", UDF_FOLDER),
-    UDF_FUNCTION("UDFFunction", RESOURCE),
     TASK_GROUP("TaskGroup", RESOURCE),
 
     DATASOURCE("Datasource", null),

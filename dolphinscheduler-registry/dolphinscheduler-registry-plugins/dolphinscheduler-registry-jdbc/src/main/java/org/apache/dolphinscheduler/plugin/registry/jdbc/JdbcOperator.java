@@ -27,7 +27,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -142,7 +141,6 @@ public final class JdbcOperator {
     /**
      * Try to acquire the target Lock, if cannot acquire, return null.
      */
-    @SuppressWarnings("checkstyle:IllegalCatch")
     public JdbcRegistryLock tryToAcquireLock(String key) {
         JdbcRegistryLock jdbcRegistryLock = JdbcRegistryLock.builder()
                 .lockKey(key)
@@ -154,7 +152,7 @@ public final class JdbcOperator {
             jdbcRegistryLockMapper.insert(jdbcRegistryLock);
             return jdbcRegistryLock;
         } catch (Exception e) {
-            if (e instanceof SQLIntegrityConstraintViolationException || e instanceof DuplicateKeyException) {
+            if (e instanceof DuplicateKeyException) {
                 return null;
             }
             throw e;

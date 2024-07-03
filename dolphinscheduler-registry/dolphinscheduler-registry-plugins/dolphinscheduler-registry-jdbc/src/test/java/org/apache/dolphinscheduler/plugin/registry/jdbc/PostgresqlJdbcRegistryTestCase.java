@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.commons.lang3.RandomUtils;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -37,8 +35,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import com.google.common.collect.Lists;
-
 @ActiveProfiles("postgresql")
 @SpringBootTest(classes = {JdbcRegistryProperties.class})
 @SpringBootApplication(scanBasePackageClasses = JdbcRegistryProperties.class)
@@ -55,12 +51,11 @@ public class PostgresqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withDatabaseName("dolphinscheduler")
                 .withNetwork(Network.newNetwork())
                 .withExposedPorts(5432);
-        int exposedPort = RandomUtils.nextInt(10000, 65535);
 
-        postgresqlContainer.setPortBindings(Lists.newArrayList(exposedPort + ":5432"));
         Startables.deepStart(Stream.of(postgresqlContainer)).join();
 
-        String jdbcUrl = "jdbc:postgresql://localhost:" + exposedPort + "/dolphinscheduler";
+        String jdbcUrl = "jdbc:postgresql://localhost:" + postgresqlContainer.getMappedPort(5432) + "/dolphinscheduler";
+        System.clearProperty("spring.datasource.url");
         System.setProperty("spring.datasource.url", jdbcUrl);
         try (
                 Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");

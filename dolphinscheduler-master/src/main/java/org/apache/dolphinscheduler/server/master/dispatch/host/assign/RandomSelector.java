@@ -27,6 +27,14 @@ import java.util.concurrent.ThreadLocalRandom;
  */
 public class RandomSelector extends AbstractSelector<HostWorker> {
 
+    /**
+     * This method selects a HostWorker from a collection of HostWorker objects using a weighted random algorithm.
+     * The selection is based on the weight of each HostWorker.
+     * A random number is generated and the HostWorker whose weight spans this random number is selected.
+     *
+     * @param source A collection of HostWorker objects to select from.
+     * @return The selected HostWorker based on the weighted random algorithm.
+     */
     @Override
     public HostWorker doSelect(final Collection<HostWorker> source) {
 
