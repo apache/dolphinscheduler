@@ -111,7 +111,7 @@ public class AdbSparkTask extends AbstractRemoteTask {
 
     @Override
     public AbstractParameters getParameters() {
-        return null;
+        return adbSparkTaskParameters;
     }
 
     @Override
