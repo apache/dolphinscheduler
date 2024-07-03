@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
 import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
@@ -85,6 +86,7 @@ public class AlertHeartbeatTask extends BaseHeartBeatTask<AlertServerHeartBeat> 
     public void writeHeartBeat(AlertServerHeartBeat heartBeat) {
         String heartBeatJson = JSONUtils.toJsonString(heartBeat);
         registryClient.persistEphemeral(heartBeatPath, heartBeatJson);
+        AlertServerMetrics.incAlertHeartbeatCount();
         log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, heartBeatJson);
     }
