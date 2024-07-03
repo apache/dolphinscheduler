@@ -141,6 +141,11 @@ public class AdbSparkTask extends AbstractRemoteTask {
 
     @Override
     public void trackApplicationStatus() throws TaskException {
+        if (StringUtils.isBlank(applicationId)) {
+            log.warn("Try to track no-specified adb spark application");
+            return;
+        }
+
         String appState = null;
         try {
             appState = getSparkAppState();
@@ -163,6 +168,11 @@ public class AdbSparkTask extends AbstractRemoteTask {
 
     @Override
     public void cancelApplication() throws TaskException {
+        if (StringUtils.isBlank(applicationId)) {
+            log.warn("Try to kill no-specified adb spark application");
+            return;
+        }
+
         log.info("trying cancel adb spark, taskId:{}, appId:{}", this.taskExecutionContext.getTaskInstanceId(),
                 applicationId);
         KillSparkAppRequest killSparkAppRequest = new KillSparkAppRequest();
