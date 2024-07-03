@@ -18,22 +18,22 @@
  *
  */
 
-
 package org.apache.dolphinscheduler.e2e.pages.common;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+
 import lombok.Getter;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
 
 @Getter
 public class HttpInput {
+
     @FindBys({
             @FindBy(className = "input-url-name"),
             @FindBy(tagName = "input")
@@ -42,15 +42,13 @@ public class HttpInput {
 
     private WebDriver driver;
 
-
-
     public HttpInput(WebDriver driver) {
         PageFactory.initElements(driver, this);
         this.driver = driver;
     }
 
     public HttpInput content(String content) {
-        new WebDriverWait(this.driver, Duration.ofSeconds(20)).until(ExpectedConditions.elementToBeClickable(urlInput));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(urlInput));
         urlInput().sendKeys(content);
         return this;
     }

@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.tools.datasource.jupiter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
-import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
 @Slf4j
@@ -39,12 +37,6 @@ public class DolphinSchedulerDatabaseContainerExtension implements BeforeAllCall
     @Override
     public void beforeAll(ExtensionContext context) {
         databaseContainer = getDataSourceContainer(context);
-        log.info("Create {} successfully.", databaseContainer.getDockerImageName());
-        databaseContainer.start();
-
-        log.info("Starting {}...", databaseContainer.getDockerImageName());
-        Startables.deepStart(Stream.of(databaseContainer)).join();
-        log.info("{} started", databaseContainer.getDockerImageName());
 
     }
 

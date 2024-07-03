@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseR
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstancePauseResponse;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -71,7 +71,7 @@ public class TaskInstanceOperationFunctionTest {
 
     private WorkerTaskExecutorThreadPool workerManager = Mockito.mock(WorkerTaskExecutorThreadPool.class);
 
-    private StorageOperate storageOperate = Mockito.mock(StorageOperate.class);
+    private StorageOperator storageOperator = Mockito.mock(StorageOperator.class);
 
     private WorkerRegistryClient workerRegistryClient = Mockito.mock(WorkerRegistryClient.class);
 
@@ -92,7 +92,7 @@ public class TaskInstanceOperationFunctionTest {
                 workerConfig,
                 workerMessageSender,
                 workerManager,
-                storageOperate,
+                storageOperator,
                 workerRegistryClient);
 
         TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction =
@@ -186,7 +186,7 @@ public class TaskInstanceOperationFunctionTest {
                 workerConfig,
                 workerMessageSender,
                 workerManager,
-                storageOperate,
+                storageOperator,
                 workerRegistryClient);
 
         TaskInstanceDispatchOperationFunction taskInstanceDispatchOperationFunction =

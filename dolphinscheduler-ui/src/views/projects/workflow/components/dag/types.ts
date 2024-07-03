@@ -138,6 +138,7 @@ export interface Coordinate {
 export interface GlobalParam {
   key: string
   direct: string
+  type: string
   value: string
 }
 

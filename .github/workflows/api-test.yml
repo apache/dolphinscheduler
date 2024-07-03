@@ -20,6 +20,8 @@ on:
   push:
     branches:
       - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 name: API-Test
 
@@ -35,7 +37,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -49,7 +51,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Sanity Check
@@ -73,7 +75,7 @@ jobs:
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
           && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         name: Upload Docker Images
         with:
           name: standalone-image
@@ -104,7 +106,7 @@ jobs:
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Cache local Maven repository
@@ -113,7 +115,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v4
         name: Download Docker Images
         with:
           name: standalone-image
@@ -125,9 +127,9 @@ jobs:
         run: |
           ./mvnw -B -f dolphinscheduler-api-test/pom.xml -am \
             -DfailIfNoTests=false \
-            -Dspotless.skip=false \
+            -Dspotless.skip=true \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         name: Upload Recording
         with:

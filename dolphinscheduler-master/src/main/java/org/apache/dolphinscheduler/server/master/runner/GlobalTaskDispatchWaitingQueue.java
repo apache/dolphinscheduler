@@ -17,7 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import java.util.concurrent.DelayQueue;
+import org.apache.dolphinscheduler.server.master.runner.queue.DelayEntry;
+import org.apache.dolphinscheduler.server.master.runner.queue.PriorityDelayQueue;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,26 +26,42 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * The class is used to store {@link TaskExecuteRunnable} which needs to be dispatched. The {@link TaskExecuteRunnable} will be stored in a {@link DelayQueue},
- * if the {@link TaskExecuteRunnable}'s delay time is 0, then it will be consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
+ * The class is used to store {@link TaskExecuteRunnable} which needs to be dispatched. The {@link TaskExecuteRunnable}
+ * will be stored in {@link PriorityDelayQueue}, if the {@link TaskExecuteRunnable}'s delay time is 0, then it will be
+ * consumed by {@link GlobalTaskDispatchWaitingQueueLooper}.
+ * <p>
+ * The order of {@link TaskExecuteRunnable} in the {@link PriorityDelayQueue} is determined by {@link TaskExecuteRunnable#compareTo}.
  */
 @Slf4j
 @Component
 public class GlobalTaskDispatchWaitingQueue {
 
-    private final DelayQueue<DefaultTaskExecuteRunnable> queue = new DelayQueue<>();
+    private final PriorityDelayQueue<DelayEntry<TaskExecuteRunnable>> priorityDelayQueue = new PriorityDelayQueue<>();
 
-    public void submitTaskExecuteRunnable(DefaultTaskExecuteRunnable priorityTaskExecuteRunnable) {
-        queue.put(priorityTaskExecuteRunnable);
+    /**
+     * Submit a {@link TaskExecuteRunnable} with delay time 0, it will be consumed immediately.
+     */
+    public void dispatchTaskExecuteRunnable(TaskExecuteRunnable taskExecuteRunnable) {
+        dispatchTaskExecuteRunnableWithDelay(taskExecuteRunnable, 0);
     }
 
+    /**
+     * Submit a {@link TaskExecuteRunnable} with delay time, if the delay time <= 0 then it can be consumed.
+     */
+    public void dispatchTaskExecuteRunnableWithDelay(TaskExecuteRunnable taskExecuteRunnable, long delayTimeMills) {
+        priorityDelayQueue.add(new DelayEntry<>(delayTimeMills, taskExecuteRunnable));
+    }
+
+    /**
+     * Consume {@link TaskExecuteRunnable} from the {@link PriorityDelayQueue}, only the delay time <= 0 can be consumed.
+     */
     @SneakyThrows
-    public DefaultTaskExecuteRunnable takeTaskExecuteRunnable() {
-        return queue.take();
+    public TaskExecuteRunnable takeTaskExecuteRunnable() {
+        return priorityDelayQueue.take().getData();
     }
 
     public int getWaitingDispatchTaskNumber() {
-        return queue.size();
+        return priorityDelayQueue.size();
     }
 
 }

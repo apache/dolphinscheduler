@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -33,8 +34,6 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
-
-import com.google.common.collect.Lists;
 
 @ActiveProfiles("mysql")
 class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
@@ -50,14 +49,17 @@ class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withDatabaseName("dolphinscheduler")
                 .withNetwork(Network.newNetwork())
                 .withExposedPorts(3306)
-                .waitingFor(Wait.forHealthcheck());
+                .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(300)));
 
-        mysqlContainer.setPortBindings(Lists.newArrayList("3306:3306"));
         Startables.deepStart(Stream.of(mysqlContainer)).join();
 
+        String jdbcUrl = "jdbc:mysql://localhost:" + mysqlContainer.getMappedPort(3306)
+                + "/dolphinscheduler?useSSL=false&serverTimezone=UTC";
+        System.clearProperty("spring.datasource.url");
+        System.setProperty("spring.datasource.url", jdbcUrl);
+
         try (
-                Connection connection = DriverManager.getConnection(
-                        "jdbc:mysql://localhost:3306/dolphinscheduler?useSSL=false&serverTimezone=UTC", "root", "root");
+                Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");
                 Statement statement = connection.createStatement();) {
             statement.execute(
                     "CREATE TABLE `t_ds_jdbc_registry_data`\n" +

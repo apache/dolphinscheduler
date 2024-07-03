@@ -14,6 +14,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 |-----|------|---------|-------------|
 | alert.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | alert.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| alert.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml |
+| alert.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | alert.enabled | bool | `true` | Enable or disable the Alert-Server component |
 | alert.env.JAVA_OPTS | string | `"-Xms512m -Xmx512m -Xmn256m"` | The jvm options for alert server |
 | alert.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
@@ -52,6 +54,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | alert.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
 | api.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | api.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| api.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-api/src/main/resources/application.yaml |
+| api.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | api.enabled | bool | `true` | Enable or disable the API-Server component |
 | api.env.JAVA_OPTS | string | `"-Xms512m -Xmx512m -Xmn256m"` | The jvm options for api server |
 | api.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
@@ -120,6 +124,12 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.auto | bool | `false` | auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false |
 | conf.common."alert.rpc.port" | int | `50052` | rpc port |
 | conf.common."appId.collect" | string | `"log"` | way to collect applicationId: log, aop |
+| conf.common."aws.credentials.provider.type" | string | `"AWSStaticCredentialsProvider"` |  |
+| conf.common."aws.s3.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
+| conf.common."aws.s3.access.key.secret" | string | `"minioadmin"` | The AWS secret access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
+| conf.common."aws.s3.bucket.name" | string | `"dolphinscheduler"` | The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name. |
+| conf.common."aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
+| conf.common."aws.s3.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3, This configuration is required |
 | conf.common."conda.path" | string | `"/opt/anaconda3/etc/profile.d/conda.sh"` | set path of conda.sh |
 | conf.common."data-quality.jar.dir" | string | `nil` | data quality option |
 | conf.common."data.basedir.path" | string | `"/tmp/dolphinscheduler"` | user data local directory path, please make sure the directory exists and have read write permissions |
@@ -138,11 +148,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."resource.alibaba.cloud.oss.bucket.name" | string | `"dolphinscheduler"` | oss bucket name, required if you set resource.storage.type=OSS |
 | conf.common."resource.alibaba.cloud.oss.endpoint" | string | `"https://oss-cn-hangzhou.aliyuncs.com"` | oss bucket endpoint, required if you set resource.storage.type=OSS |
 | conf.common."resource.alibaba.cloud.region" | string | `"cn-hangzhou"` | alibaba cloud region, required if you set resource.storage.type=OSS |
-| conf.common."resource.aws.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required |
-| conf.common."resource.aws.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3 or use EMR-Task, This configuration is required |
-| conf.common."resource.aws.s3.bucket.name" | string | `"dolphinscheduler"` | The name of the bucket. You need to create them by yourself. Otherwise, the system cannot start. All buckets in Amazon S3 share a single namespace; ensure the bucket is given a unique name. |
-| conf.common."resource.aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
-| conf.common."resource.aws.secret.access.key" | string | `"minioadmin"` | The AWS secret access key. if resource.storage.type=S3 or use EMR-Task, This configuration is required |
 | conf.common."resource.azure.client.id" | string | `"minioadmin"` | azure storage account name, required if you set resource.storage.type=ABS |
 | conf.common."resource.azure.client.secret" | string | `"minioadmin"` | azure storage account key, required if you set resource.storage.type=ABS |
 | conf.common."resource.azure.subId" | string | `"minioadmin"` | azure storage subId, required if you set resource.storage.type=ABS |
@@ -158,6 +163,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."yarn.application.status.address" | string | `"http://ds1:%s/ws/v1/cluster/apps/%s"` | if resourcemanager HA is enabled or not use resourcemanager, please keep the default value; If resourcemanager is single, you only need to replace ds1 to actual resourcemanager hostname |
 | conf.common."yarn.job.history.status.address" | string | `"http://ds1:19888/ws/v1/history/mapreduce/jobs/%s"` | job history status url when application number threshold is reached(default 10000, maybe it was set to 1000) |
 | conf.common."yarn.resourcemanager.ha.rm.ids" | string | `"192.168.xx.xx,192.168.xx.xx"` | if resourcemanager HA is enabled, please set the HA IPs; if resourcemanager is single, keep this value empty |
+| datasource.profile | string | `"postgresql"` | The profile of datasource |
 | externalDatabase.database | string | `"dolphinscheduler"` | The database of external database |
 | externalDatabase.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName of external database |
 | externalDatabase.enabled | bool | `false` | If exists external database, and set postgresql.enable value to false. external database will be used, otherwise Dolphinscheduler's internal database will be used. |
@@ -189,6 +195,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | initImage.pullPolicy | string | `"IfNotPresent"` | Image pull policy. Options: Always, Never, IfNotPresent |
 | master.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | master.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| master.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-master/src/main/resources/application.yaml |
+| master.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | master.enabled | bool | `true` | Enable or disable the Master component |
 | master.env.JAVA_OPTS | string | `"-Xms1g -Xmx1g -Xmn512m"` | The jvm options for master server |
 | master.env.MASTER_DISPATCH_TASK_NUM | string | `"3"` | Master dispatch task number per batch |
@@ -295,6 +303,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | timezone | string | `"Asia/Shanghai"` | World time and date for cities in all time zones |
 | worker.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | worker.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
+| worker.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-worker/src/main/resources/application.yaml |
+| worker.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | worker.enabled | bool | `true` | Enable or disable the Worker component |
 | worker.env.DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
 | worker.env.WORKER_EXEC_THREADS | string | `"100"` | Worker execute thread number to limit task instances |
@@ -306,7 +316,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
-| worker.env.WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT | bool | `false` | Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants. |
 | worker.keda.advanced | object | `{}` | Specify HPA related options |
 | worker.keda.cooldownPeriod | int | `30` | How many seconds KEDA will wait before scaling to zero. Note that HPA has a separate cooldown period for scale-downs |
 | worker.keda.enabled | bool | `false` | Enable or disable the Keda component |
@@ -314,7 +323,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.keda.minReplicaCount | int | `0` | Minimum number of workers created by keda |
 | worker.keda.namespaceLabels | object | `{}` | Keda namespace labels |
 | worker.keda.pollingInterval | int | `5` | How often KEDA polls the DolphinScheduler DB to report new scale requests to the HPA |
-| worker.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
 | worker.livenessProbe.enabled | bool | `true` | Turn on and off liveness probe |
 | worker.livenessProbe.failureThreshold | string | `"3"` | Minimum consecutive failures for the probe |
 | worker.livenessProbe.initialDelaySeconds | string | `"30"` | Delay before liveness probe is initiated |

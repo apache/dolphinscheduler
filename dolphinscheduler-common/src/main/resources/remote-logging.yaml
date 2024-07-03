@@ -34,28 +34,16 @@ remote-logging:
     bucket.name: <bucket.name>
     # oss endpoint, required if you set remote-logging.target=OSS
     endpoint: <endpoint>
-  # required if you set remote-logging.target=S3
-  s3:
-    # s3 access key id, required if you set remote-logging.target=S3
-    access.key.id: <access.key.id>
-    # s3 access key secret, required if you set remote-logging.target=S3
-    access.key.secret: <access.key.secret>
-      # s3 bucket name, required if you set remote-logging.target=S3
-    bucket.name: <bucket.name>
-      # s3 endpoint, required if you set remote-logging.target=S3
-    endpoint: <endpoint>
-      # s3 region, required if you set remote-logging.target=S3
-    region: <region>
   google.cloud.storage:
     # the location of the google cloud credential, required if you set remote-logging.target=GCS
     credential: /path/to/credential
-      # gcs bucket name, required if you set remote-logging.target=GCS
+    # gcs bucket name, required if you set remote-logging.target=GCS
     bucket.name: <your-bucket>
   abs:
     # abs account name, required if you set resource.storage.type=ABS
     account.name: <your-account-name>
-      # abs account key, required if you set resource.storage.type=ABS
+    # abs account key, required if you set resource.storage.type=ABS
     account.key: <your-account-key>
-      # abs container name, required if you set resource.storage.type=ABS
+    # abs container name, required if you set resource.storage.type=ABS
     container.name: <your-container-name>
 

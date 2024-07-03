@@ -33,8 +33,6 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import com.google.common.collect.Lists;
-
 @SpringBootTest(classes = ZookeeperRegistryProperties.class)
 @SpringBootApplication(scanBasePackageClasses = ZookeeperRegistryProperties.class)
 class ZookeeperRegistryTestCase extends RegistryTestCase<ZookeeperRegistry> {
@@ -50,11 +48,11 @@ class ZookeeperRegistryTestCase extends RegistryTestCase<ZookeeperRegistry> {
     @BeforeAll
     public static void setUpTestingServer() {
         zookeeperContainer = new GenericContainer<>(DockerImageName.parse("zookeeper:3.8"))
-                .withNetwork(NETWORK);
-
-        zookeeperContainer.setPortBindings(Lists.newArrayList("2181:2181"));
+                .withNetwork(NETWORK)
+                .withExposedPorts(2181);
         Startables.deepStart(Stream.of(zookeeperContainer)).join();
-        System.setProperty("registry.zookeeper.connect-string", "localhost:2181");
+        System.clearProperty("registry.zookeeper.connect-string");
+        System.setProperty("registry.zookeeper.connect-string", "localhost:" + zookeeperContainer.getMappedPort(2181));
     }
 
     @SneakyThrows

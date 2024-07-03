@@ -17,13 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.stream;
 
-import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
 public interface StreamTaskChannel extends TaskChannel {
 
-    AbstractTask pauseTask(TaskExecutionContext taskExecutionContext);
-
-    AbstractTask recoverTask(TaskExecutionContext taskExecutionContext);
 }

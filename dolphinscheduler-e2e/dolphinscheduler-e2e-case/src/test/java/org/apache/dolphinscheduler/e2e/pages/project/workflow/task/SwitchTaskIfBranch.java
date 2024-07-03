@@ -19,8 +19,10 @@
  */
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import lombok.Getter;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
+
+import lombok.Getter;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -29,6 +31,7 @@ import org.openqa.selenium.support.PageFactory;
 
 @Getter
 public final class SwitchTaskIfBranch {
+
     private final WebDriver driver;
     private final SwitchTaskForm parent;
 

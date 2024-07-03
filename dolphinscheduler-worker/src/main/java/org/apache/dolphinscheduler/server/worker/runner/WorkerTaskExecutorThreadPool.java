@@ -39,6 +39,7 @@ public class WorkerTaskExecutorThreadPool {
     public WorkerTaskExecutorThreadPool(WorkerConfig workerConfig) {
         this.threadPoolExecutor =
                 ThreadUtils.newDaemonFixedThreadExecutor("WorkerTaskExecutorThreadPool", workerConfig.getExecThreads());
+        threadPoolExecutor.prestartAllCoreThreads();
         this.workerConfig = workerConfig;
 
         WorkerServerMetrics.registerWorkerExecuteQueueSizeGauge(this::getWaitingTaskExecutorSize);
@@ -64,15 +65,19 @@ public class WorkerTaskExecutorThreadPool {
     }
 
     public boolean isOverload() {
-        return threadPoolExecutor.getQueue().size() > 0;
+        return WorkerTaskExecutorHolder.size() >= workerConfig.getExecThreads();
     }
 
     public int getWaitingTaskExecutorSize() {
-        return threadPoolExecutor.getQueue().size();
+        if (WorkerTaskExecutorHolder.size() <= workerConfig.getExecThreads()) {
+            return 0;
+        } else {
+            return WorkerTaskExecutorHolder.size() - workerConfig.getExecThreads();
+        }
     }
 
     public int getRunningTaskExecutorSize() {
-        return threadPoolExecutor.getActiveCount();
+        return Math.min(WorkerTaskExecutorHolder.size(), workerConfig.getExecThreads());
     }
 
     /**

@@ -40,7 +40,7 @@
         <module>dolphinscheduler-task-plugin</module>
         <module>dolphinscheduler-common</module>
         <module>dolphinscheduler-api</module>
-        <module>dolphinscheduler-aop</module>
+        <module>dolphinscheduler-yarn-aop</module>
         <module>dolphinscheduler-dao</module>
         <module>dolphinscheduler-dist</module>
         <module>dolphinscheduler-service</module>
@@ -57,6 +57,7 @@
         <module>dolphinscheduler-storage-plugin</module>
         <module>dolphinscheduler-extract</module>
         <module>dolphinscheduler-dao-plugin</module>
+        <module>dolphinscheduler-authentication</module>
     </modules>
 
     <properties>
@@ -85,7 +86,7 @@
         <jacoco.skip>false</jacoco.skip>
         <maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
         <exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
-        <owasp-dependency-check-maven.version>7.1.2</owasp-dependency-check-maven.version>
+        <owasp-dependency-check-maven.version>9.2.0</owasp-dependency-check-maven.version>
         <lombok.version>1.18.20</lombok.version>
         <awaitility.version>4.2.0</awaitility.version>
         <truth.version>1.4.2</truth.version>
@@ -136,7 +137,7 @@
 
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
-                <artifactId>dolphinscheduler-aop</artifactId>
+                <artifactId>dolphinscheduler-yarn-aop</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -291,6 +292,12 @@
             <dependency>
                 <groupId>org.apache.dolphinscheduler</groupId>
                 <artifactId>dolphinscheduler-dao-postgresql</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-aws-authentication</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -700,6 +707,14 @@
                             <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-e2e/dolphinscheduler-e2e-case/src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-e2e/dolphinscheduler-e2e-core/src/main/java/**/*.java</include>
+                            <include>dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-api-test/dolphinscheduler-api-test-core/src/main/java/**/*.java</include>
+                        </includes>
                     </java>
                     <pom>
                         <sortPom>

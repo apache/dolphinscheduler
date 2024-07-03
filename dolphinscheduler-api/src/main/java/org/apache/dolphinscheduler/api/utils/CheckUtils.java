@@ -158,14 +158,4 @@ public class CheckUtils {
 
         return pattern.matcher(str).matches();
     }
-
-    /**
-     * regex FilePath check,only use a to z, A to Z, 0 to 9, and _./- 
-     *
-     * @param str     input string
-     * @return true if regex pattern is right, otherwise return false
-     */
-    public static boolean checkFilePath(String str) {
-        return regexChecks(str, Constants.REGEX_FILE_PATH);
-    }
 }

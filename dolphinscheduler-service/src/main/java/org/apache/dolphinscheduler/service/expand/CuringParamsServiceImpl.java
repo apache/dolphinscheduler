@@ -45,7 +45,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
@@ -54,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -150,9 +153,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             return new HashMap<>();
         }
         String startParamJson = cmdParam.get(CommandKeyConstants.CMD_PARAM_START_PARAMS);
-        Map<String, String> startParamMap = JSONUtils.toMap(startParamJson);
-        return startParamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue())));
+        List<Property> propertyList = PropertyUtils.startParamsTransformPropertyList(startParamJson);
+        if (CollectionUtils.isEmpty(propertyList)) {
+            return new HashMap<>();
+        }
+        return propertyList.stream().collect(Collectors.toMap(Property::getProp, Function.identity()));
     }
 
     @Override
@@ -181,8 +186,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         Map<String, Property> prepareParamsMap = new HashMap<>();
 
         // assign value to definedParams here
-        Map<String, String> globalParamsMap = setGlobalParamsMap(processInstance);
-        Map<String, Property> globalParams = ParameterUtils.getUserDefParamsMap(globalParamsMap);
+        Map<String, Property> globalParams = setGlobalParamsMap(processInstance);
 
         // combining local and global parameters
         Map<String, Property> localParams = parameters.getInputLocalParametersMap();
@@ -287,15 +291,16 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 Long.toString(taskInstance.getProcessInstance().getProcessDefinition().getProjectCode()));
         return params;
     }
-    private Map<String, String> setGlobalParamsMap(ProcessInstance processInstance) {
-        Map<String, String> globalParamsMap = new HashMap<>(16);
+    private Map<String, Property> setGlobalParamsMap(ProcessInstance processInstance) {
+        Map<String, Property> globalParamsMap = new HashMap<>(16);
 
         // global params string
         String globalParamsStr = processInstance.getGlobalParams();
         if (globalParamsStr != null) {
             List<Property> globalParamsList = JSONUtils.toList(globalParamsStr, Property.class);
             globalParamsMap
-                    .putAll(globalParamsList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue)));
+                    .putAll(globalParamsList.stream()
+                            .collect(Collectors.toMap(Property::getProp, Function.identity())));
         }
         return globalParamsMap;
     }
@@ -323,7 +328,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         projectParameterList.forEach(projectParameter -> {
             Property property = new Property(projectParameter.getParamName(),
                     Direct.IN,
-                    DataType.VARCHAR,
+                    Enum.valueOf(DataType.class, projectParameter.getParamDataType()),
                     projectParameter.getParamValue());
             result.put(projectParameter.getParamName(), property);
         });
