@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WeightedServer<T extends IClusters.IServer> {
+public class WeightedServer<T extends IClusters.IServerMetadata> {
 
     private T server;
 

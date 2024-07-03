@@ -22,6 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +32,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
 /**
  * Use to watch the worker group from database and notify the change.
  */
+@Slf4j
 @Component
 public class WorkerGroupChangeNotifier {
 
@@ -47,9 +52,9 @@ public class WorkerGroupChangeNotifier {
 
     public WorkerGroupChangeNotifier(WorkerGroupDao workerGroupDao) {
         this.workerGroupDao = workerGroupDao;
-        checkForChanges();
-        MasterThreadFactory.getDefaultSchedulerThreadExecutor().scheduleAtFixedRate(
-                this::checkForChanges,
+        detectWorkerGroupChanges();
+        MasterThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+                this::detectWorkerGroupChanges,
                 DEFAULT_REFRESH_WORKER_INTERVAL,
                 DEFAULT_REFRESH_WORKER_INTERVAL,
                 TimeUnit.SECONDS);
@@ -59,21 +64,45 @@ public class WorkerGroupChangeNotifier {
         listeners.add(listener);
     }
 
-    private void checkForChanges() {
-        final Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll().stream()
-                .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
-        final MapComparator<String, WorkerGroup> mapComparator = new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
+    void detectWorkerGroupChanges() {
+        try {
+            MapComparator<String, WorkerGroup> mapComparator = detectChangedWorkerGroups();
+            triggerListeners(mapComparator);
+            workerGroupMap = mapComparator.getNewMap();
+        } catch (Exception ex) {
+            log.error("Detect WorkerGroup changes failed", ex);
+        }
+    }
 
+    Map<String, WorkerGroup> getWorkerGroupMap() {
+        return workerGroupMap;
+    }
+
+    private MapComparator<String, WorkerGroup> detectChangedWorkerGroups() {
+        final Map<String, WorkerGroup> tmpWorkerGroupMap = workerGroupDao.queryAll()
+                .stream()
+                .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
+        return new MapComparator<>(workerGroupMap, tmpWorkerGroupMap);
+    }
+
+    private void triggerListeners(MapComparator<String, WorkerGroup> mapComparator) {
+        if (CollectionUtils.isEmpty(listeners)) {
+            return;
+        }
         final List<WorkerGroup> workerGroupsAdded = mapComparator.getValuesToAdd();
-        listeners.forEach(listener -> listener.onWorkerGroupAdd(workerGroupsAdded));
+        if (CollectionUtils.isNotEmpty(workerGroupsAdded)) {
+            listeners.forEach(listener -> listener.onWorkerGroupAdd(workerGroupsAdded));
+        }
 
         final List<WorkerGroup> workerGroupsRemoved = mapComparator.getValuesToRemove();
-        listeners.forEach(listener -> listener.onWorkerGroupDelete(workerGroupsRemoved));
+        if (CollectionUtils.isNotEmpty(workerGroupsRemoved)) {
+            listeners.forEach(listener -> listener.onWorkerGroupDelete(workerGroupsRemoved));
+        }
 
         final List<WorkerGroup> workerGroupsUpdated = mapComparator.getNewValuesToUpdate();
-        listeners.forEach(listener -> listener.onWorkerGroupChange(workerGroupsUpdated));
-        workerGroupMap = tmpWorkerGroupMap;
-
+        if (CollectionUtils.isNotEmpty(workerGroupsUpdated)) {
+            listeners.forEach(listener -> listener.onWorkerGroupChange(workerGroupsUpdated));
+        }
     }
 
     public interface WorkerGroupListener {

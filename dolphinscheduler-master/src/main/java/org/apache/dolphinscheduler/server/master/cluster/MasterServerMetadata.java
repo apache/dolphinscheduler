@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -27,26 +26,21 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-public class WorkerServer extends BaseServer {
+public class MasterServerMetadata extends BaseServerMetadata implements Comparable<MasterServerMetadata> {
 
-    @Builder.Default
-    private final String workerGroup = "default";
-
-    // Only used in FixedWeightedRoundRobinWorkerLoadBalancer
-    @Builder.Default
-    private final double workerWeight = 1;
-
-    private final double taskThreadPoolUsage;
-
-    public static WorkerServer parseFromHeartBeat(WorkerHeartBeat workerHeartBeat) {
-        return WorkerServer.builder()
-                .address(workerHeartBeat.getHost() + ":" + workerHeartBeat.getPort())
-                .cpuUsage(workerHeartBeat.getCpuUsage())
-                .memoryUsage(workerHeartBeat.getMemoryUsage())
-                .serverStatus(workerHeartBeat.getServerStatus())
-                .workerWeight(workerHeartBeat.getWorkerHostWeight())
-                .taskThreadPoolUsage(workerHeartBeat.getThreadPoolUsage())
+    public static MasterServerMetadata parseFromHeartBeat(MasterHeartBeat masterHeartBeat) {
+        return MasterServerMetadata.builder()
+                .address(masterHeartBeat.getHost() + ":" + masterHeartBeat.getPort())
+                .cpuUsage(masterHeartBeat.getCpuUsage())
+                .memoryUsage(masterHeartBeat.getMemoryUsage())
+                .serverStatus(masterHeartBeat.getServerStatus())
                 .build();
+    }
+
+    // Use the master address to sort the master server
+    @Override
+    public int compareTo(MasterServerMetadata o) {
+        return this.getAddress().compareTo(o.getAddress());
     }
 
 }

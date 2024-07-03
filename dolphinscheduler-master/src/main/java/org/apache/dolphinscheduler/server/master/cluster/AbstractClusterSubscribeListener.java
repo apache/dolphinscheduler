@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public abstract class AbstractClusterSubscribeListener<T extends BaseServer> implements SubscribeListener {
+public abstract class AbstractClusterSubscribeListener<T extends BaseServerMetadata> implements SubscribeListener {
 
     @Override
     public void notify(Event event) {

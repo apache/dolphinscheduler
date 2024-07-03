@@ -21,13 +21,13 @@ import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
 import java.util.List;
 
-public interface IClusters<S extends IClusters.IServer> {
+public interface IClusters<S extends IClusters.IServerMetadata> {
 
     List<S> getServers();
 
     void registerListener(IClustersChangeListener<S> listener);
 
-    interface IServer {
+    interface IServerMetadata {
 
         String getAddress();
 
@@ -35,7 +35,7 @@ public interface IClusters<S extends IClusters.IServer> {
 
     }
 
-    interface IClustersChangeListener<S extends IServer> {
+    interface IClustersChangeListener<S extends IServerMetadata> {
 
         void onServerAdded(S server);
 
@@ -45,7 +45,7 @@ public interface IClusters<S extends IClusters.IServer> {
 
     }
 
-    interface ServerAddedListener<S extends IServer> extends IClustersChangeListener<S> {
+    interface ServerAddedListener<S extends IServerMetadata> extends IClustersChangeListener<S> {
 
         @Override
         default void onServerRemove(S server) {
@@ -59,13 +59,14 @@ public interface IClusters<S extends IClusters.IServer> {
 
     }
 
-    interface ServerRemovedListener<S extends IServer> extends IClustersChangeListener<S> {
+    interface ServerRemovedListener<S extends IServerMetadata> extends IClustersChangeListener<S> {
 
         @Override
         default void onServerAdded(S server) {
             // only care about server removed
         }
 
+        @Override
         void onServerRemove(S server);
 
         @Override

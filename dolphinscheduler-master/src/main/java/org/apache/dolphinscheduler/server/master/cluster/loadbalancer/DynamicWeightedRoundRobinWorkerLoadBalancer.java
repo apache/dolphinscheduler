@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
 import org.apache.dolphinscheduler.server.master.cluster.IClusters;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
-import org.apache.dolphinscheduler.server.master.cluster.WorkerServer;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -45,29 +45,29 @@ public class DynamicWeightedRoundRobinWorkerLoadBalancer implements IWorkerLoadB
 
     private final AtomicInteger robinIndex = new AtomicInteger(0);
 
-    private Map<String, WeightedServer<WorkerServer>> weightedServerMap = new ConcurrentHashMap<>();
+    private Map<String, WeightedServer<WorkerServerMetadata>> weightedServerMap = new ConcurrentHashMap<>();
 
     public DynamicWeightedRoundRobinWorkerLoadBalancer(WorkerClusters workerClusters,
                                                        WorkerLoadBalancerConfigurationProperties.DynamicWeightConfigProperties dynamicWeightConfigProperties) {
         this.workerClusters = workerClusters;
-        this.workerClusters.registerListener(new IClusters.IClustersChangeListener<WorkerServer>() {
+        this.workerClusters.registerListener(new IClusters.IClustersChangeListener<WorkerServerMetadata>() {
 
             @Override
-            public void onServerAdded(WorkerServer server) {
+            public void onServerAdded(WorkerServerMetadata server) {
                 weightedServerMap.put(server.getAddress(), new WeightedServer<>(server, calculateWeight(server)));
             }
 
             @Override
-            public void onServerRemove(WorkerServer server) {
+            public void onServerRemove(WorkerServerMetadata server) {
                 weightedServerMap.remove(server.getAddress());
             }
 
             @Override
-            public void onServerUpdate(WorkerServer server) {
+            public void onServerUpdate(WorkerServerMetadata server) {
                 weightedServerMap.put(server.getAddress(), new WeightedServer<>(server, calculateWeight(server)));
             }
 
-            private double calculateWeight(WorkerServer server) {
+            private double calculateWeight(WorkerServerMetadata server) {
                 return 100 - (dynamicWeightConfigProperties.getCpuUsageWeight() * server.getCpuUsage()
                         + dynamicWeightConfigProperties.getMemoryUsageWeight() * server.getMemoryUsage()
                         + dynamicWeightConfigProperties.getTaskThreadPoolUsageWeight()
@@ -79,7 +79,7 @@ public class DynamicWeightedRoundRobinWorkerLoadBalancer implements IWorkerLoadB
 
     @Override
     public Optional<String> select(@NotNull String workerGroup) {
-        List<WeightedServer<WorkerServer>> weightedServers =
+        List<WeightedServer<WorkerServerMetadata>> weightedServers =
                 workerClusters.getNormalWorkerServerAddressByGroup(workerGroup)
                         .stream()
                         .map(weightedServerMap::get)
@@ -93,9 +93,9 @@ public class DynamicWeightedRoundRobinWorkerLoadBalancer implements IWorkerLoadB
 
         double totalWeight = weightedServers.stream().mapToDouble(WeightedServer::getWeight).sum();
 
-        WeightedServer<WorkerServer> selectedWorker = null;
+        WeightedServer<WorkerServerMetadata> selectedWorker = null;
         while (selectedWorker == null) {
-            WeightedServer<WorkerServer> tmpWorker =
+            WeightedServer<WorkerServerMetadata> tmpWorker =
                     weightedServers.get((robinIndex.incrementAndGet()) % weightedServers.size());
             tmpWorker.setCurrentWeight(tmpWorker.getCurrentWeight() + tmpWorker.getWeight());
 

@@ -21,5 +21,5 @@ import java.util.List;
 
 public interface IMasterSlotReBalancer {
 
-    void doReBalance(List<MasterServer> masterServerList);
+    void doReBalance(List<MasterServerMetadata> masterServerList);
 }

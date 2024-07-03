@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
-import org.apache.dolphinscheduler.server.master.cluster.WorkerServer;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 
 import java.util.HashMap;
 import java.util.List;
@@ -79,29 +79,29 @@ class DynamicWeightedRoundRobinWorkerLoadBalancerTest {
                 WorkerGroup.builder()
                         .name("busyCluster")
                         .build());
-        List<WorkerServer> workerServers = Lists.newArrayList(
-                WorkerServer.builder()
+        List<WorkerServerMetadata> workerServers = Lists.newArrayList(
+                WorkerServerMetadata.builder()
                         .address("127.0.0.1:1234")
                         .serverStatus(ServerStatus.NORMAL)
                         .cpuUsage(0.1)
                         .memoryUsage(0.1)
                         .taskThreadPoolUsage(0.1)
                         .build(),
-                WorkerServer.builder()
+                WorkerServerMetadata.builder()
                         .address("127.0.0.2:1234")
                         .serverStatus(ServerStatus.NORMAL)
                         .cpuUsage(0.2)
                         .memoryUsage(0.2)
                         .taskThreadPoolUsage(0.2)
                         .build(),
-                WorkerServer.builder()
+                WorkerServerMetadata.builder()
                         .address("127.0.0.3:1234")
                         .serverStatus(ServerStatus.NORMAL)
                         .cpuUsage(0.3)
                         .memoryUsage(0.3)
                         .taskThreadPoolUsage(0.3)
                         .build(),
-                WorkerServer.builder()
+                WorkerServerMetadata.builder()
                         .address("127.0.0.4:1234")
                         .serverStatus(ServerStatus.BUSY)
                         .cpuUsage(0.8)

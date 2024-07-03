@@ -17,30 +17,31 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class MasterServer extends BaseServer implements Comparable<MasterServer> {
+public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
 
-    public static MasterServer parseFromHeartBeat(MasterHeartBeat masterHeartBeat) {
-        return MasterServer.builder()
-                .address(masterHeartBeat.getHost() + ":" + masterHeartBeat.getPort())
-                .cpuUsage(masterHeartBeat.getCpuUsage())
-                .memoryUsage(masterHeartBeat.getMemoryUsage())
-                .serverStatus(masterHeartBeat.getServerStatus())
-                .build();
+    private final String address;
+
+    private final double cpuUsage;
+
+    private final double memoryUsage;
+
+    private final ServerStatus serverStatus;
+
+    @Override
+    public String getAddress() {
+        return address;
     }
 
-    // Use the master address to sort the master server
     @Override
-    public int compareTo(MasterServer o) {
-        return this.getAddress().compareTo(o.getAddress());
+    public ServerStatus getServerStatus() {
+        return serverStatus;
     }
 
 }

@@ -40,19 +40,19 @@ public class ClusterStateMonitors {
 
     public void start() {
         this.clusterManager.getMasterClusters()
-                .registerListener((IClusters.ServerRemovedListener<MasterServer>) this::masterRemoved);
+                .registerListener((IClusters.ServerRemovedListener<MasterServerMetadata>) this::masterRemoved);
         this.clusterManager.getWorkerClusters()
-                .registerListener((IClusters.ServerRemovedListener<WorkerServer>) this::workerRemoved);
+                .registerListener((IClusters.ServerRemovedListener<WorkerServerMetadata>) this::workerRemoved);
         log.info("ClusterStateMonitors started...");
     }
 
-    void masterRemoved(MasterServer masterServer) {
+    void masterRemoved(MasterServerMetadata masterServer) {
         // todo: unify the alert message
         alertDao.sendServerStoppedAlert(masterServer.getAddress(), "MASTER");
         listenerEventAlertManager.publishServerDownListenerEvent(masterServer.getAddress(), "MASTER");
     }
 
-    void workerRemoved(WorkerServer workerServer) {
+    void workerRemoved(WorkerServerMetadata workerServer) {
         alertDao.sendServerStoppedAlert(workerServer.getAddress(), "WORKER");
         listenerEventAlertManager.publishServerDownListenerEvent(workerServer.getAddress(), "WORKER");
     }

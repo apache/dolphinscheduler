@@ -17,12 +17,21 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.SetUtils;
+
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
+@ToString
 public class MapComparator<K, V> {
 
     private final Map<K, V> oldMap;
@@ -33,27 +42,63 @@ public class MapComparator<K, V> {
         this.newMap = newMap;
     }
 
+    /**
+     * Get keys that are in the new map but not in the old map
+     */
     public Set<K> getKeysToAdd() {
+        if (MapUtils.isEmpty(newMap)) {
+            return SetUtils.emptySet();
+        }
+        if (MapUtils.isEmpty(oldMap)) {
+            return new HashSet<>(newMap.keySet());
+        }
         Set<K> keysToAdd = new HashSet<>(newMap.keySet());
         keysToAdd.removeAll(oldMap.keySet());
         return keysToAdd;
     }
 
+    /**
+     * Get values which key in the new map but not in the old map
+     */
     public List<V> getValuesToAdd() {
+        if (MapUtils.isEmpty(newMap)) {
+            return Collections.emptyList();
+        }
         return getKeysToAdd().stream().map(newMap::get).collect(Collectors.toList());
     }
 
+    /**
+     * Get keys which in the old map but not in the new map
+     */
     public Set<K> getKeysToRemove() {
+        if (MapUtils.isEmpty(oldMap)) {
+            return SetUtils.emptySet();
+        }
+        if (MapUtils.isEmpty(newMap)) {
+            return new HashSet<>(oldMap.keySet());
+        }
         Set<K> keysToRemove = new HashSet<>(oldMap.keySet());
         keysToRemove.removeAll(newMap.keySet());
         return keysToRemove;
     }
 
+    /**
+     * Get values which key in the old map but not in the new map
+     */
     public List<V> getValuesToRemove() {
+        if (MapUtils.isEmpty(oldMap)) {
+            return Collections.emptyList();
+        }
         return getKeysToRemove().stream().map(oldMap::get).collect(Collectors.toList());
     }
 
+    /**
+     * Get keys which in both the old map and the new map, but the value is different
+     */
     public Set<K> getKeysToUpdate() {
+        if (MapUtils.isEmpty(oldMap) || MapUtils.isEmpty(newMap)) {
+            return SetUtils.emptySet();
+        }
         Set<K> keysToUpdate = new HashSet<>(newMap.keySet());
         keysToUpdate.retainAll(oldMap.keySet());
         keysToUpdate.removeIf(key -> newMap.get(key).equals(oldMap.get(key)));
@@ -61,7 +106,13 @@ public class MapComparator<K, V> {
         return keysToUpdate;
     }
 
+    /**
+     * Get new values which key in both the old map and the new map, but the value is different
+     */
     public List<V> getNewValuesToUpdate() {
+        if (MapUtils.isEmpty(oldMap) || MapUtils.isEmpty(newMap)) {
+            return Collections.emptyList();
+        }
         return getKeysToUpdate().stream().map(newMap::get).collect(Collectors.toList());
     }
 }

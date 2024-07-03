@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
@@ -27,59 +28,70 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MasterClusters extends AbstractClusterSubscribeListener<MasterServer> implements IClusters<MasterServer> {
+public class MasterClusters extends AbstractClusterSubscribeListener<MasterServerMetadata>
+        implements
+            IClusters<MasterServerMetadata> {
 
     /**
      * Master address -> MasterServer
      **/
-    private static final Map<String, MasterServer> masterServerMap = new ConcurrentHashMap<>();
+    private final Map<String, MasterServerMetadata> masterServerMap = new ConcurrentHashMap<>();
 
-    private static final List<IClustersChangeListener<MasterServer>> masterClusterChangeListeners =
+    private final List<IClustersChangeListener<MasterServerMetadata>> masterClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
     @Override
-    public List<MasterServer> getServers() {
+    public List<MasterServerMetadata> getServers() {
         return UnmodifiableList.unmodifiableList(new ArrayList<>(masterServerMap.values()));
     }
 
+    public List<MasterServerMetadata> getNormalServers() {
+        List<MasterServerMetadata> normalMasterServers = masterServerMap.values()
+                .stream()
+                .filter(masterServer -> masterServer.getServerStatus() == ServerStatus.NORMAL)
+                .collect(Collectors.toList());
+        return UnmodifiableList.unmodifiableList(normalMasterServers);
+    }
+
     @Override
-    public void registerListener(IClustersChangeListener<MasterServer> listener) {
+    public void registerListener(IClustersChangeListener<MasterServerMetadata> listener) {
         masterClusterChangeListeners.add(listener);
     }
 
     @Override
-    MasterServer parseServerFromHeartbeat(String masterHeartBeatJson) {
+    MasterServerMetadata parseServerFromHeartbeat(String masterHeartBeatJson) {
         MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(masterHeartBeatJson, MasterHeartBeat.class);
         if (masterHeartBeat == null) {
             return null;
         }
-        return MasterServer.parseFromHeartBeat(masterHeartBeat);
+        return MasterServerMetadata.parseFromHeartBeat(masterHeartBeat);
     }
 
     @Override
-    public void onServerAdded(MasterServer masterServer) {
+    public void onServerAdded(MasterServerMetadata masterServer) {
         masterServerMap.put(masterServer.getAddress(), masterServer);
-        for (IClustersChangeListener<MasterServer> listener : masterClusterChangeListeners) {
+        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerAdded(masterServer);
         }
     }
 
     @Override
-    public void onServerRemove(MasterServer masterServer) {
+    public void onServerRemove(MasterServerMetadata masterServer) {
         masterServerMap.remove(masterServer.getAddress());
-        for (IClustersChangeListener<MasterServer> listener : masterClusterChangeListeners) {
+        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerRemove(masterServer);
         }
     }
 
     @Override
-    public void onServerUpdate(MasterServer masterServer) {
+    public void onServerUpdate(MasterServerMetadata masterServer) {
         masterServerMap.put(masterServer.getAddress(), masterServer);
-        for (IClustersChangeListener<MasterServer> listener : masterClusterChangeListeners) {
+        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerUpdate(masterServer);
         }
     }

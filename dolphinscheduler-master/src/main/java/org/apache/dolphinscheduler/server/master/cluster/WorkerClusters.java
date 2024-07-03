@@ -34,22 +34,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServer>
+public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServerMetadata>
         implements
-            IClusters<WorkerServer>,
+            IClusters<WorkerServerMetadata>,
             WorkerGroupChangeNotifier.WorkerGroupListener {
 
     // WorkerIdentifier(workerAddress) -> worker
-    private static final Map<String, WorkerServer> workerMapping = new ConcurrentHashMap<>();
+    private final Map<String, WorkerServerMetadata> workerMapping = new ConcurrentHashMap<>();
 
     // WorkerGroup -> WorkerIdentifier(workerAddress)
-    private static final Map<String, List<String>> workerGroupMapping = new ConcurrentHashMap<>();
+    private final Map<String, List<String>> workerGroupMapping = new ConcurrentHashMap<>();
 
-    private static final List<IClustersChangeListener<WorkerServer>> workerClusterChangeListeners =
+    private final List<IClustersChangeListener<WorkerServerMetadata>> workerClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
     @Override
-    public List<WorkerServer> getServers() {
+    public List<WorkerServerMetadata> getServers() {
         return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.values()));
     }
 
@@ -66,7 +66,7 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
                 .map(workerMapping::get)
                 .filter(Objects::nonNull)
                 .filter(workerServer -> workerServer.getServerStatus() == ServerStatus.NORMAL)
-                .map(WorkerServer::getAddress)
+                .map(WorkerServerMetadata::getAddress)
                 .collect(Collectors.toList());
         return UnmodifiableList.unmodifiableList(normalWorkerAddresses);
     }
@@ -77,7 +77,7 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     }
 
     @Override
-    public void registerListener(IClustersChangeListener<WorkerServer> listener) {
+    public void registerListener(IClustersChangeListener<WorkerServerMetadata> listener) {
         workerClusterChangeListeners.add(listener);
     }
 
@@ -102,41 +102,41 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
                     .stream()
                     .map(workerMapping::get)
                     .filter(Objects::nonNull)
-                    .map(WorkerServer::getAddress)
+                    .map(WorkerServerMetadata::getAddress)
                     .collect(Collectors.toList());
             workerGroupMapping.put(workerGroup.getName(), activeWorkers);
         }
     }
 
     @Override
-    WorkerServer parseServerFromHeartbeat(String serverHeartBeatJson) {
+    WorkerServerMetadata parseServerFromHeartbeat(String serverHeartBeatJson) {
         WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(serverHeartBeatJson, WorkerHeartBeat.class);
         if (workerHeartBeat == null) {
             return null;
         }
-        return WorkerServer.parseFromHeartBeat(workerHeartBeat);
+        return WorkerServerMetadata.parseFromHeartBeat(workerHeartBeat);
     }
 
     @Override
-    public void onServerAdded(WorkerServer workerServer) {
+    public void onServerAdded(WorkerServerMetadata workerServer) {
         workerMapping.put(workerServer.getAddress(), workerServer);
-        for (IClustersChangeListener<WorkerServer> listener : workerClusterChangeListeners) {
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerAdded(workerServer);
         }
     }
 
     @Override
-    public void onServerRemove(WorkerServer workerServer) {
+    public void onServerRemove(WorkerServerMetadata workerServer) {
         workerMapping.remove(workerServer.getAddress(), workerServer);
-        for (IClustersChangeListener<WorkerServer> listener : workerClusterChangeListeners) {
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerRemove(workerServer);
         }
     }
 
     @Override
-    public void onServerUpdate(WorkerServer workerServer) {
+    public void onServerUpdate(WorkerServerMetadata workerServer) {
         workerMapping.put(workerServer.getAddress(), workerServer);
-        for (IClustersChangeListener<WorkerServer> listener : workerClusterChangeListeners) {
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerUpdate(workerServer);
         }
     }
