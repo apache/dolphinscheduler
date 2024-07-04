@@ -15,9 +15,15 @@
  * limitations under the License.
  */
 
-export default {
-  profile: 'Profile',
-  password: 'Password',
-  about: 'About',
-  logout: 'Logout'
+package org.apache.dolphinscheduler.api.dto;
+
+import lombok.Data;
+
+/**
+ * ProductInfoDto
+ */
+@Data
+public class ProductInfoDto {
+
+    private String version;
 }
