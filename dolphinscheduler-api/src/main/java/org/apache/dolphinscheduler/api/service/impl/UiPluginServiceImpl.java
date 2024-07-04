@@ -17,18 +17,23 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.dao.entity.DsVersion;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.dao.repository.DsVersionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,6 +49,16 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
 
     @Autowired
     PluginDefineMapper pluginDefineMapper;
+
+    @Autowired
+    private DsVersionDao dsVersionDao;
+
+    private String dsVersion;
+
+    @PostConstruct
+    private void init() {
+        dsVersion = dsVersionDao.selectVersion().map(DsVersion::getVersion).orElse("unknown");
+    }
 
     @Override
     public Map<String, Object> queryUiPluginsByType(PluginType pluginType) {
@@ -79,6 +94,13 @@ public class UiPluginServiceImpl extends BaseServiceImpl implements UiPluginServ
         // pluginDefine.setPluginParams(parseParams(params));
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, pluginDefine);
+        return result;
+    }
+
+    @Override
+    public ProductInfoDto queryProductInfo() {
+        ProductInfoDto result = new ProductInfoDto();
+        result.setVersion(dsVersion);
         return result;
     }
 
