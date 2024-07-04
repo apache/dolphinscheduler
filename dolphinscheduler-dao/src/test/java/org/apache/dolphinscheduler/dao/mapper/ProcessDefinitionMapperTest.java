@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
@@ -29,7 +28,6 @@ import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.jupiter.api.Assertions;
@@ -300,22 +298,6 @@ public class ProcessDefinitionMapperTest extends BaseDaoTest {
         List<WorkflowDefinitionCountDto> processDefinitions = processDefinitionMapper
                 .countDefinitionByProjectCodes(Lists.newArrayList(processDefinition.getProjectCode()));
         Assertions.assertNotEquals(0, processDefinitions.size());
-    }
-
-    @Test
-    public void listResourcesTest() {
-        ProcessDefinition processDefinition = insertOne("def 1");
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        List<Map<String, Object>> maps = processDefinitionMapper.listResources();
-        Assertions.assertNotNull(maps);
-    }
-
-    @Test
-    public void listResourcesByUserTest() {
-        ProcessDefinition processDefinition = insertOne("def 1");
-        processDefinition.setReleaseState(ReleaseState.ONLINE);
-        List<Map<String, Object>> maps = processDefinitionMapper.listResourcesByUser(processDefinition.getUserId());
-        Assertions.assertNotNull(maps);
     }
 
     @Test

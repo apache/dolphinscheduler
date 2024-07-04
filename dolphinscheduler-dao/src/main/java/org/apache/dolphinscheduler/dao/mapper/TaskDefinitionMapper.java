@@ -23,12 +23,10 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
-import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -73,22 +71,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return task definition list
      */
     List<WorkflowDefinitionCountDto> countDefinitionGroupByUser(@Param("projectCodes") Long[] projectCodes);
-
-    /**
-     * list all resource ids and task_params containing resourceList
-     *
-     * @return task ids list
-     */
-    @MapKey("id")
-    List<Map<String, Object>> listResources();
-
-    /**
-     * list all resource ids by user id
-     *
-     * @return resource ids list
-     */
-    @MapKey("id")
-    List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
 
     /**
      * delete task definition by code

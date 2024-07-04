@@ -71,17 +71,7 @@
         from t_ds_task_definition
         where code = #{code}
     </select>
-    <select id="listResources" resultType="java.util.HashMap">
-        SELECT id,resource_ids
-        FROM t_ds_task_definition
-        WHERE  resource_ids is not null and resource_ids != ''
-    </select>
 
-    <select id="listResourcesByUser" resultType="java.util.HashMap">
-        SELECT id,resource_ids
-        FROM t_ds_task_definition
-        WHERE user_id = #{userId} and resource_ids is not null and resource_ids != ''
-    </select>
     <delete id="deleteByCode">
         delete from t_ds_task_definition
         where code = #{code}
