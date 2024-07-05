@@ -288,7 +288,7 @@ public enum Status {
     UPDATE_PROJECT_PREFERENCE_ERROR(10301, "update project preference error", "更新项目偏好设置错误"),
     QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
     UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
-
+    VERSION_INFO_STATE_ERROR(10304, "Failed to obtain project version and address", "获取版本信息错误"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
     RESOURCE_EXIST(20005, "resource already exists", "资源已存在"),
     RESOURCE_SUFFIX_NOT_SUPPORT_VIEW(20006, "resource suffix do not support online viewing", "资源文件后缀不支持查看"),
