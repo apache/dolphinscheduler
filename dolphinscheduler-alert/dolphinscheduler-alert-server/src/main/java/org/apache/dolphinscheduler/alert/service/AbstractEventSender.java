@@ -122,7 +122,7 @@ public abstract class AbstractEventSender<T> implements EventSender<T> {
 
         AlertInfo alertInfo = AlertInfo.builder()
                 .alertData(alertData)
-                .alertParams(PluginParamsTransfer.getPluginParamsMap(instance.getPluginInstanceParams()))
+                .alertParams(JSONUtils.toMap(instance.getPluginInstanceParams()))
                 .alertPluginInstanceId(instance.getId())
                 .build();
         try {
