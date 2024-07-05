@@ -20,7 +20,8 @@ registry:
     connection-timeout: 9s
     block-until-connected: 600ms
     # The following options are set according to personal needs    
-    digest: ~
+    authorization:
+      digest: ~
 ```
 
 After do this config, you can start your DolphinScheduler cluster, your cluster will use zookeeper as registry center to
