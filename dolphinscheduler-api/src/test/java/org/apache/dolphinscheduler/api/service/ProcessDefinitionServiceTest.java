@@ -171,7 +171,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     private DataSourceMapper dataSourceMapper;
 
     @Mock
-    private WorkFlowLineageService workFlowLineageService;
+    private ProcessLineageService processLineageService;
 
     @Mock
     private MetricsCleanUpService metricsCleanUpService;
@@ -524,7 +524,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleMapper.deleteById(46)).thenReturn(1);
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
+        when(processLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         processDefinitionService.deleteProcessDefinitionByCode(user, 46L);
         Mockito.verify(metricsCleanUpService, times(1)).cleanUpWorkflowMetricsByDefinitionCode(46L);
@@ -540,7 +540,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // process used by other task, sub process
         user.setUserType(UserType.ADMIN_USER);
         TaskMainInfo taskMainInfo = getTaskMainInfo().get(0);
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
+        when(processLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(ImmutableSet.copyOf(getTaskMainInfo()));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
@@ -551,7 +551,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setReleaseState(ReleaseState.OFFLINE);
         when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
+        when(processLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
                 .thenReturn(Collections.emptySet());
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
         Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(46L);
@@ -600,7 +600,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // delete success
         process.setReleaseState(ReleaseState.OFFLINE);
         when(processDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(process));
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
+        when(processLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
                 .thenReturn(Collections.emptySet());
         putMsg(result, Status.SUCCESS, projectCode);
         doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(11L);

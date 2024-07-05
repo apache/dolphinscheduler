@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProcessLineageServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -48,7 +48,7 @@ public class WorkFlowLineageControllerTest {
     private WorkFlowLineageController workFlowLineageController;
 
     @Mock
-    private WorkFlowLineageServiceImpl workFlowLineageService;
+    private ProcessLineageServiceImpl workFlowLineageService;
 
     protected User user;
 

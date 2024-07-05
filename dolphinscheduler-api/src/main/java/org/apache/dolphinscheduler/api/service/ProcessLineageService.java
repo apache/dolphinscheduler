@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 
@@ -28,7 +29,7 @@ import java.util.Set;
 /**
  * work flow lineage service
  */
-public interface WorkFlowLineageService {
+public interface ProcessLineageService {
 
     List<WorkFlowLineage> queryWorkFlowLineageByName(long projectCode, String workFlowName);
 
@@ -39,7 +40,7 @@ public interface WorkFlowLineageService {
     /**
      * Query tasks depend on process definition, include upstream or downstream
      *
-     * @param projectCode Project code want to query tasks dependence
+     * @param projectCode           Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
      * @return Set of TaskMainInfo
      */
@@ -49,7 +50,7 @@ public interface WorkFlowLineageService {
      * Query downstream tasks depend on a process definition or a task
      *
      * @param processDefinitionCode Process definition code want to query tasks dependence
-     * @param taskCode Task code want to query tasks dependence
+     * @param taskCode              Task code want to query tasks dependence
      * @return downstream dependent tasks
      */
     Map<String, Object> queryDownstreamDependentTasks(Long processDefinitionCode, Long taskCode);
@@ -57,10 +58,16 @@ public interface WorkFlowLineageService {
     /**
      * Query and return tasks dependence with string format, is a wrapper of queryTaskDepOnTask and task query method.
      *
-     * @param projectCode Project code want to query tasks dependence
+     * @param projectCode           Project code want to query tasks dependence
      * @param processDefinitionCode Process definition code want to query tasks dependence
-     * @param taskCode Task code want to query tasks dependence
+     * @param taskCode              Task code want to query tasks dependence
      * @return dependent process definition
      */
     Optional<String> taskDepOnTaskMsg(long projectCode, long processDefinitionCode, long taskCode);
+
+    int createProcessLineage(List<ProcessLineage> processLineages);
+
+    int updateProcessLineage(List<ProcessLineage> processLineages);
+
+    int deleteProcessLineage(List<Long> processDefinitionCodes);
 }

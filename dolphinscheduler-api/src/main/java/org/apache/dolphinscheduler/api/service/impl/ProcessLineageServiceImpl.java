@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
+import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+import org.apache.dolphinscheduler.dao.mapper.ProcessLineageMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
@@ -64,7 +65,7 @@ import org.springframework.util.CollectionUtils;
  */
 @Slf4j
 @Service
-public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkFlowLineageService {
+public class ProcessLineageServiceImpl extends BaseServiceImpl implements ProcessLineageService {
 
     @Autowired
     private WorkFlowLineageMapper workFlowLineageMapper;
@@ -77,6 +78,9 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Autowired
+    private ProcessLineageMapper processLineageMapper;
 
     @Override
     public List<WorkFlowLineage> queryWorkFlowLineageByName(long projectCode, String workFlowName) {
@@ -165,50 +169,52 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
             putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
             return result;
         }
-        List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineage(projectCode);
-        Map<Long, WorkFlowLineage> workFlowLineagesMap = new HashMap<>();
-        Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
-        if (!processLineages.isEmpty()) {
-            List<WorkFlowLineage> workFlowLineages =
-                    workFlowLineageMapper.queryWorkFlowLineageByLineage(processLineages);
-            workFlowLineagesMap = workFlowLineages.stream()
-                    .collect(Collectors.toMap(WorkFlowLineage::getWorkFlowCode, workFlowLineage -> workFlowLineage));
-            Map<Long, List<TaskDefinition>> workFlowMap = new HashMap<>();
-            for (ProcessLineage processLineage : processLineages) {
-                workFlowMap.compute(processLineage.getProcessDefinitionCode(), (k, v) -> {
-                    if (v == null) {
-                        v = new ArrayList<>();
-                    }
-                    if (processLineage.getPreTaskCode() > 0) {
-                        v.add(new TaskDefinition(processLineage.getPreTaskCode(), processLineage.getPreTaskVersion()));
-                    }
-                    if (processLineage.getPostTaskCode() > 0) {
-                        v.add(new TaskDefinition(processLineage.getPostTaskCode(),
-                                processLineage.getPostTaskVersion()));
-                    }
-                    return v;
-                });
-            }
-            for (Entry<Long, List<TaskDefinition>> workFlow : workFlowMap.entrySet()) {
-                Set<Long> sourceWorkFlowCodes =
-                        querySourceWorkFlowCodes(projectCode, workFlow.getKey(), workFlow.getValue());
-                if (sourceWorkFlowCodes.isEmpty()) {
-                    workFlowRelations.add(new WorkFlowRelation(0L, workFlow.getKey()));
-                } else {
-                    workFlowLineagesMap.get(workFlow.getKey())
-                            .setSourceWorkFlowCode(StringUtils.join(sourceWorkFlowCodes, Constants.COMMA));
-                    sourceWorkFlowCodes
-                            .forEach(code -> workFlowRelations.add(new WorkFlowRelation(code, workFlow.getKey())));
-                }
-            }
-        }
-        Map<String, Object> workFlowLists = new HashMap<>();
-        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineagesMap.values());
-        workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
-        result.put(Constants.DATA_LIST, workFlowLists);
-        putMsg(result, Status.SUCCESS);
+//        List<ProcessLineage> processLineages = workFlowLineageMapper.queryProcessLineage(projectCode);
+//        Map<Long, WorkFlowLineage> workFlowLineagesMap = new HashMap<>();
+//        Set<WorkFlowRelation> workFlowRelations = new HashSet<>();
+//        if (!processLineages.isEmpty()) {
+//            List<WorkFlowLineage> workFlowLineages =
+//                    workFlowLineageMapper.queryWorkFlowLineageByLineage(processLineages);
+//            workFlowLineagesMap = workFlowLineages.stream()
+//                    .collect(Collectors.toMap(WorkFlowLineage::getWorkFlowCode, workFlowLineage -> workFlowLineage));
+//            Map<Long, List<TaskDefinition>> workFlowMap = new HashMap<>();
+//            for (ProcessLineage processLineage : processLineages) {
+//                workFlowMap.compute(processLineage.getProcessDefinitionCode(), (k, v) -> {
+//                    if (v == null) {
+//                        v = new ArrayList<>();
+//                    }
+//                    if (processLineage.getPreTaskCode() > 0) {
+//                        v.add(new TaskDefinition(processLineage.getPreTaskCode(), processLineage.getPreTaskVersion()));
+//                    }
+//                    if (processLineage.getPostTaskCode() > 0) {
+//                        v.add(new TaskDefinition(processLineage.getPostTaskCode(),
+//                                processLineage.getPostTaskVersion()));
+//                    }
+//                    return v;
+//                });
+//            }
+//            for (Entry<Long, List<TaskDefinition>> workFlow : workFlowMap.entrySet()) {
+//                Set<Long> sourceWorkFlowCodes =
+//                        querySourceWorkFlowCodes(projectCode, workFlow.getKey(), workFlow.getValue());
+//                if (sourceWorkFlowCodes.isEmpty()) {
+//                    workFlowRelations.add(new WorkFlowRelation(0L, workFlow.getKey()));
+//                } else {
+//                    workFlowLineagesMap.get(workFlow.getKey())
+//                            .setSourceWorkFlowCode(StringUtils.join(sourceWorkFlowCodes, Constants.COMMA));
+//                    sourceWorkFlowCodes
+//                            .forEach(code -> workFlowRelations.add(new WorkFlowRelation(code, workFlow.getKey())));
+//                }
+//            }
+//        }
+//        Map<String, Object> workFlowLists = new HashMap<>();
+//        workFlowLists.put(Constants.WORKFLOW_LIST, workFlowLineagesMap.values());
+//        workFlowLists.put(Constants.WORKFLOW_RELATION_LIST, workFlowRelations);
+//        result.put(Constants.DATA_LIST, workFlowLists);
+//        putMsg(result, Status.SUCCESS);
         return result;
     }
+
+    private List<>
 
     private Set<Long> querySourceWorkFlowCodes(long projectCode, long workFlowCode,
                                                List<TaskDefinition> taskDefinitionList) {
@@ -302,5 +308,23 @@ public class WorkFlowLineageServiceImpl extends BaseServiceImpl implements WorkF
         result.put(Constants.DATA_LIST, taskDependents);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    @Override
+    public int createProcessLineage(List<ProcessLineage> processLineages) {
+        return processLineageMapper.batchInsert(processLineages);
+    }
+
+    @Override
+    public int updateProcessLineage(List<ProcessLineage> processLineages) {
+        processLineageMapper.batchDeleteByProcessDefinitionCode(processLineages.stream()
+            .map(ProcessLineage::getProcessDefinitionCode).distinct().collect(Collectors.toList()));
+
+        return processLineageMapper.batchInsert(processLineages);
+    }
+
+    @Override
+    public int deleteProcessLineage(List<Long> processDefinitionCodes) {
+        return processLineageMapper.batchDeleteByProcessDefinitionCode(processDefinitionCodes);
     }
 }

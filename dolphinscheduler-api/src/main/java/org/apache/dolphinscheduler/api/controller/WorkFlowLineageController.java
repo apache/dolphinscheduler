@@ -24,7 +24,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SESSION_USE
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.WorkFlowLineageService;
+import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -64,7 +64,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class WorkFlowLineageController extends BaseController {
 
     @Autowired
-    private WorkFlowLineageService workFlowLineageService;
+    private ProcessLineageService processLineageService;
 
     @Operation(summary = "queryLineageByWorkFlowName", description = "QUERY_WORKFLOW_LINEAGE_BY_NAME_NOTES")
     @GetMapping(value = "/query-by-name")
@@ -75,7 +75,7 @@ public class WorkFlowLineageController extends BaseController {
                                                                     @RequestParam(value = "workFlowName", required = false) String workFlowName) {
         workFlowName = ParameterUtils.handleEscapes(workFlowName);
         List<WorkFlowLineage> workFlowLineages =
-                workFlowLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
+                processLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
         return Result.success(workFlowLineages);
     }
 
@@ -86,7 +86,7 @@ public class WorkFlowLineageController extends BaseController {
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
-        Map<String, Object> result = workFlowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        Map<String, Object> result = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
         return Result.success(result);
     }
 
@@ -96,7 +96,7 @@ public class WorkFlowLineageController extends BaseController {
     public Result<Map<String, Object>> queryWorkFlowLineage(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
-            Map<String, Object> result = workFlowLineageService.queryWorkFlowLineage(projectCode);
+            Map<String, Object> result = processLineageService.queryWorkFlowLineage(projectCode);
             return returnDataList(result);
         } catch (Exception e) {
             log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
@@ -128,7 +128,7 @@ public class WorkFlowLineageController extends BaseController {
                                       @RequestParam(value = "taskCode", required = true) long taskCode) {
         Result result = new Result();
         Optional<String> taskDepMsg =
-                workFlowLineageService.taskDepOnTaskMsg(projectCode, processDefinitionCode, taskCode);
+                processLineageService.taskDepOnTaskMsg(projectCode, processDefinitionCode, taskCode);
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }
@@ -148,7 +148,7 @@ public class WorkFlowLineageController extends BaseController {
                                                                         @RequestParam(value = "workFlowCode") Long workFlowCode,
                                                                         @RequestParam(value = "taskCode", required = false, defaultValue = "0") Long taskCode) {
         Map<String, Object> result =
-                workFlowLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
+                processLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
         return returnDataList(result);
     }
 }

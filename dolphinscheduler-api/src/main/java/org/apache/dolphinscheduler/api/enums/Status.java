@@ -585,6 +585,9 @@ public enum Status {
     USED_WORKER_GROUP_EXISTS(1402004,
             "You can not reassign worker groups to the project, cause these worker groups {0} are already used.",
             "Worker组{0}被项目中任务或定时引用，无法重新分配"),
+    CREATE_PROCESS_LINEAGE_ERROR(1403001, "create process lineage error", "创建工作流血缘错误"),
+    UPDATE_PROCESS_LINEAGE_ERROR(1403002, "update process lineage error", "更新工作流血缘错误"),
+    DELETE_PROCESS_LINEAGE_ERROR(1403003, "delete process lineage error", "删除工作流血缘错误"),
             ;
     private final int code;
     private final String enMsg;

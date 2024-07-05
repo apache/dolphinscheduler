@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.service.impl.WorkFlowLineageServiceImpl;
+import org.apache.dolphinscheduler.api.service.impl.ProcessLineageServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -49,10 +49,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * work flow lineage service test
  */
 @ExtendWith(MockitoExtension.class)
-public class WorkFlowLineageServiceTest {
+public class ProcessLineageServiceTest {
 
     @InjectMocks
-    private WorkFlowLineageServiceImpl workFlowLineageService;
+    private ProcessLineageServiceImpl workFlowLineageService;
 
     @Mock
     private WorkFlowLineageMapper workFlowLineageMapper;

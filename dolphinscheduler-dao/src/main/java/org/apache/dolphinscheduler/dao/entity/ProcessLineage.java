@@ -17,99 +17,32 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-/**
- * Process lineage
- */
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName("t_ds_process_lineage")
 public class ProcessLineage {
+    @TableId(value = "id", type = IdType.AUTO)
+    private int id;
 
-    /**
-     * project code
-     */
-    private long projectCode;
-
-    /**
-     * post task code
-     */
-    private long postTaskCode;
-
-    /**
-     * post task version
-     */
-    private int postTaskVersion;
-
-    /**
-     * pre task code
-     */
-    private long preTaskCode;
-
-    /**
-     * pre task version
-     */
-    private int preTaskVersion;
-
-    /**
-     * process definition code
-     */
     private long processDefinitionCode;
-
-    /**
-     * process definition version
-     */
     private int processDefinitionVersion;
-
-    public long getProjectCode() {
-        return projectCode;
-    }
-
-    public void setProjectCode(long projectCode) {
-        this.projectCode = projectCode;
-    }
-
-    public long getPostTaskCode() {
-        return postTaskCode;
-    }
-
-    public void setPostTaskCode(long postTaskCode) {
-        this.postTaskCode = postTaskCode;
-    }
-
-    public int getPostTaskVersion() {
-        return postTaskVersion;
-    }
-
-    public void setPostTaskVersion(int postTaskVersion) {
-        this.postTaskVersion = postTaskVersion;
-    }
-
-    public long getPreTaskCode() {
-        return preTaskCode;
-    }
-
-    public void setPreTaskCode(long preTaskCode) {
-        this.preTaskCode = preTaskCode;
-    }
-
-    public int getPreTaskVersion() {
-        return preTaskVersion;
-    }
-
-    public void setPreTaskVersion(int preTaskVersion) {
-        this.preTaskVersion = preTaskVersion;
-    }
-
-    public long getProcessDefinitionCode() {
-        return processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long processDefinitionCode) {
-        this.processDefinitionCode = processDefinitionCode;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
+    private long taskDefinitionCode;
+    private int taskDefinitionVersion;
+    private long deptProjectCode;
+    private long deptProcessDefinitionCode;
+    private long deptTaskDefinitionCode;
+    private Date createTime;
+    private Date updateTime;
 }
