@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.datax;
 import static org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils.decodePassword;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dolphinscheduler.common.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -420,7 +421,7 @@ public class DataxTask extends AbstractTask {
      */
     private String[] parsingSqlColumnNames(DbType sourceType, DbType targetType, BaseConnectionParam dataSourceCfg,
                                            String sql) {
-        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql);
+        String[] columnNames = tryGrammaticalAnalysisSqlColumnNames(sourceType, sql,dataSourceCfg.getCompatibleMode());
 
         if (columnNames == null || columnNames.length == 0) {
             log.info("try to execute sql analysis query column name");
@@ -440,11 +441,14 @@ public class DataxTask extends AbstractTask {
      * @return column name array
      * @throws RuntimeException if error throws RuntimeException
      */
-    private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql) {
+    private String[] tryGrammaticalAnalysisSqlColumnNames(DbType dbType, String sql,String compatibleMode) {
         String[] columnNames;
 
         try {
-            SQLStatementParser parser = DataxUtils.getSqlStatementParser(dbType, sql);
+            SQLStatementParser parser=DataxUtils.getSqlStatementParser(dbType, sql);
+            if (StringUtils.isNotBlank(compatibleMode)){
+                parser=DataxUtils.getSqlStatementParser(compatibleMode,sql);
+            }
             if (parser == null) {
                 log.warn("database driver [{}] is not support grammatical analysis sql", dbType);
                 return new String[0];
