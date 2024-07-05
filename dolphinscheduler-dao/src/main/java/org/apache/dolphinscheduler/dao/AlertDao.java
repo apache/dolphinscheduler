@@ -65,6 +65,8 @@ public class AlertDao {
 
     private static final Integer QUERY_ALERT_THRESHOLD = 100;
 
+    private static final int ADMIN_ALERT_GROUP_ID = 1;
+
     @Value("${alert.alarm-suppression.crash:60}")
     private Integer crashAlarmSuppression;
 
@@ -159,11 +161,10 @@ public class AlertDao {
     /**
      * MasterServer or WorkerServer stopped
      *
-     * @param alertGroupId alertGroupId
      * @param host         host
      * @param serverType   serverType
      */
-    public void sendServerStoppedAlert(int alertGroupId, String host, String serverType) {
+    public void sendServerStoppedAlert(String host, String serverType) {
         ServerAlertContent serverStopAlertContent = ServerAlertContent.newBuilder().type(serverType)
                 .host(host)
                 .event(AlertEvent.SERVER_DOWN)
@@ -175,7 +176,7 @@ public class AlertDao {
         alert.setWarningType(WarningType.FAILURE);
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alert.setContent(content);
-        alert.setAlertGroupId(alertGroupId);
+        alert.setAlertGroupId(ADMIN_ALERT_GROUP_ID);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());
         alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
