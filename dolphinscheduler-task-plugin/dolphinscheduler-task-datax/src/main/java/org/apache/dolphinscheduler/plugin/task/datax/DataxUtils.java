@@ -42,7 +42,7 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_RDBMS = "rdbmsreader";
 
-    public static final String DATAX_READER_PLUGIN_OCEANBASE="oceanbasev10reader";
+    public static final String DATAX_READER_PLUGIN_OCEANBASE = "oceanbasev10reader";
 
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
@@ -57,7 +57,7 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_RDBMS = "rdbmswriter";
 
-    public static final String DATAX_WRITER_PLUGIN_OCEANBASE="oceanbasev10writer";
+    public static final String DATAX_WRITER_PLUGIN_OCEANBASE = "oceanbasev10writer";
 
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
@@ -124,9 +124,8 @@ public class DataxUtils {
         }
     }
 
-
     public static SQLStatementParser getSqlStatementParser(String compatibleMode, String sql) {
-        if (compatibleMode.toLowerCase().equals(DbType.ORACLE.getName())){
+        if (compatibleMode.toLowerCase().equals(DbType.ORACLE.getName())) {
             return new OracleStatementParser(sql);
         }
         return new MySqlStatementParser(sql);
