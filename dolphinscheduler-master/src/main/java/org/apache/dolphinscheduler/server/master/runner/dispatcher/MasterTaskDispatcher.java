@@ -24,9 +24,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchR
 import org.apache.dolphinscheduler.extract.master.transportor.LogicTaskDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
 
 import java.util.Optional;
@@ -41,10 +39,8 @@ public class MasterTaskDispatcher extends BaseTaskDispatcher {
 
     private final Optional<Host> masterTaskExecuteHost;
 
-    public MasterTaskDispatcher(TaskEventService taskEventService,
-                                MasterConfig masterConfig) {
-        super(taskEventService, masterConfig);
-        masterTaskExecuteHost = Optional.of(Host.of(masterConfig.getMasterAddress()));
+    public MasterTaskDispatcher(MasterConfig masterConfig) {
+        this.masterTaskExecuteHost = Optional.of(Host.of(masterConfig.getMasterAddress()));
     }
 
     @Override

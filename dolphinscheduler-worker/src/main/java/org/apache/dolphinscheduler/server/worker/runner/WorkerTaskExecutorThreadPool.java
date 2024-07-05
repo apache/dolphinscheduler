@@ -80,6 +80,10 @@ public class WorkerTaskExecutorThreadPool {
         return Math.min(WorkerTaskExecutorHolder.size(), workerConfig.getExecThreads());
     }
 
+    public double getThreadPoolUsage() {
+        return (double) WorkerTaskExecutorHolder.size() / workerConfig.getExecThreads();
+    }
+
     /**
      * Kill tasks that have not been executed, e.g. waiting in the queue
      */

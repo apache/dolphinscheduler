@@ -95,8 +95,6 @@ master:
   exec-threads: 100
   # master dispatch task number per batch, if all the tasks dispatch failed in a batch, will sleep 1s.
   dispatch-task-number: 30
-  # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
-  host-selector: lower_weight
   # master heartbeat interval
   max-heartbeat-interval: 10s
   # master commit task retry times
@@ -115,6 +113,14 @@ master:
     max-system-memory-usage-percentage-thresholds: 0.77
     # Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
     max-disk-usage-percentage-thresholds: 0.77
+  worker-load-balancer-configuration-properties:
+    # RANDOM, ROUND_ROBIN, FIXED_WEIGHTED_ROUND_ROBIN, DYNAMIC_WEIGHTED_ROUND_ROBIN
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # dynamic-weight-config-properties only used in DYNAMIC_WEIGHTED_ROUND_ROBIN, the weight of memory-usage, cpu-usage, task-thread-pool-usage should sum to 100.
+    dynamic-weight-config-properties:
+      memory-usage-weight: 40
+      cpu-usage-weight: 30
+      task-thread-pool-usage-weight: 30
   # failover interval, the unit is minute
   failover-interval: 10m
   # kill yarn / k8s application when failover taskInstance, default true

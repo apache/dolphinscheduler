@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.master.command;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
+import org.apache.dolphinscheduler.server.master.cluster.MasterSlotManager;
 import org.apache.dolphinscheduler.server.master.config.CommandFetchStrategy;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -51,13 +51,13 @@ public class IdSlotBasedCommandFetcher implements ICommandFetcher {
     @Override
     public List<Command> fetchCommands() {
         long scheduleStartTime = System.currentTimeMillis();
-        int currentSlotIndex = masterSlotManager.getSlot();
-        int totalSlot = masterSlotManager.getMasterSize();
-        if (totalSlot <= 0 || currentSlotIndex < 0) {
-            log.warn("Slot is validated, current master slots: {}, the current slot index is {}", totalSlot,
-                    currentSlotIndex);
+        if (!masterSlotManager.checkSlotValid()) {
+            log.warn("MasterSlotManager check slot ({} -> {})is invalidated.",
+                    masterSlotManager.getCurrentMasterSlot(), masterSlotManager.getTotalMasterSlots());
             return Collections.emptyList();
         }
+        int currentSlotIndex = masterSlotManager.getCurrentMasterSlot();
+        int totalSlot = masterSlotManager.getTotalMasterSlots();
         List<Command> commands = commandDao.queryCommandByIdSlot(
                 currentSlotIndex,
                 totalSlot,

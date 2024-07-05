@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.runner;
 
-import org.apache.dolphinscheduler.common.enums.SlotCheckState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
@@ -25,7 +24,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.graph.WorkflowGraphFactory;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -39,9 +37,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class WorkflowExecuteContextFactory {
-
-    @Autowired
-    private MasterSlotManager masterSlotManager;
 
     @Autowired
     private ProcessService processService;
@@ -69,33 +64,10 @@ public class WorkflowExecuteContextFactory {
 
     private Optional<ProcessInstance> createWorkflowInstance(Command command) throws CronParseException {
         long commandTransformStartTime = System.currentTimeMillis();
-        // Note: this check is not safe, the slot may change after command transform.
-        // We use the database transaction in `handleCommand` so that we can guarantee the command will
-        // always be executed
-        // by only one master
-        SlotCheckState slotCheckState = slotCheck(command);
-        if (slotCheckState.equals(SlotCheckState.CHANGE) || slotCheckState.equals(SlotCheckState.INJECT)) {
-            log.info("Master handle command {} skip, slot check state: {}", command.getId(), slotCheckState);
-            throw new RuntimeException("Slot check failed the current state: " + slotCheckState);
-        }
         ProcessInstance processInstance = processService.handleCommand(masterConfig.getMasterAddress(), command);
         ProcessInstanceMetrics
                 .recordProcessInstanceGenerateTime(System.currentTimeMillis() - commandTransformStartTime);
         return Optional.ofNullable(processInstance);
-    }
-
-    private SlotCheckState slotCheck(Command command) {
-        int slot = masterSlotManager.getSlot();
-        int masterSize = masterSlotManager.getMasterSize();
-        SlotCheckState state;
-        if (masterSize <= 0) {
-            state = SlotCheckState.CHANGE;
-        } else if (command.getId() % masterSize == slot) {
-            state = SlotCheckState.PASS;
-        } else {
-            state = SlotCheckState.INJECT;
-        }
-        return state;
     }
 
 }

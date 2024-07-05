@@ -59,9 +59,15 @@ public class RegistryClient {
 
     public RegistryClient(Registry registry) {
         this.registry = registry;
-        registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        if (!registry.exists(RegistryNodeType.MASTER.getRegistryPath())) {
+            registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.WORKER.getRegistryPath())) {
+            registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.ALERT_SERVER.getRegistryPath())) {
+            registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        }
     }
 
     public boolean isConnected() {

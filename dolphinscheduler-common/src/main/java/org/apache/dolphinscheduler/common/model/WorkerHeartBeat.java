@@ -29,6 +29,6 @@ import lombok.experimental.SuperBuilder;
 public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
 
     private int workerHostWeight; // worker host weight
-    private int threadPoolUsage; // worker waiting task count
+    private double threadPoolUsage; // worker waiting task count
 
 }
