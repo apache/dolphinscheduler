@@ -41,8 +41,8 @@ public class ConsulRegistryAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(value = Registry.class)
-    public ConsulRegistry etcdRegistry(ConsulRegistryProperties etcdRegistryProperties) throws SSLException {
-        ConsulRegistry consulRegistry = new ConsulRegistry(etcdRegistryProperties);
+    public ConsulRegistry consulRegistry(ConsulRegistryProperties consulRegistryProperties) throws SSLException {
+        ConsulRegistry consulRegistry = new ConsulRegistry(consulRegistryProperties);
         consulRegistry.start();
         return consulRegistry;
     }
