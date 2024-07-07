@@ -266,8 +266,16 @@ public final class ConsulRegistry implements Registry {
 
     @Override
     public boolean acquireLock(String key) {
+        key = apNameSpace(key);
+        while (true) {
+            if (lock(key)) {
+                return true;
+            }
+        }
+    }
+
+    public boolean lock(String key) {
         synchronized (this) {
-            key = apNameSpace(key);
             if (lockMap.containsKey(key)) {
                 return lockMap.get(key).equals(LockUtils.getLockOwner());
             }
@@ -285,7 +293,7 @@ public final class ConsulRegistry implements Registry {
         try {
             key = apNameSpace(key);
             while (System.currentTimeMillis() - startTime < timeout) {
-                if (acquireLock(key)) {
+                if (lock(key)) {
                     return true;
                 }
                 ThreadUtils.sleep(500);
@@ -301,6 +309,7 @@ public final class ConsulRegistry implements Registry {
         try {
             key = apNameSpace(key);
             consulClient.keyValueClient().releaseLock(key, sessionId);
+            lockMap.remove(key);
             return true;
         } catch (Exception e) {
             throw new RegistryException("Error releasing lock for key: " + key, e);
