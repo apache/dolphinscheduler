@@ -21,9 +21,9 @@ import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,8 +34,11 @@ public class RandomWorkerLoadBalancer implements IWorkerLoadBalancer {
 
     private final WorkerClusters workerClusters;
 
+    private final SecureRandom secureRandom;
+
     public RandomWorkerLoadBalancer(WorkerClusters workerClusters) {
         this.workerClusters = workerClusters;
+        this.secureRandom = new SecureRandom();
     }
 
     @Override
@@ -44,7 +47,7 @@ public class RandomWorkerLoadBalancer implements IWorkerLoadBalancer {
         if (CollectionUtils.isEmpty(workerServerAddresses)) {
             return Optional.empty();
         }
-        int index = ThreadLocalRandom.current().nextInt(workerServerAddresses.size());
+        int index = secureRandom.nextInt(workerServerAddresses.size());
         return Optional.of(workerServerAddresses.get(index));
     }
 
