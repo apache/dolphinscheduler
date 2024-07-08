@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 
 import java.util.Map;
@@ -29,5 +30,7 @@ public interface UiPluginService {
     Map<String, Object> queryUiPluginsByType(PluginType pluginType);
 
     Map<String, Object> queryUiPluginDetailById(int id);
+
+    ProductInfoDto queryProductInfo();
 
 }

@@ -25,12 +25,8 @@ import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceDispatchResponse;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.dispatch.exceptions.WorkerGroupNotFoundException;
-import org.apache.dolphinscheduler.server.master.dispatch.host.HostManager;
-import org.apache.dolphinscheduler.server.master.exception.TaskDispatchException;
-import org.apache.dolphinscheduler.server.master.processor.queue.TaskEventService;
-import org.apache.dolphinscheduler.server.master.runner.BaseTaskDispatcher;
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.IWorkerLoadBalancer;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.server.master.runner.TaskExecuteRunnable;
 
 import java.util.Optional;
@@ -43,39 +39,36 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkerTaskDispatcher extends BaseTaskDispatcher {
 
-    private final HostManager hostManager;
+    private final IWorkerLoadBalancer workerLoadBalancer;
 
-    public WorkerTaskDispatcher(TaskEventService taskEventService,
-                                MasterConfig masterConfig,
-                                HostManager hostManager) {
-        super(taskEventService, masterConfig);
-        this.hostManager = checkNotNull(hostManager);
+    public WorkerTaskDispatcher(IWorkerLoadBalancer workerLoadBalancer) {
+        this.workerLoadBalancer = checkNotNull(workerLoadBalancer);
     }
 
     @Override
     protected void doDispatch(TaskExecuteRunnable taskExecuteRunnable) throws TaskDispatchException {
-        TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+        final TaskExecutionContext taskExecutionContext = taskExecuteRunnable.getTaskExecutionContext();
+        final String taskName = taskExecutionContext.getTaskName();
+        final String workerAddress = taskExecutionContext.getHost();
         try {
             ITaskInstanceOperator taskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                    .getProxyClient(taskExecutionContext.getHost(), ITaskInstanceOperator.class);
+                    .getProxyClient(workerAddress, ITaskInstanceOperator.class);
             TaskInstanceDispatchResponse taskInstanceDispatchResponse = taskInstanceOperator
                     .dispatchTask(new TaskInstanceDispatchRequest(taskExecuteRunnable.getTaskExecutionContext()));
             if (!taskInstanceDispatchResponse.isDispatchSuccess()) {
-                throw new TaskDispatchException(String.format("Dispatch task to %s failed, response is: %s",
-                        taskExecutionContext.getHost(), taskInstanceDispatchResponse));
+                throw new TaskDispatchException("Dispatch task: " + taskName + " to " + workerAddress + " failed: "
+                        + taskInstanceDispatchResponse);
             }
         } catch (TaskDispatchException e) {
             throw e;
         } catch (Exception e) {
-            throw new TaskDispatchException(String.format("Dispatch task to %s failed",
-                    taskExecutionContext.getHost()), e);
+            throw new TaskDispatchException("Dispatch task: " + taskName + " to " + workerAddress + " failed", e);
         }
     }
 
     @Override
-    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecuteRunnable) throws WorkerGroupNotFoundException {
+    protected Optional<Host> getTaskInstanceDispatchHost(TaskExecuteRunnable taskExecuteRunnable) {
         String workerGroup = taskExecuteRunnable.getTaskExecutionContext().getWorkerGroup();
-        return hostManager.select(workerGroup);
-
+        return workerLoadBalancer.select(workerGroup).map(Host::of);
     }
 }
