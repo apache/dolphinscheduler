@@ -2154,17 +2154,17 @@ create index idx_listener_event_sign on t_ds_listener_event (sign);
 -- Table structure for t_ds_process_lineage
 -- ----------------------------
 CREATE TABLE t_ds_process_lineage (
-    id int NOT NULL,
-    process_definition_code bigint NOT NULL DEFAULT 0,
-    process_definition_version int NOT NULL DEFAULT 0,
-    task_definition_code bigint NOT NULL DEFAULT 0,
-    task_definition_version int NOT NULL DEFAULT 0,
-    dept_project_code bigint NOT NULL DEFAULT 0,
-    dept_process_definition_code bigint NOT NULL DEFAULT 0,
-    dept_task_definition_code bigint NOT NULL DEFAULT 0,
-    create_time timestamp NOT NULL DEFAULT current_timestamp,
-    update_time timestamp NOT NULL DEFAULT current_timestamp,
-    PRIMARY KEY (id)
+                                      id int NOT NULL,
+                                      process_definition_code bigint NOT NULL DEFAULT 0,
+                                      process_definition_version int NOT NULL DEFAULT 0,
+                                      task_definition_code bigint NOT NULL DEFAULT 0,
+                                      task_definition_version int NOT NULL DEFAULT 0,
+                                      dept_project_code bigint NOT NULL DEFAULT 0,
+                                      dept_process_definition_code bigint NOT NULL DEFAULT 0,
+                                      dept_task_definition_code bigint NOT NULL DEFAULT 0,
+                                      create_time timestamp NOT NULL DEFAULT current_timestamp,
+                                      update_time timestamp NOT NULL DEFAULT current_timestamp,
+                                      PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 create index idx_process_code_version on t_ds_process_lineage (process_definition_code,process_definition_version);
