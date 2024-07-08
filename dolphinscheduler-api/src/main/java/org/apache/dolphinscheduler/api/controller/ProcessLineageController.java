@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.List;
@@ -70,25 +71,25 @@ public class WorkFlowLineageController extends BaseController {
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
-    public Result<List<WorkFlowLineage>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+    public Result<List<WorkFlowRelationDetail>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                    @RequestParam(value = "workFlowName", required = false) String workFlowName) {
-        workFlowName = ParameterUtils.handleEscapes(workFlowName);
-        List<WorkFlowLineage> workFlowLineages =
-                processLineageService.queryWorkFlowLineageByName(projectCode, workFlowName);
+                                                                    @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName) {
+        processDefinitionName = ParameterUtils.handleEscapes(processDefinitionName);
+        List<WorkFlowRelationDetail> workFlowLineages =
+                processLineageService.queryWorkFlowLineageByName(projectCode, processDefinitionName);
         return Result.success(workFlowLineages);
     }
 
-    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
-    @GetMapping(value = "/{workFlowCode}")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
-    public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                  @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
-        Map<String, Object> result = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
-        return Result.success(result);
-    }
+//    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
+//    @GetMapping(value = "/{workFlowCode}")
+//    @ResponseStatus(HttpStatus.OK)
+//    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+//    public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+//                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+//                                                                  @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
+//        Map<String, Object> result = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+//        return Result.success(result);
+//    }
 
     @Operation(summary = "queryWorkFlowList", description = "QUERY_WORKFLOW_LINEAGE_NOTES")
     @GetMapping(value = "/list")
@@ -136,19 +137,19 @@ public class WorkFlowLineageController extends BaseController {
         return result;
     }
 
-    @Operation(summary = "queryDownstreamDependentTaskList", description = "QUERY_DOWNSTREAM_DEPENDENT_TASK_NOTES")
-    @Parameters({
-            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class)),
-            @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = false, schema = @Schema(implementation = Long.class, example = "123456789")),
-    })
-    @GetMapping(value = "/query-dependent-tasks")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
-    public Result<Map<String, Object>> queryDownstreamDependentTaskList(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                        @RequestParam(value = "workFlowCode") Long workFlowCode,
-                                                                        @RequestParam(value = "taskCode", required = false, defaultValue = "0") Long taskCode) {
-        Map<String, Object> result =
-                processLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
-        return returnDataList(result);
-    }
+//    @Operation(summary = "queryDownstreamDependentTaskList", description = "QUERY_DOWNSTREAM_DEPENDENT_TASK_NOTES")
+//    @Parameters({
+//            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class)),
+//            @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = false, schema = @Schema(implementation = Long.class, example = "123456789")),
+//    })
+//    @GetMapping(value = "/query-dependent-tasks")
+//    @ResponseStatus(HttpStatus.OK)
+//    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+//    public Result<Map<String, Object>> queryDownstreamDependentTaskList(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+//                                                                        @RequestParam(value = "workFlowCode") Long workFlowCode,
+//                                                                        @RequestParam(value = "taskCode", required = false, defaultValue = "0") Long taskCode) {
+//        Map<String, Object> result =
+//                processLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
+//        return returnDataList(result);
+//    }
 }
