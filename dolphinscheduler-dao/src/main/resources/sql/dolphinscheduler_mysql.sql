@@ -2161,6 +2161,7 @@ CREATE TABLE `t_ds_listener_event` (
 -- ----------------------------
 -- Table structure for t_ds_process_lineage
 -- ----------------------------
+DROP TABLE IF EXISTS `t_ds_process_lineage`;
 CREATE TABLE `t_ds_process_lineage` (
     `id` int NOT NULL AUTO_INCREMENT,
     `process_definition_code` bigint NOT NULL DEFAULT 0,
