@@ -63,30 +63,50 @@ public class PostgresqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
             statement.execute(
                     "create table t_ds_jdbc_registry_data\n" +
                             "(\n" +
-                            "    id               serial\n" +
-                            "        constraint t_ds_jdbc_registry_data_pk primary key,\n" +
-                            "    data_key         varchar                             not null,\n" +
-                            "    data_value       text                                not null,\n" +
-                            "    data_type        int4                                not null,\n" +
-                            "    last_term        bigint                              not null,\n" +
-                            "    last_update_time timestamp default current_timestamp not null,\n" +
-                            "    create_time      timestamp default current_timestamp not null\n" +
+                            "    id               bigserial NOT NULL,\n" +
+                            "    data_key         varchar   not null,\n" +
+                            "    data_value       text      not null,\n" +
+                            "    data_type        varchar   not null,\n" +
+                            "    client_id        bigint    not null,\n" +
+                            "    create_time      timestamp not null,\n" +
+                            "    last_update_time timestamp not null,\n" +
+                            "PRIMARY KEY (id)\n" +
                             ");");
             statement.execute(
-                    "create unique index t_ds_jdbc_registry_data_key_uindex on t_ds_jdbc_registry_data (data_key);");
+                    "create unique index uk_t_ds_jdbc_registry_dataKey on t_ds_jdbc_registry_data (data_key);");
+
             statement.execute(
                     "create table t_ds_jdbc_registry_lock\n" +
                             "(\n" +
-                            "    id               serial\n" +
-                            "        constraint t_ds_jdbc_registry_lock_pk primary key,\n" +
-                            "    lock_key         varchar                             not null,\n" +
-                            "    lock_owner       varchar                             not null,\n" +
-                            "    last_term        bigint                              not null,\n" +
-                            "    last_update_time timestamp default current_timestamp not null,\n" +
-                            "    create_time      timestamp default current_timestamp not null\n" +
+                            "    id          bigserial NOT NULL,\n" +
+                            "    lock_key    varchar   not null,\n" +
+                            "    lock_owner  varchar   not null,\n" +
+                            "    client_id   bigint    not null,\n" +
+                            "    create_time timestamp not null,\n" +
+                            "PRIMARY KEY (id)\n" +
                             ");");
             statement.execute(
-                    "create unique index t_ds_jdbc_registry_lock_key_uindex on t_ds_jdbc_registry_lock (lock_key);");
+                    "create unique index uk_t_ds_jdbc_registry_lockKey on t_ds_jdbc_registry_lock (lock_key);");
+
+            statement.execute("create table t_ds_jdbc_registry_client_heartbeat\n" +
+                    "(\n" +
+                    "    id                  bigint    NOT NULL,\n" +
+                    "    client_name         varchar   not null,\n" +
+                    "    last_heartbeat_time bigint    not null,\n" +
+                    "    connection_config   text      not null,\n" +
+                    "    create_time         timestamp not null,\n" +
+                    "PRIMARY KEY (id)\n" +
+                    ");");
+
+            statement.execute("create table t_ds_jdbc_registry_data_change_event\n" +
+                    "(\n" +
+                    "    id                 bigserial NOT NULL,\n" +
+                    "    event_type         varchar   not null,\n" +
+                    "    jdbc_registry_data text      not null,\n" +
+                    "    create_time        timestamp not null,\n" +
+                    "PRIMARY KEY (id)\n" +
+                    ");");
+
         }
     }
 

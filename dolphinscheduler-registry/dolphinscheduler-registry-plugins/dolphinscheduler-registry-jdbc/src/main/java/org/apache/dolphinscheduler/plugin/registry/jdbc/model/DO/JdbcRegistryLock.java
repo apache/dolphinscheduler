@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.model;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO;
 
 import java.util.Date;
 
@@ -37,24 +37,8 @@ public class JdbcRegistryLock {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    /**
-     * The lock key.
-     */
     private String lockKey;
-    /**
-     * acquire lock host.
-     */
     private String lockOwner;
-    /**
-     * The last term, if the (currentTime - lastTerm) > termExpire time, the lock will be expired.
-     */
-    private Long lastTerm;
-    /**
-     * The lock last update time.
-     */
-    private Date lastUpdateTime;
-    /**
-     * The lock create time.
-     */
+    private Long clientId;
     private Date createTime;
 }

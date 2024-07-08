@@ -15,25 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryLock;
+import java.util.Date;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.List;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+@TableName(value = "t_ds_jdbc_registry_data")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class JdbcRegistryData {
 
-public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+    private String dataKey;
+    private String dataValue;
+    private String dataType;
+    private long clientId;
+    private Date createTime;
+    private Date lastUpdateTime;
 
-    @Delete({"<script>",
-            "delete from t_ds_jdbc_registry_lock",
-            "where client_id IN ",
-            "<foreach item='clientId' index='index' collection='clientIds' open='(' separator=',' close=')'>",
-            "   #{clientId}",
-            "</foreach>",
-            "</script>"})
-    void deleteByClientIds(@Param("clientIds") List<Long> clientIds);
 }

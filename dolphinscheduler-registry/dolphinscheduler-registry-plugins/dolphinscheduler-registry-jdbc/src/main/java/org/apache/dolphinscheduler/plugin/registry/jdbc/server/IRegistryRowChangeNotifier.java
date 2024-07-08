@@ -15,13 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
 
-import lombok.experimental.UtilityClass;
+public interface IRegistryRowChangeNotifier<T> {
 
-@UtilityClass
-final class JdbcRegistryConstant {
+    int DEFAULT_DETECT_INTERVAL = 1000;
 
-    public static final long LOCK_ACQUIRE_INTERVAL = 1_000;
+    void start();
+
+    void subscribeRegistryRowChange(RegistryRowChangeListener<T> registryRowChangeListener);
+
+    interface RegistryRowChangeListener<T> {
+
+        void onRegistryRowUpdated(T data);
+
+        void onRegistryRowAdded(T data);
+
+        void onRegistryRowDeleted(T data);
+    }
 
 }

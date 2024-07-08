@@ -33,15 +33,8 @@ import com.zaxxer.hikari.HikariConfig;
 @ConfigurationProperties(prefix = "registry")
 public class JdbcRegistryProperties {
 
-    /**
-     * Used to schedule refresh the ephemeral data/ lock.
-     */
-    private Duration termRefreshInterval = Duration.ofSeconds(2);
-    /**
-     * Used to calculate the expire time,
-     * e.g. if you set 2, and latest two refresh error, then the ephemeral data/lock will be expire.
-     */
-    private int termExpireTimes = 3;
+    private Duration heartbeatRefreshInterval = Duration.ofSeconds(3);
+    private Duration sessionTimeout = Duration.ofSeconds(60);
     private HikariConfig hikariConfig;
 
 }

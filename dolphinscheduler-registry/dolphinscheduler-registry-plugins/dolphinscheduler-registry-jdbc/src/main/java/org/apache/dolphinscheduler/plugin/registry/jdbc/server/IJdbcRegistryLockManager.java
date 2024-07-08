@@ -15,25 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryLock;
+public interface IJdbcRegistryLockManager {
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
+    /**
+     * Acquire the jdbc registry lock by key. this is a blocking method. if you want to stop the blocking, you can use interrupt the thread.
+     */
+    void acquireJdbcRegistryLock(Long clientId, String lockKey) throws InterruptedException;
 
-import java.util.List;
+    /**
+     * Acquire the jdbc registry lock by key until timeout.
+     */
+    boolean acquireJdbcRegistryLock(Long clientId, String lockKey, long timeout);
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+    /**
+     * Release the jdbc registry lock by key, if the lockKey is not exist will do nothing.
+     */
+    void releaseJdbcRegistryLock(Long clientId, String lockKey);
 
-public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
-
-    @Delete({"<script>",
-            "delete from t_ds_jdbc_registry_lock",
-            "where client_id IN ",
-            "<foreach item='clientId' index='index' collection='clientIds' open='(' separator=',' close=')'>",
-            "   #{clientId}",
-            "</foreach>",
-            "</script>"})
-    void deleteByClientIds(@Param("clientIds") List<Long> clientIds);
 }

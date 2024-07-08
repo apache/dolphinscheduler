@@ -64,36 +64,52 @@ class MysqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
             statement.execute(
                     "CREATE TABLE `t_ds_jdbc_registry_data`\n" +
                             "(\n" +
-                            "    `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
+                            "    `id`               bigint(11)   NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
                             "    `data_key`         varchar(256) NOT NULL COMMENT 'key, like zookeeper node path',\n" +
                             "    `data_value`       text         NOT NULL COMMENT 'data, like zookeeper node value',\n"
                             +
-                            "    `data_type`        tinyint(4) NOT NULL COMMENT '1: ephemeral node, 2: persistent node',\n"
-                            +
-                            "    `last_term`        bigint       NOT NULL COMMENT 'last term time',\n" +
-                            "    `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last update time',\n"
-                            +
-                            "    `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',\n"
-                            +
+                            "    `data_type`        varchar(64)  NOT NULL COMMENT 'EPHEMERAL, PERSISTENT',\n" +
+                            "    `client_id`        bigint       NOT NULL COMMENT 'client id',\n" +
+                            "    `create_time`      timestamp    NOT NULL COMMENT 'create time',\n" +
+                            "    `last_update_time` timestamp    NOT NULL COMMENT 'last update time',\n" +
                             "    PRIMARY KEY (`id`),\n" +
                             "    unique (`data_key`)\n" +
                             ") ENGINE = InnoDB\n" +
                             "  DEFAULT CHARSET = utf8;");
+
             statement.execute(
                     "CREATE TABLE `t_ds_jdbc_registry_lock`\n" +
                             "(\n" +
-                            "    `id`               bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
-                            "    `lock_key`         varchar(256) NOT NULL COMMENT 'lock path',\n" +
-                            "    `lock_owner`       varchar(256) NOT NULL COMMENT 'the lock owner, ip_processId',\n" +
-                            "    `last_term`        bigint       NOT NULL COMMENT 'last term time',\n" +
-                            "    `last_update_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'last update time',\n"
-                            +
-                            "    `create_time`      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',\n"
-                            +
+                            "    `id`          bigint(11)   NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
+                            "    `lock_key`    varchar(256) NOT NULL COMMENT 'lock path',\n" +
+                            "    `lock_owner`  varchar(256) NOT NULL COMMENT 'the lock owner, ip_processId',\n" +
+                            "    `client_id`   bigint       NOT NULL COMMENT 'client id',\n" +
+                            "    `create_time` timestamp    NOT NULL COMMENT 'create time',\n" +
                             "    PRIMARY KEY (`id`),\n" +
-                            "    unique (`lock_key`)\n" +
+                            "    unique Key `uk_t_ds_jdbc_registry_lockKey` (`lock_key`)\n" +
                             ") ENGINE = InnoDB\n" +
                             "  DEFAULT CHARSET = utf8;");
+
+            statement.execute("CREATE TABLE `t_ds_jdbc_registry_client_heartbeat`\n" +
+                    "(\n" +
+                    "    `id`                  bigint(11)   NOT NULL   COMMENT 'primary key',\n" +
+                    "    `client_name`         varchar(256) NOT NULL COMMENT 'client name, ip_processId',\n" +
+                    "    `last_heartbeat_time` bigint       NOT NULL COMMENT 'last heartbeat timestamp',\n" +
+                    "    `connection_config`   text         NOT NULL COMMENT 'connection config',\n" +
+                    "    `create_time`         timestamp    NOT NULL COMMENT 'create time',\n" +
+                    "    PRIMARY KEY (`id`)\n" +
+                    ") ENGINE = InnoDB\n" +
+                    "  DEFAULT CHARSET = utf8;");
+
+            statement.execute("CREATE TABLE `t_ds_jdbc_registry_data_change_event`\n" +
+                    "(\n" +
+                    "    `id`                 bigint(11)  NOT NULL AUTO_INCREMENT COMMENT 'primary key',\n" +
+                    "    `event_type`         varchar(64) NOT NULL COMMENT 'ADD, UPDATE, DELETE',\n" +
+                    "    `jdbc_registry_data` text        NOT NULL COMMENT 'jdbc registry data',\n" +
+                    "    `create_time`        timestamp   NOT NULL COMMENT 'create time',\n" +
+                    "    PRIMARY KEY (`id`)\n" +
+                    ") ENGINE = InnoDB\n" +
+                    "  DEFAULT CHARSET = utf8;");
         }
     }
 

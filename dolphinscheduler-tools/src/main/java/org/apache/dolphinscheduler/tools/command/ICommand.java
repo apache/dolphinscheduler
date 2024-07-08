@@ -15,33 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.model;
+package org.apache.dolphinscheduler.tools.command;
 
-import java.util.Date;
+public interface ICommand {
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-@TableName(value = "t_ds_jdbc_registry_data")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class JdbcRegistryData {
-
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
-    private String dataKey;
-    private String dataValue;
-    private int dataType;
-    private long lastTerm;
-    private Date createTime;
-    private Date lastUpdateTime;
-
+    void run(String... args);
 }

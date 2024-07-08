@@ -15,25 +15,17 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
+package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryLock;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Param;
+import java.util.concurrent.ScheduledExecutorService;
 
-import java.util.List;
+public class JdbcRegistryThreadFactory {
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+    public static ScheduledExecutorService getDefaultSchedulerThreadExecutor() {
+        return ThreadUtils.newDaemonScheduledExecutorService("jdbc-registry-default-scheduler-thread-pool",
+                Runtime.getRuntime().availableProcessors());
+    }
 
-public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
-
-    @Delete({"<script>",
-            "delete from t_ds_jdbc_registry_lock",
-            "where client_id IN ",
-            "<foreach item='clientId' index='index' collection='clientIds' open='(' separator=',' close=')'>",
-            "   #{clientId}",
-            "</foreach>",
-            "</script>"})
-    void deleteByClientIds(@Param("clientIds") List<Long> clientIds);
 }

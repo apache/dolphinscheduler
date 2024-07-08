@@ -15,20 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.model;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
-public enum DataType {
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryClientHeartbeat;
 
-    EPHEMERAL(1),
-    PERSISTENT(2),
-    ;
-    private final int typeValue;
+import org.apache.ibatis.annotations.Select;
 
-    DataType(int typeValue) {
-        this.typeValue = typeValue;
-    }
+import java.util.List;
 
-    public int getTypeValue() {
-        return typeValue;
-    }
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+public interface JdbcRegistryClientHeartbeatMapper extends BaseMapper<JdbcRegistryClientHeartbeat> {
+
+    @Select("select * from t_ds_jdbc_registry_client_heartbeat")
+    List<JdbcRegistryClientHeartbeat> selectAll();
+
 }
