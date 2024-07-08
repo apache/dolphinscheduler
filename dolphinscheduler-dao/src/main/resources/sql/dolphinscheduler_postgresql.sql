@@ -2166,7 +2166,7 @@ CREATE TABLE t_ds_process_lineage (
     create_time timestamp NOT NULL DEFAULT current_timestamp,
     update_time timestamp NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+);
 
 create index idx_process_code_version on t_ds_process_lineage (process_definition_code,process_definition_version);
 create index idx_task_code_version on t_ds_process_lineage (task_definition_code,task_definition_version);
