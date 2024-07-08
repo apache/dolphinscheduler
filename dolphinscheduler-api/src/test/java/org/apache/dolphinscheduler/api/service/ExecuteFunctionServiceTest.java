@@ -39,14 +39,17 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
@@ -72,6 +75,7 @@ import org.apache.dolphinscheduler.service.process.TriggerRelationService;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,6 +161,9 @@ public class ExecuteFunctionServiceTest {
 
     @Mock
     private ProcessDefinitionService processDefinitionService;
+
+    @Mock
+    private ProcessLineageService processLineageService;
 
     private int processDefinitionId = 1;
 
@@ -329,6 +336,65 @@ public class ExecuteFunctionServiceTest {
         } catch (ServiceException e) {
             Assertions.assertEquals(Status.START_NODE_NOT_EXIST_IN_LAST_PROCESS.getCode(), e.getCode());
         }
+    }
+
+    @Test
+    public void testComplementWithDependentMode() {
+        Schedule schedule = new Schedule();
+        schedule.setStartTime(new Date());
+        schedule.setEndTime(new Date());
+        schedule.setCrontab("0 0 7 * * ? *");
+        schedule.setFailureStrategy(FailureStrategy.CONTINUE);
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setWarningType(WarningType.NONE);
+        schedule.setCreateTime(new Date());
+        schedule.setUpdateTime(new Date());
+        List<Schedule> schedules = Lists.newArrayList(schedule);
+        Mockito.when(processService.queryReleaseSchedulerListByProcessDefinitionCode(
+                processDefinitionCode))
+                .thenReturn(schedules);
+
+        DependentProcessDefinition dependentProcessDefinition = new DependentProcessDefinition();
+        dependentProcessDefinition.setProcessDefinitionCode(2);
+        dependentProcessDefinition.setProcessDefinitionVersion(1);
+        dependentProcessDefinition.setTaskDefinitionCode(1);
+        dependentProcessDefinition.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
+        dependentProcessDefinition.setTaskParams(
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":2,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
+        Mockito.when(processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode))
+                .thenReturn(Lists.newArrayList(dependentProcessDefinition));
+
+        Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
+        processDefinitionWorkerGroupMap.put(1L, WorkerGroupUtils.getDefaultWorkerGroup());
+        Mockito.when(workerGroupService.queryWorkerGroupByProcessDefinitionCodes(Lists.newArrayList(1L)))
+                .thenReturn(processDefinitionWorkerGroupMap);
+
+        Command command = new Command();
+        command.setId(1);
+        command.setCommandType(CommandType.COMPLEMENT_DATA);
+        command.setCommandParam(
+                "{\"StartNodeList\":\"1\",\"complementStartDate\":\"2020-01-01 00:00:00\",\"complementEndDate\":\"2020-01-31 23:00:00\"}");
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
+        command.setProcessDefinitionCode(processDefinitionCode);
+        command.setExecutorId(1);
+
+        // not enable allLevelDependent
+        int count = executorService.createComplementDependentCommand(schedules, command, false);
+        Assertions.assertEquals(1, count);
+
+        // enable allLevelDependent
+        DependentProcessDefinition childDependent = new DependentProcessDefinition();
+        childDependent.setProcessDefinitionCode(3);
+        childDependent.setProcessDefinitionVersion(1);
+        childDependent.setTaskDefinitionCode(4);
+        childDependent.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
+        childDependent.setTaskParams(
+                "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
+        Mockito.when(processLineageService.queryDownstreamDependentProcessDefinitions(
+                dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent))
+                .thenReturn(Lists.newArrayList());
+        int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);
+        Assertions.assertEquals(2, allLevelDependentCount);
     }
 
     /**
