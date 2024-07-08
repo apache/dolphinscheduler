@@ -80,9 +80,6 @@ public class MigrateLineageService {
         List<ProcessTaskRelation> processTaskRelationList =
                 processTaskRelationMapper.queryByTaskCodes(taskDefinitionList.stream()
                         .map(TaskDefinition::getCode).toArray(Long[]::new));
-        List<ProcessDefinition> processDefinitionList =
-                processDefinitionMapper.queryByCodes(processTaskRelationList.stream()
-                        .map(ProcessTaskRelation::getProcessDefinitionCode).collect(Collectors.toList()));
         List<ProcessLineage> processLineageList = new ArrayList<>();
 
         for (TaskDefinition taskDefinition : taskDefinitionList) {
