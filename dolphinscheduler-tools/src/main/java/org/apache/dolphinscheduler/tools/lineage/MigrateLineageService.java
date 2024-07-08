@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.tools.lineage;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -36,7 +35,6 @@ import org.apache.commons.collections.CollectionUtils;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
