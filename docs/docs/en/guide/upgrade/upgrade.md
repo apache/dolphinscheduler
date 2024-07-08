@@ -54,6 +54,14 @@ Execution result:
 - The original UDF resource `x/y.jar` migrates to `/dolphinscheduler/abc/udf/.migrate/x/y.jar`.
 - Update UDF function's bound resource info.
 
+### Upgrade Lineage
+
+Execute script: `sh ./tools/bin/migrate-lineage.sh`.
+
+Execution result:
+
+- Migrate lineage data to new table `t_ds_process_lineage`.
+
 ### Upgrade Service
 
 #### Change Configuration `bin/env/install_env.sh`

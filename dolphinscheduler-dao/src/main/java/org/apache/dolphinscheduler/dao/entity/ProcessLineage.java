@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -33,8 +32,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @AllArgsConstructor
 @TableName("t_ds_process_lineage")
 public class ProcessLineage {
+
     @TableId(value = "id", type = IdType.AUTO)
-    private int id;
+    private Integer id;
 
     private long processDefinitionCode;
     private int processDefinitionVersion;

@@ -684,6 +684,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         } else
             log.info("Update process definition complete, projectCode:{}, processDefinitionName:{}.", projectCode,
                     processDefinition.getName());
+
+        // save process lineage
+        if (syncDefine) {
+            processDefinitionService.saveProcessLineage(taskDefinitionLogs, projectCode, processDefinition.getCode(),
+                    insertVersion);
+        }
+
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, syncDefine);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {

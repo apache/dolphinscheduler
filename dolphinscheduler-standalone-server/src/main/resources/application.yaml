@@ -27,13 +27,10 @@ spring:
     init:
       schema-locations: classpath:sql/dolphinscheduler_h2.sql
   datasource:
-    driver-class-name: "com.mysql.cj.jdbc.Driver"    # org.h2.Driver
-    url: jdbc:mysql://home.ixzh.xyz:22781/ds_dev_test?useUnicode=true&characterEncoding=UTF-8
-    username: ds_test
-    password: QpByUxkp65MHrlS1
-#    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
-#    username: sa
-#    password: ""
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:dolphinscheduler;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true
+    username: sa
+    password: ""
   quartz:
     job-store-type: jdbc
     jdbc:

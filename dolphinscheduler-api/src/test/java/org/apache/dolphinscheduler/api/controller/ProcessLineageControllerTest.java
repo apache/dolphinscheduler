@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.text.MessageFormat;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,10 +41,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * work flow lineage controller test
  */
 @ExtendWith(MockitoExtension.class)
-public class WorkFlowLineageControllerTest {
+public class ProcessLineageControllerTest {
 
     @InjectMocks
-    private WorkFlowLineageController workFlowLineageController;
+    private ProcessLineageController processLineageController;
 
     @Mock
     private ProcessLineageServiceImpl workFlowLineageService;
@@ -76,27 +75,7 @@ public class WorkFlowLineageControllerTest {
         String searchVal = "test";
         Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal))
                 .thenReturn(Collections.emptyList());
-        assertDoesNotThrow(() -> workFlowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal));
+        assertDoesNotThrow(() -> processLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal));
     }
 
-    @Test
-    public void testQueryWorkFlowLineageByCode() {
-        long projectCode = 1L;
-        long code = 1L;
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByCode(projectCode, code)).thenReturn(new HashMap<>());
-        assertDoesNotThrow(() -> workFlowLineageController.queryWorkFlowLineageByCode(user, projectCode, code));
-    }
-
-    @Test
-    public void testQueryDownstreamDependentTaskList() {
-        long code = 1L;
-        long taskCode = 1L;
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(workFlowLineageService.queryDownstreamDependentTasks(code, taskCode))
-                .thenReturn(result);
-
-        assertDoesNotThrow(
-                () -> workFlowLineageController.queryDownstreamDependentTaskList(user, code, taskCode));
-    }
 }

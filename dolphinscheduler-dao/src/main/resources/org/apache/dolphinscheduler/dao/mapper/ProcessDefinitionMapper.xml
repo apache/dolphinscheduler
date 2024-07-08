@@ -92,10 +92,10 @@
             <if test=" pd.projectCode != 0">
                 and project_code = #{pd.projectCode}
             </if>
-            <if test=" pd.name != null and pd.name != ''">
+            <if test="pd.name != null and pd.name != ''">
                 and name like concat('%', #{pd.name}, '%')
             </if>
-            <if test=" pd.releaseState != null and pd.releaseState != ''">
+            <if test="pd.releaseState != null and pd.releaseState != ''">
                 and release_state = #{pd.releaseState}
             </if>
         </where>

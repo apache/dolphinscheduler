@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -62,7 +61,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("projects/{projectCode}/lineages")
 @Slf4j
-public class WorkFlowLineageController extends BaseController {
+public class ProcessLineageController extends BaseController {
 
     @Autowired
     private ProcessLineageService processLineageService;
@@ -72,24 +71,25 @@ public class WorkFlowLineageController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
     public Result<List<WorkFlowRelationDetail>> queryWorkFlowLineageByName(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                    @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName) {
+                                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                           @RequestParam(value = "processDefinitionName", required = false) String processDefinitionName) {
         processDefinitionName = ParameterUtils.handleEscapes(processDefinitionName);
         List<WorkFlowRelationDetail> workFlowLineages =
                 processLineageService.queryWorkFlowLineageByName(projectCode, processDefinitionName);
         return Result.success(workFlowLineages);
     }
 
-//    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
-//    @GetMapping(value = "/{workFlowCode}")
-//    @ResponseStatus(HttpStatus.OK)
-//    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
-//    public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-//                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-//                                                                  @PathVariable(value = "workFlowCode", required = true) long workFlowCode) {
-//        Map<String, Object> result = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
-//        return Result.success(result);
-//    }
+    @Operation(summary = "queryLineageByWorkFlowCode", description = "QUERY_WORKFLOW_LINEAGE_BY_CODE_NOTE")
+    @GetMapping(value = "/{workFlowCode}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+    public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
+                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                  @PathVariable(value = "workFlowCode") long workFlowCode) {
+        Map<String, Object> result = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        return returnDataList(result);
+
+    }
 
     @Operation(summary = "queryWorkFlowList", description = "QUERY_WORKFLOW_LINEAGE_NOTES")
     @GetMapping(value = "/list")
@@ -108,10 +108,10 @@ public class WorkFlowLineageController extends BaseController {
     /**
      * Whether task can be deleted or not, avoiding task depend on other task of process definition delete by accident.
      *
-     * @param loginUser login user
-     * @param projectCode project codes which taskCode belong
+     * @param loginUser             login user
+     * @param projectCode           project codes which taskCode belong
      * @param processDefinitionCode project code which taskCode belong
-     * @param taskCode task definition code
+     * @param taskCode              task definition code
      * @return Result of task can be deleted or not
      */
     @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
@@ -123,13 +123,13 @@ public class WorkFlowLineageController extends BaseController {
     @PostMapping(value = "/tasks/verify-delete")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(TASK_WITH_DEPENDENT_ERROR)
-    public Result verifyTaskCanDelete(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                      @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
-                                      @RequestParam(value = "taskCode", required = true) long taskCode) {
-        Result result = new Result();
+    public Result<Map<String, Object>> verifyTaskCanDelete(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                           @RequestParam(value = "processDefinitionCode", required = true) long processDefinitionCode,
+                                                           @RequestParam(value = "taskCode", required = true) long taskCode) {
+        Result<Map<String, Object>> result = new Result<>();
         Optional<String> taskDepMsg =
-                processLineageService.taskDepOnTaskMsg(projectCode, processDefinitionCode, taskCode);
+                processLineageService.taskDependentMsg(projectCode, processDefinitionCode, taskCode);
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }
@@ -137,19 +137,23 @@ public class WorkFlowLineageController extends BaseController {
         return result;
     }
 
-//    @Operation(summary = "queryDownstreamDependentTaskList", description = "QUERY_DOWNSTREAM_DEPENDENT_TASK_NOTES")
-//    @Parameters({
-//            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = Long.class)),
-//            @Parameter(name = "taskCode", description = "TASK_DEFINITION_CODE", required = false, schema = @Schema(implementation = Long.class, example = "123456789")),
-//    })
-//    @GetMapping(value = "/query-dependent-tasks")
-//    @ResponseStatus(HttpStatus.OK)
-//    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
-//    public Result<Map<String, Object>> queryDownstreamDependentTaskList(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
-//                                                                        @RequestParam(value = "workFlowCode") Long workFlowCode,
-//                                                                        @RequestParam(value = "taskCode", required = false, defaultValue = "0") Long taskCode) {
-//        Map<String, Object> result =
-//                processLineageService.queryDownstreamDependentTasks(workFlowCode, taskCode);
-//        return returnDataList(result);
-//    }
+    /**
+     * Whether task can be deleted or not, avoiding task depend on other task of process definition delete by accident.
+     */
+    @Operation(summary = "verifyTaskCanDelete", description = "VERIFY_TASK_CAN_DELETE")
+    @Parameters({
+            @Parameter(name = "projectCode", description = "PROCESS_DEFINITION_NAME", required = true, schema = @Schema(implementation = long.class)),
+            @Parameter(name = "workFlowCode", description = "PROCESS_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class)),
+    })
+    @GetMapping(value = "/query-dependent-tasks")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_WORKFLOW_LINEAGE_ERROR)
+    public Result<Map<String, Object>> queryDependentTasks(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                           @RequestParam(value = "workFlowCode") long workFlowCode,
+                                                           @RequestParam(value = "taskCode", required = false) Long taskCode) {
+        return returnDataList(
+                processLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode));
+    }
+
 }

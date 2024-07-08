@@ -427,4 +427,9 @@ public interface ProcessDefinitionService {
      * @return variables data
      */
     Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
+
+    void saveProcessLineage(List<TaskDefinitionLog> taskDefinitionLogList,
+                            long projectCode,
+                            long processDefinitionCode,
+                            int processDefinitionVersion);
 }

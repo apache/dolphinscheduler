@@ -22,7 +22,7 @@ import java.util.Date;
 import lombok.Data;
 
 @Data
-public class WorkFlowLineage {
+public class WorkFlowRelationDetail {
 
     private long workFlowCode;
     private String workFlowName;

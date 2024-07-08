@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -26,7 +27,24 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface ProcessLineageMapper extends BaseMapper<ProcessLineage> {
+
     int batchDeleteByProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
 
     int batchInsert(@Param("processLineages") List<ProcessLineage> processLineages);
+
+    List<ProcessLineage> queryByProjectCode(@Param("projectCode") long projectCode);
+
+    List<WorkFlowRelationDetail> queryWorkFlowLineageByCode(@Param("processDefinitionCode") long processDefinitionCode);
+
+    List<WorkFlowRelationDetail> queryWorkFlowLineageByName(@Param("projectCode") long projectCode,
+                                                            @Param("processDefinitionName") String processDefinitionName);
+
+    List<ProcessLineage> queryWorkFlowLineageByDept(@Param("deptProjectCode") long deptProjectCode,
+                                                    @Param("deptProcessDefinitionCode") long deptProcessDefinitionCode,
+                                                    @Param("deptTaskDefinitionCode") long deptTaskDefinitionCode);
+
+    List<ProcessLineage> queryByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
+
+    void truncateTable();
+
 }

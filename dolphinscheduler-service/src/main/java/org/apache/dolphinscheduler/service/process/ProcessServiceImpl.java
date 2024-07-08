@@ -51,7 +51,6 @@ import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
@@ -87,6 +86,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProcessLineageMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -98,7 +98,6 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkFlowLineageMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
@@ -257,9 +256,6 @@ public class ProcessServiceImpl implements ProcessService {
     private TaskGroupMapper taskGroupMapper;
 
     @Autowired
-    private WorkFlowLineageMapper workFlowLineageMapper;
-
-    @Autowired
     private ClusterMapper clusterMapper;
 
     @Autowired
@@ -270,6 +266,8 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private TriggerRelationService triggerRelationService;
+    @Autowired
+    private ProcessLineageMapper processLineageMapper;
 
     /**
      * todo: split this method
@@ -1428,17 +1426,6 @@ public class ProcessServiceImpl implements ProcessService {
     @Override
     public List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode) {
         return scheduleMapper.queryReleaseSchedulerListByProcessDefinitionCode(processDefinitionCode);
-    }
-
-    /**
-     * query dependent process definition by process definition code
-     *
-     * @param processDefinitionCode processDefinitionCode
-     * @see DependentProcessDefinition
-     */
-    @Override
-    public List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode) {
-        return workFlowLineageMapper.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode);
     }
 
     /**

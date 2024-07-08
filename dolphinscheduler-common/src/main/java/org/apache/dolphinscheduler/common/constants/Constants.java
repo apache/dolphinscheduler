@@ -485,7 +485,7 @@ public final class Constants {
     /**
      * workflow
      */
-    public static final String WORKFLOW_LIST = "workFlowList";
+    public static final String WORKFLOW_RELATION_DETAIL_LIST = "workFlowRelationDetailList";
     public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
 
     /**
