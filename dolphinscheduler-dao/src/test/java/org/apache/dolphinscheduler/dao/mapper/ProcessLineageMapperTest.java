@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class WorkFlowLineageMapperTest extends BaseDaoTest {
+public class ProcessLineageMapperTest extends BaseDaoTest {
 
     @Autowired
     private ProcessLineageMapper processLineageMapper;
@@ -83,6 +83,21 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         processDefinitionMapper.insert(processDefinition);
     }
 
+    private void insertOneProcessLineage() {
+        // insertOne
+        ProcessLineage processLineage = new ProcessLineage();
+        processLineage.setProcessDefinitionCode(1L);
+        processLineage.setProcessDefinitionVersion(1);
+        processLineage.setTaskDefinitionCode(1L);
+        processLineage.setTaskDefinitionVersion(1);
+        processLineage.setDeptProjectCode(1L);
+        processLineage.setDeptProcessDefinitionCode(1L);
+        processLineage.setDeptTaskDefinitionCode(1L);
+        processLineage.setUpdateTime(new Date());
+        processLineage.setCreateTime(new Date());
+        processLineageMapper.insert(processLineage);
+    }
+
     /**
      * insert
      *
@@ -107,7 +122,6 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneSchedule(processDefinition.getId());
-
         List<WorkFlowRelationDetail> workFlowLineages = processLineageMapper
                 .queryWorkFlowLineageByName(processDefinition.getProjectCode(), processDefinition.getName());
         Assertions.assertNotEquals(0, workFlowLineages.size());
@@ -118,9 +132,10 @@ public class WorkFlowLineageMapperTest extends BaseDaoTest {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneProcessTaskRelation();
-        List<ProcessLineage> workFlowLineages =
+        insertOneProcessLineage();
+        List<ProcessLineage> processLineages =
                 processLineageMapper.queryByProjectCode(processDefinition.getProjectCode());
-        Assertions.assertNotEquals(0, workFlowLineages.size());
+        Assertions.assertNotEquals(0, processLineages.size());
     }
 
     @Test
