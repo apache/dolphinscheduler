@@ -118,6 +118,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
       - uses: actions/download-artifact@v4
         name: Download Binary Package
         with:

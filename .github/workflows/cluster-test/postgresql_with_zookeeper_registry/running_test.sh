@@ -46,23 +46,23 @@ do
 
   if [[ $i -eq $TIMEOUT ]];then
     if [[ $MASTER_HTTP_STATUS -ne 200 ]];then
-      cat ./dolphinscheduler/master-server/logs/dolphinscheduler-master.log
-      cat ./dolphinscheduler/master-server/logs/*.out
+      cat ~/dolphinscheduler/master-server/logs/dolphinscheduler-master.log
+      cat ~/dolphinscheduler/master-server/logs/*.out
       echo "master start health check failed"
     fi
     if [[ $WORKER_HTTP_STATUS -ne 200 ]]; then
-      cat ./dolphinscheduler/worker-server/logs/dolphinscheduler-master.log
-      cat ./dolphinscheduler/worker-server/logs/*.out
+      cat ~/dolphinscheduler/worker-server/logs/dolphinscheduler-master.log
+      cat ~/dolphinscheduler/worker-server/logs/*.out
       echo "worker start health check failed"
     fi
     if [[ $API_HTTP_STATUS -ne 200 ]]; then
-      cat ./dolphinscheduler/api-server/logs/dolphinscheduler-master.log
-      cat ./dolphinscheduler/api-server/logs/*.out
+      cat ~/dolphinscheduler/api-server/logs/dolphinscheduler-master.log
+      cat ~/dolphinscheduler/api-server/logs/*.out
       echo "api start health check failed"
     fi
     if [[ $ALERT_HTTP_STATUS -ne 200 ]]; then
-      cat ./dolphinscheduler/alert-server/logs/dolphinscheduler-master.log
-      cat ./dolphinscheduler/alert-server/logs/*.out
+      cat ~/dolphinscheduler/alert-server/logs/dolphinscheduler-master.log
+      cat ~/dolphinscheduler/alert-server/logs/*.out
       echo "alert start health check failed"
     fi
     exit $START_HEALTHCHECK_EXITCODE
