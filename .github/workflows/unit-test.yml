@@ -110,12 +110,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
   result:
     name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [ unit-test, paths-filter ]
+    needs: [ unit-test, paths-filter, sonarcloud-analysis ]
     if: always()
     steps:
       - name: Status
