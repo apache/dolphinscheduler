@@ -75,7 +75,12 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-unit-test
           restore-keys: ${{ runner.os }}-maven-
-
+  sonarcloud-analysis:
+    name: SonarCloud-Analysis
+    needs: unit-test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
       - name: Run Unit tests
         run: ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false
       - name: Upload coverage report to codecov
@@ -97,7 +102,6 @@ jobs:
           -Dsonar.organization=apache
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
-          -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
           -Dsonar.exclusions=,dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
           -DskipUT=true
