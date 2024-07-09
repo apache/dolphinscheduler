@@ -81,7 +81,6 @@ jobs:
         run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
   sonarcloud-analysis:
     name: SonarCloud-Analysis
-#    needs: unit-test
     needs: paths-filter
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -130,7 +129,7 @@ jobs:
             echo "Skip Unit Test!"
             exit 0
           fi
-          if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
+          if [[ ${{ needs.unit-test.result }} != 'success' || ${{ needs.sonarcloud-analysis.result }} != 'success' ]]; then
             echo "Unit Test Failed!"
             exit -1
           fi
