@@ -403,6 +403,7 @@ alter table t_ds_process_instance add process_definition_version int(11) DEFAULT
 alter table t_ds_process_instance add environment_code bigint(20) DEFAULT '-1' COMMENT 'environment code' AFTER worker_group;
 alter table t_ds_process_instance add var_pool longtext COMMENT 'var_pool' AFTER tenant_id;
 alter table t_ds_process_instance add dry_run tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run' AFTER var_pool;
+alter table t_ds_process_instance add next_process_instance_id int(11) DEFAULT '0' COMMENT 'serial queue next processInstanceId' AFTER dry_run;
 alter table t_ds_process_instance drop KEY `process_instance_index`;
 alter table t_ds_process_instance add KEY `process_instance_index` (`process_definition_code`,`id`) USING BTREE;
 alter table t_ds_process_instance drop process_instance_json;
