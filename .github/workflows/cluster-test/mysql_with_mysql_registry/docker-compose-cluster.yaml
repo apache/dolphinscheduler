@@ -23,7 +23,10 @@ services:
     image: jdk8:ds_mysql_cluster
     restart: always
     volumes:
-      - ${HOME}/ds_test:/root/apache-dolphinscheduler-test-SNAPSHOT-bin
+      - ${HOME}/ds_test/master-server/logs:/root/apache-dolphinscheduler-test-SNAPSHOT-bin/master-server/logs
+      - ${HOME}/ds_test/worker-server/logs:/root/apache-dolphinscheduler-test-SNAPSHOT-bin/worker-server/logs
+      - ${HOME}/ds_test/alert-server/logs:/root/apache-dolphinscheduler-test-SNAPSHOT-bin/alert-server/logs
+      - ${HOME}/ds_test/api-server/logs:/root/apache-dolphinscheduler-test-SNAPSHOT-bin/api-server/logs
     ports:
       - "12345:12345"
       - "5679:5679"

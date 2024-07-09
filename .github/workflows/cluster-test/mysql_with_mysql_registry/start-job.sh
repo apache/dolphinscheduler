@@ -24,7 +24,6 @@ docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docke
 docker build -t jdk8:ds_mysql_cluster -f .github/workflows/cluster-test/mysql_with_mysql_registry/Dockerfile .
 
 #Start ds mysql cluster container
-mkdir ~/ds_test
 docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docker-compose-cluster.yaml up -d
 
 #Running tests
