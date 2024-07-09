@@ -24,6 +24,7 @@ docker-compose -f .github/workflows/cluster-test/mysql_with_zookeeper_registry/d
 docker build -t jdk8:ds_mysql_cluster -f .github/workflows/cluster-test/mysql_with_zookeeper_registry/Dockerfile .
 
 #Start ds mysql cluster container
+mkdir ~/ds_test
 docker-compose -f .github/workflows/cluster-test/mysql_with_zookeeper_registry/docker-compose-cluster.yaml up -d
 
 #Running tests

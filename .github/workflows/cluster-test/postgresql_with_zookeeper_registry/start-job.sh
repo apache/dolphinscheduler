@@ -24,6 +24,7 @@ docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_regis
 docker build -t jdk8:ds_postgresql_cluster -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/Dockerfile .
 
 #Start ds postgresql cluster container
+mkdir ~/ds_test
 docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-cluster.yaml up -d
 
 #Running tests
