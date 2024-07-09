@@ -23,7 +23,7 @@ services:
     image: jdk8:ds_postgresql_cluster
     restart: always
     volumes:
-      - ~/ds_test:/root/apache-dolphinscheduler-test-SNAPSHOT-bin
+      - ${HOME}/ds_test:/root/apache-dolphinscheduler-test-SNAPSHOT-bin
     ports:
       - "12345:12345"
       - "5679:5679"
