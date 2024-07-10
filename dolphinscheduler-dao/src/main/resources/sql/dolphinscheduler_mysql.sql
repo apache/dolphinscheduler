@@ -2159,7 +2159,7 @@ CREATE TABLE `t_ds_listener_event` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
--- Table structure for t_ds_process_lineage
+-- Table structure for t_ds_process_task_lineage
 -- ----------------------------
 DROP TABLE IF EXISTS `t_ds_process_task_lineage`;
 CREATE TABLE `t_ds_process_task_lineage` (

@@ -2151,7 +2151,7 @@ create index idx_listener_event_post_status on t_ds_listener_event (post_status)
 create index idx_listener_event_sign on t_ds_listener_event (sign);
 
 -- ----------------------------
--- Table structure for t_ds_process_lineage
+-- Table structure for t_ds_process_task_lineage
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_process_task_lineage;
 CREATE TABLE t_ds_process_task_lineage (
