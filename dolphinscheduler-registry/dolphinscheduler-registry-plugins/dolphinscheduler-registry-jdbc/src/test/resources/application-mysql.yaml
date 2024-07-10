@@ -28,4 +28,3 @@ registry:
   type: jdbc
   heartbeat-refresh-interval: 1s
   session-timeout: 3s
-

@@ -100,6 +100,8 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
             // The server is already started or stopped, will not start again.
             return;
         }
+        // Purge the previous client to avoid the client is still in the registry.
+        purgePreviousJdbcRegistryClient();
         // Start the Purge thread
         // The Purge thread will remove the client from the registry, and remove it's related data and lock.
         // Connect to the database, load the data and lock.
@@ -122,8 +124,6 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     @SneakyThrows
     @Override
     public void registerClient(IJdbcRegistryClient jdbcRegistryClient) {
-        // todo: Insert a new client DTO(Heartbeat) to the db.
-        // check if the client is already exist the registry.
         checkNotNull(jdbcRegistryClient);
 
         JdbcRegistryClientIdentify jdbcRegistryClientIdentify = jdbcRegistryClient.getJdbcRegistryClientIdentify();
@@ -157,7 +157,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         JdbcRegistryClientIdentify jdbcRegistryClientIdentify = jdbcRegistryClient.getJdbcRegistryClientIdentify();
         checkNotNull(jdbcRegistryClientIdentify);
 
-        doPurgeDeadJdbcRegistryClientInDB(Lists.newArrayList(jdbcRegistryClientIdentify.getClientId()));
+        doPurgeJdbcRegistryClientInDB(Lists.newArrayList(jdbcRegistryClientIdentify.getClientId()));
     }
 
     @Override
@@ -255,9 +255,23 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 .map(IJdbcRegistryClient::getJdbcRegistryClientIdentify)
                 .map(JdbcRegistryClientIdentify::getClientId)
                 .collect(Collectors.toList());
-        doPurgeDeadJdbcRegistryClientInDB(clientIds);
+        doPurgeJdbcRegistryClientInDB(clientIds);
         jdbcRegistryClients.clear();
         jdbcRegistryClientDTOMap.clear();
+    }
+
+    private void purgePreviousJdbcRegistryClient() {
+        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
+            return;
+        }
+        List<Long> previousJdbcRegistryClientIds = jdbcRegistryClientRepository.queryAll()
+                .stream()
+                .filter(jdbcRegistryClientHeartbeat -> jdbcRegistryClientHeartbeat.getClientName()
+                        .equals(jdbcRegistryProperties.getJdbcRegistryClientName()))
+                .map(JdbcRegistryClientHeartbeatDTO::getId)
+                .collect(Collectors.toList());
+        doPurgeJdbcRegistryClientInDB(previousJdbcRegistryClientIds);
+
     }
 
     private void purgeDeadJdbcRegistryClient() {
@@ -269,11 +283,11 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 .filter(JdbcRegistryClientHeartbeatDTO::isDead)
                 .map(JdbcRegistryClientHeartbeatDTO::getId)
                 .collect(Collectors.toList());
-        doPurgeDeadJdbcRegistryClientInDB(deadJdbcRegistryClientIds);
+        doPurgeJdbcRegistryClientInDB(deadJdbcRegistryClientIds);
 
     }
 
-    private void doPurgeDeadJdbcRegistryClientInDB(List<Long> jdbcRegistryClientIds) {
+    private void doPurgeJdbcRegistryClientInDB(List<Long> jdbcRegistryClientIds) {
         if (CollectionUtils.isEmpty(jdbcRegistryClientIds)) {
             return;
         }
