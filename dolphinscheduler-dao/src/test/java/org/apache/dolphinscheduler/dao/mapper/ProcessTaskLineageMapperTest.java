@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
@@ -34,10 +34,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ProcessLineageMapperTest extends BaseDaoTest {
+public class ProcessTaskLineageMapperTest extends BaseDaoTest {
 
     @Autowired
-    private ProcessLineageMapper processLineageMapper;
+    private ProcessTaskLineageMapper processTaskLineageMapper;
 
     @Autowired
     private ProcessDefinitionMapper processDefinitionMapper;
@@ -85,17 +85,17 @@ public class ProcessLineageMapperTest extends BaseDaoTest {
 
     private void insertOneProcessLineage() {
         // insertOne
-        ProcessLineage processLineage = new ProcessLineage();
-        processLineage.setProcessDefinitionCode(1L);
-        processLineage.setProcessDefinitionVersion(1);
-        processLineage.setTaskDefinitionCode(1L);
-        processLineage.setTaskDefinitionVersion(1);
-        processLineage.setDeptProjectCode(1L);
-        processLineage.setDeptProcessDefinitionCode(1L);
-        processLineage.setDeptTaskDefinitionCode(1L);
-        processLineage.setUpdateTime(new Date());
-        processLineage.setCreateTime(new Date());
-        processLineageMapper.insert(processLineage);
+        ProcessTaskLineage processTaskLineage = new ProcessTaskLineage();
+        processTaskLineage.setProcessDefinitionCode(1L);
+        processTaskLineage.setProcessDefinitionVersion(1);
+        processTaskLineage.setTaskDefinitionCode(1L);
+        processTaskLineage.setTaskDefinitionVersion(1);
+        processTaskLineage.setDeptProjectCode(1L);
+        processTaskLineage.setDeptProcessDefinitionCode(1L);
+        processTaskLineage.setDeptTaskDefinitionCode(1L);
+        processTaskLineage.setUpdateTime(new Date());
+        processTaskLineage.setCreateTime(new Date());
+        processTaskLineageMapper.insert(processTaskLineage);
     }
 
     /**
@@ -122,7 +122,7 @@ public class ProcessLineageMapperTest extends BaseDaoTest {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneSchedule(processDefinition.getId());
-        List<WorkFlowRelationDetail> workFlowLineages = processLineageMapper
+        List<WorkFlowRelationDetail> workFlowLineages = processTaskLineageMapper
                 .queryWorkFlowLineageByName(processDefinition.getProjectCode(), processDefinition.getName());
         Assertions.assertNotEquals(0, workFlowLineages.size());
     }
@@ -133,9 +133,9 @@ public class ProcessLineageMapperTest extends BaseDaoTest {
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneProcessTaskRelation();
         insertOneProcessLineage();
-        List<ProcessLineage> processLineages =
-                processLineageMapper.queryByProjectCode(processDefinition.getProjectCode());
-        Assertions.assertNotEquals(0, processLineages.size());
+        List<ProcessTaskLineage> processTaskLineages =
+                processTaskLineageMapper.queryByProjectCode(processDefinition.getProjectCode());
+        Assertions.assertNotEquals(0, processTaskLineages.size());
     }
 
     @Test
@@ -143,7 +143,7 @@ public class ProcessLineageMapperTest extends BaseDaoTest {
         insertOneProcessDefinition();
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(1L);
         insertOneSchedule(processDefinition.getId());
-        List<WorkFlowRelationDetail> workFlowLineages = processLineageMapper
+        List<WorkFlowRelationDetail> workFlowLineages = processTaskLineageMapper
                 .queryWorkFlowLineageByCode(processDefinition.getCode());
         Assertions.assertNotNull(workFlowLineages);
     }

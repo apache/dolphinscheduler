@@ -27,10 +27,13 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,8 +89,10 @@ public class ProcessLineageController extends BaseController {
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @PathVariable(value = "workFlowCode") long workFlowCode) {
-        Map<String, Object> result = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
-        return returnDataList(result);
+        WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.DATA_LIST, workFlowLineage);
+        return Result.success(result);
 
     }
 
@@ -97,8 +102,10 @@ public class ProcessLineageController extends BaseController {
     public Result<Map<String, Object>> queryWorkFlowLineage(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
-            Map<String, Object> result = processLineageService.queryWorkFlowLineage(projectCode);
-            return returnDataList(result);
+            Map<String, Object> result = new HashMap<>();
+            WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineage(projectCode);
+            result.put(Constants.DATA_LIST, workFlowLineage);
+            return Result.success(result);
         } catch (Exception e) {
             log.error(QUERY_WORKFLOW_LINEAGE_ERROR.getMsg(), e);
             return error(QUERY_WORKFLOW_LINEAGE_ERROR.getCode(), QUERY_WORKFLOW_LINEAGE_ERROR.getMsg());
@@ -152,8 +159,10 @@ public class ProcessLineageController extends BaseController {
                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                            @RequestParam(value = "workFlowCode") long workFlowCode,
                                                            @RequestParam(value = "taskCode", required = false) Long taskCode) {
-        return returnDataList(
-                processLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode));
+        Map<String, Object> result = new HashMap<>();
+        List<DependentLineageTask> dependentLineageTaskList = processLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode);
+        result.put(Constants.DATA_LIST, dependentLineageTaskList);
+        return Result.success(result);
     }
 
 }

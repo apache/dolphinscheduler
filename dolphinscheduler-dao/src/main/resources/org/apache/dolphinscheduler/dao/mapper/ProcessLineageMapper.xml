@@ -17,7 +17,7 @@
   -->
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessLineageMapper">
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.ProcessTaskLineageMapper">
     <sql id="baseSql">
         id
         , process_definition_code
@@ -43,15 +43,15 @@
         insert into t_ds_process_lineage (process_definition_code, process_definition_version, task_definition_code,
         task_definition_version, dept_project_code, dept_process_definition_code, dept_task_definition_code)
         values
-        <foreach collection="processLineages" item="processLineage" separator=",">
-            (#{processLineage.processDefinitionCode},#{processLineage.processDefinitionVersion},
-            #{processLineage.taskDefinitionCode},#{processLineage.taskDefinitionVersion},
-            #{processLineage.deptProjectCode},#{processLineage.deptProcessDefinitionCode},
-            #{processLineage.deptTaskDefinitionCode})
+        <foreach collection="processTaskLineages" item="processTaskLineage" separator=",">
+            (#{processTaskLineage.processDefinitionCode},#{processTaskLineage.processDefinitionVersion},
+            #{processTaskLineage.taskDefinitionCode},#{processTaskLineage.taskDefinitionVersion},
+            #{processTaskLineage.deptProjectCode},#{processTaskLineage.deptProcessDefinitionCode},
+            #{processTaskLineage.deptTaskDefinitionCode})
         </foreach>
     </insert>
 
-    <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
+    <select id="queryByProjectCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
         select
             <include refid="baseSql"/>
         from
@@ -61,53 +61,53 @@
 
     <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
         select
-            tepd.code as work_flow_code
-            ,tepd.name as work_flow_name
-            ,tepd.release_state as work_flow_publish_status
-            ,tes.start_time as schedule_start_time
-            ,tes.end_time as schedule_end_time
-            ,tes.crontab as crontab
-            ,tes.release_state as schedule_publish_status
-        from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
-        where tepd.code = #{processDefinitionCode}
+            pd.code as work_flow_code
+            ,pd.name as work_flow_name
+            ,pd.release_state as work_flow_publish_status
+            ,schd.start_time as schedule_start_time
+            ,schd.end_time as schedule_end_time
+            ,schd.crontab as crontab
+            ,schd.release_state as schedule_publish_status
+        from t_ds_process_definition pd
+        left join t_ds_schedules schd on pd.code = schd.process_definition_code
+        where pd.code = #{processDefinitionCode}
     </select>
 
     <select id="queryWorkFlowLineageByName" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
         select
-        tepd.code as work_flow_code
-        ,tepd.name as work_flow_name
-        ,tepd.release_state as work_flow_publish_status
-        ,tes.start_time as schedule_start_time
-        ,tes.end_time as schedule_end_time
-        ,tes.crontab as crontab
-        ,tes.release_state as schedule_publish_status
-        from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
+        pd.code as work_flow_code
+        ,pd.name as work_flow_name
+        ,pd.release_state as work_flow_publish_status
+        ,schd.start_time as schedule_start_time
+        ,schd.end_time as schedule_end_time
+        ,schd.crontab as crontab
+        ,schd.release_state as schedule_publish_status
+        from t_ds_process_definition pd
+        left join t_ds_schedules schd on pd.code = schd.process_definition_code
         where 1=1
         <if test="processDefinitionName != null and processDefinitionName != ''">
-            and tepd.name = #{processDefinitionName}
+            and pd.name = #{processDefinitionName}
         </if>
-        and tepd.project_code = #{projectCode}
+        and pd.project_code = #{projectCode}
     </select>
 
     <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
         select
-        tepd.code as work_flow_code
-        ,tepd.name as work_flow_name
-        ,tepd.release_state as work_flow_publish_status
-        ,tes.start_time as schedule_start_time
-        ,tes.end_time as schedule_end_time
-        ,tes.crontab as crontab
-        ,tes.release_state as schedule_publish_status
-        from t_ds_process_definition tepd
-        left join t_ds_schedules tes on tepd.code = tes.process_definition_code
+        pd.code as work_flow_code
+        ,pd.name as work_flow_name
+        ,pd.release_state as work_flow_publish_status
+        ,schd.start_time as schedule_start_time
+        ,schd.end_time as schedule_end_time
+        ,schd.crontab as crontab
+        ,schd.release_state as schedule_publish_status
+        from t_ds_process_definition pd
+        left join t_ds_schedules schd on pd.code = schd.process_definition_code
         where 1=1
-        and tepd.code = #{processDefinitionCode}
-        and tepd.project_code = #{projectCode}
+        and pd.code = #{processDefinitionCode}
+        and pd.project_code = #{projectCode}
     </select>
 
-    <select id="queryWorkFlowLineageByDept" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
+    <select id="queryWorkFlowLineageByDept" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
         select
             <include refid="baseSql"/>
         from
@@ -122,7 +122,7 @@
         </if>
     </select>
 
-    <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessLineage">
+    <select id="queryByProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
         select
             <include refid="baseSql"/>
         from

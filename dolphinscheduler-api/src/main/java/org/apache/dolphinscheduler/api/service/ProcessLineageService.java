@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
-import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 
 import java.util.List;
@@ -32,9 +34,9 @@ public interface ProcessLineageService {
 
     List<WorkFlowRelationDetail> queryWorkFlowLineageByName(long projectCode, String processDefinitionName);
 
-    Map<String, Object> queryWorkFlowLineageByCode(long projectCode, long processDefinitionCode);
+    WorkFlowLineage queryWorkFlowLineageByCode(long projectCode, long processDefinitionCode);
 
-    Map<String, Object> queryWorkFlowLineage(long projectCode);
+    WorkFlowLineage queryWorkFlowLineage(long projectCode);
 
     /**
      * Query downstream tasks depend on a process definition or a task
@@ -54,11 +56,11 @@ public interface ProcessLineageService {
      */
     Optional<String> taskDependentMsg(long projectCode, long processDefinitionCode, long taskCode);
 
-    Map<String, Object> queryDependentProcessDefinitions(long projectCode, long processDefinitionCode, Long taskCode);
+    List<DependentLineageTask> queryDependentProcessDefinitions(long projectCode, long processDefinitionCode, Long taskCode);
 
-    int createProcessLineage(List<ProcessLineage> processLineages);
+    int createProcessLineage(List<ProcessTaskLineage> processTaskLineages);
 
-    int updateProcessLineage(List<ProcessLineage> processLineages);
+    int updateProcessLineage(List<ProcessTaskLineage> processTaskLineages);
 
     int deleteProcessLineage(List<Long> processDefinitionCodes);
 }

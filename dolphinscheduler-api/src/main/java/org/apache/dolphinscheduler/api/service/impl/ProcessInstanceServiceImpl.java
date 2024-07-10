@@ -687,8 +687,8 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
 
         // save process lineage
         if (syncDefine) {
-            processDefinitionService.saveProcessLineage(taskDefinitionLogs, projectCode, processDefinition.getCode(),
-                    insertVersion);
+            processDefinitionService.saveProcessLineage(projectCode, processDefinition.getCode(),
+                    insertVersion, taskDefinitionLogs);
         }
 
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),

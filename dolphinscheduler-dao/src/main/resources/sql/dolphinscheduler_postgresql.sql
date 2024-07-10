@@ -2153,8 +2153,8 @@ create index idx_listener_event_sign on t_ds_listener_event (sign);
 -- ----------------------------
 -- Table structure for t_ds_process_lineage
 -- ----------------------------
-DROP TABLE IF EXISTS t_ds_process_lineage;
-CREATE TABLE t_ds_process_lineage (
+DROP TABLE IF EXISTS t_ds_process_task_lineage;
+CREATE TABLE t_ds_process_task_lineage (
     id int NOT NULL,
     process_definition_code bigint NOT NULL DEFAULT 0,
     process_definition_version int NOT NULL DEFAULT 0,
@@ -2168,6 +2168,6 @@ CREATE TABLE t_ds_process_lineage (
     PRIMARY KEY (id)
 );
 
-create index idx_process_code_version on t_ds_process_lineage (process_definition_code,process_definition_version);
-create index idx_task_code_version on t_ds_process_lineage (task_definition_code,task_definition_version);
-create index idx_dept_code on t_ds_process_lineage (dept_project_code,dept_process_definition_code,dept_task_definition_code);
+create index idx_process_code_version on t_ds_process_task_lineage (process_definition_code,process_definition_version);
+create index idx_task_code_version on t_ds_process_task_lineage (task_definition_code,task_definition_version);
+create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_process_definition_code,dept_task_definition_code);

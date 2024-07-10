@@ -20,20 +20,19 @@ package org.apache.dolphinscheduler.api.service;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.ProcessLineageServiceImpl;
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
-import org.apache.dolphinscheduler.dao.mapper.ProcessLineageMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.repository.ProcessTaskLineageDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,13 +46,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * work flow lineage service test
  */
 @ExtendWith(MockitoExtension.class)
-public class ProcessLineageServiceTest {
+public class ProcessTaskLineageServiceTest {
 
     @InjectMocks
     private ProcessLineageServiceImpl processLineageService;
 
     @Mock
-    private ProcessLineageMapper processLineageMapper;
+    private ProcessTaskLineageDao processTaskLineageDao;
 
     @Mock
     private ProjectMapper projectMapper;
@@ -81,7 +80,7 @@ public class ProcessLineageServiceTest {
         Project project = getProject("test");
         String name = "test";
         when(projectMapper.queryByCode(1L)).thenReturn(project);
-        when(processLineageMapper.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
+        when(processTaskLineageDao.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(getWorkFlowLineages());
         List<WorkFlowRelationDetail> workFlowLineages = processLineageService.queryWorkFlowLineageByName(1L, name);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(workFlowLineages));
@@ -91,35 +90,34 @@ public class ProcessLineageServiceTest {
     public void testQueryWorkFlowLineage() {
         Project project = getProject("test");
 
-        List<ProcessLineage> processLineages = new ArrayList<>();
-        ProcessLineage processLineage = new ProcessLineage();
-        processLineage.setProcessDefinitionCode(1);
-        processLineage.setProcessDefinitionVersion(1);
-        processLineage.setTaskDefinitionCode(2L);
-        processLineage.setTaskDefinitionVersion(1);
-        processLineage.setDeptProjectCode(1111L);
-        processLineage.setDeptProcessDefinitionCode(1);
-        processLineage.setDeptTaskDefinitionCode(1111L);
-        processLineages.add(processLineage);
+        List<ProcessTaskLineage> processTaskLineages = new ArrayList<>();
+        ProcessTaskLineage processTaskLineage = new ProcessTaskLineage();
+        processTaskLineage.setProcessDefinitionCode(1);
+        processTaskLineage.setProcessDefinitionVersion(1);
+        processTaskLineage.setTaskDefinitionCode(2L);
+        processTaskLineage.setTaskDefinitionVersion(1);
+        processTaskLineage.setDeptProjectCode(1111L);
+        processTaskLineage.setDeptProcessDefinitionCode(1);
+        processTaskLineage.setDeptTaskDefinitionCode(1111L);
+        processTaskLineages.add(processTaskLineage);
 
         List<WorkFlowRelationDetail> workFlowRelationDetailList = new ArrayList<>();
         WorkFlowRelationDetail workFlowRelationDetail = new WorkFlowRelationDetail();
-        workFlowRelationDetail.setWorkFlowCode(processLineage.getProcessDefinitionCode());
+        workFlowRelationDetail.setWorkFlowCode(processTaskLineage.getProcessDefinitionCode());
         workFlowRelationDetail.setWorkFlowName("testProcessDefinitionName");
         workFlowRelationDetailList.add(workFlowRelationDetail);
 
         when(projectMapper.queryByCode(1L)).thenReturn(project);
-        when(processLineageMapper.queryByProjectCode(project.getCode())).thenReturn(processLineages);
-        when(processLineageMapper.queryWorkFlowLineageByCode(processLineage.getProcessDefinitionCode()))
+        when(processTaskLineageDao.queryByProjectCode(project.getCode())).thenReturn(processTaskLineages);
+        when(processTaskLineageDao.queryWorkFlowLineageByCode(processTaskLineage.getProcessDefinitionCode()))
                 .thenReturn(workFlowRelationDetailList);
 
-        Map<String, Object> result = processLineageService.queryWorkFlowLineage(1L);
+        WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineage(1L);
 
-        Map<String, Object> workFlowLists = (Map<String, Object>) result.get(Constants.DATA_LIST);
         List<WorkFlowRelationDetail> workFlowLineageList =
-                (List<WorkFlowRelationDetail>) workFlowLists.get(Constants.WORKFLOW_RELATION_DETAIL_LIST);
+            workFlowLineage.getWorkFlowRelationDetailList();
         List<WorkFlowRelation> workFlowRelations =
-                (List<WorkFlowRelation>) workFlowLists.get(Constants.WORKFLOW_RELATION_LIST);
+            workFlowLineage.getWorkFlowRelationList();
         Assertions.assertTrue(!workFlowLineageList.isEmpty());
         Assertions.assertTrue(!workFlowRelations.isEmpty());
     }

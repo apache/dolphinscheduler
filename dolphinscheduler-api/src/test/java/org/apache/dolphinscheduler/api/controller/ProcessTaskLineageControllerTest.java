@@ -41,7 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * work flow lineage controller test
  */
 @ExtendWith(MockitoExtension.class)
-public class ProcessLineageControllerTest {
+public class ProcessTaskLineageControllerTest {
 
     @InjectMocks
     private ProcessLineageController processLineageController;

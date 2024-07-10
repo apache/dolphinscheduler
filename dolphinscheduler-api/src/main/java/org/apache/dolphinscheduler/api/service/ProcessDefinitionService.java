@@ -428,8 +428,8 @@ public interface ProcessDefinitionService {
      */
     Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
 
-    void saveProcessLineage(List<TaskDefinitionLog> taskDefinitionLogList,
-                            long projectCode,
+    void saveProcessLineage(long projectCode,
                             long processDefinitionCode,
-                            int processDefinitionVersion);
+                            int processDefinitionVersion,
+                            List<TaskDefinitionLog> taskDefinitionLogList);
 }

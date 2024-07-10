@@ -42,6 +42,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYP
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
+import org.apache.dolphinscheduler.api.dto.TaskCodeVersionDto;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
@@ -83,7 +84,7 @@ import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessLineage;
+import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -96,7 +97,6 @@ import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProcessLineageMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -148,6 +148,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -157,6 +158,7 @@ import javax.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.MediaType;
@@ -250,8 +252,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
 
     @Autowired
     private ListenerEventAlertManager listenerEventAlertManager;
-    @Autowired
-    private ProcessLineageMapper processLineageMapper;
 
     /**
      * create process definition
@@ -413,8 +413,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     processDefinition.getProjectCode(), processDefinition.getCode(), insertVersion);
         }
 
-        saveProcessLineage(taskDefinitionLogs, processDefinition.getProjectCode(), processDefinition.getCode(),
-                insertVersion);
+        saveProcessLineage(processDefinition.getProjectCode(), processDefinition.getCode(),
+                insertVersion, taskDefinitionLogs);
 
         putMsg(result, Status.SUCCESS);
         result.put(Constants.DATA_LIST, processDefinition);
@@ -422,54 +422,55 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     }
 
     @Override
-    public void saveProcessLineage(List<TaskDefinitionLog> taskDefinitionLogList,
-                                   long projectCode,
+    public void saveProcessLineage(long projectCode,
                                    long processDefinitionCode,
-                                   int processDefinitionVersion) {
-        List<ProcessLineage> processLineageList =
+                                   int processDefinitionVersion,
+                                   List<TaskDefinitionLog> taskDefinitionLogList) {
+        List<ProcessTaskLineage> processTaskLineageList =
                 generateProcessLineageList(taskDefinitionLogList, processDefinitionCode, processDefinitionVersion);
-        if (!processLineageList.isEmpty()) {
-            int insertProcessLineageResult = processLineageService.updateProcessLineage(processLineageList);
-            if (insertProcessLineageResult <= 0) {
-                log.error(
-                        "Save process lineage error, projectCode: {}, processDefinitionCode: {}, processDefinitionVersion: {}",
-                        projectCode, processDefinitionCode, processDefinitionVersion);
-                throw new ServiceException(Status.CREATE_PROCESS_LINEAGE_ERROR);
-            } else {
-                log.info(
-                        "Save process lineage complete, projectCode: {}, processDefinitionCode: {}, processDefinitionVersion: {}",
-                        projectCode, processDefinitionCode, processDefinitionVersion);
-            }
+        if (processTaskLineageList.isEmpty()) {
+            return;
         }
 
+        int insertProcessLineageResult = processLineageService.updateProcessLineage(processTaskLineageList);
+        if (insertProcessLineageResult <= 0) {
+            log.error(
+                    "Save process lineage error, projectCode: {}, processDefinitionCode: {}, processDefinitionVersion: {}",
+                    projectCode, processDefinitionCode, processDefinitionVersion);
+            throw new ServiceException(Status.CREATE_PROCESS_LINEAGE_ERROR);
+        } else {
+            log.info(
+                    "Save process lineage complete, projectCode: {}, processDefinitionCode: {}, processDefinitionVersion: {}",
+                    projectCode, processDefinitionCode, processDefinitionVersion);
+        }
     }
 
-    private List<ProcessLineage> generateProcessLineageList(List<TaskDefinitionLog> taskDefinitionLogList,
-                                                            long processDefinitionCode,
-                                                            int processDefinitionVersion) {
-        List<ProcessLineage> processLineageList = new ArrayList<>();
+    private List<ProcessTaskLineage> generateProcessLineageList(List<TaskDefinitionLog> taskDefinitionLogList,
+                                                                long processDefinitionCode,
+                                                                int processDefinitionVersion) {
+        List<ProcessTaskLineage> processTaskLineageList = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
-
-            if (TaskTypeUtils.isDependentTask(taskDefinitionLog.getTaskType())) {
-                for (DependentTaskModel dependentTaskModel : JSONUtils
-                        .parseObject(taskDefinitionLog.getTaskParams(), DependentParameters.class)
-                        .getDependence().getDependTaskList()) {
-                    for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
-                        ProcessLineage processLineage = new ProcessLineage();
-                        processLineage.setProcessDefinitionCode(processDefinitionCode);
-                        processLineage.setProcessDefinitionVersion(processDefinitionVersion);
-                        processLineage.setTaskDefinitionCode(taskDefinitionLog.getCode());
-                        processLineage.setTaskDefinitionVersion(taskDefinitionLog.getVersion());
-                        processLineage.setDeptProjectCode(taskDefinitionLog.getProjectCode());
-                        processLineage.setDeptProcessDefinitionCode(dependentItem.getDefinitionCode());
-                        processLineage.setDeptTaskDefinitionCode(dependentItem.getDepTaskCode());
-                        processLineageList.add(processLineage);
-                    }
-                }
+            if (!TaskTypeUtils.isDependentTask(taskDefinitionLog.getTaskType())) {
+                continue;
             }
 
+            for (DependentTaskModel dependentTaskModel : JSONUtils
+                    .parseObject(taskDefinitionLog.getTaskParams(), DependentParameters.class)
+                    .getDependence().getDependTaskList()) {
+                for (DependentItem dependentItem : dependentTaskModel.getDependItemList()) {
+                    ProcessTaskLineage processTaskLineage = new ProcessTaskLineage();
+                    processTaskLineage.setProcessDefinitionCode(processDefinitionCode);
+                    processTaskLineage.setProcessDefinitionVersion(processDefinitionVersion);
+                    processTaskLineage.setTaskDefinitionCode(taskDefinitionLog.getCode());
+                    processTaskLineage.setTaskDefinitionVersion(taskDefinitionLog.getVersion());
+                    processTaskLineage.setDeptProjectCode(taskDefinitionLog.getProjectCode());
+                    processTaskLineage.setDeptProcessDefinitionCode(dependentItem.getDefinitionCode());
+                    processTaskLineage.setDeptTaskDefinitionCode(dependentItem.getDepTaskCode());
+                    processTaskLineageList.add(processTaskLineage);
+                }
+            }
         }
-        return processLineageList;
+        return processTaskLineageList;
     }
 
     private List<TaskDefinitionLog> generateTaskDefinitionList(String taskDefinitionJson) {
@@ -969,8 +970,8 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 throw new ServiceException(Status.UPDATE_PROCESS_DEFINITION_ERROR);
             }
 
-            saveProcessLineage(taskDefinitionLogs, processDefinition.getProjectCode(), processDefinition.getCode(),
-                    insertVersion);
+            saveProcessLineage(processDefinition.getProjectCode(), processDefinition.getCode(),
+                    insertVersion, taskDefinitionLogs);
         } else {
             log.info(
                     "Process definition does not need to be updated because there is no change, projectCode:{}, processCode:{}, processVersion:{}.",
@@ -2284,30 +2285,41 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<ProcessTaskRelation> processTaskRelationList = processTaskRelationMapper
                 .queryProcessTaskRelationsByProcessDefinitionCode(processDefinitionLog.getCode(),
                         processDefinitionLog.getVersion());
-        List<TaskDefinition> taskDefinitionList = new ArrayList<>();
-        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
-            if (processTaskRelation.getPreTaskCode() != 0) {
-                TaskDefinition taskDefinition = new TaskDefinition();
-                taskDefinition.setCode(processTaskRelation.getPreTaskCode());
-                taskDefinition.setVersion(processTaskRelation.getPreTaskVersion());
-                taskDefinitionList.add(taskDefinition);
-            }
-            if (processTaskRelation.getPostTaskCode() != 0) {
-                TaskDefinition taskDefinition = new TaskDefinition();
-                taskDefinition.setCode(processTaskRelation.getPostTaskCode());
-                taskDefinition.setVersion(processTaskRelation.getPostTaskVersion());
-                taskDefinitionList.add(taskDefinition);
-            }
-        }
+        List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(processTaskRelationList);
         List<TaskDefinitionLog> taskDefinitionLogList =
-                taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList);
-        saveProcessLineage(taskDefinitionLogList, processDefinitionLog.getProjectCode(), processDefinitionLog.getCode(),
-                processDefinitionLog.getVersion());
+                taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList.stream()
+                    .flatMap(taskCodeVersionDto -> {
+                        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+                        taskDefinitionLog.setCode(taskCodeVersionDto.getCode());
+                        taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
+                        return Stream.of(taskDefinitionLog);
+                    }).collect(Collectors.toList()));
+        saveProcessLineage(processDefinitionLog.getProjectCode(), processDefinitionLog.getCode(),
+                processDefinitionLog.getVersion(), taskDefinitionLogList);
 
         log.info("Switch process definition version complete, projectCode:{}, processDefinitionCode:{}, version:{}.",
                 projectCode, code, version);
         putMsg(result, Status.SUCCESS);
         return result;
+    }
+
+    private static @NotNull List<TaskCodeVersionDto> getTaskCodeVersionDtos(List<ProcessTaskRelation> processTaskRelationList) {
+        List<TaskCodeVersionDto> taskDefinitionList = new ArrayList<>();
+        for (ProcessTaskRelation processTaskRelation : processTaskRelationList) {
+            if (processTaskRelation.getPreTaskCode() != 0) {
+                TaskCodeVersionDto taskCodeVersionDto = new TaskCodeVersionDto();
+                taskCodeVersionDto.setCode(processTaskRelation.getPreTaskCode());
+                taskCodeVersionDto.setVersion(processTaskRelation.getPreTaskVersion());
+                taskDefinitionList.add(taskCodeVersionDto);
+            }
+            if (processTaskRelation.getPostTaskCode() != 0) {
+                TaskCodeVersionDto taskCodeVersionDto = new TaskCodeVersionDto();
+                taskCodeVersionDto.setCode(processTaskRelation.getPostTaskCode());
+                taskCodeVersionDto.setVersion(processTaskRelation.getPostTaskVersion());
+                taskDefinitionList.add(taskCodeVersionDto);
+            }
+        }
+        return taskDefinitionList;
     }
 
     /**

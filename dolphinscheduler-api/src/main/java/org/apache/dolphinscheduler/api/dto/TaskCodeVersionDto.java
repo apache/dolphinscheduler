@@ -15,34 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.entity;
+package org.apache.dolphinscheduler.api.dto;
 
-import java.util.Date;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@TableName("t_ds_process_lineage")
-public class ProcessLineage {
-
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    private long processDefinitionCode;
-    private int processDefinitionVersion;
-    private long taskDefinitionCode;
-    private int taskDefinitionVersion;
-    private long deptProjectCode;
-    private long deptProcessDefinitionCode;
-    private long deptTaskDefinitionCode;
-    private Date createTime;
-    private Date updateTime;
+public class TaskCodeVersionDto {
+    private long code;
+    private int version;
 }
