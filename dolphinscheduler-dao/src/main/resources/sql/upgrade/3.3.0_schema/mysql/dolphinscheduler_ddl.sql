@@ -15,8 +15,8 @@
  * limitations under the License.
 */
 
-DROP TABLE IF EXISTS `t_ds_process_lineage`;
-CREATE TABLE `t_ds_process_lineage`
+DROP TABLE IF EXISTS `t_ds_process_task_lineage`;
+CREATE TABLE `t_ds_process_task_lineage`
 (
     `id`                           int      NOT NULL AUTO_INCREMENT,
     `process_definition_code`      bigint   NOT NULL DEFAULT 0,
