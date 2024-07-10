@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -56,7 +55,8 @@ public interface ProcessLineageService {
      */
     Optional<String> taskDependentMsg(long projectCode, long processDefinitionCode, long taskCode);
 
-    List<DependentLineageTask> queryDependentProcessDefinitions(long projectCode, long processDefinitionCode, Long taskCode);
+    List<DependentLineageTask> queryDependentProcessDefinitions(long projectCode, long processDefinitionCode,
+                                                                Long taskCode);
 
     int createProcessLineage(List<ProcessTaskLineage> processTaskLineages);
 

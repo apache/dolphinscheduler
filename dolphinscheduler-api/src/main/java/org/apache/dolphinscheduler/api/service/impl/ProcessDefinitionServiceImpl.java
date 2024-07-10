@@ -2288,12 +2288,12 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(processTaskRelationList);
         List<TaskDefinitionLog> taskDefinitionLogList =
                 taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList.stream()
-                    .flatMap(taskCodeVersionDto -> {
-                        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
-                        taskDefinitionLog.setCode(taskCodeVersionDto.getCode());
-                        taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
-                        return Stream.of(taskDefinitionLog);
-                    }).collect(Collectors.toList()));
+                        .flatMap(taskCodeVersionDto -> {
+                            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+                            taskDefinitionLog.setCode(taskCodeVersionDto.getCode());
+                            taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
+                            return Stream.of(taskDefinitionLog);
+                        }).collect(Collectors.toList()));
         saveProcessLineage(processDefinitionLog.getProjectCode(), processDefinitionLog.getCode(),
                 processDefinitionLog.getVersion(), taskDefinitionLogList);
 

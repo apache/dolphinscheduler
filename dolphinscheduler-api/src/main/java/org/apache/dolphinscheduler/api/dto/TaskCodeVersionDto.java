@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class TaskCodeVersionDto {
+
     private long code;
     private int version;
 }

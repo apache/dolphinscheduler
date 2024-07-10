@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import lombok.NonNull;
-
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskLineageMapper;
@@ -30,11 +28,14 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.NonNull;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class ProcessTaskLineageDaoImpl extends BaseDao<ProcessTaskLineage, ProcessTaskLineageMapper>
-    implements ProcessTaskLineageDao {
+        implements
+            ProcessTaskLineageDao {
 
     public ProcessTaskLineageDaoImpl(@NonNull ProcessTaskLineageMapper processTaskLineageMapper) {
         super(processTaskLineageMapper);
@@ -72,8 +73,10 @@ public class ProcessTaskLineageDaoImpl extends BaseDao<ProcessTaskLineage, Proce
     }
 
     @Override
-    public List<ProcessTaskLineage> queryWorkFlowLineageByDept(long deptProjectCode, long deptProcessDefinitionCode, long deptTaskDefinitionCode) {
-        return mybatisMapper.queryWorkFlowLineageByDept(deptProjectCode, deptProcessDefinitionCode, deptTaskDefinitionCode);
+    public List<ProcessTaskLineage> queryWorkFlowLineageByDept(long deptProjectCode, long deptProcessDefinitionCode,
+                                                               long deptTaskDefinitionCode) {
+        return mybatisMapper.queryWorkFlowLineageByDept(deptProjectCode, deptProcessDefinitionCode,
+                deptTaskDefinitionCode);
     }
 
     @Override
@@ -91,8 +94,9 @@ public class ProcessTaskLineageDaoImpl extends BaseDao<ProcessTaskLineage, Proce
         if (CollectionUtils.isEmpty(processTaskLineages)) {
             return 0;
         }
-        this.batchDeleteByProcessDefinitionCode(processTaskLineages.stream().map(ProcessTaskLineage::getProcessDefinitionCode)
-            .distinct().collect(Collectors.toList()));
+        this.batchDeleteByProcessDefinitionCode(
+                processTaskLineages.stream().map(ProcessTaskLineage::getProcessDefinitionCode)
+                        .distinct().collect(Collectors.toList()));
         return mybatisMapper.batchInsert(processTaskLineages);
     }
 }

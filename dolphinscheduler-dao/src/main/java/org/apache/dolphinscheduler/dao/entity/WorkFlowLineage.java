@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import java.util.List;
+
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
 public class WorkFlowLineage {
+
     private List<WorkFlowRelation> workFlowRelationList;
     private List<WorkFlowRelationDetail> workFlowRelationDetailList;
 }

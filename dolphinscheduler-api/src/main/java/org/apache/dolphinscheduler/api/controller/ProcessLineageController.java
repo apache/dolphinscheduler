@@ -160,7 +160,8 @@ public class ProcessLineageController extends BaseController {
                                                            @RequestParam(value = "workFlowCode") long workFlowCode,
                                                            @RequestParam(value = "taskCode", required = false) Long taskCode) {
         Map<String, Object> result = new HashMap<>();
-        List<DependentLineageTask> dependentLineageTaskList = processLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode);
+        List<DependentLineageTask> dependentLineageTaskList =
+                processLineageService.queryDependentProcessDefinitions(projectCode, workFlowCode, taskCode);
         result.put(Constants.DATA_LIST, dependentLineageTaskList);
         return Result.success(result);
     }

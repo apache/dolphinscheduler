@@ -115,9 +115,9 @@ public class ProcessTaskLineageServiceTest {
         WorkFlowLineage workFlowLineage = processLineageService.queryWorkFlowLineage(1L);
 
         List<WorkFlowRelationDetail> workFlowLineageList =
-            workFlowLineage.getWorkFlowRelationDetailList();
+                workFlowLineage.getWorkFlowRelationDetailList();
         List<WorkFlowRelation> workFlowRelations =
-            workFlowLineage.getWorkFlowRelationList();
+                workFlowLineage.getWorkFlowRelationList();
         Assertions.assertTrue(!workFlowLineageList.isEmpty());
         Assertions.assertTrue(!workFlowRelations.isEmpty());
     }

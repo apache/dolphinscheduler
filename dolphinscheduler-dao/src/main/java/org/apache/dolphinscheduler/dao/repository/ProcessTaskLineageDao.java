@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import java.util.List;
 
 public interface ProcessTaskLineageDao extends IDao<ProcessTaskLineage> {
+
     int batchDeleteByProcessDefinitionCode(List<Long> processDefinitionCodes);
 
     int batchInsert(List<ProcessTaskLineage> processTaskLineages);
