@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
 
 public interface IRegistryRowChangeNotifier<T> {
 
-    int DEFAULT_DETECT_INTERVAL = 1000;
-
     void start();
 
     void subscribeRegistryRowChange(RegistryRowChangeListener<T> registryRowChangeListener);

@@ -17,9 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
+
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -34,6 +33,9 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @ActiveProfiles("postgresql")
 @SpringBootTest(classes = {JdbcRegistryProperties.class})
@@ -57,56 +59,15 @@ public class PostgresqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
         String jdbcUrl = "jdbc:postgresql://localhost:" + postgresqlContainer.getMappedPort(5432) + "/dolphinscheduler";
         System.clearProperty("spring.datasource.url");
         System.setProperty("spring.datasource.url", jdbcUrl);
-        try (
-                Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");
-                Statement statement = connection.createStatement();) {
-            statement.execute(
-                    "create table t_ds_jdbc_registry_data\n" +
-                            "(\n" +
-                            "    id               bigserial NOT NULL,\n" +
-                            "    data_key         varchar   not null,\n" +
-                            "    data_value       text      not null,\n" +
-                            "    data_type        varchar   not null,\n" +
-                            "    client_id        bigint    not null,\n" +
-                            "    create_time      timestamp not null,\n" +
-                            "    last_update_time timestamp not null,\n" +
-                            "PRIMARY KEY (id)\n" +
-                            ");");
-            statement.execute(
-                    "create unique index uk_t_ds_jdbc_registry_dataKey on t_ds_jdbc_registry_data (data_key);");
 
-            statement.execute(
-                    "create table t_ds_jdbc_registry_lock\n" +
-                            "(\n" +
-                            "    id          bigserial NOT NULL,\n" +
-                            "    lock_key    varchar   not null,\n" +
-                            "    lock_owner  varchar   not null,\n" +
-                            "    client_id   bigint    not null,\n" +
-                            "    create_time timestamp not null,\n" +
-                            "PRIMARY KEY (id)\n" +
-                            ");");
-            statement.execute(
-                    "create unique index uk_t_ds_jdbc_registry_lockKey on t_ds_jdbc_registry_lock (lock_key);");
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername("root");
+        config.setPassword("root");
 
-            statement.execute("create table t_ds_jdbc_registry_client_heartbeat\n" +
-                    "(\n" +
-                    "    id                  bigint    NOT NULL,\n" +
-                    "    client_name         varchar   not null,\n" +
-                    "    last_heartbeat_time bigint    not null,\n" +
-                    "    connection_config   text      not null,\n" +
-                    "    create_time         timestamp not null,\n" +
-                    "PRIMARY KEY (id)\n" +
-                    ");");
-
-            statement.execute("create table t_ds_jdbc_registry_data_change_event\n" +
-                    "(\n" +
-                    "    id                 bigserial NOT NULL,\n" +
-                    "    event_type         varchar   not null,\n" +
-                    "    jdbc_registry_data text      not null,\n" +
-                    "    create_time        timestamp not null,\n" +
-                    "PRIMARY KEY (id)\n" +
-                    ");");
-
+        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+            SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, "postgresql_registry_init.sql");
+            sqlScriptRunner.execute();
         }
     }
 
