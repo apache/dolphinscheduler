@@ -283,6 +283,7 @@ const BatchTaskInstance = defineComponent({
         <Card title={t('project.task.batch_task')}>
           <NSpace vertical>
             <NDataTable
+              row-class-name='batch-task-instance-items'
               loading={loadingRef}
               columns={this.columns}
               data={this.tableData}

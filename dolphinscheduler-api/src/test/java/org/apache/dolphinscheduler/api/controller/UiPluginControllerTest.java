@@ -25,6 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -32,7 +33,9 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
@@ -90,5 +93,24 @@ public class UiPluginControllerTest extends AbstractControllerTest {
         final Result actualResponseContent =
                 JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+    }
+
+    @Test
+    public void testQueryProductInfo() throws Exception {
+        ProductInfoDto mockResult = new ProductInfoDto();
+        Mockito.when(uiPluginService.queryProductInfo()).thenReturn(mockResult);
+
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userId", "1");
+
+        MvcResult mvcResult = mockMvc.perform(get("/ui-plugins/query-product-info")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 }

@@ -19,32 +19,31 @@
 
 package org.apache.dolphinscheduler.e2e.pages;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
-import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+
+import lombok.Getter;
+import lombok.SneakyThrows;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import lombok.Getter;
-import lombok.SneakyThrows;
-
-import java.time.Duration;
 
 @Getter
 public final class LoginPage extends NavBarPage {
+
     @FindBys({
-        @FindBy(className = "input-user-name"),
-        @FindBy(tagName = "input"),
+            @FindBy(className = "input-user-name"),
+            @FindBy(tagName = "input"),
     })
     private WebElement inputUsername;
 
-    @FindBys( {
-        @FindBy(className = "input-password"),
-        @FindBy(tagName = "input"),
+    @FindBys({
+            @FindBy(className = "input-password"),
+            @FindBy(tagName = "input"),
     })
     private WebElement inputPassword;
 
@@ -59,17 +58,21 @@ public final class LoginPage extends NavBarPage {
     }
 
     @SneakyThrows
-    public NavBarPage login(String username, String password) {
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
+    public NavBarPage login(IUser user) {
+        return login(user.getUserName(), user.getPassword());
+    }
 
+    @SneakyThrows
+    public NavBarPage login(String username, String password) {
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(buttonSwitchLanguage));
         buttonSwitchLanguage().click();
 
         inputUsername().sendKeys(username);
         inputPassword().sendKeys(password);
         buttonLogin().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30))
-            .until(ExpectedConditions.urlContains("/home"));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/home"));
 
         return new NavBarPage(driver);
     }
