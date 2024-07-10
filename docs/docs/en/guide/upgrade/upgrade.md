@@ -60,7 +60,7 @@ Execute script: `sh ./tools/bin/migrate-lineage.sh`.
 
 Execution result:
 
-- Migrate lineage data to new table `t_ds_process_lineage`.
+- Migrate lineage data to new table `t_ds_process_task_lineage`.
 
 ### Upgrade Service
 

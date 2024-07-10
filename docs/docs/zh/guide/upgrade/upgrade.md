@@ -59,7 +59,7 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
 执行结果：
 
-- 原血缘数据迁移至新血缘表 `t_ds_process_lineage`。
+- 原血缘数据迁移至新血缘表 `t_ds_process_task_lineage`。
 
 ### 服务升级
 
