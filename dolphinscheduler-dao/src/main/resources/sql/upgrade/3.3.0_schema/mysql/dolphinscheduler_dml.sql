@@ -13,19 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.dao.entity;
-
-import java.util.List;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class WorkFlowLineage {
-
-    private List<WorkFlowRelation> workFlowRelationList;
-    private List<WorkFlowRelationDetail> workFlowRelationDetailList;
-}
+*/

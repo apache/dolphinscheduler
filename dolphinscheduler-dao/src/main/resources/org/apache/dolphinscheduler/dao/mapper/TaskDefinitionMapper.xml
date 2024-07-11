@@ -160,4 +160,12 @@
         </where>
         order by update_time desc, id asc
     </select>
+
+    <select id="queryDefinitionsByTaskType" resultType="org.apache.dolphinscheduler.dao.entity.TaskDefinition">
+        select
+            <include refid="baseSql"/>
+        from t_ds_task_definition
+        where task_type = #{taskType}
+    </select>
+
 </mapper>

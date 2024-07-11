@@ -17,35 +17,32 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Objects;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkFlowRelation {
+@TableName("t_ds_process_task_lineage")
+public class ProcessTaskLineage {
 
-    private long sourceWorkFlowCode;
-    private long targetWorkFlowCode;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        WorkFlowRelation that = (WorkFlowRelation) o;
-        return sourceWorkFlowCode == that.sourceWorkFlowCode
-                && targetWorkFlowCode == that.targetWorkFlowCode;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sourceWorkFlowCode, targetWorkFlowCode);
-    }
+    private long processDefinitionCode;
+    private int processDefinitionVersion;
+    private long taskDefinitionCode;
+    private int taskDefinitionVersion;
+    private long deptProjectCode;
+    private long deptProcessDefinitionCode;
+    private long deptTaskDefinitionCode;
+    private Date createTime;
+    private Date updateTime;
 }

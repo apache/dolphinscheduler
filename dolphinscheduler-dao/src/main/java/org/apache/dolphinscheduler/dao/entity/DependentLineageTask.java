@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Objects;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,26 +24,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkFlowRelation {
+public class DependentLineageTask {
 
-    private long sourceWorkFlowCode;
-    private long targetWorkFlowCode;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        WorkFlowRelation that = (WorkFlowRelation) o;
-        return sourceWorkFlowCode == that.sourceWorkFlowCode
-                && targetWorkFlowCode == that.targetWorkFlowCode;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sourceWorkFlowCode, targetWorkFlowCode);
-    }
+    private long projectCode;
+    private long processDefinitionCode;
+    private String processDefinitionName;
+    private long taskDefinitionCode;
+    private String taskDefinitionName;
 }

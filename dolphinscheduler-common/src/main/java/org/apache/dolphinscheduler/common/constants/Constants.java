@@ -482,11 +482,9 @@ public final class Constants {
 
     public static final String TOTAL = "total";
 
-    /**
-     * workflow
-     */
-    public static final String WORKFLOW_LIST = "workFlowList";
-    public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
+    public static final long DEFAULT_PROJECT_CODE = 0;
+
+    public static final long DEPENDENT_ALL_TASK = 0;
 
     /**
      * session user

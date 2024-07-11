@@ -17,35 +17,20 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Objects;
+import java.util.Date;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkFlowRelation {
+public class WorkFlowRelationDetail {
 
-    private long sourceWorkFlowCode;
-    private long targetWorkFlowCode;
+    private long workFlowCode;
+    private String workFlowName;
+    private String workFlowPublishStatus;
+    private Date scheduleStartTime;
+    private Date scheduleEndTime;
+    private String crontab;
+    private int schedulePublishStatus;
+    private String sourceWorkFlowCode;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        WorkFlowRelation that = (WorkFlowRelation) o;
-        return sourceWorkFlowCode == that.sourceWorkFlowCode
-                && targetWorkFlowCode == that.targetWorkFlowCode;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(sourceWorkFlowCode, targetWorkFlowCode);
-    }
 }

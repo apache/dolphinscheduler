@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.executor.ExecuteContext;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -185,6 +186,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TenantMapper tenantMapper;
+
+    @Autowired
+    private ProcessLineageService processLineageService;
 
     /**
      * execute process instance
@@ -999,7 +1003,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   boolean allLevelDependent) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 checkDependentProcessDefinitionValid(
-                        processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode),
+                        processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode),
                         processDefinitionCycle, workerGroup,
                         processDefinitionCode);
 
@@ -1013,7 +1017,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 List<DependentProcessDefinition> childDependentList = childList
                         .stream()
                         .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
-                                processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+                                processLineageService.queryDownstreamDependentProcessDefinitions(
                                         dependentProcessDefinition.getProcessDefinitionCode()),
                                 processDefinitionCycle,
                                 workerGroup,
