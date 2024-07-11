@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -80,6 +81,7 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     public void writeHeartBeat(MasterHeartBeat masterHeartBeat) {
         String masterHeartBeatJson = JSONUtils.toJsonString(masterHeartBeat);
         registryClient.persistEphemeral(heartBeatPath, masterHeartBeatJson);
+        MasterServerMetrics.incMasterHeartbeatCount();
         log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, masterHeartBeatJson);
     }

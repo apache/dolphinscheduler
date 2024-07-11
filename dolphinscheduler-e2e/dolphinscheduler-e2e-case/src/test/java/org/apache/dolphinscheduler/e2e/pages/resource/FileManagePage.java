@@ -20,35 +20,31 @@
 
 package org.apache.dolphinscheduler.e2e.pages.resource;
 
-import lombok.Getter;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.util.List;
+
+import lombok.Getter;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.io.File;
-import java.time.Duration;
-import java.util.List;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
-
 
 @Getter
 public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
+
     @FindBy(className = "btn-create-directory")
     private WebElement buttonCreateDirectory;
 
@@ -62,8 +58,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     private final RenameBox renameBox;
 
-    private final CreateFileBox createFileBox;
-
     private final UploadFileBox uploadFileBox;
 
     private final EditFileBox editFileBox;
@@ -72,8 +66,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     private List<WebElement> fileList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -89,8 +83,6 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         createDirectoryBox = new CreateDirectoryBox();
 
         renameBox = new RenameBox();
-
-        createFileBox = new CreateFileBox();
 
         uploadFileBox = new UploadFileBox();
 
@@ -169,16 +161,18 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     // todo: add file type
     public FileManagePage createFile(String fileName, String scripts) {
 
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(buttonCreateFile()));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(buttonCreateFile()));
 
         buttonCreateFile().click();
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file/create"));
 
-        createFileBox().inputFileName().sendKeys(fileName);
-        createFileBox().codeEditor().content(scripts);
-        createFileBox().buttonSubmit().click();
-        // todo: check if the operation is successful
+        CreateFileBox createFileBox = new CreateFileBox();
+        createFileBox.inputFileName().sendKeys(fileName);
+        createFileBox.codeEditor().content(scripts);
+        createFileBox.buttonSubmit().click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file-manage"));
         return this;
     }
 
@@ -187,11 +181,10 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         createFile(fileName, scripts);
 
         await()
-                .untilAsserted(() ->
-                        assertThat(fileList())
-                                .as("File list should contain newly-created file: " + fileName)
-                                .extracting(WebElement::getText)
-                                .anyMatch(it -> it.contains(fileName)));
+                .untilAsserted(() -> assertThat(fileList())
+                        .as("File list should contain newly-created file: " + fileName)
+                        .extracting(WebElement::getText)
+                        .anyMatch(it -> it.contains(fileName)));
         return this;
     }
 
@@ -207,7 +200,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/edit"));
 
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.tagName("body")), fileName));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.textToBePresentInElement(driver.findElement(By.tagName("body")), fileName));
 
         editFileBox().codeEditor().content(scripts);
         editFileBox().buttonSubmit().click();
@@ -241,6 +235,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class CreateDirectoryBox {
+
         CreateDirectoryBox() {
             PageFactory.initElements(driver, this);
         }
@@ -260,6 +255,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class RenameBox {
+
         RenameBox() {
             PageFactory.initElements(driver, this);
         }
@@ -279,6 +275,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class CreateFileBox {
+
         CreateFileBox() {
             PageFactory.initElements(driver, this);
         }
@@ -300,6 +297,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class EditFileBox {
+
         EditFileBox() {
             PageFactory.initElements(driver, this);
         }
@@ -315,6 +313,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     @Getter
     public class UploadFileBox {
+
         UploadFileBox() {
             PageFactory.initElements(driver, this);
         }

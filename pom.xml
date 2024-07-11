@@ -707,6 +707,14 @@
                             <searchRegex>import\s+io\.kubernetes\.client\.[^\*\s]*(|\*);(\r\n|\r|\n)</searchRegex>
                             <replacement>$1</replacement>
                         </replaceRegex>
+                        <includes>
+                            <include>src/main/java/**/*.java</include>
+                            <include>src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-e2e/dolphinscheduler-e2e-case/src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-e2e/dolphinscheduler-e2e-core/src/main/java/**/*.java</include>
+                            <include>dolphinscheduler-api-test/dolphinscheduler-api-test-case/src/test/java/**/*.java</include>
+                            <include>dolphinscheduler-api-test/dolphinscheduler-api-test-core/src/main/java/**/*.java</include>
+                        </includes>
                     </java>
                     <pom>
                         <sortPom>

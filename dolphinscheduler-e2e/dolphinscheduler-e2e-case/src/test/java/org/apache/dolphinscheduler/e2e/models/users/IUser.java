@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.e2e.models.users;
 
-import org.apache.dolphinscheduler.e2e.models.tenant.ITenant;
-
 public interface IUser {
 
     String getUserName();
@@ -30,6 +28,5 @@ public interface IUser {
     String getPhone();
 
     String getTenant();
-
 
 }

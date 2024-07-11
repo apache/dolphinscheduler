@@ -56,7 +56,6 @@ task:
     - 'PYTORCH'
     - 'KUBEFLOW'
   other:
-    - 'PIGEON'
     - 'ZEPPELIN'
     - 'CHUNJUN'
     - 'DATASYNC'

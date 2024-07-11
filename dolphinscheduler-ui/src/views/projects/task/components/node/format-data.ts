@@ -432,10 +432,6 @@ export function formatParams(data: INodeData): {
     taskParams.others = data.others
   }
 
-  if (data.taskType === 'PIGEON') {
-    taskParams.targetJobName = data.targetJobName
-  }
-
   if (data.taskType === 'HIVECLI') {
     taskParams.hiveCliTaskExecutionType = data.hiveCliTaskExecutionType
     taskParams.hiveSqlScript = data.hiveSqlScript

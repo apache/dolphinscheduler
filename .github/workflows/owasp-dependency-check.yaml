@@ -20,7 +20,8 @@ name: OWASP Dependency Check
 on:
   push:
     branches:
-      - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
   pull_request:
     paths:
       - '**/pom.xml'
@@ -30,6 +31,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
         with:
@@ -47,4 +49,4 @@ jobs:
         continue-on-error: true
         with:
           name: dependency report
-          path: target/dependency-check-report.html          
+          path: target/dependency-check-report.html
