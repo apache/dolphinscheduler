@@ -89,7 +89,7 @@ public class ProcessLineageServiceImpl extends BaseServiceImpl implements Proces
                 processTaskLineageDao.queryByProcessDefinitionCode(processDefinitionCode);
         List<ProcessTaskLineage> downstreamProcessTaskLineageList =
                 processTaskLineageDao.queryWorkFlowLineageByDept(projectCode, processDefinitionCode,
-                        Constants.DEFAULT_TASK_CODE);
+                        Constants.DEPENDENT_ALL_TASK);
         List<ProcessTaskLineage> totalProcessTaskLineageList =
                 Stream.of(upstreamProcessTaskLineageList, downstreamProcessTaskLineageList)
                         .flatMap(List::stream)
@@ -217,7 +217,7 @@ public class ProcessLineageServiceImpl extends BaseServiceImpl implements Proces
         List<DependentProcessDefinition> dependentProcessDefinitionList = new ArrayList<>();
         List<ProcessTaskLineage> processTaskLineageList =
                 processTaskLineageDao.queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, processDefinitionCode,
-                        Constants.DEFAULT_TASK_CODE);
+                        Constants.DEPENDENT_ALL_TASK);
         if (processTaskLineageList.isEmpty()) {
             return dependentProcessDefinitionList;
         }

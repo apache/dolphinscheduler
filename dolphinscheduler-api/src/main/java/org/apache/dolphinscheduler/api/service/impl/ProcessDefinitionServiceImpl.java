@@ -1081,8 +1081,9 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                 processDefinition.getCode(), 0);
 
         if (taskDepMsg.isPresent()) {
-            log.error("Process definition cannot be deleted because it has dependent, {}", taskDepMsg.get());
-            throw new ServiceException(taskDepMsg.get());
+            String errorMeg = "Process definition cannot be deleted because it has dependent, " + taskDepMsg.get();
+            log.error(errorMeg);
+            throw new ServiceException(errorMeg);
         }
     }
 

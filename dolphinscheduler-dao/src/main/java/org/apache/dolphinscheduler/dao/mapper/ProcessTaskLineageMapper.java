@@ -45,6 +45,4 @@ public interface ProcessTaskLineageMapper extends BaseMapper<ProcessTaskLineage>
 
     List<ProcessTaskLineage> queryByProcessDefinitionCode(@Param("processDefinitionCode") long processDefinitionCode);
 
-    void truncateTable();
-
 }

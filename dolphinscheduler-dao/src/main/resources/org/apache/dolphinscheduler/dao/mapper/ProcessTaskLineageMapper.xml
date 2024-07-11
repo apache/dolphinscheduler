@@ -130,8 +130,4 @@
         where process_definition_code = #{processDefinitionCode}
     </select>
 
-    <update id="truncateTable">
-        truncate table t_ds_process_task_lineage
-    </update>
-
 </mapper>

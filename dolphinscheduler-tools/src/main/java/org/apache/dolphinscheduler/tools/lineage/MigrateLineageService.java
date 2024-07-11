@@ -60,7 +60,6 @@ public class MigrateLineageService {
     public void migrateLineageOnce() {
         try {
             List<ProcessTaskLineage> processTaskLineageList = getAllProcessLineages();
-            processTaskLineageDao.truncateTable();
             int insertResult = processTaskLineageDao.batchInsert(processTaskLineageList);
             if (insertResult > 0) {
                 log.info("Migrate lineage successfully, insert count: {}", insertResult);

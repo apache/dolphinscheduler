@@ -85,11 +85,6 @@ public class ProcessTaskLineageDaoImpl extends BaseDao<ProcessTaskLineage, Proce
     }
 
     @Override
-    public void truncateTable() {
-        mybatisMapper.truncateTable();
-    }
-
-    @Override
     public int updateProcessTaskLineage(List<ProcessTaskLineage> processTaskLineages) {
         if (CollectionUtils.isEmpty(processTaskLineages)) {
             return 0;

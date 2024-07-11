@@ -41,7 +41,5 @@ public interface ProcessTaskLineageDao extends IDao<ProcessTaskLineage> {
 
     List<ProcessTaskLineage> queryByProcessDefinitionCode(long processDefinitionCode);
 
-    void truncateTable();
-
     int updateProcessTaskLineage(List<ProcessTaskLineage> processTaskLineages);
 }
