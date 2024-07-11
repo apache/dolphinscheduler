@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 import org.apache.dolphinscheduler.plugin.task.api.ILogicTaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.DynamicLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
@@ -41,7 +42,7 @@ public class TaskTypeUtils {
     }
 
     public boolean isDependentTask(String taskType) {
-        return SubWorkflowLogicTaskChannelFactory.NAME.equals(taskType);
+        return DependentLogicTaskChannelFactory.NAME.equals(taskType);
     }
 
     public boolean isDynamicTask(String taskType) {

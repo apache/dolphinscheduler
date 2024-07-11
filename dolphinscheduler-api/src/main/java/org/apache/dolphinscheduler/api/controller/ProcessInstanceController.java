@@ -158,7 +158,6 @@ public class ProcessInstanceController extends BaseController {
      * @param scheduleTime schedule time
      * @param syncDefine sync define
      * @param locations locations
-     * @param tenantCode tenantCode
      * @return update result code
      */
     @Operation(summary = "updateProcessInstance", description = "UPDATE_PROCESS_INSTANCE_NOTES")
