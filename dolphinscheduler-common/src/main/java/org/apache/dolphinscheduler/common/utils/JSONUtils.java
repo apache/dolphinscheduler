@@ -25,6 +25,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -81,6 +82,7 @@ public final class JSONUtils {
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
+            .addModule(new JavaTimeModule())
             .defaultTimeZone(TimeZone.getDefault())
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();
