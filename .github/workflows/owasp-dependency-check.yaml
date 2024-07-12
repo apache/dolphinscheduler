@@ -22,7 +22,7 @@ on:
     branches:
       - '[0-9]+.[0-9]+.[0-9]+-prepare'
       - '[0-9]+.[0-9]+.[0-9]+-release'
-  pull_request:
+  pull_request_target:
     paths:
       - '**/pom.xml'
 env:
@@ -30,6 +30,9 @@ env:
 
 jobs:
   build:
+    permissions:
+      contents: read
+      pull-requests: write
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
