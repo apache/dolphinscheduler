@@ -52,16 +52,13 @@ public interface Registry extends Closeable {
 
     /**
      * Subscribe the path, when the path has expose {@link Event}, the listener will be triggered.
+     * <p>
+     * The sub path will also be watched, if the sub path has event, the listener will be triggered.
      *
      * @param path     the path to subscribe
      * @param listener the listener to be triggered
      */
     void subscribe(String path, SubscribeListener listener);
-
-    /**
-     * Remove the path from the subscribe list.
-     */
-    void unsubscribe(String path);
 
     /**
      * Add a connection listener to collection.

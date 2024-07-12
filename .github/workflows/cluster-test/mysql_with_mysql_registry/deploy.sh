@@ -35,7 +35,6 @@ service ssh start
 
 #Init schema
 /bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/upgrade-schema.sh
-/bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/initialize-jdbc-registry.sh
 
 #Start Cluster
 /bin/bash $DOLPHINSCHEDULER_HOME/bin/start-all.sh

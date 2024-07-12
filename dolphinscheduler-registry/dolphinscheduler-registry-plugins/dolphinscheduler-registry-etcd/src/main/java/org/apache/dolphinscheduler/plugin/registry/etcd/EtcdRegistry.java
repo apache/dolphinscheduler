@@ -166,20 +166,6 @@ public class EtcdRegistry implements Registry {
         }
     }
 
-    /**
-     * @param path The prefix of the key being listened to
-     * @throws throws an exception if the unsubscribe path does not exist
-     */
-    @Override
-    public void unsubscribe(String path) {
-        try {
-            watcherMap.get(path).close();
-            watcherMap.remove(path);
-        } catch (Exception e) {
-            throw new RegistryException("Failed to unsubscribe listener for key: " + path, e);
-        }
-    }
-
     @Override
     public void addConnectionStateListener(ConnectionListener listener) {
         etcdConnectionStateListener.addConnectionListener(listener);
