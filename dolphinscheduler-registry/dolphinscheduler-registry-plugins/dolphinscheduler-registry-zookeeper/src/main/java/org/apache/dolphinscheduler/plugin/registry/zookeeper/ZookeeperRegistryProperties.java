@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.Errors;
@@ -36,6 +37,7 @@ import org.springframework.validation.Validator;
 @NoArgsConstructor
 @AllArgsConstructor
 @Configuration
+@ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "zookeeper")
 @ConfigurationProperties(prefix = "registry")
 class ZookeeperRegistryProperties implements Validator {
 

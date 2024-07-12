@@ -17,8 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryClientHeartbeatMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataChanceEventMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockMapper;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryClientRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChanceEventRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServer;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.server.JdbcRegistryServer;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 
@@ -50,15 +58,25 @@ public class JdbcRegistryAutoConfiguration {
     }
 
     @Bean
-    public JdbcOperator jdbcOperator(JdbcRegistryProperties jdbcRegistryProperties,
-                                     JdbcRegistryDataMapper jdbcRegistryDataMapper,
-                                     JdbcRegistryLockMapper jdbcRegistryLockMapper) {
-        return new JdbcOperator(jdbcRegistryProperties, jdbcRegistryDataMapper, jdbcRegistryLockMapper);
+    public IJdbcRegistryServer jdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
+                                                  JdbcRegistryLockRepository jdbcRegistryLockRepository,
+                                                  JdbcRegistryClientRepository jdbcRegistryClientRepository,
+                                                  JdbcRegistryDataChanceEventRepository jdbcRegistryDataChanceEventRepository,
+                                                  JdbcRegistryProperties jdbcRegistryProperties) {
+        return new JdbcRegistryServer(
+                jdbcRegistryDataRepository,
+                jdbcRegistryLockRepository,
+                jdbcRegistryClientRepository,
+                jdbcRegistryDataChanceEventRepository,
+                jdbcRegistryProperties);
     }
 
     @Bean
-    public JdbcRegistry jdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties, JdbcOperator jdbcOperator) {
-        return new JdbcRegistry(jdbcRegistryProperties, jdbcOperator);
+    public JdbcRegistry jdbcRegistry(JdbcRegistryProperties jdbcRegistryProperties,
+                                     IJdbcRegistryServer jdbcRegistryServer) {
+        JdbcRegistry jdbcRegistry = new JdbcRegistry(jdbcRegistryProperties, jdbcRegistryServer);
+        jdbcRegistry.start();
+        return jdbcRegistry;
     }
 
     @Bean
@@ -87,6 +105,18 @@ public class JdbcRegistryAutoConfiguration {
     public JdbcRegistryLockMapper jdbcRegistryLockMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
         jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryLockMapper.class);
         return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryLockMapper.class);
+    }
+
+    @Bean
+    public JdbcRegistryDataChanceEventMapper jdbcRegistryDataChanceEventMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryDataChanceEventMapper.class);
+        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryDataChanceEventMapper.class);
+    }
+
+    @Bean
+    public JdbcRegistryClientHeartbeatMapper jdbcRegistryClientHeartbeatMapper(SqlSessionTemplate jdbcRegistrySqlSessionTemplate) {
+        jdbcRegistrySqlSessionTemplate.getConfiguration().addMapper(JdbcRegistryClientHeartbeatMapper.class);
+        return jdbcRegistrySqlSessionTemplate.getMapper(JdbcRegistryClientHeartbeatMapper.class);
     }
 
 }

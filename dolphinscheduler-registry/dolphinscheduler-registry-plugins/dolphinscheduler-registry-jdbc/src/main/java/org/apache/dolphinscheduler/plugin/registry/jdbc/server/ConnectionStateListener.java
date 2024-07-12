@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
 
-import lombok.experimental.UtilityClass;
+public interface ConnectionStateListener {
 
-@UtilityClass
-final class JdbcRegistryConstant {
+    void onConnected();
 
-    public static final long LOCK_ACQUIRE_INTERVAL = 1_000;
+    void onDisConnected();
 
+    void onReconnected();
 }

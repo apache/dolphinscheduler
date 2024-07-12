@@ -148,11 +148,6 @@ final class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public void unsubscribe(String path) {
-        CloseableUtils.closeQuietly(treeCacheMap.get(path));
-    }
-
-    @Override
     public String get(String key) {
         try {
             return new String(client.getData().forPath(key), StandardCharsets.UTF_8);
