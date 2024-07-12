@@ -46,8 +46,7 @@ jobs:
           ./mvnw -B clean install verify dependency-check:check \
           -DskipDepCheck=false \
           -Dmaven.test.skip=true \
-          -Dspotless.skip=true \
-          -DnvdApiKey=${NVD_API_KEY}
+          -Dspotless.skip=true
         env:
           NVD_API_KEY: ${{ secrets.NIST_NVD_API_KEY }}
       - name: Upload report

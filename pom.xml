@@ -545,6 +545,7 @@
                         <skipRuntimeScope>true</skipRuntimeScope>
                         <skipSystemScope>true</skipSystemScope>
                         <failBuildOnCVSS>7</failBuildOnCVSS>
+                        <nvdApiKeyEnvironmentVariable>NIST_NVD_API_KEY</nvdApiKeyEnvironmentVariable>
                     </configuration>
                     <executions>
                         <execution>
