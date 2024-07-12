@@ -102,7 +102,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HI
 ```
 
 > **_注意:_** 如果您使用的是 MySQL 数据库，需要将 `DATABASE` 设置为 `mysql`，并且修改 `SPRING_DATASOURCE_URL`、`SPRING_DATASOURCE_USERNAME` 和 `SPRING_DATASOURCE_PASSWORD` 为您的数据库配置
-
+>
 > **_注意:_** dolphinscheduler_env.sh 文件中的配置会覆盖各个服务的配置文件(application.yaml)中的配置，所以如果您在配置文件中配置了某个参数，
 > 而且在 dolphinscheduler_env.sh 文件中也配置了，那么以 dolphinscheduler_env.sh 文件中的配置为准。dolphinscheduler_env.sh 里的配置项格式样例:
 > SPRING_DATASOURCE_URL 在 application.yaml 为 spring.datasource.url，以此类推

@@ -95,7 +95,7 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HI
 ```
 
 > **_Note:_** If you use MySQL database, set `DATABASE` to `mysql`, and modify `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` and `SPRING_DATASOURCE_PASSWORD` to your database configuration.
-> 
+>
 > **_Note:_** The configuration in `dolphinscheduler_env.sh` will overwrite the configuration in each service's configuration file (application.yaml), so if you configure a parameter in the application.yaml file and also configure it in `dolphinscheduler_env.sh`,
 > the configuration in `dolphinscheduler_env.sh` will take precedence. The configuration format in `dolphinscheduler_env.sh` is as follows:
 > `SPRING_DATASOURCE_URL` in `application.yaml` is `spring.datasource.url`, and so on.
