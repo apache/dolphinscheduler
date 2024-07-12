@@ -8,10 +8,10 @@
 
 伪分布式部署 DolphinScheduler 需要有外部软件的支持
 
-- JDK：下载[JDK][jdk] (1.8+)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
+- JDK：下载[JDK][jdk] (1.8 或者 11)，安装并配置 `JAVA_HOME` 环境变量，并将其下的 `bin` 目录追加到 `PATH` 环境变量中。如果你的环境中已存在，可以跳过这步。
 - 二进制包：在[下载页面](https://dolphinscheduler.apache.org/zh-cn/download)下载 DolphinScheduler 二进制包
-- 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.16
-- 注册中心：[ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0+)，[下载地址][zookeeper]
+- 数据库：[PostgreSQL](https://www.postgresql.org/download/) (8.2.15+) 或者 [MySQL](https://dev.mysql.com/downloads/mysql/) (5.7+)，两者任选其一即可，如 MySQL 则需要 JDBC Driver 8.0.33
+- 注册中心：当前支持 [ZooKeeper](https://zookeeper.apache.org/releases.html) (3.8.0)，[MYSQL](https://www.mysql.com/)(8.0.33)，[ETCD](https://etcd.io/)
 - 进程树分析
   - macOS 安装`pstree`
   - Fedora/Red/Hat/CentOS/Ubuntu/Debian 安装`psmisc`
@@ -42,22 +42,8 @@ chmod -R 755 apache-dolphinscheduler-*-bin
 
 > **_注意:_**
 >
-> - 因为任务执行服务是以 `sudo -u {linux-user}` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
+> - 因为任务执行服务是以 `sudo -u {linux-user} -i` 切换不同 linux 用户的方式来实现多租户运行作业，所以部署用户需要有 sudo 权限，而且是免密的。初学习者不理解的话，完全可以暂时忽略这一点
 > - 如果发现 `/etc/sudoers` 文件中有 "Defaults requirett" 这行，也请注释掉
-
-### 配置机器 SSH 免密登陆
-
-由于安装的时候需要向不同机器发送资源，所以要求各台机器间能实现 SSH 免密登陆。配置免密登陆的步骤如下
-
-```shell
-su dolphinscheduler
-
-ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa
-cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
-chmod 600 ~/.ssh/authorized_keys
-```
-
-> **_注意:_** 配置完成后，可以通过运行命令 `ssh localhost` 判断是否成功，如果不需要输入密码就能 ssh 登陆则证明成功
 
 ### 启动 zookeeper
 
@@ -70,7 +56,8 @@ chmod 600 ~/.ssh/authorized_keys
 
 ## 修改相关配置
 
-完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env/dolphinscheduler_env.sh` 中找到。
+完成基础环境的准备后，需要根据你的机器环境修改配置文件。配置文件可以在目录 `bin/env/dolphinscheduler_env.sh`，`api-server/conf/application.yaml`，
+`master-server/conf/application.yaml`，`worker-server/conf/application.yaml`，`alert-server/conf/application.yaml` 中找到。
 
 ### 修改 `dolphinscheduler_env.sh` 文件
 
@@ -78,6 +65,8 @@ chmod 600 ~/.ssh/authorized_keys
 
 - DolphinScheduler 的数据库配置，详细配置方法见[初始化数据库]
 - 一些任务类型外部依赖路径或库文件，如 `JAVA_HOME` 和 `SPARK_HOME`都是在这里定义的
+- 默认的注册中心是 mysql
+- 服务器相关配置，如缓存类型、时区等
 
 如果您不使用某些任务类型，您可以忽略任务外部依赖项，但您必须根据您的环境更改 `JAVA_HOME`、注册中心和数据库相关配置。
 
@@ -112,15 +101,36 @@ export DATAX_LAUNCHER=${DATAX_LAUNCHER:-/opt/soft/datax/bin/python3}
 export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HIVE_HOME/bin:$FLINK_HOME/bin:$DATAX_LAUNCHER:$PATH
 ```
 
+> **_注意:_** 如果您使用的是 MySQL 数据库，需要将 `DATABASE` 设置为 `mysql`，并且修改 `SPRING_DATASOURCE_URL`、`SPRING_DATASOURCE_USERNAME` 和 `SPRING_DATASOURCE_PASSWORD` 为您的数据库配置
+
+> **_注意:_** dolphinscheduler_env.sh 文件中的配置会覆盖各个服务的配置文件(application.yaml)中的配置，所以如果您在配置文件中配置了某个参数，
+> 而且在 dolphinscheduler_env.sh 文件中也配置了，那么以 dolphinscheduler_env.sh 文件中的配置为准。dolphinscheduler_env.sh 里的配置项格式样例:
+> SPRING_DATASOURCE_URL 在 application.yaml 为 spring.datasource.url，以此类推
+
 ## 初始化数据库
 
 请参考 [数据源配置] `伪分布式/分布式安装初始化数据库` 创建并初始化数据库
 
 ## 启动 DolphinScheduler
 
-使用上面创建的**部署用户**运行命令完成部署，部署后的运行日志将存放在 logs 文件夹内
+部署后的运行日志将存放在 `xxx-server/logs` 文件夹内
 
-> **_注意:_** 第一次部署的话，可能出现 5 次`sh: bin/dolphinscheduler-daemon.sh: No such file or directory`相关信息，此为非重要信息直接忽略即可
+```
+# 启动 api-server
+bash ./bin/dolphinscheduler-daemon.sh start api-server
+
+# 启动 master-server
+bash ./bin/dolphinscheduler-daemon.sh start master-server
+
+# 启动 worker-server
+bash ./bin/dolphinscheduler-daemon.sh start worker-server
+
+# 启动 alert-server
+bash ./bin/dolphinscheduler-daemon.sh start alert-server
+
+```
+
+> **_注意:_** 第一次部署的话，可以通过 bash ./bin/dolphinscheduler-daemon.sh status xxx-server 来进行服务状态查询
 
 ## 登录 DolphinScheduler
 
@@ -129,11 +139,8 @@ export PATH=$HADOOP_HOME/bin:$SPARK_HOME/bin:$PYTHON_LAUNCHER:$JAVA_HOME/bin:$HI
 ## 启停服务
 
 ```shell
-# 一键停止集群所有服务
-bash ./bin/stop-all.sh
-
-# 一键开启集群所有服务
-bash ./bin/start-all.sh
+# 查询服务状态
+bash ./bin/dolphinscheduler-daemon.sh status xxx-server
 
 # 启停 Master
 bash ./bin/dolphinscheduler-daemon.sh stop master-server
