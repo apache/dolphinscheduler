@@ -274,7 +274,7 @@ public class JSONUtilsTest {
     }
 
     @Test
-    public void toOffsetDateTimeNodeTest(){
+    public void toOffsetDateTimeNodeTest() {
         LocalDateTime localDateTime = LocalDateTime.of(2024, 7, 10, 15, 0, 0);
         OffsetDateTime offsetDateTime = OffsetDateTime.of(localDateTime, ZoneOffset.ofHours(8));
         Map<String, OffsetDateTime> map = new HashMap<>();
