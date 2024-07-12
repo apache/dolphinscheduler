@@ -17,32 +17,23 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryLock;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
 
-    @Select("select count(1) from t_ds_jdbc_registry_lock")
-    int countAll();
-
-    @Delete("delete from t_ds_jdbc_registry_lock where last_term < #{term}")
-    void clearExpireLock(@Param("term") long term);
-
-    @Update({"<script>",
-            "update t_ds_jdbc_registry_lock",
-            "set last_term = #{term}",
-            "where id IN ",
-            "<foreach item='id' index='index' collection='ids' open='(' separator=',' close=')'>",
-            "   #{id}",
+    @Delete({"<script>",
+            "delete from t_ds_jdbc_registry_lock",
+            "where client_id IN ",
+            "<foreach item='clientId' index='index' collection='clientIds' open='(' separator=',' close=')'>",
+            "   #{clientId}",
             "</foreach>",
             "</script>"})
-    int updateTermByIds(@Param("ids") Collection<Long> ids, @Param("term") long term);
+    void deleteByClientIds(@Param("clientIds") List<Long> clientIds);
 }

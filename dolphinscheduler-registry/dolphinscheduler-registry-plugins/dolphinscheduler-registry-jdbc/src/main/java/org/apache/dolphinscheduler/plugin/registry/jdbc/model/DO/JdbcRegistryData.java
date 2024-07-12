@@ -15,20 +15,33 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc.model;
+package org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO;
 
-public enum DataType {
+import java.util.Date;
 
-    EPHEMERAL(1),
-    PERSISTENT(2),
-    ;
-    private final int typeValue;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    DataType(int typeValue) {
-        this.typeValue = typeValue;
-    }
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 
-    public int getTypeValue() {
-        return typeValue;
-    }
+@TableName(value = "t_ds_jdbc_registry_data")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class JdbcRegistryData {
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+    private String dataKey;
+    private String dataValue;
+    private String dataType;
+    private long clientId;
+    private Date createTime;
+    private Date lastUpdateTime;
+
 }
