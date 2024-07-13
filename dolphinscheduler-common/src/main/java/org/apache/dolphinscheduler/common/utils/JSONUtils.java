@@ -79,10 +79,10 @@ public final class JSONUtils {
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .configure(FAIL_ON_EMPTY_BEANS, false)
+            .addModule(new JavaTimeModule())
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
-            .addModule(new JavaTimeModule())
             .defaultTimeZone(TimeZone.getDefault())
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();
