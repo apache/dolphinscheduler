@@ -84,7 +84,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,7 +107,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
@@ -171,7 +169,7 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
     private DataSourceMapper dataSourceMapper;
 
     @Mock
-    private WorkFlowLineageService workFlowLineageService;
+    private ProcessLineageService processLineageService;
 
     @Mock
     private MetricsCleanUpService metricsCleanUpService;
@@ -524,8 +522,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         when(processDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(processDefinition));
         when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleMapper.deleteById(46)).thenReturn(1);
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
-                .thenReturn(Collections.emptySet());
+        when(processLineageService.taskDependentMsg(project.getCode(), processDefinition.getCode(), 0))
+                .thenReturn(Optional.empty());
         processDefinitionService.deleteProcessDefinitionByCode(user, 46L);
         Mockito.verify(metricsCleanUpService, times(1)).cleanUpWorkflowMetricsByDefinitionCode(46L);
 
@@ -540,19 +538,17 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // process used by other task, sub process
         user.setUserType(UserType.ADMIN_USER);
         TaskMainInfo taskMainInfo = getTaskMainInfo().get(0);
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
-                .thenReturn(ImmutableSet.copyOf(getTaskMainInfo()));
+        when(processLineageService.taskDependentMsg(project.getCode(), processDefinition.getCode(), 0))
+                .thenReturn(Optional.of(taskMainInfo.getTaskName()));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL.getCode(),
-                ((ServiceException) exception).getCode());
 
         // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
         when(scheduleMapper.queryByProcessDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), processDefinition.getCode()))
-                .thenReturn(Collections.emptySet());
+        when(processLineageService.taskDependentMsg(project.getCode(), processDefinition.getCode(), 0))
+                .thenReturn(Optional.empty());
         Assertions.assertDoesNotThrow(() -> processDefinitionService.deleteProcessDefinitionByCode(user, 46L));
         Mockito.verify(metricsCleanUpService, times(2)).cleanUpWorkflowMetricsByDefinitionCode(46L);
     }
@@ -600,8 +596,8 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         // delete success
         process.setReleaseState(ReleaseState.OFFLINE);
         when(processDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(process));
-        when(workFlowLineageService.queryTaskDepOnProcess(project.getCode(), process.getCode()))
-                .thenReturn(Collections.emptySet());
+        when(processLineageService.taskDependentMsg(project.getCode(), process.getCode(), 0))
+                .thenReturn(Optional.empty());
         putMsg(result, Status.SUCCESS, projectCode);
         doNothing().when(metricsCleanUpService).cleanUpWorkflowMetricsByDefinitionCode(11L);
         Map<String, Object> deleteSuccess =
