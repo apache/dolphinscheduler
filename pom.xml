@@ -643,6 +643,9 @@
                         <goals>
                             <goal>restore-instrumented-classes</goal>
                         </goals>
+                        <configuration>
+                            <excludes>com/github/dreamhead/moco/*</excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>default-report</id>
