@@ -115,7 +115,7 @@ jackson-databind-2.13.4.jar
 jackson-dataformat-cbor-2.13.3.jar
 jackson-dataformat-yaml-2.13.3.jar
 jackson-datatype-jdk8-2.13.3.jar
-jackson-datatype-jsr310-2.13.3.jar
+jackson-datatype-jsr310-2.13.4.jar
 jackson-jaxrs-base-2.13.3.jar
 jackson-jaxrs-json-provider-2.13.3.jar
 jackson-mapper-asl-1.9.13.jar
