@@ -34,7 +34,10 @@ chmod 600 ~/.ssh/authorized_keys
 service ssh start
 
 #Init schema
-/bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/upgrade-schema.sh
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start master-server
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start worker-server
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start api-server
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start alert-server
 
 #Start Cluster
 /bin/bash $DOLPHINSCHEDULER_HOME/bin/start-all.sh
