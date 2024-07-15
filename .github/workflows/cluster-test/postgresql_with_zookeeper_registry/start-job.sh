@@ -30,4 +30,5 @@ docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_regis
 /bin/bash .github/workflows/cluster-test/postgresql_with_zookeeper_registry/running_test.sh
 
 #Cleanup
-docker rm -f $(docker ps -aq)
+docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-cluster.yaml down -v --remove-orphans
+docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-base.yaml down -v --remove-orphans

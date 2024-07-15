@@ -21,13 +21,6 @@ The directory structure of DolphinScheduler is as follows:
 │   ├── dolphinscheduler-daemon.sh              script to start or shut down DolphinScheduler application
 │   ├── env                                     directory of scripts to load environment variables
 │   │   ├── dolphinscheduler_env.sh             script to export environment variables [eg: JAVA_HOME,HADOOP_HOME, HIVE_HOME ...] when you start or stop service using script `dolphinscheduler-daemon.sh`
-│   │   └── install_env.sh                      script to export environment variables for DolphinScheduler installation when you use scripts `install.sh` `start-all.sh` `stop-all.sh` `status-all.sh`
-│   ├── install.sh                              script to auto-setup services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
-│   ├── remove-zk-node.sh                       script to cleanup ZooKeeper caches
-│   ├── scp-hosts.sh                            script to copy installation files to target hosts
-│   ├── start-all.sh                            script to start all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
-│   ├── status-all.sh                           script to check the status of all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
-│   └── stop-all.sh                             script to shut down all services when you deploy DolphinScheduler in `psuedo-cluster` mode or `cluster` mode
 │
 ├── alert-server                                directory of DolphinScheduler alert-server commands, configurations scripts and libs
 │   ├── bin
