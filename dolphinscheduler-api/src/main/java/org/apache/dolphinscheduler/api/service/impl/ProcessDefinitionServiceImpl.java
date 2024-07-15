@@ -1583,6 +1583,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             schedule.setUserId(loginUser.getId());
             schedule.setCreateTime(now);
             schedule.setUpdateTime(now);
+            schedule.setUpdatedBy(loginUser.getId());
             int scheduleInsert = scheduleMapper.insert(schedule);
             if (0 == scheduleInsert) {
                 log.error(
@@ -2178,6 +2179,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     scheduleObj.setCreateTime(date);
                     scheduleObj.setUpdateTime(date);
+                    scheduleObj.setUpdatedBy(loginUser.getId());
                     int insertResult = scheduleMapper.insert(scheduleObj);
                     if (insertResult != 1) {
                         log.error("Schedule create error, processDefinitionCode:{}.", processDefinition.getCode());
@@ -2627,7 +2629,7 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
         processDefinitionDao.updateById(workflowDefinition);
 
-        schedulerService.offlineSchedulerByWorkflowCode(workflowDefinitionCode);
+        schedulerService.offlineSchedulerByWorkflowCode(loginUser, workflowDefinitionCode);
     }
 
     /**

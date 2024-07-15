@@ -101,9 +101,19 @@ public class ScheduleVO {
     private int userId;
 
     /**
-     * created user name
+     * created username
      */
     private String userName;
+
+    /**
+     * updated user id
+     */
+    private int updatedBy;
+
+    /**
+     * updated username
+     */
+    private String updatedByUserName;
 
     /**
      * release state
@@ -151,6 +161,8 @@ public class ScheduleVO {
         this.setUserId(schedule.getUserId());
         this.setCreateTime(schedule.getCreateTime());
         this.setUpdateTime(schedule.getUpdateTime());
+        this.setUpdatedBy(schedule.getUpdatedBy());
+        this.setUpdatedByUserName(schedule.getUpdatedByUserName());
         this.setTimezoneId(schedule.getTimezoneId());
         this.setReleaseState(schedule.getReleaseState());
         this.setProcessInstancePriority(schedule.getProcessInstancePriority());

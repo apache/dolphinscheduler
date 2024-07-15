@@ -108,10 +108,21 @@ public class Schedule {
     private int userId;
 
     /**
-     * created user name
+     * created username
      */
     @TableField(exist = false)
     private String userName;
+
+    /**
+     * updated user id
+     */
+    private int updatedBy;
+
+    /**
+     * updated username
+     */
+    @TableField(exist = false)
+    private String updatedByUserName;
 
     /**
      * release state

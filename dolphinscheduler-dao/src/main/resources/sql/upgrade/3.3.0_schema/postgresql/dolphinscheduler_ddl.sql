@@ -82,3 +82,5 @@ create table t_ds_jdbc_registry_data_change_event
     create_time        timestamp not null default current_timestamp,
     primary key (id)
 );
+
+ALTER TABLE t_ds_schedules ADD COLUMN IF NOT EXISTS updated_by int DEFAULT NULL;

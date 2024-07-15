@@ -85,3 +85,5 @@ CREATE TABLE `t_ds_jdbc_registry_data_change_event`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
+
+ALTER TABLE t_ds_schedules ADD  `updated_by` int(11) DEFAULT NULL COMMENT 'updated user id';

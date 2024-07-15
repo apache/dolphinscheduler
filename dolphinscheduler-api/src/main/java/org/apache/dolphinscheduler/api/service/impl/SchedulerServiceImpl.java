@@ -201,6 +201,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setUpdateTime(now);
         scheduleObj.setUserId(loginUser.getId());
         scheduleObj.setUserName(loginUser.getUserName());
+        scheduleObj.setUpdatedBy(loginUser.getId());
+        scheduleObj.setUpdatedByUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
@@ -286,6 +288,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setUserId(loginUser.getId());
         // give more detail when return schedule object
         schedule.setUserName(loginUser.getUserName());
+        schedule.setUpdatedBy(loginUser.getId());
+        schedule.setUpdatedByUserName(loginUser.getUserName());
         schedule.setProcessDefinitionName(processDefinition.getName());
 
         this.scheduleParamCheck(scheduleCreateRequest.getScheduleParam());
@@ -355,7 +359,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
+        updateSchedule(loginUser, result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, processInstancePriority, workerGroup, tenantCode, environmentCode);
         return result;
     }
@@ -381,6 +385,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Schedule scheduleUpdate;
         try {
             scheduleUpdate = scheduleUpdateRequest.mergeIntoSchedule(schedule);
+            scheduleUpdate.setUpdatedBy(loginUser.getId());
             // check update params
             this.scheduleParamCheck(scheduleUpdateRequest.updateScheduleParam(scheduleUpdate));
         } catch (InvocationTargetException | IllegalAccessException | InstantiationException
@@ -669,7 +674,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return result;
         }
 
-        updateSchedule(result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
+        updateSchedule(loginUser, result, schedule, processDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, processInstancePriority, workerGroup, tenantCode, environmentCode);
         return result;
     }
@@ -679,17 +684,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
         Schedule schedule = scheduleMapper.selectById(schedulerId);
-        doOnlineScheduler(schedule);
+        doOnlineScheduler(loginUser, schedule);
     }
 
     @Transactional
     @Override
-    public void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+    public void onlineSchedulerByWorkflowCode(User loginUser, Long workflowDefinitionCode) {
         Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
-        doOnlineScheduler(schedule);
+        doOnlineScheduler(loginUser, schedule);
     }
 
-    private void doOnlineScheduler(Schedule schedule) {
+    private void doOnlineScheduler(User loginUser, Schedule schedule) {
         if (schedule == null) {
             return;
         }
@@ -703,6 +708,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         schedule.setReleaseState(ReleaseState.ONLINE);
+        schedule.setUpdatedBy(loginUser.getId());
+        schedule.setUpdateTime(new Date());
         scheduleMapper.updateById(schedule);
 
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
@@ -714,17 +721,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     public void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
         Schedule schedule = scheduleMapper.selectById(schedulerId);
-        doOfflineScheduler(schedule);
+        doOfflineScheduler(loginUser, schedule);
     }
 
     @Transactional
     @Override
-    public void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+    public void offlineSchedulerByWorkflowCode(User loginUser, Long workflowDefinitionCode) {
         Schedule schedule = scheduleMapper.queryByProcessDefinitionCode(workflowDefinitionCode);
-        doOfflineScheduler(schedule);
+        doOfflineScheduler(loginUser, schedule);
     }
 
-    private void doOfflineScheduler(Schedule schedule) {
+    private void doOfflineScheduler(User loginUser, Schedule schedule) {
         if (schedule == null) {
             return;
         }
@@ -733,13 +740,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return;
         }
         schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setUpdatedBy(loginUser.getId());
+        schedule.setUpdateTime(new Date());
         scheduleMapper.updateById(schedule);
         ProcessDefinition processDefinition = processDefinitionMapper.queryByCode(schedule.getProcessDefinitionCode());
         Project project = projectMapper.queryByCode(processDefinition.getProjectCode());
         schedulerApi.deleteScheduleTask(project.getId(), schedule.getId());
     }
 
-    private void updateSchedule(Map<String, Object> result, Schedule schedule, ProcessDefinition processDefinition,
+    private void updateSchedule(User loginUser, Map<String, Object> result, Schedule schedule,
+                                ProcessDefinition processDefinition,
                                 String scheduleExpression, WarningType warningType, int warningGroupId,
                                 FailureStrategy failureStrategy, Priority processInstancePriority, String workerGroup,
                                 String tenantCode,
@@ -799,6 +809,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setWorkerGroup(workerGroup);
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);
+        schedule.setUpdatedBy(loginUser.getId());
         schedule.setProcessInstancePriority(processInstancePriority);
         scheduleMapper.updateById(schedule);
 
