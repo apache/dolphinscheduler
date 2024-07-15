@@ -244,9 +244,7 @@ export function useForm(id?: number) {
   const changeType = async (type: IDataBase, options: IDataBaseOption) => {
     state.detailForm.port = options.previousPort || options.defaultPort
     state.detailForm.type = type
-
-    state.requiredDataBase = type !== 'POSTGRESQL' && type !== 'ATHENA'
-
+    state.requiredDataBase = type !== 'POSTGRESQL' && type !== 'ATHENA' && type !== 'DOLPHINDB'
     state.showHost = type !== 'ATHENA'
     state.showPort = type !== 'ATHENA'
     state.showAwsRegion = type === 'ATHENA' || type === 'SAGEMAKER'
@@ -268,12 +266,18 @@ export function useForm(id?: number) {
       type === 'SSH' ||
       type === 'ZEPPELIN' ||
       type === 'SAGEMAKER' ||
-      type === 'K8S'
+      type === 'K8S' ||
+      type === 'DOLPHINDB'
     ) {
+
       state.showDataBaseName = false
       state.requiredDataBase = false
       state.showJDBCConnectParameters = false
       state.showPublicKey = false
+      if(type === 'DOLPHINDB'){
+          state.showJDBCConnectParameters = true
+          state.showPublicKey = false
+      }
       if (type === 'SSH') {
         state.showPublicKey = true
       }
@@ -458,7 +462,12 @@ export const datasourceType: IDataBaseOptionKeys = {
     value: 'K8S',
     label: 'K8S',
     defaultPort: 6443
-  }
+  },
+  DOLPHINDB: {
+      value: 'DOLPHINDB',
+      label: 'DOLPHINDB',
+      defaultPort: 8848
+    }
 }
 
 export const datasourceTypeList: IDataBaseOption[] = Object.values(

@@ -60,6 +60,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Strings;
 
 /**
@@ -81,6 +82,7 @@ public final class JSONUtils {
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
+            .addModule(new JavaTimeModule())
             .defaultTimeZone(TimeZone.getDefault())
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();

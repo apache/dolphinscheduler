@@ -56,6 +56,7 @@
         <module>dolphinscheduler-datasource-sagemaker</module>
         <module>dolphinscheduler-datasource-k8s</module>
         <module>dolphinscheduler-datasource-hana</module>
+        <module>dolphinscheduler-datasource-dolphindb</module>
     </modules>
 
     <dependencyManagement>

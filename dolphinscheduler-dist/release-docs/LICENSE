@@ -813,3 +813,8 @@ JDOM licenses
 Vertica Client Driver License
 ========================================
     vertica-jdbc 12.0.4-0: https://mvnrepository.com/artifact/com.vertica.jdbc/vertica-jdbc/12.0.4-0, Vertica Client Driver License
+
+========================================
+DolphinDB Client Driver License
+========================================
+    dolphin-jdbc 3.00.0.1: https://mvnrepository.com/artifact/com.dolphindb/jdbc/3.00.0.1, DolphinDB Client Driver License
