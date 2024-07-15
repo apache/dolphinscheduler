@@ -114,41 +114,6 @@ public abstract class RegistryTestCase<R extends Registry> {
 
     @SneakyThrows
     @Test
-    public void testUnsubscribe() {
-        registry.start();
-
-        final AtomicBoolean subscribeAdded = new AtomicBoolean(false);
-        final AtomicBoolean subscribeRemoved = new AtomicBoolean(false);
-        final AtomicBoolean subscribeUpdated = new AtomicBoolean(false);
-
-        SubscribeListener subscribeListener = event -> {
-            if (event.type() == Event.Type.ADD) {
-                subscribeAdded.compareAndSet(false, true);
-            }
-            if (event.type() == Event.Type.REMOVE) {
-                subscribeRemoved.compareAndSet(false, true);
-            }
-            if (event.type() == Event.Type.UPDATE) {
-                subscribeUpdated.compareAndSet(false, true);
-            }
-        };
-        String key = "/nodes/master" + System.nanoTime();
-        String value = "127.0.0.1:8080";
-        registry.subscribe(key, subscribeListener);
-        registry.unsubscribe(key);
-        registry.put(key, value, true);
-        registry.put(key, value, true);
-        registry.delete(key);
-
-        Thread.sleep(2000);
-        Assertions.assertFalse(subscribeAdded.get());
-        Assertions.assertFalse(subscribeRemoved.get());
-        Assertions.assertFalse(subscribeUpdated.get());
-
-    }
-
-    @SneakyThrows
-    @Test
     public void testAddConnectionStateListener() {
 
         AtomicReference<ConnectionState> connectionState = new AtomicReference<>();

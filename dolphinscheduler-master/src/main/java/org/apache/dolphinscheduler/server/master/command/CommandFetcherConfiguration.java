@@ -20,9 +20,9 @@ package org.apache.dolphinscheduler.server.master.command;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
+import org.apache.dolphinscheduler.server.master.cluster.MasterSlotManager;
 import org.apache.dolphinscheduler.server.master.config.CommandFetchStrategy;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
