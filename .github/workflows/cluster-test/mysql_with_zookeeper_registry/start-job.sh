@@ -30,4 +30,5 @@ docker-compose -f .github/workflows/cluster-test/mysql_with_zookeeper_registry/d
 /bin/bash .github/workflows/cluster-test/mysql_with_zookeeper_registry/running_test.sh
 
 #Cleanup
-docker rm -f $(docker ps -aq)
+docker-compose -f .github/workflows/cluster-test/mysql_with_zookeeper_registry/docker-compose-base.yaml down -v
+docker-compose -f .github/workflows/cluster-test/mysql_with_zookeeper_registry/docker-compose-cluster.yaml down -v
