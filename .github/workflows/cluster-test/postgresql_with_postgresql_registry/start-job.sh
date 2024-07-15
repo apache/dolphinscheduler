@@ -30,5 +30,5 @@ docker-compose -f .github/workflows/cluster-test/postgresql_with_postgresql_regi
 /bin/bash .github/workflows/cluster-test/postgresql_with_postgresql_registry/running_test.sh
 
 #Cleanup
-docker-compose -f .github/workflows/cluster-test/postgresql_with_postgresql_registry/docker-compose-cluster.yaml down -v
-docker-compose -f .github/workflows/cluster-test/postgresql_with_postgresql_registry/docker-compose-base.yaml down -v
+docker-compose -f .github/workflows/cluster-test/postgresql_with_postgresql_registry/docker-compose-cluster.yaml down -v --remove-orphans
+docker-compose -f .github/workflows/cluster-test/postgresql_with_postgresql_registry/docker-compose-base.yaml down -v --remove-orphans
