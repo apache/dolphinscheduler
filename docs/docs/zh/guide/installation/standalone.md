@@ -51,3 +51,5 @@ bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 
 Standalone server 使用 H2 数据库作为其元数据存储数据，这是为了上手简单，用户在启动服务器之前不需要启动数据库。但是如果用户想将元数据库存储在
 MySQL 或 PostgreSQL 等其他数据库中，必须更改一些配置。请参考 [数据源配置](../howto/datasource-setting.md) `Standalone 切换元数据库` 创建并初始化数据库
+
+> **_注意_**: DS默认使用本地模式的目录 /tmp/dolphinscheduler 作为资源中心, 如果需要修改资源中心目录, 请修改配置文件 conf/common.properties 中 resource 的相关配置项

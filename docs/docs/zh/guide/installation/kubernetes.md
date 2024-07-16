@@ -525,6 +525,7 @@ helm install dolphinscheduler-gpu-worker . \
 ```
 
 > **注意**:以上步骤仅供参考，具体操作需要根据实际情况进行调整。
+> **注意**: DS默认使用本地模式的目录 /tmp/dolphinscheduler 作为资源中心, 如果需要修改资源中心目录, 请修改配置文件 conf/common.properties 中 resource 的相关配置项
 
 ## 附录-配置
 
