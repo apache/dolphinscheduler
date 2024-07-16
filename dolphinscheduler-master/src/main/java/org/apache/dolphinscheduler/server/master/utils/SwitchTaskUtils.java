@@ -63,7 +63,6 @@ public class SwitchTaskUtils {
         if (MapUtils.isNotEmpty(varParams)) {
             params.putAll(varParams);
         }
-        String originContent = content;
         Pattern pattern = Pattern.compile(rgex);
         Matcher m = pattern.matcher(content);
         while (m.find()) {
@@ -82,10 +81,6 @@ public class SwitchTaskUtils {
             content = content.replace("${" + paramName + "}", value);
         }
 
-        // if not replace any params, throw exception to avoid illegal condition
-        if (originContent.equals(content)) {
-            throw new IllegalArgumentException("condition is not valid, please check it. condition: " + condition);
-        }
         return content;
     }
 

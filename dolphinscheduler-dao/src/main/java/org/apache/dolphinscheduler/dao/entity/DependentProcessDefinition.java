@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -26,20 +25,18 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * dependent process definition
  */
+@Data
 public class DependentProcessDefinition {
 
     /**
      * process definition code
      */
     private long processDefinitionCode;
-
-    /**
-     * process definition name
-     */
-    private String processDefinitionName;
 
     /**
      * process definition version
@@ -67,7 +64,7 @@ public class DependentProcessDefinition {
      */
     public CycleEnum getDependentCycle(long upstreamProcessDefinitionCode) {
         DependentParameters dependentParameters = this.getDependentParameters();
-        List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependTaskList();
+        List<DependentTaskModel> dependentTaskModelList = dependentParameters.getDependence().getDependTaskList();
 
         for (DependentTaskModel dependentTaskModel : dependentTaskModelList) {
             List<DependentItem> dependentItemList = dependentTaskModel.getDependItemList();
@@ -104,59 +101,7 @@ public class DependentProcessDefinition {
     }
 
     public DependentParameters getDependentParameters() {
-        return JSONUtils.parseObject(getDependence(), DependentParameters.class);
-    }
-
-    public String getDependence() {
-        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
-    }
-
-    public String getProcessDefinitionName() {
-        return this.processDefinitionName;
-    }
-
-    public void setProcessDefinitionName(String name) {
-        this.processDefinitionName = name;
-    }
-
-    public long getProcessDefinitionCode() {
-        return this.processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long code) {
-        this.processDefinitionCode = code;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public long getTaskDefinitionCode() {
-        return this.taskDefinitionCode;
-    }
-
-    public void setTaskDefinitionCode(long code) {
-        this.taskDefinitionCode = code;
-    }
-
-    public String getTaskParams() {
-        return this.taskParams;
-    }
-
-    public void setTaskParams(String taskParams) {
-        this.taskParams = taskParams;
-    }
-
-    public String getWorkerGroup() {
-        return this.workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
+        return JSONUtils.parseObject(taskParams, DependentParameters.class);
     }
 
 }

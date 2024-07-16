@@ -31,16 +31,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
-import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-
-import lombok.extern.slf4j.Slf4j;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -50,6 +41,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 
 //TODO: Some test cases rely on ProcessInstance APIs. Should complete remaining cases after ProcessInstance related API tests done.
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
@@ -80,7 +79,8 @@ public class ExecutorAPITest {
     public static void setup() {
         LoginPage loginPage = new LoginPage();
         HttpResponse loginHttpResponse = loginPage.login(username, password);
-        sessionId = JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
+        sessionId =
+                JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         executorPage = new ExecutorPage(sessionId);
         processDefinitionPage = new ProcessDefinitionPage(sessionId);
         projectPage = new ProjectPage(sessionId);
@@ -103,24 +103,30 @@ public class ExecutorAPITest {
             HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test");
             HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
             Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
-            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse.getBody().getData()).get(0)).get("code");
+            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
+                    .getBody().getData()).get(0)).get("code");
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
             CloseableHttpResponse importProcessDefinitionResponse = processDefinitionPage
-                .importProcessDefinition(loginUser, projectCode, file);
+                    .importProcessDefinition(loginUser, projectCode, file);
             String data = EntityUtils.toString(importProcessDefinitionResponse.getEntity());
             Assertions.assertTrue(data.contains("\"success\":true"));
 
             // get workflow definition code
-            HttpResponse queryAllProcessDefinitionByProjectCodeResponse = processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
+            HttpResponse queryAllProcessDefinitionByProjectCodeResponse =
+                    processDefinitionPage.queryAllProcessDefinitionByProjectCode(loginUser, projectCode);
             Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getSuccess());
-            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString().contains("hello world"));
-            processDefinitionCode = (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse.getBody().getData()).get(0)).get("processDefinition")).get("code");
+            Assertions.assertTrue(queryAllProcessDefinitionByProjectCodeResponse.getBody().getData().toString()
+                    .contains("hello world"));
+            processDefinitionCode =
+                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProcessDefinitionByProjectCodeResponse
+                            .getBody().getData()).get(0)).get("processDefinition")).get("code");
 
             // release test workflow
-            HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser, projectCode, processDefinitionCode, ReleaseState.ONLINE);
+            HttpResponse releaseProcessDefinitionResponse = processDefinitionPage.releaseProcessDefinition(loginUser,
+                    projectCode, processDefinitionCode, ReleaseState.ONLINE);
             Assertions.assertTrue(releaseProcessDefinitionResponse.getBody().getSuccess());
 
             // trigger workflow instance
@@ -128,11 +134,12 @@ public class ExecutorAPITest {
             Date date = new Date();
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
-            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            HttpResponse startProcessInstanceResponse = executorPage.startProcessInstance(loginUser, projectCode,
+                    processDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             Assertions.assertTrue(startProcessInstanceResponse.getBody().getSuccess());
 
             triggerCode = (long) startProcessInstanceResponse.getBody().getData();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
         }
@@ -141,7 +148,8 @@ public class ExecutorAPITest {
     @Test
     @Order(2)
     public void testStartCheckProcessDefinition() {
-        HttpResponse testStartCheckProcessDefinitionResponse = executorPage.startCheckProcessDefinition(loginUser, projectCode, processDefinitionCode);
+        HttpResponse testStartCheckProcessDefinitionResponse =
+                executorPage.startCheckProcessDefinition(loginUser, projectCode, processDefinitionCode);
         Assertions.assertTrue(testStartCheckProcessDefinitionResponse.getBody().getSuccess());
     }
 

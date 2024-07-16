@@ -17,7 +17,6 @@
 
 import { DependentTaskReq } from '@/service/modules/lineages/types'
 import { queryDependentTasks } from '@/service/modules/lineages'
-import { TASK_TYPES_MAP } from '@/store/project'
 
 export function useDependencies() {
   const getDependentTasksBySingleTask = async (
@@ -33,13 +32,11 @@ export function useDependencies() {
       } as DependentTaskReq
       const res = await queryDependentTasks(projectCode, dependentTaskReq)
       res
-        .filter(
-          (item: any) =>
-            item.processDefinitionCode !== workflowCode &&
-            item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
-        )
+        .filter((item: any) => item.processDefinitionCode !== workflowCode)
         .forEach((item: any) => {
-          tasks.push(item.processDefinitionName + '->' + item.taskName)
+          tasks.push(
+            item.processDefinitionName + '->' + item.taskDefinitionName
+          )
         })
     }
     return tasks
@@ -56,13 +53,11 @@ export function useDependencies() {
       } as DependentTaskReq
       const res = await queryDependentTasks(projectCode, dependentTaskReq)
       res
-        .filter(
-          (item: any) =>
-            item.processDefinitionCode !== workflowCode &&
-            item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
-        )
+        .filter((item: any) => item.processDefinitionCode !== workflowCode)
         .forEach((item: any) => {
-          tasks.push(item.processDefinitionName + '->' + item.taskName)
+          tasks.push(
+            item.processDefinitionName + '->' + item.taskDefinitionName
+          )
         })
     }
     return tasks
@@ -116,14 +111,11 @@ export function useDependencies() {
       await queryDependentTasks(projectCode, dependentTaskReq).then(
         (res: any) => {
           res
-            .filter(
-              (item: any) =>
-                item.processDefinitionCode !== workflowCode &&
-                item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
-            )
+            .filter((item: any) => item.processDefinitionCode !== workflowCode)
             .forEach((item: any) => {
               dependentTaskLinks.push({
-                text: item.processDefinitionName + '->' + item.taskName,
+                text:
+                  item.processDefinitionName + '->' + item.taskDefinitionName,
                 show: true,
                 action: () => {
                   const url = `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`
@@ -151,14 +143,11 @@ export function useDependencies() {
       await queryDependentTasks(projectCode, dependentTaskReq).then(
         (res: any) => {
           res
-            .filter(
-              (item: any) =>
-                item.processDefinitionCode !== workflowCode &&
-                item.taskType === TASK_TYPES_MAP.DEPENDENT.alias
-            )
+            .filter((item: any) => item.processDefinitionCode !== workflowCode)
             .forEach((item: any) => {
               dependentTaskLinks.push({
-                text: item.processDefinitionName + '->' + item.taskName,
+                text:
+                  item.processDefinitionName + '->' + item.taskDefinitionName,
                 show: true,
                 action: () => {
                   const url = `/projects/${item.projectCode}/workflow/definitions/${item.processDefinitionCode}`

@@ -31,9 +31,10 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
+import org.apache.dolphinscheduler.server.master.cluster.ClusterStateMonitors;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
 import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
 import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
@@ -86,10 +87,13 @@ public class MasterServer implements IStoppable {
     private MetricsProvider metricsProvider;
 
     @Autowired
-    private MasterSlotManager masterSlotManager;
+    private TaskGroupCoordinator taskGroupCoordinator;
 
     @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
+    private ClusterStateMonitors clusterStateMonitors;
+
+    @Autowired
+    private ClusterManager clusterManager;
 
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
@@ -108,14 +112,15 @@ public class MasterServer implements IStoppable {
         this.masterRPCServer.start();
 
         // install task plugin
-        TaskPluginManager.loadPlugin();
+        TaskPluginManager.loadTaskPlugin();
         DataSourceProcessorProvider.initialize();
-
-        this.masterSlotManager.start();
 
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
+
+        this.clusterManager.start();
+        this.clusterStateMonitors.start();
 
         this.masterSchedulerBootstrap.start();
 
@@ -179,5 +184,9 @@ public class MasterServer implements IStoppable {
     @Override
     public void stop(String cause) {
         close(cause);
+
+        // make sure exit after server closed, don't call System.exit in close logic, will cause deadlock if close
+        // multiple times at the same time
+        System.exit(1);
     }
 }

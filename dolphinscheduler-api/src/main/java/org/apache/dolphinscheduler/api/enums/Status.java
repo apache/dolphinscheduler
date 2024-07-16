@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.enums;
 import java.util.Locale;
 import java.util.Optional;
 
+import lombok.Getter;
+
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
@@ -93,17 +95,9 @@ public enum Status {
     RESOURCE_FILE_IS_EMPTY(10062, "resource file is empty", "资源文件内容不能为空"),
     EDIT_RESOURCE_FILE_ON_LINE_ERROR(10063, "edit resource file online error", "更新资源文件错误"),
     DOWNLOAD_RESOURCE_FILE_ERROR(10064, "download resource file error", "下载资源文件错误"),
-    CREATE_UDF_FUNCTION_ERROR(10065, "create udf function error", "创建UDF函数错误"),
-    VIEW_UDF_FUNCTION_ERROR(10066, "view udf function error", "查询UDF函数错误"),
-    UPDATE_UDF_FUNCTION_ERROR(10067, "update udf function error", "更新UDF函数错误"),
-    QUERY_UDF_FUNCTION_LIST_PAGING_ERROR(10068, "query udf function list paging error", "分页查询UDF函数列表错误"),
     QUERY_DATASOURCE_BY_TYPE_ERROR(10069, "query datasource by type error", "查询数据源信息错误"),
-    VERIFY_UDF_FUNCTION_NAME_ERROR(10070, "verify udf function name error", "UDF函数名称验证错误"),
-    DELETE_UDF_FUNCTION_ERROR(10071, "delete udf function error", "删除UDF函数错误"),
     AUTHORIZED_FILE_RESOURCE_ERROR(10072, "authorized file resource error", "授权资源文件错误"),
     AUTHORIZE_RESOURCE_TREE(10073, "authorize resource tree display error", "授权资源目录树错误"),
-    UNAUTHORIZED_UDF_FUNCTION_ERROR(10074, "unauthorized udf function error", "查询未授权UDF函数错误"),
-    AUTHORIZED_UDF_FUNCTION_ERROR(10075, "authorized udf function error", "授权UDF函数错误"),
     CREATE_SCHEDULE_ERROR(10076, "create schedule error", "创建调度配置错误"),
     UPDATE_SCHEDULE_ERROR(10077, "update schedule error", "更新调度配置错误"),
     PUBLISH_SCHEDULE_ONLINE_ERROR(10078, "publish schedule online error", "上线调度配置错误"),
@@ -124,7 +118,6 @@ public enum Status {
     DELETE_USER_BY_ID_ERROR(10093, "delete user by id error", "删除用户错误"),
     GRANT_PROJECT_ERROR(10094, "grant project error", "授权项目错误"),
     GRANT_RESOURCE_ERROR(10095, "grant resource error", "授权资源错误"),
-    GRANT_UDF_FUNCTION_ERROR(10096, "grant udf function error", "授权UDF函数错误"),
     GRANT_DATASOURCE_ERROR(10097, "grant datasource error", "授权数据源错误"),
     GET_USER_INFO_ERROR(10098, "get user info error", "获取用户信息错误"),
     USER_LIST_ERROR(10099, "user list error", "查询用户列表错误"),
@@ -247,7 +240,7 @@ public enum Status {
     QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
     DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL(10193, "delete process definition fail, cause used by other tasks: {0}",
             "删除工作流定时失败，被其他任务引用：{0}"),
-    DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, cause used by other tasks: {1}",
+    DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, the reason is that used by other tasks: {1}",
             "删除任务 {0} 失败，被其他任务引用：{1}"),
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
     TASK_SAVEPOINT_ERROR(10196, "task savepoint error", "任务实例savepoint错误"),
@@ -297,20 +290,18 @@ public enum Status {
     UPDATE_PROJECT_PREFERENCE_ERROR(10301, "update project preference error", "更新项目偏好设置错误"),
     QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
     UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
-
-    UDF_FUNCTION_NOT_EXIST(20001, "UDF function not found", "UDF函数不存在"),
-    UDF_FUNCTION_EXISTS(20002, "UDF function already exists", "UDF函数已存在"),
+    VERSION_INFO_STATE_ERROR(10304, "Failed to obtain project version and address", "获取版本信息错误"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
     RESOURCE_EXIST(20005, "resource already exists", "资源已存在"),
     RESOURCE_SUFFIX_NOT_SUPPORT_VIEW(20006, "resource suffix do not support online viewing", "资源文件后缀不支持查看"),
     RESOURCE_SIZE_EXCEED_LIMIT(20007, "upload resource file size exceeds limit", "上传资源文件大小超过限制"),
     RESOURCE_SUFFIX_FORBID_CHANGE(20008, "resource suffix not allowed to be modified", "资源文件后缀不支持修改"),
-    UDF_RESOURCE_SUFFIX_NOT_JAR(20009, "UDF resource suffix name must be jar", "UDF资源文件后缀名只支持[jar]"),
+
     HDFS_COPY_FAIL(20010, "hdfs copy {0} -> {1} fail", "hdfs复制失败：[{0}] -> [{1}]"),
     RESOURCE_FILE_EXIST(20011, "resource file {0} already exists in hdfs,please delete it or change name!",
             "资源文件[{0}]在hdfs中已存在，请删除或修改资源名"),
     RESOURCE_FILE_NOT_EXIST(20012, "resource file {0} not exists !", "资源文件[{0}]不存在"),
-    UDF_RESOURCE_IS_BOUND(20013, "udf resource file is bound by UDF functions:{0}", "udf函数绑定了资源文件[{0}]"),
+
     RESOURCE_IS_USED(20014, "resource file is used by process definition", "资源文件被上线的流程定义使用了"),
     PARENT_RESOURCE_NOT_EXIST(20015, "parent resource not exist", "父资源文件不存在"),
 
@@ -596,7 +587,12 @@ public enum Status {
     USED_WORKER_GROUP_EXISTS(1402004,
             "You can not reassign worker groups to the project, cause these worker groups {0} are already used.",
             "Worker组{0}被项目中任务或定时引用，无法重新分配"),
-            ;
+    CREATE_PROCESS_LINEAGE_ERROR(1403001, "create process lineage error", "创建工作流血缘错误"),
+    UPDATE_PROCESS_LINEAGE_ERROR(1403002, "update process lineage error", "更新工作流血缘错误"),
+    DELETE_PROCESS_LINEAGE_ERROR(1403003, "delete process lineage error", "删除工作流血缘错误"),
+    ;
+
+    @Getter
     private final int code;
     private final String enMsg;
     private final String zhMsg;
@@ -605,10 +601,6 @@ public enum Status {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
-    }
-
-    public int getCode() {
-        return this.code;
     }
 
     public String getMsg() {

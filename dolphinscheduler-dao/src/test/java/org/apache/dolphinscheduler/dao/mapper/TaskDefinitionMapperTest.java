@@ -130,27 +130,6 @@ public class TaskDefinitionMapperTest extends BaseDaoTest {
     }
 
     @Test
-    public void testListResources() {
-        TaskDefinition taskDefinition = insertOne();
-        List<Map<String, Object>> maps = taskDefinitionMapper.listResources();
-        Assertions.assertNotEquals(0, maps.size());
-
-    }
-
-    @Test
-    public void testListResourcesByUser() {
-        User user = new User();
-        user.setUserName("un");
-        userMapper.insert(user);
-        User un = userMapper.queryByUserNameAccurately("un");
-        TaskDefinition taskDefinition = insertOne(un.getId());
-
-        List<Map<String, Object>> maps = taskDefinitionMapper.listResourcesByUser(taskDefinition.getUserId());
-        Assertions.assertNotEquals(0, maps.size());
-
-    }
-
-    @Test
     public void testDeleteByCode() {
         TaskDefinition taskDefinition = insertOne();
         int i = taskDefinitionMapper.deleteByCode(taskDefinition.getCode());

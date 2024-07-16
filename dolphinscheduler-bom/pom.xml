@@ -31,7 +31,6 @@
         <netty.version>4.1.53.Final</netty.version>
         <spring-boot.version>2.7.3</spring-boot.version>
         <spring-ldap.version>2.4.1</spring-ldap.version>
-        <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
         <druid.version>1.2.20</druid.version>
@@ -169,11 +168,6 @@
                 <scope>test</scope>
             </dependency>
 
-            <dependency>
-                <groupId>org.java-websocket</groupId>
-                <artifactId>Java-WebSocket</artifactId>
-                <version>${java-websocket.version}</version>
-            </dependency>
             <!-- mybatis -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -366,7 +360,11 @@
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
             <!--protostuff-->
             <dependency>
                 <groupId>io.protostuff</groupId>
@@ -961,6 +959,13 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>postgresql</artifactId>
+                <version>${testcontainer.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>minio</artifactId>
                 <version>${testcontainer.version}</version>
                 <scope>test</scope>
             </dependency>

@@ -17,11 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import org.apache.commons.lang3.RandomUtils;
+import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -37,7 +34,8 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.lifecycle.Startables;
 import org.testcontainers.utility.DockerImageName;
 
-import com.google.common.collect.Lists;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 @ActiveProfiles("postgresql")
 @SpringBootTest(classes = {JdbcRegistryProperties.class})
@@ -55,43 +53,21 @@ public class PostgresqlJdbcRegistryTestCase extends JdbcRegistryTestCase {
                 .withDatabaseName("dolphinscheduler")
                 .withNetwork(Network.newNetwork())
                 .withExposedPorts(5432);
-        int exposedPort = RandomUtils.nextInt(10000, 65535);
 
-        postgresqlContainer.setPortBindings(Lists.newArrayList(exposedPort + ":5432"));
         Startables.deepStart(Stream.of(postgresqlContainer)).join();
 
-        String jdbcUrl = "jdbc:postgresql://localhost:" + exposedPort + "/dolphinscheduler";
+        String jdbcUrl = "jdbc:postgresql://localhost:" + postgresqlContainer.getMappedPort(5432) + "/dolphinscheduler";
+        System.clearProperty("spring.datasource.url");
         System.setProperty("spring.datasource.url", jdbcUrl);
-        try (
-                Connection connection = DriverManager.getConnection(jdbcUrl, "root", "root");
-                Statement statement = connection.createStatement();) {
-            statement.execute(
-                    "create table t_ds_jdbc_registry_data\n" +
-                            "(\n" +
-                            "    id               serial\n" +
-                            "        constraint t_ds_jdbc_registry_data_pk primary key,\n" +
-                            "    data_key         varchar                             not null,\n" +
-                            "    data_value       text                                not null,\n" +
-                            "    data_type        int4                                not null,\n" +
-                            "    last_term        bigint                              not null,\n" +
-                            "    last_update_time timestamp default current_timestamp not null,\n" +
-                            "    create_time      timestamp default current_timestamp not null\n" +
-                            ");");
-            statement.execute(
-                    "create unique index t_ds_jdbc_registry_data_key_uindex on t_ds_jdbc_registry_data (data_key);");
-            statement.execute(
-                    "create table t_ds_jdbc_registry_lock\n" +
-                            "(\n" +
-                            "    id               serial\n" +
-                            "        constraint t_ds_jdbc_registry_lock_pk primary key,\n" +
-                            "    lock_key         varchar                             not null,\n" +
-                            "    lock_owner       varchar                             not null,\n" +
-                            "    last_term        bigint                              not null,\n" +
-                            "    last_update_time timestamp default current_timestamp not null,\n" +
-                            "    create_time      timestamp default current_timestamp not null\n" +
-                            ");");
-            statement.execute(
-                    "create unique index t_ds_jdbc_registry_lock_key_uindex on t_ds_jdbc_registry_lock (lock_key);");
+
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(jdbcUrl);
+        config.setUsername("root");
+        config.setPassword("root");
+
+        try (HikariDataSource dataSource = new HikariDataSource(config)) {
+            SqlScriptRunner sqlScriptRunner = new SqlScriptRunner(dataSource, "postgresql_registry_init.sql");
+            sqlScriptRunner.execute();
         }
     }
 

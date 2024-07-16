@@ -1,6 +1,5 @@
 HdrHistogram-2.1.12.jar
 HikariCP-4.0.3.jar
-Java-WebSocket-1.5.1.jar
 LatencyUtils-2.0.3.jar
 SparseBitSet-1.2.jar
 accessors-smart-2.4.8.jar
@@ -116,7 +115,7 @@ jackson-databind-2.13.4.jar
 jackson-dataformat-cbor-2.13.3.jar
 jackson-dataformat-yaml-2.13.3.jar
 jackson-datatype-jdk8-2.13.3.jar
-jackson-datatype-jsr310-2.13.3.jar
+jackson-datatype-jsr310-2.13.4.jar
 jackson-jaxrs-base-2.13.3.jar
 jackson-jaxrs-json-provider-2.13.3.jar
 jackson-mapper-asl-1.9.13.jar
@@ -429,7 +428,6 @@ azure-security-keyvault-keys-4.5.4.jar
 azure-security-keyvault-secrets-4.5.4.jar
 azure-storage-common-12.20.0.jar
 azure-storage-file-share-12.17.0.jar
-nimbus-jose-jwt-9.22.jar
 woodstox-core-6.4.0.jar
 azure-core-management-1.10.1.jar
 api-common-2.6.0.jar

@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -126,7 +125,7 @@ public class OperatorUtils {
         return auditType.getAuditOperationType();
     }
 
-    public static long getObjectIdentityByParma(String[] paramNameArr, Map<String, Object> paramsMap) {
+    public static long getObjectIdentityByParam(String[] paramNameArr, Map<String, Object> paramsMap) {
         for (String name : paramNameArr) {
             if (paramsMap.get(name) instanceof String) {
                 String param = (String) paramsMap.get(name);
@@ -172,23 +171,13 @@ public class OperatorUtils {
         return map;
     }
 
-    public static boolean isUdfResource(Map<String, Object> paramsMap) {
-        ResourceType resourceType = (ResourceType) paramsMap.get(Constants.STRING_PLUGIN_PARAM_TYPE);
-        return resourceType != null && resourceType.equals(ResourceType.UDF);
-    }
-
     public static boolean isFolder(String name) {
         return name != null && name.endsWith("/");
     }
 
     public static String getFileAuditObject(AuditType auditType, Map<String, Object> paramsMap, String name) {
-        boolean isUdfResource = isUdfResource(paramsMap);
         boolean isFolder = auditType == AuditType.FOLDER_CREATE || isFolder(name);
-        if (isUdfResource) {
-            return isFolder ? AuditModelType.UDF_FOLDER.getName() : AuditModelType.UDF_FILE.getName();
-        } else {
-            return isFolder ? AuditModelType.FOLDER.getName() : AuditModelType.FILE.getName();
-        }
+        return isFolder ? AuditModelType.FOLDER.getName() : AuditModelType.FILE.getName();
     }
 
 }

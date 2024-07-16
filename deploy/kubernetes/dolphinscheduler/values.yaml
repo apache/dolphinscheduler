@@ -449,7 +449,19 @@ master:
   #   requests:
   #     memory: "2Gi"
   #     cpu: "500m"
-
+  # -- enable configure custom config
+  enableCustomizedConfig: false
+  # -- configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-master/src/main/resources/application.yaml
+  customizedConfig: { }
+  #  customizedConfig:
+  #    application.yaml: |
+  #      profiles:
+  #        active: postgresql
+  #      banner:
+  #        charset: UTF-8
+  #      jackson:
+  #        time-zone: UTC
+  #        date-format: "yyyy-MM-dd HH:mm:ss"
   # -- Periodic probe of container liveness. Container will be restarted if the probe fails.
   # More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
   livenessProbe:
@@ -578,6 +590,17 @@ worker:
 
   # -- Periodic probe of container liveness. Container will be restarted if the probe fails.
   # More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
+  # -- enable configure custom config
+  enableCustomizedConfig: false
+  # -- configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-worker/src/main/resources/application.yaml
+  customizedConfig: { }
+#  customizedConfig:
+#    application.yaml: |
+#      banner:
+#        charset: UTF-8
+#      jackson:
+#        time-zone: UTC
+#        date-format: "yyyy-MM-dd HH:mm:ss"
   livenessProbe:
     # -- Turn on and off liveness probe
     enabled: true
@@ -654,8 +677,6 @@ worker:
     WORKER_HOST_WEIGHT: "100"
     # -- tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: true
-    # -- Scenes to be used for distributed users. For example, users created by FreeIpa are stored in LDAP. This parameter only applies to Linux, When this parameter is true, worker.tenant.auto.create has no effect and will not automatically create tenants.
-    WORKER_TENANT_CONFIG_DISTRIBUTED_TENANT: false
     # -- If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
     DEFAULT_TENANT_ENABLED: false
 
@@ -742,7 +763,19 @@ alert:
   #   requests:
   #     memory: "1Gi"
   #     cpu: "500m"
-
+  # -- enable configure custom config
+  enableCustomizedConfig: false
+  # -- configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml
+  customizedConfig: { }
+  #  customizedConfig:
+  #    application.yaml: |
+  #      profiles:
+  #        active: postgresql
+  #      banner:
+  #        charset: UTF-8
+  #      jackson:
+  #        time-zone: UTC
+  #        date-format: "yyyy-MM-dd HH:mm:ss"
   # -- Periodic probe of container liveness. Container will be restarted if the probe fails.
   # More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
   livenessProbe:
@@ -842,7 +875,19 @@ api:
   #   requests:
   #     memory: "1Gi"
   #     cpu: "500m"
-
+  # -- enable configure custom config
+  enableCustomizedConfig: false
+  # -- configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-api/src/main/resources/application.yaml
+  customizedConfig: { }
+  #  customizedConfig:
+  #    application.yaml: |
+  #      profiles:
+  #        active: postgresql
+  #      banner:
+  #        charset: UTF-8
+  #      jackson:
+  #        time-zone: UTC
+  #        date-format: "yyyy-MM-dd HH:mm:ss"
   # -- Periodic probe of container liveness. Container will be restarted if the probe fails.
   # More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
   livenessProbe:

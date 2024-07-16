@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.executor.ExecuteContext;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -89,8 +90,8 @@ import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -185,6 +186,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TenantMapper tenantMapper;
+
+    @Autowired
+    private ProcessLineageService processLineageService;
 
     /**
      * execute process instance
@@ -361,7 +365,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         // find out the process definition code
         Set<Long> processDefinitionCodeSet = new HashSet<>();
         taskDefinitions.stream()
-                .filter(task -> TaskConstants.TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(task.getTaskType())).forEach(
+                .filter(task -> TaskTypeUtils.isSubWorkflowTask(task.getTaskType())).forEach(
                         taskDefinition -> processDefinitionCodeSet.add(Long.valueOf(
                                 JSONUtils.getNodeString(taskDefinition.getTaskParams(),
                                         CMD_PARAM_SUB_PROCESS_DEFINE_CODE))));
@@ -999,7 +1003,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   boolean allLevelDependent) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 checkDependentProcessDefinitionValid(
-                        processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode),
+                        processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode),
                         processDefinitionCycle, workerGroup,
                         processDefinitionCode);
 
@@ -1013,7 +1017,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 List<DependentProcessDefinition> childDependentList = childList
                         .stream()
                         .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
-                                processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+                                processLineageService.queryDownstreamDependentProcessDefinitions(
                                         dependentProcessDefinition.getProcessDefinitionCode()),
                                 processDefinitionCycle,
                                 workerGroup,

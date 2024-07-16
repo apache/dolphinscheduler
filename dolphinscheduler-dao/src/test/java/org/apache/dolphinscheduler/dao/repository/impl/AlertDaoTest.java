@@ -56,11 +56,10 @@ class AlertDaoTest extends BaseDaoTest {
 
     @Test
     void testSendServerStoppedAlert() {
-        int alertGroupId = 1;
         String host = "127.0.0.998165432";
         String serverType = "Master";
-        alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
-        alertDao.sendServerStoppedAlert(alertGroupId, host, serverType);
+        alertDao.sendServerStoppedAlert(host, serverType);
+        alertDao.sendServerStoppedAlert(host, serverType);
         long count = alertDao.listPendingAlerts(-1)
                 .stream()
                 .filter(alert -> alert.getContent().contains(host))
