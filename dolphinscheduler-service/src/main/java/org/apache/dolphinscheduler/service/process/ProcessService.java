@@ -50,16 +50,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 import org.springframework.transaction.annotation.Transactional;
 
 public interface ProcessService {
-
-    @Transactional
-    @Nullable
-    ProcessInstance handleCommand(String host,
-                                  Command command) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
 
     ProcessInstance constructProcessInstance(Command command,
                                              String host) throws CronParseException, CodeGenerateUtils.CodeGenerateException;
@@ -182,8 +175,6 @@ public interface ProcessService {
     public String findConfigYamlByName(String clusterName);
 
     void forceProcessInstanceSuccessByTaskInstanceId(TaskInstance taskInstance);
-
-    void saveCommandTrigger(Integer commandId, Integer processInstanceId);
 
     void setGlobalParamIfCommanded(ProcessDefinition processDefinition, Map<String, String> cmdParam);
 }

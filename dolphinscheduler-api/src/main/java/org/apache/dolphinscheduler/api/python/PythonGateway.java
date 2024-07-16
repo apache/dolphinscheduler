@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.python;
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
@@ -382,30 +383,14 @@ public class PythonGateway {
         // make sure workflow online
         processDefinitionService.onlineWorkflowDefinition(user, project.getCode(), processDefinition.getCode());
 
-        executorService.execProcessInstance(user,
-                project.getCode(),
-                processDefinition.getCode(),
-                cronTime,
-                null,
-                DEFAULT_FAILURE_STRATEGY,
-                null,
-                DEFAULT_TASK_DEPEND_TYPE,
-                WarningType.valueOf(warningType),
-                warningGroupId,
-                DEFAULT_RUN_MODE,
-                DEFAULT_PRIORITY,
-                workerGroup,
-                user.getTenantCode(),
-                DEFAULT_ENVIRONMENT_CODE,
-                timeout,
-                null,
-                null,
-                DEFAULT_DRY_RUN,
-                DEFAULT_TEST_FLAG,
-                COMPLEMENT_DEPENDENT_MODE,
-                processDefinition.getVersion(),
-                false,
-                DEFAULT_EXECUTION_ORDER);
+        WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
+                .loginUser(user)
+                .workflowDefinitionCode(processDefinition.getCode())
+                .workerGroup(workerGroup)
+                .warningType(WarningType.of(warningType))
+                .warningGroupId(warningGroupId)
+                .build();
+        executorService.triggerWorkflowDefinition(workflowTriggerRequest);
     }
 
     // side object

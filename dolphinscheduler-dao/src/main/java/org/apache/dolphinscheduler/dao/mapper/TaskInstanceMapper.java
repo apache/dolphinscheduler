@@ -147,4 +147,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance findLastTaskInstance(@Param("processInstanceId") Integer processInstanceId,
                                       @Param("taskCode") long depTaskCode,
                                       @Param("testFlag") int testFlag);
+
+    void updateTaskInstanceState(@Param("taskInstanceId") Integer taskInstanceId,
+                                 @Param("originState") int originState,
+                                 @Param("targetState") int targetState);
 }

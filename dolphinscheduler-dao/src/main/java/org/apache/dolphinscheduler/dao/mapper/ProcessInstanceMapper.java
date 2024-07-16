@@ -68,7 +68,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * query process instance by tenantCode and stateArray
      *
      * @param tenantCode tenantCode
-     * @param states   states array
+     * @param states     states array
      * @return process instance list
      */
     List<ProcessInstance> queryByTenantCodeAndStatus(@Param("tenantCode") String tenantCode,
@@ -103,7 +103,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param projectCode           projectCode
      * @param processDefinitionCode processDefinitionCode
      * @param searchVal             searchVal
-     * @param executorName            executorName
+     * @param executorName          executorName
      * @param statusArray           statusArray
      * @param host                  host
      * @param startTime             startTime
@@ -131,14 +131,12 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
                                        @Param("states") int[] stateArray);
 
     /**
-     * update process instance by state
-     *
-     * @param originState originState
-     * @param destState   destState
-     * @return update result
+     * Update the workflow instance state from originState to destState
      */
-    int updateProcessInstanceByState(@Param("originState") WorkflowExecutionStatus originState,
-                                     @Param("destState") WorkflowExecutionStatus destState);
+    int updateWorkflowInstanceState(
+                                    @Param("workflowInstanceId") Integer workflowInstanceId,
+                                    @Param("originState") WorkflowExecutionStatus originState,
+                                    @Param("destState") WorkflowExecutionStatus destState);
 
     /**
      * update process instance by tenantCode
@@ -189,10 +187,10 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * query last scheduler process instance
      *
      * @param processDefinitionCode definitionCode
-     * @param taskDefinitionCode definitionCode
-     * @param startTime      startTime
-     * @param endTime        endTime
-     * @param testFlag       testFlag
+     * @param taskDefinitionCode    definitionCode
+     * @param startTime             startTime
+     * @param endTime               endTime
+     * @param testFlag              testFlag
      * @return process instance
      */
     ProcessInstance queryLastSchedulerProcess(@Param("processDefinitionCode") Long processDefinitionCode,
@@ -205,7 +203,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * query last manual process instance
      *
      * @param definitionCode definitionCode
-     * @param taskCode taskCode
+     * @param taskCode       taskCode
      * @param startTime      startTime
      * @param endTime        endTime
      * @param testFlag       testFlag
@@ -308,8 +306,8 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
      * @param endTime      endTime
      * @param projectCode  projectCode
      * @param workflowCode workflowCode
-     * @param model model
-     * @param projectIds projectIds
+     * @param model        model
+     * @param projectIds   projectIds
      * @return ExecuteStatusCount list
      */
     List<ExecuteStatusCount> countInstanceStateV2(

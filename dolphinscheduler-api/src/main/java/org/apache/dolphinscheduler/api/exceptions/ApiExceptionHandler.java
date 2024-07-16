@@ -49,7 +49,7 @@ public class ApiExceptionHandler {
             return Result.errorWithArgs(Status.INTERNAL_SERVER_ERROR_ARGS, e.getMessage());
         }
         Status st = ce.value();
-        return Result.error(st);
+        return new Result<>(st.getCode(), st.getMsg() + ":" + e.getMessage());
     }
 
 }

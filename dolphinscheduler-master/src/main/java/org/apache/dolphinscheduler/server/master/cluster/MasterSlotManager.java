@@ -89,13 +89,19 @@ public class MasterSlotManager implements IMasterSlotReBalancer {
         }
         if (tmpCurrentSlot == -1) {
             log.warn(
-                    "Do re balance failed, cannot found the current master: {} in the normal master clusters: {}. Please check the current master server status",
+                    "Do rebalance failed, cannot found the current master: {} in the normal master clusters: {}. Please check the current master server status",
                     masterConfig.getMasterAddress(), normalMasterServers);
             currentSlot = -1;
             return;
         }
 
+        if (totalSlots == normalMasterServers.size() && currentSlot == tmpCurrentSlot) {
+            log.debug("No need to rebalance, the currentSlot: {}, totalSlots: {} doesn't changed", currentSlot,
+                    totalSlots);
+            return;
+        }
         totalSlots = normalMasterServers.size();
         currentSlot = tmpCurrentSlot;
+        log.info("DO rebalance success, current master slot: {}, total master slots: {}", currentSlot, totalSlots);
     }
 }

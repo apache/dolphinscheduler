@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.runner.taskgroup;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 
 import java.util.List;
 
@@ -157,13 +159,11 @@ class TaskGroupCoordinatorTest {
         // TaskInstance is NULL
         IllegalArgumentException illegalArgumentException =
                 assertThrows(IllegalArgumentException.class, () -> taskGroupCoordinator.releaseTaskGroupSlot(null));
-        assertEquals("The current TaskInstance does not use task group", illegalArgumentException.getMessage());
+        assertEquals("The TaskInstance is null", illegalArgumentException.getMessage());
 
         // TaskGroupId is NULL
         TaskInstance taskInstance = new TaskInstance();
-        illegalArgumentException = assertThrows(IllegalArgumentException.class,
-                () -> taskGroupCoordinator.releaseTaskGroupSlot(taskInstance));
-        assertEquals("The current TaskInstance does not use task group", illegalArgumentException.getMessage());
+        assertDoesNotThrow(() -> taskGroupCoordinator.releaseTaskGroupSlot(taskInstance));
 
         // Release TaskGroupQueue
         taskInstance.setId(1);

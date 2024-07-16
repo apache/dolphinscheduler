@@ -20,10 +20,8 @@ package org.apache.dolphinscheduler.service.command;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_PROCESS_ID_STRING;
-import static org.mockito.ArgumentMatchers.anyString;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -157,48 +155,6 @@ class MessageServiceImplTest {
         Command command2 = new Command();
         command2.setCommandType(CommandType.PAUSE);
         Assertions.assertTrue(commandService.verifyIsNeedCreateCommand(command2));
-    }
-
-    @Test
-    public void testCreateRecoveryWaitingThreadCommand() {
-        int id = 123;
-        Mockito.when(commandMapper.deleteById(id)).thenReturn(1);
-        ProcessInstance subProcessInstance = new ProcessInstance();
-        subProcessInstance.setIsSubProcess(Flag.YES);
-        Command originCommand = new Command();
-        originCommand.setId(id);
-        commandService.createRecoveryWaitingThreadCommand(originCommand, subProcessInstance);
-
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstance.setId(111);
-        commandService.createRecoveryWaitingThreadCommand(null, subProcessInstance);
-
-        Command recoverCommand = new Command();
-        recoverCommand.setCommandType(CommandType.RECOVER_WAITING_THREAD);
-        commandService.createRecoveryWaitingThreadCommand(recoverCommand, subProcessInstance);
-
-        Command repeatRunningCommand = new Command();
-        recoverCommand.setCommandType(CommandType.REPEAT_RUNNING);
-        commandService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance);
-
-        ProcessInstance subProcessInstance2 = new ProcessInstance();
-        subProcessInstance2.setId(111);
-        subProcessInstance2.setIsSubProcess(Flag.NO);
-        commandService.createRecoveryWaitingThreadCommand(repeatRunningCommand, subProcessInstance2);
-    }
-
-    @Test
-    public void giveNullOriginCommand_thenCreateRecoveryWaitingThreadCommand_expectNoDelete() {
-        ProcessInstance subProcessInstance = new ProcessInstance();
-        subProcessInstance.setIsSubProcess(Flag.NO);
-        subProcessInstance.setId(111);
-        ProcessDefinition processDefinition = new ProcessDefinition();
-        processDefinition.setId(111);
-        processDefinition.setCode(10L);
-        subProcessInstance.setProcessDefinition(processDefinition);
-        subProcessInstance.setWarningGroupId(1);
-        commandService.createRecoveryWaitingThreadCommand(null, subProcessInstance);
-        Mockito.verify(commandMapper, Mockito.times(0)).deleteById(anyString());
     }
 
     @Test

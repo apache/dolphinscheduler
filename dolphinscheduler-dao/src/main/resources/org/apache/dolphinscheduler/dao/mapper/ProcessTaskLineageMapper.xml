@@ -91,22 +91,6 @@
         and pd.project_code = #{projectCode}
     </select>
 
-    <select id="queryWorkFlowLineageByCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail">
-        select
-        pd.code as work_flow_code
-        ,pd.name as work_flow_name
-        ,pd.release_state as work_flow_publish_status
-        ,schd.start_time as schedule_start_time
-        ,schd.end_time as schedule_end_time
-        ,schd.crontab as crontab
-        ,schd.release_state as schedule_publish_status
-        from t_ds_process_definition pd
-        left join t_ds_schedules schd on pd.code = schd.process_definition_code
-        where 1=1
-        and pd.code = #{processDefinitionCode}
-        and pd.project_code = #{projectCode}
-    </select>
-
     <select id="queryWorkFlowLineageByDept" resultType="org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage">
         select
             <include refid="baseSql"/>

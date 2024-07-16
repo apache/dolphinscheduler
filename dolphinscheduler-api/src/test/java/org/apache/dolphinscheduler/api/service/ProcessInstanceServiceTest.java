@@ -204,7 +204,7 @@ public class ProcessInstanceServiceTest {
                     "2020-01-02 00:00:00",
                     "",
                     "test_user",
-                    WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                    WorkflowExecutionStatus.RUNNING_EXECUTION,
                     "192.168.xx.xx",
                     "",
                     1,
@@ -237,7 +237,7 @@ public class ProcessInstanceServiceTest {
                 "20200102 00:00:00",
                 "",
                 loginUser.getUserName(),
-                WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                WorkflowExecutionStatus.RUNNING_EXECUTION,
                 "192.168.xx.xx",
                 "",
                 1,
@@ -264,7 +264,7 @@ public class ProcessInstanceServiceTest {
 
         Result successRes =
                 processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
-                        "2020-01-02 00:00:00", "", loginUser.getUserName(), WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                        "2020-01-02 00:00:00", "", loginUser.getUserName(), WorkflowExecutionStatus.RUNNING_EXECUTION,
                         "192.168.xx.xx", "", 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
@@ -273,7 +273,7 @@ public class ProcessInstanceServiceTest {
                 eq(1L), eq(""), eq(""), Mockito.any(),
                 eq("192.168.xx.xx"), eq(null), eq(null))).thenReturn(pageReturn);
         successRes = processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "",
-                "", "", loginUser.getUserName(), WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                "", "", loginUser.getUserName(), WorkflowExecutionStatus.RUNNING_EXECUTION,
                 "192.168.xx.xx", "", 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
@@ -282,7 +282,7 @@ public class ProcessInstanceServiceTest {
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(-1);
         Result executorExistRes =
                 processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
-                        "2020-01-02 00:00:00", "", "admin", WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                        "2020-01-02 00:00:00", "", "admin", WorkflowExecutionStatus.RUNNING_EXECUTION,
                         "192.168.xx.xx", "", 1, 10);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorExistRes.getCode());
@@ -293,7 +293,7 @@ public class ProcessInstanceServiceTest {
                 eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         Result executorEmptyRes =
                 processInstanceService.queryProcessInstanceList(loginUser, projectCode, 1, "2020-01-01 00:00:00",
-                        "2020-01-02 00:00:00", "", "", WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                        "2020-01-02 00:00:00", "", "", WorkflowExecutionStatus.RUNNING_EXECUTION,
                         "192.168.xx.xx", "", 1, 10);
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorEmptyRes.getCode());
 

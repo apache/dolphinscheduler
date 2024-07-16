@@ -17,11 +17,16 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent.TaskInstanceExecutionEventType;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceExecutionEventAckListener;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionFinishEventAck;
-import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionInfoEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionFailedEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionKilledEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionPausedEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutionSuccessEventAck;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionDispatchedEventAck;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceExecutionRunningEventAck;
-import org.apache.dolphinscheduler.server.worker.runner.listener.TaskInstanceExecutionEventAckListenFunctionManager;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,23 +38,102 @@ import org.springframework.stereotype.Component;
 public class TaskInstanceExecutionEventAckListenerImpl implements ITaskInstanceExecutionEventAckListener {
 
     @Autowired
-    private TaskInstanceExecutionEventAckListenFunctionManager taskInstanceExecutionEventAckListenFunctionManager;
+    private MessageRetryRunner messageRetryRunner;
+
+    @Override
+    public void handleTaskInstanceDispatchedEventAck(TaskInstanceExecutionDispatchedEventAck taskInstanceExecutionDispatchedEventAck) {
+        try {
+            final int taskInstanceId = taskInstanceExecutionDispatchedEventAck.getTaskInstanceId();
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            log.info("Receive TaskInstanceDispatchedEventAck: {}", taskInstanceExecutionDispatchedEventAck);
+            if (taskInstanceExecutionDispatchedEventAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.DISPATCH);
+            } else {
+                log.warn("TaskInstanceDispatchedEvent handle failed: {}", taskInstanceExecutionDispatchedEventAck);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
+    }
 
     @Override
     public void handleTaskInstanceExecutionRunningEventAck(TaskInstanceExecutionRunningEventAck taskInstanceExecutionRunningEventAck) {
-        taskInstanceExecutionEventAckListenFunctionManager.getTaskInstanceExecutionRunningEventAckListenFunction()
-                .handleTaskInstanceExecutionEventAck(taskInstanceExecutionRunningEventAck);
+        try {
+            final int taskInstanceId = taskInstanceExecutionRunningEventAck.getTaskInstanceId();
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            log.info("Receive TaskInstanceExecutionRunningEventAck: {}", taskInstanceExecutionRunningEventAck);
+            if (taskInstanceExecutionRunningEventAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.RUNNING);
+            } else {
+                log.warn("TaskInstanceExecutionRunningEvent handle failed: {}", taskInstanceExecutionRunningEventAck);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
     }
 
     @Override
-    public void handleTaskInstanceExecutionFinishEventAck(TaskInstanceExecutionFinishEventAck taskInstanceExecutionFinishEventAck) {
-        taskInstanceExecutionEventAckListenFunctionManager.getTaskInstanceExecutionFinishEventAckListenFunction()
-                .handleTaskInstanceExecutionEventAck(taskInstanceExecutionFinishEventAck);
+    public void handleTaskExecutionSuccessEventAck(TaskExecutionSuccessEventAck taskExecutionSuccessEventAck) {
+        try {
+            final int taskInstanceId = taskExecutionSuccessEventAck.getTaskInstanceId();
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            log.info("Receive TaskExecutionSuccessEventAck: {}", taskExecutionSuccessEventAck);
+            if (taskExecutionSuccessEventAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.SUCCESS);
+            } else {
+                log.warn("TaskExecutionSuccessEvent handle failed: {}", taskExecutionSuccessEventAck);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
     }
 
     @Override
-    public void handleTaskInstanceExecutionInfoEventAck(TaskInstanceExecutionInfoEventAck taskInstanceExecutionInfoEventAck) {
-        taskInstanceExecutionEventAckListenFunctionManager.getTaskInstanceExecutionInfoEventAckListenFunction()
-                .handleTaskInstanceExecutionEventAck(taskInstanceExecutionInfoEventAck);
+    public void handleTaskExecutionPausedEventAck(TaskExecutionPausedEventAck taskExecutionPausedEventAck) {
+        try {
+            final int taskInstanceId = taskExecutionPausedEventAck.getTaskInstanceId();
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            log.info("Receive TaskExecutionPausedEventAck: {}", taskExecutionPausedEventAck);
+            if (taskExecutionPausedEventAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.PAUSED);
+            } else {
+                log.warn("TaskExecutionPausedEvent handle failed: {}", taskExecutionPausedEventAck);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
     }
+
+    @Override
+    public void handleTaskExecutionFailedEventAck(TaskExecutionFailedEventAck taskExecutionFailedEventAck) {
+        try {
+            final int taskInstanceId = taskExecutionFailedEventAck.getTaskInstanceId();
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            log.info("Receive TaskExecutionFailedEventAck: {}", taskExecutionFailedEventAck);
+            if (taskExecutionFailedEventAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.FAILED);
+            } else {
+                log.warn("TaskExecutionFailedEvent handle failed: {}", taskExecutionFailedEventAck);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
+    }
+
+    @Override
+    public void handleTaskExecutionKilledEventAck(TaskExecutionKilledEventAck taskExecutionKilledEventAck) {
+        try {
+            final int taskInstanceId = taskExecutionKilledEventAck.getTaskInstanceId();
+            LogUtils.setTaskInstanceIdMDC(taskInstanceId);
+            log.info("Receive TaskExecutionKilledEventAck: {}", taskExecutionKilledEventAck);
+            if (taskExecutionKilledEventAck.isSuccess()) {
+                messageRetryRunner.removeRetryMessage(taskInstanceId, TaskInstanceExecutionEventType.KILLED);
+            } else {
+                log.warn("TaskExecutionKilledEvent handle failed: {}", taskExecutionKilledEventAck);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceIdMDC();
+        }
+    }
+
 }

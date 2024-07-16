@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
+import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.execute.AsyncTaskExecuteFunction;
 import org.apache.dolphinscheduler.server.master.runner.task.BaseAsyncLogicTask;
 
@@ -49,7 +49,7 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
     private final TaskInstanceDao taskInstanceDao;
     private final ProcessInstanceDao processInstanceDao;
 
-    private final WorkflowExecuteRunnable workflowExecuteRunnable;
+    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
 
     public DependentLogicTask(TaskExecutionContext taskExecutionContext,
                               ProjectDao projectDao,
@@ -57,7 +57,7 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
                               TaskDefinitionDao taskDefinitionDao,
                               TaskInstanceDao taskInstanceDao,
                               ProcessInstanceDao processInstanceDao,
-                              WorkflowExecuteRunnable workflowExecuteRunnable) {
+                              IWorkflowExecutionRunnable workflowExecutionRunnable) {
         super(taskExecutionContext,
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), new TypeReference<DependentParameters>() {
                 }));
@@ -66,7 +66,7 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
         this.taskDefinitionDao = taskDefinitionDao;
         this.taskInstanceDao = taskInstanceDao;
         this.processInstanceDao = processInstanceDao;
-        this.workflowExecuteRunnable = workflowExecuteRunnable;
+        this.workflowExecutionRunnable = workflowExecutionRunnable;
 
     }
 
@@ -83,12 +83,15 @@ public class DependentLogicTask extends BaseAsyncLogicTask<DependentParameters> 
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        if (workflowExecuteRunnable == null) {
+        if (workflowExecutionRunnable == null) {
             log.error("Cannot find the WorkflowExecuteRunnable");
             return;
         }
-        TaskInstance taskInstance =
-                workflowExecuteRunnable.getTaskInstance(taskExecutionContext.getTaskInstanceId()).orElse(null);
+        TaskInstance taskInstance = workflowExecutionRunnable
+                .getWorkflowExecuteContext()
+                .getWorkflowExecutionGraph()
+                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                .getTaskInstance();
         if (taskInstance == null) {
             log.error("Cannot find the TaskInstance in workflowExecuteRunnable");
             return;

@@ -42,13 +42,11 @@ public class DataSourceProcessorManager {
         ServiceLoader.load(DataSourceProcessor.class).forEach(factory -> {
             final String name = factory.getDbType().name();
 
-            log.info("start register processor: {}", name);
             if (dataSourceProcessorMap.containsKey(name)) {
                 throw new IllegalStateException(format("Duplicate datasource plugins named '%s'", name));
             }
             loadDatasourceClient(factory);
-
-            log.info("done register processor: {}", name);
+            log.info("Success register datasource plugin -> {}", name);
 
         });
     }

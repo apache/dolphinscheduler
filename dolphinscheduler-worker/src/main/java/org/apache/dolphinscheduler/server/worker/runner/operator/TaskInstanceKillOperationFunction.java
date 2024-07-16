@@ -87,7 +87,7 @@ public class TaskInstanceKillOperationFunction
             }
 
             taskExecutionContext
-                    .setCurrentExecutionStatus(result ? TaskExecutionStatus.SUCCESS : TaskExecutionStatus.FAILURE);
+                    .setCurrentExecutionStatus(result ? TaskExecutionStatus.KILL : TaskExecutionStatus.FAILURE);
 
             WorkerTaskExecutorHolder.remove(taskInstanceId);
             messageRetryRunner.removeRetryMessages(taskInstanceId);

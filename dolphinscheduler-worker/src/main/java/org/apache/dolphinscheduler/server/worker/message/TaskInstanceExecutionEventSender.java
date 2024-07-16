@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.worker.message;
 
-import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
+import org.apache.dolphinscheduler.extract.master.transportor.ITaskExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
-public interface TaskInstanceExecutionEventSender<T extends ITaskInstanceExecutionEvent> {
+public interface TaskInstanceExecutionEventSender<T extends ITaskExecutionEvent> {
 
     /**
      * Send the message
@@ -36,5 +36,5 @@ public interface TaskInstanceExecutionEventSender<T extends ITaskInstanceExecuti
     /**
      * The message type can be sent by this sender.
      */
-    ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType getMessageType();
+    ITaskExecutionEvent.TaskInstanceExecutionEventType getMessageType();
 }
