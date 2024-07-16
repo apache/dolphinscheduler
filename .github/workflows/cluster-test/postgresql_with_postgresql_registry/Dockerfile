@@ -27,9 +27,6 @@ RUN mv /root/apache-dolphinscheduler-*-SNAPSHOT-bin /root/apache-dolphinschedule
 
 ENV DOLPHINSCHEDULER_HOME /root/apache-dolphinscheduler-test-SNAPSHOT-bin
 
-#Setting install.sh
-COPY .github/workflows/cluster-test/postgresql_with_postgresql_registry/install_env.sh $DOLPHINSCHEDULER_HOME/bin/env/install_env.sh
-
 #Setting dolphinscheduler_env.sh
 COPY .github/workflows/cluster-test/postgresql_with_postgresql_registry/dolphinscheduler_env.sh $DOLPHINSCHEDULER_HOME/bin/env/dolphinscheduler_env.sh
 
