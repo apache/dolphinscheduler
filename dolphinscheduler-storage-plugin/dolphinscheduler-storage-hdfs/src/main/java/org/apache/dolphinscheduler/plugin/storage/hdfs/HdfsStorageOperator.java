@@ -224,7 +224,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     @Override
     public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
         exceptionIfPathEmpty(resourceAbsolutePath);
-        log.info("resourceAbsolutePath: {}", resourceAbsolutePath);
         List<StorageEntity> result = new ArrayList<>();
 
         LinkedList<String> foldersToFetch = new LinkedList<>();
@@ -233,7 +232,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
         while (!foldersToFetch.isEmpty()) {
             String absolutePath = foldersToFetch.pollFirst();
             Path path = new Path(absolutePath);
-            log.info("absolutePath: {}", absolutePath);
             if (!fs.exists(path)) {
                 continue;
             }
