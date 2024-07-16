@@ -50,6 +50,7 @@ export default {
     create_workflow: '创建工作流',
     create_workflow_dynamic: '创建工作流 (动态)',
     import_workflow: '导入工作流',
+    import_sql_workflow: '导入sql工作流',
     workflow_name: '工作流名称',
     workflow_instance_name: '工作流实例名称',
     current_selection: '当前选择',

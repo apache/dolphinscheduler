@@ -133,4 +133,28 @@
         order by update_time desc
     </select>
 
+    <select id="queryDataSourceByNames" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
+        select
+        <include refid="baseSql"/>
+        from t_ds_datasource
+        where name in
+        <foreach collection="names" close=")" item="name" open="(" separator=",">
+            #{name,jdbcType=VARCHAR}
+        </foreach>
+    </select>
+
+    <select id="queryDataSourceByNamesAndUserId" resultType="org.apache.dolphinscheduler.dao.entity.DataSource">
+        select
+        ds.id as id,
+        ds.name as name,
+        ds.type as type
+        from t_ds_datasource ds
+        join t_ds_relation_datasource_user rel
+        on ds.id = rel.datasource_id
+        where ds.name in
+        <foreach collection="names" close=")" item="name" open="(" separator=",">
+            #{name,jdbcType=VARCHAR}
+        </foreach>
+        and rel.user_id = #{userId}
+    </select>
 </mapper>

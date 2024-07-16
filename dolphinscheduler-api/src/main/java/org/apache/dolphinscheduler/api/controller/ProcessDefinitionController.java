@@ -711,12 +711,18 @@ public class ProcessDefinitionController extends BaseController {
     public Result importProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                           @RequestParam("file") MultipartFile file) {
-        Map<String, Object> result;
-        if ("application/zip".equals(file.getContentType())) {
-            result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file);
-        } else {
-            result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
-        }
+        Map<String, Object> result = processDefinitionService.importProcessDefinition(loginUser, projectCode, file);
+        return returnDataList(result);
+    }
+
+    @Operation(summary = "importSqlProcessDefinition", description = "IMPORT_SQL_PROCESS_DEFINITION_NOTES")
+    @Parameter(name = "file", description = "RESOURCE_FILE", required = true, schema = @Schema(implementation = MultipartFile.class))
+    @PostMapping(value = "/importSql")
+    @ApiException(IMPORT_PROCESS_DEFINE_ERROR)
+    public Result importSqlProcessDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                             @RequestParam("file") MultipartFile file) {
+        Map<String, Object> result = processDefinitionService.importSqlProcessDefinition(loginUser, projectCode, file);
         return returnDataList(result);
     }
 
