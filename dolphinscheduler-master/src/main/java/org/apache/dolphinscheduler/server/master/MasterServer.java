@@ -184,5 +184,9 @@ public class MasterServer implements IStoppable {
     @Override
     public void stop(String cause) {
         close(cause);
+
+        // make sure exit after server closed, don't call System.exit in close logic, will cause deadlock if close
+        // multiple times at the same time
+        System.exit(1);
     }
 }
