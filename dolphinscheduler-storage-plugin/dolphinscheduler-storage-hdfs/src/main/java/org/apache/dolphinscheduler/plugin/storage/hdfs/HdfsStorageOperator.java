@@ -234,7 +234,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
             String absolutePath = foldersToFetch.pollFirst();
             Path path = new Path(absolutePath);
             if (!fs.exists(path)) {
-                createStorageDir(absolutePath);
+                return result;
             }
             RemoteIterator<LocatedFileStatus> remoteIterator = fs.listFiles(path, true);
             while (remoteIterator.hasNext()) {
