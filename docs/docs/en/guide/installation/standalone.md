@@ -59,3 +59,4 @@ Standalone server use H2 database as its metadata store, it is easy and users do
 But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database
 
 > Note: DS uses the /tmp/dolphinscheduler directory as the resource center by default. If you need to change the directory of the resource center, change the resource items in the conf/common.properties file
+

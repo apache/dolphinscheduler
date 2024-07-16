@@ -168,7 +168,6 @@ bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 > 请通过更改 api-server 配置文件 `api-server/conf/application.yaml` 中的 `python-gateway.enabled : false` 来禁用它。
 > **_注意 3:_**: DS默认使用本地模式的目录 /tmp/dolphinscheduler 作为资源中心, 如果需要修改资源中心目录, 请修改配置文件 conf/common.properties 中 resource 的相关配置项
 
-
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
 [issue]: https://github.com/apache/dolphinscheduler/issues/6597
