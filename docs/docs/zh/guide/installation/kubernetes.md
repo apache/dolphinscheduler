@@ -490,16 +490,10 @@ common:
 common:
   configmap:
     RESOURCE_STORAGE_TYPE: "S3"
-    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
-    FS_DEFAULT_FS: "s3a://BUCKET_NAME"
-    FS_S3A_ENDPOINT: "http://MINIO_IP:9000"
-    FS_S3A_ACCESS_KEY: "MINIO_ACCESS_KEY"
-    FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
+    ...
 ```
 
-`BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` 和 `MINIO_SECRET_KEY` 需要被修改为实际值
-
-> **注意**: `MINIO_IP` 只能使用 IP 而非域名, 因为 DolphinScheduler 尚不支持 S3 路径风格访问 (S3 path style access)
+对于配置其他字段相关细节, 请参考: [资源中心配置详情](../resource/configuration.md)
 
 ### 如何单独部署特定组件?
 
