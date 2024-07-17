@@ -24,7 +24,7 @@ import { useEdit, useIsDetailPageStore } from './use-edit'
 import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import styles from '../index.module.scss'
-import { useDetailPageStore } from "@/views/resource/components/resource/table/use-table";
+import { useDetailPageStore } from '@/views/resource/components/resource/table/use-table'
 
 export default defineComponent({
   name: 'ResourceEdit',
