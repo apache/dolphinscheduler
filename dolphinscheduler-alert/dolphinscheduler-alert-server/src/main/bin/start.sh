@@ -22,7 +22,7 @@ DOLPHINSCHEDULER_HOME=$(cd ${BIN_DIR}/..;pwd)
 
 source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
 
-JVM_ARGS_ENV_FILE=${DOLPHINSCHEDULER_HOME}/bin/jvm_args_env.sh
+JVM_ARGS_ENV_FILE=${BIN_DIR}/bin/jvm_args_env.sh
 JVM_ARGS="-server"
 
 if [ -f $JVM_ARGS_ENV_FILE ]; then
