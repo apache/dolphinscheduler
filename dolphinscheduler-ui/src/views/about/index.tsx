@@ -16,7 +16,7 @@
  */
 
 import { useI18n } from 'vue-i18n'
-import { defineComponent, onMounted, ref} from 'vue'
+import { defineComponent, onMounted, ref } from 'vue'
 import Card from '@/components/card'
 import { NSpace } from 'naive-ui'
 import { queryProductInfo } from '@/service/modules/ui-plugins'
@@ -30,7 +30,7 @@ const about = defineComponent({
       if (!productInfo) throw Error()
       info.value = productInfo.version
     }
-    onMounted( () => {
+    onMounted(() => {
       queryProduct()
     })
 
@@ -41,13 +41,11 @@ const about = defineComponent({
     const { info } = this
     return (
       <div>
-        <Card
-          title={t('about.about')}
-        >
+        <Card title={t('about.about')}>
           <NSpace vertical>
-            <NSpace align='center' >
+            <NSpace align='center'>
               <span>{t('about.about_version')}</span>
-              <div>{ info }</div>
+              <div>{info}</div>
             </NSpace>
           </NSpace>
         </Card>

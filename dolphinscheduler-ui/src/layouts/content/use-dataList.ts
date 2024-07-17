@@ -364,7 +364,7 @@ export function useDataList() {
       {
         label: t('user_dropdown.about'),
         key: 'about',
-        icon: renderIcon(SelectOutlined),
+        icon: renderIcon(SelectOutlined)
       },
       {
         label: t('user_dropdown.logout'),
