@@ -491,16 +491,10 @@ Take MinIO as an example: Modify the following configurations in `values.yaml`:
 common:
   configmap:
     RESOURCE_STORAGE_TYPE: "S3"
-    RESOURCE_UPLOAD_PATH: "/dolphinscheduler"
-    FS_DEFAULT_FS: "s3a://BUCKET_NAME"
-    FS_S3A_ENDPOINT: "http://MINIO_IP:9000"
-    FS_S3A_ACCESS_KEY: "MINIO_ACCESS_KEY"
-    FS_S3A_SECRET_KEY: "MINIO_SECRET_KEY"
+    ...
 ```
 
-Modify `BUCKET_NAME`, `MINIO_IP`, `MINIO_ACCESS_KEY` and `MINIO_SECRET_KEY` to actual environment values.
-
-> **Note**: `MINIO_IP` can only use IP instead of the domain name, because DolphinScheduler currently doesn't support S3 path style access.
+For detailed explanation of specific fields, please see: [Resource Center Configuration](../resource/configuration.md)
 
 ### How to deploy specific components separately?
 
