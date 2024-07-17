@@ -173,7 +173,7 @@ export default {
         children: [
           {
             key: 'docs0',
-            text: '最新版本latest(2)',
+            text: '最新版本latest(3.2.2)',
             link: '/zh-cn/docs/latest/user_doc/about/introduction.html',
           },
           {
