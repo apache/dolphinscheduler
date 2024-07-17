@@ -72,6 +72,7 @@ jobs:
       - name: Code Format Check
         run: |
           set -x
+          npm install pnpm@7 -g
           pnpm run lint
           modified_files=$(git status | grep modified | wc -l)
           if [ $modified_files -gt 0 ]; then
@@ -81,7 +82,6 @@ jobs:
       - name: Compile and Build on ${{ matrix.os }}
         run: |
           set -x
-          npm install pnpm@7 -g
           pnpm install
           pnpm run build:prod
   result:
