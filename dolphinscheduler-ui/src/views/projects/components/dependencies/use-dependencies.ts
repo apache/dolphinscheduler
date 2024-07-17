@@ -110,8 +110,14 @@ export function useDependencies() {
     if (workflowCode && projectCode) {
       await queryDependentTasks(projectCode, dependentTaskReq).then(
         (res: any) => {
-          res
-            .filter((item: any) => item.processDefinitionCode !== workflowCode)
+          res.data
+            .filter((item: any) => {
+              if (item.processDefinitionCode) {
+                return item.processDefinitionCode !== workflowCode
+              } else {
+                return false
+              }
+            })
             .forEach((item: any) => {
               dependentTaskLinks.push({
                 text:
