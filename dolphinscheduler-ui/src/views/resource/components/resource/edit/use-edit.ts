@@ -19,7 +19,10 @@ import { useI18n } from 'vue-i18n'
 import type { Router } from 'vue-router'
 import { useRouter } from 'vue-router'
 import { useAsyncState } from '@vueuse/core'
-import { updateResourceContent, viewResource } from '@/service/modules/resources'
+import {
+  updateResourceContent,
+  viewResource
+} from '@/service/modules/resources'
 import { defineStore } from 'pinia'
 
 export function useEdit(state: any) {
