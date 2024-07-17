@@ -159,6 +159,7 @@ bash ./bin/dolphinscheduler-daemon.sh stop alert-server
 > **_Note2:_**: Please refer to the section of "System Architecture Design" for service usage. Python gateway service is
 > started along with the api-server, and if you do not want to start Python gateway service please disabled it by changing
 > the yaml config `python-gateway.enabled : false` in api-server's configuration path `api-server/conf/application.yaml`
+> **_Note3:_**: DS uses the /tmp/dolphinscheduler directory as the resource center by default. If you need to change the directory of the resource center, change the resource items in the conf/common.properties file
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 [zookeeper]: https://zookeeper.apache.org/releases.html
