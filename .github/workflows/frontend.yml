@@ -73,6 +73,7 @@ jobs:
         run: |
           set -x
           npm install pnpm@7 -g
+          pnpm install
           pnpm run lint
           modified_files=$(git status | grep modified | wc -l)
           if [ $modified_files -gt 0 ]; then
@@ -81,8 +82,6 @@ jobs:
           fi
       - name: Compile and Build on ${{ matrix.os }}
         run: |
-          set -x
-          pnpm install
           pnpm run build:prod
   result:
     name: Frontend Build
