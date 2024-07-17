@@ -520,6 +520,7 @@ helm install dolphinscheduler-gpu-worker . \
 ```
 
 > **Note**: the above steps are for reference only, and specific operations need to be adjusted according to the actual situation.
+> **Note**: DS uses the /tmp/dolphinscheduler directory as the resource center by default. If you need to change the directory of the resource center, change the resource items in the conf/common.properties file
 
 ## Appendix-Configuration
 
