@@ -395,15 +395,17 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             }
         }
         List<User> userList = userMapper.selectByIds(projectList.stream()
-            .map(Project::getUserId).distinct().collect(Collectors.toList()));
-        List<ProjectProcessDefinitionCount> projectProcessDefinitionCountList = processDefinitionMapper.queryProjectProcessDefinitionCountByProjectCodes(
-            projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
+                .map(Project::getUserId).distinct().collect(Collectors.toList()));
+        List<ProjectProcessDefinitionCount> projectProcessDefinitionCountList =
+                processDefinitionMapper.queryProjectProcessDefinitionCountByProjectCodes(
+                        projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
         for (Project project : projectList) {
             project.setUserName(userList.stream().filter(user -> user.getId().equals(project.getUserId()))
-                .findFirst().map(User::getUserName).orElse(null));
+                    .findFirst().map(User::getUserName).orElse(null));
             project.setDefCount(projectProcessDefinitionCountList.stream()
-                .filter(projectProcessDefinitionCount -> projectProcessDefinitionCount.getProjectCode().equals(project.getCode()))
-                .findFirst().map(ProjectProcessDefinitionCount::getCount).orElse(0));
+                    .filter(projectProcessDefinitionCount -> projectProcessDefinitionCount.getProjectCode()
+                            .equals(project.getCode()))
+                    .findFirst().map(ProjectProcessDefinitionCount::getCount).orElse(0));
         }
         pageInfo.setTotal((int) projectIPage.getTotal());
         pageInfo.setTotalList(projectList);

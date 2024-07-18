@@ -140,7 +140,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
         createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
         WebDriverWaitFactory.createWebDriverWait(driver)
-            .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
+                .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
         createDirectoryBox().buttonSubmit().click();
 
         return this;
