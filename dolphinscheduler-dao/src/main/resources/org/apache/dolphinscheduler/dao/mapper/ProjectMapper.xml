@@ -84,13 +84,8 @@
         select
             <include refid="baseSqlV2">
                 <property name="alias" value="p"/>
-            </include> ,
-            u.user_name as user_name,
-            count(distinct def.id) AS def_count,
+            </include>
         from t_ds_project p
-        left join t_ds_user u on u.id=p.user_id
-        left join t_ds_process_definition def
-        on def.project_code = p.code
         where 1=1
         <if test="projectsIds != null and projectsIds.size() > 0">
             and p.id  in
@@ -103,7 +98,7 @@
             OR p.description LIKE concat('%', #{searchName}, '%')
             )
         </if>
-        group by p.id,u.user_name
+        group by p.id
         order by p.id desc
     </select>
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">

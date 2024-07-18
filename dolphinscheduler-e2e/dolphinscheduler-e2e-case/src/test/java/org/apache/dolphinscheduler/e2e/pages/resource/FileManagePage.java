@@ -94,8 +94,9 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
         createDirectoryBox().buttonSubmit().click();
-
         return this;
     }
 
@@ -138,6 +139,8 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
+        WebDriverWaitFactory.createWebDriverWait(driver)
+            .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
         createDirectoryBox().buttonSubmit().click();
 
         return this;
