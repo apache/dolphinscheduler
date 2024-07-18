@@ -82,20 +82,15 @@
     </select>
     <select id="queryProjectListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="p"/>
-        </include> ,
-        u.user_name as user_name,
-        count(distinct def.id) AS def_count,
-        count(distinct inst.id) as inst_running_count
+            <include refid="baseSqlV2">
+                <property name="alias" value="p"/>
+            </include> ,
+            u.user_name as user_name,
+            count(distinct def.id) AS def_count,
         from t_ds_project p
         left join t_ds_user u on u.id=p.user_id
         left join t_ds_process_definition def
         on def.project_code = p.code
-        left join t_ds_process_instance inst
-        on inst.process_definition_code = def.code
-        and inst.process_definition_version = def.version
-        and inst.state = 1
         where 1=1
         <if test="projectsIds != null and projectsIds.size() > 0">
             and p.id  in
