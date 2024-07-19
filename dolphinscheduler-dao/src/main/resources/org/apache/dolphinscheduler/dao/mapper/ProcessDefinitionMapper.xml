@@ -194,4 +194,16 @@
                 #{i}
             </foreach>
     </select>
+
+    <select id="queryProjectProcessDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount">
+        select
+            project_code as projectCode
+            ,count(*) as count
+        from t_ds_process_definition
+        where project_code in
+        <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+        group by project_code
+    </select>
 </mapper>
