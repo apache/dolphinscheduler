@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -392,6 +393,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             for (Project project : projectList) {
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
+        }
+        List<User> userList = userMapper.selectByIds(projectList.stream()
+                .map(Project::getUserId).distinct().collect(Collectors.toList()));
+        List<ProjectProcessDefinitionCount> projectProcessDefinitionCountList =
+                processDefinitionMapper.queryProjectProcessDefinitionCountByProjectCodes(
+                        projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
+        for (Project project : projectList) {
+            project.setUserName(userList.stream().filter(user -> user.getId().equals(project.getUserId()))
+                    .findFirst().map(User::getUserName).orElse(null));
+            project.setDefCount(projectProcessDefinitionCountList.stream()
+                    .filter(projectProcessDefinitionCount -> projectProcessDefinitionCount.getProjectCode()
+                            .equals(project.getCode()))
+                    .findFirst().map(ProjectProcessDefinitionCount::getCount).orElse(0));
         }
         pageInfo.setTotal((int) projectIPage.getTotal());
         pageInfo.setTotalList(projectList);
