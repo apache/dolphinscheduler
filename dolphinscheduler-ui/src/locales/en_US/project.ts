@@ -27,7 +27,6 @@ export default {
     project_description: 'Project Description',
     owned_users: 'Owned Users',
     workflow_define_count: 'Workflow Define Count',
-    process_instance_running_count: 'Process Instance Running Count',
     description: 'Description',
     create_time: 'Create Time',
     update_time: 'Update Time',

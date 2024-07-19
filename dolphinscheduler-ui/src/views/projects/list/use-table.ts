@@ -123,14 +123,6 @@ export function useTable() {
         }
       },
       {
-        title: t('project.list.process_instance_running_count'),
-        key: 'instRunningCount',
-        width: 120,
-        ellipsis: {
-          tooltip: true
-        }
-      },
-      {
         title: t('project.list.description'),
         key: 'description',
         ...COLUMN_WIDTH_CONFIG['note']
