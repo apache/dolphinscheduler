@@ -27,7 +27,6 @@ export default {
     project_description: '项目描述',
     owned_users: '所属用户',
     workflow_define_count: '工作流定义数',
-    process_instance_running_count: '正在运行的流程数',
     description: '描述',
     create_time: '创建时间',
     update_time: '更新时间',

@@ -91,15 +91,18 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public FileManagePage createDirectory(String name) {
+        waitForPageLoading();
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
         createDirectoryBox().buttonSubmit().click();
-
         return this;
     }
 
     public FileManagePage cancelCreateDirectory(String name) {
+        waitForPageLoading();
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
@@ -109,6 +112,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public FileManagePage rename(String currentName, String AfterName) {
+        waitForPageLoading();
         fileList()
                 .stream()
                 .filter(it -> it.getText().contains(currentName))
@@ -138,12 +142,15 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
         buttonCreateDirectory().click();
 
         createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
         createDirectoryBox().buttonSubmit().click();
 
         return this;
     }
 
     public FileManagePage delete(String name) {
+        waitForPageLoading();
         fileList()
                 .stream()
                 .filter(it -> it.getText().contains(name))
@@ -160,7 +167,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     // todo: add file type
     public FileManagePage createFile(String fileName, String scripts) {
-
+        waitForPageLoading();
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.elementToBeClickable(buttonCreateFile()));
 
@@ -189,6 +196,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public FileManagePage editFile(String fileName, String scripts) {
+        waitForPageLoading();
         fileList()
                 .stream()
                 .filter(it -> it.getText().contains(fileName))
@@ -210,6 +218,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public FileManagePage uploadFile(String filePath) {
+        waitForPageLoading();
         buttonUploadFile().click();
 
         driver.setFileDetector(new LocalFileDetector());
@@ -221,6 +230,7 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
     }
 
     public FileManagePage downloadFile(String fileName) {
+        waitForPageLoading();
         fileList()
                 .stream()
                 .filter(it -> it.getText().contains(fileName))
@@ -231,6 +241,10 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
                 .click();
 
         return this;
+    }
+
+    private void waitForPageLoading() {
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.urlContains("/resource/file-manage"));
     }
 
     @Getter

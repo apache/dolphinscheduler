@@ -71,7 +71,10 @@ do
 done
 
 #Stop Cluster
-docker exec -u root ds bash -c "/root/apache-dolphinscheduler-*-SNAPSHOT-bin/bin/stop-all.sh"
+docker exec -u root ds bash -c "/root/apache-dolphinscheduler-*-SNAPSHOT-bin/bin/dolphinscheduler-daemon.sh stop master-server"
+docker exec -u root ds bash -c "/root/apache-dolphinscheduler-*-SNAPSHOT-bin/bin/dolphinscheduler-daemon.sh stop worker-server"
+docker exec -u root ds bash -c "/root/apache-dolphinscheduler-*-SNAPSHOT-bin/bin/dolphinscheduler-daemon.sh stop alert-server"
+docker exec -u root ds bash -c "/root/apache-dolphinscheduler-*-SNAPSHOT-bin/bin/dolphinscheduler-daemon.sh stop api-server"
 
 #Cluster stop health check
 sleep 5

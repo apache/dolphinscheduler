@@ -424,6 +424,13 @@ master:
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  # -- Update strategy
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  #
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
@@ -562,6 +569,13 @@ worker:
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  # -- Update strategy
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  #
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.

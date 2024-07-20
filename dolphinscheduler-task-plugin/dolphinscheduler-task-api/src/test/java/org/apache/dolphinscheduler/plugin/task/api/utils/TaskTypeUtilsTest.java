@@ -15,7 +15,17 @@
  * limitations under the License.
  */
 
-export default {
-  about: 'About',
-  about_version: 'Product Version'
+package org.apache.dolphinscheduler.plugin.task.api.utils;
+
+import static com.google.common.truth.Truth.assertThat;
+
+import org.junit.jupiter.api.Test;
+
+class TaskTypeUtilsTest {
+
+    @Test
+    void isSwitchTask() {
+        assertThat(TaskTypeUtils.isSwitchTask("SWITCH")).isTrue();
+    }
+
 }

@@ -30,4 +30,5 @@ docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docke
 /bin/bash .github/workflows/cluster-test/mysql_with_mysql_registry/running_test.sh
 
 #Cleanup
-docker rm -f $(docker ps -aq)
+docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docker-compose-cluster.yaml down -v --remove-orphans
+docker-compose -f .github/workflows/cluster-test/mysql_with_mysql_registry/docker-compose-base.yaml down -v --remove-orphans

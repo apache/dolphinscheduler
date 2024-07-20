@@ -30,7 +30,7 @@ export SPRING_CACHE_TYPE=${SPRING_CACHE_TYPE:-none}
 export SPRING_JACKSON_TIME_ZONE=${SPRING_JACKSON_TIME_ZONE:-UTC}
 
 # Registry center configuration, determines the type and link of the registry center
-export REGISTRY_TYPE=${REGISTRY_TYPE:-jdbc}
+export REGISTRY_TYPE=jdbc
 export REGISTRY_HIKARI_CONFIG_JDBC_URL="jdbc:mysql://mysql:3306/dolphinscheduler?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
 export REGISTRY_HIKARI_CONFIG_USERNAME=root
 export REGISTRY_HIKARI_CONFIG_PASSWORD=123456

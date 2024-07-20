@@ -15,7 +15,18 @@
  * limitations under the License.
  */
 
-export default {
-  about: 'About',
-  about_version: 'Product Version'
+package org.apache.dolphinscheduler.dao.entity;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ProjectProcessDefinitionCount {
+
+    private Long projectCode;
+
+    private Integer count;
 }
