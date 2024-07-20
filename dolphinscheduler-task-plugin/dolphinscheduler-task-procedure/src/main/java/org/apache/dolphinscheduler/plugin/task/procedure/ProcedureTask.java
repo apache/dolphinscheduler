@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClient
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -131,9 +132,9 @@ public class ProcedureTask extends AbstractTask {
     }
 
     private String formatSql(Map<Integer, Property> sqlParamsMap, Map<String, Property> paramsMap) {
-        setSqlParamsMap(procedureParameters.getMethod(), rgex, sqlParamsMap, paramsMap,
+        setSqlParamsMap(procedureParameters.getMethod(), sqlParamsMap, paramsMap,
                 taskExecutionContext.getTaskInstanceId());
-        return procedureParameters.getMethod().replaceAll(rgex, "?");
+        return procedureParameters.getMethod().replaceAll(TaskConstants.SQL_PARAMS_REGEX, "?");
     }
 
     /**
