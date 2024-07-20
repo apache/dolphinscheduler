@@ -233,9 +233,9 @@ kubectl scale --replicas=6 sts dolphinscheduler-worker -n test # with test names
 2. Create a new `Dockerfile` to add MySQL driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.2.2
 # For example
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-tools:3.2.2
 
 # Attention Please, If the build is dolphinscheduler-tools image
 # You need to change the following line to: COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/tools/libs
@@ -284,9 +284,9 @@ externalDatabase:
 2. Create a new `Dockerfile` to add MySQL or Oracle driver:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-<service>:3.2.2
 # For example
-# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+# FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.2
 
 # If you want to support MySQL Datasource
 COPY mysql-connector-java-8.0.16.jar /opt/dolphinscheduler/libs
@@ -316,7 +316,7 @@ docker build -t apache/dolphinscheduler-<service>:new-driver .
 1. Create a new `Dockerfile` to install pip:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.2
 COPY requirements.txt /tmp
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python-pip && \
@@ -351,7 +351,7 @@ docker build -t apache/dolphinscheduler-worker:pip .
 1. Create a new `Dockerfile` to install Python 3:
 
 ```
-FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:<version>
+FROM dolphinscheduler.docker.scarf.sh/apache/dolphinscheduler-worker:3.2.2
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 && \
     rm -rf /var/lib/apt/lists/*
