@@ -212,6 +212,7 @@ public final class JdbcRegistry implements Registry {
                     .map(JdbcRegistryDataDTO::getDataKey)
                     .filter(fullPath -> fullPath.length() > key.length())
                     .map(fullPath -> StringUtils.substringBefore(fullPath.substring(key.length() + 1), "/"))
+                    .distinct()
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RegistryException(String.format("Get key: %s children error", key), e);
