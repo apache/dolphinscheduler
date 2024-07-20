@@ -33,5 +33,6 @@
         <module>dolphinscheduler-registry-jdbc</module>
         <module>dolphinscheduler-registry-etcd</module>
         <module>dolphinscheduler-registry-it</module>
+        <module>dolphinscheduler-registry-raft</module>
     </modules>
 </project>

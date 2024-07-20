@@ -695,4 +695,9 @@ public final class Constants {
     public static final String RELEASE_STATE = "releaseState";
     public static final String EXECUTE_TYPE = "executeType";
 
+    /**
+     * use for endKey of RheaKVStore scan
+     */
+    public static final String RAFT_END_KEY = "zzzz";
+
 }
