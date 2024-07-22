@@ -30,7 +30,7 @@ public interface ProcessTaskLineageMapper extends BaseMapper<ProcessTaskLineage>
 
     int batchDeleteByProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
 
-    int batchInsert(@Param("processLineages") List<ProcessTaskLineage> processTaskLineages);
+    int batchInsert(@Param("processTaskLineages") List<ProcessTaskLineage> processTaskLineages);
 
     List<ProcessTaskLineage> queryByProjectCode(@Param("projectCode") long projectCode);
 
