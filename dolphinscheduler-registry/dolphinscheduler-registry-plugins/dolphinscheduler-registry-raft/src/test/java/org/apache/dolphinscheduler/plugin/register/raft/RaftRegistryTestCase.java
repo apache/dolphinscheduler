@@ -38,7 +38,6 @@ import lombok.SneakyThrows;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,19 +52,8 @@ import com.google.common.truth.Truth;
 public class RaftRegistryTestCase {
 
     @Autowired
-    private RaftRegistryProperties raftRegistryProperties;
-    private static RaftRegisterServer raftRegisterServer;
-    private static RaftRegistry registry;
+    private RaftRegistry registry;
 
-    @BeforeAll
-    public void start() {
-        if (raftRegisterServer == null && registry == null) {
-            raftRegisterServer = new RaftRegisterServer(raftRegistryProperties);
-            registry = new RaftRegistry(raftRegistryProperties);
-            raftRegisterServer.start();
-            registry.start();
-        }
-    }
 
     @Test
     public void testPut() {

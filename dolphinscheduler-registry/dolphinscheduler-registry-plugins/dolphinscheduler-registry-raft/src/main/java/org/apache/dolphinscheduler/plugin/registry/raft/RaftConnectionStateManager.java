@@ -57,7 +57,7 @@ public class RaftConnectionStateManager implements IRaftConnectionStateManager {
                 1,
                 new ThreadFactoryBuilder().setNameFormat("ConnectionStateRefreshThread").setDaemon(true).build());
     }
-
+    @Override
     public void start() {
         cliClientService.init(cliOptions);
         scheduledExecutorService.scheduleWithFixedDelay(
@@ -66,7 +66,7 @@ public class RaftConnectionStateManager implements IRaftConnectionStateManager {
                 CONNECT_STATE_CHECK_INTERVENE.toMillis(),
                 TimeUnit.MILLISECONDS);
     }
-
+    @Override
     public void addConnectionListener(ConnectionListener listener) {
         connectionListeners.add(listener);
     }

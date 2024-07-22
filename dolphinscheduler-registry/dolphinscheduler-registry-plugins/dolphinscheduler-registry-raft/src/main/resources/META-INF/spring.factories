@@ -16,4 +16,4 @@
 #
 
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  org.apache.dolphinscheduler.plugin.registry.raft.RaftRegisterAutoConfiguration
+  org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryAutoConfiguration

@@ -25,29 +25,48 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 @Slf4j
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(prefix = "registry", name = "type", havingValue = "raft")
 @EnableConfigurationProperties(RaftRegistryProperties.class)
-public class RaftRegisterAutoConfiguration {
+public class RaftRegistryAutoConfiguration {
 
-    public RaftRegisterAutoConfiguration() {
+    public RaftRegistryAutoConfiguration() {
         log.info("Load RaftRegisterAutoConfiguration");
     }
 
     @Bean
-    public RaftRegistry raftRegistry(RaftRegistryProperties raftRegistryProperties) {
+    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "master")
+    public RaftRegisterServer raftRegisterServer(RaftRegistryProperties raftRegistryProperties) {
+        RaftRegisterServer raftRegisterServer = new RaftRegisterServer(raftRegistryProperties);
+        raftRegisterServer.start();
+        return raftRegisterServer;
+    }
+
+    @Bean
+    @DependsOn("raftRegisterServer")
+    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "master")
+    public RaftRegistry masterRegisterClient(RaftRegistryProperties raftRegistryProperties) {
         RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
         raftRegistry.start();
         return raftRegistry;
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "register", name = "module", havingValue = "master")
-    public RaftRegisterServer raftRegisterServer(RaftRegistryProperties raftRegistryProperties) {
-        RaftRegisterServer raftRegisterServer = new RaftRegisterServer(raftRegistryProperties);
-        raftRegisterServer.start();
-        return raftRegisterServer;
+    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "worker")
+    public RaftRegistry workerRegisterClient(RaftRegistryProperties raftRegistryProperties) {
+        RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
+        raftRegistry.start();
+        return raftRegistry;
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "api")
+    public RaftRegistry apiRegisterClient(RaftRegistryProperties raftRegistryProperties) {
+        RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
+        raftRegistry.start();
+        return raftRegistry;
     }
 }

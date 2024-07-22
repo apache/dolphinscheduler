@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RaftRegistry implements Registry {
 
+    private static final long RECONNECT_WAIT_TIME_MS = 50L;
     private final IRaftRegisterClient raftRegisterClient;
     public RaftRegistry(RaftRegistryProperties raftRegistryProperties) {
         this.raftRegisterClient = new RaftRegisterClient(raftRegistryProperties);
@@ -64,7 +65,7 @@ public class RaftRegistry implements Registry {
                     return;
                 }
             }
-            ThreadUtils.sleep(50);
+            ThreadUtils.sleep(RECONNECT_WAIT_TIME_MS);
         } catch (Exception ex) {
             throw new RegistryException("connect to raft cluster timeout", ex);
         }
