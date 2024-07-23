@@ -19,9 +19,14 @@ On the project screen, list of all the existing projects along with details like
 
 ## Create Project
 
-- Click `Project Management` to enter the project management page, click the `Create Project` button, enter the project name, project description, and click "Submit" to create a new project.
+- Click `Project Management` to enter the project management page, click the `Create Project` button, enter the project name, project description, and click `Submit` to create a new project.
 
 ![project-list](../../../../img/new_ui/dev/project/project-create.png)
+
+## Project Worker Group Authorization
+
+- On the project management page, click the `Worker Group Authorization` button to enter the worker group authorization page, as shown in the figure below, select the worker group, click `WorkerGroup`, after successful authorization, the project can access the worker group.
+  ![project-worker-group](../../../../img/new_ui/dev/project/project-worker-group-auth.png)
 
 ## Project Overview
 
