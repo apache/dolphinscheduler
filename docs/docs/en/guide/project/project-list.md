@@ -19,7 +19,7 @@ On the project screen, list of all the existing projects along with details like
 
 ## Create Project
 
-- Click `Project Management` to enter the project management page, click the `Create Project` button, enter the project name, project description, and click "Submit" to create a new project.
+- Click `Project Management` to enter the project management page, click the `Create Project` button, enter the project name, project description, and click `Submit` to create a new project.
 
 ![project-list](../../../../img/new_ui/dev/project/project-create.png)
 
