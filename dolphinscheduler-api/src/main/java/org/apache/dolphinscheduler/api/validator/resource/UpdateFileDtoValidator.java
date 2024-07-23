@@ -43,7 +43,9 @@ public class UpdateFileDtoValidator extends AbstractResourceValidator<UpdateFile
         User loginUser = updateFileDto.getLoginUser();
         MultipartFile file = updateFileDto.getFile();
 
-        if (!Objects.equals(Files.getFileExtension(file.getName()),
+        if (!Objects.equals(
+                Files.getFileExtension(
+                        file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename()),
                 Files.getFileExtension(updateFileDto.getFileAbsolutePath()))) {
             throw new ServiceException("file extension cannot not change");
         }
