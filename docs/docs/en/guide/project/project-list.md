@@ -23,6 +23,11 @@ On the project screen, list of all the existing projects along with details like
 
 ![project-list](../../../../img/new_ui/dev/project/project-create.png)
 
+## Project Worker Group Authorization
+
+- On the project management page, click the `Worker Group Authorization` button to enter the worker group authorization page, as shown in the figure below, select the worker group, click `WorkerGroup`, after successful authorization, the project can access the worker group.
+![project-worker-group](../../../../img/new_ui/dev/project/project-worker-group-auth.png)
+
 ## Project Overview
 
 - Click the project name link on the project management page to enter the project home page, as shown in the figure below, the project home page contains the task status statistics, process status statistics, and workflow definition statistics of the project. The introduction for those metrics:
