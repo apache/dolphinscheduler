@@ -40,4 +40,11 @@ public class RaftRegistryProperties {
     private Duration distributedLockRetryInterval = Duration.ofSeconds(5);
     private String module = "master";
     private Duration listenerCheckInterval = Duration.ofSeconds(3);
+    private int cliMaxRetries = 3;
+    private Duration cliTimeout = Duration.ofSeconds(5);
+    private Duration refreshLeaderTimeout = Duration.ofSeconds(2);
+    private Duration connectStateCheckInterval = Duration.ofSeconds(2);
+    private int subscribeListenerThreadPoolSize = 1;
+    private int connectionListenerThreadPoolSize = 1;
+
 }

@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistry;
 import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
-import org.apache.dolphinscheduler.plugin.registry.raft.server.RaftRegisterServer;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -53,7 +52,6 @@ public class RaftRegistryTestCase {
 
     @Autowired
     private RaftRegistry registry;
-
 
     @Test
     public void testPut() {

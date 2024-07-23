@@ -27,7 +27,7 @@ registry:
     log-storage-dir: raft-data/
     listener-check-interval: 3s
     distributed-lock-timeout: 3s
-    distributedLockRetryInterval: 3s
+    distributed-lock-retry-interval: 3s
     module: master
 ```
 worker's appplication.yml example
@@ -38,7 +38,7 @@ registry:
     server-address-list: 127.0.0.1:8181,127.0.0.1:8182,127.0.0.1:8183
     listener-check-interval: 3s
     distributed-lock-timeout: 3s
-    distributedLockRetryInterval: 3s
+    distributed-lock-retry-interval: 3s
     module: worker
 ```
 api's appplication.yml example
@@ -49,7 +49,7 @@ registry:
     server-address-list: 127.0.0.1:8181,127.0.0.1:8182,127.0.0.1:8183
     listener-check-interval: 3s
     distributed-lock-timeout: 3s
-    distributedLockRetryInterval: 3s
+    distributed-lock-retry-interval: 3s
     module: api
 ```
 

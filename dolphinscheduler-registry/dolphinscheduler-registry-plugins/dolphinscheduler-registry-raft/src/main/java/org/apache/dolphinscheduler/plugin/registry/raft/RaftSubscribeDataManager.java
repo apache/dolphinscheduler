@@ -43,22 +43,21 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
 
-    private static final int SUBSCRIBE_LISTENER_THREAD_POOL_SIZE = 1;
-
     private final Map<String, List<SubscribeListener>> dataSubScribeMap = new ConcurrentHashMap<>();
 
     private final RaftRegistryProperties properties;
 
     private final RheaKVStore kvStore;
 
+    private final ScheduledExecutorService scheduledExecutorService;
+
     public RaftSubscribeDataManager(RaftRegistryProperties properties, RheaKVStore kvStore) {
         this.properties = properties;
         this.kvStore = kvStore;
+        this.scheduledExecutorService = Executors.newScheduledThreadPool(
+                properties.getSubscribeListenerThreadPoolSize(),
+                new ThreadFactoryBuilder().setNameFormat("SubscribeListenerCheckThread").setDaemon(true).build());
     }
-
-    private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(
-            SUBSCRIBE_LISTENER_THREAD_POOL_SIZE,
-            new ThreadFactoryBuilder().setNameFormat("SubscribeListenerCheckThread").setDaemon(true).build());
 
     @Override
     public void start() {

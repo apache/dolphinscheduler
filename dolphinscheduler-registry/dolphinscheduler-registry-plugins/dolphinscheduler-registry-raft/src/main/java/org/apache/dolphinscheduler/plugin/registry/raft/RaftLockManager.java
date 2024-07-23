@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.registry.raft;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.registry.raft.model.RaftLockEntry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,18 +28,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import com.alipay.sofa.jraft.rhea.util.concurrent.DistributedLock;
 import com.alipay.sofa.jraft.util.ExecutorServiceHelper;
 
 public class RaftLockManager implements IRaftLockManager {
 
-    private final Map<String, LockEntry> distributedLockMap = new ConcurrentHashMap<>();
+    private final Map<String, RaftLockEntry> distributedLockMap = new ConcurrentHashMap<>();
     private final RheaKVStore rheaKvStore;
     private final RaftRegistryProperties raftRegistryProperties;
     private static final ScheduledExecutorService WATCH_DOG = Executors.newSingleThreadScheduledExecutor();
@@ -61,7 +57,7 @@ public class RaftLockManager implements IRaftLockManager {
 
         while (true) {
             if (distributedLock.tryLock()) {
-                distributedLockMap.put(lockKey, LockEntry.builder().distributedLock(distributedLock)
+                distributedLockMap.put(lockKey, RaftLockEntry.builder().distributedLock(distributedLock)
                         .lockOwner(lockOwner)
                         .build());
                 return true;
@@ -84,7 +80,7 @@ public class RaftLockManager implements IRaftLockManager {
 
         while (System.currentTimeMillis() < endTime) {
             if (distributedLock.tryLock()) {
-                distributedLockMap.put(lockKey, LockEntry.builder().distributedLock(distributedLock)
+                distributedLockMap.put(lockKey, RaftLockEntry.builder().distributedLock(distributedLock)
                         .lockOwner(lockOwner)
                         .build());
                 return true;
@@ -98,14 +94,14 @@ public class RaftLockManager implements IRaftLockManager {
     }
 
     private boolean isThreadReentrant(String lockKey, String lockOwner) {
-        final LockEntry lockEntry = distributedLockMap.get(lockKey);
+        final RaftLockEntry lockEntry = distributedLockMap.get(lockKey);
         return lockEntry != null && lockOwner.equals(lockEntry.getLockOwner());
     }
 
     @Override
     public boolean releaseLock(String lockKey) {
         final String lockOwner = getLockOwnerPrefix();
-        final LockEntry lockEntry = distributedLockMap.get(lockKey);
+        final RaftLockEntry lockEntry = distributedLockMap.get(lockKey);
         if (lockEntry == null || !lockOwner.equals(lockEntry.getLockOwner())) {
             return false;
         }
@@ -120,16 +116,6 @@ public class RaftLockManager implements IRaftLockManager {
 
     public static String getLockOwnerPrefix() {
         return LOCK_OWNER_PREFIX + Thread.currentThread().getName();
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class LockEntry {
-
-        private DistributedLock<byte[]> distributedLock;
-        private String lockOwner;
     }
 
     @Override

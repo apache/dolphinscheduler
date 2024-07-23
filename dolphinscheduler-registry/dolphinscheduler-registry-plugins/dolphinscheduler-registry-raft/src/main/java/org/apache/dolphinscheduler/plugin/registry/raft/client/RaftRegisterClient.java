@@ -21,7 +21,13 @@ import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.plugin.registry.raft.*;
+import org.apache.dolphinscheduler.plugin.registry.raft.IRaftConnectionStateManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.IRaftLockManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.IRaftSubscribeDataManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftConnectionStateManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftLockManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftSubscribeDataManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
