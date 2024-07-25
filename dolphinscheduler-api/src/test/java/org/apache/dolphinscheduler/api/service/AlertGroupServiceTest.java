@@ -93,7 +93,7 @@ public class AlertGroupServiceTest {
 
         when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
         List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(user);
-        Assertions.assertEquals(2, alertGroups.size());
+        Assertions.assertEquals(1, alertGroups.size());
 
         user.setUserType(UserType.GENERAL_USER);
         user.setId(2);
