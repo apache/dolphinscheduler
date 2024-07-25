@@ -40,8 +40,7 @@ public enum WarningType {
     NONE(0, "none"),
     SUCCESS(1, "success"),
     FAILURE(2, "failure"),
-    ALL(3, "all"),
-    GLOBAL(4, "global");
+    ALL(3, "all");
 
     WarningType(int code, String descp) {
         this.code = code;
