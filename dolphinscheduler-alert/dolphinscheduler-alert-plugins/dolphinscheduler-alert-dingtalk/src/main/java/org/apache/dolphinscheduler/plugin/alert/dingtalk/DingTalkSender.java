@@ -67,7 +67,7 @@ public final class DingTalkSender {
     private String msgType;
 
     private final String atMobiles;
-    private final String atUserIds;
+    private final String atDingtalkIds;
     private final Boolean atAll;
 
     private final Boolean enableProxy;
@@ -87,7 +87,7 @@ public final class DingTalkSender {
         msgType = config.get(DingTalkParamsConstants.NAME_DING_TALK_MSG_TYPE);
 
         atMobiles = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_MOBILES);
-        atUserIds = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS);
+        atDingtalkIds = config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS);
         atAll = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_AT_ALL));
 
         enableProxy = Boolean.valueOf(config.get(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE));
@@ -271,8 +271,8 @@ public final class DingTalkSender {
                 builder.append(" ");
             });
         }
-        if (org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds)) {
-            Arrays.stream(atUserIds.split(",")).forEach(value -> {
+        if (org.apache.commons.lang3.StringUtils.isNotBlank(atDingtalkIds)) {
+            Arrays.stream(atDingtalkIds.split(",")).forEach(value -> {
                 builder.append("@");
                 builder.append(value);
                 builder.append(" ");
@@ -297,12 +297,12 @@ public final class DingTalkSender {
                 org.apache.commons.lang3.StringUtils.isNotBlank(atMobiles) ? atMobiles.split(",")
                         : new String[0];
         String[] atUserArray =
-                org.apache.commons.lang3.StringUtils.isNotBlank(atUserIds) ? atUserIds.split(",")
+                org.apache.commons.lang3.StringUtils.isNotBlank(atDingtalkIds) ? atDingtalkIds.split(",")
                         : new String[0];
         boolean isAtAll = Objects.isNull(atAll) ? false : atAll;
 
         at.put("atMobiles", atMobileArray);
-        at.put("atUserIds", atUserArray);
+        at.put("atDingtalkIds", atUserArray);
         at.put("isAtAll", isAtAll);
 
         items.put("at", at);
