@@ -80,7 +80,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.create(any(User.class), eq(pluginDefineId), eq(instanceName),
-                eq(warningType), eq(pluginInstanceParams))).thenReturn(alertPluginInstance);
+                eq(pluginInstanceParams))).thenReturn(alertPluginInstance);
 
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances")
