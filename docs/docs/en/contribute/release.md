@@ -102,12 +102,14 @@ sub   4096R/A63BC462 2019-11-15
 Among them, 85E11560 is public key ID.
 
 The format has changed after gpg2.0 version
+
 ```shell
 pub   rsa4096 2023-07-01 [SC]
 1234ABCD5678EFGH9012IJKL3456MNOP7890QRST
 uid           [ultimate] ${用户名} <{邮件地址}>
 sub   rsa4096 2023-07-01 [E]
 ```
+
 Among them, 1234ABCD5678EFGH9012IJKL3456MNOP7890QRST is public key ID。
 
 #### Upload the Public Key to Key Server
@@ -202,6 +204,7 @@ We need to update some documentation before the Maven release. For example, to r
 > Note: `VERSION` is a place hold string, is same as the version we set in `VERSION=<THE-VERSION-YOU-RELEASE>`.
 
 ### Modify Correct year in NOTICE file
+
 The NOTICE file needs to be checked, changing the correct year in the second line to the current year. Files to check include
 - `dolphinscheduler-dist/release-docs/NOTICE`
 - `NOTICE`
@@ -549,6 +552,7 @@ DolphinScheduler Resources:
 ```
 
 ## Remove prepare branch
+
 ```shell
 cd "${SOURCE_CODE_DIR}"
 git push --delete "${GH_REMOTE}" "${VERSION}-prepare"

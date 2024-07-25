@@ -108,12 +108,14 @@ sub   4096R/A63BC462 2019-11-15
 其中 85E11560 为公钥 ID。
 
 gpg2.0版本后格式发生变化
+
 ```shell
 pub   rsa4096 2023-07-01 [SC]
 1234ABCD5678EFGH9012IJKL3456MNOP7890QRST
 uid           [ultimate] ${用户名} <{邮件地址}>
 sub   rsa4096 2023-07-01 [E]
 ```
+
 其中1234ABCD5678EFGH9012IJKL3456MNOP7890QRST为公钥 ID。
 
 #### 将公钥同步到服务器
@@ -208,9 +210,10 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
 > 注意：`VERSION` 是一个占位字符串，与我们在 `VERSION=<THE-VERSION-YOU-RELEASE>` 中设置的版本相同。
 
 ### 修改NOTICE年份
+
 需要检查NOTICE文件，将第二行中的截止年份修改为当前年份。 需要检查的文件包括
-  - `dolphinscheduler-dist/release-docs/NOTICE`
-  - `NOTICE`
+- `dolphinscheduler-dist/release-docs/NOTICE`
+- `NOTICE`
 
 ### Maven 发布
 
@@ -549,6 +552,7 @@ DolphinScheduler Resources:
 ```
 
 ## 删除prepare分支
+
 ```shell
 cd "${SOURCE_CODE_DIR}"
 git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
