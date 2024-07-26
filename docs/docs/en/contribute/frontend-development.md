@@ -57,9 +57,9 @@ npm install node-sass --unsafe-perm #Install node-sass dependency separately
 
 #### Front-end project release
 
-- `npm run build` project packaging (after packaging, the root directory will create a folder called dist for publishing Nginx online)
+- `pnpm run build:prod` project packaging (after packaging, the root directory will create a folder called dist for publishing Nginx online)
 
-Run the `npm run build` command to generate a package file (dist) package
+Run the `pnpm run build:prod` command to generate a package file (dist) package
 
 Copy it to the corresponding directory of the server (front-end service static page storage directory)
 
