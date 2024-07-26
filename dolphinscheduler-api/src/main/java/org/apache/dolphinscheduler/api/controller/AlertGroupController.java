@@ -114,22 +114,6 @@ public class AlertGroupController extends BaseController {
     }
 
     /**
-     * normal alert group list
-     *
-     * @param loginUser login user
-     * @return normal alert group list
-     */
-    @Operation(summary = "listNormalAlertGroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
-    @GetMapping(value = "/normal-list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
-    public Result<List<AlertGroup>> normalAlertGroupList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-
-        List<AlertGroup> alertGroups = alertGroupService.queryNormalAlertGroups(loginUser);
-        return Result.success(alertGroups);
-    }
-
-    /**
      * paging query alarm group list
      *
      * @param loginUser login user

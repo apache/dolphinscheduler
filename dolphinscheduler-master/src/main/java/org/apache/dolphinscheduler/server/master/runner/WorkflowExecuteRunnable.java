@@ -76,7 +76,6 @@ import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
-import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -218,8 +217,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     private final MasterConfig masterConfig;
 
-    private final ListenerEventAlertManager listenerEventAlertManager;
-
     private final TaskGroupCoordinator taskGroupCoordinator;
 
     public WorkflowExecuteRunnable(
@@ -233,7 +230,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                                    @NonNull CuringParamsService curingParamsService,
                                    @NonNull TaskInstanceDao taskInstanceDao,
                                    @NonNull DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory,
-                                   @NonNull ListenerEventAlertManager listenerEventAlertManager,
                                    @NonNull TaskGroupCoordinator taskGroupCoordinator) {
         this.processService = processService;
         this.commandService = commandService;
@@ -245,7 +241,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         this.curingParamsService = curingParamsService;
         this.taskInstanceDao = taskInstanceDao;
         this.defaultTaskExecuteRunnableFactory = defaultTaskExecuteRunnableFactory;
-        this.listenerEventAlertManager = listenerEventAlertManager;
         this.taskGroupCoordinator = taskGroupCoordinator;
         TaskMetrics.registerTaskPrepared(standByTaskInstancePriorityQueue::size);
     }
@@ -329,18 +324,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         return this.stateEvents.size();
     }
 
-    public void processStart() {
-        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-        this.listenerEventAlertManager.publishProcessStartListenerEvent(workflowInstance, projectUser);
-    }
-
-    public void taskStart(TaskInstance taskInstance) {
-        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-        this.listenerEventAlertManager.publishTaskStartListenerEvent(workflowInstance, taskInstance, projectUser);
-    }
-
     public void processTimeout() {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
@@ -372,9 +355,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 workflowInstance.setVarPool(VarPoolUtils.mergeVarPoolJsonString(
                         Lists.newArrayList(workflowInstance.getVarPool(), taskInstance.getVarPool())));
                 processInstanceDao.upsertProcessInstance(workflowInstance);
-                ProjectUser projectUser =
-                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-                listenerEventAlertManager.publishTaskEndListenerEvent(workflowInstance, taskInstance, projectUser);
+
                 // save the cacheKey only if the task is defined as cache task and the task is success
                 if (taskInstance.getIsCache().equals(Flag.YES)) {
                     saveCacheTaskInstance(taskInstance);
@@ -387,7 +368,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             } else if (taskInstance.getState().isFailure() || taskInstance.getState().isKill()
                     || taskInstance.getState().isStop()) {
                 completeTaskSet.add(taskInstance.getTaskCode());
-                listenerEventAlertManager.publishTaskFailListenerEvent(workflowInstance, taskInstance);
                 if (isTaskNeedPutIntoErrorMap(taskInstance)) {
                     errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                 }
@@ -670,7 +650,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
             }
             if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_QUEUE) {
-                processStart();
                 submitPostNode(null);
                 workflowRunnableStatus = WorkflowRunnableStatus.STARTED;
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
@@ -699,9 +678,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         processAlertManager.sendAlertProcessInstance(workflowInstance, getValidTaskList(), projectUser);
         if (workflowInstance.getState().isSuccess()) {
             processAlertManager.closeAlert(workflowInstance);
-            listenerEventAlertManager.publishProcessEndListenerEvent(workflowInstance, projectUser);
-        } else {
-            listenerEventAlertManager.publishProcessFailListenerEvent(workflowInstance, projectUser);
         }
         taskInstanceMap.forEach((id, taskInstance) -> {
             if (taskInstance != null && taskInstance.getTaskGroupId() > 0) {

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.dao.AlertDao;
-import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,9 +30,6 @@ public class ClusterStateMonitors {
 
     @Autowired
     private ClusterManager clusterManager;
-
-    @Autowired
-    private ListenerEventAlertManager listenerEventAlertManager;
 
     @Autowired
     private AlertDao alertDao;
@@ -49,12 +45,10 @@ public class ClusterStateMonitors {
     void masterRemoved(MasterServerMetadata masterServer) {
         // todo: unify the alert message
         alertDao.sendServerStoppedAlert(masterServer.getAddress(), "MASTER");
-        listenerEventAlertManager.publishServerDownListenerEvent(masterServer.getAddress(), "MASTER");
     }
 
     void workerRemoved(WorkerServerMetadata workerServer) {
         alertDao.sendServerStoppedAlert(workerServer.getAddress(), "WORKER");
-        listenerEventAlertManager.publishServerDownListenerEvent(workerServer.getAddress(), "WORKER");
     }
 
 }

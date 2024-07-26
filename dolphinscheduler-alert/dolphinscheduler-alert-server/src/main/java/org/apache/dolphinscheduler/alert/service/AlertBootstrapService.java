@@ -44,26 +44,18 @@ public final class AlertBootstrapService implements AutoCloseable {
 
     private final AlertEventLoop alertEventLoop;
 
-    private final ListenerEventLoop listenerEventLoop;
-
-    private final ListenerEventFetcher listenerEventFetcher;
-
     public AlertBootstrapService(AlertRpcServer alertRpcServer,
                                  AlertRegistryClient alertRegistryClient,
                                  AlertPluginManager alertPluginManager,
                                  AlertHAServer alertHAServer,
                                  AlertEventFetcher alertEventFetcher,
-                                 AlertEventLoop alertEventLoop,
-                                 ListenerEventLoop listenerEventLoop,
-                                 ListenerEventFetcher listenerEventFetcher) {
+                                 AlertEventLoop alertEventLoop) {
         this.alertRpcServer = alertRpcServer;
         this.alertRegistryClient = alertRegistryClient;
         this.alertPluginManager = alertPluginManager;
         this.alertHAServer = alertHAServer;
         this.alertEventFetcher = alertEventFetcher;
         this.alertEventLoop = alertEventLoop;
-        this.listenerEventLoop = listenerEventLoop;
-        this.listenerEventFetcher = listenerEventFetcher;
     }
 
     public void start() {
@@ -73,10 +65,7 @@ public final class AlertBootstrapService implements AutoCloseable {
         alertRegistryClient.start();
         alertHAServer.start();
 
-        listenerEventFetcher.start();
         alertEventFetcher.start();
-
-        listenerEventLoop.start();
         alertEventLoop.start();
         log.info("AlertBootstrapService started...");
     }
@@ -88,10 +77,8 @@ public final class AlertBootstrapService implements AutoCloseable {
                 AlertRpcServer closedAlertRpcServer = alertRpcServer;
                 AlertRegistryClient closedAlertRegistryClient = alertRegistryClient) {
             // close resource
-            listenerEventFetcher.shutdown();
             alertEventFetcher.shutdown();
 
-            listenerEventLoop.shutdown();
             alertEventLoop.shutdown();
             alertHAServer.shutdown();
         }

@@ -18,7 +18,7 @@
 import _ from 'lodash'
 import { defineComponent, onMounted, PropType, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { listNormalAlertGroupById } from '@/service/modules/alert-group'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { runningType, warningTypeList } from '@/common/common'
 import { IStartupParam } from './types'
@@ -42,7 +42,7 @@ export default defineComponent({
     const commandParam = JSON.parse(props.startupParam?.commandParam || '{}')
 
     const getAlertGroupList = () => {
-      listNormalAlertGroupById().then((res: any) => {
+      listAlertGroupById().then((res: any) => {
         alertGroupListRef.value = res
       })
     }

@@ -82,3 +82,44 @@ create table t_ds_jdbc_registry_data_change_event
     create_time        timestamp not null default current_timestamp,
     primary key (id)
 );
+
+DROP TABLE IF EXISTS t_ds_listener_event;
+
+-- drop_column_t_ds_alert_plugin_instance
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_alert_plugin_instance() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_alert_plugin_instance'
+                  AND column_name = 'instance_type')
+      THEN
+ALTER TABLE t_ds_alert_plugin_instance
+    DROP COLUMN "instance_type";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_alert_plugin_instance();
+DROP FUNCTION IF EXISTS drop_column_t_ds_alert_plugin_instance();
+
+
+-- drop_column_t_ds_alert_plugin_instance
+delimiter d//
+CREATE OR REPLACE FUNCTION drop_column_t_ds_alert_plugin_instance() RETURNS void AS $$
+BEGIN
+      IF EXISTS (SELECT 1
+                  FROM information_schema.columns
+                  WHERE table_name = 't_ds_alert_plugin_instance'
+                  AND column_name = 'warning_type')
+      THEN
+ALTER TABLE t_ds_alert_plugin_instance
+DROP COLUMN "warning_type";
+END IF;
+END;
+$$ LANGUAGE plpgsql;
+d//
+
+select drop_column_t_ds_alert_plugin_instance();
+DROP FUNCTION IF EXISTS drop_column_t_ds_alert_plugin_instance();

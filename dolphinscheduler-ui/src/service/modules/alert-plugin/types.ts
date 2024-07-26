@@ -24,8 +24,6 @@ interface ListReq {
 interface PluginInstanceReq {
   instanceName: string
   pluginDefineId: number
-  instanceType: string
-  warningType: string
   pluginInstanceParams: string
 }
 
@@ -41,7 +39,6 @@ interface InstanceNameReq {
 interface UpdatePluginInstanceReq {
   alertPluginInstanceId: number
   instanceName: string
-  warningType: string
   pluginInstanceParams: string
 }
 

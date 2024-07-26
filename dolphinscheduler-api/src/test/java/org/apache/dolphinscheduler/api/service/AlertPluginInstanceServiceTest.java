@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
-import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -96,13 +95,9 @@ public class AlertPluginInstanceServiceTest {
 
     private User noPermUser;
 
-    private final AlertPluginInstanceType normalInstanceType = AlertPluginInstanceType.NORMAL;
-
-    private final AlertPluginInstanceType globalInstanceType = AlertPluginInstanceType.GLOBAL;
-
-    private final WarningType warningType = WarningType.ALL;
-
     private final Integer GLOBAL_ALERT_GROUP_ID = 2;
+
+    private static final WarningType warningType = WarningType.ALL;
 
     private String uiParams = "[\n"
             + "    {\n"
@@ -192,7 +187,7 @@ public class AlertPluginInstanceServiceTest {
         noPermUser.setUserType(UserType.GENERAL_USER);
         noPermUser.setId(2);
 
-        alertPluginInstance = getAlertPluginInstance(1, normalInstanceType, "test");
+        alertPluginInstance = getAlertPluginInstance(1, "test");
         alertPluginInstances = new ArrayList<>();
         alertPluginInstances.add(alertPluginInstance);
     }
@@ -202,7 +197,7 @@ public class AlertPluginInstanceServiceTest {
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 noPermUser.getId(), ALERT_INSTANCE_CREATE, baseServiceLogger)).thenReturn(false);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> alertPluginInstanceService.create(noPermUser,
-                1, "test", normalInstanceType, warningType, uiParams));
+                1, "test", uiParams));
 
         when(alertPluginInstanceMapper.existInstanceName("test")).thenReturn(true);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
@@ -210,23 +205,15 @@ public class AlertPluginInstanceServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 null, 0, baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.PLUGIN_INSTANCE_ALREADY_EXISTS,
-                () -> alertPluginInstanceService.create(user, 1, "test", normalInstanceType, warningType, uiParams));
+                () -> alertPluginInstanceService.create(user, 1, "test", uiParams));
         when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(1);
         AlertPluginInstance alertPluginInstance =
-                alertPluginInstanceService.create(user, 1, "test1", normalInstanceType, warningType, uiParams);
+                alertPluginInstanceService.create(user, 1, "test1", uiParams);
         assertNotNull(alertPluginInstance);
-
-        when(alertGroupMapper.selectById(GLOBAL_ALERT_GROUP_ID)).thenReturn(getGlobalAlertGroup());
-        assertDoesNotThrow(() -> alertPluginInstanceService.create(user, 1, "global_plugin_instance",
-                AlertPluginInstanceType.GLOBAL, warningType, uiParams));
-
-        when(alertGroupMapper.selectById(GLOBAL_ALERT_GROUP_ID)).thenReturn(getGlobalAlertGroup("1"));
-        assertDoesNotThrow(() -> alertPluginInstanceService.create(user, 1, "global_plugin_instance",
-                AlertPluginInstanceType.GLOBAL, warningType, uiParams));
 
         when(alertPluginInstanceMapper.insert(Mockito.any())).thenReturn(-1);
         assertThrowsServiceException(Status.SAVE_ERROR,
-                () -> alertPluginInstanceService.create(user, 1, "test_insert_error", normalInstanceType, warningType,
+                () -> alertPluginInstanceService.create(user, 1, "test_insert_error",
                         uiParams));
     }
 
@@ -258,17 +245,6 @@ public class AlertPluginInstanceServiceTest {
                 1, ALERT_PLUGIN_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 null, 0, baseServiceLogger)).thenReturn(true);
-        AlertPluginInstance normalInstanceWithId1 = getAlertPluginInstance(1, normalInstanceType, "test1");
-        AlertPluginInstance normalInstanceWithId9 = getAlertPluginInstance(9, normalInstanceType, "test9");
-        AlertPluginInstance globalInstanceWithId5 = getAlertPluginInstance(5, globalInstanceType, "test5");
-        when(alertPluginInstanceMapper.selectById(1)).thenReturn(normalInstanceWithId1);
-        when(alertPluginInstanceMapper.selectById(9)).thenReturn(normalInstanceWithId9);
-        when(alertPluginInstanceMapper.selectById(5)).thenReturn(globalInstanceWithId5);
-        AlertGroup globalAlertGroup = new AlertGroup();
-        globalAlertGroup.setId(2);
-        globalAlertGroup.setAlertInstanceIds("5,96");
-        when(alertGroupMapper.selectById(2)).thenReturn(globalAlertGroup);
-        when(alertGroupMapper.updateById(Mockito.any())).thenReturn(1);
 
         assertThrowsServiceException(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED,
                 () -> alertPluginInstanceService.deleteById(user, 1));
@@ -276,8 +252,8 @@ public class AlertPluginInstanceServiceTest {
         when(alertPluginInstanceMapper.deleteById(9)).thenReturn(1);
         Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.deleteById(user, 9));
 
-        when(alertPluginInstanceMapper.deleteById(5)).thenReturn(1);
-        Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.deleteById(user, 5));
+        assertThrowsServiceException(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED,
+                () -> alertPluginInstanceService.deleteById(user, 5));
 
         when(alertGroupMapper.queryInstanceIdsList()).thenReturn(Collections.emptyList());
         Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.deleteById(user, 9));
@@ -288,7 +264,7 @@ public class AlertPluginInstanceServiceTest {
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 noPermUser.getId(), ALERT_PLUGIN_UPDATE, baseServiceLogger)).thenReturn(false);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> alertPluginInstanceService.updateById(noPermUser, 1, "test", warningType, uiParams));
+                () -> alertPluginInstanceService.updateById(noPermUser, 1, "test", uiParams));
 
         when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(0);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, 1,
@@ -296,11 +272,11 @@ public class AlertPluginInstanceServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0,
                 baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.SAVE_ERROR,
-                () -> alertPluginInstanceService.updateById(user, 1, "testUpdate", warningType, uiParams));
+                () -> alertPluginInstanceService.updateById(user, 1, "testUpdate", uiParams));
 
         when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(1);
         AlertPluginInstance alertPluginInstance =
-                alertPluginInstanceService.updateById(user, 1, "testUpdate", warningType, uiParams);
+                alertPluginInstanceService.updateById(user, 1, "testUpdate", uiParams);
         Assertions.assertNotNull(alertPluginInstance);
     }
 
@@ -316,7 +292,7 @@ public class AlertPluginInstanceServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0,
                 baseServiceLogger)).thenReturn(true);
         when(alertPluginInstanceMapper.selectById(1))
-                .thenReturn(getAlertPluginInstance(1, AlertPluginInstanceType.NORMAL, "test_get_instance"));
+                .thenReturn(getAlertPluginInstance(1, "test_get_instance"));
 
         Assertions.assertEquals(alertPluginInstanceService.getById(user, 1).getId(), 1);
     }
@@ -349,7 +325,7 @@ public class AlertPluginInstanceServiceTest {
         when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(Collections.emptyList());
         Assertions.assertEquals(0, alertPluginInstanceService.queryAll().size());
 
-        AlertPluginInstance alertPluginInstance = getAlertPluginInstance(1, normalInstanceType, "test");
+        AlertPluginInstance alertPluginInstance = getAlertPluginInstance(1, "test");
         PluginDefine pluginDefine = new PluginDefine("script", "script", uiParams);
         pluginDefine.setId(1);
         List<PluginDefine> pluginDefines = Collections.singletonList(pluginDefine);
@@ -359,13 +335,10 @@ public class AlertPluginInstanceServiceTest {
         Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.queryAll());
     }
 
-    private AlertPluginInstance getAlertPluginInstance(int id, AlertPluginInstanceType instanceType,
-                                                       String instanceName) {
+    private AlertPluginInstance getAlertPluginInstance(int id, String instanceName) {
         AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
         alertPluginInstance.setId(id);
         alertPluginInstance.setPluginDefineId(1);
-        alertPluginInstance.setInstanceType(instanceType);
-        alertPluginInstance.setWarningType(warningType);
         alertPluginInstance.setPluginInstanceParams(paramsMap);
         alertPluginInstance.setInstanceName(instanceName);
         return alertPluginInstance;

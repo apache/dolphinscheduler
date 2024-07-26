@@ -83,7 +83,6 @@ export function useDetail(getFormValues: Function) {
             {
               alertPluginInstanceId: values.pluginDefineId,
               instanceName: values.instanceName,
-              warningType: values.warningType,
               pluginInstanceParams: formatParams(json, values)
             },
             currentRecord.id
@@ -91,8 +90,6 @@ export function useDetail(getFormValues: Function) {
         : await createAlertPluginInstance({
             instanceName: values.instanceName,
             pluginDefineId: values.pluginDefineId,
-            instanceType: values.instanceType,
-            warningType: values.warningType,
             pluginInstanceParams: formatParams(json, values)
           })
 

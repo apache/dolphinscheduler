@@ -24,7 +24,7 @@ import { queryProcessDefinitionByCode } from '@/service/modules/process-definiti
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryTenantList } from '@/service/modules/tenants'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
-import { listNormalAlertGroupById } from '@/service/modules/alert-group'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 import type { EnvironmentItem } from '@/service/modules/environment/types'
 import type { IStartState } from '../types'
 
@@ -90,7 +90,7 @@ export const useStart = (
   }
 
   const getAlertGroups = () => {
-    listNormalAlertGroupById().then((res: any) => {
+    listAlertGroupById().then((res: any) => {
       variables.startState.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id
