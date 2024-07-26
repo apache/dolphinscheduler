@@ -310,10 +310,6 @@ CREATE TABLE t_ds_alertgroup
 );
 
 -- ----------------------------
--- Records of t_ds_alertgroup
--- ----------------------------
-
--- ----------------------------
 -- Table structure for t_ds_command
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_command CASCADE;
@@ -1081,10 +1077,6 @@ INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, desc
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39',
         '2018-11-29 10:20:39');
 
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39',
-        '2018-11-29 10:20:39');
-
 -- ----------------------------
 -- Records of t_ds_user
 -- ----------------------------
@@ -1120,8 +1112,6 @@ CREATE TABLE t_ds_alert_plugin_instance
     create_time            timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     update_time            timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     instance_name          varchar(200) DEFAULT NULL,
-    instance_type          int NOT NULL default '0',
-    warning_type           int NOT NULL default '3',
     PRIMARY KEY (id)
 );
 
@@ -2014,7 +2004,7 @@ CREATE TABLE t_ds_task_group
 );
 
 -- ----------------------------
--- Table structure for t_ds_alert_plugin_instance
+-- Table structure for t_ds_audit_log
 -- ----------------------------
 DROP TABLE IF EXISTS t_ds_audit_log;
 CREATE TABLE t_ds_audit_log
@@ -2166,25 +2156,6 @@ CREATE TABLE t_ds_relation_sub_workflow (
     INDEX idx_parent_task_code (parent_task_code),
     INDEX idx_sub_workflow_instance_id (sub_workflow_instance_id)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
--- ----------------------------
--- Table structure for t_ds_listener_event
--- ----------------------------
-DROP TABLE IF EXISTS t_ds_listener_event;
-CREATE TABLE t_ds_listener_event
-(
-    id          int      NOT NULL AUTO_INCREMENT,
-    content     text,
-    sign        char(64) NOT NULL DEFAULT '',
-    post_status tinyint(4) NOT NULL DEFAULT '0',
-    event_type  int(11),
-    log         text,
-    create_time datetime          DEFAULT NULL,
-    update_time datetime          DEFAULT NULL,
-    PRIMARY KEY (id),
-    KEY         idx_status (post_status),
-    KEY         idx_event_sign (sign)
-);
 
 -- ----------------------------
 -- Table structure for t_ds_process_task_lineage

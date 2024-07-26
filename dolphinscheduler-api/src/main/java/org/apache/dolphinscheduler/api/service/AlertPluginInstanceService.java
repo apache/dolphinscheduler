@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
-import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -43,8 +41,6 @@ public interface AlertPluginInstanceService {
     AlertPluginInstance create(User loginUser,
                                int pluginDefineId,
                                String instanceName,
-                               AlertPluginInstanceType instanceType,
-                               WarningType warningType,
                                String pluginInstanceParams);
 
     /**
@@ -58,7 +54,6 @@ public interface AlertPluginInstanceService {
     AlertPluginInstance updateById(User loginUser,
                                    int alertPluginInstanceId,
                                    String instanceName,
-                                   WarningType warningType,
                                    String pluginInstanceParams);
 
     /**

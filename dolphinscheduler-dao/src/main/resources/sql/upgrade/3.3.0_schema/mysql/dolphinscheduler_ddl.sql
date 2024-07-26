@@ -85,3 +85,43 @@ CREATE TABLE `t_ds_jdbc_registry_data_change_event`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
+
+DROP TABLE IF EXISTS `t_ds_listener_event`;
+
+-- drop_column_t_ds_alert_plugin_instance behavior change
+DROP PROCEDURE if EXISTS drop_column_t_ds_alert_plugin_instance;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_alert_plugin_instance()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_alert_plugin_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='instance_type')
+   THEN
+ALTER TABLE `t_ds_alert_plugin_instance`
+    DROP COLUMN `instance_type`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_alert_plugin_instance;
+DROP PROCEDURE drop_column_t_ds_alert_plugin_instance;
+
+-- drop_column_t_ds_alert_plugin_instance behavior change
+DROP PROCEDURE if EXISTS drop_column_t_ds_alert_plugin_instance;
+delimiter d//
+CREATE PROCEDURE drop_column_t_ds_alert_plugin_instance()
+BEGIN
+   IF EXISTS (SELECT 1 FROM information_schema.COLUMNS
+           WHERE TABLE_NAME='t_ds_alert_plugin_instance'
+           AND TABLE_SCHEMA=(SELECT DATABASE())
+           AND COLUMN_NAME ='warning_type')
+   THEN
+ALTER TABLE `t_ds_alert_plugin_instance`
+    DROP COLUMN `warning_type`;
+END IF;
+END;
+d//
+delimiter ;
+CALL drop_column_t_ds_alert_plugin_instance;
+DROP PROCEDURE drop_column_t_ds_alert_plugin_instance;
