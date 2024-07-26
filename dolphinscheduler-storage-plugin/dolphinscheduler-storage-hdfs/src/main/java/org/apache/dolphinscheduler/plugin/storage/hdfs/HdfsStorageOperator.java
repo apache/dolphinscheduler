@@ -224,7 +224,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     @Override
     public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
         exceptionIfPathEmpty(resourceAbsolutePath);
-
         List<StorageEntity> result = new ArrayList<>();
 
         LinkedList<String> foldersToFetch = new LinkedList<>();
@@ -232,7 +231,11 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
 
         while (!foldersToFetch.isEmpty()) {
             String absolutePath = foldersToFetch.pollFirst();
-            RemoteIterator<LocatedFileStatus> remoteIterator = fs.listFiles(new Path(absolutePath), true);
+            Path path = new Path(absolutePath);
+            if (!fs.exists(path)) {
+                continue;
+            }
+            RemoteIterator<LocatedFileStatus> remoteIterator = fs.listFiles(path, true);
             while (remoteIterator.hasNext()) {
                 LocatedFileStatus locatedFileStatus = remoteIterator.next();
                 result.add(transformFileStatusToResourceMetadata(locatedFileStatus));

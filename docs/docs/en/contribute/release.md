@@ -101,6 +101,17 @@ sub   4096R/A63BC462 2019-11-15
 
 Among them, 85E11560 is public key ID.
 
+The format has changed after gpg2.0 version
+
+```shell
+pub   rsa4096 2023-07-01 [SC]
+1234ABCD5678EFGH9012IJKL3456MNOP7890QRST
+uid           [ultimate] ${用户名} <{邮件地址}>
+sub   rsa4096 2023-07-01 [E]
+```
+
+Among them, 1234ABCD5678EFGH9012IJKL3456MNOP7890QRST is public key ID。
+
 #### Upload the Public Key to Key Server
 
 The command is as follow:
@@ -191,6 +202,12 @@ We need to update some documentation before the Maven release. For example, to r
   - `docs/configs/docsdev.js`: change `/dev/` to `/x.y.z/`, **DO NOT** change this filename, is will be auto change by website tools.
 
 > Note: `VERSION` is a place hold string, is same as the version we set in `VERSION=<THE-VERSION-YOU-RELEASE>`.
+
+### Modify Correct year in NOTICE file
+
+The NOTICE file needs to be checked, changing the correct year in the second line to the current year. Files to check include
+- `dolphinscheduler-dist/release-docs/NOTICE`
+- `NOTICE`
 
 ### Maven Release
 
@@ -468,9 +485,6 @@ svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinsch
 # remove old release directory
 svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
 
-# Remove prepare branch
-cd "${SOURCE_CODE_DIR}"
-git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 and then find DolphinScheduler in [apache staging repositories](https://repository.apache.org/#stagingRepositories) and click `Release`
@@ -497,14 +511,14 @@ the release version is `<VERSION>`, the following updates are required(note it w
 
 We have a [workflow](../../../../.github/workflows/publish-docker.yaml) to automatically publish Docker images
 and a [workflow](../../../../.github/workflows/publish-helm-chart.yaml) to automatically publish Helm Chart to Docker Hub,
-after you change the release from "pre-release" to "release", the workflow will be triggered. All you need to do
+after you create release node, the workflow will be triggered. All you need to do
 is to observe the aforementioned workflows, and after they are completed, you can pull the Docker images locally and
 verify that they work as expected.
 
 ### Send Announcement E-mail Community
 
 You should send announcement E-mail after release process finished. The E-mail should send to `dev@dolphinscheduler.apache.org`
-and cc to `announce@apache.org`.
+and cc to `announce@apache.org`, Note: **Mail format requires plain text format**.
 
 Announcement e-mail template as below：
 
@@ -535,6 +549,13 @@ DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
 - Documents: https://dolphinscheduler.apache.org/en-us/docs/<VERSION>/about/introduction
+```
+
+## Remove prepare branch
+
+```shell
+cd "${SOURCE_CODE_DIR}"
+git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 ## News

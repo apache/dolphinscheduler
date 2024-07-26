@@ -36,10 +36,6 @@ export function useColumns(onCallback: Function) {
         key: 'instanceName'
       },
       {
-        title: t('security.alarm_instance.alarm_instance_type'),
-        key: 'instanceType'
-      },
-      {
         title: t('security.alarm_instance.alarm_plugin_name'),
         key: 'alertPluginName'
       },

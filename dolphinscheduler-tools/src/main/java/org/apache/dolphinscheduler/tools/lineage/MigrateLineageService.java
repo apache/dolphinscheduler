@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessTaskLineageDao;
@@ -32,7 +31,6 @@ import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChanne
 
 import org.apache.commons.collections.CollectionUtils;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,9 +52,6 @@ public class MigrateLineageService {
     @Autowired
     private ProcessTaskRelationMapper processTaskRelationMapper;
 
-    @Autowired
-    private ProcessDefinitionMapper processDefinitionMapper;
-
     public void migrateLineageOnce() {
         try {
             List<ProcessTaskLineage> processTaskLineageList = getAllProcessLineages();
@@ -71,7 +66,7 @@ public class MigrateLineageService {
         }
     }
 
-    private List<ProcessTaskLineage> getAllProcessLineages() throws SQLException {
+    private List<ProcessTaskLineage> getAllProcessLineages() {
         List<TaskDefinition> taskDefinitionList =
                 taskDefinitionMapper.queryDefinitionsByTaskType(DependentLogicTaskChannelFactory.NAME);
         List<ProcessTaskRelation> processTaskRelationList =
@@ -83,14 +78,15 @@ public class MigrateLineageService {
             parseDependentTaskParams(taskDefinition, processTaskLineageList);
 
             for (ProcessTaskLineage processTaskLineage : processTaskLineageList) {
-                processTaskLineage.setProcessDefinitionCode(processTaskRelationList.stream()
+                processTaskRelationList.stream()
                         .filter(processTaskRelation -> processTaskRelation.getPreTaskCode() == taskDefinition.getCode()
                                 || processTaskRelation.getPostTaskCode() == taskDefinition.getCode())
-                        .findFirst().get().getProcessDefinitionCode());
-                processTaskLineage.setProcessDefinitionVersion(processTaskRelationList.stream()
-                        .filter(processTaskRelation -> processTaskRelation.getPreTaskCode() == taskDefinition.getCode()
-                                || processTaskRelation.getPostTaskCode() == taskDefinition.getCode())
-                        .findFirst().get().getProcessDefinitionVersion());
+                        .findFirst()
+                        .ifPresent(processTaskRelation -> {
+                            processTaskLineage.setProcessDefinitionCode(processTaskRelation.getProcessDefinitionCode());
+                            processTaskLineage
+                                    .setProcessDefinitionVersion(processTaskRelation.getProcessDefinitionVersion());
+                        });
             }
         }
         return processTaskLineageList;
