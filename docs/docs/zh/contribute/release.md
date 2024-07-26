@@ -107,6 +107,17 @@ sub   4096R/A63BC462 2019-11-15
 
 其中 85E11560 为公钥 ID。
 
+gpg2.0版本后格式发生变化
+
+```shell
+pub   rsa4096 2023-07-01 [SC]
+1234ABCD5678EFGH9012IJKL3456MNOP7890QRST
+uid           [ultimate] ${用户名} <{邮件地址}>
+sub   rsa4096 2023-07-01 [E]
+```
+
+其中1234ABCD5678EFGH9012IJKL3456MNOP7890QRST为公钥 ID。
+
 #### 将公钥同步到服务器
 
 命令如下：
@@ -197,6 +208,12 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
     - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`，**不要**修改文件名称，website 仓库的 shell 脚本会对他进行修改
 
 > 注意：`VERSION` 是一个占位字符串，与我们在 `VERSION=<THE-VERSION-YOU-RELEASE>` 中设置的版本相同。
+
+### 修改NOTICE年份
+
+需要检查NOTICE文件，将第二行中的截止年份修改为当前年份。 需要检查的文件包括
+- `dolphinscheduler-dist/release-docs/NOTICE`
+- `NOTICE`
 
 ### Maven 发布
 
@@ -351,6 +368,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 - 检查源码包是否包含由于包含不必要文件，致使 tarball 过于庞大
 - 存在`LICENSE`和`NOTICE`文件
+- `NOTICE` 文件中的当前年份
 - 只存在文本文件，不存在二进制文件
 - 所有文件的开头都有 ASF 许可证
 - 能够正确编译，单元测试可以通过 (mvn install)
@@ -462,7 +480,7 @@ Thanks everyone for taking time to check this release and help us.
 
 ## Announce
 
-### Move Packages to Release
+### 移动发布包
 
 ```shell
 # move to release directory
@@ -471,9 +489,6 @@ svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinsch
 # remove old release directory
 svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
 
-# Remove prepare branch
-cd "${SOURCE_CODE_DIR}"
-git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 在 [apache staging repositories](https://repository.apache.org/#stagingRepositories) 仓库找到 DolphinScheduler 并点击`Release`
@@ -498,12 +513,12 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 
 我们有一个 [工作流](../../../../.github/workflows/publish-docker.yaml) 来自动发布 Docker 镜像，
 以及一个 [工作流](../../../../.github/workflows/publish-helm-chart.yaml) 来自动发布 Helm Chart 到 Docker Hub。
-当你将发版从 "pre-release" 改为 "release" 后，这两个工作流就会被触发。你需要做的就是观察上述的工作流，
+当你创建了release node后，这两个工作流就会被触发。你需要做的就是观察上述的工作流，
 当它们完成后，你可以在本地拉取 Docker 镜像并验证它们是否按预期工作。
 
 ### 发送公告邮件通知社区
 
-当完成了上述的发版流程后，需要发送一封公告邮件给社区。你需要将邮件发送到 `dev@dolphinscheduler.apache.org` 并抄送到 `announce@apache.org`。
+当完成了上述的发版流程后，需要发送一封公告邮件给社区。你需要将邮件发送到 `dev@dolphinscheduler.apache.org` 并抄送到 `announce@apache.org`，注意**邮件格式需要使用纯文本格式**。
 
 通知邮件模板如下：
 
@@ -534,6 +549,13 @@ DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
 - Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
+```
+
+## 删除prepare分支
+
+```shell
+cd "${SOURCE_CODE_DIR}"
+git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 ## News
