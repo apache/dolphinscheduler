@@ -16,6 +16,12 @@
  */
 
 export default {
-  about: '关于产品',
-  about_version: '产品版本'
-}
+  about: '关于DolphinScheduler',
+  about_version: '产品版本',
+  github_page: 'Github 页面',
+  license: '许可证信息',
+  homepage: 'DolphinScheduler 首页',
+  product_introduction: '产品简介',
+  "Apache DolphinScheduler is a distributed and extensible open-source workflow orchestration platform with powerful DAG visual interfaces":
+      'Apache DolphinScheduler 是一个分布式和可扩展的开源工作流协调平台，具有强大的 DAG 可视化界面',
+};
