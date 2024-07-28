@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.Param;
@@ -170,5 +171,8 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
      * @return project ids list
      */
     List<Integer> listProjectIds();
+
     List<Long> queryDefinitionCodeListByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
+
+    List<ProjectProcessDefinitionCount> queryProjectProcessDefinitionCountByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 }

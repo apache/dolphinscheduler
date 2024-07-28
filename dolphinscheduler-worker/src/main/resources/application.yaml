@@ -61,9 +61,7 @@ worker:
     max-disk-usage-percentage-thresholds: 0.7
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
-    strategy: waiting
-    # The max waiting time to reconnect to registry if you set the strategy to waiting
-    max-waiting-time: 100s
+    strategy: stop
   task-execute-threads-full-policy: REJECT
   tenant-config:
     # tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.

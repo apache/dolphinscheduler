@@ -162,6 +162,9 @@ public class ExecuteFunctionServiceTest {
     @Mock
     private ProcessDefinitionService processDefinitionService;
 
+    @Mock
+    private ProcessLineageService processLineageService;
+
     private int processDefinitionId = 1;
 
     private int processDefinitionVersion = 1;
@@ -358,7 +361,7 @@ public class ExecuteFunctionServiceTest {
         dependentProcessDefinition.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         dependentProcessDefinition.setTaskParams(
                 "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":2,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
-        Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode))
+        Mockito.when(processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode))
                 .thenReturn(Lists.newArrayList(dependentProcessDefinition));
 
         Map<Long, String> processDefinitionWorkerGroupMap = new HashMap<>();
@@ -387,7 +390,7 @@ public class ExecuteFunctionServiceTest {
         childDependent.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         childDependent.setTaskParams(
                 "{\"localParams\":[],\"resourceList\":[],\"dependence\":{\"relation\":\"AND\",\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":[{\"depTaskCode\":3,\"status\":\"SUCCESS\"}]}]},\"conditionResult\":{\"successNode\":[1],\"failedNode\":[1]}}");
-        Mockito.when(processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+        Mockito.when(processLineageService.queryDownstreamDependentProcessDefinitions(
                 dependentProcessDefinition.getProcessDefinitionCode())).thenReturn(Lists.newArrayList(childDependent))
                 .thenReturn(Lists.newArrayList());
         int allLevelDependentCount = executorService.createComplementDependentCommand(schedules, command, true);

@@ -15,13 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+set -eo pipefail
 
-BIN_DIR=$(dirname $0)
-DOLPHINSCHEDULER_HOME=${DOLPHINSCHEDULER_HOME:-$(cd $BIN_DIR/..; pwd)}
+BIN_DIR=$(dirname $(readlink -f "$0"))
+DOLPHINSCHEDULER_HOME=$(cd ${BIN_DIR}/..;pwd)
 
 source "$DOLPHINSCHEDULER_HOME/conf/dolphinscheduler_env.sh"
 
-JVM_ARGS_ENV_FILE=${BIN_DIR}/jvm_args_env.sh
+JVM_ARGS_ENV_FILE=${DOLPHINSCHEDULER_HOME}/bin/jvm_args_env.sh
 JVM_ARGS="-server"
 
 if [ -f $JVM_ARGS_ENV_FILE ]; then

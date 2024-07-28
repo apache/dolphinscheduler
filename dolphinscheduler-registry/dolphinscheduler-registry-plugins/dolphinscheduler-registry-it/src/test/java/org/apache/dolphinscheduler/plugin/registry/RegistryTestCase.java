@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.registry;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -35,13 +36,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.SneakyThrows;
 
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.google.common.truth.Truth;
 
 public abstract class RegistryTestCase<R extends Registry> {
 
@@ -62,7 +60,7 @@ public abstract class RegistryTestCase<R extends Registry> {
     @Test
     public void testIsConnected() {
         registry.start();
-        Truth.assertThat(registry.isConnected()).isTrue();
+        assertThat(registry.isConnected()).isTrue();
     }
 
     @Test
@@ -114,47 +112,12 @@ public abstract class RegistryTestCase<R extends Registry> {
 
     @SneakyThrows
     @Test
-    public void testUnsubscribe() {
-        registry.start();
-
-        final AtomicBoolean subscribeAdded = new AtomicBoolean(false);
-        final AtomicBoolean subscribeRemoved = new AtomicBoolean(false);
-        final AtomicBoolean subscribeUpdated = new AtomicBoolean(false);
-
-        SubscribeListener subscribeListener = event -> {
-            if (event.type() == Event.Type.ADD) {
-                subscribeAdded.compareAndSet(false, true);
-            }
-            if (event.type() == Event.Type.REMOVE) {
-                subscribeRemoved.compareAndSet(false, true);
-            }
-            if (event.type() == Event.Type.UPDATE) {
-                subscribeUpdated.compareAndSet(false, true);
-            }
-        };
-        String key = "/nodes/master" + System.nanoTime();
-        String value = "127.0.0.1:8080";
-        registry.subscribe(key, subscribeListener);
-        registry.unsubscribe(key);
-        registry.put(key, value, true);
-        registry.put(key, value, true);
-        registry.delete(key);
-
-        Thread.sleep(2000);
-        Assertions.assertFalse(subscribeAdded.get());
-        Assertions.assertFalse(subscribeRemoved.get());
-        Assertions.assertFalse(subscribeUpdated.get());
-
-    }
-
-    @SneakyThrows
-    @Test
     public void testAddConnectionStateListener() {
 
         AtomicReference<ConnectionState> connectionState = new AtomicReference<>();
         registry.addConnectionStateListener(connectionState::set);
 
-        Truth.assertThat(connectionState.get()).isNull();
+        assertThat(connectionState.get()).isNull();
         registry.start();
 
         await().atMost(Duration.ofSeconds(2))
@@ -169,7 +132,7 @@ public abstract class RegistryTestCase<R extends Registry> {
         String value = "127.0.0.1:8080";
         assertThrows(RegistryException.class, () -> registry.get(key));
         registry.put(key, value, true);
-        Truth.assertThat(registry.get(key)).isEqualTo(value);
+        assertThat(registry.get(key)).isEqualTo(value);
     }
 
     @Test
@@ -178,11 +141,11 @@ public abstract class RegistryTestCase<R extends Registry> {
         String key = "/nodes/master" + System.nanoTime();
         String value = "127.0.0.1:8080";
         registry.put(key, value, true);
-        Truth.assertThat(registry.get(key)).isEqualTo(value);
+        assertThat(registry.get(key)).isEqualTo(value);
 
         // Update the value
         registry.put(key, "123", true);
-        Truth.assertThat(registry.get(key)).isEqualTo("123");
+        assertThat(registry.get(key)).isEqualTo("123");
     }
 
     @Test
@@ -194,22 +157,23 @@ public abstract class RegistryTestCase<R extends Registry> {
         registry.delete(key);
 
         registry.put(key, value, true);
-        Truth.assertThat(registry.get(key)).isEqualTo(value);
+        assertThat(registry.get(key)).isEqualTo(value);
         registry.delete(key);
-        Truth.assertThat(registry.exists(key)).isFalse();
+        assertThat(registry.exists(key)).isFalse();
 
     }
 
     @Test
     public void testChildren() {
         registry.start();
-        String master1 = "/nodes/children/127.0.0.1:8080";
-        String master2 = "/nodes/children/127.0.0.2:8080";
+        String master1 = "/nodes/children/childGroup1/127.0.0.1:8080";
+        String master2 = "/nodes/children/childGroup1/127.0.0.2:8080";
         String value = "123";
         registry.put(master1, value, true);
         registry.put(master2, value, true);
-        Truth.assertThat(registry.children("/nodes/children"))
-                .containsAtLeastElementsIn(Lists.newArrayList("127.0.0.1:8080", "127.0.0.2:8080"));
+        assertThat(registry.children("/nodes/children")).containsExactly("childGroup1");
+        assertThat(registry.children("/nodes/children/childGroup1")).containsExactly("127.0.0.1:8080",
+                "127.0.0.2:8080");
     }
 
     @Test
@@ -217,9 +181,9 @@ public abstract class RegistryTestCase<R extends Registry> {
         registry.start();
         String key = "/nodes/master" + System.nanoTime();
         String value = "123";
-        Truth.assertThat(registry.exists(key)).isFalse();
+        assertThat(registry.exists(key)).isFalse();
         registry.put(key, value, true);
-        Truth.assertThat(registry.exists(key)).isTrue();
+        assertThat(registry.exists(key)).isTrue();
 
     }
 
@@ -230,10 +194,10 @@ public abstract class RegistryTestCase<R extends Registry> {
         String lockKey = "/lock" + System.nanoTime();
 
         // 1. Acquire the lock at the main thread
-        Truth.assertThat(registry.acquireLock(lockKey)).isTrue();
+        assertThat(registry.acquireLock(lockKey)).isTrue();
         // Acquire the lock at the main thread again
         // It should acquire success
-        Truth.assertThat(registry.acquireLock(lockKey)).isTrue();
+        assertThat(registry.acquireLock(lockKey)).isTrue();
 
         // Acquire the lock at another thread
         // It should acquire failed
@@ -248,17 +212,17 @@ public abstract class RegistryTestCase<R extends Registry> {
         registry.start();
         String lockKey = "/lock" + System.nanoTime();
         // 1. Acquire the lock in the main thread
-        Truth.assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
+        assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
 
         // Acquire the lock in the main thread
         // It should acquire success
-        Truth.assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
+        assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
 
         // Acquire the lock at another thread
         // It should acquire failed
         CompletableFuture<Boolean> acquireResult =
                 CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
-        Truth.assertThat(acquireResult.get()).isFalse();
+        assertThat(acquireResult.get()).isFalse();
 
     }
 
@@ -268,21 +232,21 @@ public abstract class RegistryTestCase<R extends Registry> {
         registry.start();
         String lockKey = "/lock" + System.nanoTime();
         // 1. Acquire the lock in the main thread
-        Truth.assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
+        assertThat(registry.acquireLock(lockKey, 3000)).isTrue();
 
         // Acquire the lock at another thread
         // It should acquire failed
         CompletableFuture<Boolean> acquireResult =
                 CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
-        Truth.assertThat(acquireResult.get()).isFalse();
+        assertThat(acquireResult.get()).isFalse();
 
         // 2. Release the lock in the main thread
-        Truth.assertThat(registry.releaseLock(lockKey)).isTrue();
+        assertThat(registry.releaseLock(lockKey)).isTrue();
 
         // Acquire the lock at another thread
         // It should acquire success
         acquireResult = CompletableFuture.supplyAsync(() -> registry.acquireLock(lockKey, 3000));
-        Truth.assertThat(acquireResult.get()).isTrue();
+        assertThat(acquireResult.get()).isTrue();
     }
 
     public abstract R createRegistry();

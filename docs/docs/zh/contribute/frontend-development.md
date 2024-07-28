@@ -57,9 +57,9 @@ npm install node-sass --unsafe-perm #单独安装node-sass依赖
 
 #### 前端项目发布
 
-- `npm run build` 项目打包 (打包后根目录会创建一个名为dist文件夹，用于发布线上Nginx)
+- `pnpm run build:prod` 项目打包 (打包后根目录会创建一个名为dist文件夹，用于发布线上Nginx)
 
-运行 `npm run build` 命令，生成打包文件（dist）包
+运行 `pnpm run build:prod` 命令，生成打包文件（dist）包
 
 再拷贝到服务器对应的目录下（前端服务静态页面存放目录）
 

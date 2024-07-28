@@ -6,6 +6,11 @@
 
 ![project](../../../../img/new_ui/dev/project/project-create.png)
 
+## 项目工作组授权
+
+在项目管理页面，点击“工作组授权”按钮，进入工作组授权页面，如下图所示，选择工作组，点击“分配WorkerGroup”，授权成功后，该项目可以访问该工作组。
+![project-worker-group](../../../../img/new_ui/dev/project/project-worker-group-auth.png)
+
 ## 项目首页
 
 在项目管理页面点击项目名称链接，进入项目首页，如下图所示，项目首页包含该项目的任务实例状态统计、工作流实例状态统计、工作流定义统计。这几个指标的说明如下
