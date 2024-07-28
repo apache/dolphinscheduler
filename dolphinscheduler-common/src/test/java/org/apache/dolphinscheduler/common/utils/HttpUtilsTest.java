@@ -46,7 +46,7 @@ public class HttpUtilsTest {
      */
     @Test
     void testGetValidRequest() {
-        String response3 = HttpUtils.get("https://www.google.com/");
+        String response3 = HttpUtils.get("https://www.bing.com/");
         assertNotNull(response3, "Response should not be null for a valid certification https URL");
     }
 

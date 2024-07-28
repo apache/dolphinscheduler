@@ -17,7 +17,7 @@
 
 import { ref, onMounted, computed, h } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { listNormalAlertGroupById } from '@/service/modules/alert-group'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 import styles from '../index.module.scss'
 import type { IJsonItem } from '../types'
 
@@ -43,7 +43,7 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
   const getGroups = async () => {
     if (groupsLoading.value) return
     groupsLoading.value = true
-    const res = await listNormalAlertGroupById()
+    const res = await listAlertGroupById()
     groups.value = res.map((item: { id: number; groupName: string }) => ({
       label: item.groupName,
       value: item.id

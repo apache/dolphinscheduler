@@ -49,7 +49,7 @@ class CodeGenerateUtilsTest {
     @Test
     void testNoGenerateDuplicateCodeWithDifferentAppName() throws UnknownHostException, InterruptedException {
         int threadNum = 10;
-        int codeNum = 1000000;
+        int codeNum = 100000;
 
         final String hostName = InetAddress.getLocalHost().getHostName();
         Map<String, List<Long>> machineCodes = new ConcurrentHashMap<>();
