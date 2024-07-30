@@ -15,26 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.raft;
+package org.apache.dolphinscheduler.plugin.registry.raft.model;
 
-import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
-/**
- * Interface for managing data subscriptions in a raft registry client.
- */
-public interface IRaftSubscribeDataManager extends AutoCloseable {
+@AllArgsConstructor
+@Getter
+public enum NodeType {
 
-    /**
-     * Starts the data subscription manager.
-     * This method initializes and starts the data subscription functionality.
-     */
-    void start();
-
-    /**
-     * Adds a listener to subscribe to data changes at the specified path.
-     *
-     * @param path     the path to subscribe to for data changes
-     * @param listener the listener to be notified of data changes
-     */
-    void addDataSubscribeListener(String path, SubscribeListener listener);
+    EPHEMERAL("ephemeralNode"),
+    PERSISTENT("persistentNode");
+    private final String name;
 }

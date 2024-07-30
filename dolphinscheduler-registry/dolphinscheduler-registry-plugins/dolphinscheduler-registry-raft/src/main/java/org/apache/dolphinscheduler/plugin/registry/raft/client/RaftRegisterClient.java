@@ -21,13 +21,14 @@ import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 import static com.alipay.sofa.jraft.util.BytesUtil.writeUtf8;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.plugin.registry.raft.IRaftConnectionStateManager;
-import org.apache.dolphinscheduler.plugin.registry.raft.IRaftLockManager;
-import org.apache.dolphinscheduler.plugin.registry.raft.IRaftSubscribeDataManager;
-import org.apache.dolphinscheduler.plugin.registry.raft.RaftConnectionStateManager;
-import org.apache.dolphinscheduler.plugin.registry.raft.RaftLockManager;
 import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
-import org.apache.dolphinscheduler.plugin.registry.raft.RaftSubscribeDataManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.manage.IRaftConnectionStateManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.manage.IRaftLockManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.manage.IRaftSubscribeDataManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.manage.RaftConnectionStateManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.manage.RaftLockManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.manage.RaftSubscribeDataManager;
+import org.apache.dolphinscheduler.plugin.registry.raft.model.NodeType;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -116,16 +117,22 @@ public class RaftRegisterClient implements IRaftRegisterClient {
 
     @Override
     public String getRegistryDataByKey(String key) {
-        String value = readUtf8(rheaKvStore.bGet(key));
-        if (value == null) {
-            throw new RegistryException("key does not exist");
+        String compositeValue = readUtf8(rheaKvStore.bGet(key));
+        if (compositeValue == null) {
+            throw new RegistryException("key does not exist:" + key);
         }
-        return value;
+        String[] nodeTypeAndValue = compositeValue.split(Constants.AT_SIGN);
+        if (nodeTypeAndValue.length != 2) {
+            throw new RegistryException("value format is incorrect for key: " + key + ", value: " + compositeValue);
+        }
+        return nodeTypeAndValue[1];
     }
 
     @Override
     public void putRegistryData(String key, String value, boolean deleteOnDisconnect) {
-        rheaKvStore.bPut(key, writeUtf8(value));
+        NodeType nodeType = deleteOnDisconnect ? NodeType.EPHEMERAL : NodeType.PERSISTENT;
+        String compositeValue = nodeType.getName() + Constants.AT_SIGN + value;
+        rheaKvStore.bPut(key, writeUtf8(compositeValue));
     }
 
     @Override

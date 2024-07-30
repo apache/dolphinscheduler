@@ -15,11 +15,16 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.raft;
+package org.apache.dolphinscheduler.plugin.registry.raft.manage;
 
 import static com.alipay.sofa.jraft.util.BytesUtil.readUtf8;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
+import org.apache.dolphinscheduler.plugin.registry.raft.model.NodeItem;
+import org.apache.dolphinscheduler.plugin.registry.raft.model.NodeType;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -76,37 +81,60 @@ public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
 
     private class SubscribeCheckTask implements Runnable {
 
-        private final Map<String, String> oldDataMap = new ConcurrentHashMap<>();
+        private final Map<String, NodeItem> oldDataMap = new ConcurrentHashMap<>();
 
         @Override
         public void run() {
-            final Map<String, String> newDataMap = getNodeDataMap();
-            if (dataSubScribeMap.isEmpty() || newDataMap.isEmpty()) {
-                return;
-            }
-            // find the different
-            final Map<String, String> addedData = new HashMap<>();
-            final Map<String, String> deletedData = new HashMap<>();
-            final Map<String, String> updatedData = new HashMap<>();
-            for (Map.Entry<String, String> entry : newDataMap.entrySet()) {
-                final String oldData = oldDataMap.get(entry.getKey());
-                if (oldData == null) {
-                    addedData.put(entry.getKey(), entry.getValue());
-                } else {
-                    if (!oldData.equals(entry.getValue())) {
-                        updatedData.put(entry.getKey(), entry.getValue());
+            try {
+                final Map<String, NodeItem> newDataMap = getNodeDataMap();
+                if (dataSubScribeMap.isEmpty() || newDataMap.isEmpty()) {
+                    return;
+                }
+                // find the different
+                final Map<String, String> addedData = new HashMap<>();
+                final Map<String, String> deletedData = new HashMap<>();
+                final Map<String, String> updatedData = new HashMap<>();
+                for (Map.Entry<String, NodeItem> entry : newDataMap.entrySet()) {
+                    final NodeItem oldData = oldDataMap.get(entry.getKey());
+                    if (oldData == null) {
+                        addedData.put(entry.getKey(), entry.getValue().getNodeValue());
+                    } else if (NodeType.EPHEMERAL.getName().equals(entry.getValue().getNodeType())
+                            && isUnHealthy(entry.getValue().getNodeValue())) {
+                        kvStore.bDelete(entry.getKey());
+                        newDataMap.remove(entry.getKey(), entry.getValue());
+                    } else if (!oldData.getNodeValue().equals(entry.getValue().getNodeValue())) {
+                        updatedData.put(entry.getKey(), entry.getValue().getNodeValue());
                     }
                 }
-            }
-            for (Map.Entry<String, String> entry : oldDataMap.entrySet()) {
-                if (!newDataMap.containsKey(entry.getKey())) {
-                    deletedData.put(entry.getKey(), entry.getValue());
+                for (Map.Entry<String, NodeItem> entry : oldDataMap.entrySet()) {
+                    if (!newDataMap.containsKey(entry.getKey())) {
+                        deletedData.put(entry.getKey(), entry.getValue().getNodeValue());
+                    }
                 }
+                oldDataMap.clear();
+                oldDataMap.putAll(newDataMap);
+                // trigger listener
+                triggerListener(addedData, deletedData, updatedData);
+            } catch (Exception ex) {
+                log.error("Error in SubscribeCheckTask run method", ex);
             }
-            oldDataMap.clear();
-            oldDataMap.putAll(newDataMap);
-            // trigger listener
-            triggerListener(addedData, deletedData, updatedData);
+        }
+
+        private boolean isUnHealthy(String heartBeat) {
+            try {
+                // consider this not a valid heartbeat instance, do not check
+                if (heartBeat == null || !heartBeat.contains("reportTime")) {
+                    return false;
+                }
+                BaseHeartBeat baseHeartBeat = JSONUtils.parseObject(heartBeat, BaseHeartBeat.class);
+                if (baseHeartBeat != null) {
+                    return System.currentTimeMillis() - baseHeartBeat.getReportTime() > properties.getHeartBeatTimeOut()
+                            .toMillis();
+                }
+            } catch (Exception ex) {
+                log.error("Fail to parse heartBeat : {}", heartBeat, ex);
+            }
+            return false;
         }
 
         private void triggerListener(Map<String, String> addedData, Map<String, String> deletedData,
@@ -126,20 +154,41 @@ public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
             }
         }
 
-        private Map<String, String> getNodeDataMap() {
-            final Map<String, String> dataMap = new HashMap<>();
+        private Map<String, NodeItem> getNodeDataMap() {
+            final Map<String, NodeItem> nodeItemMap = new HashMap<>();
             final List<KVEntry> entryList = kvStore.bScan(RegistryNodeType.ALL_SERVERS.getRegistryPath(),
                     RegistryNodeType.ALL_SERVERS.getRegistryPath() + Constants.SINGLE_SLASH + Constants.RAFT_END_KEY);
+
             for (KVEntry kvEntry : entryList) {
                 final String entryKey = readUtf8(kvEntry.getKey());
-                final String entryValue = readUtf8(kvEntry.getValue());
-                if (StringUtils.isEmpty(entryValue)
+                final String compositeValue = readUtf8(kvEntry.getValue());
+
+                if (StringUtils.isEmpty(compositeValue)
                         || !entryKey.startsWith(RegistryNodeType.ALL_SERVERS.getRegistryPath())) {
                     continue;
                 }
-                dataMap.put(entryKey, entryValue);
+
+                String[] nodeTypeAndValue = parseCompositeValue(compositeValue);
+                if (nodeTypeAndValue.length < 2) {
+                    continue;
+                }
+                String nodeType = nodeTypeAndValue[0];
+                String nodeValue = nodeTypeAndValue[1];
+
+                nodeItemMap.put(entryKey, NodeItem.builder().nodeValue(nodeValue).nodeType(nodeType).build());
             }
-            return dataMap;
+            return nodeItemMap;
+        }
+
+        private String[] parseCompositeValue(String compositeValue) {
+            String[] nodeTypeAndValue = compositeValue.split(Constants.AT_SIGN);
+            if (nodeTypeAndValue.length < 2) {
+                log.error("Invalid compositeValue: {}", compositeValue);
+                return new String[]{};
+            }
+            String nodeType = nodeTypeAndValue[0];
+            String nodeValue = nodeTypeAndValue[1];
+            return new String[]{nodeType, nodeValue};
         }
 
         private void triggerListener(Map<String, String> nodeDataMap, String subscribeKey,

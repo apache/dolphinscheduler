@@ -15,11 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.raft;
+package org.apache.dolphinscheduler.plugin.registry.raft.manage;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.raft.model.RaftLockEntry;
 
 import java.util.Map;

@@ -44,6 +44,7 @@ public class RaftRegistryProperties {
     private Duration cliTimeout = Duration.ofSeconds(5);
     private Duration refreshLeaderTimeout = Duration.ofSeconds(2);
     private Duration connectStateCheckInterval = Duration.ofSeconds(2);
+    private Duration heartBeatTimeOut = Duration.ofSeconds(20);
     private int subscribeListenerThreadPoolSize = 1;
     private int connectionListenerThreadPoolSize = 1;
 

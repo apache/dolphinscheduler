@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.raft;
+package org.apache.dolphinscheduler.plugin.registry.raft.manage;
 
+import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 

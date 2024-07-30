@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.register.raft;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistry;
 import org.apache.dolphinscheduler.plugin.registry.raft.RaftRegistryProperties;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
@@ -87,7 +89,7 @@ public class RaftRegistryTestCase {
 
     @SneakyThrows
     @Test
-    public void testSubscribe() {
+    public void testEphemeralNodeSubscribe() {
         final AtomicBoolean subscribeAdded = new AtomicBoolean(false);
         final AtomicBoolean subscribeRemoved = new AtomicBoolean(false);
         final AtomicBoolean subscribeUpdated = new AtomicBoolean(false);
@@ -106,13 +108,19 @@ public class RaftRegistryTestCase {
         };
 
         String key = "/nodes/master/";
+        BaseHeartBeat baseHeartBeat = BaseHeartBeat.builder().reportTime(System.currentTimeMillis())
+                .host("127.0.0.1:8081")
+                .build();
+
         registry.subscribe(key, subscribeListener);
-        registry.put(key, String.valueOf(System.nanoTime()), true);
-        // If multiple event occurs in a refresh time, only the last event will be triggered
+        registry.put(key, JSONUtils.toJsonString(baseHeartBeat), true);
+
         Thread.sleep(3000);
-        registry.put(key, String.valueOf(System.nanoTime()), true);
-        Thread.sleep(3000);
-        registry.delete(key);
+        BaseHeartBeat newBaseHeartBeat = BaseHeartBeat.builder().reportTime(System.currentTimeMillis())
+                .host("127.0.0.1:8081")
+                .build();
+        registry.put(key, JSONUtils.toJsonString(newBaseHeartBeat), true);
+        Thread.sleep(20000);
 
         await().atMost(Duration.ofSeconds(10))
                 .untilAsserted(() -> {
@@ -120,6 +128,62 @@ public class RaftRegistryTestCase {
                     Assertions.assertTrue(subscribeUpdated.get());
                     Assertions.assertTrue(subscribeRemoved.get());
                 });
+
+        // verify that the temporary node data has been removed
+        try {
+            String currentData = registry.get(key);
+        } catch (RegistryException ex) {
+            Assertions.assertEquals("key does not exist:" + key, ex.getMessage(),
+                    "Unexpected registry exception message");
+        }
+    }
+
+    @SneakyThrows
+    @Test
+    public void testPersistentNodeSubscribe() {
+        final AtomicBoolean subscribeAdded = new AtomicBoolean(false);
+        final AtomicBoolean subscribeRemoved = new AtomicBoolean(false);
+        final AtomicBoolean subscribeUpdated = new AtomicBoolean(false);
+
+        SubscribeListener subscribeListener = event -> {
+            System.out.println("Receive event: " + event);
+            if (event.type() == Event.Type.ADD) {
+                subscribeAdded.compareAndSet(false, true);
+            }
+            if (event.type() == Event.Type.REMOVE) {
+                subscribeRemoved.compareAndSet(false, true);
+            }
+            if (event.type() == Event.Type.UPDATE) {
+                subscribeUpdated.compareAndSet(false, true);
+            }
+        };
+
+        String key = "/nodes/master/";
+        BaseHeartBeat baseHeartBeat = BaseHeartBeat.builder().reportTime(System.currentTimeMillis())
+                .host("127.0.0.1:8081")
+                .build();
+
+        registry.subscribe(key, subscribeListener);
+        registry.put(key, JSONUtils.toJsonString(baseHeartBeat), false);
+
+        Thread.sleep(3000);
+        BaseHeartBeat newBaseHeartBeat = BaseHeartBeat.builder().reportTime(System.currentTimeMillis())
+                .host("127.0.0.1:8081")
+                .build();
+        registry.put(key, JSONUtils.toJsonString(newBaseHeartBeat), false);
+        Thread.sleep(20000);
+
+        await().atMost(Duration.ofSeconds(10))
+                .untilAsserted(() -> {
+                    Assertions.assertTrue(subscribeAdded.get());
+                    Assertions.assertTrue(subscribeUpdated.get());
+                    Assertions.assertFalse(subscribeRemoved.get());
+                });
+
+        String currentData = registry.get(key);
+        Assertions.assertNotNull(currentData, "Node data was unexpectedly removed");
+        Assertions.assertEquals(JSONUtils.toJsonString(newBaseHeartBeat), currentData,
+                "Node data does not match the expected value");
     }
 
     @SneakyThrows

@@ -15,33 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.raft;
+package org.apache.dolphinscheduler.plugin.registry.raft.manage;
 
-import org.apache.dolphinscheduler.registry.api.ConnectionListener;
-import org.apache.dolphinscheduler.registry.api.ConnectionState;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 /**
- * Interface for managing the connection state in a raft registry client.
+ * Interface for managing data subscriptions in a raft registry client.
  */
-public interface IRaftConnectionStateManager extends AutoCloseable {
+public interface IRaftSubscribeDataManager extends AutoCloseable {
 
     /**
-     * Starts the connection state manager.
-     * This method initializes and starts monitoring the connection state.
+     * Starts the data subscription manager.
+     * This method initializes and starts the data subscription functionality.
      */
     void start();
 
     /**
-     * Adds a connection listener to listen for connection state changes.
+     * Adds a listener to subscribe to data changes at the specified path.
      *
-     * @param listener the listener to be added for connection state changes
+     * @param path     the path to subscribe to for data changes
+     * @param listener the listener to be notified of data changes
      */
-    void addConnectionListener(ConnectionListener listener);
-
-    /**
-     * Retrieves the current connection state.
-     *
-     * @return the current connection state
-     */
-    ConnectionState getConnectionState();
+    void addDataSubscribeListener(String path, SubscribeListener listener);
 }
