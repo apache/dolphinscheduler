@@ -246,7 +246,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | master.service.serviceMonitor.labels | object | `{}` | serviceMonitor.labels ServiceMonitor extra labels |
 | master.service.serviceMonitor.path | string | `"/actuator/prometheus"` | serviceMonitor.path path of the metrics endpoint |
 | master.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
-| master.updateStrategy | object | `{"rollingUpdate":{"partition":0},"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
+| master.updateStrategy | object | `{"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
 | minio.auth.rootPassword | string | `"minioadmin"` | minio password |
 | minio.auth.rootUser | string | `"minioadmin"` | minio username |
 | minio.defaultBuckets | string | `"dolphinscheduler"` | minio default buckets |
@@ -359,7 +359,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.service.serviceMonitor.labels | object | `{}` | serviceMonitor.labels ServiceMonitor extra labels |
 | worker.service.serviceMonitor.path | string | `"/actuator/prometheus"` | serviceMonitor.path path of the metrics endpoint |
 | worker.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
-| worker.updateStrategy | object | `{"rollingUpdate":{"partition":0},"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
+| worker.updateStrategy | object | `{"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
