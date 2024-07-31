@@ -429,8 +429,6 @@ master:
   #
   updateStrategy:
     type: RollingUpdate
-    rollingUpdate:
-      partition: 0
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
@@ -574,8 +572,6 @@ worker:
   #
   updateStrategy:
     type: RollingUpdate
-    rollingUpdate:
-      partition: 0
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
