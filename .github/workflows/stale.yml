@@ -32,7 +32,7 @@ jobs:
           # Stale Issues
           days-before-issue-stale: 30
           days-before-issue-close: 7
-          # We do not stale Issues with label `Waiting for reply`, `feature` and `DSIP`
+          # We do not stale Issues with label Waiting for reply,DSIP,security,roadmap,help wanted,good first issue,community
           exempt-issue-labels: 'Waiting for reply,DSIP,security,roadmap,help wanted,good first issue,community'
           stale-issue-message: >
             This issue has been automatically marked as stale because it has not had recent activity
