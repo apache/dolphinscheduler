@@ -23,21 +23,34 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Data
 @Slf4j
 public class AliyunServerlessSparkParameters extends AbstractParameters {
 
     // spark job configurations
     private String workspaceId;
+
     private String resourceQueueId;
+
     private String codeType;
+
     private String jobName;
+
     private String engineReleaseVersion;
+
     private String entryPoint;
+
     private String entryPointArguments;
+
     private String sparkSubmitParameters;
+
+    @JsonProperty("isProduction")
     boolean isProduction;
+
     private int datasource;
+
     private String type;
 
     @Override

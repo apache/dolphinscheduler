@@ -85,6 +85,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         aliyunServerlessSparkParameters = JSONUtils.parseObject(taskParams, AliyunServerlessSparkParameters.class);
+        log.info("aliyunServerlessSparkParameters - {}", aliyunServerlessSparkParameters);
         if (this.aliyunServerlessSparkParameters == null || !this.aliyunServerlessSparkParameters.checkParameters()) {
             throw new AliyunServerlessSparkTaskException("Aliyun-Serverless-Spark task parameters are not valid!");
         }
@@ -119,7 +120,6 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
             StartJobRunRequest startJobRunRequest = buildStartJobRunRequest(aliyunServerlessSparkParameters);
             RuntimeOptions runtime = new RuntimeOptions();
             Map<String, String> headers = new HashMap<>();
-            log.info("[debug111] aliyunServerlessSparkParameters - {}", aliyunServerlessSparkParameters);
             StartJobRunResponse startJobRunResponse = aliyunServerlessSparkClient.startJobRunWithOptions(
                     aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest, headers, runtime);
             jobRunId = startJobRunResponse.getBody().getJobRunId();

@@ -323,12 +323,11 @@ const DetailModal = defineComponent({
                     v-show={showEndpoint}
                     label={t('datasource.endpoint')}
                     path='endpoint'
-                    show-require-mark
                 >
                   <NInput
                       allowInput={this.trim}
                       class='input-endpoint'
-                      v-model={[detailForm.regionId, 'value']}
+                      v-model={[detailForm.endpoint, 'value']}
                       type='text'
                       maxlength={255}
                       placeholder={t('datasource.endpoint_tips')}
