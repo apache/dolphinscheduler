@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.aliyunserverlessspark;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.AliyunServerlessSparkConstants;
 import org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.param.AliyunServerlessSparkConnectionParam;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
@@ -73,6 +74,8 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
 
     private String regionId;
 
+    private String endpoint;
+
     protected AliyunServerlessSparkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
@@ -97,9 +100,11 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         accessKeyId = aliyunServerlessSparkConnectionParam.getAccessKeyId();
         accessKeySecret = aliyunServerlessSparkConnectionParam.getAccessKeySecret();
         regionId = aliyunServerlessSparkConnectionParam.getRegionId();
+        endpoint = aliyunServerlessSparkConnectionParam.getEndpoint();
 
         try {
-            aliyunServerlessSparkClient = buildAliyunServerlessSparkClient(accessKeyId, accessKeySecret, regionId);
+            aliyunServerlessSparkClient =
+                    buildAliyunServerlessSparkClient(accessKeyId, accessKeySecret, regionId, endpoint);
         } catch (Exception e) {
             log.error("Failed to build Aliyun-Serverless-Spark client!", e);
             throw new AliyunServerlessSparkTaskException("Failed to build Aliyun-Serverless-Spark client!");
@@ -181,8 +186,11 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
     }
 
     protected Client buildAliyunServerlessSparkClient(String accessKeyId, String accessKeySecret,
-                                                      String regionId) throws Exception {
-        String endpoint = String.format("emr-serverless-spark.%s.aliyuncs.com", regionId);
+                                                      String regionId, String endpoint) throws Exception {
+        if (StringUtils.isEmpty(endpoint)) {
+            endpoint = String.format(AliyunServerlessSparkConstants.ENDPOINT_TEMPLATE, regionId);
+        }
+
         Config config = new Config()
                 .setEndpoint(endpoint)
                 .setAccessKeyId(accessKeyId)

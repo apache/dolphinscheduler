@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.commons.lang3.StringUtils;
+
 import lombok.extern.slf4j.Slf4j;
 
 import com.aliyun.emr_serverless_spark20230808.Client;
@@ -32,11 +34,16 @@ public class AliyunServerlessSparkClientWrapper implements AutoCloseable {
     public AliyunServerlessSparkClientWrapper(
                                               String accessKeyId,
                                               String accessKeySecret,
-                                              String regionId)
+                                              String regionId,
+                                              String endpoint)
                                                                throws Exception {
 
         checkNotNull(accessKeyId, accessKeySecret, regionId);
-        String endpoint = String.format("emr-serverless-spark.%s.aliyuncs.com", regionId);
+
+        if (StringUtils.isEmpty(endpoint)) {
+            endpoint = String.format(AliyunServerlessSparkConstants.ENDPOINT_TEMPLATE, regionId);
+        }
+
         Config config = new Config()
                 .setEndpoint(endpoint)
                 .setAccessKeyId(accessKeyId)
@@ -50,7 +57,7 @@ public class AliyunServerlessSparkClientWrapper implements AutoCloseable {
             // If the login fails, an exception will be thrown directly
             return true;
         } catch (Exception e) {
-            log.info("spark client failed to connect to the server");
+            log.info("spark client failed to connect to the server", e);
             return false;
         }
     }

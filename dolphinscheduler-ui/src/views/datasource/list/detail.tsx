@@ -158,6 +158,7 @@ const DetailModal = defineComponent({
       showAccessKeyId,
       showAccessKeySecret,
       showRegionId,
+      showEndpoint,
       showAwsRegion,
       showCompatibleMode,
       showConnectType,
@@ -316,6 +317,21 @@ const DetailModal = defineComponent({
                       type='text'
                       maxlength={255}
                       placeholder={t('datasource.region_id_tips')}
+                  />
+                </NFormItem>
+                <NFormItem
+                    v-show={showEndpoint}
+                    label={t('datasource.endpoint')}
+                    path='endpoint'
+                    show-require-mark
+                >
+                  <NInput
+                      allowInput={this.trim}
+                      class='input-endpoint'
+                      v-model={[detailForm.regionId, 'value']}
+                      type='text'
+                      maxlength={255}
+                      placeholder={t('datasource.endpoint_tips')}
                   />
                 </NFormItem>
                 <NFormItem

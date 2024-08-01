@@ -77,6 +77,7 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
         aliyunServerlessSparkDataSourceParamDTO.setAccessKeyId(connectionParams.getAccessKeyId());
         aliyunServerlessSparkDataSourceParamDTO.setAccessKeySecret(connectionParams.getAccessKeySecret());
         aliyunServerlessSparkDataSourceParamDTO.setRegionId(connectionParams.getRegionId());
+        aliyunServerlessSparkDataSourceParamDTO.setEndpoint(connectionParams.getEndpoint());
         return aliyunServerlessSparkDataSourceParamDTO;
     }
 
@@ -90,6 +91,7 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
         aliyunServerlessSparkConnectionParam
                 .setAccessKeySecret(aliyunServerlessSparkDataSourceParamDTO.getAccessKeySecret());
         aliyunServerlessSparkConnectionParam.setRegionId(aliyunServerlessSparkDataSourceParamDTO.getRegionId());
+        aliyunServerlessSparkConnectionParam.setEndpoint(aliyunServerlessSparkDataSourceParamDTO.getEndpoint());
 
         return aliyunServerlessSparkConnectionParam;
     }
@@ -128,7 +130,8 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
                         new AliyunServerlessSparkClientWrapper(
                                 baseConnectionParam.getAccessKeyId(),
                                 baseConnectionParam.getAccessKeySecret(),
-                                baseConnectionParam.getRegionId())) {
+                                baseConnectionParam.getRegionId(),
+                                baseConnectionParam.getEndpoint())) {
             return aliyunServerlessSparkClientWrapper.checkConnect(
                     baseConnectionParam.getAccessKeyId(),
                     baseConnectionParam.getAccessKeySecret(),

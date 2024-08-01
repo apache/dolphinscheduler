@@ -99,13 +99,15 @@ public class AliyunServerlessSparkTaskTest {
 
     private static final String mockRegionId = "cn-hangzhou";
 
+    private static final String mockEndpoint = "emr-serverless-spark-vpc.cn-hangzhou.aliyuncs.com";
+
     private static final int mockDatasourceId = 1;
 
     private static final String taskParamsString =
             "{\"localParams\":[],\"resourceList\":[],\"workspaceId\":\"w-ae42e9c929275cc5\",\"resourceQueueId\":\"root_queue\",\"codeType\":\"JAR\",\"jobName\":\"spark\",\"entryPoint\":\"oss://datadev-oss-hdfs-test/spark-resource/examples/jars/spark-examples_2.12-3.3.1.jar\",\"entryPointArguments\":\"10\",\"sparkSubmitParameters\":\"--class org.apache.spark.examples.SparkPi --conf spark.executor.cores=4 --conf spark.executor.memory=20g --conf spark.driver.cores=4 --conf spark.driver.memory=8g --conf spark.executor.instances=1\",\"isProduction\":true,\"type\":\"ALIYUN_SERVERLESS_SPARK\",\"datasource\":1}";
 
     private static final String connectionParamsString =
-            "{\"accessKeyId\":\"mockAccessKeyId\",\"accessKeySecret\":\"mockAccessKeySecret\",\"regionId\":\"cn-hangzhou\",\"password\":\"\"}";
+            "{\"accessKeyId\":\"mockAccessKeyId\",\"accessKeySecret\":\"mockAccessKeySecret\",\"regionId\":\"cn-hangzhou\",\"endpoint\":\"emr-serverless-spark-vpc.cn-hangzhou.aliyuncs.com\",\"password\":\"\"}";
 
     private static final String mockJobRunId = "jr-f6a1d0dd17d6b8a3";
 
@@ -130,7 +132,7 @@ public class AliyunServerlessSparkTaskTest {
         when(mockResourceParametersHelper.getResourceParameters(any(), any())).thenReturn(dataSourceParameters);
         when(mockTaskExecutionContext.getResourceParametersHelper()).thenReturn(mockResourceParametersHelper);
         Assertions.assertDoesNotThrow(
-                () -> when(aliyunServerlessSparkTask.buildAliyunServerlessSparkClient(any(), any(), any()))
+                () -> when(aliyunServerlessSparkTask.buildAliyunServerlessSparkClient(any(), any(), any(), any()))
                         .thenReturn(mockAliyunServerlessSparkClient));
     }
 
@@ -140,7 +142,7 @@ public class AliyunServerlessSparkTaskTest {
         verify(mockTaskExecutionContext).getTaskParams();
         verify(mockResourceParametersHelper).getResourceParameters(ResourceType.DATASOURCE, mockDatasourceId);
         verify(aliyunServerlessSparkTask).buildAliyunServerlessSparkClient(mockAccessKeyId, mockAccessKeySecret,
-                mockRegionId);
+                mockRegionId, mockEndpoint);
     }
 
     @Test

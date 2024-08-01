@@ -15,23 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark.param;
+package org.apache.dolphinscheduler.plugin.datasource.aliyunserverlessspark;
 
-import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
+import lombok.experimental.UtilityClass;
 
-import lombok.Data;
+@UtilityClass
+public class AliyunServerlessSparkConstants {
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+    public String ENDPOINT_TEMPLATE = "emr-serverless-spark.%s.aliyuncs.com";
 
-@Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class AliyunServerlessSparkConnectionParam implements ConnectionParam {
-
-    protected String accessKeyId;
-
-    protected String accessKeySecret;
-
-    protected String regionId;
-
-    protected String endpoint;
 }

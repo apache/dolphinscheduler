@@ -31,6 +31,8 @@ public class AliyunServerlessSparkDataSourceParamDTO extends BaseDataSourceParam
 
     protected String regionId;
 
+    protected String endpoint;
+
     @Override
     public DbType getType() {
         return DbType.ALIYUN_SERVERLESS_SPARK;

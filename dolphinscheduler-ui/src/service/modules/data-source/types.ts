@@ -87,7 +87,6 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
-  endpoint?: string
   restEndpoint?: string
   kubeConfig?: string
   namespace?: string
@@ -99,6 +98,7 @@ interface IDataSource {
   accessKeyId?: string
   accessKeySecret?: string
   regionId?: string
+  endpoint?: string
 }
 
 interface ListReq {

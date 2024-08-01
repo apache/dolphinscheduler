@@ -74,6 +74,7 @@ export function useForm(id?: number) {
     showAccessKeyId: false,
     showAccessKeySecret: false,
     showRegionId: false,
+    showEndpoint: false,
     rules: {
       name: {
         trigger: ['input'],
@@ -299,6 +300,7 @@ export function useForm(id?: number) {
         state.showAccessKeyId = true
         state.showAccessKeySecret = true
         state.showRegionId = true
+        state.showEndpoint = true
       }
     } else {
       state.showDataBaseName = true

@@ -912,6 +912,8 @@ export default {
     dependent_on_task: 'Dependent on task',
     region_id: "region id",
     region_id_tips: "region id",
+    endpoint: "endpoint",
+    endpoint_tips: "restful endpoint",
     access_key_id: "access key id",
     access_key_id_tips: "access key id",
     access_key_secret: "access key secret",

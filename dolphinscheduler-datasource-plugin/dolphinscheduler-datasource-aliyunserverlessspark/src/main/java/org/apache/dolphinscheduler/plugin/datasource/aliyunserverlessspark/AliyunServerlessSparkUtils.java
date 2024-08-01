@@ -29,7 +29,8 @@ public class AliyunServerlessSparkUtils {
     }
 
     public static Client getAliyunServerlessSparkClient(AliyunServerlessSparkConnectionParam connectionParam) throws Exception {
-        String endpoint = String.format("emr-serverless-spark.%s.aliyuncs.com", connectionParam.getRegionId());
+        String endpoint =
+                String.format(AliyunServerlessSparkConstants.ENDPOINT_TEMPLATE, connectionParam.getRegionId());
         Config config = new Config()
                 .setEndpoint(endpoint)
                 .setAccessKeyId(connectionParam.getAccessKeyId())

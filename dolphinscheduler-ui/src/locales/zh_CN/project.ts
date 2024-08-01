@@ -881,6 +881,8 @@ export default {
     dependent_on_task: '依赖于任务',
     region_id: "region id",
     region_id_tips: "region id",
+    endpoint: "endpoint",
+    endpoint_tips: "请输入endpoint",
     access_key_id: "access key id",
     access_key_id_tips: "access key id",
     access_key_secret: "access key secret",
