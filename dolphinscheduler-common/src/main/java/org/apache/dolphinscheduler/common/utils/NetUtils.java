@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.Sets;
-
+import com.google.common.base.Strings;
 @Slf4j
 public class NetUtils {
 
@@ -98,6 +98,9 @@ public class NetUtils {
     }
 
     public static String getHost() {
+        if (!Strings.isNullOrEmpty(System.getenv("LOCALE_ADDRESS"))) {
+            return System.getenv("LOCALE_ADDRESS");
+        }
         if (HOST_ADDRESS != null) {
             return HOST_ADDRESS;
         }
