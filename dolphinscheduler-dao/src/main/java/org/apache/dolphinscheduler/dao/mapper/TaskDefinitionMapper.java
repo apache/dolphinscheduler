@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
@@ -87,22 +86,6 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
      * @return int
      */
     int batchInsert(@Param("taskDefinitions") List<TaskDefinitionLog> taskDefinitions);
-
-    /**
-     * task main info page
-     *
-     * @param page page
-     * @param projectCode projectCode
-     * @param searchTaskName searchTaskName
-     * @param taskType taskType
-     * @param taskExecuteType taskExecuteType
-     * @return task main info IPage
-     */
-    IPage<TaskMainInfo> queryDefineListPaging(IPage<TaskMainInfo> page,
-                                              @Param("projectCode") long projectCode,
-                                              @Param("searchTaskName") String searchTaskName,
-                                              @Param("taskType") String taskType,
-                                              @Param("taskExecuteType") TaskExecuteType taskExecuteType);
 
     /**
      * task main info
