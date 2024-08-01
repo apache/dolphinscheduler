@@ -42,7 +42,7 @@ public final class ProjectDetailPage extends NavBarPage {
     @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(2) .n-menu-item:nth-of-type(3) > .n-menu-item-content")
     private WebElement menuProcessInstances;
 
-    @FindBy(css = ".tab-vertical .n-submenu:nth-of-type(3) .n-menu-item:nth-of-type(2) > .n-menu-item-content")
+    @FindBy(xpath = "//div[contains(@class, 'n-menu-item-content')]//div[contains(., 'Task Instance')]")
     private WebElement menuTaskInstances;
 
     public ProjectDetailPage(RemoteWebDriver driver) {
