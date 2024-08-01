@@ -288,7 +288,11 @@ export function useForm(id?: number) {
         state.showPort = false
         state.showRestEndpoint = true
       }
-      if (type === 'SAGEMAKER' || type === 'K8S' || type == 'ALIYUN_SERVERLESS_SPARK') {
+      if (
+        type === 'SAGEMAKER' ||
+        type === 'K8S' ||
+        type == 'ALIYUN_SERVERLESS_SPARK'
+      ) {
         state.showHost = false
         state.showPort = false
       }
