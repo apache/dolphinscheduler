@@ -16,22 +16,8 @@ If you are a new hand and want to experience DolphinScheduler functions, we reco
 
 ```bash
 # Choose the corresponding version yourself
-export VERSION=3.2.1
-helm pull oci://registry-1.docker.io/apache/dolphinscheduler-helm --version ${VERSION}
-tar -xvf dolphinscheduler-helm-${VERSION}.tgz
-cd dolphinscheduler-helm
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm dependency update .
-helm install dolphinscheduler .
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version>
 ```
-
-To publish the release name `dolphinscheduler` version to `test` namespace:
-
-```bash
-$ helm install dolphinscheduler . -n test
-```
-
-> **Tip**: If a namespace named `test` is used, the optional parameter `-n test` needs to be added to the `helm` and `kubectl` commands.
 
 These commands are used to deploy DolphinScheduler on the Kubernetes cluster by default. The [Appendix-Configuration](#appendix-configuration) section lists the parameters that can be configured during installation.
 
@@ -112,7 +98,7 @@ helm install keda kedacore/keda \
 Secondly, you need to set `worker.keda.enabled` to `true` in `values.yaml` or install the chart by:
 
 ```bash
-helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.keda.enabled=true
 ```
 
 Once autoscaling enabled, the number of workers will scale between `minReplicaCount` and `maxReplicaCount` based on the states
@@ -504,15 +490,15 @@ For example, if you need to deploy worker to both CPU and GPU servers in a clust
 
 ```bash
 # Install master, api-server, alert-server, and other default components, but do not install worker
-helm install dolphinscheduler . --set worker.enabled=false
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.enabled=false
 # Disable the installation of other components, only install worker, use the self-built CPU image, deploy to CPU servers with the `x86` label through nodeselector, and use zookeeper as the external registry center
-helm install dolphinscheduler-cpu-worker . \
+helm upgrade --install dolphinscheduler-cpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 # Disable the installation of other components, only install worker, use the self-built GPU image, deploy to GPU servers with the `a100` label through nodeselector, and use zookeeper as the external registry center
-helm install dolphinscheduler-gpu-worker . \
+helm upgrade --install dolphinscheduler-gpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \
