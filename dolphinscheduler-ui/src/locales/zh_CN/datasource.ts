@@ -82,7 +82,7 @@ export default {
   clientId: 'ClientId',
   clientSecret: 'ClientSecret',
   OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
-  endpoint_tips: '请输入OAuth',
+  OAuth_token_endpoint_tips: '请输入OAuth',
   AccessKeyID: 'AccessKeyID',
   AccessKeyID_tips: '请输入AccessKeyID',
   SecretAccessKey: 'SecretAccessKey',
@@ -94,5 +94,13 @@ export default {
   kubeConfig: 'kubeConfig',
   kubeConfig_tips: '请输入KubeConfig',
   namespace: 'namespace',
-  namespace_tips: '请输入namespace'
+  namespace_tips: '请输入namespace',
+  access_key_id: 'Access Key Id',
+  access_key_id_tips: '请输入access key id',
+  access_key_secret: 'Access Key Secret',
+  access_key_secret_tips: '请输入access key secret',
+  region_id: 'Region Id',
+  region_id_tips: '请输入Region Id',
+  endpoint: 'endpoint',
+  endpoint_tips: '请输入endpoint'
 }

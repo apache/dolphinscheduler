@@ -210,6 +210,9 @@ $bgLight: #ffffff;
     &.icon-remoteshell {
       background-image: url('/images/task-icons/remoteshell.png');
     }
+    &.icon-icon-aliyun_serverless_spark {
+      background-image: url('/images/task-icons/aliyun_serverless_spark.png');
+    }
   }
 
   &:hover {
@@ -322,6 +325,9 @@ $bgLight: #ffffff;
       }
       &.icon-remoteshell {
         background-image: url('/images/task-icons/remoteshell_hover.png');
+      }
+      &.icon-aliyun_serverless_spark {
+        background-image: url('/images/task-icons/aliyun_serverless_spark_hover.png');
       }
     }
   }

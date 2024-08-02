@@ -157,6 +157,11 @@ export function useDatasource(
       id: 25,
       code: 'SAGEMAKER',
       disabled: false
+    },
+    {
+      id: 27,
+      code: 'ALIYUN_SERVERLESS_SPARK',
+      disabled: false
     }
   ]
 

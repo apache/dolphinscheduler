@@ -89,6 +89,10 @@ export const TASK_TYPES_MAP = {
     alias: 'ZEPPELIN',
     helperLinkDisable: true
   },
+  ALIYUN_SERVERLESS_SPARK: {
+    alias: 'ALIYUN_SERVERLESS_SPARK',
+    helperLinkDisable: true
+  },
   JUPYTER: {
     alias: 'JUPYTER',
     helperLinkDisable: true

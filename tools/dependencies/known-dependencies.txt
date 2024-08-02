@@ -520,4 +520,12 @@ semver-5.7.2.jar
 sigmund-1.0.1.jar
 wrappy-1.0.2.jar
 yallist-2.1.2.jar
+credentials-java-0.3.0.jar
+dom4j-2.0.3.jar
+emr_serverless_spark20230808-1.0.0.jar
+openapiutil-0.2.1.jar
+tea-1.2.7.jar
+tea-openapi-0.3.2.jar
+tea-util-0.2.21.jar
+tea-xml-0.1.5.jar
 
