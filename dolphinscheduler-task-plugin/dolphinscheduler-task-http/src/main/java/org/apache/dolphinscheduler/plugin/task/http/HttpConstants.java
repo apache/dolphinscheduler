@@ -15,16 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.http;
 
-/**
- * http parameters type
- */
-public enum HttpParametersType {
-    /**
-     * 0 parameter;
-     * 1 body;
-     * 2 headers;
-     */
-    PARAMETER, BODY, HEADERS
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class HttpConstants {
+
+    public static final String CONTENT_TYPE = "Content-Type";
+
+    public static final int RESPONSE_CODE_SUCCESS = 200;
 }

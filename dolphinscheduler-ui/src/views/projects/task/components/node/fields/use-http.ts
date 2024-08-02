@@ -17,9 +17,12 @@
 import { useI18n } from 'vue-i18n'
 import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
+import { ref, watch } from 'vue'
 
 export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
+  const httpBodySpan = ref(0)
+  const httpParametersType = ref(GET_HTTP_PARAMETERS_TYPE)
 
   const HTTP_CHECK_CONDITIONS = [
     {
@@ -39,6 +42,36 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       value: 'BODY_NOT_CONTAINS'
     }
   ]
+
+  const resetHttpParametersType = () => {
+    switch (model.httpMethod) {
+      case 'GET':
+        httpParametersType.value = GET_HTTP_PARAMETERS_TYPE
+        break
+      case 'POST':
+        httpParametersType.value = POST_HTTP_PARAMETERS_TYPE
+        break
+    }
+  }
+
+  const resetSpan = () => {
+    switch (model.httpMethod) {
+      case 'GET':
+        httpBodySpan.value = 0
+        break
+      case 'POST':
+        httpBodySpan.value = 24
+        break
+    }
+  }
+
+  watch(
+    () => [model.httpMethod],
+    () => {
+      resetSpan()
+      resetHttpParametersType()
+    }
+  )
 
   return [
     {
@@ -104,8 +137,8 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
           type: 'select',
           field: 'httpParametersType',
           span: 6,
-          options: POSITIONS,
-          value: 'PARAMETER'
+          options: httpParametersType,
+          value: 'HEADERS'
         },
         {
           type: 'input',
@@ -128,14 +161,30 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
       ]
     },
     {
-      type: 'input',
+      type: 'editor',
       field: 'httpBody',
       name: t('project.node.http_body'),
-      props: {
-        type: 'textarea',
-        placeholder: t('project.node.http_body_tips')
+      span: httpBodySpan,
+      validate: {
+        trigger: ['blur', 'input'],
+        required: true,
+        validator(validate, value) {
+          if (httpBodySpan.value && !value) {
+            return new Error(t('project.node.http_body_tips'))
+          }
+        }
       }
     },
+    // {
+    //   type: 'input',
+    //   field: 'httpBody',
+    //   name: t('project.node.http_body'),
+    //   span: httpBodySpan,
+    //   props: {
+    //     type: 'textarea',
+    //     placeholder: t('project.node.http_body_tips')
+    //   }
+    // },
     {
       type: 'select',
       field: 'httpCheckCondition',
@@ -174,29 +223,6 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    {
-      type: 'input-number',
-      field: 'socketTimeout',
-      name: t('project.node.socket_timeout'),
-      span: 12,
-      props: {
-        max: Math.pow(7, 10) - 1
-      },
-      slots: {
-        suffix: () => t('project.node.ms')
-      },
-      validate: {
-        trigger: ['input', 'blur'],
-        validator(validate: any, value: string) {
-          if (!Number.isInteger(parseInt(value))) {
-            return new Error(
-              t('project.node.socket_timeout') +
-                t('project.node.positive_integer_tips')
-            )
-          }
-        }
-      }
-    },
     ...useCustomParams({
       model,
       field: 'localParams',
@@ -213,30 +239,21 @@ const HTTP_METHODS = [
   {
     value: 'POST',
     label: 'POST'
-  },
-  {
-    value: 'HEAD',
-    label: 'HEAD'
-  },
-  {
-    value: 'PUT',
-    label: 'PUT'
-  },
-  {
-    value: 'DELETE',
-    label: 'DELETE'
   }
 ]
 
-const POSITIONS = [
+const GET_HTTP_PARAMETERS_TYPE = [
   {
     value: 'PARAMETER',
     label: 'Parameter'
   },
   {
-    value: 'BODY',
-    label: 'Body'
-  },
+    value: 'HEADERS',
+    label: 'Headers'
+  }
+]
+
+const POST_HTTP_PARAMETERS_TYPE = [
   {
     value: 'HEADERS',
     label: 'Headers'

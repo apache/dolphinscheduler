@@ -120,9 +120,12 @@ public class LoginControllerTest extends AbstractControllerTest {
         String userInfoResult = "{\"login\":\"username\"}";
         MockedStatic<OkHttpUtils> okHttpUtilsMockedStatic = Mockito.mockStatic(OkHttpUtils.class);
         okHttpUtilsMockedStatic
-                .when(() -> OkHttpUtils.post(Mockito.notNull(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .when(() -> OkHttpUtils.post(Mockito.notNull(), Mockito.any(), Mockito.any(), Mockito.any(),
+                        Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(tokenResult);
-        okHttpUtilsMockedStatic.when(() -> OkHttpUtils.get(Mockito.notNull(), Mockito.any(), Mockito.any()))
+        okHttpUtilsMockedStatic
+                .when(() -> OkHttpUtils.get(Mockito.notNull(), Mockito.any(), Mockito.any(), Mockito.any(),
+                        Mockito.any(), Mockito.any()))
                 .thenReturn(userInfoResult);
         MvcResult mvcResult = mockMvc.perform(get("/redirect/login/oauth2?code=test&provider=github"))
                 .andExpect(status().is3xxRedirection())
@@ -137,7 +140,9 @@ public class LoginControllerTest extends AbstractControllerTest {
     @Test
     void testOauth2RedirectError() throws Exception {
         MockedStatic<OkHttpUtils> okHttpUtilsMockedStatic = Mockito.mockStatic(OkHttpUtils.class);
-        okHttpUtilsMockedStatic.when(() -> OkHttpUtils.post(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        okHttpUtilsMockedStatic
+                .when(() -> OkHttpUtils.post(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+                        Mockito.any(), Mockito.any()))
                 .thenThrow(new RuntimeException("oauth error"));
         MvcResult mvcResult = mockMvc.perform(get("/redirect/login/oauth2?code=test&provider=github"))
                 .andExpect(status().is3xxRedirection())

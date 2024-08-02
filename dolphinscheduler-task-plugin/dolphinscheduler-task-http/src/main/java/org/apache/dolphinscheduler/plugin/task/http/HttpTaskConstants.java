@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-public class HttpTaskConstants {
+import lombok.experimental.UtilityClass;
 
-    public static final String APPLICATION_JSON = "application/json";
+@UtilityClass
+public final class HttpTaskConstants {
+
+    public static final String REQUEST_HEADER_APPLICATION_JSON = "application/json";
 }

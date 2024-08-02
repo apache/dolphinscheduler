@@ -15,21 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.loop.template.http;
+package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceStatus;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
-@Data
-@AllArgsConstructor
-public class HttpLoopTaskInstanceStatus implements LoopTaskInstanceStatus {
-
-    private final boolean finished;
-
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
+/**
+ * http method
+ */
+public enum HttpRequestMethod {
+    GET, POST
 }

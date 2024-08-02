@@ -592,7 +592,7 @@ No.|parameter name||type|description |notes
 | 3   | name                 |                    | String | task name                      |
 | 4   | params               |                    | Object | customized parameters          | JSON format                  |
 | 5   |                      | url                | String | request url                    |
-| 6   |                      | httpMethod         | String | http method                    | GET,POST,HEAD,PUT,DELETE     |
+| 6   |                      | httpRequestMethod  | String | http method                    | GET,POST,HEAD,PUT,DELETE     |
 | 7   |                      | httpParams         | Array  | http parameters                |
 | 8   |                      | httpCheckCondition | String | validation of HTTP code status | default code 200             |
 | 9   |                      | condition          | String | validation conditions          |
@@ -634,7 +634,7 @@ No.|parameter name||type|description |notes
             }
         ],
         "url":"https://www.xxxxx.com:9012",
-        "httpMethod":"POST",
+        "httpRequestMethod":"POST",
         "httpCheckCondition":"STATUS_CODE_DEFAULT",
         "condition":""
     },

@@ -33,7 +33,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -91,7 +91,7 @@ public class RequestClient {
 
     public static String getParams(Map<String, Object> params) {
         StringBuilder sb = new StringBuilder(Constants.QUESTION_MARK);
-        if (params.size() > 0) {
+        if (!params.isEmpty()) {
             for (Map.Entry<String, Object> item : params.entrySet()) {
                 Object value = item.getValue();
                 if (Objects.nonNull(value)) {
@@ -116,7 +116,7 @@ public class RequestClient {
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
         log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
@@ -147,7 +147,7 @@ public class RequestClient {
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(MediaType.parse(Constants.REQUEST_CONTENT_TYPE), getParams(params));
+        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
         log.info("PUT request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
@@ -177,7 +177,7 @@ public class RequestClient {
             builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
             builder.addBinaryBody(
                     "file",
-                    new FileInputStream(file),
+                    Files.newInputStream(file.toPath()),
                     ContentType.APPLICATION_OCTET_STREAM,
                     file.getName());
             HttpEntity multipart = builder.build();
@@ -189,8 +189,7 @@ public class RequestClient {
             }
             httpPost.setEntity(multipart);
             CloseableHttpClient client = HttpClients.createDefault();
-            CloseableHttpResponse response = client.execute(httpPost);
-            return response;
+            return client.execute(httpPost);
         } catch (Exception e) {
             log.error("error", e);
         }

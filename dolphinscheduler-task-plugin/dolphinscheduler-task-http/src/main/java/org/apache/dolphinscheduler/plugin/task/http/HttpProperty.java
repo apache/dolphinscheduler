@@ -19,79 +19,22 @@ package org.apache.dolphinscheduler.plugin.task.http;
 
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class HttpProperty {
 
-    /**
-     * key
-     */
     private String prop;
 
-    /**
-     *  httpParametersType
-     */
     private HttpParametersType httpParametersType;
 
-    /**
-     * value
-     */
     private String value;
-
-    public HttpProperty() {
-    }
-
-    public HttpProperty(String prop, HttpParametersType httpParametersType, String value) {
-        this.prop = prop;
-        this.httpParametersType = httpParametersType;
-        this.value = value;
-    }
-
-    /**
-     * getter method
-     *
-     * @return the prop
-     * @see HttpProperty#prop
-     */
-    public String getProp() {
-        return prop;
-    }
-
-    /**
-     * setter method
-     *
-     * @param prop the prop to set
-     * @see HttpProperty#prop
-     */
-    public void setProp(String prop) {
-        this.prop = prop;
-    }
-
-    /**
-     * getter method
-     *
-     * @return the value
-     * @see HttpProperty#value
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * setter method
-     *
-     * @param value the value to set
-     * @see HttpProperty#value
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public HttpParametersType getHttpParametersType() {
-        return httpParametersType;
-    }
-
-    public void setHttpParametersType(HttpParametersType httpParametersType) {
-        this.httpParametersType = httpParametersType;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -109,15 +52,6 @@ public class HttpProperty {
     @Override
     public int hashCode() {
         return Objects.hash(prop, value);
-    }
-
-    @Override
-    public String toString() {
-        return "HttpProperty{"
-                + "prop='" + prop + '\''
-                + ", httpParametersType=" + httpParametersType
-                + ", value='" + value + '\''
-                + '}';
     }
 
 }
