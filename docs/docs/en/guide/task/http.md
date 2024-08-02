@@ -50,4 +50,3 @@ The main configuration parameters are as follows(All parameters can be replaced 
 - Verification content: When the verification condition is custom response code, content included, content not included, the verification content is required, and the verification content is a fuzzy match.
 
 ![http_task](../../../../img/tasks/demo/http_post.png)
-
