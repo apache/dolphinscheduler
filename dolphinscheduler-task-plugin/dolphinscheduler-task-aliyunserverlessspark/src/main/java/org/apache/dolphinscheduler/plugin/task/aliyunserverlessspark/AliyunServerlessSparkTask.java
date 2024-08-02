@@ -206,20 +206,20 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         startJobRunRequest.setName(aliyunServerlessSparkParameters.getJobName());
         String engineReleaseVersion = aliyunServerlessSparkParameters.getEngineReleaseVersion();
         engineReleaseVersion =
-                StringUtils.isEmpty(engineReleaseVersion) ? "esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)"
+                StringUtils.isEmpty(engineReleaseVersion) ? AliyunServerlessSparkConstants.DEFAULT_ENGINE
                         : engineReleaseVersion;
         startJobRunRequest.setReleaseVersion(engineReleaseVersion);
         Tag envTag = new Tag();
-        envTag.setKey("environment");
-        String envType = aliyunServerlessSparkParameters.isProduction() ? "production" : "dev";
+        envTag.setKey(AliyunServerlessSparkConstants.ENV_KEY);
+        String envType = aliyunServerlessSparkParameters.isProduction() ? AliyunServerlessSparkConstants.ENV_PROD : AliyunServerlessSparkConstants.ENV_DEV;
         envTag.setValue(envType);
         Tag workflowTag = new Tag();
-        workflowTag.setKey("workflow");
-        workflowTag.setValue("true");
+        workflowTag.setKey(AliyunServerlessSparkConstants.WORKFLOW_KEY);
+        workflowTag.setValue(AliyunServerlessSparkConstants.WORKFLOW_VALUE);
         startJobRunRequest.setTags(Arrays.asList(envTag, workflowTag));
         List<String> entryPointArguments =
                 StringUtils.isEmpty(aliyunServerlessSparkParameters.getEntryPointArguments()) ? Collections.emptyList()
-                        : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split("#"));
+                        : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split(AliyunServerlessSparkConstants.ENTRY_POINT_ARGUMENTS_DELIMITER));
         JobDriver.JobDriverSparkSubmit jobDriverSparkSubmit = new JobDriver.JobDriverSparkSubmit()
                 .setEntryPoint(aliyunServerlessSparkParameters.getEntryPoint())
                 .setEntryPointArguments(entryPointArguments)

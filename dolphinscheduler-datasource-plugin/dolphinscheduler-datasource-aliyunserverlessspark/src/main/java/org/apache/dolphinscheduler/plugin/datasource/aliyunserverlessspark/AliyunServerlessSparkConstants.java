@@ -24,4 +24,18 @@ public class AliyunServerlessSparkConstants {
 
     public String ENDPOINT_TEMPLATE = "emr-serverless-spark.%s.aliyuncs.com";
 
+    public String DEFAULT_ENGINE = "esr-2.1-native (Spark 3.3.1, Scala 2.12, Native Runtime)";
+
+    public String ENV_PROD = "production";
+
+    public String ENV_DEV = "dev";
+
+    public String ENTRY_POINT_ARGUMENTS_DELIMITER = "#";
+
+    public String ENV_KEY = "environment";
+
+    public String WORKFLOW_KEY = "workflow";
+
+    public String WORKFLOW_VALUE = "true";
+
 }
