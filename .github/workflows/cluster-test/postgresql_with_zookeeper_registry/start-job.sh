@@ -18,17 +18,17 @@
 set -euox pipefail
 
 #Start base service containers
-docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-base.yaml up -d
+docker compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-base.yaml up -d
 
 #Build ds postgresql cluster image
 docker build -t jdk8:ds_postgresql_cluster -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/Dockerfile .
 
 #Start ds postgresql cluster container
-docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-cluster.yaml up -d
+docker compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-cluster.yaml up -d
 
 #Running tests
 /bin/bash .github/workflows/cluster-test/postgresql_with_zookeeper_registry/running_test.sh
 
 #Cleanup
-docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-cluster.yaml down -v --remove-orphans
-docker-compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-base.yaml down -v --remove-orphans
+docker compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-cluster.yaml down -v --remove-orphans
+docker compose -f .github/workflows/cluster-test/postgresql_with_zookeeper_registry/docker-compose-base.yaml down -v --remove-orphans
