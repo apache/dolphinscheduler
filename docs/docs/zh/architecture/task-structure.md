@@ -591,7 +591,7 @@
 | 3  | name                 |                    | String | 名称        |
 | 4  | params               |                    | Object | 自定义参数     | Json 格式                  |
 | 5  |                      | url                | String | 请求地址      |
-| 6  |                      | httpRequestMethod  | String | 请求方式      | GET,POST,HEAD,PUT,DELETE |
+| 6  |                      | httpMethod  | String | 请求方式      | GET,POST,HEAD,PUT,DELETE |
 | 7  |                      | httpParams         | Array  | 请求参数      |
 | 8  |                      | httpCheckCondition | String | 校验条件      | 默认响应码200                 |
 | 9  |                      | condition          | String | 校验内容      |
