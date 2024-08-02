@@ -35,6 +35,7 @@ task:
     - 'K8S'
     - 'DMS'
     - 'DATA_FACTORY'
+    - 'ALIYUN_SERVERLESS_SPARK'
   logic:
     - 'SUB_PROCESS'
     - 'DEPENDENT'
