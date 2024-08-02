@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.RWXR_XR_X;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
@@ -33,6 +34,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Map;
 import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
@@ -59,11 +61,15 @@ public class FileUtils {
         String initOptionsString = StringUtils.join(
                 FlinkArgsUtils.buildInitOptionsForSql(flinkParameters),
                 FlinkConstants.FLINK_SQL_NEWLINE).concat(FlinkConstants.FLINK_SQL_NEWLINE);
-        writeScriptFile(initScriptFilePath, initOptionsString + flinkParameters.getInitScript());
-        writeScriptFile(scriptFilePath, flinkParameters.getRawScript());
+
+        // get all configuration
+        Map<String, String> propertiesMap = ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
+
+        writeScriptFile(initScriptFilePath, initOptionsString + flinkParameters.getInitScript(), propertiesMap);
+        writeScriptFile(scriptFilePath, flinkParameters.getRawScript(), propertiesMap);
     }
 
-    private static void writeScriptFile(String scriptFileFullPath, String script) {
+    private static void writeScriptFile(String scriptFileFullPath, String script, Map<String, String> propertiesMap) {
         File scriptFile = new File(scriptFileFullPath);
         Path path = scriptFile.toPath();
         if (Files.exists(path)) {
@@ -88,7 +94,9 @@ public class FileUtils {
             }
 
             if (StringUtils.isNotEmpty(script)) {
-                String replacedScript = script.replaceAll("\\r\\n", "\n");
+                // Replace parameter placeholders in the script
+                String replacedScript =
+                        ParameterUtils.convertParameterPlaceholders(script, propertiesMap).replaceAll("\\r\\n", "\n");
                 FileUtils.writeStringToFile(scriptFile, replacedScript, StandardOpenOption.APPEND);
             }
         } catch (IOException e) {

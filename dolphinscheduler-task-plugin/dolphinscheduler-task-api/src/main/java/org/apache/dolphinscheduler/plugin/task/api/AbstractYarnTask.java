@@ -45,7 +45,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
-            IShellInterceptorBuilder shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+            IShellInterceptorBuilder<?, ?> shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
                     .properties(getProperties())
                     // todo: do we need to move the replace to subclass?
                     .appendScript(getScript().replaceAll("\\r\\n", System.lineSeparator()));

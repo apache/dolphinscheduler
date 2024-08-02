@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -81,7 +82,7 @@ public class FlinkTask extends AbstractYarnTask {
 
     @Override
     protected Map<String, String> getProperties() {
-        return taskExecutionContext.getDefinedParams();
+        return ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap());
     }
 
     @Override
