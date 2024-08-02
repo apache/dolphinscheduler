@@ -21,5 +21,5 @@ package org.apache.dolphinscheduler.plugin.task.http;
  * http method
  */
 public enum HttpRequestMethod {
-    GET, POST
+    GET, POST, PUT, DELETE
 }

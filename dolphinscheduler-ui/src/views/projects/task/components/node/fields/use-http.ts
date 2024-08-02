@@ -46,9 +46,11 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const resetHttpParametersType = () => {
     switch (model.httpMethod) {
       case 'GET':
+      case 'DELETE':
         httpParametersType.value = GET_HTTP_PARAMETERS_TYPE
         break
       case 'POST':
+      case 'PUT':
         httpParametersType.value = POST_HTTP_PARAMETERS_TYPE
         break
     }
@@ -57,9 +59,11 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const resetSpan = () => {
     switch (model.httpMethod) {
       case 'GET':
+      case 'DELETE':
         httpBodySpan.value = 0
         break
       case 'POST':
+      case 'PUT':
         httpBodySpan.value = 24
         break
     }
@@ -239,6 +243,14 @@ const HTTP_METHODS = [
   {
     value: 'POST',
     label: 'POST'
+  },
+  {
+    value: 'PUT',
+    label: 'PUT'
+  },
+  {
+    value: 'DELETE',
+    label: 'DELETE'
   }
 ]
 

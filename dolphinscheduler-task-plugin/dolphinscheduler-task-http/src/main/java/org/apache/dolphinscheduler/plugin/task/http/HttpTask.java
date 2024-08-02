@@ -130,6 +130,10 @@ public class HttpTask extends AbstractTask {
                 return sendGetRequest();
             case POST:
                 return sendPostRequest();
+            case PUT:
+                return sendPutRequest();
+            case DELETE:
+                return sendDeleteRequest();
             default:
                 throw new TaskException(String.format("http request method %s not supported",
                         httpParameters.getHttpRequestMethod()));
@@ -160,6 +164,33 @@ public class HttpTask extends AbstractTask {
         OkHttpResponse okHttpResponse = OkHttpUtils.post(httpParameters.getUrl(), okHttpRequestHeaders, null,
                 requestBody, httpParameters.getConnectTimeout(),
                 httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
+        addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
+        return okHttpResponse;
+    }
+
+    @SneakyThrows
+    private OkHttpResponse sendPutRequest() {
+        OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
+        okHttpRequestHeaders.setHeaders(getHeaders());
+        okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        Map<String, Object> requestBody = getRequestBody();
+
+        OkHttpResponse okHttpResponse = OkHttpUtils.put(httpParameters.getUrl(), okHttpRequestHeaders,
+                requestBody, httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
+        addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
+        return okHttpResponse;
+    }
+
+    @SneakyThrows
+    private OkHttpResponse sendDeleteRequest() {
+        OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
+        okHttpRequestHeaders.setHeaders(getHeaders());
+        okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+
+        OkHttpResponse okHttpResponse = OkHttpUtils.delete(httpParameters.getUrl(), okHttpRequestHeaders,
+                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
+                httpParameters.getConnectTimeout());
         addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
         return okHttpResponse;
     }

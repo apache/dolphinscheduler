@@ -74,10 +74,16 @@ public class HttpTaskTest {
     public void testHandleCheckCodeDefaultSuccess() throws Exception {
         HttpTask getHttpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
         HttpTask postHttpTask = generateHttpTask(HttpRequestMethod.POST, HttpStatus.SC_OK);
+        HttpTask putHttpTask = generateHttpTask(HttpRequestMethod.PUT, HttpStatus.SC_OK);
+        HttpTask deleteHttpTask = generateHttpTask(HttpRequestMethod.DELETE, HttpStatus.SC_OK);
         getHttpTask.handle(null);
         postHttpTask.handle(null);
+        putHttpTask.handle(null);
+        deleteHttpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, getHttpTask.getExitStatusCode());
         Assertions.assertEquals(EXIT_CODE_SUCCESS, postHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, putHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, deleteHttpTask.getExitStatusCode());
     }
 
     @Test

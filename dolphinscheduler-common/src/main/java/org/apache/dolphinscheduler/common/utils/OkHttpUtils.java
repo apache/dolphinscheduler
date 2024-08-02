@@ -90,6 +90,51 @@ public class OkHttpUtils {
         }
     }
 
+    public static @NonNull OkHttpResponse put(@NonNull String url,
+                                              @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                              @Nullable Map<String, Object> requestBodyMap,
+                                              int connectTimeout,
+                                              int writeTimeout,
+                                              int readTimeout) throws IOException {
+        CLIENT.newBuilder()
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .build();
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        if (requestBodyMap != null) {
+            requestBuilder = requestBuilder.put(RequestBody.create(
+                    JSONUtils.toJsonString(requestBodyMap),
+                    MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
+        }
+        try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
+            return new OkHttpResponse(response.code(), getResponseBody(response));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Put request execute failed, url: %s", url), e);
+        }
+    }
+
+    public static @NonNull OkHttpResponse delete(@NonNull String url,
+                                                 @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                                 int connectTimeout,
+                                                 int writeTimeout,
+                                                 int readTimeout) throws IOException {
+        CLIENT.newBuilder()
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .build();
+        Request.Builder requestBuilder = new Request.Builder().url(url);
+        addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
+        requestBuilder = requestBuilder.delete();
+        try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
+            return new OkHttpResponse(response.code(), getResponseBody(response));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Delete request execute failed, url: %s", url), e);
+        }
+    }
+
     public static @NonNull String demoPost(@NonNull String url,
                                            @Nullable String token,
                                            @Nullable Map<String, Object> requestBodyMap) throws IOException {
