@@ -634,7 +634,7 @@ No.|parameter name||type|description |notes
             }
         ],
         "url":"https://www.xxxxx.com:9012",
-        "httpRequestMethod":"POST",
+        "httpMethod":"POST",
         "httpCheckCondition":"STATUS_CODE_DEFAULT",
         "condition":""
     },
