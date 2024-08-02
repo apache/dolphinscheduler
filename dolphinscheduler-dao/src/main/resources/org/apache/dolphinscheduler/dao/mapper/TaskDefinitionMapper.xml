@@ -98,21 +98,6 @@
             #{taskDefinition.taskGroupId}, #{taskDefinition.taskExecuteType})
         </foreach>
     </insert>
-    <select id="queryDefineListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
-        select td.code        task_code
-        from t_ds_task_definition td
-        WHERE td.project_code = #{projectCode}
-        <if test="taskType != ''">
-            and td.task_type = #{taskType}
-        </if>
-        <if test="taskExecuteType != null">
-            and td.task_execute_type = #{taskExecuteType.code}
-        </if>
-        <if test="searchTaskName != null and searchTaskName != ''">
-            and td.name like concat('%', #{searchTaskName}, '%')
-        </if>
-        order by td.update_time desc
-    </select>
 
     <select id="queryDefineListByCodeList" resultType="org.apache.dolphinscheduler.dao.entity.TaskMainInfo">
         select td.name task_name,td.code task_code,td.version task_version,td.task_type,td.create_time task_create_time,td.update_time task_update_time,
