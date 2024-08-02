@@ -211,7 +211,8 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         startJobRunRequest.setReleaseVersion(engineReleaseVersion);
         Tag envTag = new Tag();
         envTag.setKey(AliyunServerlessSparkConstants.ENV_KEY);
-        String envType = aliyunServerlessSparkParameters.isProduction() ? AliyunServerlessSparkConstants.ENV_PROD : AliyunServerlessSparkConstants.ENV_DEV;
+        String envType = aliyunServerlessSparkParameters.isProduction() ? AliyunServerlessSparkConstants.ENV_PROD
+                : AliyunServerlessSparkConstants.ENV_DEV;
         envTag.setValue(envType);
         Tag workflowTag = new Tag();
         workflowTag.setKey(AliyunServerlessSparkConstants.WORKFLOW_KEY);
@@ -219,7 +220,8 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
         startJobRunRequest.setTags(Arrays.asList(envTag, workflowTag));
         List<String> entryPointArguments =
                 StringUtils.isEmpty(aliyunServerlessSparkParameters.getEntryPointArguments()) ? Collections.emptyList()
-                        : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments().split(AliyunServerlessSparkConstants.ENTRY_POINT_ARGUMENTS_DELIMITER));
+                        : Arrays.asList(aliyunServerlessSparkParameters.getEntryPointArguments()
+                                .split(AliyunServerlessSparkConstants.ENTRY_POINT_ARGUMENTS_DELIMITER));
         JobDriver.JobDriverSparkSubmit jobDriverSparkSubmit = new JobDriver.JobDriverSparkSubmit()
                 .setEntryPoint(aliyunServerlessSparkParameters.getEntryPoint())
                 .setEntryPointArguments(entryPointArguments)
