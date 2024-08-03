@@ -56,7 +56,13 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
       - name: Set environment variables
         run: |
-          if [[ ${{ github.event_name }} == "release" || ${{ github.event_name }} == "pull_request" ]]; then
+          if [[ ${{ github.event_name }} == "pull_request" ]]; then
+            echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=apache" >> $GITHUB_ENV
+            echo "DOCKER_TAG=dev" >> $GITHUB_ENV
+          elif [[ ${{ github.event_name }} == "release" ]]; then
             echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
