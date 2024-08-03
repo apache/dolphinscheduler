@@ -56,21 +56,27 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-docker
           restore-keys: ${{ runner.os }}-maven-
-#      - name: Set environment variables
-#        run: |
-#          if [[ ${{ github.event_name }} == "release" ]]; then
-#            echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
-#            echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
-#            echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
-#            echo "HUB=apache" >> $GITHUB_ENV
-#            echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
-#          else
-#            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-#            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-#            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-#            echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-#            echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
-#          fi
+      - name: Set environment variables
+        run: |
+          if [[ ${{ github.event_name }} == "push" ]]; then
+            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=apache" >> $GITHUB_ENV
+            echo "DOCKER_TAG=dev" >> $GITHUB_ENV
+          elif [[ ${{ github.event_name }} == "release" ]]; then
+            echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=apache" >> $GITHUB_ENV
+            echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+          else
+            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
+            echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
+          fi
 #      - name: Log in to the Container registry
 #        uses: docker/login-action@v2
 #        with:
