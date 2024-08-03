@@ -34,6 +34,9 @@ jobs:
       packages: write
     timeout-minutes: 30
     steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
       - name: Maximize runner space
         uses: ./.github/actions/maximize-build-space
         with:
