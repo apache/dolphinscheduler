@@ -17,7 +17,6 @@
 name: publish-docker
 
 on:
-  pull_request:
   push:
     branches:
       - dev
@@ -56,7 +55,7 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
       - name: Set environment variables
         run: |
-          if [[ ${{ github.event_name }} == "pull_request" ]]; then
+          if [[ ${{ github.event_name }} == "push" ]]; then
             echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
@@ -69,11 +68,8 @@ jobs:
             echo "HUB=apache" >> $GITHUB_ENV
             echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
           else
-            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-            echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-            echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
+            echo "unknown event name: ${{ github.event_name }}"
+            exit 2
           fi
       - name: Log in to the Container registry
         uses: docker/login-action@v3
