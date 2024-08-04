@@ -28,3 +28,6 @@
 [submodule ".github/actions/workflow-telemetry-action"]
 	path = .github/actions/workflow-telemetry-action
 	url = https://github.com/catchpoint/workflow-telemetry-action
+[submodule ".github/actions/maximize-build-space"]
+	path = .github/actions/maximize-build-space
+	url = https://github.com/easimon/maximize-build-space
