@@ -16,22 +16,8 @@ Kubernetes 部署目的是在 Kubernetes 集群中部署 DolphinScheduler 服务
 
 ```bash
 # 自行选择对应的版本
-export VERSION=3.2.1
-helm pull oci://registry-1.docker.io/apache/dolphinscheduler-helm --version ${VERSION}
-tar -xvf dolphinscheduler-helm-${VERSION}.tgz
-cd dolphinscheduler-helm
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm dependency update .
-helm install dolphinscheduler .
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version>
 ```
-
-将名为 `dolphinscheduler` 的版本(release) 发布到 `test` 的命名空间中：
-
-```bash
-$ helm install dolphinscheduler . -n test
-```
-
-> **提示**: 如果名为 `test` 的命名空间被使用, 选项参数 `-n test` 需要添加到 `helm` 和 `kubectl` 命令中
 
 这些命令以默认配置在 Kubernetes 集群上部署 DolphinScheduler，[附录-配置](#appendix-configuration)部分列出了可以在安装过程中配置的参数 <!-- markdown-link-check-disable-line -->
 
@@ -112,7 +98,7 @@ helm install keda kedacore/keda \
 其次，您需要将 `values.yaml` 中的 `worker.keda.enabled` 配置设置成 `true`，或者您可以通过以下命令安装 chart：
 
 ```bash
-helm install dolphinscheduler . --set worker.keda.enabled=true -n <your-namespace-to-deploy-dolphinscheduler>
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.keda.enabled=true
 ```
 
 一旦自动扩缩容功能启用，worker的数量将基于任务状态在 `minReplicaCount` 和 `maxReplicaCount` 之间弹性扩缩。
@@ -503,15 +489,15 @@ common:
 
 ```bash
 # 安装 master、api-server、alert-server以及其他默认组件，但是不安装 worker
-helm install dolphinscheduler . --set worker.enabled=false
+helm upgrade --install dolphinscheduler --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> --set worker.enabled=false
 # 禁用其他组件的安装，只安装 worker，使用自行建构建的 CPU镜像，通过 nodeselector部署到附带 x86标签的 CPU服务器，使用 zookeeper作为外部注册中心
-helm install dolphinscheduler-cpu-worker . \
+helm upgrade --install dolphinscheduler-cpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-cpu --set worker.nodeSelector.cpu="x86" \
      --set externalRegistry.registryPluginName=zookeeper --set externalRegistry.registryServers=dolphinscheduler-zookeeper:2181
 # 禁用其他组件的安装，只安装 worker，使用自行建构建的 GPU 镜像，通过 nodeselector部署到附带 a100标签的 gpu服务器，使用zookeeper作为外部注册中心
-helm install dolphinscheduler-gpu-worker . \
+helm upgrade --install dolphinscheduler-gpu-worker --create-namespace --namespace dolphinscheduler oci://registry-1.docker.io/apache/dolphinscheduler-helm --version <version> \
      --set minio.enabled=false --set postgresql.enabled=false --set zookeeper.enabled=false \
      --set master.enabled=false  --set api.enabled=false --set alert.enabled=false \
      --set worker.enabled=true --set image.tag=latest-gpu --set worker.nodeSelector.gpu="a100" \

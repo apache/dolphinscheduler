@@ -34,6 +34,19 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Maximize runner space
+        uses: ./.github/actions/maximize-build-space
+        with:
+          root-reserve-mb: 30720
+          temp-reserve-mb: 10240
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+      - uses: actions/checkout@v4
       - name: Cache local Maven repository
         uses: actions/cache@v4
         with:
@@ -42,29 +55,32 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
       - name: Set environment variables
         run: |
-          if [[ ${{ github.event_name }} == "release" ]]; then
+          if [[ ${{ github.event_name }} == "push" ]]; then
+            echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
+            echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
+            echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
+            echo "HUB=apache" >> $GITHUB_ENV
+            echo "DOCKER_TAG=dev" >> $GITHUB_ENV
+          elif [[ ${{ github.event_name }} == "release" ]]; then
             echo "DOCKER_REGISTRY=docker.io" >> $GITHUB_ENV
             echo "DOCKER_USERNAME=${{ secrets.DOCKERHUB_USER }}" >> $GITHUB_ENV
             echo "DOCKER_PASSWORD=${{ secrets.DOCKERHUB_TOKEN }}" >> $GITHUB_ENV
             echo "HUB=apache" >> $GITHUB_ENV
             echo "DOCKER_TAG=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
           else
-            echo "DOCKER_REGISTRY=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-            echo "DOCKER_USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-            echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-            echo "HUB=ghcr.io/apache/dolphinscheduler" >> $GITHUB_ENV
-            echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
+            echo "unknown event name: ${{ github.event_name }}"
+            exit 2
           fi
       - name: Log in to the Container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ env.DOCKER_USERNAME }}
           password: ${{ env.DOCKER_PASSWORD }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Build and push docker images
         run: |
           ./mvnw -B clean deploy \

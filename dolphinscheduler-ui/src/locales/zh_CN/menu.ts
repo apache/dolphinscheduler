@@ -33,7 +33,6 @@ export default {
   workflow_timing: '工作流定时',
   task: '任务',
   task_instance: '任务实例',
-  task_definition: '任务定义',
   file_manage: '文件管理',
   resource_manage: '资源管理',
   function_manage: '函数管理',
