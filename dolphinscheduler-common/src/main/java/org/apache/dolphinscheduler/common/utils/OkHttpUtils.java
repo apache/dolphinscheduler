@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
@@ -39,8 +40,6 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
 
-    private static OkHttpClient CLIENT = new OkHttpClient();
-
     /**
      * http get request
      * @param connectTimeout connect timeout in milliseconds
@@ -55,16 +54,12 @@ public class OkHttpUtils {
                                               int connectTimeout,
                                               int writeTimeout,
                                               int readTimeout) throws IOException {
-        CLIENT.newBuilder()
-                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-                .build();
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         String finalUrl = addUrlParams(requestParams, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
         addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
         Request request = requestBuilder.build();
-        try (Response response = CLIENT.newCall(request).execute()) {
+        try (Response response = client.newCall(request).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Get request execute failed, url: %s", url), e);
@@ -86,11 +81,7 @@ public class OkHttpUtils {
                                                int connectTimeout,
                                                int writeTimeout,
                                                int readTimeout) throws IOException {
-        CLIENT.newBuilder()
-                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-                .build();
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         String finalUrl = addUrlParams(requestParamsMap, url);
         Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
         addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
@@ -99,7 +90,7 @@ public class OkHttpUtils {
                     JSONUtils.toJsonString(requestBodyMap),
                     MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
         }
-        try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
+        try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Post request execute failed, url: %s", url), e);
@@ -120,11 +111,7 @@ public class OkHttpUtils {
                                               int connectTimeout,
                                               int writeTimeout,
                                               int readTimeout) throws IOException {
-        CLIENT.newBuilder()
-                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-                .build();
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         Request.Builder requestBuilder = new Request.Builder().url(url);
         addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
         if (requestBodyMap != null) {
@@ -132,7 +119,7 @@ public class OkHttpUtils {
                     JSONUtils.toJsonString(requestBodyMap),
                     MediaType.parse(okHttpRequestHeaders.getOkHttpRequestHeaderContentType().getValue())));
         }
-        try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
+        try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Put request execute failed, url: %s", url), e);
@@ -152,15 +139,11 @@ public class OkHttpUtils {
                                                  int connectTimeout,
                                                  int writeTimeout,
                                                  int readTimeout) throws IOException {
-        CLIENT.newBuilder()
-                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
-                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
-                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-                .build();
+        OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout);
         Request.Builder requestBuilder = new Request.Builder().url(url);
         addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
         requestBuilder = requestBuilder.delete();
-        try (Response response = CLIENT.newCall(requestBuilder.build()).execute()) {
+        try (Response response = client.newCall(requestBuilder.build()).execute()) {
             return new OkHttpResponse(response.code(), getResponseBody(response));
         } catch (Exception e) {
             throw new RuntimeException(String.format("Delete request execute failed, url: %s", url), e);
@@ -188,8 +171,9 @@ public class OkHttpUtils {
                 .addHeader("accpect", "application/json")
                 .post(body)
                 .build();
-
-        try (Response response = CLIENT.newCall(request).execute()) {
+        OkHttpClient client = getHttpClient(Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT);
+        try (Response response = client.newCall(request).execute()) {
             return response.body().string();
         }
 
@@ -225,5 +209,15 @@ public class OkHttpUtils {
                     response.body());
         }
         return response.body().string();
+    }
+
+    private static OkHttpClient getHttpClient(int connectTimeout,
+                                              int writeTimeout,
+                                              int readTimeout) {
+        return new OkHttpClient().newBuilder()
+                .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
+                .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
+                .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
+                .build();
     }
 }
