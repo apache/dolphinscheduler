@@ -228,10 +228,10 @@ public class LoginController extends BaseController {
             OkHttpRequestHeaders okHttpRequestHeadersPost = new OkHttpRequestHeaders();
             okHttpRequestHeadersPost.setHeaders(tokenRequestHeader);
             okHttpRequestHeadersPost.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_JSON);
-            int timeout = 30000;
 
             String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), okHttpRequestHeadersPost,
-                    requestParamsMap, requestBody, timeout, timeout, timeout).getBody();
+                    requestParamsMap, requestBody, Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
+                    Constants.HTTP_CONNECT_TIMEOUT).getBody();
             String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
             Map<String, String> userInfoRequestHeaders = new HashMap<>();
             userInfoRequestHeaders.put("Accept", "application/json");
@@ -244,9 +244,9 @@ public class LoginController extends BaseController {
             String userInfoJsonStr = OkHttpUtils.get(oAuth2ClientProperties.getUserInfoUri(),
                     okHttpRequestHeadersGet,
                     userInfoQueryMap,
-                    timeout,
-                    timeout,
-                    timeout).getBody();
+                    Constants.HTTP_CONNECT_TIMEOUT,
+                    Constants.HTTP_CONNECT_TIMEOUT,
+                    Constants.HTTP_CONNECT_TIMEOUT).getBody();
             String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
             User user = usersService.getUserByUserName(username);
             if (user == null) {

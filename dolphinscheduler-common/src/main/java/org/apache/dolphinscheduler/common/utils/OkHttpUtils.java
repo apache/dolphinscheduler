@@ -41,6 +41,14 @@ public class OkHttpUtils {
 
     private static OkHttpClient CLIENT = new OkHttpClient();
 
+    /**
+     * http get request
+     * @param connectTimeout connect timeout in milliseconds
+     * @param writeTimeout write timeout in milliseconds
+     * @param readTimeout read timeout in milliseconds
+     * @return OkHttpResponse
+     * @throws RuntimeException
+     */
     public static @NonNull OkHttpResponse get(@NonNull String url,
                                               @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
                                               @Nullable Map<String, Object> requestParams,
@@ -63,6 +71,14 @@ public class OkHttpUtils {
         }
     }
 
+    /**
+     * http post request
+     * @param connectTimeout connect timeout in milliseconds
+     * @param writeTimeout write timeout in milliseconds
+     * @param readTimeout read timeout in milliseconds
+     * @return OkHttpResponse
+     * @throws RuntimeException
+     */
     public static @NonNull OkHttpResponse post(@NonNull String url,
                                                @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
                                                @Nullable Map<String, Object> requestParamsMap,
@@ -90,6 +106,14 @@ public class OkHttpUtils {
         }
     }
 
+    /**
+     * http put request
+     * @param connectTimeout connect timeout in milliseconds
+     * @param writeTimeout write timeout in milliseconds
+     * @param readTimeout read timeout in milliseconds
+     * @return OkHttpResponse
+     * @throws RuntimeException
+     */
     public static @NonNull OkHttpResponse put(@NonNull String url,
                                               @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
                                               @Nullable Map<String, Object> requestBodyMap,
@@ -115,6 +139,14 @@ public class OkHttpUtils {
         }
     }
 
+    /**
+     * http delete request
+     * @param connectTimeout connect timeout in milliseconds
+     * @param writeTimeout write timeout in milliseconds
+     * @param readTimeout read timeout in milliseconds
+     * @return OkHttpResponse
+     * @throws RuntimeException
+     */
     public static @NonNull OkHttpResponse delete(@NonNull String url,
                                                  @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
                                                  int connectTimeout,
