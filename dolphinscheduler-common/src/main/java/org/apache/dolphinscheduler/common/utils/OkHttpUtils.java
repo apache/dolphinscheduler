@@ -40,6 +40,8 @@ import okhttp3.Response;
 
 public class OkHttpUtils {
 
+    private static OkHttpClient CLIENT = new OkHttpClient();
+
     /**
      * http get request
      * @param connectTimeout connect timeout in milliseconds
@@ -214,7 +216,7 @@ public class OkHttpUtils {
     private static OkHttpClient getHttpClient(int connectTimeout,
                                               int writeTimeout,
                                               int readTimeout) {
-        return new OkHttpClient().newBuilder()
+        return CLIENT.newBuilder()
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
