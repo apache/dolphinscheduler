@@ -49,8 +49,7 @@ public class AliyunServerlessSparkDataSourceProcessor extends AbstractDataSource
         AliyunServerlessSparkDataSourceParamDTO aliyunServerlessSparkDataSourceParamDTO =
                 (AliyunServerlessSparkDataSourceParamDTO) datasourceParamDTO;
         if (StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getRegionId()) ||
-                StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getAccessKeyId()) ||
-                StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getRegionId())) {
+                StringUtils.isEmpty(aliyunServerlessSparkDataSourceParamDTO.getAccessKeyId())) {
             throw new IllegalArgumentException("spark datasource param is not valid");
         }
     }
