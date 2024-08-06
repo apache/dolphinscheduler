@@ -17,47 +17,37 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * http parameter
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class HttpParameters extends AbstractParameters {
 
-    /**
-     * url
-     */
     private String url;
 
-    /**
-     * httpMethod
-     */
-    private HttpMethod httpMethod;
+    @JsonProperty("httpMethod")
+    private HttpRequestMethod httpRequestMethod;
 
-    /**
-     *  http params
-     */
-    private List<HttpProperty> httpParams;
+    @JsonProperty("httpParams")
+    private List<HttpProperty> httpRequestParams;
 
-    /**
-     * httpBody
-     */
-    private String httpBody;
+    @JsonProperty("httpBody")
+    private String httpRequestBody;
 
-    /**
-     * httpCheckCondition
-     */
     private HttpCheckCondition httpCheckCondition = HttpCheckCondition.STATUS_CODE_DEFAULT;
 
-    /**
-     * condition
-     */
     private String condition;
 
     /**
@@ -66,83 +56,10 @@ public class HttpParameters extends AbstractParameters {
      */
     private int connectTimeout;
 
-    /**
-     * Socket Timeout
-     * Unit: ms
-     */
-    private int socketTimeout;
-
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(url);
+        return StringUtils.isNotEmpty(url) && httpRequestMethod != null
+                && connectTimeout > 0;
     }
 
-    @Override
-    public List<ResourceInfo> getResourceFilesList() {
-        return new ArrayList<>();
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public HttpMethod getHttpMethod() {
-        return httpMethod;
-    }
-
-    public void setHttpMethod(HttpMethod httpMethod) {
-        this.httpMethod = httpMethod;
-    }
-
-    public List<HttpProperty> getHttpParams() {
-        return httpParams;
-    }
-
-    public void setHttpParams(List<HttpProperty> httpParams) {
-        this.httpParams = httpParams;
-    }
-
-    public HttpCheckCondition getHttpCheckCondition() {
-        return httpCheckCondition;
-    }
-
-    public void setHttpCheckCondition(HttpCheckCondition httpCheckCondition) {
-        this.httpCheckCondition = httpCheckCondition;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
-
-    public int getConnectTimeout() {
-        return connectTimeout;
-    }
-
-    public void setConnectTimeout(int connectTimeout) {
-        this.connectTimeout = connectTimeout;
-    }
-
-    public int getSocketTimeout() {
-        return socketTimeout;
-    }
-
-    public void setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-    }
-
-    public String getHttpBody() {
-        return httpBody;
-    }
-
-    public void setHttpBody(String httpBody) {
-        this.httpBody = httpBody;
-    }
 }

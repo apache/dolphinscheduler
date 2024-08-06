@@ -89,7 +89,7 @@
         <aws-sdk.version>1.12.300</aws-sdk.version>
         <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
-        <okhttp.version>4.9.3</okhttp.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <json-path.version>2.7.0</json-path.version>
         <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
         <gson.version>2.9.1</gson.version>

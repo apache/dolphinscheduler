@@ -15,21 +15,14 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.loop.template.http;
+package org.apache.dolphinscheduler.plugin.task.http;
 
-import org.apache.dolphinscheduler.plugin.task.api.loop.LoopTaskInstanceStatus;
+import lombok.experimental.UtilityClass;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+@UtilityClass
+public class HttpConstants {
 
-@Data
-@AllArgsConstructor
-public class HttpLoopTaskInstanceStatus implements LoopTaskInstanceStatus {
+    public static final String CONTENT_TYPE = "Content-Type";
 
-    private final boolean finished;
-
-    @Override
-    public boolean isSuccess() {
-        return true;
-    }
+    public static final int RESPONSE_CODE_SUCCESS = 200;
 }

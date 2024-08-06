@@ -22,11 +22,10 @@ import org.apache.commons.lang3.SystemUtils;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-public final class Constants {
+import lombok.experimental.UtilityClass;
 
-    private Constants() {
-        throw new UnsupportedOperationException("Construct Constants");
-    }
+@UtilityClass
+public final class Constants {
 
     public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
 
