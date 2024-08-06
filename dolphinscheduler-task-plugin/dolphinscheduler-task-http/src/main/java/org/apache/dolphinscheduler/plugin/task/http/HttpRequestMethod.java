@@ -15,16 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.http;
 
 /**
- * http parameters type
+ * http method
  */
-public enum HttpParametersType {
-    /**
-     * 0 parameter;
-     * 1 body;
-     * 2 headers;
-     */
-    PARAMETER, BODY, HEADERS
+public enum HttpRequestMethod {
+    GET, POST, PUT, DELETE
 }
