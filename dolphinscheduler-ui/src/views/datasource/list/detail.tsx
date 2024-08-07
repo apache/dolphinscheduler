@@ -207,9 +207,9 @@ const DetailModal = defineComponent({
                 label-align='left'
               >
                 <NFormItem
-                    label={t('datasource.datasource')}
-                    path='type'
-                    show-require-mark
+                  label={t('datasource.datasource')}
+                  path='type'
+                  show-require-mark
                 >
                   <div class={[styles.typeBox, !!id && styles.disabledBox]}>
                     <div v-model={[detailForm.type, 'value']}>
