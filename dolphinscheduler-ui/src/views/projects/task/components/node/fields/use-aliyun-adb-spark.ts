@@ -15,9 +15,8 @@
  * limitations under the License.
  */
 import { useI18n } from 'vue-i18n'
-import {useCustomParams, useResources} from '.'
+import { useCustomParams } from '.'
 import type { IJsonItem } from '../types'
-import {ref} from "vue";
 
 export function useADBSPARK(model: { [field: string]: any}): IJsonItem[] {
 

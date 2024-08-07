@@ -158,6 +158,11 @@ public class AdbSparkTaskTest {
         adbSparkTask.setAppIds(mockAppId);
 
         // mock
+        when(mockAdbSparkClient.submitSparkApp(any())).thenReturn(mockSubmitSparkAppResponse);
+        when(mockSubmitSparkAppResponse.getBody()).thenReturn(mockSubmitSparkAppResponseBody);
+        when(mockSubmitSparkAppResponseBody.getData()).thenReturn(mockSubmitSparkAppResponseBodyData);
+        when(mockSubmitSparkAppResponseBodyData.getAppId()).thenReturn(mockAppId);
+
         when(mockAdbSparkClient.getSparkAppState(any(GetSparkAppStateRequest.class)))
                 .thenReturn(mockGetSparkAppStateResponse);
         when(mockGetSparkAppStateResponse.getBody()).thenReturn(mockGetSparkAppStateResponseBody);
@@ -165,6 +170,7 @@ public class AdbSparkTaskTest {
         when(mockGetSparkAppStateResponseBodyData.getState()).thenReturn("COMPLETED");
 
         // action
+        adbSparkTask.submitApplication();
         adbSparkTask.trackApplicationStatus();
 
         // verify
@@ -177,7 +183,20 @@ public class AdbSparkTaskTest {
         adbSparkTask.init();
         adbSparkTask.setAppIds(mockAppId);
 
+        // mock
+        when(mockAdbSparkClient.submitSparkApp(any())).thenReturn(mockSubmitSparkAppResponse);
+        when(mockSubmitSparkAppResponse.getBody()).thenReturn(mockSubmitSparkAppResponseBody);
+        when(mockSubmitSparkAppResponseBody.getData()).thenReturn(mockSubmitSparkAppResponseBodyData);
+        when(mockSubmitSparkAppResponseBodyData.getAppId()).thenReturn(mockAppId);
+
+        when(mockAdbSparkClient.getSparkAppState(any(GetSparkAppStateRequest.class)))
+                .thenReturn(mockGetSparkAppStateResponse);
+        when(mockGetSparkAppStateResponse.getBody()).thenReturn(mockGetSparkAppStateResponseBody);
+        when(mockGetSparkAppStateResponseBody.getData()).thenReturn(mockGetSparkAppStateResponseBodyData);
+        when(mockGetSparkAppStateResponseBodyData.getState()).thenReturn("SUBMITTED");
+
         // action
+        adbSparkTask.submitApplication();
         adbSparkTask.cancelApplication();
 
         // verify
