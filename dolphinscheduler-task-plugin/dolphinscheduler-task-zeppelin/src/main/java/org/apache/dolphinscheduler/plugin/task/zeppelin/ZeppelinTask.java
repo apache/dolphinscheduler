@@ -24,7 +24,10 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParamUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parser.ParameterUtils;
 
 import org.apache.zeppelin.client.ClientConfig;
 import org.apache.zeppelin.client.NoteResult;
@@ -85,7 +88,12 @@ public class ZeppelinTask extends AbstractRemoteTask {
         try {
             final String paragraphId = this.zeppelinParameters.getParagraphId();
             final String productionNoteDirectory = this.zeppelinParameters.getProductionNoteDirectory();
-            final String parameters = this.zeppelinParameters.getParameters();
+            String parametersOld = this.zeppelinParameters.getParameters();
+            // combining local and global parameters
+            Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+            String parameters =
+                    ParameterUtils.convertParameterPlaceholders(parametersOld, ParamUtils.convert(paramsMap));
+            logger.info("old parameters: " + parametersOld + "new parameters: " + parameters);
             // noteId may be replaced with cloned noteId
             String noteId = this.zeppelinParameters.getNoteId();
             Map<String, String> zeppelinParamsMap = new HashMap<>();
