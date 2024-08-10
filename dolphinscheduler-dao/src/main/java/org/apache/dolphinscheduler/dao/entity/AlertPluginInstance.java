@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
-
 import java.util.Date;
 
 import lombok.Data;
@@ -59,18 +56,6 @@ public class AlertPluginInstance {
     private String pluginInstanceParams;
 
     /**
-     * instance_type. 0 normal, 1 global
-     */
-    @TableField("instance_type")
-    private AlertPluginInstanceType instanceType;
-
-    /**
-     * warning_type
-     */
-    @TableField("warning_type")
-    private WarningType warningType;
-
-    /**
      * create_time
      */
     @TableField("create_time")
@@ -95,11 +80,10 @@ public class AlertPluginInstance {
         this.instanceName = instanceName;
     }
 
-    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName, WarningType warningType,
+    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName,
                                Date updateDate) {
         this.id = id;
         this.pluginInstanceParams = pluginInstanceParams;
-        this.warningType = warningType;
         this.updateTime = updateDate;
         this.instanceName = instanceName;
     }

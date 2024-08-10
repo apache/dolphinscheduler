@@ -73,7 +73,6 @@ import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -185,9 +184,6 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private ListenerEventAlertManager listenerEventAlertManager;
 
     protected User user;
     protected Exception exception;

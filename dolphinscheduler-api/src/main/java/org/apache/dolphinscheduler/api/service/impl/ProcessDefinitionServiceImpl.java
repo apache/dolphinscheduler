@@ -119,7 +119,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.plugin.task.sql.SqlTaskChannelFactory;
-import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -250,9 +249,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
     @Autowired
     private MetricsCleanUpService metricsCleanUpService;
 
-    @Autowired
-    private ListenerEventAlertManager listenerEventAlertManager;
-
     /**
      * create process definition
      *
@@ -309,11 +305,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
 
         result = createDagDefine(loginUser, taskRelationList, processDefinition, taskDefinitionLogs);
-        if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            listenerEventAlertManager.publishProcessDefinitionCreatedListenerEvent(loginUser, processDefinition,
-                    taskDefinitionLogs,
-                    taskRelationList);
-        }
         return result;
     }
 
@@ -862,11 +853,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinition.setExecutionType(executionType);
         result = updateDagDefine(loginUser, taskRelationList, processDefinition, processDefinitionDeepCopy,
                 taskDefinitionLogs);
-        if (result.get(Constants.STATUS) == Status.SUCCESS) {
-            listenerEventAlertManager.publishProcessDefinitionUpdatedListenerEvent(loginUser, processDefinition,
-                    taskDefinitionLogs,
-                    taskRelationList);
-        }
         return result;
     }
 
@@ -1131,7 +1117,6 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinitionDao.deleteByWorkflowDefinitionCode(processDefinition.getCode());
         metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
-        listenerEventAlertManager.publishProcessDefinitionDeletedListenerEvent(loginUser, project, processDefinition);
     }
 
     /**

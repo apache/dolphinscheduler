@@ -336,6 +336,20 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
   }
 
+  if (data.taskType === 'ALIYUN_SERVERLESS_SPARK') {
+    taskParams.workspaceId = data.workspaceId
+    taskParams.resourceQueueId = data.resourceQueueId
+    taskParams.codeType = data.codeType
+    taskParams.jobName = data.jobName
+    taskParams.engineReleaseVersion = data.engineReleaseVersion
+    taskParams.entryPoint = data.entryPoint
+    taskParams.entryPointArguments = data.entryPointArguments
+    taskParams.sparkSubmitParameters = data.sparkSubmitParameters
+    taskParams.isProduction = data.isProduction
+    taskParams.type = data.type
+    taskParams.datasource = data.datasource
+  }
+
   if (data.taskType === 'K8S') {
     taskParams.namespace = data.namespace
     taskParams.minCpuCores = data.minCpuCores
