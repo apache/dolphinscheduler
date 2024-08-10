@@ -1,0 +1,59 @@
+{{- if .Values.ec2NodeClass.enabled }}
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: {{ .Values.name }}
+spec:
+  {{- if .Values.ec2NodeClass.amiFamily }}
+  amiFamily: {{ .Values.ec2NodeClass.amiFamily }}
+  {{- else if .Values.ec2NodeClass.amiSelectorTerms }}
+  amiSelectorTerms:
+    {{- toYaml .Values.ec2NodeClass.amiSelectorTerms | nindent 4 }}
+  {{- end }}
+  subnetSelectorTerms:
+    {{- if and (.Values.ec2NodeClass.subnetSelectorTerms) (hasKey .Values.ec2NodeClass.subnetSelectorTerms "tags") }}
+    - tags:
+      {{- range $key, $value := .Values.ec2NodeClass.subnetSelectorTerms.tags }}
+        {{ $key }}: {{ $value | quote }}
+      {{- end }}
+    {{- end }}
+    {{- if and (.Values.ec2NodeClass.subnetSelectorTerms.id) (hasKey .Values.ec2NodeClass.subnetSelectorTerms "id") }}
+    - id: {{ .Values.ec2NodeClass.subnetSelectorTerms.id }}
+    {{- end }}
+  securityGroupSelectorTerms:
+    {{- if and (.Values.ec2NodeClass.securityGroupSelectorTerms) (hasKey .Values.ec2NodeClass.securityGroupSelectorTerms "name") }}
+    - name: {{ .Values.ec2NodeClass.securityGroupSelectorTerms.name }}
+    {{- end }}
+    {{- if and (.Values.ec2NodeClass.securityGroupSelectorTerms) (hasKey .Values.ec2NodeClass.securityGroupSelectorTerms "id") }}
+    - id: {{ .Values.ec2NodeClass.securityGroupSelectorTerms.id }}
+    {{- end }}
+    {{- if and (.Values.ec2NodeClass.securityGroupSelectorTerms) (hasKey .Values.ec2NodeClass.securityGroupSelectorTerms "tags") }}
+    - tags:
+      {{- range $key, $value := .Values.ec2NodeClass.securityGroupSelectorTerms.tags }}
+        {{ $key }}: {{ $value | quote }}
+      {{- end }}
+    {{- end }}
+  role: {{ .Values.ec2NodeClass.karpenterRole }}
+  tags:
+    Name: karpenter-{{ .Values.name }}
+  metadataOptions:
+    httpEndpoint: {{ .Values.ec2NodeClass.metadataOptions.httpEndpoint }}
+    httpProtocolIPv6: {{ .Values.ec2NodeClass.metadataOptions.httpProtocolIPv6 }}
+    httpPutResponseHopLimit: {{ .Values.ec2NodeClass.metadataOptions.httpPutResponseHopLimit }}
+    httpTokens: {{ .Values.ec2NodeClass.metadataOptions.httpTokens }}
+  blockDeviceMappings:
+    - deviceName: {{ default "/dev/xvda" .Values.ec2NodeClass.blockDevice.deviceName }}
+      ebs:
+        volumeSize: {{ .Values.ec2NodeClass.blockDevice.volumeSize }}
+        volumeType: {{ .Values.ec2NodeClass.blockDevice.volumeType }}
+        encrypted: {{ .Values.ec2NodeClass.blockDevice.encrypted }}
+        deleteOnTermination: {{ .Values.ec2NodeClass.blockDevice.deleteOnTermination }}
+  detailedMonitoring: {{ .Values.ec2NodeClass.detailedMonitoring }}
+  {{- if .Values.ec2NodeClass.instanceStorePolicy }}
+  instanceStorePolicy: {{ .Values.ec2NodeClass.instanceStorePolicy }}
+  {{- end }}
+  {{- if .Values.ec2NodeClass.userData }}
+  userData: |
+    {{- .Values.ec2NodeClass.userData | nindent 4 }}
+  {{- end }}
+{{- end }}

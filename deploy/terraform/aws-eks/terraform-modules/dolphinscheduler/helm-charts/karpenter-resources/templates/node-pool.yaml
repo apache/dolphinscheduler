@@ -1,0 +1,38 @@
+{{- if .Values.nodePool.enabled }}
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: {{ .Values.name }}
+spec:
+  template:
+    metadata:
+      labels:
+        NodePool: {{ .Values.name }}
+        NodeGroupType: {{ .Values.name }}
+        {{- with .Values.nodePool.labels }}
+        {{- range . }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- end }}
+    spec:
+      nodeClassRef:
+        name: {{ .Values.name }}
+      {{- with .Values.nodePool.taints }}
+      taints:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodePool.requirements }}
+      requirements:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+  disruption:
+    consolidationPolicy: {{ .Values.nodePool.disruption.consolidationPolicy }}
+    {{- if eq .Values.nodePool.disruption.consolidationPolicy "WhenEmpty" }}
+    consolidateAfter: {{ .Values.nodePool.disruption.consolidateAfter }} # Only defined if consolidationPolicy is WhenEmpty
+    {{- end }}
+    expireAfter: {{ .Values.nodePool.disruption.expireAfter }}
+  limits:
+    cpu: {{ .Values.nodePool.limits.cpu }}
+    memory: {{ .Values.nodePool.limits.memory }}
+  weight: {{ .Values.nodePool.weight }}
+{{- end }}

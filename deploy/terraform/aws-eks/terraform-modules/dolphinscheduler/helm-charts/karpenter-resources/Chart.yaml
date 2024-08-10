@@ -1,0 +1,5 @@
+apiVersion: v2
+name: karpenter-resources
+description: Helm chart for configuring custom resources for Karpenter on the cluster
+version: 0.0.1
+appVersion: 0.0.1
