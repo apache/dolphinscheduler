@@ -40,8 +40,8 @@ public final class DingTalkParamsConstants {
     static final String DING_TALK_AT_MOBILES = "$t('atMobiles')";
     static final String NAME_DING_TALK_AT_MOBILES = "AtMobiles";
 
-    static final String DING_TALK_AT_USERIDS = "$t('atUserIds')";
-    static final String NAME_DING_TALK_AT_USERIDS = "AtUserIds";
+    static final String DING_TALK_AT_USERIDS = "$t('atDingtalkIds')";
+    static final String NAME_DING_TALK_AT_USERIDS = "AtDingtalkIds";
 
     static final String DING_TALK_AT_ALL = "$t('isAtAll')";
     static final String NAME_DING_TALK_AT_ALL = "IsAtAll";

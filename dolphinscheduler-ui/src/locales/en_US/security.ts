@@ -263,7 +263,7 @@ export default {
     AtSomeoneInRoom: 'At Someone In Room',
     Destination: 'Destination',
     AtMobiles: 'At User Mobiles',
-    AtUserIds: 'At User Ids',
+    AtDingtalkIds: 'At User Ids',
     MsgType: 'Msg Type',
     // eslint-disable-next-line quotes
     IsAtAll: "{'@'}All",

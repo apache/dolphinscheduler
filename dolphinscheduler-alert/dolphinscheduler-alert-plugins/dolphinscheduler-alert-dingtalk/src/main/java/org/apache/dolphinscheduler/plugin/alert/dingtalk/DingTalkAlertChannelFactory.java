@@ -87,7 +87,7 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                         .setRequired(false)
                         .build())
                 .build();
-        InputParam atUserIdsParam = InputParam
+        InputParam atDingtalkIdsParam = InputParam
                 .newBuilder(DingTalkParamsConstants.NAME_DING_TALK_AT_USERIDS,
                         DingTalkParamsConstants.DING_TALK_AT_USERIDS)
                 .addValidate(Validate.newBuilder()
@@ -141,7 +141,7 @@ public final class DingTalkAlertChannelFactory implements AlertChannelFactory {
                 .setType("password")
                 .build();
 
-        return Arrays.asList(webHookParam, keywordParam, secretParam, msgTypeParam, atMobilesParam, atUserIdsParam,
+        return Arrays.asList(webHookParam, keywordParam, secretParam, msgTypeParam, atMobilesParam, atDingtalkIdsParam,
                 isAtAll, isEnableProxy, proxyParam, portParam, userParam, passwordParam);
     }
 

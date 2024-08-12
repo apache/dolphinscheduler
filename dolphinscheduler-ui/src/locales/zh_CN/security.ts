@@ -262,7 +262,7 @@ export default {
     // eslint-disable-next-line quotes
     AtMobiles: "被{'@'}人的手机号",
     // eslint-disable-next-line quotes
-    AtUserIds: "被{'@'}人的用户ID",
+    AtDingtalkIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
     IsAtAll: "{'@'}所有人",
