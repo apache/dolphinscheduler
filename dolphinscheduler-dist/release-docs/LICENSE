@@ -352,7 +352,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     netty 3.10.6.Final: https://github.com/netty/netty, Apache 2.0
     netty 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
     nimbus-jose-jwt 9.8.1: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.8.1, Apache 2.0
-    okhttp 3.14.9: https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/3.14.9, Apache 2.0
+    okhttp 4.12.0: https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/4.12.0, Apache 2.0
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
     parquet-hadoop-bundle 1.8.1: https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop-bundle/1.8.1, Apache 2.0
     poi 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi/4.1.2, Apache 2.0
@@ -436,8 +436,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     zjsonpatch 0.3.0 https://mvnrepository.com/artifact/io.fabric8/zjsonpatch/0.3.0, Apache 2.0
     jackson-dataformat-yaml 2.13.0 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.13.0, Apache 2.0
     logging-interceptor 4.9.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor/4.9.3, Apache 2.0
-    okhttp 3.14.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp/3.14.3, Apache 2.0
-    okio 1.17.2 https://mvnrepository.com/artifact/com.squareup.okio/okio/1.17.2, Apache 2.0
+    okio 3.6.0 https://mvnrepository.com/artifact/com.squareup.okio/okio/3.6.0, Apache 2.0
+    okio-jvm 3.6.0 https://repo1.maven.org/maven2/com/squareup/okio/okio-jvm/3.6.0, Apache 2.0
     hibernate-validator  6.2.2.Final https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator/6.2.2.Final, Apache 2.0
     jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0
     jboss-logging:jar 3.4.3.Final https://mvnrepository.com/artifact/org.jboss.logging/jboss-logging/3.4.3.Final, Apache 2.0

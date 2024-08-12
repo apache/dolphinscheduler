@@ -30,13 +30,12 @@ public class HttpParametersTest {
     @Test
     public void testGenerator() {
         String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
-                + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
+                + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\"}";
         HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
         Assertions.assertEquals(10000, httpParameters.getConnectTimeout());
-        Assertions.assertEquals(10000, httpParameters.getSocketTimeout());
         Assertions.assertEquals("https://www.baidu.com/", httpParameters.getUrl());
-        Assertions.assertEquals(HttpMethod.GET, httpParameters.getHttpMethod());
+        Assertions.assertEquals(HttpRequestMethod.GET, httpParameters.getHttpRequestMethod());
         Assertions.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT, httpParameters.getHttpCheckCondition());
         Assertions.assertEquals("", httpParameters.getCondition());
 
@@ -45,14 +44,13 @@ public class HttpParametersTest {
     @Test
     public void testCheckParameters() {
         String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
-                + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
+                + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\"}";
         HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
         Assertions.assertTrue(httpParameters.checkParameters());
         Assertions.assertEquals(10000, httpParameters.getConnectTimeout());
-        Assertions.assertEquals(10000, httpParameters.getSocketTimeout());
         Assertions.assertEquals("https://www.baidu.com/", httpParameters.getUrl());
-        Assertions.assertEquals(HttpMethod.GET, httpParameters.getHttpMethod());
+        Assertions.assertEquals(HttpRequestMethod.GET, httpParameters.getHttpRequestMethod());
         Assertions.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT, httpParameters.getHttpCheckCondition());
         Assertions.assertEquals("", httpParameters.getCondition());
 
@@ -61,14 +59,13 @@ public class HttpParametersTest {
     @Test
     public void testCheckValues() {
         String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
-                + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\",\"socketTimeout\":\"10000\"}";
+                + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\"}";
         HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
         Assertions.assertTrue(httpParameters.checkParameters());
         Assertions.assertEquals(10000, httpParameters.getConnectTimeout());
-        Assertions.assertEquals(10000, httpParameters.getSocketTimeout());
         Assertions.assertEquals("https://www.baidu.com/", httpParameters.getUrl());
-        Assertions.assertEquals(HttpMethod.GET, httpParameters.getHttpMethod());
+        Assertions.assertEquals(HttpRequestMethod.GET, httpParameters.getHttpRequestMethod());
         Assertions.assertEquals(HttpCheckCondition.STATUS_CODE_DEFAULT, httpParameters.getHttpCheckCondition());
         Assertions.assertEquals("", httpParameters.getCondition());
         Assertions.assertEquals(0, httpParameters.getLocalParametersMap().size());
