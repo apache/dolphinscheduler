@@ -562,7 +562,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
-        variables.totalPage = res.totalPage
+        variables.totalPage = res.totalPage ?? Math.ceil(res.totalCount / res.pageSize)
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
