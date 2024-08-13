@@ -123,3 +123,5 @@ d//
 
 select drop_column_t_ds_alert_plugin_instance();
 DROP FUNCTION IF EXISTS drop_column_t_ds_alert_plugin_instance();
+
+ALTER TABLE t_ds_schedules ADD COLUMN IF NOT EXISTS operator int;

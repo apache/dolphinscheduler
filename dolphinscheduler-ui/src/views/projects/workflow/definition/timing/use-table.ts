@@ -264,6 +264,16 @@ export function useTable() {
         width: 160
       },
       {
+        title: t('project.workflow.create_user'),
+        key: 'createUser',
+        width: 140
+      },
+      {
+        title: t('project.workflow.modify_user'),
+        key: 'modifyUser',
+        width: 140
+      },
+      {
         title: t('project.workflow.create_time'),
         key: 'createTime',
         ...COLUMN_WIDTH_CONFIG['time']

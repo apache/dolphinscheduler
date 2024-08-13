@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.ScheduleMapper">
     <sql id="baseSql">
-        id, process_definition_code, start_time, end_time, timezone_id, crontab, failure_strategy, user_id, release_state,
+        id, process_definition_code, start_time, end_time, timezone_id, crontab, failure_strategy, user_id, operator, release_state,
         warning_type, warning_group_id, process_instance_priority, worker_group, tenant_code, environment_code, create_time, update_time
     </sql>
     <sql id="baseSqlV2">
@@ -29,14 +29,15 @@
         ${alias}.update_time
     </sql>
     <select id="queryByProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name as create_user, u2.user_name as modify_user,e.name as environment_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
         from t_ds_schedules s
         join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
-        join t_ds_user as u on s.user_id = u.id
+        left join t_ds_user as u on s.user_id = u.id
+        left join t_ds_user as u2 on s.operator = u2.id
         left join t_ds_environment as e on s.environment_code = e.code
         where 1=1
         <if test="processDefinitionCode != 0">
@@ -45,14 +46,15 @@
         order by s.update_time desc
     </select>
     <select id="queryByProjectAndProcessDefineCodePaging" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p.name as project_name,u.user_name,e.name as environment_name,
+        select p_f.name as process_definition_name, p.name as project_name,u.user_name as create_user, u2.user_name as modify_user,e.name as environment_name,
         <include refid="baseSqlV2">
             <property name="alias" value="s"/>
         </include>
         from t_ds_schedules s
         join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
-        join t_ds_user as u on s.user_id = u.id
+        left join t_ds_user as u on s.user_id = u.id
+        left join t_ds_user as u2 on s.operator = u2.id
         left join t_ds_environment as e on s.environment_code = e.code
         where 1=1
         <if test="projectCode != 0">
@@ -64,11 +66,12 @@
         order by s.update_time desc
     </select>
     <select id="querySchedulerListByProjectName" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">
-        select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name, s.*
+        select p_f.name as process_definition_name, p_f.description as definition_description, p.name as project_name,u.user_name as create_user, u2.user_name as modify_user, s.*
         from t_ds_schedules s
         join t_ds_process_definition p_f on s.process_definition_code = p_f.code
         join t_ds_project as p on p_f.project_code = p.code
-        join t_ds_user as u on s.user_id = u.id
+        left join t_ds_user as u on s.user_id = u.id
+        left join t_ds_user as u2 on s.operator = u2.id
         where p.name = #{projectName}
     </select>
     <select id="selectAllByProcessDefineArray" resultType="org.apache.dolphinscheduler.dao.entity.Schedule">

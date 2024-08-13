@@ -761,6 +761,7 @@ CREATE TABLE t_ds_schedules (
   crontab varchar(255) NOT NULL ,
   failure_strategy int NOT NULL ,
   user_id int NOT NULL ,
+  operator int DEFAULT NULL ,
   release_state int NOT NULL ,
   warning_type int NOT NULL ,
   warning_group_id int DEFAULT NULL ,

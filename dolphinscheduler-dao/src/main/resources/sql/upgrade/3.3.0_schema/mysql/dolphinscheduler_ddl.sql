@@ -125,3 +125,5 @@ d//
 delimiter ;
 CALL drop_column_t_ds_alert_plugin_instance;
 DROP PROCEDURE drop_column_t_ds_alert_plugin_instance;
+
+ALTER TABLE t_ds_schedules ADD  `operator` int(11) DEFAULT NULL COMMENT 'operator user id';
