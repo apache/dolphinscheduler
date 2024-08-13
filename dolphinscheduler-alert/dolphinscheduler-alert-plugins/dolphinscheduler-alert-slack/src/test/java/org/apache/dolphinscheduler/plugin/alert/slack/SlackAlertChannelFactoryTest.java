@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.slack;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.common.enums.AlertPluginType;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class SlackAlertChannelFactoryTest {
 
     @Test
     public void testTestGetName() {
-        Assertions.assertEquals("Slack", slackAlertChannelFactory.name());
+        Assertions.assertEquals(AlertPluginType.SLACK.getName(), slackAlertChannelFactory.name());
     }
 
     @Test

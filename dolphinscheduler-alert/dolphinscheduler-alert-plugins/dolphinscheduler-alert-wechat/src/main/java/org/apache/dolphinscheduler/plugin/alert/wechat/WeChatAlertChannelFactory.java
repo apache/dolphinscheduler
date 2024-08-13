@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.common.enums.AlertPluginType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -38,7 +39,7 @@ public final class WeChatAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String name() {
-        return "WeChat";
+        return AlertPluginType.WECHAT.getName();
     }
 
     @Override

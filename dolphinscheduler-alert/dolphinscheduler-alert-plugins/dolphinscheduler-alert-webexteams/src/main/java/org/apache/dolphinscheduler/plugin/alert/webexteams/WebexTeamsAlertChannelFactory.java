@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.webexteams;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.enums.AlertPluginType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -36,7 +37,7 @@ public final class WebexTeamsAlertChannelFactory implements AlertChannelFactory 
 
     @Override
     public String name() {
-        return "WebexTeams";
+        return AlertPluginType.WEBEXTEAMS.getName();
     }
 
     @Override

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.alert.pagerduty;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
+import org.apache.dolphinscheduler.common.enums.AlertPluginType;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -33,7 +34,7 @@ public final class PagerDutyAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String name() {
-        return "PagerDuty";
+        return AlertPluginType.PAGERDUTY.getName();
     }
 
     @Override

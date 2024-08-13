@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertConstants;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
 import org.apache.dolphinscheduler.alert.api.ShowType;
+import org.apache.dolphinscheduler.common.enums.AlertPluginType;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -45,7 +46,7 @@ public final class EmailAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String name() {
-        return "Email";
+        return AlertPluginType.EMAIL.getName();
     }
 
     @Override

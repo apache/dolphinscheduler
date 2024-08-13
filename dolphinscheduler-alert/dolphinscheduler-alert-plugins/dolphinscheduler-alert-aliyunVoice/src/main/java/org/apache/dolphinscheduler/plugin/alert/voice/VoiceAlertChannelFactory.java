@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.voice;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.enums.AlertPluginType;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -34,7 +35,7 @@ public final class VoiceAlertChannelFactory implements AlertChannelFactory {
 
     @Override
     public String name() {
-        return "AliyunVoice";
+        return AlertPluginType.ALIYUNVOICE.getName();
     }
 
     @Override
