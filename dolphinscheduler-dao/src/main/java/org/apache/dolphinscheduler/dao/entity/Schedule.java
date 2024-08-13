@@ -114,10 +114,21 @@ public class Schedule {
     private int userId;
 
     /**
-     * created user name
+     * operator user id
+     */
+    private Integer operator;
+
+    /**
+     * created user
      */
     @TableField(exist = false)
-    private String userName;
+    private String createUser;
+
+    /**
+     * modify user
+     */
+    @TableField(exist = false)
+    private String modifyUser;
 
     /**
      * release state

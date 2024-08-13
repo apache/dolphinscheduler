@@ -101,9 +101,14 @@ public class ScheduleVO {
     private int userId;
 
     /**
-     * created user name
+     * created user
      */
-    private String userName;
+    private String createUser;
+
+    /**
+     * modify user
+     */
+    private String modifyUser;
 
     /**
      * release state
@@ -144,7 +149,7 @@ public class ScheduleVO {
         this.setId(schedule.getId());
         this.setCrontab(schedule.getCrontab());
         this.setProjectName(schedule.getProjectName());
-        this.setUserName(schedule.getUserName());
+        this.setCreateUser(schedule.getCreateUser());
         this.setWorkerGroup(schedule.getWorkerGroup());
         this.setWarningType(schedule.getWarningType());
         this.setWarningGroupId(schedule.getWarningGroupId());
@@ -162,5 +167,6 @@ public class ScheduleVO {
         this.setEndTime(DateUtils.dateToString(schedule.getEndTime(), ZoneId.systemDefault().getId()));
         this.setEnvironmentName(schedule.getEnvironmentName());
         this.setTenantCode(schedule.getTenantCode());
+        this.setModifyUser(schedule.getModifyUser());
     }
 }
