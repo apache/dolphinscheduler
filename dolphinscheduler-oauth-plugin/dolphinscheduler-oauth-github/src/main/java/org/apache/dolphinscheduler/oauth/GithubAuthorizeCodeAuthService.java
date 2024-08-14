@@ -1,5 +1,8 @@
 package org.apache.dolphinscheduler.oauth;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
+import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 
@@ -34,15 +37,27 @@ public class GithubAuthorizeCodeAuthService implements AuthorizeCodeAuthService 
         requestParamsMap.put("redirect_uri",
                 String.format("%s?provider=%s", oAuth2ClientProperties.getRedirectUri(),
                         GithubOAuthProviderConstants.GITHUB_OAUTH_PROVIDER_NAME));
-        String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), tokenRequestHeader,
-                requestParamsMap, requestBody);
+        OkHttpRequestHeaders okHttpRequestHeadersPost = new OkHttpRequestHeaders();
+        okHttpRequestHeadersPost.setHeaders(tokenRequestHeader);
+        okHttpRequestHeadersPost.setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_JSON);
+        String tokenJsonStr = OkHttpUtils.post(oAuth2ClientProperties.getTokenUri(), okHttpRequestHeadersPost,
+                requestParamsMap, requestBody, Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT,
+                Constants.HTTP_CONNECT_TIMEOUT).getBody();
         String accessToken = JSONUtils.getNodeString(tokenJsonStr, "access_token");
         Map<String, String> userInfoRequestHeaders = new HashMap<>();
         userInfoRequestHeaders.put("Accept", "application/json");
         Map<String, Object> userInfoQueryMap = new HashMap<>();
         userInfoRequestHeaders.put("Authorization", "Bearer " + accessToken);
+        OkHttpRequestHeaders userInfoRequestHeadersGet = new OkHttpRequestHeaders();
+        okHttpRequestHeadersPost.setHeaders(userInfoRequestHeaders);
+        okHttpRequestHeadersPost
+                .setOkHttpRequestHeaderContentType(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED);
         String userInfoJsonStr =
-                OkHttpUtils.get(oAuth2ClientProperties.getUserInfoUri(), userInfoRequestHeaders, userInfoQueryMap);
+                OkHttpUtils.get(oAuth2ClientProperties.getUserInfoUri(), userInfoRequestHeadersGet, userInfoQueryMap,
+                        Constants.HTTP_CONNECT_TIMEOUT,
+                        Constants.HTTP_CONNECT_TIMEOUT,
+                        Constants.HTTP_CONNECT_TIMEOUT).getBody();
         String username = JSONUtils.getNodeString(userInfoJsonStr, "login");
         String email = JSONUtils.getNodeString(userInfoJsonStr, "email");
         String name = JSONUtils.getNodeString(userInfoJsonStr, "name");
