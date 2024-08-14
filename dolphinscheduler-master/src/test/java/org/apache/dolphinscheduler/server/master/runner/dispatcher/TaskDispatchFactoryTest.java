@@ -17,15 +17,18 @@
 
 package org.apache.dolphinscheduler.server.master.runner.dispatcher;
 
-import org.apache.dolphinscheduler.server.master.runner.task.blocking.BlockingLogicTask;
-import org.apache.dolphinscheduler.server.master.runner.task.condition.ConditionLogicTask;
-import org.apache.dolphinscheduler.server.master.runner.task.dependent.DependentLogicTask;
-import org.apache.dolphinscheduler.server.master.runner.task.subworkflow.SubWorkflowLogicTask;
-import org.apache.dolphinscheduler.server.master.runner.task.switchtask.SwitchLogicTask;
+import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.task.DynamicLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
+import org.apache.dolphinscheduler.plugin.task.shell.ShellTaskChannelFactory;
+
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,18 +45,20 @@ public class TaskDispatchFactoryTest {
     @Mock
     private WorkerTaskDispatcher workerTaskDispatcher;
 
-    @Test
-    public void getTaskDispatcher() {
-        Assertions.assertEquals(masterTaskDispatcher,
-                taskDispatchFactory.getTaskDispatcher(BlockingLogicTask.TASK_TYPE));
-        Assertions.assertEquals(masterTaskDispatcher,
-                taskDispatchFactory.getTaskDispatcher(ConditionLogicTask.TASK_TYPE));
-        Assertions.assertEquals(masterTaskDispatcher,
-                taskDispatchFactory.getTaskDispatcher(DependentLogicTask.TASK_TYPE));
-        Assertions.assertEquals(masterTaskDispatcher,
-                taskDispatchFactory.getTaskDispatcher(SubWorkflowLogicTask.TASK_TYPE));
-        Assertions.assertEquals(masterTaskDispatcher, taskDispatchFactory.getTaskDispatcher(SwitchLogicTask.TASK_TYPE));
+    @ParameterizedTest
+    @ValueSource(strings = {
+            ConditionsLogicTaskChannelFactory.NAME,
+            DependentLogicTaskChannelFactory.NAME,
+            DynamicLogicTaskChannelFactory.NAME,
+            SubWorkflowLogicTaskChannelFactory.NAME,
+            SwitchLogicTaskChannelFactory.NAME})
+    public void getTaskDispatcher_withLogicTask(String taskType) {
+        assertThat(taskDispatchFactory.getTaskDispatcher(taskType)).isSameInstanceAs(masterTaskDispatcher);
+    }
 
-        Assertions.assertEquals(workerTaskDispatcher, taskDispatchFactory.getTaskDispatcher("SHELL"));
+    @ParameterizedTest
+    @ValueSource(strings = {ShellTaskChannelFactory.NAME})
+    public void getTaskDispatcher_withWorkerTask(String taskType) {
+        assertThat(taskDispatchFactory.getTaskDispatcher(taskType)).isSameInstanceAs(workerTaskDispatcher);
     }
 }

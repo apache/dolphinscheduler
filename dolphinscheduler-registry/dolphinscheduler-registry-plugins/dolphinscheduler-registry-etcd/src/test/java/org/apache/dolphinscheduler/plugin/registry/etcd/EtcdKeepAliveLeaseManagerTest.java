@@ -36,13 +36,14 @@ class EtcdKeepAliveLeaseManagerTest {
     static Client client;
 
     static EtcdKeepAliveLeaseManager etcdKeepAliveLeaseManager;
+
     @BeforeAll
     public static void before() throws Exception {
         server = EtcdClusterExtension.builder()
                 .withNodes(1)
                 .withImage("ibmcom/etcd:3.2.24")
                 .build();
-        server.restart();
+        server.cluster().start();
 
         client = Client.builder().endpoints(server.clientEndpoints()).build();
 
@@ -65,8 +66,9 @@ class EtcdKeepAliveLeaseManagerTest {
 
     @AfterAll
     public static void after() throws IOException {
-        try (EtcdCluster closeServer = server.cluster()) {
-            client.close();
+        try (
+                EtcdCluster closeServer = server.cluster();
+                Client closedClient = client) {
         }
     }
 }

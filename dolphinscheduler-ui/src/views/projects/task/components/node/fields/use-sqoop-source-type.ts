@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, h, watch, Ref } from 'vue'
+import { h, onMounted, Ref, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDatasource } from './use-sqoop-datasource'
 import { useCustomParams } from '.'
@@ -27,76 +27,100 @@ export function useSourceType(
   unCustomSpan: Ref<number>
 ): IJsonItem[] {
   const { t } = useI18n()
-  const mysqlSpan = ref(24)
+  const rdbmsSpan = ref(24)
   const tableSpan = ref(0)
   const editorSpan = ref(24)
   const columnSpan = ref(0)
   const hiveSpan = ref(0)
   const hdfsSpan = ref(0)
-  const datasourceSpan = ref(12)
+  const datasourceSpan = ref(24)
+  const isChange: any = ref(false)
+  const rdbmsSourceTypes = ref([
+    {
+      label: 'MYSQL',
+      value: 'MYSQL'
+    },
+    {
+      label: 'ORACLE',
+      value: 'ORACLE'
+    },
+    {
+      label: 'SQLSERVER',
+      value: 'SQLSERVER'
+    },
+    {
+      label: 'HANA',
+      value: 'HANA'
+    }
+  ] as IOption[])
+  const hadoopSourceTypes = ref([
+    {
+      label: 'HIVE',
+      value: 'HIVE'
+    },
+    {
+      label: 'HDFS',
+      value: 'HDFS'
+    }
+  ] as IOption[])
+  const sourceTypes = ref()
   const resetSpan = () => {
-    mysqlSpan.value =
-      unCustomSpan.value && model.sourceType === 'MYSQL' ? 24 : 0
-    tableSpan.value = mysqlSpan.value && model.srcQueryType === '0' ? 24 : 0
-    editorSpan.value = mysqlSpan.value && model.srcQueryType === '1' ? 24 : 0
+    rdbmsSpan.value =
+      unCustomSpan.value &&
+      rdbmsSourceTypes.value.some((source) => source.value === model.sourceType)
+        ? 24
+        : 0
+    tableSpan.value = rdbmsSpan.value && model.srcQueryType === '0' ? 24 : 0
+    editorSpan.value = rdbmsSpan.value && model.srcQueryType === '1' ? 24 : 0
     columnSpan.value = tableSpan.value && model.srcColumnType === '1' ? 24 : 0
     hiveSpan.value = unCustomSpan.value && model.sourceType === 'HIVE' ? 24 : 0
     hdfsSpan.value = unCustomSpan.value && model.sourceType === 'HDFS' ? 24 : 0
     datasourceSpan.value =
-      unCustomSpan.value && model.sourceType === 'MYSQL' ? 12 : 0
+      unCustomSpan.value &&
+      rdbmsSourceTypes.value.some((source) => source.value === model.sourceType)
+        ? 24
+        : 0
   }
-  const sourceTypes = ref([
-    {
-      label: 'MYSQL',
-      value: 'MYSQL'
+  const resetValue = () => {
+    if (!isChange.value) {
+      isChange.value = true
+      return
     }
-  ] as IOption[])
-
+    switch (model.modelType) {
+      case 'import':
+        model.sourceMysqlDatasource = ''
+        break
+      case 'export':
+        model.sourceHiveDatabase = ''
+        model.sourceHiveTable = ''
+        model.sourceHivePartitionKey = ''
+        model.sourceHivePartitionValue = ''
+        model.sourceHdfsExportDir = ''
+        break
+      default:
+        model.sourceMysqlDatasource = ''
+    }
+  }
   const getSourceTypesByModelType = (modelType: ModelType): IOption[] => {
     switch (modelType) {
       case 'import':
-        return [
-          {
-            label: 'MYSQL',
-            value: 'MYSQL'
-          }
-        ]
+        return rdbmsSourceTypes.value
       case 'export':
-        return [
-          {
-            label: 'HDFS',
-            value: 'HDFS'
-          },
-          {
-            label: 'HIVE',
-            value: 'HIVE'
-          }
-        ]
+        return hadoopSourceTypes.value
       default:
-        return [
-          {
-            label: 'MYSQL',
-            value: 'MYSQL'
-          },
-          {
-            label: 'HDFS',
-            value: 'HDFS'
-          },
-          {
-            label: 'HIVE',
-            value: 'HIVE'
-          }
-        ]
+        return rdbmsSourceTypes.value
     }
   }
+
+  onMounted(() => {
+    sourceTypes.value = [...rdbmsSourceTypes.value]
+  })
 
   watch(
     () => model.modelType,
     (modelType: ModelType) => {
       sourceTypes.value = getSourceTypesByModelType(modelType)
-      if (!model.sourceType) {
-        model.sourceType = sourceTypes.value[0].value
-      }
+      model.sourceType = sourceTypes.value[0].value
     }
   )
   watch(
@@ -107,6 +131,7 @@ export function useSourceType(
       model.srcColumnType
     ],
     () => {
+      resetValue()
       resetSpan()
     }
   )
@@ -139,7 +164,7 @@ export function useSourceType(
       type: 'radio',
       field: 'srcQueryType',
       name: t('project.node.model_type'),
-      span: mysqlSpan,
+      span: rdbmsSpan,
       options: [
         {
           label: t('project.node.form'),
@@ -294,14 +319,14 @@ export function useSourceType(
       field: 'mapColumnHive',
       name: 'map_column_hive',
       isSimple: true,
-      span: mysqlSpan
+      span: rdbmsSpan
     }),
     ...useCustomParams({
       model,
       field: 'mapColumnJava',
       name: 'map_column_java',
       isSimple: true,
-      span: mysqlSpan
+      span: rdbmsSpan
     })
   ]
 }

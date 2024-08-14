@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.executor.ExecuteContext;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.ProcessDefinitionService;
+import org.apache.dolphinscheduler.api.service.ProcessLineageService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -55,7 +56,6 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -83,16 +83,16 @@ import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
-import org.apache.dolphinscheduler.extract.master.ILogicTaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.master.IStreamingTaskOperator;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceExecutionEventListener;
 import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.StreamingTaskTriggerResponse;
-import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceForceStartRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStateChangeEvent;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -107,6 +107,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -186,6 +187,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Autowired
     private TenantMapper tenantMapper;
 
+    @Autowired
+    private ProcessLineageService processLineageService;
+
     /**
      * execute process instance
      *
@@ -205,7 +209,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
      * @param environmentCode           environment code
      * @param runMode                   run mode
      * @param timeout                   timeout
-     * @param startParams               the global param values which pass to new process instance
+     * @param startParamList               the global param values which pass to new process instance
      * @param expectedParallelismNumber the expected parallelism number when execute complement in parallel mode
      * @param testFlag testFlag
      * @param executionOrder the execution order when complementing data
@@ -221,7 +225,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                    Priority processInstancePriority, String workerGroup,
                                                    String tenantCode,
                                                    Long environmentCode, Integer timeout,
-                                                   Map<String, String> startParams, Integer expectedParallelismNumber,
+                                                   List<Property> startParamList, Integer expectedParallelismNumber,
                                                    int dryRun, int testFlag,
                                                    ComplementDependentMode complementDependentMode, Integer version,
                                                    boolean allLevelDependent, ExecutionOrder executionOrder) {
@@ -260,7 +264,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkScheduleTimeNumExceed(commandType, cronTime);
         checkMasterExists();
 
-        long triggerCode = CodeGenerateUtils.getInstance().genCode();
+        long triggerCode = CodeGenerateUtils.genCode();
 
         /**
          * create command
@@ -271,7 +275,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         startNodeList,
                         cronTime, warningType, loginUser.getId(), warningGroupId, runMode, processInstancePriority,
                         workerGroup, tenantCode,
-                        environmentCode, startParams, expectedParallelismNumber, dryRun, testFlag,
+                        environmentCode, startParamList, expectedParallelismNumber, dryRun, testFlag,
                         complementDependentMode, allLevelDependent, executionOrder);
 
         if (create > 0) {
@@ -291,7 +295,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     private void checkMasterExists() {
         // check master server exists
-        List<Server> masterServers = monitorService.getServerListFromRegistry(true);
+        List<Server> masterServers = monitorService.listServer(RegistryNodeType.MASTER);
 
         // no master
         if (masterServers.isEmpty()) {
@@ -361,7 +365,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         // find out the process definition code
         Set<Long> processDefinitionCodeSet = new HashSet<>();
         taskDefinitions.stream()
-                .filter(task -> TaskConstants.TASK_TYPE_SUB_PROCESS.equalsIgnoreCase(task.getTaskType())).forEach(
+                .filter(task -> TaskTypeUtils.isSubWorkflowTask(task.getTaskType())).forEach(
                         taskDefinition -> processDefinitionCodeSet.add(Long.valueOf(
                                 JSONUtils.getNodeString(taskDefinition.getTaskParams(),
                                         CMD_PARAM_SUB_PROCESS_DEFINE_CODE))));
@@ -551,16 +555,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         Map<String, Object> result = new HashMap<>();
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check process instance exist
-        ProcessInstance processInstance = processInstanceMapper.selectById(taskGroupQueue.getProcessId());
-        if (processInstance == null) {
-            log.error("Process instance does not exist, projectCode:{}, processInstanceId:{}.",
-                    taskGroupQueue.getProjectCode(), taskGroupQueue.getProcessId());
-            putMsg(result, Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId());
-            return result;
-        }
-
+        ProcessInstance processInstance = processInstanceDao.queryOptionalById(taskGroupQueue.getProcessId())
+                .orElseThrow(
+                        () -> new ServiceException(Status.PROCESS_INSTANCE_NOT_EXIST, taskGroupQueue.getProcessId()));
         checkMasterExists();
-        return forceStart(processInstance, taskGroupQueue);
+
+        if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
+            throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);
+        }
+        taskGroupQueue.setForceStart(Flag.YES.getCode());
+        taskGroupQueue.setUpdateTime(new Date());
+        taskGroupQueueMapper.updateById(taskGroupQueue);
+
+        result.put(Constants.STATUS, Status.SUCCESS);
+        return result;
     }
 
     public void checkStartNodeList(String startNodeList, Long processDefinitionCode, int version) {
@@ -664,31 +672,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     /**
-     * prepare to update process instance command type and status
-     *
-     * @param processInstance process instance
-     * @return update result
-     */
-    private Map<String, Object> forceStart(ProcessInstance processInstance, TaskGroupQueue taskGroupQueue) {
-        Map<String, Object> result = new HashMap<>();
-        if (taskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
-            log.warn("Task group queue already starts, taskGroupQueueId:{}.", taskGroupQueue.getId());
-            putMsg(result, Status.TASK_GROUP_QUEUE_ALREADY_START);
-            return result;
-        }
-
-        taskGroupQueue.setForceStart(Flag.YES.getCode());
-        processService.updateTaskGroupQueue(taskGroupQueue);
-        log.info("Sending force start command to master: {}.", processInstance.getHost());
-        ILogicTaskInstanceOperator iLogicTaskInstanceOperator = SingletonJdkDynamicRpcClientProxyFactory
-                .getProxyClient(processInstance.getHost(), ILogicTaskInstanceOperator.class);
-        iLogicTaskInstanceOperator.forceStartTaskInstance(
-                new TaskInstanceForceStartRequest(processInstance.getId(), taskGroupQueue.getTaskId()));
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
      * check whether sub processes are offline before starting process definition
      *
      * @param processDefinitionCode process definition code
@@ -754,7 +737,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                               WarningType warningType, int executorId, Integer warningGroupId, RunMode runMode,
                               Priority processInstancePriority, String workerGroup, String tenantCode,
                               Long environmentCode,
-                              Map<String, String> startParams, Integer expectedParallelismNumber, int dryRun,
+                              List<Property> startParamList, Integer expectedParallelismNumber, int dryRun,
                               int testFlag, ComplementDependentMode complementDependentMode,
                               boolean allLevelDependent, ExecutionOrder executionOrder) {
 
@@ -783,8 +766,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         if (warningType != null) {
             command.setWarningType(warningType);
         }
-        if (startParams != null && startParams.size() > 0) {
-            cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
+        if (CollectionUtils.isNotEmpty(startParamList)) {
+            cmdParam.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParamList));
         }
         command.setCommandParam(JSONUtils.toJsonString(cmdParam));
         command.setExecutorId(executorId);
@@ -1020,7 +1003,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                                                                   boolean allLevelDependent) {
         List<DependentProcessDefinition> dependentProcessDefinitionList =
                 checkDependentProcessDefinitionValid(
-                        processService.queryDependentProcessDefinitionByProcessDefinitionCode(processDefinitionCode),
+                        processLineageService.queryDownstreamDependentProcessDefinitions(processDefinitionCode),
                         processDefinitionCycle, workerGroup,
                         processDefinitionCode);
 
@@ -1034,7 +1017,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 List<DependentProcessDefinition> childDependentList = childList
                         .stream()
                         .flatMap(dependentProcessDefinition -> checkDependentProcessDefinitionValid(
-                                processService.queryDependentProcessDefinitionByProcessDefinitionCode(
+                                processLineageService.queryDownstreamDependentProcessDefinitions(
                                         dependentProcessDefinition.getProcessDefinitionCode()),
                                 processDefinitionCycle,
                                 workerGroup,
@@ -1165,7 +1148,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkValidTenant(tenantCode);
         checkMasterExists();
         // todo dispatch improvement
-        List<Server> masterServerList = monitorService.getServerListFromRegistry(true);
+        List<Server> masterServerList = monitorService.listServer(RegistryNodeType.MASTER);
         Server server = masterServerList.get(0);
 
         StreamingTaskTriggerRequest taskExecuteStartMessage = new StreamingTaskTriggerRequest();

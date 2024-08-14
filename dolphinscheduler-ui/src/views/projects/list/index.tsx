@@ -29,6 +29,7 @@ import { useTable } from './use-table'
 import Card from '@/components/card'
 import Search from '@/components/input-search'
 import ProjectModal from './components/project-modal'
+import WorkerGroupModal from '@/views/projects/list/components/worker-group-modal'
 
 const list = defineComponent({
   name: 'list',
@@ -71,6 +72,15 @@ const list = defineComponent({
       requestData()
     }
 
+    const onCancelWorkerGroupModal = () => {
+      variables.showWorkerGroupModalRef = false
+    }
+
+    const onConfirmWorkerGroupModal = () => {
+      variables.showWorkerGroupModalRef = false
+      requestData()
+    }
+
     const handleChangePageSize = () => {
       variables.page = 1
       requestData()
@@ -95,6 +105,8 @@ const list = defineComponent({
       handleSearch,
       onCancelModal,
       onConfirmModal,
+      onCancelWorkerGroupModal,
+      onConfirmWorkerGroupModal,
       onClearSearch,
       handleChangePageSize,
       trim
@@ -159,6 +171,12 @@ const list = defineComponent({
           row={this.row}
           onCancelModal={this.onCancelModal}
           onConfirmModal={this.onConfirmModal}
+        />
+        <WorkerGroupModal
+          showModalRef={this.showWorkerGroupModalRef}
+          row={this.row}
+          onCancelModal={this.onCancelWorkerGroupModal}
+          onConfirmModal={this.onConfirmWorkerGroupModal}
         />
       </NSpace>
     )

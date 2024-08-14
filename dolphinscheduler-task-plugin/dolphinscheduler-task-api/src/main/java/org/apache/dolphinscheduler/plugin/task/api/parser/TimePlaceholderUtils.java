@@ -338,10 +338,10 @@ public class TimePlaceholderUtils {
      */
     public static String getPlaceHolderTime(String expression, Date date) {
         if (StringUtils.isBlank(expression)) {
-            return null;
+            throw new IllegalArgumentException("expression is null");
         }
         if (null == date) {
-            return null;
+            throw new IllegalArgumentException("date is null");
         }
         return calculateTime(expression, date);
     }
@@ -354,8 +354,9 @@ public class TimePlaceholderUtils {
      */
     private static String calculateTime(String expression, Date date) {
         // After N years: $[add_months(yyyyMMdd,12*N)], the first N months: $[add_months(yyyyMMdd,-N)], etc
-        String value;
-
+        if (date == null) {
+            throw new IllegalArgumentException("Cannot parse the expression: " + expression + ", date is null");
+        }
         try {
             if (expression.startsWith(TIMESTAMP)) {
                 String timeExpression = expression.substring(TIMESTAMP.length() + 1, expression.length() - 1);
@@ -366,19 +367,16 @@ public class TimePlaceholderUtils {
 
                 Date timestamp = DateUtils.parse(dateStr, PARAMETER_FORMAT_TIME);
 
-                value = String.valueOf(timestamp.getTime() / 1000);
-            } else if (expression.startsWith(YEAR_WEEK)) {
-                value = calculateYearWeek(expression, date);
-            } else {
-                Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
-                value = DateUtils.format(entry.getKey(), entry.getValue());
+                return String.valueOf(timestamp.getTime() / 1000);
             }
+            if (expression.startsWith(YEAR_WEEK)) {
+                return calculateYearWeek(expression, date);
+            }
+            Map.Entry<Date, String> entry = calcTimeExpression(expression, date);
+            return DateUtils.format(entry.getKey(), entry.getValue());
         } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw e;
+            throw new IllegalArgumentException("Unsupported placeholder expression: " + expression, e);
         }
-
-        return value;
     }
 
     /**

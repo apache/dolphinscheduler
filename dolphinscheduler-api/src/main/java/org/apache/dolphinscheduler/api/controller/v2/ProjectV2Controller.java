@@ -184,7 +184,7 @@ public class ProjectV2Controller extends BaseController {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return the projects which user have not permission to see
+     * @return the projects which user have no permission to see
      */
     @Operation(summary = "queryUnauthorizedProject", description = "QUERY_UNAUTHORIZED_PROJECT_NOTES")
     @Parameters({

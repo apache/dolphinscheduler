@@ -24,15 +24,17 @@ import { useEdit, useIsDetailPageStore } from './use-edit'
 import Card from '@/components/card'
 import MonacoEditor from '@/components/monaco-editor'
 import styles from '../index.module.scss'
+import { useDetailPageStore } from '@/views/resource/components/resource/table/use-table'
 
 export default defineComponent({
   name: 'ResourceEdit',
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const detailPageStore = useDetailPageStore()
     const isDetailPageStore = useIsDetailPageStore()
     isDetailPageStore.$reset()
-    
+
     const componentName = route.name
     // fullname is now the id of resources
     const fullName = String(router.currentRoute.value.query.prefix || '')
@@ -43,14 +45,22 @@ export default defineComponent({
     const { getResourceView, handleUpdateContent } = useEdit(state)
 
     const handleFileContent = () => {
-      isDetailPageStore.setIsDetailPage(true)
       state.fileForm.content = resourceViewRef.state.value.content
       handleUpdateContent(fullName, tenantCode)
+      updateDetailPage()
     }
 
     const handleReturn = () => {
-      isDetailPageStore.setIsDetailPage(true)
+      updateDetailPage()
       router.go(-1)
+    }
+
+    const updateDetailPage = () => {
+      isDetailPageStore.setIsDetailPage(true)
+      const pathSplit = fullName.split('/')
+      pathSplit.pop()
+      detailPageStore.fullName = pathSplit.join('/')
+      detailPageStore.tenantCode = tenantCode
     }
 
     const resourceViewRef = getResourceView(fullName, tenantCode)

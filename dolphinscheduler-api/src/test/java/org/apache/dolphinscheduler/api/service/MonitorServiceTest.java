@@ -98,13 +98,13 @@ public class MonitorServiceTest {
     public void testQueryMaster() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
         Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(getServerList());
-        assertDoesNotThrow(() -> monitorService.queryMaster(user));
+        assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.MASTER));
     }
 
     @Test
     public void testQueryWorker() {
         Mockito.when(registryClient.getServerList(RegistryNodeType.WORKER)).thenReturn(getServerList());
-        AssertionsHelper.assertDoesNotThrow(() -> monitorService.queryWorker(user));
+        AssertionsHelper.assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.WORKER));
     }
 
     @Test

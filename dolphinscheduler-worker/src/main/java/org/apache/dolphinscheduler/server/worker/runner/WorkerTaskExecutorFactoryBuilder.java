@@ -17,32 +17,47 @@
 
 package org.apache.dolphinscheduler.server.worker.runner;
 
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
 
-import javax.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import lombok.NonNull;
-import lombok.experimental.UtilityClass;
-
-@UtilityClass
+@Component
 public class WorkerTaskExecutorFactoryBuilder {
 
-    public static WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(@NonNull TaskExecutionContext taskExecutionContext,
-                                                                                                          @NonNull WorkerConfig workerConfig,
-                                                                                                          @NonNull WorkerMessageSender workerMessageSender,
-                                                                                                          @NonNull TaskPluginManager taskPluginManager,
-                                                                                                          @Nullable StorageOperate storageOperate,
-                                                                                                          @NonNull WorkerRegistryClient workerRegistryClient) {
+    @Autowired
+    private WorkerConfig workerConfig;
+
+    @Autowired
+    private WorkerMessageSender workerMessageSender;
+
+    @Autowired(required = false)
+    private StorageOperator storageOperator;
+
+    @Autowired
+    private WorkerRegistryClient workerRegistryClient;
+
+    public WorkerTaskExecutorFactoryBuilder(
+                                            WorkerConfig workerConfig,
+                                            WorkerMessageSender workerMessageSender,
+                                            WorkerTaskExecutorThreadPool workerManager,
+                                            StorageOperator storageOperator,
+                                            WorkerRegistryClient workerRegistryClient) {
+        this.workerConfig = workerConfig;
+        this.workerMessageSender = workerMessageSender;
+        this.storageOperator = storageOperator;
+        this.workerRegistryClient = workerRegistryClient;
+    }
+
+    public WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(TaskExecutionContext taskExecutionContext) {
         return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
                 workerConfig,
                 workerMessageSender,
-                taskPluginManager,
-                storageOperate,
+                storageOperator,
                 workerRegistryClient);
     }
 

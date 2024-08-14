@@ -20,6 +20,10 @@ package org.apache.dolphinscheduler.plugin.datasource.hana.param;
 import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,16 +31,13 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @ExtendWith(MockitoExtension.class)
-public class HanaDataSourceProcessorTest {
+class HanaDataSourceProcessorTest {
 
     private HanaDataSourceProcessor hanaDataSourceProcessor = new HanaDataSourceProcessor();
 
     @Test
-    public void testCreateConnectionParams() {
+    void testCreateConnectionParams() {
         Map<String, String> props = new HashMap<>();
         HanaDataSourceParamDTO mysqlDatasourceParamDTO = new HanaDataSourceParamDTO();
         mysqlDatasourceParamDTO.setUserName("root");
@@ -55,7 +56,7 @@ public class HanaDataSourceProcessorTest {
     }
 
     @Test
-    public void testCreateConnectionParams2() {
+    void testCreateConnectionParams2() {
         String connectionJson = "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:sap://localhost:30015\""
                 + ",\"database\":\"default\",\"jdbcUrl\":\"jdbc:sap://localhost:30015?currentschema=default\"}";
         HanaConnectionParam connectionParams = (HanaConnectionParam) hanaDataSourceProcessor
@@ -65,13 +66,13 @@ public class HanaDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDatasourceDriver() {
+    void testGetDatasourceDriver() {
         Assertions.assertEquals(DataSourceConstants.COM_HANA_DB_JDBC_DRIVER,
                 hanaDataSourceProcessor.getDatasourceDriver());
     }
 
     @Test
-    public void testGetJdbcUrl() {
+    void testGetJdbcUrl() {
         HanaConnectionParam hanaConnectionParam = new HanaConnectionParam();
         hanaConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015?currentschema=default");
         Assertions.assertEquals(
@@ -80,18 +81,18 @@ public class HanaDataSourceProcessorTest {
     }
 
     @Test
-    public void testGetDbType() {
+    void testGetDbType() {
         Assertions.assertEquals(DbType.HANA, hanaDataSourceProcessor.getDbType());
     }
 
     @Test
-    public void testGetValidationQuery() {
+    void testGetValidationQuery() {
         Assertions.assertEquals(DataSourceConstants.HANA_VALIDATION_QUERY,
                 hanaDataSourceProcessor.getValidationQuery());
     }
 
     @Test
-    public void testGetDatasourceUniqueId() {
+    void testGetDatasourceUniqueId() {
         HanaConnectionParam mysqlConnectionParam = new HanaConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:sap://localhost:30015?currentschema=default");
         mysqlConnectionParam.setUser("root");

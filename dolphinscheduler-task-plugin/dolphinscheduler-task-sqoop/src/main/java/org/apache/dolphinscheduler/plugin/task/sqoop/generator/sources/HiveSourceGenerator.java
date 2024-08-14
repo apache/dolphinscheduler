@@ -33,38 +33,49 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * hive source generator
- */
+/** hive source generator */
 @Slf4j
 public class HiveSourceGenerator implements ISourceGenerator {
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+    public String generate(
+                           SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder hiveSourceSb = new StringBuilder();
 
         try {
             SourceHiveParameter sourceHiveParameter =
-                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceHiveParameter.class);
+                    JSONUtils.parseObject(
+                            sqoopParameters.getSourceParams(), SourceHiveParameter.class);
 
             if (null != sourceHiveParameter) {
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveDatabase())) {
-                    hiveSourceSb.append(SPACE).append(HCATALOG_DATABASE)
-                            .append(SPACE).append(sourceHiveParameter.getHiveDatabase());
+                    hiveSourceSb
+                            .append(SPACE)
+                            .append(HCATALOG_DATABASE)
+                            .append(SPACE)
+                            .append(sourceHiveParameter.getHiveDatabase());
                 }
 
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHiveTable())) {
-                    hiveSourceSb.append(SPACE).append(HCATALOG_TABLE)
-                            .append(SPACE).append(sourceHiveParameter.getHiveTable());
+                    hiveSourceSb
+                            .append(SPACE)
+                            .append(HCATALOG_TABLE)
+                            .append(SPACE)
+                            .append(sourceHiveParameter.getHiveTable());
                 }
 
                 if (StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionKey())
                         && StringUtils.isNotEmpty(sourceHiveParameter.getHivePartitionValue())) {
-                    hiveSourceSb.append(SPACE).append(HCATALOG_PARTITION_KEYS)
-                            .append(SPACE).append(sourceHiveParameter.getHivePartitionKey())
-                            .append(SPACE).append(HCATALOG_PARTITION_VALUES)
-                            .append(SPACE).append(sourceHiveParameter.getHivePartitionValue());
+                    hiveSourceSb
+                            .append(SPACE)
+                            .append(HCATALOG_PARTITION_KEYS)
+                            .append(SPACE)
+                            .append(sourceHiveParameter.getHivePartitionKey())
+                            .append(SPACE)
+                            .append(HCATALOG_PARTITION_VALUES)
+                            .append(SPACE)
+                            .append(sourceHiveParameter.getHivePartitionValue());
                 }
             }
         } catch (Exception e) {

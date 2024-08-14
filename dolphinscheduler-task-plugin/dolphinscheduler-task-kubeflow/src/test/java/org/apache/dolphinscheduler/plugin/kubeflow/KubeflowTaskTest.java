@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -127,7 +126,6 @@ public class KubeflowTaskTest {
         }
         Mockito.when(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml())
                 .thenReturn(kubeflowParameters.getClusterYAML());
-        TaskExecutionContextCacheManager.cacheTaskExecutionContext(taskExecutionContext);
 
         return taskExecutionContext;
     }

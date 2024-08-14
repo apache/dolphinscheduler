@@ -43,7 +43,7 @@ public class FeiShuSenderTest {
         alertData.setContent("feishu test content");
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         AlertResult alertResult = feiShuSender.sendFeiShuMsg(alertData);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
@@ -87,12 +87,12 @@ public class FeiShuSenderTest {
 
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         AlertResult alertResult = feiShuSender.checkSendFeiShuSendMsgResult("");
-        Assertions.assertFalse(Boolean.valueOf(alertResult.getStatus()));
+        Assertions.assertFalse(alertResult.isSuccess());
         AlertResult alertResult2 = feiShuSender.checkSendFeiShuSendMsgResult("123");
         Assertions.assertEquals("send fei shu msg fail", alertResult2.getMessage());
 
         String response = "{\"StatusCode\":\"0\",\"extra\":\"extra\",\"StatusMessage\":\"StatusMessage\"}";
         AlertResult alertResult3 = feiShuSender.checkSendFeiShuSendMsgResult(response);
-        Assertions.assertTrue(Boolean.valueOf(alertResult3.getStatus()));
+        Assertions.assertTrue(alertResult3.isSuccess());
     }
 }

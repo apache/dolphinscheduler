@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -130,6 +131,12 @@ public class DamengDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new DamengDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.dm);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.dm);
     }
 
     private String transformOther(Map<String, String> paramMap) {

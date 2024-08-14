@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.scheduler.api;
 
 public class SchedulerException extends RuntimeException {
 
-    public SchedulerException(String message) {
-        super(message);
+    public SchedulerException(SchedulerExceptionEnum schedulerExceptionEnum) {
+        super("Scheduler[" + schedulerExceptionEnum.getCode() + "] " + schedulerExceptionEnum.getMessage());
     }
 
-    public SchedulerException(String message, Throwable cause) {
-        super(message, cause);
+    public SchedulerException(SchedulerExceptionEnum schedulerExceptionEnum, Throwable cause) {
+        super("Scheduler[" + schedulerExceptionEnum.getCode() + "] " + schedulerExceptionEnum.getMessage(), cause);
     }
 
 }

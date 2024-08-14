@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
@@ -41,6 +40,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -157,6 +157,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         handleDefaultWorkGroup(workerGroupMapper, workerGroup, loginUser, otherParamsJson);
         log.info("Worker group save complete, workerGroupName:{}.", workerGroup.getName());
         putMsg(result, Status.SUCCESS);
+        result.put(Constants.DATA_LIST, workerGroup);
         return result;
     }
 
@@ -356,12 +357,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             workerGroups = workerGroupMapper.queryAllWorkerGroup();
         }
         boolean containDefaultWorkerGroups = workerGroups.stream()
-                .anyMatch(workerGroup -> Constants.DEFAULT_WORKER_GROUP.equals(workerGroup.getName()));
+                .anyMatch(workerGroup -> WorkerGroupUtils.isWorkerGroupEmpty(workerGroup.getName()));
         if (!containDefaultWorkerGroups) {
             // there doesn't exist a default WorkerGroup, we will add all worker to the default worker group.
             Set<String> activeWorkerNodes = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
             WorkerGroup defaultWorkerGroup = new WorkerGroup();
-            defaultWorkerGroup.setName(Constants.DEFAULT_WORKER_GROUP);
+            defaultWorkerGroup.setName(WorkerGroupUtils.getDefaultWorkerGroup());
             defaultWorkerGroup.setAddrList(String.join(Constants.COMMA, activeWorkerNodes));
             defaultWorkerGroup.setCreateTime(new Date());
             defaultWorkerGroup.setUpdateTime(new Date());
@@ -428,27 +429,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         result.put(Constants.DATA_LIST, serverNodeList);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    @Override
-    public String getTaskWorkerGroup(TaskInstance taskInstance) {
-        if (taskInstance == null) {
-            return null;
-        }
-
-        String workerGroup = taskInstance.getWorkerGroup();
-
-        if (StringUtils.isNotEmpty(workerGroup)) {
-            return workerGroup;
-        }
-        int processInstanceId = taskInstance.getProcessInstanceId();
-        ProcessInstance processInstance = processService.findProcessInstanceById(processInstanceId);
-
-        if (processInstance != null) {
-            return processInstance.getWorkerGroup();
-        }
-        log.info("task : {} will use default worker group", taskInstance.getId());
-        return Constants.DEFAULT_WORKER_GROUP;
     }
 
     @Override

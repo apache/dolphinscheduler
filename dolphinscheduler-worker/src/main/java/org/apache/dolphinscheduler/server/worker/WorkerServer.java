@@ -17,20 +17,27 @@
 
 package org.apache.dolphinscheduler.server.worker;
 
+import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.server.worker.message.MessageRetryRunner;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerRpcServer;
-import org.apache.dolphinscheduler.server.worker.runner.GlobalTaskInstanceWaitingQueueLooper;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerManagerThread;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -43,23 +50,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.context.annotation.Import;
 
-@SpringBootApplication
-@EnableTransactionManagement
-@ComponentScan(basePackages = "org.apache.dolphinscheduler")
 @Slf4j
+@Import({CommonConfiguration.class,
+        StorageConfiguration.class,
+        RegistryConfiguration.class})
+@SpringBootApplication
 public class WorkerServer implements IStoppable {
 
     @Autowired
-    private WorkerManagerThread workerManagerThread;
-
-    @Autowired
     private WorkerRegistryClient workerRegistryClient;
-
-    @Autowired
-    private TaskPluginManager taskPluginManager;
 
     @Autowired
     private WorkerRpcServer workerRpcServer;
@@ -68,7 +69,7 @@ public class WorkerServer implements IStoppable {
     private MessageRetryRunner messageRetryRunner;
 
     @Autowired
-    private GlobalTaskInstanceWaitingQueueLooper globalTaskInstanceWaitingQueueLooper;
+    private MetricsProvider metricsProvider;
 
     /**
      * worker server startup, not use web service
@@ -76,6 +77,8 @@ public class WorkerServer implements IStoppable {
      * @param args arguments
      */
     public static void main(String[] args) {
+        WorkerServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
+        Thread.setDefaultUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance());
         Thread.currentThread().setName(Constants.THREAD_NAME_WORKER_SERVER);
         SpringApplication.run(WorkerServer.class);
     }
@@ -83,15 +86,26 @@ public class WorkerServer implements IStoppable {
     @PostConstruct
     public void run() {
         this.workerRpcServer.start();
-        this.taskPluginManager.loadPlugin();
+        TaskPluginManager.loadTaskPlugin();
+        DataSourceProcessorProvider.initialize();
 
         this.workerRegistryClient.setRegistryStoppable(this);
         this.workerRegistryClient.start();
 
-        this.workerManagerThread.start();
-
         this.messageRetryRunner.start();
-        this.globalTaskInstanceWaitingQueueLooper.start();
+
+        WorkerServerMetrics.registerWorkerCpuUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getSystemCpuUsagePercentage();
+        });
+        WorkerServerMetrics.registerWorkerMemoryAvailableGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return (systemMetrics.getSystemMemoryMax() - systemMetrics.getSystemMemoryUsed()) / 1024.0 / 1024 / 1024;
+        });
+        WorkerServerMetrics.registerWorkerMemoryUsageGauge(() -> {
+            SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+            return systemMetrics.getJvmMemoryUsedPercentage();
+        });
 
         /*
          * registry hooks, which are called before the process exits
@@ -114,7 +128,13 @@ public class WorkerServer implements IStoppable {
                 WorkerRpcServer closedWorkerRpcServer = workerRpcServer;
                 WorkerRegistryClient closedRegistryClient = workerRegistryClient) {
             log.info("Worker server is stopping, current cause : {}", cause);
-            // kill running tasks
+            // todo: we need to remove this method
+            // since for some task, we need to take-over the remote task after the worker restart
+            // and if the worker crash, the `killAllRunningTasks` will not be execute, this will cause there exist two
+            // kind of situation:
+            // 1. If the worker is stop by kill, the tasks will be kill.
+            // 2. If the worker is stop by kill -9, the tasks will not be kill.
+            // So we don't need to kill the tasks.
             this.killAllRunningTasks();
         } catch (Exception e) {
             log.error("Worker server stop failed, current cause: {}", cause, e);
@@ -126,28 +146,32 @@ public class WorkerServer implements IStoppable {
     @Override
     public void stop(String cause) {
         close(cause);
+
+        // make sure exit after server closed, don't call System.exit in close logic, will cause deadlock if close
+        // multiple times at the same time
+        System.exit(1);
     }
 
     public void killAllRunningTasks() {
-        Collection<TaskExecutionContext> taskRequests = TaskExecutionContextCacheManager.getAllTaskRequestList();
-        if (CollectionUtils.isEmpty(taskRequests)) {
+        Collection<WorkerTaskExecutor> workerTaskExecutors = WorkerTaskExecutorHolder.getAllTaskExecutor();
+        if (CollectionUtils.isEmpty(workerTaskExecutors)) {
             return;
         }
-        log.info("Worker begin to kill all cache task, task size: {}", taskRequests.size());
+        log.info("Worker begin to kill all cache task, task size: {}", workerTaskExecutors.size());
         int killNumber = 0;
-        for (TaskExecutionContext taskRequest : taskRequests) {
+        for (WorkerTaskExecutor workerTaskExecutor : workerTaskExecutors) {
             // kill task when it's not finished yet
             try {
-                LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getProcessInstanceId(),
-                        taskRequest.getTaskInstanceId());
-                if (ProcessUtils.kill(taskRequest)) {
+                TaskExecutionContext taskExecutionContext = workerTaskExecutor.getTaskExecutionContext();
+                LogUtils.setTaskInstanceIdMDC(taskExecutionContext.getTaskInstanceId());
+                if (ProcessUtils.kill(taskExecutionContext)) {
                     killNumber++;
                 }
             } finally {
                 LogUtils.removeWorkflowAndTaskInstanceIdMDC();
             }
         }
-        log.info("Worker after kill all cache task, task size: {}, killed number: {}", taskRequests.size(),
+        log.info("Worker after kill all cache task, task size: {}, killed number: {}", workerTaskExecutors.size(),
                 killNumber);
     }
 }

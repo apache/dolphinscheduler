@@ -70,14 +70,16 @@ public class K8sTask extends AbstractK8sTask {
         }
 
         k8sTaskExecutionContext =
-                k8sTaskParameters.generateExtendedContext(taskExecutionContext.getResourceParametersHelper());
-        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
+                k8sTaskParameters.generateK8sTaskExecutionContext(taskExecutionContext.getResourceParametersHelper(),
+                        k8sTaskParameters.getDatasource());
         k8sConnectionParam =
                 (K8sConnectionParam) DataSourceUtils.buildConnectionParams(DbType.valueOf(k8sTaskParameters.getType()),
                         k8sTaskExecutionContext.getConnectionParams());
         String kubeConfig = k8sConnectionParam.getKubeConfig();
         k8sTaskParameters.setNamespace(k8sConnectionParam.getNamespace());
         k8sTaskParameters.setKubeConfig(kubeConfig);
+        k8sTaskExecutionContext.setConfigYaml(kubeConfig);
+        taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
         log.info("Initialize k8s task params:{}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
     }
 

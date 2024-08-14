@@ -30,24 +30,6 @@
         ${alias}.flag, ${alias}.is_cache, ${alias}.cache_key, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group,${alias}.environment_code , ${alias}.executor_id,
         ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.task_params, ${alias}.var_pool, ${alias}.dry_run, ${alias}.test_flag, ${alias}.task_group_id, ${alias}.task_execute_type
     </sql>
-    <update id="setFailoverByHostAndStateArray">
-        update t_ds_task_instance
-        set state = #{destStatus}
-        where host = #{host}
-        <if test="states != null and states.length != 0">
-            and state in
-            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
-    </update>
-    <select id="queryTaskByProcessIdAndState" resultType="java.lang.Integer">
-        select id
-        from t_ds_task_instance
-        WHERE  process_instance_id = #{processInstanceId}
-        and state = #{state}
-        and flag = 1
-    </select>
     <select id="findValidTaskListByProcessId" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>
@@ -62,21 +44,6 @@
         <include refid="baseSql"/>
         from t_ds_task_instance
         WHERE process_instance_id = #{workflowInstanceId}
-    </select>
-    <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select
-        <include refid="baseSql"/>
-        from t_ds_task_instance
-        where 1 = 1
-        <if test="host != null and host != ''">
-            and host = #{host}
-        </if>
-        <if test="states != null and states.length != 0">
-            and state in
-            <foreach collection="states" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
     </select>
 
     <select id="countTaskInstanceStateByProjectCodes" resultType="org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto">
@@ -118,32 +85,7 @@
         </if>
         group by t.state
     </select>
-    <select id="countTaskInstanceStateByProjectCodesAndStatesBySubmitTime" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
-        select
-        state, count(0) as count
-        from t_ds_task_instance t
-        left join t_ds_task_definition_log d on d.code=t.task_code and d.version=t.task_definition_version
-        where 1=1
-        <if test="states != null and states.size != 0">
-            and t.state in
-            <foreach collection="states" index="index" item="state" open="(" separator="," close=")">
-                #{state.code}
-            </foreach>
-        </if>
-        <if test="projectCodes != null and projectCodes.length != 0">
-            and d.project_code in
-            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
-        <if test="startTime != null">
-            and t.submit_time <![CDATA[ > ]]> #{startTime}
-        </if>
-        <if test="endTime != null">
-            and t.submit_time <![CDATA[ <= ]]> #{endTime}
-        </if>
-        group by t.state
-    </select>
+
     <select id="countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2" resultType="org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount">
         select
         state, count(0) as count
@@ -181,15 +123,7 @@
         </if>
         group by t.state
     </select>
-    <select id="queryByInstanceIdAndName" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select
-        <include refid="baseSql"/>
-        from t_ds_task_instance
-        where process_instance_id = #{processInstanceId}
-        and name = #{name}
-        and flag = 1
-        limit 1
-    </select>
+
     <select id="queryByInstanceIdAndCode" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>
@@ -229,24 +163,7 @@
             </foreach>
         </if>
     </select>
-    <select id="countTask" resultType="java.lang.Integer">
-        select count(1) as count
-        from t_ds_task_instance task,t_ds_task_definition_log define
-        where task.task_code=define.code
-        and task.task_definition_version=define.version
-        <if test="projectCodes != null and projectCodes.length != 0">
-            and define.project_code in
-            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
-        <if test="taskIds != null and taskIds.length != 0">
-            and task.id in
-            <foreach collection="taskIds" index="index" item="i" open="(" separator="," close=")">
-                #{i}
-            </foreach>
-        </if>
-    </select>
+
     <select id="queryTaskInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>
@@ -330,16 +247,6 @@
         </if>
         order by start_time desc
     </select>
-    <select id="loadAllInfosNoRelease" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
-        select
-        <include refid="baseSqlV2">
-            <property name="alias" value="instance"/>
-        </include>
-        from t_ds_task_instance instance
-        left join t_ds_task_group_queue que on instance.id = que.task_id
-        where instance.process_instance_id = #{processInstanceId}
-        and que.status = #{status}
-    </select>
     <select id="findLastTaskInstances" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSqlV2">
@@ -350,27 +257,25 @@
         select task_code, max(end_time) as max_end_time
         from t_ds_task_instance
         where 1=1 and test_flag = #{testFlag}
+        and instance.process_instance_id = #{processInstanceId}
         <if test="taskCodes != null and taskCodes.size() != 0">
             and task_code in
             <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
                 #{i}
             </foreach>
         </if>
-        <if test="startTime!=null and endTime != null">
-            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
-        </if>
         group by task_code
         ) t_max
-        on instance.task_code = t_max.task_code and instance.end_time = t_max.max_end_time
+        on instance.process_instance_id = t_max.process_instance_id
+        and instance.task_code = t_max.task_code
+        and instance.end_time = t_max.max_end_time
     </select>
     <select id="findLastTaskInstance" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>
         from t_ds_task_instance
-        where task_code = #{taskCode}
-        <if test="startTime!=null and endTime != null">
-            and start_time <![CDATA[ >= ]]> #{startTime} and start_time <![CDATA[ <= ]]> #{endTime}
-        </if>
+        where process_instance_id = #{processInstanceId}
+        and task_code = #{taskCode}
         order by end_time desc limit 1
     </select>
 

@@ -36,7 +36,7 @@ public interface TriggerRelationMapper extends BaseMapper<TriggerRelation> {
      * @param jobId
      * @return
      */
-    TriggerRelation queryByTypeAndJobId(@Param("triggerType") Integer triggerType, @Param("jobId") int jobId);
+    List<TriggerRelation> queryByTypeAndJobId(@Param("triggerType") Integer triggerType, @Param("jobId") int jobId);
 
     /**
      * query triggerRelation by code

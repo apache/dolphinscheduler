@@ -179,8 +179,9 @@ public class TaskDefinition {
     private int delayTime;
 
     /**
-     * resource ids
+     * resource ids we do
      */
+    @Deprecated
     private String resourceIds;
 
     /**

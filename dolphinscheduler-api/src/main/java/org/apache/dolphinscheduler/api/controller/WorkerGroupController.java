@@ -22,6 +22,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_ADDRESS_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKER_GROUP_FAIL;
 import static org.apache.dolphinscheduler.api.enums.Status.SAVE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -75,11 +77,12 @@ public class WorkerGroupController extends BaseController {
             @Parameter(name = "name", description = "WORKER_GROUP_NAME", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "addrList", description = "WORKER_ADDR_LIST", required = true, schema = @Schema(implementation = String.class)),
             @Parameter(name = "description", description = "WORKER_DESC", required = false, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "otherParamsJson", description = "WORKER_PARMS_JSON", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "otherParamsJson", description = "WORKER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class)),
     })
     @PostMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SAVE_ERROR)
+    @OperatorLog(auditType = AuditType.WORKER_GROUP_CREATE)
     public Result saveWorkerGroup(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "id", required = false, defaultValue = "0") int id,
                                   @RequestParam(value = "name") String name,
@@ -147,6 +150,7 @@ public class WorkerGroupController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
+    @OperatorLog(auditType = AuditType.WORKER_GROUP_DELETE)
     public Result deleteWorkerGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable("id") Integer id) {
         Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
@@ -167,5 +171,4 @@ public class WorkerGroupController extends BaseController {
         Map<String, Object> result = workerGroupService.getWorkerAddressList();
         return returnDataList(result);
     }
-
 }

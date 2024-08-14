@@ -85,7 +85,7 @@ public class ProcessDefinitionDemo {
             project = Project
                     .builder()
                     .name("demo")
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .description("")
                     .userId(loginUser.getId())
                     .userName(loginUser.getUserName())
@@ -167,7 +167,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 1; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -242,7 +242,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 2; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -334,7 +334,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 2; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -420,7 +420,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 4; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -537,7 +537,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 4; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -656,7 +656,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 3; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);
@@ -755,7 +755,7 @@ public class ProcessDefinitionDemo {
         List<Long> taskCodes = new ArrayList<>();
         try {
             for (int i = 0; i < 1; i++) {
-                taskCodes.add(CodeGenerateUtils.getInstance().genCode());
+                taskCodes.add(CodeGenerateUtils.genCode());
             }
         } catch (CodeGenerateUtils.CodeGenerateException e) {
             log.error("task code get error, ", e);

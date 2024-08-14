@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.sagemaker.param;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -36,7 +37,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 @Slf4j
-public class SagemakerDataSourceProcessor implements DataSourceProcessor {
+public class SagemakerDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -56,7 +57,7 @@ public class SagemakerDataSourceProcessor implements DataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         SagemakerConnectionParam baseConnectionParam = (SagemakerConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(),
                 PasswordUtils.encodePassword(baseConnectionParam.getUserName()),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()),
                 PasswordUtils.encodePassword(baseConnectionParam.getAwsRegion()));

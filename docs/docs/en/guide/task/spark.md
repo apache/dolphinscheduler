@@ -24,6 +24,7 @@ Spark task type for executing Spark application. When executing the Spark task, 
 |----------------------------|------------------------------------------------------------------------------------------------------------------------------------|
 | Program type               | Supports Java, Scala, Python, and SQL.                                                                                             |
 | The class of main function | The **full path** of Main Class, the entry point of the Spark program.                                                             |
+| Master                     | The The master URL for the cluster.                                                                                                |
 | Main jar package           | The Spark jar package (upload by Resource Center).                                                                                 |
 | SQL scripts                | SQL statements in .sql files that Spark sql runs.                                                                                  |
 | Deployment mode            | <ul><li>spark submit supports three modes: cluster, client and local.</li><li>spark sql supports client and local modes.</li></ul> |
@@ -35,7 +36,7 @@ Spark task type for executing Spark application. When executing the Spark task, 
 | Executor memory size       | Set the size of Executor memories, which can be set according to the actual production environment.                                |
 | Yarn queue                 | Set the yarn queue, use `default` queue by default.                                                                                |
 | Main program parameters    | Set the input parameters of the Spark program and support the substitution of custom parameter variables.                          |
-| Optional parameters        | Support `--jars`, `--files`,` --archives`, `--conf` format.                                                                        |
+| Optional parameters        | Set the spark command options, such as `--jars`, `--files`,` --archives`, `--conf`.                                                |
 | Resource                   | Appoint resource files in the `Resource` if parameters refer to them.                                                              |
 | Custom parameter           | It is a local user-defined parameter for Spark, and will replace the content with `${variable}` in the script.                     |
 | Predecessor task           | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task.         |

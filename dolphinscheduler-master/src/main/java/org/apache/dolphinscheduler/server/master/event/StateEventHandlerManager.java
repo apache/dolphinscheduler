@@ -24,14 +24,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class StateEventHandlerManager {
 
     private static final Map<StateEventType, StateEventHandler> stateEventHandlerMap = new HashMap<>();
 
     static {
         ServiceLoader.load(StateEventHandler.class)
-                .forEach(stateEventHandler -> stateEventHandlerMap.put(stateEventHandler.getEventType(),
-                        stateEventHandler));
+                .forEach(stateEventHandler -> {
+                    log.info("Initialize StateEventHandler: {} for eventType: {}",
+                            stateEventHandler.getClass().getName(), stateEventHandler.getEventType());
+                    stateEventHandlerMap.put(stateEventHandler.getEventType(), stateEventHandler);
+                });
     }
 
     public static Optional<StateEventHandler> getStateEventHandler(StateEventType stateEventType) {

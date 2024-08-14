@@ -39,9 +39,26 @@ public class AlertServerMetrics {
                     .description("Alert failure count")
                     .register(Metrics.globalRegistry);
 
+    private final Counter alertHeartBeatCounter =
+            Counter.builder("ds.alert.heartbeat.count")
+                    .description("alert heartbeat count")
+                    .register(Metrics.globalRegistry);
+
     public void registerPendingAlertGauge(final Supplier<Number> supplier) {
         Gauge.builder("ds.alert.pending", supplier)
                 .description("Number of pending alert")
+                .register(Metrics.globalRegistry);
+    }
+
+    public void registerSendingAlertGauge(final Supplier<Number> supplier) {
+        Gauge.builder("ds.alert.sending", supplier)
+                .description("Number of sending alert")
+                .register(Metrics.globalRegistry);
+    }
+
+    public static void registerUncachedException(final Supplier<Number> supplier) {
+        Gauge.builder("ds.alert.uncached.exception", supplier)
+                .description("number of uncached exception")
                 .register(Metrics.globalRegistry);
     }
 
@@ -53,4 +70,7 @@ public class AlertServerMetrics {
         alertFailCounter.increment();
     }
 
+    public void incAlertHeartbeatCount() {
+        alertHeartBeatCounter.increment();
+    }
 }

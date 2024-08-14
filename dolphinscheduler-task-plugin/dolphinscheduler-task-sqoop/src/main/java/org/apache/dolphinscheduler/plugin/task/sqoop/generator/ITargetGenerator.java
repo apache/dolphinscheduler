@@ -20,17 +20,16 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.generator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
-/**
- * Target Generator Interface
- */
+/** Target Generator Interface */
 public interface ITargetGenerator {
 
     /**
      * generate the target script
      *
-     * @param sqoopParameters      sqoopParameters
+     * @param sqoopParameters sqoopParameters
      * @param sqoopTaskExecutionContext sqoopTaskExecutionContext
      * @return target script
      */
-    String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext);
+    String generate(
+                    SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext);
 }

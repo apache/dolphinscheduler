@@ -50,7 +50,6 @@ import org.apache.dolphinscheduler.plugin.task.dq.utils.SparkArgsUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -117,6 +116,7 @@ public class DataQualityTask extends AbstractYarnTask {
         DataQualityConfiguration dataQualityConfiguration =
                 ruleManager.generateDataQualityParameter();
 
+        log.info("data quality configuration: {}", JSONUtils.toPrettyJsonString(dataQualityConfiguration));
         dataQualityParameters
                 .getSparkParameters()
                 .setMainArgs("\""
@@ -177,9 +177,7 @@ public class DataQualityTask extends AbstractYarnTask {
 
     protected void setMainJarName() {
         ResourceInfo mainJar = new ResourceInfo();
-        String basePath = System.getProperty("user.dir").replace(File.separator + "bin", "");
-        mainJar.setResourceName(
-                basePath + File.separator + "libs" + File.separator + CommonUtils.getDataQualityJarName());
+        mainJar.setResourceName(CommonUtils.getDataQualityJarPath());
         dataQualityParameters.getSparkParameters().setMainJar(mainJar);
     }
 

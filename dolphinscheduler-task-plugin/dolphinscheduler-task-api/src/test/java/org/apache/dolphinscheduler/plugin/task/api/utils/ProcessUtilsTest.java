@@ -38,6 +38,7 @@ public class ProcessUtilsTest {
         String command;
         MockedStatic<OSUtils> osUtilsMockedStatic = Mockito.mockStatic(OSUtils.class);
         if (SystemUtils.IS_OS_MAC) {
+            pids = "-+= 6279 sudo -+- 6282 558_1497.sh --- 6354 sleep";
             command = String.format("%s -sp %d", TaskConstants.PSTREE, processId);
         } else if (SystemUtils.IS_OS_LINUX) {
             command = String.format("%s -p %d", TaskConstants.PSTREE, processId);
@@ -54,6 +55,7 @@ public class ProcessUtilsTest {
         String exceptPidsStr2 = "2000 2100 2101";
         String command2;
         if (SystemUtils.IS_OS_MAC) {
+            pids2 = "-+= 2000 apache2 -+- 2100 222332-apache2-submit_task.py --- 2101 apache2";
             command2 = String.format("%s -sp %d", TaskConstants.PSTREE, processId2);
         } else if (SystemUtils.IS_OS_LINUX) {
             command2 = String.format("%s -p %d", TaskConstants.PSTREE, processId2);
@@ -70,6 +72,7 @@ public class ProcessUtilsTest {
         String exceptPidsStr3 = "5000 6000 7000 7100";
         String command3;
         if (SystemUtils.IS_OS_MAC) {
+            pids3 = "-+= 5000 sshd -+- 6000 sshd --= 7000 bash --- 7100 python";
             command3 = String.format("%s -sp %d", TaskConstants.PSTREE, processId3);
         } else if (SystemUtils.IS_OS_LINUX) {
             command3 = String.format("%s -p %d", TaskConstants.PSTREE, processId3);

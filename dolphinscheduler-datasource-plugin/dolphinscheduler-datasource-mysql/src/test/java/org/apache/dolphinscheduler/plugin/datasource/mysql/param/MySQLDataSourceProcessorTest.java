@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -30,6 +31,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
 public class MySQLDataSourceProcessorTest {
@@ -77,7 +80,7 @@ public class MySQLDataSourceProcessorTest {
         MySQLConnectionParam mysqlConnectionParam = new MySQLConnectionParam();
         mysqlConnectionParam.setJdbcUrl("jdbc:mysql://localhost:3306/default");
         Assertions.assertEquals(
-                "jdbc:mysql://localhost:3306/default?allowLoadLocalInfile=false&autoDeserialize=false&allowLocalInfile=false&allowUrlInLocalInfile=false",
+                "jdbc:mysql://localhost:3306/default",
                 mysqlDatasourceProcessor.getJdbcUrl(mysqlConnectionParam));
     }
 
@@ -104,4 +107,20 @@ public class MySQLDataSourceProcessorTest {
                     mysqlDatasourceProcessor.getDatasourceUniqueId(mysqlConnectionParam, DbType.MYSQL));
         }
     }
+
+    @Test
+    public void testSplitAndRemoveComment() {
+        String sql = "select * from table1;\nselect * from table2;\nselect * from table3;\r\n";
+        List<String> expect = Lists.newArrayList(
+                "select * from table1",
+                "select * from table2",
+                "select * from table3");
+        Assertions.assertEquals(expect, mysqlDatasourceProcessor.splitAndRemoveComment(sql));
+
+        // Variable
+        sql = "select * from ${table1};";
+        expect = Lists.newArrayList("select * from ${table1}");
+        Assertions.assertEquals(expect, mysqlDatasourceProcessor.splitAndRemoveComment(sql));
+    }
+
 }

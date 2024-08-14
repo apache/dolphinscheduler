@@ -51,15 +51,7 @@ spring:
     password: root
     hikari:
       connection-test-query: select 1
-      minimum-idle: 5
-      auto-commit: true
-      validation-timeout: 3000
       pool-name: DolphinScheduler
-      maximum-pool-size: 50
-      connection-timeout: 30000
-      idle-timeout: 600000
-      leak-detection-threshold: 0
-      initialization-fail-timeout: 1
   quartz:
     auto-startup: false
     job-store-type: jdbc
@@ -83,6 +75,8 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
     static-path-pattern: /static/**
+  cloud.discovery.client.composite-indicator.enabled: false
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -126,8 +120,8 @@ registry:
     namespace: dolphinscheduler
     connect-string: localhost:2181
     retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
+      base-sleep-time: 1s
+      max-sleep: 3s
       max-retries: 5
     session-timeout: 60s
     connection-timeout: 15s
@@ -149,8 +143,8 @@ api:
       #tenant1: 11
       #tenant2: 20
   python-gateway:
-    # Weather enable python gateway server or not. The default value is true.
-    enabled: true
+    # Weather enable python gateway server or not. The default value is false.
+    enabled: false
     # Authentication token for connection from python api to python gateway server. Should be changed the default value
     # when you deploy in public network.
     auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc

@@ -36,13 +36,13 @@ export function ssoLoginUrl(): any {
 export function getOauth2Provider(): any {
   return axios({
     url: '/oauth2-provider',
-    method: 'get',
+    method: 'get'
   })
 }
 
 export function clearCookie(): any {
   return axios({
     url: '/cookies',
-    method: 'delete',
+    method: 'delete'
   })
 }

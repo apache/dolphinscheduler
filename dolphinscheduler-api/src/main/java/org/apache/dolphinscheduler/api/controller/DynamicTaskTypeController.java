@@ -62,7 +62,7 @@ public class DynamicTaskTypeController extends BaseController {
      * @param loginUser login user
      * @return dynamic task category list
      */
-    @Operation(summary = "listTaskCates", description = "LIST_TASK_TYPE_CATES")
+    @Operation(summary = "listTaskCategories", description = "LIST_TASK_TYPE_CATEGORIES")
     @GetMapping(value = "/taskCategories")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LIST_TASK_TYPE_ERROR)

@@ -4,7 +4,7 @@ This module is the zookeeper registry plugin module, this plugin will use zookee
 
 # How to use
 
-If you want to set the registry center as zookeeper,you need to set the registry properties in master/worker/api's appplication.yml
+If you want to set the registry center as zookeeper,you need to set the registry properties in master/worker/api's application.yml
 
 ```yaml
 registry:

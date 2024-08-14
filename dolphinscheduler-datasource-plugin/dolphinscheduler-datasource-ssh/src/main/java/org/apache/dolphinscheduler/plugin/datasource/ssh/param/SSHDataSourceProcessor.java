@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.datasource.ssh.param;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -36,7 +37,7 @@ import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 @Slf4j
-public class SSHDataSourceProcessor implements DataSourceProcessor {
+public class SSHDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -54,7 +55,7 @@ public class SSHDataSourceProcessor implements DataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         SSHConnectionParam baseConnectionParam = (SSHConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getHost(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(), baseConnectionParam.getHost(),
                 baseConnectionParam.getUser(),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()));
     }

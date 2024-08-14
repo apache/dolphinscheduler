@@ -163,15 +163,17 @@ export function useTaskEdit(options: Options) {
    */
   function taskConfirm({ data }: any) {
     const taskDef = formatParams(data).taskDefinitionJsonObj as NodeData
+
     // override target config
     processDefinition.value.taskDefinitionList =
       processDefinition.value.taskDefinitionList.map((task) => {
         if (task.code === currTask.value?.code) {
           setNodeName(task.code + '', taskDef.name)
           let fillColor = '#ffffff'
-          if (task.flag === 'YES') {
+          if (taskDef.flag === 'NO') {
             fillColor = 'var(--custom-disable-bg)'
           }
+
           setNodeFillColor(task.code + '', fillColor)
 
           setNodeEdge(String(task.code), data.preTasks)

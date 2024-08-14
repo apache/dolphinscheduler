@@ -27,14 +27,18 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -71,6 +75,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
 /**
@@ -105,7 +111,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Override
-    public TaskInstanceCountVo getTaskInstanceStateCountByProject(User loginUser,
+    public TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,
                                                                   Long projectCode,
                                                                   String startDate,
                                                                   String endDate) {
@@ -114,26 +120,26 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
                 taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
-        return TaskInstanceCountVo.of(taskInstanceStatusCounts);
+        return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
     @Override
-    public TaskInstanceCountVo getAllTaskInstanceStateCount(User loginUser,
+    public TaskInstanceCountVO getAllTaskInstanceStateCount(User loginUser,
                                                             String startDate,
                                                             String endDate) {
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
         if (CollectionUtils.isEmpty(projectCodes)) {
-            return TaskInstanceCountVo.empty();
+            return TaskInstanceCountVO.empty();
         }
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
                 taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
-        return TaskInstanceCountVo.of(taskInstanceStatusCounts);
+        return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
     @Override
-    public WorkflowInstanceCountVo getWorkflowInstanceStateCountByProject(User loginUser,
+    public WorkflowInstanceCountVO getWorkflowInstanceStateCountByProject(User loginUser,
                                                                           Long projectCode,
                                                                           String startDate,
                                                                           String endDate) {
@@ -142,40 +148,40 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = endDate == null ? null : transformDate(endDate);
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = processInstanceMapper
                 .countWorkflowInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
-        return WorkflowInstanceCountVo.of(workflowInstanceStatusCountDtos);
+        return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
 
     @Override
-    public WorkflowInstanceCountVo getAllWorkflowInstanceStateCount(User loginUser,
+    public WorkflowInstanceCountVO getAllWorkflowInstanceStateCount(User loginUser,
                                                                     String startDate,
                                                                     String endDate) {
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
         if (CollectionUtils.isEmpty(projectCodes)) {
-            return WorkflowInstanceCountVo.empty();
+            return WorkflowInstanceCountVO.empty();
         }
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
 
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos =
                 processInstanceMapper.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
-        return WorkflowInstanceCountVo.of(workflowInstanceStatusCountDtos);
+        return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
 
     @Override
-    public WorkflowDefinitionCountVo getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
+    public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
                 processDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
-        return WorkflowDefinitionCountVo.of(workflowDefinitionCounts);
+        return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
     }
 
     @Override
-    public WorkflowDefinitionCountVo getAllWorkflowDefinitionCount(User loginUser) {
+    public WorkflowDefinitionCountVO getAllWorkflowDefinitionCount(User loginUser) {
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
         if (CollectionUtils.isEmpty(projectCodes)) {
-            return WorkflowDefinitionCountVo.empty();
+            return WorkflowDefinitionCountVO.empty();
         }
-        return WorkflowDefinitionCountVo.of(processDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
+        return WorkflowDefinitionCountVO.of(processDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
     }
 
     @Override
@@ -378,6 +384,66 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         startTimeStates.orElseGet(ArrayList::new).addAll(recounts);
         List<ExecuteStatusCount> executeStatusCounts = startTimeStates.orElse(null);
         return new TaskCountDto(executeStatusCounts);
+    }
+
+    @Override
+    public PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize) {
+        Page<Command> page = new Page<>(pageNo, pageSize);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            IPage<Command> commandIPage = commandMapper.queryCommandPage(page);
+            return PageInfo.of(commandIPage);
+        }
+
+        List<Long> workflowDefinitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
+
+        if (workflowDefinitionCodes.isEmpty()) {
+            return PageInfo.of(pageNo, pageSize);
+        }
+
+        IPage<Command> commandIPage =
+                commandMapper.queryCommandPageByIds(page, new ArrayList<>(workflowDefinitionCodes));
+        return PageInfo.of(commandIPage);
+    }
+
+    @Override
+    public PageInfo<ErrorCommand> listErrorCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize) {
+        Page<ErrorCommand> page = new Page<>(pageNo, pageSize);
+        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            IPage<ErrorCommand> commandIPage = errorCommandMapper.queryErrorCommandPage(page);
+            return PageInfo.of(commandIPage);
+        }
+
+        List<Long> workflowDefinitionCodes = getAuthDefinitionCodes(loginUser, projectCode);
+
+        if (workflowDefinitionCodes.isEmpty()) {
+            return PageInfo.of(pageNo, pageSize);
+        }
+
+        IPage<ErrorCommand> commandIPage =
+                errorCommandMapper.queryErrorCommandPageByIds(page, new ArrayList<>(workflowDefinitionCodes));
+        return PageInfo.of(commandIPage);
+    }
+
+    private List<Long> getAuthDefinitionCodes(User loginUser, Long projectCode) {
+        Set<Integer> projectIds = resourcePermissionCheckService
+                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
+        if (CollectionUtils.isEmpty(projectIds)) {
+            return Collections.emptyList();
+        }
+        List<Long> projectCodes = projectMapper.selectBatchIds(projectIds)
+                .stream()
+                .map(Project::getCode)
+                .collect(Collectors.toList());
+
+        if (projectCode != null) {
+            if (!projectCodes.contains(projectCode)) {
+                return Collections.emptyList();
+            }
+
+            projectCodes = Collections.singletonList(projectCode);
+        }
+
+        return processDefinitionMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
     }
 
     /**

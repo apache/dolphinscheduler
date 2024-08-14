@@ -24,6 +24,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TENANT_LIST_PAG
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TENANT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_OS_TENANT_CODE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -83,6 +85,7 @@ public class TenantController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_TENANT_ERROR)
+    @OperatorLog(auditType = AuditType.TENANT_CREATE)
     public Result<Tenant> createTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "tenantCode") String tenantCode,
                                        @RequestParam(value = "queueId") int queueId,
@@ -101,7 +104,7 @@ public class TenantController extends BaseController {
      * @param pageSize page size
      * @return tenant list page
      */
-    @Operation(summary = "queryTenantlistPaging", description = "QUERY_TENANT_LIST_PAGING_NOTES")
+    @Operation(summary = "queryTenantListPaging", description = "QUERY_TENANT_LIST_PAGING_NOTES")
     @Parameters({
             @Parameter(name = "searchVal", description = "SEARCH_VAL", schema = @Schema(implementation = String.class)),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
@@ -110,7 +113,7 @@ public class TenantController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_PAGING_ERROR)
-    public Result<PageInfo<Tenant>> queryTenantlistPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+    public Result<PageInfo<Tenant>> queryTenantListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                           @RequestParam(value = "searchVal", required = false) String searchVal,
                                                           @RequestParam("pageNo") Integer pageNo,
                                                           @RequestParam("pageSize") Integer pageSize) {
@@ -126,11 +129,11 @@ public class TenantController extends BaseController {
      * @param loginUser login user
      * @return tenant list
      */
-    @Operation(summary = "queryTenantlist", description = "QUERY_TENANT_LIST_NOTES")
+    @Operation(summary = "queryTenantList", description = "QUERY_TENANT_LIST_NOTES")
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
-    public Result<List<Tenant>> queryTenantlist(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result<List<Tenant>> queryTenantList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<Tenant> tenants = tenantService.queryTenantList(loginUser);
         return Result.success(tenants);
     }
@@ -155,6 +158,7 @@ public class TenantController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_TENANT_ERROR)
+    @OperatorLog(auditType = AuditType.TENANT_UPDATE)
     public Result<Boolean> updateTenant(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                         @PathVariable(value = "id") int id,
                                         @RequestParam(value = "tenantCode") String tenantCode,
@@ -179,6 +183,7 @@ public class TenantController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_TENANT_BY_ID_ERROR)
+    @OperatorLog(auditType = AuditType.TENANT_DELETE)
     public Result<Boolean> deleteTenantById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @PathVariable(value = "id") int id) throws Exception {
         tenantService.deleteTenantById(loginUser, id);

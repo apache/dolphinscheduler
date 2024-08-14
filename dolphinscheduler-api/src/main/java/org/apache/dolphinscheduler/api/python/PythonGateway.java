@@ -31,14 +31,12 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.service.UsersService;
-import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.enums.ProgramType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -184,7 +182,7 @@ public class PythonGateway {
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
         if (project == null) {
-            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
             return result;
         }
@@ -194,7 +192,7 @@ public class PythonGateway {
         // In the case project exists, but current workflow still not created, we should also return the init
         // version of it
         if (processDefinition == null) {
-            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
             return result;
         }
@@ -202,7 +200,7 @@ public class PythonGateway {
         TaskDefinition taskDefinition =
                 taskDefinitionMapper.queryByName(project.getCode(), processDefinition.getCode(), taskName);
         if (taskDefinition == null) {
-            result.put("code", CodeGenerateUtils.getInstance().genCode());
+            result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
         } else {
             result.put("code", taskDefinition.getCode());
@@ -216,22 +214,22 @@ public class PythonGateway {
      * If workflow do not exists in Project=`projectCode` would create a new one
      * If workflow already exists in Project=`projectCode` would update it
      *
-     * @param userName user name who create or update workflow
-     * @param projectName project name which workflow belongs to
-     * @param name workflow name
-     * @param description description
-     * @param globalParams global params
-     * @param schedule schedule for workflow, will not set schedule if null,
-     * and if would always fresh exists schedule if not null
-     * @param onlineSchedule Whether set the workflow's schedule to online state
-     * @param warningType warning type
-     * @param warningGroupId warning group id
-     * @param timeout timeout for workflow working, if running time longer than timeout,
-     * task will mark as fail
-     * @param workerGroup run task in which worker group
-     * @param taskRelationJson relation json for nodes
+     * @param userName           user name who create or update workflow
+     * @param projectName        project name which workflow belongs to
+     * @param name               workflow name
+     * @param description        description
+     * @param globalParams       global params
+     * @param schedule           schedule for workflow, will not set schedule if null,
+     *                           and if would always fresh exists schedule if not null
+     * @param onlineSchedule     Whether set the workflow's schedule to online state
+     * @param warningType        warning type
+     * @param warningGroupId     warning group id
+     * @param timeout            timeout for workflow working, if running time longer than timeout,
+     *                           task will mark as fail
+     * @param workerGroup        run task in which worker group
+     * @param taskRelationJson   relation json for nodes
      * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson otherParamsJson handle other params
+     * @param otherParamsJson    otherParamsJson handle other params
      * @return create result code
      */
     public Long createOrUpdateWorkflow(String userName,
@@ -300,8 +298,8 @@ public class PythonGateway {
     /**
      * get workflow
      *
-     * @param user user who create or update schedule
-     * @param projectCode project which workflow belongs to
+     * @param user         user who create or update schedule
+     * @param projectCode  project which workflow belongs to
      * @param workflowName workflow name
      */
     private ProcessDefinition getWorkflow(User user, long projectCode, String workflowName) {
@@ -327,13 +325,13 @@ public class PythonGateway {
      * It would always use latest schedule define in workflow-as-code, and set schedule online when
      * it's not null
      *
-     * @param user user who create or update schedule
-     * @param projectCode project which workflow belongs to
-     * @param workflowCode workflow code
-     * @param schedule schedule expression
+     * @param user           user who create or update schedule
+     * @param projectCode    project which workflow belongs to
+     * @param workflowCode   workflow code
+     * @param schedule       schedule expression
      * @param onlineSchedule Whether set the workflow's schedule to online state
-     * @param workerGroup work group
-     * @param warningType warning type
+     * @param workerGroup    work group
+     * @param warningType    warning type
      * @param warningGroupId warning group id
      */
     private void createOrUpdateSchedule(User user,
@@ -512,7 +510,7 @@ public class PythonGateway {
      * it will return the datasource match the type.
      *
      * @param datasourceName datasource name of datasource
-     * @param type datasource type
+     * @param type           datasource type
      */
     public DataSource getDatasource(String datasourceName, String type) {
 
@@ -545,8 +543,8 @@ public class PythonGateway {
      * Get workflow object by given workflow name. It returns map contain workflow id, name, code.
      * Useful in Python API create subProcess task which need workflow information.
      *
-     * @param userName user who create or update schedule
-     * @param projectName project name which workflow belongs to
+     * @param userName     user who create or update schedule
+     * @param projectName  project name which workflow belongs to
      * @param workflowName workflow name
      */
     public Map<String, Object> getWorkflowInfo(String userName, String projectName,
@@ -577,9 +575,9 @@ public class PythonGateway {
      * Get project, workflow, task code.
      * Useful in Python API create dependent task which need workflow information.
      *
-     * @param projectName project name which workflow belongs to
+     * @param projectName  project name which workflow belongs to
      * @param workflowName workflow name
-     * @param taskName task name
+     * @param taskName     task name
      */
     public Map<String, Object> getDependentInfo(String projectName, String workflowName, String taskName) {
         Map<String, Object> result = new HashMap<>();
@@ -614,25 +612,22 @@ public class PythonGateway {
      * Get resource by given program type and full name. It returns map contain resource id, name.
      * Useful in Python API create flink or spark task which need workflow information.
      *
-     * @param programType program type one of SCALA, JAVA and PYTHON
-     * @param fullName full name of the resource
+     * @param fullName    full name of the resource
      */
-    public Map<String, Object> getResourcesFileInfo(String programType, String fullName) {
+    public Map<String, Object> getResourcesFileInfo(String fullName) {
         Map<String, Object> result = new HashMap<>();
 
-        Result<Object> resources = resourceService.queryResourceByProgramType(dummyAdminUser, ResourceType.FILE,
-                ProgramType.valueOf(programType));
-        List<ResourceComponent> resourcesComponent = (List<ResourceComponent>) resources.getData();
-        List<ResourceComponent> namedResources =
-                resourcesComponent.stream().filter(s -> fullName.equals(s.getFullName())).collect(Collectors.toList());
+        List<ResourceComponent> resourceComponents =
+                resourceService.queryResourceFiles(dummyAdminUser, ResourceType.FILE);
+        List<ResourceComponent> namedResources = resourceComponents.stream()
+                .filter(s -> fullName.equals(s.getFullName()))
+                .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(namedResources)) {
-            String msg =
-                    String.format("Can not find valid resource by program type %s and name %s", programType, fullName);
+            String msg = String.format("Can not find valid resource by name %s", fullName);
             log.error(msg);
             throw new IllegalArgumentException(msg);
         }
 
-        result.put("id", namedResources.get(0).getId());
         result.put("name", namedResources.get(0).getName());
         return result;
     }
@@ -669,20 +664,6 @@ public class PythonGateway {
 
     public String getGatewayVersion() {
         return PythonGateway.class.getPackage().getImplementationVersion();
-    }
-
-    /**
-     * create or update resource.
-     * If the folder is not already created, it will be
-     *
-     * @param userName user who create or update resource
-     * @param fullName The fullname of resource.Includes path and suffix.
-     * @param resourceContent content of resource
-     * @return StorageEntity object which contains necessary information about resource
-     */
-    public StorageEntity createOrUpdateResource(String userName, String fullName,
-                                                String resourceContent) throws Exception {
-        return resourceService.createOrUpdateResource(userName, fullName, resourceContent);
     }
 
     @PostConstruct

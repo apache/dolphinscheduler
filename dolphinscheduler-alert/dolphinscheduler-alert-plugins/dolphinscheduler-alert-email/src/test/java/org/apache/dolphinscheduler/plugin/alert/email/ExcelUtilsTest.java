@@ -66,8 +66,15 @@ public class ExcelUtilsTest {
 
     @Test
     public void testGenExcelFileByCheckDir() {
-        ExcelUtils.genExcelFile("[{\"a\": \"a\"},{\"a\": \"a\"}]", "t", "/tmp/xls");
-        File file = new File("/tmp/xls" + EmailConstants.SINGLE_SLASH + "t" + EmailConstants.EXCEL_SUFFIX_XLSX);
+        String path = "/tmp/xls";
+        ExcelUtils.genExcelFile("[{\"a\": \"a\"},{\"a\": \"a\"}]", "t", path);
+        File file =
+                new File(
+                        path
+                                + EmailConstants.SINGLE_SLASH
+                                + "t"
+                                + EmailConstants.EXCEL_SUFFIX_XLSX);
         file.delete();
+        Assertions.assertFalse(file.exists());
     }
 }

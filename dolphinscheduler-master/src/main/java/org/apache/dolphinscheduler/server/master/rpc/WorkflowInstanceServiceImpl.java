@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.extract.master.IWorkflowInstanceService;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.TaskInstanceWakeupResponse;
 import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.service.ExecutingService;
 
@@ -36,6 +38,9 @@ public class WorkflowInstanceServiceImpl implements IWorkflowInstanceService {
     @Autowired
     private ExecutingService executingService;
 
+    @Autowired
+    private TaskInstanceWakeupOperationFunction taskInstanceWakeupOperationFunction;
+
     @Override
     public void clearWorkflowMetrics(Long workflowDefinitionCode) {
         log.info("Receive clearWorkflowMetrics request: {}", workflowDefinitionCode);
@@ -48,5 +53,10 @@ public class WorkflowInstanceServiceImpl implements IWorkflowInstanceService {
         Optional<WorkflowExecuteDto> workflowExecuteDtoOptional =
                 executingService.queryWorkflowExecutingData(workflowInstanceId);
         return workflowExecuteDtoOptional.orElse(null);
+    }
+
+    @Override
+    public TaskInstanceWakeupResponse wakeupTaskInstance(TaskInstanceWakeupRequest taskWakeupRequest) {
+        return taskInstanceWakeupOperationFunction.operate(taskWakeupRequest);
     }
 }

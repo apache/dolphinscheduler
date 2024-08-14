@@ -37,8 +37,7 @@ public class ApiFuncIdentificationConstant {
     public static final String TENANT_CREATE = "security:tenant:create";
     public static final String TENANT_UPDATE = "security:tenant:update";
     public static final String TENANT_DELETE = "security:tenant:delete";
-    public static final String ALART_LIST = "monitor:alert:view";
-    public static final String ALART_INSTANCE_CREATE = "security:alert-plugin:create";
+    public static final String ALERT_INSTANCE_CREATE = "security:alert-plugin:create";
     public static final String ALERT_PLUGIN_UPDATE = "security:alert-plugin:update";
     public static final String ALERT_PLUGIN_DELETE = "security:alert-plugin:delete";
     public static final String WORKER_GROUP_CREATE = "security:worker-group:create";
@@ -128,18 +127,6 @@ public class ApiFuncIdentificationConstant {
     public static final String FILE_RENAME = "resources:file:rename";
     public static final String FILE_DOWNLOAD = "resources:file:download";
     public static final String FILE_DELETE = "resources:file:delete";
-
-    public static final String UDF_FILE_VIEW = "resources:udf:view";
-    public static final String UDF_FOLDER_ONLINE_CREATE = "resources:udf:create";
-    public static final String UDF_UPLOAD = "resources:udf:upload";
-    public static final String UDF_UPDATE = "resources:udf:edit";
-    public static final String UDF_DOWNLOAD = "resources:udf:download";
-    public static final String UDF_DELETE = "resources:udf:delete";
-
-    public static final String UDF_FUNCTION_VIEW = "resources:udf-func:view";
-    public static final String UDF_FUNCTION_CREATE = "resources:udf-func:create";
-    public static final String UDF_FUNCTION_UPDATE = "resources:udf-func:update";
-    public static final String UDF_FUNCTION_DELETE = "resources:udf-func:delete";
 
     public static final String TASK_GROUP_VIEW = "resources:task-group:view";
     public static final String TASK_GROUP_CREATE = "resources:task-group:create";

@@ -32,6 +32,6 @@ public class DorisDataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return DbType.DORIS.getDescp();
+        return DbType.DORIS.getName();
     }
 }

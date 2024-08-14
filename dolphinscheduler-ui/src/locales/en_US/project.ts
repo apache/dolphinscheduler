@@ -27,7 +27,6 @@ export default {
     project_description: 'Project Description',
     owned_users: 'Owned Users',
     workflow_define_count: 'Workflow Define Count',
-    process_instance_running_count: 'Process Instance Running Count',
     description: 'Description',
     create_time: 'Create Time',
     update_time: 'Update Time',
@@ -40,7 +39,8 @@ export default {
     authorize_level: 'Authorize Level',
     no_permission: 'No Permission',
     read_permission: 'Read Permission',
-    all_permission: 'All Permission'
+    all_permission: 'All Permission',
+    assign_worker_group: 'Worker Group'
   },
   workflow: {
     on_line: 'Online',
@@ -82,6 +82,8 @@ export default {
     timezone: 'Timezone',
     up_line: 'Online',
     down_line: 'Offline',
+    time_up_line: 'Scheduler Online',
+    time_down_line: 'Scheduler Offline',
     copy_workflow: 'Copy Workflow',
     copy_workflow_name: 'Copy workflow name',
     visit_workflow_instances: 'Visit workflow instances',
@@ -129,6 +131,7 @@ export default {
     success_send: 'Success',
     failure_send: 'Failure',
     all_send: 'All',
+    warning_group_tip: 'Please select alarm group',
     whether_complement_data: 'Whether it is a complement process?',
     schedule_date: 'Schedule date',
     select_date: 'Select Date',
@@ -232,6 +235,22 @@ export default {
     want_to_set_timing: 'Would you like to set the workflow timing?',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',
+    time_to_online: 'Confirm to make the Scheduler online?',
+    time_to_offline: 'Confirm to make the Scheduler offline?',
+    warning_dependent_tasks_title: 'Warning',
+    warning_dependent_tasks_desc:
+      'The downstream dependent tasks exists. Are you sure to make the workflow offline?',
+    warning_dependencies: 'Dependencies:',
+    delete_validate_dependent_tasks_desc:
+      'The downstream dependent tasks exists. You can not delete the workflow.',
+    warning_offline_scheduler_dependent_tasks_desc:
+      'The downstream dependent tasks exists. Are you sure to make the scheduler offline?',
+    delete_task_validate_dependent_tasks_desc:
+      'The downstream dependent tasks exists. You can not delete the task.',
+    warning_delete_scheduler_dependent_tasks_desc:
+      'The downstream dependent tasks exists. Are you sure to delete the scheduler?',
+    warning_too_large_parallelism_number:
+      'The parallelism number is too large. It is better not to be over 10.'
   },
   task: {
     on_line: 'Online',
@@ -300,7 +319,9 @@ export default {
     startup_parameter: 'Startup Parameter',
     whether_dry_run: 'Whether Dry-Run',
     please_choose: 'Please Choose',
-    remove_task_cache: 'Clear cache'
+    remove_task_cache: 'Clear cache',
+    delete_validate_dependent_tasks_desc:
+      'The downstream dependent tasks exists. You can not delete the task.'
   },
   dag: {
     create: 'Create Workflow',
@@ -427,12 +448,14 @@ export default {
     timeout_period_tips: 'Timeout must be a positive integer',
     script: 'Script',
     script_tips: 'Please enter script(required)',
+    master: 'Master',
+    master_tips: 'Please enter master url(required)',
     init_script: 'Initialization script',
     init_script_tips: 'Please enter initialization script',
     resources: 'Resources',
     resources_tips: 'Please select resources',
     resources_limit_tips: 'Please select again, resource limit:',
-    non_resources_tips: 'Please delete all non-existent resources',
+    no_resources_tips: 'Please delete all non-existent resources',
     useless_resources_tips: 'Unauthorized or deleted resources',
     custom_parameters: 'Custom Parameters',
     copy_success: 'Copy success',
@@ -493,20 +516,20 @@ export default {
     http_url_validator: 'The request address must contain HTTP or HTTPS',
     http_method: 'Http Method',
     http_parameters: 'Http Parameters',
+    http_body: 'Http Body',
+    http_body_tips: 'http body(required)',
     http_check_condition: 'Http Check Condition',
     http_condition: 'Http Condition',
     http_condition_tips: 'Please Enter Http Condition',
     timeout_settings: 'Timeout Settings',
     connect_timeout: 'Connect Timeout',
     ms: 'ms',
-    socket_timeout: 'Socket Timeout',
     status_code_default: 'Default response code 200',
     status_code_custom: 'Custom response code',
     body_contains: 'Content includes',
     body_not_contains: 'Content does not contain',
     http_parameters_position: 'Http Parameters Position',
     target_task_name: 'Target Task Name',
-    target_task_name_tips: 'Please enter the Pigeon task name(required)',
     datasource_type: 'Datasource types',
     datasource_instances: 'Datasource instances',
     sql_type: 'SQL Type',
@@ -539,7 +562,7 @@ export default {
     model_type: 'ModelType',
     form: 'Form',
     table: 'Table',
-    table_tips: 'Please enter Mysql Table(required)',
+    table_tips: 'Please enter Table(required)',
     column_type: 'ColumnType',
     all_columns: 'All Columns',
     some_columns: 'Some Columns',
@@ -813,7 +836,6 @@ export default {
     integer_tips: 'Please enter a positive integer',
     sql_parameter: 'SQL Parameter',
     format_tips: 'Please enter format',
-    udf_function: 'UDF Function',
     unlimited: 'unlimited',
     please_select_source_connector_type: 'Please select source connector type',
     please_select_source_datasource_id: 'Please select source datasource id',
@@ -826,9 +848,12 @@ export default {
     please_select_target_datasource: 'Please select target datasource id',
     please_select_target_database: 'Please select target database',
     please_enter_target_table: 'Please select target table name',
-    please_enter_target_filter_expression: 'Please enter target filter expression',
-    please_enter_comparison_name_the_alias_in_comparison_execute_sql: 'Please enter comparison name the alias in comparison execute sql',
-    please_enter_statistics_name_the_alias_in_statistics_execute_sql: 'Please enter statistics name the alias in statistics execute sql',
+    please_enter_target_filter_expression:
+      'Please enter target filter expression',
+    please_enter_comparison_name_the_alias_in_comparison_execute_sql:
+      'Please enter comparison name the alias in comparison execute sql',
+    please_enter_statistics_name_the_alias_in_statistics_execute_sql:
+      'Please enter statistics name the alias in statistics execute sql',
     please_enter_comparison_execute_sql: 'Please enter comparison execute sql',
     please_enter_statistics_execute_sql: 'Please enter statistics execute sql',
     please_enter_threshold_number_is_needed:
@@ -883,7 +908,32 @@ export default {
     dependent_type: 'Dependency Type',
     dependent_on_workflow: 'Dependent on workflow',
     dependent_on_task: 'Dependent on task',
-
+    region_id: 'region id',
+    region_id_tips: 'region id',
+    endpoint: 'endpoint',
+    endpoint_tips: 'restful endpoint',
+    access_key_id: 'access key id',
+    access_key_id_tips: 'access key id',
+    access_key_secret: 'access key secret',
+    access_key_secret_tips: 'access key secret',
+    workspace_id: 'workspace id',
+    workspace_id_tips: 'workspace id',
+    resource_queue_id: 'resource queue id',
+    resource_queue_id_tips: 'resource queue id',
+    code_type: 'code type',
+    code_type_tips: 'code type',
+    job_name: 'job name',
+    job_name_tips: 'job name',
+    engine_release_version: 'engine release version',
+    engine_release_version_tips: 'engine release version',
+    entry_point: 'entry point',
+    entry_point_tips: 'entry point',
+    entry_point_arguments: 'entry point arguments',
+    entry_point_arguments_tips: 'entry point arguments',
+    spark_submit_parameters: 'spark submit parameters',
+    spark_submit_parameters_tips: 'spark submit parameters',
+    is_production: 'is production',
+    is_production_tips: 'is production'
   },
   menu: {
     fav: 'Favorites',
@@ -902,23 +952,28 @@ export default {
     code: 'Parameter Code',
     name: 'Parameter Name',
     value: 'Parameter Value',
+    data_type: 'Parameter Data Type',
+    create_user: 'Create User',
+    modify_user: 'Modify User',
     create_time: 'Create Time',
     update_time: 'Update Time',
     name_tips: 'Please enter your parameter name',
     value_tips: 'Please enter your parameter value',
+    data_type_tips: 'Please choose your parameter data type',
     operation: 'Operation',
     edit: 'Edit',
     delete: 'Delete',
     delete_confirm: 'Delete?',
-    success: 'Success',
+    success: 'Success'
   },
   preference: {
     edit_preference: 'Edit Preference',
     preference_manage: 'Project Preference Management',
-    instruction_tips: 'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
+    instruction_tips:
+      'The settings below will affect all workflows and tasks under this project.When creating the workflow or task, these preferences will be the default value of their components.',
     success: 'Success',
     submit: 'Submit',
     enabled: 'Enabled',
     disabled: 'Disabled'
-  },
+  }
 }

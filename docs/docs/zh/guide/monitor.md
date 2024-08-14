@@ -16,6 +16,12 @@
 
 ![worker](../../../img/new_ui/dev/monitor/worker.png)
 
+### Alert Server
+
+- 主要是 alert server 的相关信息。
+
+![alert-server](../../../img/new_ui/dev/monitor/alert-server.png)
+
 ### Database
 
 - 主要是 DB 的健康状况
@@ -26,15 +32,16 @@
 
 ### Statistics
 
-![statistics](../../../img/new_ui/dev/monitor/statistics.png)
+![Command Statistics List](../../../img/new_ui/dev/monitor/command-list.png)
 
-- 待执行命令数：统计 t_ds_command 表的数据
-- 执行失败的命令数：统计 t_ds_error_command 表的数据
-- 待运行任务数：统计 Zookeeper 中 task_queue 的数据
-- 待杀死任务数：统计 Zookeeper 中 task_kill 的数据
+展示系统中的命令列表，数据来自`t_ds_command`表。
+
+![Failure Command Statistics List](../../../img/new_ui/dev/monitor/failure-command-list.png)
+
+展示系统中的失败命令列表，数据来自`t_ds_error_command`表。
 
 ### 审计日志
 
-审计日志的记录提供了有关谁访问了系统，以及他或她在给定时间段内执行了哪些操作的信息，他对于维护安全都很有用。
+审计日志的记录提供了有关谁访问了系统，以及他或她在给定时间段内执行了哪些操作的信息，对于维护安全都很有用。
 
-![audit-log](../../../img/new_ui/dev/monitor/audit-log.jpg)
+![audit-log](../../../img/new_ui/dev/monitor/audit-log.png)

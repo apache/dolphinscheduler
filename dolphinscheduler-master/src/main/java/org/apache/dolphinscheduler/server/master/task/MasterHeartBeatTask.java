@@ -24,8 +24,12 @@ import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,8 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
 
     private final MasterConfig masterConfig;
 
+    private final MetricsProvider metricsProvider;
+
     private final RegistryClient registryClient;
 
     private final String heartBeatPath;
@@ -42,9 +48,11 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     private final int processId;
 
     public MasterHeartBeatTask(@NonNull MasterConfig masterConfig,
+                               @NonNull MetricsProvider metricsProvider,
                                @NonNull RegistryClient registryClient) {
-        super("MasterHeartBeatTask", masterConfig.getHeartbeatInterval().toMillis());
+        super("MasterHeartBeatTask", masterConfig.getMaxHeartbeatInterval().toMillis());
         this.masterConfig = masterConfig;
+        this.metricsProvider = metricsProvider;
         this.registryClient = registryClient;
         this.heartBeatPath = masterConfig.getMasterRegistryPath();
         this.processId = OSUtils.getProcessID();
@@ -52,16 +60,18 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
 
     @Override
     public MasterHeartBeat getHeartBeat() {
+        SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+        ServerStatus serverStatus = getServerStatus(systemMetrics, masterConfig.getServerLoadProtection());
         return MasterHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())
-                .cpuUsage(OSUtils.cpuUsagePercentage())
-                .availablePhysicalMemorySize(OSUtils.availablePhysicalMemorySize())
-                .reservedMemory(masterConfig.getReservedMemory())
-                .memoryUsage(OSUtils.memoryUsagePercentage())
-                .diskAvailable(OSUtils.diskAvailable())
+                .jvmCpuUsage(systemMetrics.getJvmCpuUsagePercentage())
+                .cpuUsage(systemMetrics.getSystemCpuUsagePercentage())
+                .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
+                .diskUsage(systemMetrics.getDiskUsedPercentage())
                 .processId(processId)
-                .serverStatus(getServerStatus())
+                .serverStatus(serverStatus)
                 .host(NetUtils.getHost())
                 .port(masterConfig.getListenPort())
                 .build();
@@ -71,13 +81,13 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
     public void writeHeartBeat(MasterHeartBeat masterHeartBeat) {
         String masterHeartBeatJson = JSONUtils.toJsonString(masterHeartBeat);
         registryClient.persistEphemeral(heartBeatPath, masterHeartBeatJson);
+        MasterServerMetrics.incMasterHeartbeatCount();
         log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
                 heartBeatPath, masterHeartBeatJson);
     }
 
-    private ServerStatus getServerStatus() {
-        return OSUtils.isOverload(masterConfig.getMaxCpuLoadAvg(), masterConfig.getReservedMemory())
-                ? ServerStatus.ABNORMAL
-                : ServerStatus.NORMAL;
+    private ServerStatus getServerStatus(SystemMetrics systemMetrics,
+                                         MasterServerLoadProtection masterServerLoadProtection) {
+        return masterServerLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL;
     }
 }

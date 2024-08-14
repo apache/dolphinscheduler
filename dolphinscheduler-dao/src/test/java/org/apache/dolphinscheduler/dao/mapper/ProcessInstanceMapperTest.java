@@ -198,30 +198,6 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
     }
 
     /**
-     * test set failover by host and state
-     */
-    @Test
-    public void testSetFailoverByHostAndStateArray() {
-
-        int[] stateArray = new int[]{
-                WorkflowExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                WorkflowExecutionStatus.SUCCESS.ordinal()};
-
-        ProcessInstance processInstance = insertOne();
-
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstance.setHost("192.168.2.220");
-        processInstanceMapper.updateById(processInstance);
-        String host = processInstance.getHost();
-        int update = processInstanceMapper.setFailoverByHostAndStateArray(host, stateArray);
-        Assertions.assertNotEquals(0, update);
-
-        processInstance = processInstanceMapper.selectById(processInstance.getId());
-        Assertions.assertNull(processInstance.getHost());
-        processInstanceMapper.deleteById(processInstance.getId());
-    }
-
-    /**
      * test update process instance by state
      */
     @Test
@@ -287,29 +263,9 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         processInstanceMapper.updateById(processInstance);
 
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), null, null,
+                processInstanceMapper.queryLastSchedulerProcess(processInstance.getProcessDefinitionCode(), 0L, null,
+                        null,
                         processInstance.getTestFlag());
-        Assertions.assertNotEquals(null, processInstance1);
-        processInstanceMapper.deleteById(processInstance.getId());
-    }
-
-    /**
-     * test query last running process instance
-     */
-    @Test
-    public void testQueryLastRunningProcess() {
-        ProcessInstance processInstance = insertOne();
-        processInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        processInstanceMapper.updateById(processInstance);
-
-        int[] stateArray = new int[]{
-                WorkflowExecutionStatus.RUNNING_EXECUTION.ordinal(),
-                WorkflowExecutionStatus.SUBMITTED_SUCCESS.ordinal()};
-
-        ProcessInstance processInstance1 = processInstanceMapper
-                .queryLastRunningProcess(processInstance.getProcessDefinitionCode(), null, null,
-                        processInstance.getTestFlag(), stateArray);
-
         Assertions.assertNotEquals(null, processInstance1);
         processInstanceMapper.deleteById(processInstance.getId());
     }
@@ -325,13 +281,15 @@ public class ProcessInstanceMapperTest extends BaseDaoTest {
         Date start = new Date(2019 - 1900, 1 - 1, 01, 0, 0, 0);
         Date end = new Date(2019 - 1900, 1 - 1, 01, 5, 0, 0);
         ProcessInstance processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end,
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), null, start,
+                        end,
                         processInstance.getTestFlag());
         Assertions.assertEquals(processInstance1.getId(), processInstance.getId());
 
         start = new Date(2019 - 1900, 1 - 1, 01, 1, 0, 0);
         processInstance1 =
-                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), start, end,
+                processInstanceMapper.queryLastManualProcess(processInstance.getProcessDefinitionCode(), null, start,
+                        end,
                         processInstance.getTestFlag());
         Assertions.assertNull(processInstance1);
 

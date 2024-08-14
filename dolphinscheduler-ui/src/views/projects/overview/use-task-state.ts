@@ -21,7 +21,7 @@ import { format } from 'date-fns'
 import { toLower } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { countTaskState } from '@/service/modules/projects-analysis'
-import type {TaskInstanceCountVo} from '@/service/modules/projects-analysis/types'
+import type { TaskInstanceCountVo } from '@/service/modules/projects-analysis/types'
 import type { StateData } from './types'
 import { reactive, ref } from 'vue'
 

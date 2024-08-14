@@ -23,6 +23,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_QUEUE_LIST_ERRO
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_QUEUE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_QUEUE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -124,6 +126,7 @@ public class QueueController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_QUEUE_ERROR)
+    @OperatorLog(auditType = AuditType.YARN_QUEUE_CREATE)
     public Result<Queue> createQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @RequestParam(value = "queue") String queue,
                                      @RequestParam(value = "queueName") String queueName) {
@@ -148,6 +151,7 @@ public class QueueController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(UPDATE_QUEUE_ERROR)
+    @OperatorLog(auditType = AuditType.YARN_QUEUE_UPDATE)
     public Result<Queue> updateQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                      @PathVariable(value = "id") int id,
                                      @RequestParam(value = "queue") String queue,
@@ -169,6 +173,7 @@ public class QueueController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_QUEUE_BY_ID_ERROR)
+    @OperatorLog(auditType = AuditType.YARN_QUEUE_DELETE)
     public Result<Boolean> deleteQueueById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                            @PathVariable(value = "id") int id) throws Exception {
         queueService.deleteQueueById(loginUser, id);

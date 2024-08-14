@@ -36,7 +36,7 @@ export function useProcessState() {
     const { state } = useAsyncState(
       countProcessInstanceState({
         startDate: !date ? '' : format(date[0], 'yyyy-MM-dd HH:mm:ss'),
-        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss'),
+        endDate: !date ? '' : format(date[1], 'yyyy-MM-dd HH:mm:ss')
       }).then((res: WorkflowInstanceCountVo): StateData => {
         const table = res.workflowInstanceStatusCounts.map((item) => {
           return {

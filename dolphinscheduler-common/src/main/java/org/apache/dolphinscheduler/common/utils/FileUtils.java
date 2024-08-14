@@ -17,17 +17,15 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES;
 import static org.apache.dolphinscheduler.common.constants.Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE;
-import static org.apache.dolphinscheduler.common.constants.Constants.UTF_8;
-import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYYMMDDHHMMSS;
-
-import org.apache.dolphinscheduler.common.exception.FileOperateException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -36,23 +34,25 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * file utils
- */
+@UtilityClass
 @Slf4j
 public class FileUtils {
 
@@ -62,14 +62,7 @@ public class FileUtils {
 
     public static final String KUBE_CONFIG_FILE = "config";
 
-    private static final String RWXR_XR_X = "rwxr-xr-x";
-
-    private static final FileAttribute<Set<PosixFilePermission>> PERMISSION_755 =
-            PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString(RWXR_XR_X));
-
-    private FileUtils() {
-        throw new UnsupportedOperationException("Construct FileUtils");
-    }
+    private static final Set<PosixFilePermission> PERMISSION_755 = PosixFilePermissions.fromString("rwxr-xr-x");
 
     /**
      * get download file absolute path and name
@@ -78,32 +71,14 @@ public class FileUtils {
      * @return download file name
      */
     public static String getDownloadFilename(String filename) {
-        String fileName =
-                String.format("%s/download/%s/%s", DATA_BASEDIR, DateUtils.getCurrentTime(YYYYMMDDHHMMSS), filename);
-
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
+        return Paths.get(DATA_BASEDIR, "tmp", CodeGenerateUtils.genCode() + "-" + filename).toString();
     }
 
     /**
-     * get upload file absolute path and name
-     *
-     * @param tenantCode tenant code
-     * @param filename file name
-     * @return local file path
+     * Generate a local tmp absolute path of the uploaded file
      */
-    public static String getUploadFilename(String tenantCode, String filename) {
-        String fileName = String.format("%s/%s/resources/%s", DATA_BASEDIR, tenantCode, filename);
-        File file = new File(fileName);
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-
-        return fileName;
+    public static String getUploadFileLocalTmpAbsolutePath() {
+        return Paths.get(DATA_BASEDIR, "tmp", String.valueOf(CodeGenerateUtils.genCode())).toString();
     }
 
     /**
@@ -117,12 +92,12 @@ public class FileUtils {
      * @param taskInstanceId       task instance id
      * @return directory of process execution
      */
-    public static String getProcessExecDir(String tenant,
-                                           long projectCode,
-                                           long processDefineCode,
-                                           int processDefineVersion,
-                                           int processInstanceId,
-                                           int taskInstanceId) {
+    public static String getTaskInstanceWorkingDirectory(String tenant,
+                                                         long projectCode,
+                                                         long processDefineCode,
+                                                         int processDefineVersion,
+                                                         int processInstanceId,
+                                                         int taskInstanceId) {
         return String.format(
                 "%s/exec/process/%s/%d/%d_%d/%d/%d",
                 DATA_BASEDIR,
@@ -147,7 +122,7 @@ public class FileUtils {
     /**
      * absolute path of appInfo file
      *
-     * @param execPath  directory of process execution
+     * @param execPath directory of process execution
      * @return
      */
     public static String getAppInfoPath(String execPath) {
@@ -162,37 +137,9 @@ public class FileUtils {
     }
 
     /**
-     * create directory if absent
-     *
-     * @param execLocalPath execute local path
-     * @throws IOException errors
-     */
-    public static void createWorkDirIfAbsent(String execLocalPath) throws IOException {
-        // if work dir exists, first delete
-        File execLocalPathFile = new File(execLocalPath);
-
-        if (execLocalPathFile.exists()) {
-            try {
-                org.apache.commons.io.FileUtils.forceDelete(execLocalPathFile);
-            } catch (Exception ex) {
-                if (ex instanceof NoSuchFileException || ex.getCause() instanceof NoSuchFileException) {
-                    // this file is already be deleted.
-                } else {
-                    throw ex;
-                }
-            }
-        }
-
-        // create work dir
-        org.apache.commons.io.FileUtils.forceMkdir(execLocalPathFile);
-        String mkdirLog = "create dir success " + execLocalPath;
-        log.info(mkdirLog);
-    }
-
-    /**
      * write content to file ,if parent path not exists, it will do one's utmost to mkdir
      *
-     * @param content content
+     * @param content  content
      * @param filePath target file path
      * @return true if write success
      */
@@ -232,25 +179,6 @@ public class FileUtils {
     }
 
     /**
-     * Gets all the parent subdirectories of the parentDir directory
-     *
-     * @param parentDir parent dir
-     * @return all dirs
-     */
-    public static File[] getAllDir(String parentDir) {
-        if (parentDir == null || "".equals(parentDir)) {
-            throw new RuntimeException("parentDir can not be empty");
-        }
-
-        File file = new File(parentDir);
-        if (!file.exists() || !file.isDirectory()) {
-            throw new RuntimeException("parentDir not exist, or is not a directory:" + parentDir);
-        }
-
-        return file.listFiles(File::isDirectory);
-    }
-
-    /**
      * Get Content
      *
      * @param inputStream input stream
@@ -265,7 +193,7 @@ public class FileUtils {
             while ((length = inputStream.read(buffer)) != -1) {
                 output.write(buffer, 0, length);
             }
-            return output.toString(UTF_8);
+            return output.toString(StandardCharsets.UTF_8.name());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
@@ -295,6 +223,7 @@ public class FileUtils {
 
     /**
      * Calculate file checksum with CRC32 algorithm
+     *
      * @param pathName
      * @return checksum of file/dir
      */
@@ -325,60 +254,94 @@ public class FileUtils {
         return crcString;
     }
 
-    public static void setFileOwner(Path filePath, String fileOwner) throws FileOperateException {
-        try {
-            // We use linux command to set the file owner, since jdk api will not use sudo.
-            String command = String.format("sudo chown %s %s", fileOwner, filePath.toString());
-            Runtime.getRuntime().exec(command);
-            Process process = Runtime.getRuntime().exec(command);
-            int exitCode = process.waitFor();
-            if (0 != exitCode) {
-                throw new FileOperateException(
-                        "Set file: " + filePath + " to owner: " + fileOwner + " failed, existCode(" + exitCode + ")");
-            }
-        } catch (FileOperateException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
-
-        }
-    }
-
-    public static void setDirectoryOwner(Path filePath, String fileOwner) throws FileOperateException {
-        try {
-            // We use linux command to set the file owner, since jdk api will not use sudo.
-            String command = String.format("sudo chown -R %s %s", fileOwner, filePath.toString());
-            Runtime.getRuntime().exec(command);
-            Process process = Runtime.getRuntime().exec(command);
-            int exitCode = process.waitFor();
-            if (0 != exitCode) {
-                throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner
-                        + " failed, existCode(" + exitCode + ")");
-            }
-        } catch (FileOperateException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new FileOperateException("Set directory: " + filePath + " to owner: " + fileOwner + " failed");
-
-        }
-    }
-
-    public static void createDirectoryIfNotPresent(Path path) throws IOException {
-        if (Files.exists(path)) {
-            return;
-        }
-        Files.createDirectories(path);
-    }
-
-    /**
-     * Create a file with '755'.
-     */
     public static void createFileWith755(@NonNull Path path) throws IOException {
         if (SystemUtils.IS_OS_WINDOWS) {
             Files.createFile(path);
         } else {
-            Files.createFile(path, PERMISSION_755);
+            Files.createFile(path);
+            Files.setPosixFilePermissions(path, PERMISSION_755);
         }
     }
 
+    public static void createDirectoryWith755(@NonNull Path path) throws IOException {
+        if (path.toFile().exists()) {
+            return;
+        }
+        if (OSUtils.isWindows()) {
+            Files.createDirectories(path);
+        } else {
+            Path parent = path.getParent();
+            if (parent != null && !parent.toFile().exists()) {
+                createDirectoryWith755(parent);
+            }
+
+            try {
+                Files.createDirectory(path);
+                Files.setPosixFilePermissions(path, PERMISSION_755);
+            } catch (FileAlreadyExistsException fileAlreadyExistsException) {
+                // Catch the FileAlreadyExistsException here to avoid create the same parent directory in parallel
+                log.debug("The directory: {} already exists", path);
+            }
+
+        }
+    }
+
+    public static void setFileTo755(File file) throws IOException {
+        if (OSUtils.isWindows()) {
+            return;
+        }
+        if (file.isFile()) {
+            Files.setPosixFilePermissions(file.toPath(), PERMISSION_755);
+            return;
+        }
+        Files.setPosixFilePermissions(file.toPath(), PERMISSION_755);
+        File[] files = file.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                setFileTo755(f);
+            }
+        }
+    }
+
+    public static String concatFilePath(String... paths) {
+        if (paths.length == 0) {
+            throw new IllegalArgumentException("At least one path should be provided");
+        }
+        StringBuilder finalPath = new StringBuilder(paths[0]);
+        if (StringUtils.isEmpty(finalPath)) {
+            throw new IllegalArgumentException("The path should not be empty");
+        }
+        String separator = File.separator;
+        for (int i = 1; i < paths.length; i++) {
+            String path = paths[i];
+            if (StringUtils.isEmpty(path)) {
+                throw new IllegalArgumentException("The path should not be empty");
+            }
+            if (finalPath.toString().endsWith(separator) && path.startsWith(separator)) {
+                finalPath.append(path.substring(separator.length()));
+                continue;
+            }
+            if (!finalPath.toString().endsWith(separator) && !path.startsWith(separator)) {
+                finalPath.append(separator).append(path);
+                continue;
+            }
+            finalPath.append(path);
+        }
+        return finalPath.toString();
+    }
+
+    public static String getClassPathAbsolutePath(Class clazz) {
+        checkNotNull(clazz, "class is null");
+        return Optional.ofNullable(clazz.getResource("/"))
+                .map(URL::getPath)
+                .orElseThrow(() -> new IllegalArgumentException("class path: " + clazz + " is null"));
+    }
+
+    /**
+     * copy input stream to file, if the file already exists, will append the content to the beginning of the file, otherwise will create a new file.
+     */
+    @SneakyThrows
+    public static void copyInputStreamToFile(InputStream inputStream, String destFilename) {
+        org.apache.commons.io.FileUtils.copyInputStreamToFile(inputStream, new File(destFilename));
+    }
 }

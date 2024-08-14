@@ -74,7 +74,7 @@ $ docker run -d --name dolphinscheduler-tools \
 # 启动 DolphinScheduler 对应的服务
 $ docker run -d --name dolphinscheduler-master \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
+    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e SPRING_JACKSON_TIME_ZONE="UTC" \
@@ -83,7 +83,7 @@ $ docker run -d --name dolphinscheduler-master \
     -d apache/dolphinscheduler-master:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-worker \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
+    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e SPRING_JACKSON_TIME_ZONE="UTC" \
@@ -92,7 +92,7 @@ $ docker run -d --name dolphinscheduler-worker \
     -d apache/dolphinscheduler-worker:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-api \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
+    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e SPRING_JACKSON_TIME_ZONE="UTC" \
@@ -101,7 +101,7 @@ $ docker run -d --name dolphinscheduler-api \
     -d apache/dolphinscheduler-api:"${DOLPHINSCHEDULER_VERSION}"
 $ docker run -d --name dolphinscheduler-alert-server \
     -e DATABASE="postgresql" \
-    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/dolphinscheduler" \
+    -e SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/<DATABASE>" \
     -e SPRING_DATASOURCE_USERNAME="<USER>" \
     -e SPRING_DATASOURCE_PASSWORD="<PASSWORD>" \
     -e SPRING_JACKSON_TIME_ZONE="UTC" \

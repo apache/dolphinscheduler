@@ -55,16 +55,7 @@ export default {
     return: '返回',
     save: '保存'
   },
-  udf: {
-    udf_resources: 'UDF资源',
-    upload_udf_resources: '上传UDF资源',
-    udf_source_name: 'UDF资源名称'
-  },
   function: {
-    udf_function: 'UDF函数',
-    create_udf_function: '创建UDF函数',
-    edit_udf_function: '编辑UDF函数',
-    udf_function_name: 'UDF函数名称',
     user_name: '所属用户',
     class_name: '类名',
     type: '类型',
@@ -77,21 +68,15 @@ export default {
     delete: '删除',
     success: '成功',
     package_name: '包名类名',
-    udf_resources: 'UDF资源',
     instructions: '使用说明',
     upload_resources: '上传资源',
-    udf_resources_directory: 'UDF资源目录',
     delete_confirm: '确定删除吗?',
     enter_keyword_tips: '请输入关键词',
-    enter_udf_unction_name_tips: '请输入UDF函数名称',
     enter_package_name_tips: '请输入包名类名',
-    enter_select_udf_resources_tips: '请选择UDF资源',
-    enter_select_udf_resources_directory_tips: '请选择UDF资源目录',
     enter_instructions_tips: '请输入使用说明',
     enter_name_tips: '请输入名称',
     enter_description_tips: '请输入描述',
-    upload: '上传',
-    upload_udf_resources: '上传UDF资源'
+    upload: '上传'
   },
   task_group_option: {
     manage: '任务组管理',

@@ -39,7 +39,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,7 +84,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private QueueService queueService;
 
     @Autowired(required = false)
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     /**
      * Check the tenant new object valid or not
@@ -136,14 +136,13 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @param queueId queue id
      * @param desc description
      * @return create result code
-     * @throws Exception exception
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Tenant createTenant(User loginUser,
                                String tenantCode,
                                int queueId,
-                               String desc) throws Exception {
+                               String desc) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_CREATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -154,7 +153,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         createTenantValid(tenant);
         tenantMapper.insert(tenant);
 
-        storageOperate.createTenantDirIfNotExists(tenantCode);
         return tenant;
     }
 
@@ -209,11 +207,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         updateTenantValid(existsTenant, updateTenant);
 
         updateTenant.setCreateTime(existsTenant.getCreateTime());
-        // updateProcessInstance tenant
-        // if the tenant code is modified, the original resource needs to be copied to the new tenant.
-        if (!Objects.equals(existsTenant.getTenantCode(), updateTenant.getTenantCode())) {
-            storageOperate.createTenantDirIfNotExists(tenantCode);
-        }
         int update = tenantMapper.updateById(updateTenant);
         if (update <= 0) {
             throw new ServiceException(Status.UPDATE_TENANT_ERROR);
@@ -262,7 +255,6 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
 
         processInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
-        storageOperate.deleteTenant(tenant.getTenantCode());
     }
 
     private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {

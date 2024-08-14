@@ -24,6 +24,8 @@
 -XX:+PrintGCDetails
 -Xloggc:gc.log
 
+-XX:-OmitStackTraceInFastThrow
+-XX:+ExitOnOutOfMemoryError
 -XX:+HeapDumpOnOutOfMemoryError
 -XX:HeapDumpPath=dump.hprof
 

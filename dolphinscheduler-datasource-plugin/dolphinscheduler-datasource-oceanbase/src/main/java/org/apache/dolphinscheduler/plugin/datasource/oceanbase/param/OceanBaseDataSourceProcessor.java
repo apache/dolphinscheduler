@@ -40,6 +40,7 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @Slf4j
@@ -187,5 +188,11 @@ public class OceanBaseDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new OceanBaseDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.oceanbase);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.oceanbase);
     }
 }

@@ -13,14 +13,7 @@
 >
   ## 注意事项
 
-添加配置信息：`<server-name>/conf/common.properties`
-
-```properties
-data-quality.jar.name=dolphinscheduler-data-quality-dev-SNAPSHOT.jar
-```
-
-- 这里的`data-quality.jar.name`请根据实际打包的名称来填写。
-- 如果单独打包`data-quality`的话，记得修改包名和`data-quality.jar.name`一致。
+- 如果单独打包`data-quality`的话，记得修改包路径和`data-quality.jar.dir`一致，配置内容在 `common.properties` 中的 `data-quality.jar.dir`
 - 如果是老版本升级使用，运行之前需要先执行`SQL`更新脚本进行数据库初始化。
 - 当前 `dolphinscheduler-data-quality-dev-SNAPSHOT.jar` 是瘦包，不包含任何 `JDBC` 驱动。
   如果有 `JDBC` 驱动需要，可以在`节点设置` `选项参数`处设置 `--jars` 参数，

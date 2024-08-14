@@ -26,12 +26,12 @@ import {
   DesktopOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
+  SelectOutlined,
   LogoutOutlined,
   FundProjectionScreenOutlined,
   PartitionOutlined,
   SettingOutlined,
   FileSearchOutlined,
-  RobotOutlined,
   AppstoreOutlined,
   UsergroupAddOutlined,
   UserAddOutlined,
@@ -110,18 +110,18 @@ export function useDataList() {
               {
                 label: t('menu.project_overview'),
                 key: `/projects/${projectCode}`,
-                payload: { projectName: projectName },
+                payload: { projectName: projectName }
               },
               {
                 label: t('menu.project_parameter'),
                 key: `/projects/${projectCode}/parameter`,
-                payload: { projectName: projectName },
+                payload: { projectName: projectName }
               },
               {
                 label: t('menu.project_preferences'),
                 key: `/projects/${projectCode}/preferences`,
-                payload: { projectName: projectName },
-              },
+                payload: { projectName: projectName }
+              }
             ]
           },
           {
@@ -157,11 +157,6 @@ export function useDataList() {
             icon: renderIcon(SettingOutlined),
             children: [
               {
-                label: t('menu.task_definition'),
-                key: `/projects/${projectCode}/task/definitions`,
-                payload: { projectName: projectName }
-              },
-              {
                 label: t('menu.task_instance'),
                 key: `/projects/${projectCode}/task/instances`,
                 payload: { projectName: projectName }
@@ -179,21 +174,6 @@ export function useDataList() {
             label: t('menu.file_manage'),
             key: '/resource/file-manage',
             icon: renderIcon(FileSearchOutlined)
-          },
-          {
-            label: t('menu.udf_manage'),
-            key: 'udf-manage',
-            icon: renderIcon(RobotOutlined),
-            children: [
-              {
-                label: t('menu.resource_manage'),
-                key: '/resource/resource-manage'
-              },
-              {
-                label: t('menu.function_manage'),
-                key: '/resource/function-manage'
-              }
-            ]
           },
           {
             label: t('menu.task_group_manage'),
@@ -254,6 +234,10 @@ export function useDataList() {
               {
                 label: t('menu.worker'),
                 key: '/monitor/worker'
+              },
+              {
+                label: t('menu.alert_server'),
+                key: '/monitor/alert_server'
               },
               {
                 label: t('menu.db'),
@@ -371,6 +355,11 @@ export function useDataList() {
         key: 'password',
         icon: renderIcon(KeyOutlined),
         disabled: userStore.getSecurityConfigType !== 'PASSWORD'
+      },
+      {
+        label: t('user_dropdown.about'),
+        key: 'about',
+        icon: renderIcon(SelectOutlined)
       },
       {
         label: t('user_dropdown.logout'),

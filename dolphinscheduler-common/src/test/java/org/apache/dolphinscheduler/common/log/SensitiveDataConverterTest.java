@@ -79,6 +79,34 @@ public class SensitiveDataConverterTest {
                         "  }\n" +
                         "}");
 
+        // data quality
+        tcs.put("\"readers\" : [ {\n" +
+                "    \"type\" : \"JDBC\",\n" +
+                "    \"config\" : {\n" +
+                "      \"database\" : \"dolphinscheduler\",\n" +
+                "      \"password\" : \"view1\",\n" +
+                "      \"driver\" : \"com.mysql.cj.jdbc.Driver\",\n" +
+                "      \"user\" : \"root\",\n" +
+                "      \"output_table\" : \"dolphinscheduler_users\",\n" +
+                "      \"table\" : \"users\",\n" +
+                "      \"url\" : \"jdbc:mysql://127.0.0.1:3307/dolphinscheduler?userSSL=true&enabledTLSProtocols=TLSv1.2\"\n"
+                +
+                "    }\n" +
+                "  } ]",
+                "\"readers\" : [ {\n" +
+                        "    \"type\" : \"JDBC\",\n" +
+                        "    \"config\" : {\n" +
+                        "      \"database\" : \"dolphinscheduler\",\n" +
+                        "      \"password\" : \"*****\",\n" +
+                        "      \"driver\" : \"com.mysql.cj.jdbc.Driver\",\n" +
+                        "      \"user\" : \"root\",\n" +
+                        "      \"output_table\" : \"dolphinscheduler_users\",\n" +
+                        "      \"table\" : \"users\",\n" +
+                        "      \"url\" : \"jdbc:mysql://127.0.0.1:3307/dolphinscheduler?userSSL=true&enabledTLSProtocols=TLSv1.2\"\n"
+                        +
+                        "    }\n" +
+                        "  } ]");
+
         for (String logMsg : tcs.keySet()) {
             String maskedLog = SensitiveDataConverter.maskSensitiveData(logMsg);
             logger.info("original parameter : {}", logMsg);

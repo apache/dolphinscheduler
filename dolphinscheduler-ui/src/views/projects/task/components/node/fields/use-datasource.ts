@@ -84,12 +84,12 @@ export function useDatasource(
       disabled: false
     },
     {
-      id: 9,
+      id: 10,
       code: 'REDSHIFT',
       disabled: false
     },
     {
-      id: 10,
+      id: 11,
       code: 'ATHENA',
       disabled: false
     },
@@ -114,12 +114,22 @@ export function useDatasource(
       disabled: false
     },
     {
-      id: 15,
+      id: 16,
+      code: 'OCEANBASE',
+      disabled: false
+    },
+    {
+      id: 17,
       code: 'SSH',
       disabled: true
     },
     {
-      id: 16,
+      id: 18,
+      code: 'KYUUBI',
+      disabled: false
+    },
+    {
+      id: 19,
       code: 'DATABEND',
       disabled: false
     },
@@ -135,22 +145,22 @@ export function useDatasource(
     },
     {
       id: 23,
-      code: 'ZEPPELIN',
-      disabled: false
-    },
-    {
-      id: 23,
       code: 'DORIS',
       disabled: false
     },
     {
       id: 24,
-      code: 'SAGEMAKER',
+      code: 'ZEPPELIN',
       disabled: false
     },
     {
       id: 25,
-      code: 'KYUUBI',
+      code: 'SAGEMAKER',
+      disabled: false
+    },
+    {
+      id: 27,
+      code: 'ALIYUN_SERVERLESS_SPARK',
       disabled: false
     }
   ]

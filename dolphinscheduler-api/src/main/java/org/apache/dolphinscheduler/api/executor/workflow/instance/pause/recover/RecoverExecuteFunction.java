@@ -43,7 +43,7 @@ public class RecoverExecuteFunction implements ExecuteFunction<RecoverExecuteReq
     @Override
     public RecoverExecuteResult execute(RecoverExecuteRequest request) throws ExecuteRuntimeException {
         ProcessInstance workflowInstance = request.getWorkflowInstance();
-        if (!workflowInstance.getState().isPause()) {
+        if (!(workflowInstance.getState().isPause() || workflowInstance.getState().isStop())) {
             throw new ExecuteRuntimeException(
                     String.format("The workflow instance: %s state is %s, cannot recovery", workflowInstance.getName(),
                             workflowInstance.getState()));

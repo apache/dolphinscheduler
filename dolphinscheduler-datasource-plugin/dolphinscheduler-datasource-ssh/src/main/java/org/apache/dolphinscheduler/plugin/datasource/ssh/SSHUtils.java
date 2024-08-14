@@ -23,9 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.sshd.client.SshClient;
 import org.apache.sshd.client.session.ClientSession;
 import org.apache.sshd.common.config.keys.loader.KeyPairResourceLoader;
+import org.apache.sshd.common.session.SessionHeartbeatController;
 import org.apache.sshd.common.util.security.SecurityUtils;
 
 import java.security.KeyPair;
+import java.time.Duration;
 import java.util.Collection;
 
 public class SSHUtils {
@@ -57,6 +59,7 @@ public class SSHUtils {
                 throw new Exception("Failed to add public key identity", e);
             }
         }
+        session.setSessionHeartbeat(SessionHeartbeatController.HeartbeatType.IGNORE, Duration.ofSeconds(3));
         return session;
     }
 }

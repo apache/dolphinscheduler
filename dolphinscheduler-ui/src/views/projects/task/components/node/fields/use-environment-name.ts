@@ -70,7 +70,7 @@ export function useEnvironmentName(
       )
       if (model?.environmentCode) {
         if (options.value) {
-          let elementExists =
+          const elementExists =
             options.value.find(
               (item) => item.value === model.environmentCode
             ) !== undefined
@@ -93,6 +93,7 @@ export function useEnvironmentName(
   return {
     type: 'select',
     field: 'environmentCode',
+    class: 'env-select',
     span: 12,
     name: t('project.node.environment_name'),
     props: {

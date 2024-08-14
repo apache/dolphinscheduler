@@ -18,18 +18,15 @@
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParameter;
 
 import java.util.List;
 
 /**
  * source mysql parameter
  */
-public class SourceMysqlParameter {
+public class SourceMysqlParameter extends SourceCommonParameter {
 
-    /**
-     * src datasource
-     */
-    private int srcDatasource;
     /**
      * src table
      */
@@ -62,14 +59,6 @@ public class SourceMysqlParameter {
      * map column java
      */
     private List<Property> mapColumnJava;
-
-    public int getSrcDatasource() {
-        return srcDatasource;
-    }
-
-    public void setSrcDatasource(int srcDatasource) {
-        this.srcDatasource = srcDatasource;
-    }
 
     public String getSrcTable() {
         return srcTable;

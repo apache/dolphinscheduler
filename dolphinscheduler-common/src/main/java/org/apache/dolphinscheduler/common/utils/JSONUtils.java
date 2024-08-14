@@ -21,6 +21,7 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
@@ -59,13 +60,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Strings;
 
 /**
  * json utils
  */
 @Slf4j
-public class JSONUtils {
+public final class JSONUtils {
 
     static {
         log.info("init timezone: {}", TimeZone.getDefault());
@@ -76,6 +78,8 @@ public class JSONUtils {
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .configure(FAIL_ON_EMPTY_BEANS, false)
+            .addModule(new JavaTimeModule())
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))
@@ -194,7 +198,10 @@ public class JSONUtils {
      * @return true if valid
      */
     public static boolean checkJsonValid(String json) {
+        return checkJsonValid(json, true);
+    }
 
+    public static boolean checkJsonValid(String json, Boolean logFlag) {
         if (Strings.isNullOrEmpty(json)) {
             return false;
         }
@@ -203,7 +210,8 @@ public class JSONUtils {
             objectMapper.readTree(json);
             return true;
         } catch (IOException e) {
-            log.error("check json object valid exception!", e);
+            if (logFlag)
+                log.error("check json object valid exception!", e);
         }
 
         return false;

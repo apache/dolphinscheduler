@@ -29,7 +29,15 @@ export function useResources(
 ): IJsonItem {
   const { t } = useI18n()
 
-  const resourcesOptions = ref([] as IResource[])
+  interface ResourceOption {
+    name: string
+    fullName: string
+    dirctory: boolean
+    disable: boolean
+    children?: ResourceOption[]
+  }
+
+  const resourcesOptions = ref<ResourceOption[] | IResource[]>([])
   const resourcesLoading = ref(false)
 
   const taskStore = useTaskNodeStore()
@@ -48,6 +56,66 @@ export function useResources(
     taskStore.updateResource(res)
   }
 
+  const validateResourceExist = (
+    fullName: string,
+    parentDir: string[],
+    resources: ResourceOption[]
+  ): boolean => {
+    const isDirectory = (res: ResourceOption): boolean => {
+      return res.dirctory && new RegExp(`^${res.fullName}`).test(fullName)
+    }
+
+    const processDirectory = (res: ResourceOption): boolean => {
+      if (!res.children) {
+        res.children = []
+      }
+      parentDir.push(res.name)
+      return validateResourceExist(
+        fullName,
+        parentDir,
+        res.children as ResourceOption[]
+      )
+    }
+
+    if (resources.length > 0) {
+      for (const res of resources) {
+        if (isDirectory(res)) {
+          return processDirectory(res)
+        }
+
+        if (res.fullName === fullName) {
+          return true
+        }
+      }
+    }
+    addResourceNode(fullName, parentDir, resources)
+    return false
+  }
+
+  const addResourceNode = (
+    fullName: string,
+    parentDir: string[],
+    resources: ResourceOption[]
+  ) => {
+    const resourceNode = {
+      fullName: fullName,
+      name: getResourceDirAfter(fullName, parentDir),
+      dirctory: false,
+      disable: true
+    }
+    resources.push(resourceNode)
+  }
+
+  const getResourceDirAfter = (fullName: string, parentDir: string[]) => {
+    const dirctory = '/resources/' + parentDir.join('')
+    const delimiterIndex = fullName.indexOf(dirctory)
+    if (delimiterIndex !== -1) {
+      return fullName.substring(delimiterIndex + dirctory.length)
+    } else {
+      return fullName
+    }
+  }
+
   onMounted(() => {
     getResources()
   })
@@ -55,6 +123,7 @@ export function useResources(
   return {
     type: 'tree-select',
     field: 'resourceList',
+    class: 'resource-select',
     name: t('project.node.resources'),
     span: span,
     options: resourcesOptions,
@@ -69,18 +138,44 @@ export function useResources(
       placeholder: t('project.node.resources_tips'),
       keyField: 'fullName',
       labelField: 'name',
+      disabledField: 'disable',
       loading: resourcesLoading
     },
     validate: {
-      trigger: ['input', 'blur'],
+      trigger: ['blur'],
       required: required,
-      validator(validate: any, value: IResource[]) {
+      validator(validate: any, value: string[]) {
+        if (value) {
+          const errorNames: string[] = []
+          value.forEach((item) => {
+            if (
+              !validateResourceExist(
+                item,
+                [],
+                resourcesOptions.value as ResourceOption[]
+              )
+            ) {
+              errorNames.push(item)
+            }
+          })
+          if (errorNames.length > 0) {
+            let errorName = ': '
+            errorNames.forEach((name) => {
+              value.splice(value.indexOf(name), 1)
+              errorName += getResourceDirAfter(name, []) + ';'
+            })
+            return new Error(
+              t('project.node.useless_resources_tips') + errorName
+            )
+          }
+        }
+
         if (isRef(required) ? required.value : required) {
           if (!value || value.length == 0) {
             return new Error(t('project.node.resources_tips'))
           }
-
-          if (limit > 0 && value.length > limit) {
+          const limit_ = isRef(limit) ? limit.value : limit
+          if (limit_ > 0 && value.length > limit_) {
             return new Error(t('project.node.resources_limit_tips') + limit)
           }
         }

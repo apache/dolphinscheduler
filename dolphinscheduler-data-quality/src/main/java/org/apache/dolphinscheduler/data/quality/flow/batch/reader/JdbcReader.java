@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.data.quality.flow.batch.reader;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.data.quality.Constants.DATABASE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DB_TABLE;
 import static org.apache.dolphinscheduler.data.quality.Constants.DOTS;
@@ -32,16 +33,18 @@ import org.apache.dolphinscheduler.data.quality.config.ValidateResult;
 import org.apache.dolphinscheduler.data.quality.execution.SparkRuntimeEnvironment;
 import org.apache.dolphinscheduler.data.quality.flow.batch.BatchReader;
 import org.apache.dolphinscheduler.data.quality.utils.ConfigUtils;
-import org.apache.dolphinscheduler.data.quality.utils.ParserUtils;
 
 import org.apache.spark.sql.DataFrameReader;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import lombok.SneakyThrows;
 
 /**
  * AbstractJdbcSource
@@ -74,6 +77,7 @@ public class JdbcReader implements BatchReader {
         return jdbcReader(env.sparkSession()).load();
     }
 
+    @SneakyThrows
     private DataFrameReader jdbcReader(SparkSession sparkSession) {
 
         DataFrameReader reader = sparkSession.read()
@@ -81,7 +85,7 @@ public class JdbcReader implements BatchReader {
                 .option(URL, config.getString(URL))
                 .option(DB_TABLE, config.getString(DATABASE) + "." + config.getString(TABLE))
                 .option(USER, config.getString(USER))
-                .option(PASSWORD, ParserUtils.decode(config.getString(PASSWORD)))
+                .option(PASSWORD, URLDecoder.decode(config.getString(PASSWORD), UTF_8.name()))
                 .option(DRIVER, config.getString(DRIVER));
 
         Config jdbcConfig = ConfigUtils.extractSubConfig(config, JDBC + DOTS, false);

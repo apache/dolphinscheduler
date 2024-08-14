@@ -32,12 +32,6 @@ public class LogicTaskInstanceOperationFunctionManager {
     @Autowired
     private LogicITaskInstancePauseOperationFunction logicITaskInstancePauseOperationFunction;
 
-    @Autowired
-    private TaskInstanceForceStartOperationFunction taskInstanceForceStartOperationFunction;
-
-    @Autowired
-    private TaskInstanceWakeupOperationFunction taskInstanceWakeupOperationFunction;
-
     public LogicITaskInstanceDispatchOperationFunction getLogicTaskInstanceDispatchOperationFunction() {
         return logicITaskInstanceDispatchOperationFunction;
     }
@@ -50,11 +44,4 @@ public class LogicTaskInstanceOperationFunctionManager {
         return logicITaskInstancePauseOperationFunction;
     }
 
-    public TaskInstanceForceStartOperationFunction getTaskInstanceForceStartOperationFunction() {
-        return taskInstanceForceStartOperationFunction;
-    }
-
-    public TaskInstanceWakeupOperationFunction getTaskInstanceWakeupOperationFunction() {
-        return taskInstanceWakeupOperationFunction;
-    }
 }

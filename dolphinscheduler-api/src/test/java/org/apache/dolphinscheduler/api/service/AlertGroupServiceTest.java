@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_UPDATE;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_GROUP_VIEW;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -41,6 +42,7 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -67,6 +69,12 @@ public class AlertGroupServiceTest {
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupServiceTest.class);
     private static final Logger alertGroupServiceLogger = LoggerFactory.getLogger(AlertGroupServiceImpl.class);
+    private String tooLongDescription =
+            "this is a toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+                    +
+                    "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"
+                    +
+                    "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo long description";
 
     @InjectMocks
     private AlertGroupServiceImpl alertGroupService;
@@ -81,24 +89,60 @@ public class AlertGroupServiceTest {
 
     @Test
     public void testQueryAlertGroup() {
+        User user = getLoginUser();
 
         when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
-        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(getLoginUser());
-        Assertions.assertEquals(2, alertGroups.size());
+        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(user);
+        Assertions.assertEquals(1, alertGroups.size());
+
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(2);
+
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, 2,
+                alertGroupServiceLogger))
+                        .thenReturn(Collections.emptySet());
+        Assertions.assertEquals(alertGroupService.queryAllAlertGroup(user).size(), 0);
+
+        user.setId(3);
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, 3,
+                alertGroupServiceLogger))
+                        .thenReturn(Collections.singleton(1));
+        assertDoesNotThrow(() -> alertGroupService.queryAllAlertGroup(user));
     }
 
     @Test
-    public void testQueryNormalAlertGroup() {
+    public void testQueryAlertGroupById() {
+        User user = getLoginUser();
+        user.setId(2);
+        user.setUserType(UserType.GENERAL_USER);
 
-        when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
-        List<AlertGroup> alertGroups = alertGroupService.queryNormalAlertGroups(getLoginUser());
-        Assertions.assertEquals(1, alertGroups.size());
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, 2, ALERT_GROUP_VIEW,
+                baseServiceLogger))
+                        .thenReturn(false);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertGroupService.queryAlertGroupById(user, 1));
+
+        user.setId(1);
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, 1, ALERT_GROUP_VIEW,
+                baseServiceLogger))
+                        .thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{999}, 1,
+                baseServiceLogger))
+                        .thenReturn(true);
+        when(alertGroupMapper.selectById(999)).thenReturn(null);
+
+        assertThrowsServiceException(Status.ALERT_GROUP_NOT_EXIST,
+                () -> alertGroupService.queryAlertGroupById(user, 999));
+
+        when(alertGroupMapper.selectById(999)).thenReturn(getEntity());
+        assertDoesNotThrow(() -> alertGroupService.queryAlertGroupById(user, 999));
     }
 
     @Test
     public void testListPaging() {
         IPage<AlertGroup> page = new Page<>(1, 10);
-        page.setTotal(2L);
+        page.setTotal(1L);
         page.setRecords(getList());
         when(alertGroupMapper.queryAlertGroupPage(any(Page.class), eq(groupName))).thenReturn(page);
         User user = new User();
@@ -114,12 +158,24 @@ public class AlertGroupServiceTest {
         alertGroupPageInfo = alertGroupService.listPaging(user, groupName, 1, 10);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(alertGroupPageInfo.getTotalList()));
 
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(99);
+        page.setTotal(1);
+        page.setRecords(Collections.singletonList(getEntity()));
+
+        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, user.getId(),
+                alertGroupServiceLogger))
+                        .thenReturn(Collections.singleton(1));
+        when(alertGroupMapper.queryAlertGroupPageByIds(any(Page.class), any(List.class), eq(groupName)))
+                .thenReturn(page);
+
+        alertGroupService.listPaging(user, groupName, 1, 10).getTotal();
     }
 
     @Test
     public void testCreateAlertgroup() {
 
-        when(alertGroupMapper.insert(any(AlertGroup.class))).thenReturn(3);
+        when(alertGroupMapper.insert(any(AlertGroup.class))).thenReturn(2);
         User user = new User();
         user.setId(0);
         // no operate
@@ -134,8 +190,19 @@ public class AlertGroupServiceTest {
                 ALERT_GROUP_CREATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, null, user.getId(),
                 baseServiceLogger)).thenReturn(true);
+
+        assertThrowsServiceException(Status.DESCRIPTION_TOO_LONG_ERROR,
+                () -> alertGroupService.createAlertGroup(user, groupName, tooLongDescription, null));
         AlertGroup alertGroup = alertGroupService.createAlertGroup(user, groupName, groupName, null);
         assertNotNull(alertGroup);
+
+        when(alertGroupMapper.insert(any(AlertGroup.class))).thenReturn(-1);
+        assertThrowsServiceException(Status.CREATE_ALERT_GROUP_ERROR,
+                () -> alertGroupService.createAlertGroup(user, groupName, groupName, null));
+
+        when(alertGroupMapper.insert(any(AlertGroup.class))).thenThrow(DuplicateKeyException.class);
+        assertThrowsServiceException(Status.ALERT_GROUP_EXIST,
+                () -> alertGroupService.createAlertGroup(user, groupName, groupName, null));
     }
 
     @Test
@@ -162,7 +229,7 @@ public class AlertGroupServiceTest {
         user.setUserType(UserType.GENERAL_USER);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> alertGroupService.updateAlertGroupById(user, 1, groupName, groupName, null));
-        user.setUserType(UserType.ADMIN_USER);
+
         // not exist
         user.setUserType(UserType.ADMIN_USER);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP, user.getId(),
@@ -171,11 +238,15 @@ public class AlertGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.ALERT_GROUP_NOT_EXIST,
                 () -> alertGroupService.updateAlertGroupById(user, 1, groupName, groupName, null));
+
+        assertThrowsServiceException(Status.DESCRIPTION_TOO_LONG_ERROR,
+                () -> alertGroupService.updateAlertGroupById(user, 1, groupName, tooLongDescription, null));
+
         // success
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{3},
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{2},
                 user.getId(), baseServiceLogger)).thenReturn(true);
-        when(alertGroupMapper.selectById(3)).thenReturn(getEntity());
-        assertDoesNotThrow(() -> alertGroupService.updateAlertGroupById(user, 3, groupName, groupName, null));
+        when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
+        assertDoesNotThrow(() -> alertGroupService.updateAlertGroupById(user, 2, groupName, groupName, null));
     }
 
     @Test
@@ -186,23 +257,11 @@ public class AlertGroupServiceTest {
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP,
                 user.getId(), ALERT_GROUP_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP,
-                new Object[]{3}, user.getId(), baseServiceLogger)).thenReturn(true);
-        when(alertGroupMapper.selectById(3)).thenReturn(getEntity());
+                new Object[]{2}, user.getId(), baseServiceLogger)).thenReturn(true);
+        when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
         when(alertGroupMapper.updateById(Mockito.any()))
                 .thenThrow(new DuplicateKeyException("group name exist"));
         assertThrowsServiceException(Status.ALERT_GROUP_EXIST,
-                () -> alertGroupService.updateAlertGroupById(user, 3, groupName, groupName, null));
-    }
-
-    @Test
-    public void testUpdateGlobalAlertgroup() {
-        User user = new User();
-        user.setId(0);
-        user.setUserType(UserType.ADMIN_USER);
-        AlertGroup globalAlertGroup = new AlertGroup();
-        globalAlertGroup.setId(2);
-        globalAlertGroup.setGroupName("global alert group");
-        assertThrowsServiceException(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP,
                 () -> alertGroupService.updateAlertGroupById(user, 2, groupName, groupName, null));
     }
 
@@ -223,20 +282,15 @@ public class AlertGroupServiceTest {
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_GROUP,
                 user.getId(), ALERT_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP,
-                new Object[]{3}, 0, baseServiceLogger)).thenReturn(true);
+                new Object[]{2}, 0, baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.ALERT_GROUP_NOT_EXIST,
-                () -> alertGroupService.deleteAlertGroupById(user, 3));
+                () -> alertGroupService.deleteAlertGroupById(user, 2));
 
-        // not allowed1
+        // not allowed
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{1}, 0,
                 baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP,
                 () -> alertGroupService.deleteAlertGroupById(user, 1));
-        // not allowed2
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP,
-                new Object[]{2}, 0, baseServiceLogger)).thenReturn(true);
-        assertThrowsServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP,
-                () -> alertGroupService.deleteAlertGroupById(user, 2));
         // success
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{4}, 0,
                 baseServiceLogger)).thenReturn(true);
@@ -272,14 +326,7 @@ public class AlertGroupServiceTest {
      */
     private List<AlertGroup> getList() {
         List<AlertGroup> alertGroups = new ArrayList<>();
-        AlertGroup defaultAdminWarningGroup = new AlertGroup();
-        defaultAdminWarningGroup.setId(1);
-        defaultAdminWarningGroup.setGroupName("default admin warning group");
-        alertGroups.add(defaultAdminWarningGroup);
-        AlertGroup globalAlertGroup = new AlertGroup();
-        globalAlertGroup.setId(2);
-        globalAlertGroup.setGroupName("global alert group");
-        alertGroups.add(globalAlertGroup);
+        alertGroups.add(getEntity());
         return alertGroups;
     }
 

@@ -17,23 +17,19 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
-import org.apache.dolphinscheduler.scheduler.quartz.utils.QuartzTaskUtils;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -56,10 +52,9 @@ public class ProcessScheduleTask extends QuartzJobBean {
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        JobDataMap dataMap = context.getJobDetail().getJobDataMap();
-
-        int projectId = dataMap.getInt(QuartzTaskUtils.PROJECT_ID);
-        int scheduleId = dataMap.getInt(QuartzTaskUtils.SCHEDULE_ID);
+        QuartzJobData quartzJobData = QuartzJobData.of(context.getJobDetail().getJobDataMap());
+        int projectId = quartzJobData.getProjectId();
+        int scheduleId = quartzJobData.getScheduleId();
 
         Date scheduledFireTime = context.getScheduledFireTime();
 
@@ -96,8 +91,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
         command.setScheduleTime(scheduledFireTime);
         command.setStartTime(fireTime);
         command.setWarningGroupId(schedule.getWarningGroupId());
-        String workerGroup = StringUtils.isEmpty(schedule.getWorkerGroup()) ? Constants.DEFAULT_WORKER_GROUP
-                : schedule.getWorkerGroup();
+        String workerGroup = WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup());
         command.setWorkerGroup(workerGroup);
         command.setTenantCode(schedule.getTenantCode());
         command.setEnvironmentCode(schedule.getEnvironmentCode());
@@ -110,7 +104,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {
         final Scheduler scheduler = context.getScheduler();
-        JobKey jobKey = QuartzTaskUtils.getJobKey(scheduleId, projectId);
+        JobKey jobKey = QuartzJobKey.of(projectId, scheduleId).toJobKey();
         try {
             if (scheduler.checkExists(jobKey)) {
                 log.info("Try to delete job: {}, projectId: {}, schedulerId", projectId, scheduleId);

@@ -41,7 +41,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,15 +79,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
             return Collections.emptyList();
         }
         return alertGroupMapper.selectBatchIds(ids);
-    }
-
-    @Override
-    public List<AlertGroup> queryNormalAlertGroups(User loginUser) {
-        return queryAllAlertGroup(loginUser)
-                .stream()
-                // todo: remove the hardcode
-                .filter(alertGroup -> alertGroup.getId() != 2)
-                .collect(Collectors.toList());
     }
 
     /**
@@ -200,12 +190,6 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
     @Override
     public AlertGroup updateAlertGroupById(User loginUser, int id, String groupName, String desc,
                                            String alertInstanceIds) {
-        // don't allow to update global alert group
-        // todo: remove hardcode
-        if (id == 2) {
-            throw new ServiceException(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP);
-        }
-
         if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.ALERT_GROUP, ALERT_GROUP_UPDATE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -253,7 +237,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         }
 
         // Not allow to delete the default alarm group ,because the module of service need to use it.
-        if (id == 1 || id == 2) {
+        if (id == 1) {
             log.warn("Not allow to delete the default alarm group.");
             throw new ServiceException(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP);
         }

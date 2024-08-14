@@ -100,7 +100,7 @@ public class ProcessDefinitionDao {
                 processDefinition.setId(rs.getInt(1));
                 long code = rs.getLong(2);
                 if (code == 0L) {
-                    code = CodeGenerateUtils.getInstance().genCode();
+                    code = CodeGenerateUtils.genCode();
                 }
                 processDefinition.setCode(code);
                 processDefinition.setVersion(Constants.VERSION_FIRST);

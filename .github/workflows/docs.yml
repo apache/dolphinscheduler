@@ -30,7 +30,7 @@ jobs:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Style Check
         run: ./mvnw spotless:check
   img-check:
@@ -40,7 +40,7 @@ jobs:
       run:
         working-directory: docs
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
@@ -54,14 +54,51 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
-      - run: sudo npm install -g markdown-link-check@3.10.0
+      - uses: actions/checkout@v4
+      - run: sudo npm install -g markdown-link-check@3.11.2
+      - run: sudo apt install plocate -y
       # NOTE: Change command from `find . -name "*.md"` to `find . -not -path "*/node_modules/*" -not -path "*/.tox/*" -name "*.md"`
       # if you want to run check locally
       - run: |
-          for file in $(find . -name "*.md" -not \( -path ./deploy/terraform/aws/README.md -prune \)); do
-            markdown-link-check -c .dlc.json -q "$file"
+          for file in $(locate "$PWD*/*.md" | grep -v ./deploy/terraform/aws/README.md); do
+            markdown-link-check -c .dlc.json -q "$file" &
           done
+          wait
+  paths-filter:
+    name: Helm-Doc-Path-Filter
+    runs-on: ubuntu-latest
+    outputs:
+      helm-doc: ${{ steps.filter.outputs.helm-doc }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+        id: filter
+        with:
+          filters: |
+            helm-doc:
+              - 'deploy/**'
+  helm-doc:
+    name: Helm-Doc-Execute
+    needs: paths-filter
+    if: ${{ (needs.paths-filter.outputs.helm-doc == 'true') || (github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Generating helm-doc
+        run: |
+          ./mvnw validate -P helm-doc -pl :dolphinscheduler
+      - name: Check helm-doc
+        run: |
+          DIFF=$(git diff ${GITHUB_WORKSPACE}/deploy/kubernetes/*md)
+          if [ ! -z "$DIFF" ]; then
+              echo "###### ERROR: helm-doc is not up to date ######"
+              echo "Please execute './mvnw validate -P helm-doc -pl :dolphinscheduler' in your clone, of your fork, of the project, and commit an updated deploy/kubernetes/README.md for the chart."
+              echo "###### ERROR: helm-doc is not up to date ######"
+          fi
+          git diff --exit-code
   result:
     name: Docs
     runs-on: ubuntu-latest

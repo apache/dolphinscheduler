@@ -59,91 +59,142 @@ import lombok.extern.slf4j.Slf4j;
 public class MySQLSourceGenerator implements ISourceGenerator {
 
     @Override
-    public String generate(SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
+    public String generate(
+                           SqoopParameters sqoopParameters, SqoopTaskExecutionContext sqoopTaskExecutionContext) {
 
         StringBuilder mysqlSourceSb = new StringBuilder();
 
         try {
             SourceMysqlParameter sourceMysqlParameter =
-                    JSONUtils.parseObject(sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
+                    JSONUtils.parseObject(
+                            sqoopParameters.getSourceParams(), SourceMysqlParameter.class);
 
-            if (null != sourceMysqlParameter) {
-                BaseConnectionParam baseDataSource = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
-                        sqoopTaskExecutionContext.getSourcetype(),
-                        sqoopTaskExecutionContext.getSourceConnectionParams());
+            if (null == sourceMysqlParameter)
+                return mysqlSourceSb.toString();
+            BaseConnectionParam baseDataSource =
+                    (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
+                            sqoopTaskExecutionContext.getSourcetype(),
+                            sqoopTaskExecutionContext.getSourceConnectionParams());
 
-                if (null != baseDataSource) {
+            if (null == baseDataSource)
+                return mysqlSourceSb.toString();
 
-                    mysqlSourceSb.append(SPACE).append(DB_CONNECT)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource)).append(DOUBLE_QUOTES)
-                            .append(SPACE).append(DB_USERNAME)
-                            .append(SPACE).append(baseDataSource.getUser())
-                            .append(SPACE).append(DB_PWD)
-                            .append(SPACE).append(DOUBLE_QUOTES)
-                            .append(decodePassword(baseDataSource.getPassword())).append(DOUBLE_QUOTES);
+            mysqlSourceSb
+                    .append(SPACE)
+                    .append(DB_CONNECT)
+                    .append(SPACE)
+                    .append(DOUBLE_QUOTES)
+                    .append(DataSourceUtils.getJdbcUrl(DbType.MYSQL, baseDataSource))
+                    .append(DOUBLE_QUOTES)
+                    .append(SPACE)
+                    .append(DB_USERNAME)
+                    .append(SPACE)
+                    .append(baseDataSource.getUser())
+                    .append(SPACE)
+                    .append(DB_PWD)
+                    .append(SPACE)
+                    .append(DOUBLE_QUOTES)
+                    .append(decodePassword(baseDataSource.getPassword()))
+                    .append(DOUBLE_QUOTES);
 
-                    // sqoop table & sql query
-                    if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
-                        if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())) {
-                            mysqlSourceSb.append(SPACE).append(TABLE)
-                                    .append(SPACE).append(sourceMysqlParameter.getSrcTable());
-                        }
+            // sqoop table & sql query
+            if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.FORM.getCode()) {
+                if (StringUtils.isNotEmpty(sourceMysqlParameter.getSrcTable())) {
+                    mysqlSourceSb
+                            .append(SPACE)
+                            .append(TABLE)
+                            .append(SPACE)
+                            .append(sourceMysqlParameter.getSrcTable());
+                }
 
-                        if (sourceMysqlParameter.getSrcColumnType() == SqoopColumnType.CUSTOMIZE_COLUMNS.getCode()
-                                && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
-                            mysqlSourceSb.append(SPACE).append(COLUMNS)
-                                    .append(SPACE).append(sourceMysqlParameter.getSrcColumns());
-                        }
-                    } else if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
-                            && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
+                if (sourceMysqlParameter.getSrcColumnType() == SqoopColumnType.CUSTOMIZE_COLUMNS.getCode()
+                        && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcColumns())) {
+                    mysqlSourceSb
+                            .append(SPACE)
+                            .append(COLUMNS)
+                            .append(SPACE)
+                            .append(sourceMysqlParameter.getSrcColumns());
+                }
+            } else if (sourceMysqlParameter.getSrcQueryType() == SqoopQueryType.SQL.getCode()
+                    && StringUtils.isNotEmpty(sourceMysqlParameter.getSrcQuerySql())) {
 
-                        String srcQuery = sourceMysqlParameter.getSrcQuerySql();
-                        mysqlSourceSb.append(SPACE).append(QUERY)
-                                .append(SPACE).append(DOUBLE_QUOTES).append(srcQuery);
+                String srcQuery = sourceMysqlParameter.getSrcQuerySql();
+                mysqlSourceSb
+                        .append(SPACE)
+                        .append(QUERY)
+                        .append(SPACE)
+                        .append(DOUBLE_QUOTES)
+                        .append(srcQuery);
 
-                        if (srcQuery.toLowerCase().contains(QUERY_WHERE)) {
-                            mysqlSourceSb.append(SPACE).append(QUERY_CONDITION).append(DOUBLE_QUOTES);
-                        } else {
-                            mysqlSourceSb.append(SPACE).append(QUERY_WITHOUT_CONDITION).append(DOUBLE_QUOTES);
-                        }
-                    }
-
-                    // sqoop hive map column
-                    List<Property> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
-
-                    if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
-                        StringBuilder columnMap = new StringBuilder();
-                        for (Property item : mapColumnHive) {
-                            columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
-                        }
-
-                        if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            mysqlSourceSb.append(SPACE).append(MAP_COLUMN_HIVE)
-                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
-                        }
-                    }
-
-                    // sqoop map column java
-                    List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
-
-                    if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
-                        StringBuilder columnMap = new StringBuilder();
-                        for (Property item : mapColumnJava) {
-                            columnMap.append(item.getProp()).append(EQUAL_SIGN).append(item.getValue()).append(COMMA);
-                        }
-
-                        if (StringUtils.isNotEmpty(columnMap.toString())) {
-                            mysqlSourceSb.append(SPACE).append(MAP_COLUMN_JAVA)
-                                    .append(SPACE).append(columnMap.substring(0, columnMap.length() - 1));
-                        }
-                    }
+                if (srcQuery.toLowerCase().contains(QUERY_WHERE)) {
+                    mysqlSourceSb
+                            .append(SPACE)
+                            .append(QUERY_CONDITION)
+                            .append(DOUBLE_QUOTES);
+                } else {
+                    mysqlSourceSb
+                            .append(SPACE)
+                            .append(QUERY_WITHOUT_CONDITION)
+                            .append(DOUBLE_QUOTES);
                 }
             }
+            // sqoop hive map column
+            buildColumnMapToHIve(mysqlSourceSb, sourceMysqlParameter);
+            // sqoop map column java
+            buildColumnMapToJava(mysqlSourceSb, sourceMysqlParameter);
+
         } catch (Exception e) {
-            log.error(String.format("Sqoop task mysql source params build failed: [%s]", e.getMessage()));
+            log.error(
+                    String.format(
+                            "Sqoop task mysql source params build failed: [%s]", e.getMessage()));
         }
 
         return mysqlSourceSb.toString();
+    }
+
+    private static void buildColumnMapToHIve(StringBuilder mysqlSourceSb, SourceMysqlParameter sourceMysqlParameter) {
+        List<Property> mapColumnHive = sourceMysqlParameter.getMapColumnHive();
+
+        if (null != mapColumnHive && !mapColumnHive.isEmpty()) {
+            StringBuilder columnMap = new StringBuilder();
+            for (Property item : mapColumnHive) {
+                columnMap
+                        .append(item.getProp())
+                        .append(EQUAL_SIGN)
+                        .append(item.getValue())
+                        .append(COMMA);
+            }
+
+            if (StringUtils.isNotEmpty(columnMap.toString())) {
+                mysqlSourceSb
+                        .append(SPACE)
+                        .append(MAP_COLUMN_HIVE)
+                        .append(SPACE)
+                        .append(columnMap.substring(0, columnMap.length() - 1));
+            }
+        }
+    }
+
+    private static void buildColumnMapToJava(StringBuilder mysqlSourceSb, SourceMysqlParameter sourceMysqlParameter) {
+        List<Property> mapColumnJava = sourceMysqlParameter.getMapColumnJava();
+
+        if (null != mapColumnJava && !mapColumnJava.isEmpty()) {
+            StringBuilder columnMap = new StringBuilder();
+            for (Property item : mapColumnJava) {
+                columnMap
+                        .append(item.getProp())
+                        .append(EQUAL_SIGN)
+                        .append(item.getValue())
+                        .append(COMMA);
+            }
+
+            if (StringUtils.isNotEmpty(columnMap.toString())) {
+                mysqlSourceSb
+                        .append(SPACE)
+                        .append(MAP_COLUMN_JAVA)
+                        .append(SPACE)
+                        .append(columnMap.substring(0, columnMap.length() - 1));
+            }
+        }
     }
 }

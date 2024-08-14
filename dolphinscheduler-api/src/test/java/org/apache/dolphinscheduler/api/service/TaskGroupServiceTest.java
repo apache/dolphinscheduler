@@ -125,7 +125,7 @@ public class TaskGroupServiceTest {
                 .description(taskGroupDesc)
                 .groupSize(100)
                 .userId(1)
-                .status(Flag.YES.getCode())
+                .status(Flag.YES)
                 .build();
 
         return taskGroup;
@@ -204,7 +204,7 @@ public class TaskGroupServiceTest {
 
         User loginUser = getLoginUser();
         TaskGroup taskGroup = getTaskGroup();
-        taskGroup.setStatus(Flag.YES.getCode());
+        taskGroup.setStatus(Flag.YES);
         // Task group status error
 
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP,
@@ -218,7 +218,6 @@ public class TaskGroupServiceTest {
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
-        taskGroup.setStatus(0);
     }
 
     @Test
@@ -236,12 +235,12 @@ public class TaskGroupServiceTest {
         Map<String, Object> result = taskGroupService.closeTaskGroup(loginUser, 1);
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
 
-        taskGroup.setStatus(0);
+        taskGroup.setStatus(Flag.NO);
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         result = taskGroupService.closeTaskGroup(loginUser, 1);
         Assertions.assertEquals(Status.TASK_GROUP_STATUS_CLOSED, result.get(Constants.STATUS));
 
-        taskGroup.setStatus(1);
+        taskGroup.setStatus(Flag.YES);
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         result = taskGroupService.startTaskGroup(loginUser, 1);
         Assertions.assertEquals(Status.TASK_GROUP_STATUS_OPENED, result.get(Constants.STATUS));

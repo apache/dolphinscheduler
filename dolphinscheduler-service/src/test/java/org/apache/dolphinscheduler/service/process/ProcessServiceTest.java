@@ -59,7 +59,6 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessTaskRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
@@ -72,13 +71,14 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.DqTaskState;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.InputType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.OptionSourceType;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
-import org.apache.dolphinscheduler.service.cron.CronUtilsTest;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -90,6 +90,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -100,8 +101,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * process service test
@@ -110,7 +109,6 @@ import org.slf4j.LoggerFactory;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class ProcessServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);
     @InjectMocks
     private ProcessServiceImpl processService;
     @Mock
@@ -150,8 +148,6 @@ public class ProcessServiceTest {
     private ProcessTaskRelationMapper processTaskRelationMapper;
     @Mock
     private ProcessDefinitionLogMapper processDefineLogMapper;
-    @Mock
-    private ResourceMapper resourceMapper;
     @Mock
     private TaskGroupMapper taskGroupMapper;
     @Mock
@@ -616,6 +612,32 @@ public class ProcessServiceTest {
     }
 
     @Test
+    public void testSetGlobalParamIfCommanded() {
+        ProcessDefinition processDefinition = new ProcessDefinition();
+        String globalParams =
+                "[{\"prop\":\"global_param\",\"value\":\"4\",\"direct\":\"IN\",\"type\":\"VARCHAR\"},{\"prop\":\"O_ERRCODE\",\"value\":\"\",\"direct\":\"OUT\",\"type\":\"VARCHAR\"}]";
+        processDefinition.setGlobalParams(globalParams);
+        Map<String, String> globalParamMap = processDefinition.getGlobalParamMap();
+        Assertions.assertTrue(globalParamMap.size() == 2);
+        Assertions.assertTrue(processDefinition.getGlobalParamList().size() == 2);
+
+        HashMap<String, String> startParams = new HashMap<>();
+        String expectValue = "6";
+        startParams.put("global_param", expectValue);
+        HashMap<String, String> commandParams = new HashMap<>();
+        commandParams.put(CMD_PARAM_START_PARAMS, JSONUtils.toJsonString(startParams));
+        Map<String, Property> mockStartParams = new HashMap<>();
+
+        mockStartParams.put("global_param", new Property("global_param", Direct.IN,
+                org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR, startParams.get("global_param")));
+        when(curingGlobalParamsService.parseWorkflowStartParam(commandParams)).thenReturn(mockStartParams);
+
+        processService.setGlobalParamIfCommanded(processDefinition, commandParams);
+        Assertions.assertTrue(globalParamMap.get("global_param").equals(expectValue));
+        Assertions.assertTrue(globalParamMap.containsKey("O_ERRCODE"));
+    }
+
+    @Test
     public void testSaveTaskDefine() {
         User operator = new User();
         operator.setId(-1);
@@ -641,7 +663,6 @@ public class ProcessServiceTest {
         taskDefinition.setVersion(1);
         taskDefinition.setCreateTime(new Date());
         taskDefinition.setUpdateTime(new Date());
-        when(taskPluginManager.getParameters(any())).thenReturn(null);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskDefinition.getCode(),
                 taskDefinition.getVersion())).thenReturn(taskDefinition);
         when(taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinition.getCode())).thenReturn(1);
@@ -715,7 +736,7 @@ public class ProcessServiceTest {
         processInstance.setId(62);
         taskInstance.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"\"}]");
         taskInstance.setTaskParams("{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select id from tb_test limit 1\","
-                + "\"udfs\":\"\",\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
+                + "\"sqlType\":\"0\",\"sendEmail\":false,\"displayRows\":10,\"title\":\"\","
                 + "\"groupId\":null,\"localParams\":[{\"prop\":\"test1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"12\"}],"
                 + "\"connParams\":\"\",\"preStatements\":[],\"postStatements\":[],\"conditionResult\":\"{\\\"successNode\\\":[\\\"\\\"],"
                 + "\\\"failedNode\\\":[\\\"\\\"]}\",\"dependence\":\"{}\"}");
@@ -736,12 +757,10 @@ public class ProcessServiceTest {
 
         // test normal situation
         ResourceInfo resourceInfoNormal = new ResourceInfo();
-        resourceInfoNormal.setId(1);
         resourceInfoNormal.setResourceName("/test.txt");
 
         ResourceInfo updatedResourceInfo3 = processService.updateResourceInfo(0, resourceInfoNormal);
 
-        Assertions.assertEquals(-1, updatedResourceInfo3.getId().intValue());
         Assertions.assertEquals("/test.txt", updatedResourceInfo3.getResourceName());
 
     }
@@ -752,22 +771,6 @@ public class ProcessServiceTest {
         TaskGroupQueue taskGroupQueue =
                 processService.insertIntoTaskGroupQueue(1, "task name", 1, 1, 1, TaskGroupQueueStatus.WAIT_QUEUE);
         Assertions.assertNotNull(taskGroupQueue);
-    }
-
-    @Test
-    public void testDoRelease() {
-
-        TaskGroupQueue taskGroupQueue = getTaskGroupQueue();
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setId(1);
-        taskInstance.setProcessInstanceId(1);
-        taskInstance.setTaskGroupId(taskGroupQueue.getGroupId());
-
-        when(taskGroupQueueMapper.queryByTaskId(1)).thenReturn(taskGroupQueue);
-        when(taskGroupQueueMapper.updateById(taskGroupQueue)).thenReturn(1);
-
-        processService.releaseTaskGroup(taskInstance);
-
     }
 
     private TaskGroupQueue getTaskGroupQueue() {

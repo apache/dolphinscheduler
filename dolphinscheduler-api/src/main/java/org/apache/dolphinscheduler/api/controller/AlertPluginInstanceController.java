@@ -25,6 +25,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_ALL_ALERT_PLUGI
 import static org.apache.dolphinscheduler.api.enums.Status.SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_ALERT_PLUGIN_INSTANCE_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
@@ -32,8 +34,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.AlertPluginInstanceVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -91,14 +91,13 @@ public class AlertPluginInstanceController extends BaseController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.ALARM_INSTANCE_CREATE)
     public Result<AlertPluginInstance> createAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                  @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                                                  @RequestParam(value = "instanceName") String instanceName,
-                                                                 @RequestParam(value = "instanceType") AlertPluginInstanceType instanceType,
-                                                                 @RequestParam(value = "warningType") WarningType warningType,
                                                                  @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
         AlertPluginInstance alertPluginInstance = alertPluginInstanceService.create(loginUser, pluginDefineId,
-                instanceName, instanceType, warningType, pluginInstanceParams);
+                instanceName, pluginInstanceParams);
         return Result.success(alertPluginInstance);
     }
 
@@ -134,13 +133,13 @@ public class AlertPluginInstanceController extends BaseController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.ALARM_INSTANCE_UPDATE)
     public Result<AlertPluginInstance> updateAlertPluginInstanceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                      @PathVariable(value = "id") int id,
                                                                      @RequestParam(value = "instanceName") String instanceName,
-                                                                     @RequestParam(value = "warningType") WarningType warningType,
                                                                      @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
         AlertPluginInstance alertPluginInstance =
-                alertPluginInstanceService.updateById(loginUser, id, instanceName, warningType, pluginInstanceParams);
+                alertPluginInstanceService.updateById(loginUser, id, instanceName, pluginInstanceParams);
         return Result.success(alertPluginInstance);
     }
 
@@ -158,6 +157,7 @@ public class AlertPluginInstanceController extends BaseController {
     @DeleteMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ALERT_PLUGIN_INSTANCE_ERROR)
+    @OperatorLog(auditType = AuditType.ALARM_INSTANCE_DELETE)
     public Result<Boolean> deleteAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                      @PathVariable(value = "id") int id) {
 

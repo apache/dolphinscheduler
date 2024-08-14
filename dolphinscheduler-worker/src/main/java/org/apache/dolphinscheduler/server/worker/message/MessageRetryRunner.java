@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.time.Duration;
@@ -68,7 +69,7 @@ public class MessageRetryRunner extends BaseDaemonThread {
         log.info("Message retry runner staring");
         messageSenders.forEach(messageSender -> {
             messageSenderMap.put(messageSender.getMessageType(), messageSender);
-            log.info("Injected message sender: {}", messageSender.getClass().getName());
+            log.info("Injected message sender: {}", messageSender.getClass().getSimpleName());
         });
         super.start();
         log.info("Message retry runner started");
@@ -92,13 +93,15 @@ public class MessageRetryRunner extends BaseDaemonThread {
         needToRetryMessages.remove(taskInstanceId);
     }
 
-    public void updateMessageHost(int taskInstanceId, String messageReceiverHost) {
+    public boolean updateMessageHost(int taskInstanceId, String messageReceiverHost) {
         List<TaskInstanceMessage> taskInstanceMessages = this.needToRetryMessages.get(taskInstanceId);
-        if (taskInstanceMessages != null) {
-            taskInstanceMessages.forEach(taskInstanceMessage -> {
-                taskInstanceMessage.getEvent().setWorkflowInstanceHost(messageReceiverHost);
-            });
+        if (CollectionUtils.isEmpty(taskInstanceMessages)) {
+            return false;
         }
+        taskInstanceMessages.forEach(taskInstanceMessage -> {
+            taskInstanceMessage.getEvent().setWorkflowInstanceHost(messageReceiverHost);
+        });
+        return true;
     }
 
     public void run() {

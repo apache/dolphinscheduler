@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -137,8 +138,9 @@ public class HiveCliTask extends AbstractRemoteTask {
 
             try {
                 resourceFileName = resourceInfos.get(0).getResourceName();
+                ResourceContext resourceContext = taskExecutionContext.getResourceContext();
                 sqlContent = FileUtils.readFileToString(
-                        new File(String.format("%s/%s", taskExecutionContext.getExecutePath(), resourceFileName)),
+                        new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                         StandardCharsets.UTF_8);
             } catch (IOException e) {
                 log.error("read hive sql content from file {} error ", resourceFileName, e);

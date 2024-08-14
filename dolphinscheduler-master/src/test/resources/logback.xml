@@ -65,13 +65,7 @@
         </encoder>
     </appender>
 
-    <root level="INFO">
-        <if condition="${DOCKER:-false}">
-            <then>
-                <appender-ref ref="STDOUT"/>
-            </then>
-        </if>
-        <appender-ref ref="TASKLOGFILE"/>
-        <appender-ref ref="MASTERLOGFILE"/>
+    <root level="ERROR">
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

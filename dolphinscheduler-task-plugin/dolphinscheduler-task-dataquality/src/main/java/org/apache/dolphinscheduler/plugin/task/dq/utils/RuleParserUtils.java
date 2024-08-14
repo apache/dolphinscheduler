@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.dq.utils;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_BUSINESS_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_CURRENT_DATE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_DATETIME;
@@ -62,7 +63,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConst
 import static org.apache.dolphinscheduler.plugin.task.api.utils.DataQualityConstants.USER;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.data.quality.utils.ParserUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.DataQualityTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.dp.ExecuteSqlType;
@@ -80,11 +80,14 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import lombok.SneakyThrows;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -102,9 +105,10 @@ public class RuleParserUtils {
     private static final String AND_TARGET_FILTER = "AND (${target_filter})";
     private static final String WHERE_TARGET_FILTER = "WHERE (${target_filter})";
 
+    @SneakyThrows
     public static List<BaseConfig> getReaderConfigList(
                                                        Map<String, String> inputParameterValue,
-                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
 
         List<BaseConfig> readerConfigList = new ArrayList<>();
 
@@ -123,7 +127,7 @@ public class RuleParserUtils {
                 config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getSourceType()),
                         sourceDataSource));
                 config.put(USER, sourceDataSource.getUser());
-                config.put(PASSWORD, ParserUtils.encode(sourceDataSource.getPassword()));
+                config.put(PASSWORD, URLEncoder.encode(sourceDataSource.getPassword(), UTF_8.name()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getSourceType())));
                 String outputTable = inputParameterValue.get(SRC_DATABASE) + "_" + inputParameterValue.get(SRC_TABLE);
@@ -150,7 +154,7 @@ public class RuleParserUtils {
                 config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getTargetType()),
                         targetDataSource));
                 config.put(USER, targetDataSource.getUser());
-                config.put(PASSWORD, ParserUtils.encode(targetDataSource.getPassword()));
+                config.put(PASSWORD, URLEncoder.encode(targetDataSource.getPassword(), UTF_8.name()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getTargetType())));
                 String outputTable =
@@ -264,9 +268,10 @@ public class RuleParserUtils {
         return defaultInputParameterValue;
     }
 
+    @SneakyThrows
     public static List<BaseConfig> getWriterConfigList(
                                                        String sql,
-                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+                                                       DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
 
         List<BaseConfig> writerConfigList = new ArrayList<>();
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getWriterConnectorType())) {
@@ -284,7 +289,7 @@ public class RuleParserUtils {
                 config.put(URL, DataSourceUtils.getJdbcUrl(DbType.of(dataQualityTaskExecutionContext.getWriterType()),
                         writerDataSource));
                 config.put(USER, writerDataSource.getUser());
-                config.put(PASSWORD, ParserUtils.encode(writerDataSource.getPassword()));
+                config.put(PASSWORD, URLEncoder.encode(writerDataSource.getPassword(), UTF_8.name()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
                 config.put(SQL, sql);
@@ -336,8 +341,9 @@ public class RuleParserUtils {
         return readerConfigList;
     }
 
+    @SneakyThrows
     public static BaseConfig getStatisticsValueConfig(
-                                                      DataQualityTaskExecutionContext dataQualityTaskExecutionContext) throws DataQualityException {
+                                                      DataQualityTaskExecutionContext dataQualityTaskExecutionContext) {
         BaseConfig baseConfig = null;
         if (StringUtils.isNotEmpty(dataQualityTaskExecutionContext.getStatisticsValueConnectorType())) {
             BaseConnectionParam writerDataSource =
@@ -354,7 +360,7 @@ public class RuleParserUtils {
                 config.put(URL, DataSourceUtils.getJdbcUrl(
                         DbType.of(dataQualityTaskExecutionContext.getStatisticsValueType()), writerDataSource));
                 config.put(USER, writerDataSource.getUser());
-                config.put(PASSWORD, ParserUtils.encode(writerDataSource.getPassword()));
+                config.put(PASSWORD, URLEncoder.encode(writerDataSource.getPassword(), UTF_8.name()));
                 config.put(DRIVER, DataSourceUtils
                         .getDatasourceDriver(DbType.of(dataQualityTaskExecutionContext.getWriterType())));
             }
@@ -544,6 +550,7 @@ public class RuleParserUtils {
 
     /**
      * the unique code use to get the same type and condition task statistics value
+     *
      * @param inputParameterValue
      * @return
      */

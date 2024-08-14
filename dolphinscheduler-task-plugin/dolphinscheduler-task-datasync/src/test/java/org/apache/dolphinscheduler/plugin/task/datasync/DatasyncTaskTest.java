@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.datasync;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -33,6 +31,10 @@ import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionRequest
 import software.amazon.awssdk.services.datasync.model.CancelTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.CreateTaskRequest;
 import software.amazon.awssdk.services.datasync.model.CreateTaskResponse;
+import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionRequest;
+import software.amazon.awssdk.services.datasync.model.DescribeTaskExecutionResponse;
+import software.amazon.awssdk.services.datasync.model.DescribeTaskRequest;
+import software.amazon.awssdk.services.datasync.model.DescribeTaskResponse;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionRequest;
 import software.amazon.awssdk.services.datasync.model.StartTaskExecutionResponse;
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
@@ -42,9 +44,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,26 +58,22 @@ public class DatasyncTaskTest {
     private static final String mockTaskArn =
             "arn:aws:datasync:ap-northeast-3:523202806641:task/task-071ca64ff4c2f0d4a";
 
-    DatasyncHook datasyncHook;
-
+    @InjectMocks
+    @Spy
     DatasyncTask datasyncTask;
 
     @Mock
+    TaskExecutionContext taskExecutionContext;
+
+    @Spy
+    @InjectMocks
+    DatasyncHook datasyncHook;
+
+    @Mock
     DataSyncClient client;
-    MockedStatic<DatasyncHook> datasyncHookMockedStatic;
+
     @BeforeEach
     public void before() throws IllegalAccessException {
-        client = mock(DataSyncClient.class);
-        datasyncHookMockedStatic = mockStatic(DatasyncHook.class);
-        when(DatasyncHook.createClient()).thenReturn(client);
-
-        DatasyncParameters DatasyncParameters = new DatasyncParameters();
-        datasyncTask = initTask(DatasyncParameters);
-        datasyncTask.setHook(datasyncHook);
-    }
-
-    @Test
-    public void testCreateTaskJson() {
         String jsonData = "{\n" +
                 "   \"CloudWatchLogGroupArn\": \"arn:aws:logs:ap-northeast-3:523202806641:log-group:/aws/datasync:*\",\n"
                 +
@@ -123,12 +121,16 @@ public class DatasyncTaskTest {
                 "      }\n" +
                 "   ]\n" +
                 "}";
-        DatasyncParameters DatasyncParameters = new DatasyncParameters();
-        DatasyncParameters.setJsonFormat(true);
-        DatasyncParameters.setJson(jsonData);
+        DatasyncParameters parameters = new DatasyncParameters();
+        parameters.setJson(jsonData);
+        parameters.setJsonFormat(true);
+        datasyncTask = initTask(JSONUtils.toJsonString(parameters));
+    }
 
-        DatasyncTask DatasyncTask = initTask(DatasyncParameters);
-        DatasyncParameters datasyncParameters = DatasyncTask.getParameters();
+    @Test
+    public void testCreateTaskJson() {
+        DatasyncParameters datasyncParameters = datasyncTask.getParameters();
+
         Assertions.assertEquals("arn:aws:logs:ap-northeast-3:523202806641:log-group:/aws/datasync:*",
                 datasyncParameters.getCloudWatchLogGroupArn());
         Assertions.assertEquals("task001", datasyncParameters.getName());
@@ -145,86 +147,102 @@ public class DatasyncTaskTest {
         Assertions.assertEquals("* * * * * ?", datasyncParameters.getSchedule().getScheduleExpression());
         Assertions.assertEquals("aTime", datasyncParameters.getOptions().getAtime());
         Assertions.assertEquals(Long.valueOf(10), datasyncParameters.getOptions().getBytesPerSecond());
-        datasyncHookMockedStatic.close();
     }
 
     @Test
     public void testCheckCreateTask() {
-        DatasyncHook hook = spy(new DatasyncHook());
         CreateTaskResponse response = mock(CreateTaskResponse.class);
-        when(client.createTask((CreateTaskRequest) any())).thenReturn(response);
         SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
+        DescribeTaskResponse describeTaskResponse = mock(DescribeTaskResponse.class);
+        when(client.createTask((CreateTaskRequest) any())).thenReturn(response);
         when(response.sdkHttpResponse()).thenReturn(sdkMock);
+        when(describeTaskResponse.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
         when(response.taskArn()).thenReturn(mockTaskArn);
+        when(client.describeTask((DescribeTaskRequest) any())).thenReturn(describeTaskResponse);
+        when(describeTaskResponse.status()).thenReturn(TaskStatus.AVAILABLE);
 
-        doReturn(true).when(hook).doubleCheckTaskStatus(any(), any());
-        hook.createDatasyncTask(datasyncTask.getParameters());
-        Assertions.assertEquals(mockTaskArn, hook.getTaskArn());
-        datasyncHookMockedStatic.close();
+        Boolean flag = datasyncHook.createDatasyncTask(datasyncTask.getParameters());
+
+        Assertions.assertEquals(mockTaskArn, datasyncHook.getTaskArn());
+        Assertions.assertTrue(flag);
     }
 
     @Test
     public void testStartTask() {
-        DatasyncHook hook = spy(new DatasyncHook());
         StartTaskExecutionResponse response = mock(StartTaskExecutionResponse.class);
-        when(client.startTaskExecution((StartTaskExecutionRequest) any())).thenReturn(response);
         SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
+        DescribeTaskExecutionResponse describeTaskExecutionResponse = mock(DescribeTaskExecutionResponse.class);
+
+        when(client.startTaskExecution((StartTaskExecutionRequest) any())).thenReturn(response);
         when(response.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
         when(response.taskExecutionArn()).thenReturn(mockExeArn);
-        doReturn(true).when(hook).doubleCheckExecStatus(any(), any());
-        hook.startDatasyncTask();
-        Assertions.assertEquals(mockExeArn, hook.getTaskExecArn());
-        datasyncHookMockedStatic.close();
+        when(describeTaskExecutionResponse.sdkHttpResponse()).thenReturn(sdkMock);
+        when(client.describeTaskExecution((DescribeTaskExecutionRequest) any()))
+                .thenReturn(describeTaskExecutionResponse);
+        when(describeTaskExecutionResponse.status()).thenReturn(TaskExecutionStatus.LAUNCHING);
+        Boolean executionFlag = datasyncHook.startDatasyncTask();
+
+        Assertions.assertEquals(mockExeArn, datasyncHook.getTaskExecArn());
+        Assertions.assertTrue(executionFlag);
     }
 
     @Test
     public void testCancelTask() {
-        DatasyncHook hook = spy(new DatasyncHook());
         CancelTaskExecutionResponse response = mock(CancelTaskExecutionResponse.class);
-        when(client.cancelTaskExecution((CancelTaskExecutionRequest) any())).thenReturn(response);
         SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
+        when(client.cancelTaskExecution((CancelTaskExecutionRequest) any())).thenReturn(response);
         when(response.sdkHttpResponse()).thenReturn(sdkMock);
         when(sdkMock.isSuccessful()).thenReturn(true);
-        Assertions.assertEquals(true, hook.cancelDatasyncTask());
-        datasyncHookMockedStatic.close();
+        Assertions.assertEquals(true, datasyncHook.cancelDatasyncTask());
     }
 
     @Test
     public void testDescribeTask() {
-        DatasyncHook hook = spy(new DatasyncHook());
-        doReturn(null).when(hook).queryDatasyncTaskStatus();
-        Assertions.assertEquals(false, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
+        SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
+        DescribeTaskResponse failed = mock(DescribeTaskResponse.class);
+        DescribeTaskResponse available = mock(DescribeTaskResponse.class);
 
-        doReturn(TaskStatus.AVAILABLE).when(hook).queryDatasyncTaskStatus();
-        Assertions.assertEquals(true, hook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
-        datasyncHookMockedStatic.close();
+        when(client.describeTask((DescribeTaskRequest) any())).thenReturn(failed);
+        when(failed.sdkHttpResponse()).thenReturn(sdkMock);
+        when(sdkMock.isSuccessful()).thenReturn(true);
+        when(failed.status()).thenReturn(TaskStatus.UNKNOWN_TO_SDK_VERSION);
+        Assertions.assertEquals(false,
+                datasyncHook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
+
+        when(client.describeTask((DescribeTaskRequest) any())).thenReturn(available);
+        when(available.sdkHttpResponse()).thenReturn(sdkMock);
+        when(sdkMock.isSuccessful()).thenReturn(true);
+        when(available.status()).thenReturn(TaskStatus.AVAILABLE);
+        Assertions.assertEquals(true,
+                datasyncHook.doubleCheckTaskStatus(TaskStatus.AVAILABLE, DatasyncHook.taskFinishFlags));
     }
 
     @Test
     public void testDescribeTaskExec() {
-        DatasyncHook hook = spy(new DatasyncHook());
-        doReturn(null).when(hook).queryDatasyncTaskExecStatus();
-        Assertions.assertEquals(false,
-                hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
+        SdkHttpResponse sdkMock = mock(SdkHttpResponse.class);
+        DescribeTaskExecutionResponse failed = mock(DescribeTaskExecutionResponse.class);
+        DescribeTaskExecutionResponse success = mock(DescribeTaskExecutionResponse.class);
 
-        doReturn(TaskExecutionStatus.SUCCESS).when(hook).queryDatasyncTaskExecStatus();
-        Assertions.assertEquals(true, hook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
-        datasyncHookMockedStatic.close();
+        when(client.describeTaskExecution((DescribeTaskExecutionRequest) any())).thenReturn(failed);
+        when(failed.sdkHttpResponse()).thenReturn(sdkMock);
+        when(sdkMock.isSuccessful()).thenReturn(true);
+        when(failed.status()).thenReturn(TaskExecutionStatus.UNKNOWN_TO_SDK_VERSION);
+        Assertions.assertEquals(false,
+                datasyncHook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
+
+        when(client.describeTaskExecution((DescribeTaskExecutionRequest) any())).thenReturn(success);
+        when(success.sdkHttpResponse()).thenReturn(sdkMock);
+        when(sdkMock.isSuccessful()).thenReturn(true);
+        when(success.status()).thenReturn(TaskExecutionStatus.SUCCESS);
+        Assertions.assertEquals(true,
+                datasyncHook.doubleCheckExecStatus(TaskExecutionStatus.SUCCESS, DatasyncHook.doneStatus));
     }
 
-    private DatasyncTask initTask(DatasyncParameters DatasyncParameters) {
-        TaskExecutionContext taskExecutionContext = createContext(DatasyncParameters);
-        DatasyncTask datasyncTask = new DatasyncTask(taskExecutionContext);
+    private DatasyncTask initTask(String contextJson) {
+        doReturn(contextJson).when(taskExecutionContext).getTaskParams();
         datasyncTask.init();
         return datasyncTask;
-    }
-
-    public TaskExecutionContext createContext(DatasyncParameters DatasyncParameters) {
-        String parameters = JSONUtils.toJsonString(DatasyncParameters);
-        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
-        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
-        return taskExecutionContext;
     }
 }

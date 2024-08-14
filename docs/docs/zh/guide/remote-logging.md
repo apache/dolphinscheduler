@@ -10,7 +10,7 @@ Apache DolphinScheduler支持将任务日志传输到远端存储上。当配置
 ```properties
 # 是否开启远程日志存储
 remote.logging.enable=true
-# 任务日志写入的远端存储，目前支持OSS, S3, GCS
+# 任务日志写入的远端存储，目前支持OSS, S3, GCS, ABS
 remote.logging.target=OSS
 # 任务日志在远端存储上的目录
 remote.logging.base.dir=logs
@@ -66,12 +66,12 @@ remote.logging.google.cloud.storage.bucket.name=<your-bucket>
 配置`common.propertis`如下：
 
 ```properties
-# abs container name, required if you set resource.storage.type=ABS
-resource.azure.blob.storage.container.name=<your-container>
 # abs account name, required if you set resource.storage.type=ABS
-resource.azure.blob.storage.account.name=<your-account-name>
-# abs connection string, required if you set resource.storage.type=ABS
-resource.azure.blob.storage.connection.string=<your-connection-string>
+remote.logging.abs.account.name=<your-account-name>
+# abs account key, required if you set resource.storage.type=ABS
+remote.logging.abs.account.key=<your-account-key>
+# abs container name, required if you set resource.storage.type=ABS
+remote.logging.abs.container.name=<your-container-name>
 ```
 
 ### 注意事项

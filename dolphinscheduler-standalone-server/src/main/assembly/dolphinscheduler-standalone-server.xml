@@ -58,12 +58,6 @@
             <directoryMode>0755</directoryMode>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/src/main/dist-bin</directory>
-            <outputDirectory>dist-bin</outputDirectory>
-            <fileMode>0755</fileMode>
-            <directoryMode>0755</directoryMode>
-        </fileSet>
-        <fileSet>
             <directory>${basedir}/../script/env</directory>
             <outputDirectory>conf</outputDirectory>
             <includes>
@@ -83,6 +77,13 @@
             <directory>${basedir}/../dolphinscheduler-common/src/main/resources</directory>
             <includes>
                 <include>common.properties</include>
+            </includes>
+            <outputDirectory>conf</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${basedir}/../dolphinscheduler-authentication/dolphinscheduler-aws-authentication/src/main/resources</directory>
+            <includes>
+                <include>**/*.yaml</include>
             </includes>
             <outputDirectory>conf</outputDirectory>
         </fileSet>

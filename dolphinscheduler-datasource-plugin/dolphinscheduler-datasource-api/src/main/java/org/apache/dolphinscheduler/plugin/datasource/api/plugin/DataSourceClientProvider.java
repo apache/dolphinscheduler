@@ -69,9 +69,9 @@ public class DataSourceClientProvider {
         String datasourceUniqueId = DataSourceUtils.getDatasourceUniqueId(baseConnectionParam, dbType);
         return POOLED_DATASOURCE_CLIENT_CACHE.get(datasourceUniqueId, () -> {
             Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+            DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getName());
             if (null == dataSourceChannel) {
-                throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+                throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getName()));
             }
             return dataSourceChannel.createPooledDataSourceClient(baseConnectionParam, dbType);
         });
@@ -85,9 +85,9 @@ public class DataSourceClientProvider {
     public static AdHocDataSourceClient getAdHocDataSourceClient(DbType dbType, ConnectionParam connectionParam) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
         Map<String, DataSourceChannel> dataSourceChannelMap = dataSourcePluginManager.getDataSourceChannelMap();
-        DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getDescp());
+        DataSourceChannel dataSourceChannel = dataSourceChannelMap.get(dbType.getName());
         if (null == dataSourceChannel) {
-            throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getDescp()));
+            throw new RuntimeException(String.format("datasource plugin '%s' is not found", dbType.getName()));
         }
         return dataSourceChannel.createAdHocDataSourceClient(baseConnectionParam, dbType);
     }

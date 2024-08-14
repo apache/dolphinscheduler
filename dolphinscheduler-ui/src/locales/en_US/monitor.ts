@@ -35,6 +35,7 @@ export default {
     memory_usage: 'Memory Usage',
     disk_available: 'Disk Available',
     load_average: 'Load Average',
+    thread_pool_usage: 'Thread Pool Usage',
     create_time: 'Create Time',
     last_heartbeat_time: 'Last Heartbeat Time',
     directory_detail: 'Directory Detail',
@@ -43,6 +44,11 @@ export default {
     worker_no_data_result_title: 'No Worker Nodes Exist',
     worker_no_data_result_desc:
       'Currently, there are no worker nodes exist, please create a worker node and refresh this page'
+  },
+  alert_server: {
+    alert_server_no_data_result_title: 'No Alert Server Nodes Exist',
+    alert_server_no_data_result_desc:
+      'Currently, there are no alert server nodes exist, please create a alert server node and refresh this page'
   },
   db: {
     health_state: 'Health State',
@@ -60,9 +66,11 @@ export default {
   },
   audit_log: {
     user_name: 'User Name',
-    resource_type: 'Resource Type',
-    project_name: 'Project Name',
     operation_type: 'Operation Type',
+    model_type: 'Model Type',
+    model_name: 'Model Name',
+    latency: 'Latency',
+    description: 'Description',
     create_time: 'Create Time',
     start_time: 'Start Time',
     end_time: 'End Time',

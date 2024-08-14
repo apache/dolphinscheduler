@@ -38,8 +38,13 @@ import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -75,12 +80,13 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
     final String tenantCode = "root";
     final Long environmentCode = 4L;
     final Integer timeout = 5;
-    final ImmutableMap<String, String> startParams = ImmutableMap.of("start", "params");
+    final List<Property> startParams =
+            Collections.singletonList(new Property("start", Direct.IN, DataType.VARCHAR, "params"));
     final Integer expectedParallelismNumber = 6;
     final int dryRun = 7;
     final int testFlag = 0;
     final ComplementDependentMode complementDependentMode = ComplementDependentMode.OFF_MODE;
-    final Integer version = null;
+    final Integer version = 1;
     final boolean allLevelDependent = false;
     final JsonObject expectResponseContent = gson
             .fromJson("{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}",
@@ -115,6 +121,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
         paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
@@ -162,6 +169,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
         paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
@@ -209,6 +217,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("dryRun", String.valueOf(dryRun));
         paramsMap.add("testFlag", String.valueOf(testFlag));
         paramsMap.add("executionOrder", String.valueOf(executionOrder));
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(execType), eq(failureStrategy), eq(startNodeList), eq(taskDependType),
@@ -241,6 +250,7 @@ public class ExecuteFunctionControllerTest extends AbstractControllerTest {
         paramsMap.add("failureStrategy", String.valueOf(failureStrategy));
         paramsMap.add("warningType", String.valueOf(warningType));
         paramsMap.add("scheduleTime", scheduleTime);
+        paramsMap.add("version", String.valueOf(version));
 
         when(executorService.execProcessInstance(any(User.class), eq(projectCode), eq(processDefinitionCode),
                 eq(scheduleTime), eq(null), eq(failureStrategy), eq(null), eq(null), eq(warningType),

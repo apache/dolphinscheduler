@@ -260,7 +260,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     datanucleus-core 4.1.17: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-core/4.1.17, Apache 2.0
     datanucleus-rdbms 4.1.19: https://mvnrepository.com/artifact/org.datanucleus/datanucleus-rdbms/4.1.19, Apache 2.0
     derby 10.14.2.0: https://github.com/apache/derby, Apache 2.0
-    druid 1.1.14: https://mvnrepository.com/artifact/com.alibaba/druid/1.1.14, Apache 2.0
+    druid 1.2.20: https://mvnrepository.com/artifact/com.alibaba/druid/1.2.20, Apache 2.0
     metrics-core 4.2.11: https://mvnrepository.com/artifact/io.dropwizard.metrics/metrics-core, Apache 2.0
     error_prone_annotations 2.1.3 https://mvnrepository.com/artifact/com.google.errorprone/error_prone_annotations/2.1.3, Apache 2.0
     gson 2.9.1: https://github.com/google/gson, Apache 2.0
@@ -294,7 +294,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jackson-core-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl/1.9.13, Apache 2.0
     jackson-databind 2.13.4: https://github.com/FasterXML/jackson-databind, Apache 2.0
     jackson-datatype-jdk8 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jdk8/2.13.0, Apache 2.0
-    jackson-datatype-jsr310 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.13.0, Apache 2.0
+    jackson-datatype-jsr310 2.13.4: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310/2.13.4, Apache 2.0
     jackson-mapper-asl 1.9.13: https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl/1.9.13, Apache 2.0
     jackson-module-parameter-names 2.13.0: https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-parameter-names/2.13.0, Apache 2.0
     javax.jdo-3.2.0-m3: https://mvnrepository.com/artifact/org.datanucleus/javax.jdo/3.2.0-m3, Apache 2.0
@@ -352,7 +352,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     netty 3.10.6.Final: https://github.com/netty/netty, Apache 2.0
     netty 4.1.53.Final: https://github.com/netty/netty/blob/netty-4.1.53.Final/LICENSE.txt, Apache 2.0
     nimbus-jose-jwt 9.8.1: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.8.1, Apache 2.0
-    okhttp 3.14.9: https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/3.14.9, Apache 2.0
+    okhttp 4.12.0: https://mvnrepository.com/artifact/com.squareup.okhttp/okhttp/4.12.0, Apache 2.0
     opencsv 2.3: https://mvnrepository.com/artifact/net.sf.opencsv/opencsv/2.3, Apache 2.0
     parquet-hadoop-bundle 1.8.1: https://mvnrepository.com/artifact/org.apache.parquet/parquet-hadoop-bundle/1.8.1, Apache 2.0
     poi 4.1.2: https://mvnrepository.com/artifact/org.apache.poi/poi/4.1.2, Apache 2.0
@@ -436,8 +436,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     zjsonpatch 0.3.0 https://mvnrepository.com/artifact/io.fabric8/zjsonpatch/0.3.0, Apache 2.0
     jackson-dataformat-yaml 2.13.0 https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.13.0, Apache 2.0
     logging-interceptor 4.9.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/logging-interceptor/4.9.3, Apache 2.0
-    okhttp 3.14.3 https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp/3.14.3, Apache 2.0
-    okio 1.17.2 https://mvnrepository.com/artifact/com.squareup.okio/okio/1.17.2, Apache 2.0
+    okio 3.6.0 https://mvnrepository.com/artifact/com.squareup.okio/okio/3.6.0, Apache 2.0
+    okio-jvm 3.6.0 https://repo1.maven.org/maven2/com/squareup/okio/okio-jvm/3.6.0, Apache 2.0
     hibernate-validator  6.2.2.Final https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator/6.2.2.Final, Apache 2.0
     jakarta.validation-api 2.0.2 https://mvnrepository.com/artifact/jakarta.validation/jakarta.validation-api/2.0.2, Apache 2.0
     jboss-logging:jar 3.4.3.Final https://mvnrepository.com/artifact/org.jboss.logging/jboss-logging/3.4.3.Final, Apache 2.0
@@ -525,10 +525,9 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     reactor-netty-core 1.0.22: https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty-core/1.0.22, Apache 2.0
     reactor-netty-http 1.0.22: https://mvnrepository.com/artifact/io.projectreactor.netty/reactor-netty-http/1.0.22, Apache 2.0
     DmJdbcDriver18 8.1.2.79: https://mvnrepository.com/artifact/com.dameng/DmJdbcDriver18/8.1.2.79, Apache 2.0
-    nimbus-jose-jwt 9.22: https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt/9.22, Apache 2.0
     woodstox-core 6.4.0: https://mvnrepository.com/artifact/com.fasterxml.woodstox/woodstox-core/6.4.0, Apache 2.0
     auto-value 1.10.1: https://mvnrepository.com/artifact/com.google.auto.value/auto-value/1.10.1, Apache 2.0
-    auto-value-annotations 1.10.1: https://mvnrepository.com/artifact/com.google.auto.value/auto-value-annotations/1.10.1, Apache 2.0
+    auto-value-annotations 1.10.4: https://mvnrepository.com/artifact/com.google.auto.value/auto-value-annotations/1.10.4, Apache 2.0
     conscrypt-openjdk-uber 2.5.2: https://mvnrepository.com/artifact/org.conscrypt/conscrypt-openjdk-uber/2.5.2, Apache 2.0
     gapic-google-cloud-storage-v2 2.18.0-alpha: https://mvnrepository.com/artifact/com.google.api.grpc/gapic-google-cloud-storage-v2/2.18.0-alpha, Apache 2.0
     google-api-client 2.2.0: https://mvnrepository.com/artifact/com.google.api-client/google-api-client/2.2.0, Apache 2.0
@@ -562,6 +561,20 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     org.apache.oltu.oauth2.client 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.client/1.0.2  Apache 2.0
     org.apache.oltu.oauth2.common 1.0.2  https://mvnrepository.com/artifact/org.apache.oltu.oauth2/org.apache.oltu.oauth2.common/1.0.2  Apache 2.0
     esdk-obs-java-bundle 3.23.3 https://mvnrepository.com/artifact/com.huaweicloud/esdk-obs-java-bundle/3.23.3  Apache 2.0
+    dyvmsapi20170525 2.1.4 https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    alibabacloud-gateway-spi 0.0.1 https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    credentials-java 0.2.2 https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    endpoint-util 0.0.7 https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    openapiutil 0.1.14 https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    tea-1.1.14.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    tea-openapi 0.2.2.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    tea-rpc 0.0.11.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    tea-rpc-util 0.1.3.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    tea-util 0.2.13.jar https://github.com/aliyun/aliyun-openapi-java-sdk/blob/master/README.md#license Apache 2.0
+    delight-nashorn-sandbox 0.3.2 https://github.com/javadelight/delight-nashorn-sandbox/blob/master/README.md#license Apache 2.0
+
+
+
 
 
 
@@ -602,6 +615,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     google-auth-library-credentials 1.15.0: https://mvnrepository.com/artifact/com.google.auth/google-auth-library-credentials/1.15.0, BSD 3-clause
     google-auth-library-oauth2-http 1.15.0: https://mvnrepository.com/artifact/com.google.auth/google-auth-library-oauth2-http/1.15.0, BSD 3-clause
     threetenbp 1.6.5: https://mvnrepository.com/artifact/org.threeten/threetenbp/1.6.5, BSD 3-clause
+    dom4j 2.1.3 https://github.com/dom4j/dom4j/blob/master/LICENSE BSD 3-clause
 
 ========================================================================
 CDDL licenses
@@ -624,7 +638,8 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     jta 1.1: https://mvnrepository.com/artifact/javax.transaction/jta/1.1, CDDL 1.0
     transaction-api 1.1: https://mvnrepository.com/artifact/javax.transaction/transaction-api/1.1, CDDL 1.0
     javax.el 3.0.0: https://mvnrepository.com/artifact/org.glassfish/javax.el/3.0.0, CDDL and GPL and GPL 2.0
-
+    jaxb-core 2.3.0 https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-core/2.3.0 GPL 1.1
+    jaxb-impl 2.3.0 https://mvnrepository.com/artifact/com.sun.xml.bind/jaxb-impl/2.3.0 GPL 1.1
 ========================================================================
 EPL licenses
 ========================================================================
@@ -651,7 +666,6 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     animal-sniffer-annotations 1.19 https://mvnrepository.com/artifact/org.codehaus.mojo/animal-sniffer-annotations/1.19, MIT
     checker-qual 3.12.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.12.0, MIT + GPLv2
     checker-qual 3.19.0 https://mvnrepository.com/artifact/org.checkerframework/checker-qual/3.19.0, MIT + GPLv2
-    Java-WebSocket 1.5.1: https://github.com/TooTallNate/Java-WebSocket,  MIT
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     unirest-java 3.7.04-standalone: https://mvnrepository.com/artifact/com.konghq/unirest-java/3.7.04, MIT
     classgraph 4.8.83: https://mvnrepository.com/artifact/io.github.classgraph/classgraph, MIT
@@ -732,7 +746,7 @@ MIT licenses
     axios 0.27.2: https://github.com/axios/axios MIT
     date-fns 2.29.3: https://github.com/date-fns/date-fns MIT
     lodash 4.17.21: https://github.com/lodash/lodash MIT
-    monaco-editor 0.34.0: https://github.com/microsoft/monaco-editor MIT
+    monaco-editor 0.50.0: https://github.com/microsoft/monaco-editor MIT
     naive-ui 2.30.7: https://github.com/TuSimple/naive-ui MIT
     nprogress 0.2.0: https://github.com/rstacruz/nprogress MIT
     pinia 2.0.22: https://github.com/vuejs/pinia MIT

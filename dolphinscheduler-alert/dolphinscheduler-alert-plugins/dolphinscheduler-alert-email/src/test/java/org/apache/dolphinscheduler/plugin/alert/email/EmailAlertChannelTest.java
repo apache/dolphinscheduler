@@ -66,7 +66,7 @@ public class EmailAlertChannelTest {
         alertInfo.setAlertParams(paramsMap);
         AlertResult alertResult = emailAlertChannel.process(alertInfo);
         Assertions.assertNotNull(alertResult);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     public String getEmailAlertParams() {

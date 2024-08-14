@@ -20,12 +20,12 @@ import getElementByJson from '@/components/form/get-elements-by-json'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import type {
+  EditWorkflowDefinition,
+  FormRules,
   IFormItem,
   IJsonItem,
   INodeData,
-  ITaskData,
-  FormRules,
-  EditWorkflowDefinition
+  ITaskData
 } from './types'
 
 export function useTask({

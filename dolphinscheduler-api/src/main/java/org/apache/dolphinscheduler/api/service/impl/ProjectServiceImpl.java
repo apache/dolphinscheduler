@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils.CodeGenerateException;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
@@ -126,7 +127,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             project = Project
                     .builder()
                     .name(name)
-                    .code(CodeGenerateUtils.getInstance().genCode())
+                    .code(CodeGenerateUtils.genCode())
                     .description(desc)
                     .userId(loginUser.getId())
                     .userName(loginUser.getUserName())
@@ -392,6 +393,19 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             for (Project project : projectList) {
                 project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
             }
+        }
+        List<User> userList = userMapper.selectByIds(projectList.stream()
+                .map(Project::getUserId).distinct().collect(Collectors.toList()));
+        Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
+        List<ProjectProcessDefinitionCount> projectProcessDefinitionCountList =
+                processDefinitionMapper.queryProjectProcessDefinitionCountByProjectCodes(
+                        projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList()));
+        Map<Long, Integer> projectProcessDefinitionCountMap = projectProcessDefinitionCountList.stream()
+                .collect(Collectors.toMap(ProjectProcessDefinitionCount::getProjectCode,
+                        ProjectProcessDefinitionCount::getCount));
+        for (Project project : projectList) {
+            project.setUserName(userMap.get(project.getUserId()));
+            project.setDefCount(projectProcessDefinitionCountMap.getOrDefault(project.getCode(), 0));
         }
         pageInfo.setTotal((int) projectIPage.getTotal());
         pageInfo.setTotalList(projectList);

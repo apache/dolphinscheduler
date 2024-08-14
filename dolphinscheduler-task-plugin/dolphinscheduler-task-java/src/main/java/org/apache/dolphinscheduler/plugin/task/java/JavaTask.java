@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.java;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.JAVA_HOME_VAR;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.PUBLIC_CLASS_NAME_REGEX;
 
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
@@ -87,6 +87,7 @@ public class JavaTask extends AbstractTask {
 
     /**
      * Initializes a Java task
+     *
      * @return void
      **/
     @Override
@@ -176,14 +177,16 @@ public class JavaTask extends AbstractTask {
      * @return String
      **/
     protected String buildJarCommand() {
-        String mainJarName = taskRequest.getResources().get(javaParameters.getMainJar().getResourceName());
+        ResourceContext resourceContext = taskRequest.getResourceContext();
+        String mainJarAbsolutePathInLocal = resourceContext
+                .getResourceItem(javaParameters.getMainJar().getResourceName())
+                .getResourceAbsolutePathInLocal();
         StringBuilder builder = new StringBuilder();
         builder.append(getJavaCommandPath())
                 .append("java").append(" ")
                 .append(buildResourcePath()).append(" ")
                 .append("-jar").append(" ")
-                .append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
-                .append(mainJarName).append(" ")
+                .append(mainJarAbsolutePathInLocal).append(" ")
                 .append(javaParameters.getMainArgs().trim()).append(" ")
                 .append(javaParameters.getJvmArgs().trim());
         return builder.toString();
@@ -202,39 +205,6 @@ public class JavaTask extends AbstractTask {
     @Override
     public AbstractParameters getParameters() {
         return javaParameters;
-    }
-
-    /**
-     * Replaces placeholders such as local variables in source files
-     *
-     * @param rawScript
-     * @return String
-     * @throws StringIndexOutOfBoundsException
-     */
-    protected static String convertJavaSourceCodePlaceholders(String rawScript) throws StringIndexOutOfBoundsException {
-        int len = "${setShareVar(${".length();
-
-        int scriptStart = 0;
-        while ((scriptStart = rawScript.indexOf("${setShareVar(${", scriptStart)) != -1) {
-            int start = -1;
-            int end = rawScript.indexOf('}', scriptStart + len);
-            String prop = rawScript.substring(scriptStart + len, end);
-
-            start = rawScript.indexOf(',', end);
-            end = rawScript.indexOf(')', start);
-
-            String value = rawScript.substring(start + 1, end);
-
-            start = rawScript.indexOf('}', start) + 1;
-            end = rawScript.length();
-
-            String replaceScript = String.format("print(\"${{setValue({},{})}}\".format(\"%s\",%s))", prop, value);
-
-            rawScript = rawScript.substring(0, scriptStart) + replaceScript + rawScript.substring(start, end);
-
-            scriptStart += replaceScript.length();
-        }
-        return rawScript;
     }
 
     /**
@@ -277,16 +247,17 @@ public class JavaTask extends AbstractTask {
         if (javaParameters.isModulePath()) {
             builder.append("--module-path");
         } else {
-            builder.append("--class-path");
+            builder.append("-classpath");
         }
-        builder.append(" ").append(JavaConstants.CLASSPATH_CURRENT_DIR)
+        builder.append(" ")
+                .append(JavaConstants.CLASSPATH_CURRENT_DIR)
                 .append(JavaConstants.PATH_SEPARATOR)
                 .append(taskRequest.getExecutePath());
-        Map<String, String> resourceMap = taskRequest.getResources();
+        ResourceContext resourceContext = taskRequest.getResourceContext();
         for (ResourceInfo info : javaParameters.getResourceFilesList()) {
             builder.append(JavaConstants.PATH_SEPARATOR);
-            builder.append(taskRequest.getExecutePath()).append(FOLDER_SEPARATOR)
-                    .append(resourceMap.get(info.getResourceName()));
+            builder
+                    .append(resourceContext.getResourceItem(info.getResourceName()).getResourceAbsolutePathInLocal());
         }
         return builder.toString();
     }

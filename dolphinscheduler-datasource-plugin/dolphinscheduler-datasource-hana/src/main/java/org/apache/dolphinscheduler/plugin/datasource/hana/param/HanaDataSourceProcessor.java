@@ -34,16 +34,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.auto.service.AutoService;
+
 @AutoService(DataSourceProcessor.class)
 public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
 
-    private final Logger logger = LoggerFactory.getLogger(HanaDataSourceProcessor.class);
-
     private static final String APPEND_PARAMS = "reconnect=true";
+
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
         return JSONUtils.parseObject(paramJson, HanaDataSourceParamDTO.class);
@@ -96,7 +93,7 @@ public class HanaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getValidationQuery() {
-        return DataSourceConstants.COM_HANA_DB_JDBC_DRIVER;
+        return DataSourceConstants.HANA_VALIDATION_QUERY;
     }
 
     @Override

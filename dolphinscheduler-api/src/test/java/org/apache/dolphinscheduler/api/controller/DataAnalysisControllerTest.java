@@ -24,8 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
@@ -77,8 +77,8 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result<TaskInstanceCountVo> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Result<TaskInstanceCountVo>>() {
+        Result<TaskInstanceCountVO> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<TaskInstanceCountVO>>() {
                 });
         assertThat(result.getCode())
                 .isNotNull()
@@ -101,8 +101,8 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result<WorkflowInstanceCountVo> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Result<WorkflowInstanceCountVo>>() {
+        Result<WorkflowInstanceCountVO> result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(),
+                new TypeReference<Result<WorkflowInstanceCountVO>>() {
                 });
         assertThat(result.getCode())
                 .isEqualTo(Status.SUCCESS.getCode());
@@ -143,6 +143,42 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     public void testCountQueueState() throws Exception {
         MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/queue-count")
                 .header("sessionId", sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testListCommand() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectCode", "16");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "10");
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/listCommand")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        assertThat(result.getCode().intValue()).isEqualTo(Status.SUCCESS.getCode());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testListErrorCommand() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("projectCode", "16");
+        paramsMap.add("pageNo", "1");
+        paramsMap.add("pageSize", "10");
+
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/listErrorCommand")
+                .header("sessionId", sessionId)
+                .params(paramsMap))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();

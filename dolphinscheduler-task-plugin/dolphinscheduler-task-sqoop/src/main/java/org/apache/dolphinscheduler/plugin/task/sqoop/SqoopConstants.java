@@ -21,10 +21,11 @@ public final class SqoopConstants {
 
     private SqoopConstants() {
     }
-
+    public static final String FORMAT_S_S_S = "%s%s%s";
     // sqoop general param
     public static final String SQOOP = "sqoop";
     public static final String SQOOP_MR_JOB_NAME = "mapred.job.name";
+    public static final Object SQOOP_EXPORT_RECORDS_PER_STATEMENT = "sqoop.export.records.per.statement";
     public static final String SQOOP_PARALLELISM = "-m";
     public static final String FIELDS_TERMINATED_BY = "--fields-terminated-by";
     public static final String LINES_TERMINATED_BY = "--lines-terminated-by";
@@ -34,6 +35,7 @@ public final class SqoopConstants {
 
     // sqoop db
     public static final String DB_CONNECT = "--connect";
+    public static final String DRIVER = "--driver";
     public static final String DB_USERNAME = "--username";
     public static final String DB_PWD = "--password";
     public static final String TABLE = "--table";
@@ -73,4 +75,11 @@ public final class SqoopConstants {
     public static final String UPDATE_MODE = "--update-mode";
 
     public static final String SQOOP_PASSWORD_REGEX = "(?<=(--password \")).+?(?=\")";
+
+    public static final String MYSQL = "MYSQL";
+    public static final String HIVE = "HIVE";
+    public static final String HDFS = "HDFS";
+    public static final String ORACLE = "ORACLE";
+    public static final String HANA = "HANA";
+    public static final String SQLSERVER = "SQLSERVER";
 }

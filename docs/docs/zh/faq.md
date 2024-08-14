@@ -430,11 +430,11 @@ A：1，cd dolphinscheduler-ui 然后删除 node_modules 目录
 sudo rm -rf node_modules
 ```
 
-​ 2，通过 npm.taobao.org 下载 node-sass
+​ 2，通过 npmmirror.com 下载 node-sass
 
 ```
 sudo npm uninstall node-sass
-sudo npm i node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+sudo npm i node-sass --sass_binary_site=https://npmmirror.com/mirrors/node-sass/
 ```
 
 3，如果步骤 2 报错，请重新构建 node-saas [参考链接](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/zh/contribute/frontend-development.md)
@@ -477,7 +477,7 @@ A：1，被执行的服务器在哪里配置，以及实际执行的服务器是
 
 ## Q：生产环境部署方式有推荐的最佳实践吗
 
-A：1，如果没有很多任务要运行，出于稳定性考虑我们建议使用 3 个节点，并且最好把 Master/Worder 服务部署在不同的节点。如果你只有一个节点，当然只能把所有的服务部署在同一个节点！通常来说，需要多少节点取决于你的业务，海豚调度系统本身不需要很多的资源。充分测试之后，你们将找到使用较少节点的合适的部署方式。
+A：1，如果没有很多任务要运行，出于稳定性考虑我们建议使用 3 个节点，并且最好把 Master/Worker/Api 服务部署在不同的节点。如果你只有一个节点，当然只能把所有的服务部署在同一个节点！通常来说，需要多少节点取决于你的业务，海豚调度系统本身不需要很多的资源。充分测试之后，你们将找到使用较少节点的合适的部署方式。
 
 ---
 

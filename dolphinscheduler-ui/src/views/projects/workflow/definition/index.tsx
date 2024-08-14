@@ -45,6 +45,7 @@ import VersionModal from './components/version-modal'
 import CopyModal from './components/copy-modal'
 import type { Router } from 'vue-router'
 import Search from '@/components/input-search'
+import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
 
 export default defineComponent({
   name: 'WorkflowDefinitionList',
@@ -60,8 +61,7 @@ export default defineComponent({
       getTableData,
       batchDeleteWorkflow,
       batchExportWorkflow,
-      batchCopyWorkflow,
-      gotoTimingManage
+      batchCopyWorkflow
     } = useTable()
 
     const requestData = () => {
@@ -82,7 +82,7 @@ export default defineComponent({
     }
 
     const confirmToSetWorkflowTiming = () => {
-      gotoTimingManage(variables.row)
+      variables.timingShowRef = true
     }
 
     const handleSearch = () => {
@@ -295,6 +295,8 @@ export default defineComponent({
         <TimingModal
           v-model:row={this.row}
           v-model:show={this.timingShowRef}
+          v-model:type={this.timingType}
+          v-model:state={this.timingState}
           onUpdateList={this.handleUpdateList}
         />
         <VersionModal
@@ -316,6 +318,14 @@ export default defineComponent({
           negativeText={t('project.workflow.cancel')}
           maskClosable={false}
           onPositiveClick={this.confirmToSetWorkflowTiming}
+        />
+        <DependenciesModal
+          v-model:row={this.row}
+          v-model:show={this.dependenciesData.showRef}
+          v-model:taskLinks={this.dependenciesData.taskLinks}
+          required={this.dependenciesData.required}
+          content={this.dependenciesData.tip}
+          onConfirm={this.dependenciesData.action}
         />
       </NSpace>
     )

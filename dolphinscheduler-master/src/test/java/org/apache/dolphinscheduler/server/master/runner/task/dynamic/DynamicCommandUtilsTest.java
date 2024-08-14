@@ -54,6 +54,7 @@ class DynamicCommandUtilsTest {
         processInstance.setWarningGroupId(1);
         processInstance.setProcessInstancePriority(null); // update this
         processInstance.setWorkerGroup("worker");
+        processInstance.setTenantCode("unit-root");
         processInstance.setDryRun(0);
     }
 
@@ -73,6 +74,7 @@ class DynamicCommandUtilsTest {
         Assertions.assertEquals(processInstance.getProcessInstancePriority(), command.getProcessInstancePriority());
         Assertions.assertEquals(processInstance.getWorkerGroup(), command.getWorkerGroup());
         Assertions.assertEquals(processInstance.getDryRun(), command.getDryRun());
+        Assertions.assertEquals(processInstance.getTenantCode(), command.getTenantCode());
     }
 
     @Test

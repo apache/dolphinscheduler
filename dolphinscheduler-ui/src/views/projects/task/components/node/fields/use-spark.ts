@@ -37,9 +37,15 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
 
+  const masterSpan = computed(() =>
+    model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
+  )
+
   const mainArgsSpan = computed(() => (model.programType === 'SQL' ? 0 : 24))
 
-  const rawScriptSpan = computed(() => (model.programType === 'SQL' && model.sqlExecutionType === 'SCRIPT' ? 24 : 0))
+  const rawScriptSpan = computed(() =>
+    model.programType === 'SQL' && model.sqlExecutionType === 'SCRIPT' ? 24 : 0
+  )
 
   const showCluster = computed(() => model.programType !== 'SQL')
 
@@ -51,7 +57,9 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE' ? 1 : -1
   )
 
-  const sqlExecutionTypeSpan = computed(() => (model.programType === 'SQL' ? 12 : 0))
+  const sqlExecutionTypeSpan = computed(() =>
+    model.programType === 'SQL' ? 12 : 0
+  )
 
   const SQL_EXECUTION_TYPES = [
     {
@@ -132,6 +140,28 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'trigger'],
         required: true,
         message: t('project.node.script_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'master',
+      span: masterSpan,
+      name: t('project.node.master'),
+      props: {
+        placeholder: t('project.node.master_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        required: false,
+        validator(validate: any, value: string) {
+          if (
+            model.programType !== 'PYTHON' &&
+            !value &&
+            model.programType !== 'SQL'
+          ) {
+            return new Error(t('project.node.master_tips'))
+          }
+        }
       }
     },
     useDeployMode(24, ref(true), showCluster),

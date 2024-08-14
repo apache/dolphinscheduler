@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -203,11 +204,6 @@ public class TaskExecutionContext implements Serializable {
     private String workerGroup;
 
     /**
-     * delay execution time.
-     */
-    private int delayTime;
-
-    /**
      * current execution status
      */
     private TaskExecutionStatus currentExecutionStatus;
@@ -227,10 +223,8 @@ public class TaskExecutionContext implements Serializable {
      * k8s TaskExecutionContext
      */
     private K8sTaskExecutionContext k8sTaskExecutionContext;
-    /**
-     * resources full name and tenant code
-     */
-    private Map<String, String> resources;
+
+    private ResourceContext resourceContext;
 
     /**
      * taskInstance varPool
@@ -263,12 +257,9 @@ public class TaskExecutionContext implements Serializable {
 
     private boolean logBufferEnable;
 
-    /**
-     * dispatch fail times
-     */
     private int dispatchFailTimes;
 
-    public void increaseDispatchFailTimes() {
-        this.dispatchFailTimes++;
+    public int increaseDispatchFailTimes() {
+        return ++dispatchFailTimes;
     }
 }

@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -38,9 +38,7 @@ public class FlinkArgsUtilsTest {
         flinkParameters.setDeployMode(flinkDeployMode);
         flinkParameters.setParallelism(4);
         ResourceInfo resourceInfo = new ResourceInfo();
-        resourceInfo.setId(1);
         resourceInfo.setResourceName("/opt/job.jar");
-        resourceInfo.setRes("/opt/job.jar");
         flinkParameters.setMainJar(resourceInfo);
         flinkParameters.setMainClass("org.example.Main");
         flinkParameters.setSlot(4);
@@ -54,9 +52,14 @@ public class FlinkArgsUtilsTest {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTaskAppId("app-id");
         taskExecutionContext.setExecutePath("/tmp/execution");
-        HashMap<String, String> map = new HashMap<>();
-        map.put("/opt/job.jar", "/opt/job.jar");
-        taskExecutionContext.setResources(map);
+
+        ResourceContext.ResourceItem resourceItem = new ResourceContext.ResourceItem();
+        resourceItem.setResourceAbsolutePathInLocal("/opt/job.jar");
+        resourceItem.setResourceAbsolutePathInStorage("/opt/job.jar");
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(resourceItem);
+        taskExecutionContext.setResourceContext(resourceContext);
         return taskExecutionContext;
     }
 
@@ -66,7 +69,7 @@ public class FlinkArgsUtilsTest {
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assertions.assertEquals(
-                "flink run-application -t yarn-application -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
+                "${FLINK_HOME}/bin/flink run-application -t yarn-application -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine));
     }
 
@@ -78,7 +81,7 @@ public class FlinkArgsUtilsTest {
                 FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assertions.assertEquals(
-                "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
+                "${FLINK_HOME}/bin/flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine1));
 
         flinkParameters.setFlinkVersion("<1.10");
@@ -86,7 +89,7 @@ public class FlinkArgsUtilsTest {
                 FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assertions.assertEquals(
-                "flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
+                "${FLINK_HOME}/bin/flink run -m yarn-cluster -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine2));
 
         flinkParameters.setFlinkVersion(">=1.12");
@@ -94,7 +97,7 @@ public class FlinkArgsUtilsTest {
                 FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assertions.assertEquals(
-                "flink run -t yarn-per-job -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
+                "${FLINK_HOME}/bin/flink run -t yarn-per-job -ys 4 -ynm demo-app-name -yjm 1024m -ytm 1024m -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine3));
     }
 
@@ -104,7 +107,7 @@ public class FlinkArgsUtilsTest {
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
         Assertions.assertEquals(
-                "flink run -p 4 -sae -c org.example.Main /opt/job.jar",
+                "${FLINK_HOME}/bin/flink run -p 4 -sae -c org.example.Main /opt/job.jar",
                 joinStringListWithSpace(commandLine));
     }
 
@@ -114,7 +117,8 @@ public class FlinkArgsUtilsTest {
         flinkParameters.setProgramType(ProgramType.SQL);
         List<String> commandLine = FlinkArgsUtils.buildRunCommandLine(buildTestTaskExecutionContext(), flinkParameters);
 
-        Assertions.assertEquals("sql-client.sh -i /tmp/execution/app-id_init.sql -f /tmp/execution/app-id_node.sql",
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/sql-client.sh -i /tmp/execution/app-id_init.sql -f /tmp/execution/app-id_node.sql",
                 joinStringListWithSpace(commandLine));
     }
 

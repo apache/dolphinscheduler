@@ -33,25 +33,27 @@ import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcCli
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.master.transportor.ITaskInstanceExecutionEvent;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.registry.WorkerRegistryClient;
 import org.apache.dolphinscheduler.server.worker.rpc.WorkerMessageSender;
-import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionCheckerUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,8 +76,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
     protected final WorkerMessageSender workerMessageSender;
-    protected final TaskPluginManager taskPluginManager;
-    protected final @Nullable StorageOperate storageOperate;
+    protected final @Nullable StorageOperator storageOperator;
     protected final WorkerRegistryClient workerRegistryClient;
 
     protected @Nullable AbstractTask task;
@@ -84,14 +85,12 @@ public abstract class WorkerTaskExecutor implements Runnable {
                                  @NonNull TaskExecutionContext taskExecutionContext,
                                  @NonNull WorkerConfig workerConfig,
                                  @NonNull WorkerMessageSender workerMessageSender,
-                                 @NonNull TaskPluginManager taskPluginManager,
-                                 @Nullable StorageOperate storageOperate,
+                                 @Nullable StorageOperator storageOperator,
                                  @NonNull WorkerRegistryClient workerRegistryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
         this.workerMessageSender = workerMessageSender;
-        this.taskPluginManager = taskPluginManager;
-        this.storageOperate = storageOperate;
+        this.storageOperator = storageOperator;
         this.workerRegistryClient = workerRegistryClient;
         SensitiveDataConverter.addMaskPattern(K8S_CONFIG_REGEX);
     }
@@ -106,7 +105,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
         sendTaskResult();
 
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
         log.info("Remove the current task execute context from worker cache");
         clearTaskExecPathIfNeeded();
 
@@ -116,7 +115,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         if (cancelTask()) {
             log.info("Cancel the task successfully");
         }
-        TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+        WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
         taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.FAILURE);
         taskExecutionContext.setEndTime(System.currentTimeMillis());
         workerMessageSender.sendMessageWithRetry(taskExecutionContext,
@@ -126,7 +125,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     }
 
-    public boolean cancelTask() {
+    protected boolean cancelTask() {
         // cancel the task
         if (task == null) {
             return true;
@@ -155,7 +154,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
             if (DRY_RUN_FLAG_YES == taskExecutionContext.getDryRun()) {
                 taskExecutionContext.setCurrentExecutionStatus(TaskExecutionStatus.SUCCESS);
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
-                TaskExecutionContextCacheManager.removeByTaskInstanceId(taskExecutionContext.getTaskInstanceId());
+                WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext,
                         ITaskInstanceExecutionEvent.TaskInstanceExecutionEventType.FINISH);
                 log.info(
@@ -208,23 +207,32 @@ public abstract class WorkerTaskExecutor implements Runnable {
         log.info("Send task status {} master: {}", TaskExecutionStatus.RUNNING_EXECUTION.name(),
                 taskExecutionContext.getHost());
 
-        TaskExecutionCheckerUtils.checkTenantExist(workerConfig, taskExecutionContext);
+        // In most of case the origin tenant is the same as the current tenant
+        // Except `default` tenant. The originTenant is used to download the resources
+        String originTenant = taskExecutionContext.getTenantCode();
+        taskExecutionContext.setTenantCode(TenantUtils.getOrCreateActualTenant(workerConfig, taskExecutionContext));
         log.info("TenantCode: {} check successfully", taskExecutionContext.getTenantCode());
 
-        TaskExecutionCheckerUtils.createProcessLocalPathIfAbsent(taskExecutionContext);
+        TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
         log.info("WorkflowInstanceExecDir: {} check successfully", taskExecutionContext.getExecutePath());
 
-        TaskExecutionCheckerUtils.downloadResourcesIfNeeded(storageOperate, taskExecutionContext);
-        log.info("Download resources: {} successfully", taskExecutionContext.getResources());
+        TaskChannel taskChannel =
+                Optional.ofNullable(TaskPluginManager.getTaskChannel(taskExecutionContext.getTaskType()))
+                        .orElseThrow(() -> new TaskPluginException(taskExecutionContext.getTaskType()
+                                + " task plugin not found, please check the task type is correct."));
 
-        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperate);
+        log.info("Create TaskChannel: {} successfully", taskChannel.getClass().getName());
+
+        ResourceContext resourceContext = TaskExecutionContextUtils.downloadResourcesIfNeeded(taskChannel,
+                storageOperator, taskExecutionContext);
+        taskExecutionContext.setResourceContext(resourceContext);
+        log.info("Download resources successfully: \n{}", taskExecutionContext.getResourceContext());
+
+        TaskFilesTransferUtils.downloadUpstreamFiles(taskExecutionContext, storageOperator);
         log.info("Download upstream files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.IN));
 
-        task = Optional.ofNullable(taskPluginManager.getTaskChannelMap().get(taskExecutionContext.getTaskType()))
-                .map(taskChannel -> taskChannel.createTask(taskExecutionContext))
-                .orElseThrow(() -> new TaskPluginException(taskExecutionContext.getTaskType()
-                        + " task plugin not found, please check the task type is correct."));
+        task = taskChannel.createTask(taskExecutionContext);
         log.info("Task plugin instance: {} create successfully", taskExecutionContext.getTaskType());
 
         // todo: remove the init method, this should initialize in constructor method
@@ -274,7 +282,8 @@ public abstract class WorkerTaskExecutor implements Runnable {
         taskExecutionContext.setEndTime(System.currentTimeMillis());
 
         // upload out files and modify the "OUT FILE" property in VarPool
-        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperate);
+        TaskFilesTransferUtils.uploadOutputFiles(taskExecutionContext, storageOperator);
+
         log.info("Upload output files: {} successfully",
                 TaskFilesTransferUtils.getFileLocalParams(taskExecutionContext, Direct.OUT));
 

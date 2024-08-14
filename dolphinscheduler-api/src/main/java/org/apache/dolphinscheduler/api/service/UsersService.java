@@ -184,26 +184,6 @@ public interface UsersService {
     Map<String, Object> revokeProject(User loginUser, int userId, long projectCode);
 
     /**
-     * grant resource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param resourceIds resource id array
-     * @return grant result code
-     */
-    Map<String, Object> grantResources(User loginUser, int userId, String resourceIds);
-
-    /**
-     * grant udf function
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @param udfIds udf id array
-     * @return grant result code
-     */
-    Map<String, Object> grantUDFFunction(User loginUser, int userId, String udfIds);
-
-    /**
      * grant namespace
      *
      * @param loginUser login user

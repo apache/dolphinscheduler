@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { ref, h, watch, Ref } from 'vue'
+import { h, onMounted, Ref, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDatasource } from './use-sqoop-datasource'
 import styles from '../index.module.scss'
@@ -26,23 +26,31 @@ export function useTargetType(
   unCustomSpan: Ref<number>
 ): IJsonItem[] {
   const { t } = useI18n()
-  const hiveSpan = ref(0)
-  const hdfsSpan = ref(24)
-  const mysqlSpan = ref(0)
+  const hiveSpan = ref(24)
+  const hdfsSpan = ref(0)
+  const rdbmsSpan = ref(0)
   const dataSourceSpan = ref(0)
   const updateSpan = ref(0)
-
-  const resetSpan = () => {
-    hiveSpan.value = unCustomSpan.value && model.targetType === 'HIVE' ? 24 : 0
-    hdfsSpan.value = unCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0
-    mysqlSpan.value =
-      unCustomSpan.value && model.targetType === 'MYSQL' ? 24 : 0
-    dataSourceSpan.value =
-      unCustomSpan.value && model.targetType === 'MYSQL' ? 12 : 0
-    updateSpan.value = mysqlSpan.value && model.targetMysqlIsUpdate ? 24 : 0
-  }
-
-  const targetTypes = ref([
+  const isChange: any = ref(false)
+  const rdbmsSourceTypes = ref([
+    {
+      label: 'MYSQL',
+      value: 'MYSQL'
+    },
+    {
+      label: 'ORACLE',
+      value: 'ORACLE'
+    },
+    {
+      label: 'SQLSERVER',
+      value: 'SQLSERVER'
+    },
+    {
+      label: 'HANA',
+      value: 'HANA'
+    }
+  ] as IOption[])
+  const hadoopSourceTypes = ref([
     {
       label: 'HIVE',
       value: 'HIVE'
@@ -52,6 +60,23 @@ export function useTargetType(
       value: 'HDFS'
     }
   ] as IOption[])
+  const targetTypes = ref()
+
+  const resetSpan = () => {
+    hiveSpan.value = unCustomSpan.value && model.targetType === 'HIVE' ? 24 : 0
+    hdfsSpan.value = unCustomSpan.value && model.targetType === 'HDFS' ? 24 : 0
+    rdbmsSpan.value =
+      unCustomSpan.value &&
+      rdbmsSourceTypes.value.some((target) => target.value === model.targetType)
+        ? 24
+        : 0
+    dataSourceSpan.value =
+      unCustomSpan.value &&
+      rdbmsSourceTypes.value.some((target) => target.value === model.targetType)
+        ? 24
+        : 0
+    updateSpan.value = rdbmsSpan.value && model.targetMysqlIsUpdate ? 24 : 0
+  }
 
   const getTargetTypesBySourceType = (
     sourceType: SourceType,
@@ -60,62 +85,57 @@ export function useTargetType(
     switch (sourceType) {
       case 'MYSQL':
         if (srcQueryType === '1') {
-          return [
-            {
-              label: 'HIVE',
-              value: 'HIVE'
-            },
-            {
-              label: 'HDFS',
-              value: 'HDFS'
-            }
-          ]
+          return hadoopSourceTypes.value
         }
-        return [
-          {
-            label: 'HIVE',
-            value: 'HIVE'
-          },
-          {
-            label: 'HDFS',
-            value: 'HDFS'
-          }
-        ]
+        return hadoopSourceTypes.value
       case 'HDFS':
       case 'HIVE':
-        return [
-          {
-            label: 'MYSQL',
-            value: 'MYSQL'
-          }
-        ]
+        return rdbmsSourceTypes.value
       default:
-        return [
-          {
-            label: 'HIVE',
-            value: 'HIVE'
-          },
-          {
-            label: 'HDFS',
-            value: 'HDFS'
-          }
-        ]
+        return hadoopSourceTypes.value
     }
   }
+
+  const resetValue = () => {
+    if (!isChange.value) {
+      isChange.value = true
+      return
+    }
+    switch (model.modelType) {
+      case 'import':
+        model.targetHiveDatabase = ''
+        model.targetHiveTable = ''
+        model.targetHdfsTargetPath = ''
+        break
+      case 'export':
+        model.targetMysqlDatasource = ''
+        model.targetMysqlTable = ''
+        model.targetMysqlColumns = ''
+        model.targetMysqlFieldsTerminated = ''
+        model.targetMysqlLinesTerminated = ''
+        model.targetMysqlTable = ''
+        break
+      default:
+        model.sourceMysqlDatasource = ''
+    }
+  }
+
+  onMounted(() => {
+    targetTypes.value = [...hadoopSourceTypes.value]
+  })
 
   watch(
     () => [model.sourceType, model.srcQueryType],
     ([sourceType, srcQueryType]) => {
       targetTypes.value = getTargetTypesBySourceType(sourceType, srcQueryType)
-      if (!model.targetType) {
-        model.targetType = targetTypes.value[0].value
-      }
+      model.targetType = targetTypes.value[0].value
     }
   )
 
   watch(
     () => [unCustomSpan.value, model.targetType, model.targetMysqlIsUpdate],
     () => {
+      resetValue()
       resetSpan()
     }
   )
@@ -169,7 +189,7 @@ export function useTargetType(
         required: true,
         validator(rule, value) {
           if (hiveSpan.value && !value) {
-            return new Error(t('project.node.hive_table_tips'))
+            return new Error(t('project.node.table_tips'))
           }
         }
       }
@@ -294,15 +314,15 @@ export function useTargetType(
       type: 'input',
       field: 'targetMysqlTable',
       name: t('project.node.table'),
-      span: mysqlSpan,
+      span: rdbmsSpan,
       props: {
-        placeholder: t('project.node.hive_table_tips')
+        placeholder: t('project.node.table_tips')
       },
       validate: {
         trigger: ['blur', 'input'],
         required: true,
         validator(validate, value) {
-          if (mysqlSpan.value && !value) {
+          if (rdbmsSpan.value && !value) {
             return new Error(t('project.node.table_tips'))
           }
         }
@@ -312,7 +332,7 @@ export function useTargetType(
       type: 'input',
       field: 'targetMysqlColumns',
       name: t('project.node.column'),
-      span: mysqlSpan,
+      span: rdbmsSpan,
       props: {
         placeholder: t('project.node.column_tips')
       }
@@ -321,7 +341,7 @@ export function useTargetType(
       type: 'input',
       field: 'targetMysqlFieldsTerminated',
       name: t('project.node.fields_terminated'),
-      span: mysqlSpan,
+      span: rdbmsSpan,
       props: {
         placeholder: t('project.node.fields_terminated_tips')
       }
@@ -330,7 +350,7 @@ export function useTargetType(
       type: 'input',
       field: 'targetMysqlLinesTerminated',
       name: t('project.node.lines_terminated'),
-      span: mysqlSpan,
+      span: rdbmsSpan,
       props: {
         placeholder: t('project.node.lines_terminated_tips')
       }
@@ -338,7 +358,7 @@ export function useTargetType(
     {
       type: 'switch',
       field: 'targetMysqlIsUpdate',
-      span: mysqlSpan,
+      span: rdbmsSpan,
       name: t('project.node.is_update')
     },
     {

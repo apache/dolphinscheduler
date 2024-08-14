@@ -17,24 +17,33 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.generator;
 
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HANA;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HDFS;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.HIVE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.MYSQL;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.ORACLE;
+import static org.apache.dolphinscheduler.plugin.task.sqoop.SqoopConstants.SQLSERVER;
+
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopJobType;
 import org.apache.dolphinscheduler.plugin.task.sqoop.SqoopTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.HanaSourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.HdfsSourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.HiveSourceGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.MySQLSourceGenerator;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.OracleSourceGenerator;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.sources.SqlServerSourceGenerator;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HanaTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HdfsTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.HiveTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.MySQLTargetGenerator;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.OracleTargetGenerator;
+import org.apache.dolphinscheduler.plugin.task.sqoop.generator.targets.SqlServerTargetGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
 
 /**
  * Sqoop Job Scripts Generator
  */
 public class SqoopJobGenerator {
-
-    private static final String MYSQL = "MYSQL";
-    private static final String HIVE = "HIVE";
-    private static final String HDFS = "HDFS";
 
     /**
      * target script generator
@@ -61,7 +70,7 @@ public class SqoopJobGenerator {
     /**
      * get the final sqoop scripts
      *
-     * @param sqoopParameters sqoop params
+     * @param sqoopParameters           sqoop params
      * @param sqoopTaskExecutionContext
      * @return sqoop scripts
      */
@@ -100,6 +109,12 @@ public class SqoopJobGenerator {
                 return new HiveSourceGenerator();
             case HDFS:
                 return new HdfsSourceGenerator();
+            case ORACLE:
+                return new OracleSourceGenerator();
+            case HANA:
+                return new HanaSourceGenerator();
+            case SQLSERVER:
+                return new SqlServerSourceGenerator();
             default:
                 return null;
         }
@@ -119,6 +134,12 @@ public class SqoopJobGenerator {
                 return new HiveTargetGenerator();
             case HDFS:
                 return new HdfsTargetGenerator();
+            case ORACLE:
+                return new OracleTargetGenerator();
+            case HANA:
+                return new HanaTargetGenerator();
+            case SQLSERVER:
+                return new SqlServerTargetGenerator();
             default:
                 return null;
         }

@@ -213,19 +213,19 @@ export function useRules(
       }
     }
     if (field === 'target_datasource_id' && typeof value === 'number') {
-        const result = await getDatasourceDatabasesById(value)
-        targetDatabaseOptions.value = result || []
-        if (reset) {
-            targetTableOptions.value = []
-            targetTableColumnOptions.value = []
-            model.target_database = null
-            model.target_table = null
-            model.target_field = null
-        }
+      const result = await getDatasourceDatabasesById(value)
+      targetDatabaseOptions.value = result || []
+      if (reset) {
+        targetTableOptions.value = []
+        targetTableColumnOptions.value = []
+        model.target_database = null
+        model.target_table = null
+        model.target_field = null
+      }
     }
 
     if (field === 'src_database' && typeof value === 'string') {
-     const result = await getDatasourceTablesById(
+      const result = await getDatasourceTablesById(
         model.src_datasource_id,
         value
       )

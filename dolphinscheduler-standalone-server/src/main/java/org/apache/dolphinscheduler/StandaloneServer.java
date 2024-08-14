@@ -17,23 +17,17 @@
 
 package org.apache.dolphinscheduler;
 
-import org.apache.curator.test.TestingServer;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
 @Slf4j
+@SpringBootApplication
 public class StandaloneServer {
 
     public static void main(String[] args) throws Exception {
         try {
-            // We cannot use try-with-resources to close "TestingServer", since SpringApplication.run() will not block
-            // the main thread.
-            TestingServer zookeeperServer = new TestingServer(true);
-            System.setProperty("registry.zookeeper.connect-string", zookeeperServer.getConnectString());
             SpringApplication.run(StandaloneServer.class, args);
         } catch (Exception ex) {
             log.error("StandaloneServer start failed", ex);

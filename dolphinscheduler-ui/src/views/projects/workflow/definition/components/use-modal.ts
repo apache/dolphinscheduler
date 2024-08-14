@@ -26,9 +26,8 @@ import {
   importProcessDefinition,
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
-import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
-import { listNormalAlertGroupById } from '@/service/modules/alert-group'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 import { startProcessInstance } from '@/service/modules/executors'
 import {
   createSchedule,
@@ -39,6 +38,7 @@ import { parseTime } from '@/common/common'
 import { EnvironmentItem } from '@/service/modules/environment/types'
 import { ITimingState, ProcessInstanceReq } from './types'
 import { queryTenantList } from '@/service/modules/tenants'
+import { queryWorkerGroupsByProjectCode } from '@/service/modules/projects-worker-group'
 
 export function useModal(
   state: any,
@@ -119,14 +119,8 @@ export function useModal(
         })
       }
 
-      const startParams = {} as any
-      for (const item of variables.startParamsList) {
-        if (item.value !== '') {
-          startParams[item.prop] = item.value
-        }
-      }
-      params.startParams = !_.isEmpty(startParams)
-        ? JSON.stringify(startParams)
+      params.startParams = !_.isEmpty(variables.startParamsList)
+        ? JSON.stringify(variables.startParamsList)
         : ''
       await startProcessInstance(params, variables.projectCode)
       window.$message.success(t('project.workflow.success'))
@@ -228,10 +222,10 @@ export function useModal(
   }
 
   const getWorkerGroups = () => {
-    queryAllWorkerGroups().then((res: any) => {
-      variables.workerGroups = res.map((item: string) => ({
-        label: item,
-        value: item
+    queryWorkerGroupsByProjectCode(variables.projectCode).then((res: any) => {
+      variables.workerGroups = res.data.map((item: any) => ({
+        label: item.workerGroup,
+        value: item.workerGroup
       }))
     })
   }
@@ -256,7 +250,7 @@ export function useModal(
   }
 
   const getAlertGroups = () => {
-    listNormalAlertGroupById().then((res: any) => {
+    listAlertGroupById().then((res: any) => {
       variables.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id

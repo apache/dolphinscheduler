@@ -21,13 +21,11 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.PROCESS_INSTANCE_STATE_OPERATION_ERROR;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEPENDENT_SPLIT;
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.PROCESS_INSTANCE_STATE;
 import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_DEPENDENT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SUB_PROCESS;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
@@ -60,7 +58,6 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelationLog;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
-import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -70,31 +67,22 @@ import org.apache.dolphinscheduler.dao.mapper.ProcessDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceMapDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
-import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.ParametersNode;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -178,16 +166,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     UsersService usersService;
 
     @Autowired
-    private TenantMapper tenantMapper;
-
-    @Autowired
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
-    private TaskPluginManager taskPluginManager;
-
-    @Autowired
-    private ScheduleMapper scheduleMapper;
 
     @Autowired
     private RelationSubWorkflowMapper relationSubWorkflowMapper;
@@ -459,11 +438,10 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
      * @param projectCode project code
      * @param processId   process instance id
      * @return task list for the process instance
-     * @throws IOException io exception
      */
     @Override
     public Map<String, Object> queryTaskListByProcessId(User loginUser, long projectCode,
-                                                        Integer processId) throws IOException {
+                                                        Integer processId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         Map<String, Object> result =
@@ -484,7 +462,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         }
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(processId, processInstance.getTestFlag());
-        addDependResultForTaskList(loginUser, taskInstanceList);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(PROCESS_INSTANCE_STATE, processInstance.getState().toString());
         resultMap.put(TASK_LIST, taskInstanceList);
@@ -509,7 +486,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
-        if (!taskInstance.isDynamic()) {
+        if (!TaskTypeUtils.isDynamicTask(taskInstance.getTaskType())) {
             putMsg(result, Status.TASK_INSTANCE_NOT_DYNAMIC_TASK, taskInstance.getName());
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
@@ -555,57 +532,6 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     }
 
     /**
-     * add dependent result for dependent task
-     */
-    private void addDependResultForTaskList(User loginUser, List<TaskInstance> taskInstanceList) throws IOException {
-        for (TaskInstance taskInstance : taskInstanceList) {
-            if (TASK_TYPE_DEPENDENT.equalsIgnoreCase(taskInstance.getTaskType())) {
-                log.info("DEPENDENT type task instance need to set dependent result, taskCode:{}, taskInstanceId:{}",
-                        taskInstance.getTaskCode(), taskInstance.getId());
-                // TODO The result of dependent item should not be obtained from the log, waiting for optimization.
-                Result<ResponseTaskLog> logResult = loggerService.queryLog(loginUser,
-                        taskInstance.getId(), Constants.LOG_QUERY_SKIP_LINE_NUMBER, Constants.LOG_QUERY_LIMIT);
-                if (logResult.getCode() == Status.SUCCESS.ordinal()) {
-                    String log = logResult.getData().getMessage();
-                    Map<String, DependResult> resultMap = parseLogForDependentResult(log);
-                    taskInstance.setDependentResult(JSONUtils.toJsonString(resultMap));
-                }
-            }
-        }
-    }
-
-    @Override
-    public Map<String, DependResult> parseLogForDependentResult(String content) throws IOException {
-        Map<String, DependResult> resultMap = new HashMap<>();
-        if (StringUtils.isEmpty(content)) {
-            log.warn("Log content is empty.");
-            return resultMap;
-        }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(content.getBytes(
-                StandardCharsets.UTF_8)), StandardCharsets.UTF_8));
-        String line;
-        while ((line = br.readLine()) != null) {
-            if (line.contains(DEPENDENT_SPLIT)) {
-                String[] tmpStringArray = line.split(":\\|\\|");
-                if (tmpStringArray.length != 2) {
-                    continue;
-                }
-                String dependResultString = tmpStringArray[1];
-                String[] dependStringArray = dependResultString.split(",");
-                if (dependStringArray.length != 3) {
-                    continue;
-                }
-                String key = dependStringArray[0].trim().split(":")[1].trim();
-                String result = dependStringArray[1].trim().split(":")[1].trim();
-                DependResult dependResult = DependResult.valueOf(result);
-                resultMap.put(key, dependResult);
-            }
-        }
-        return resultMap;
-    }
-
-    /**
      * query sub process instance detail info by task id
      *
      * @param loginUser   login user
@@ -639,9 +565,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
 
-        if (!taskInstance.isSubProcess()) {
-            log.warn("Task instance is not {} type instance, projectCode:{}, taskInstanceId:{}.",
-                    TASK_TYPE_SUB_PROCESS, projectCode, taskId);
+        if (!TaskTypeUtils.isSubWorkflowTask(taskInstance.getTaskType())) {
             putMsg(result, Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, taskInstance.getName());
             return result;
         }
@@ -725,11 +649,7 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
             return result;
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
-            if (!taskPluginManager.checkTaskParameters(ParametersNode.builder()
-                    .taskType(taskDefinitionLog.getTaskType())
-                    .taskParams(taskDefinitionLog.getTaskParams())
-                    .dependence(taskDefinitionLog.getDependence())
-                    .build())) {
+            if (!checkTaskParameters(taskDefinitionLog.getTaskType(), taskDefinitionLog.getTaskParams())) {
                 log.error("Task parameters are invalid,  taskDefinitionName:{}.", taskDefinitionLog.getName());
                 putMsg(result, Status.PROCESS_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
                 return result;
@@ -764,6 +684,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
         } else
             log.info("Update process definition complete, projectCode:{}, processDefinitionName:{}.", projectCode,
                     processDefinition.getName());
+
+        // save process lineage
+        if (syncDefine) {
+            processDefinitionService.saveProcessLineage(projectCode, processDefinition.getCode(),
+                    insertVersion, taskDefinitionLogs);
+        }
+
         int insertResult = processService.saveTaskRelation(loginUser, processDefinition.getProjectCode(),
                 processDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, syncDefine);
         if (insertResult == Constants.EXIT_CODE_SUCCESS) {
@@ -1062,6 +989,13 @@ public class ProcessInstanceServiceImpl extends BaseServiceImpl implements Proce
     @Override
     public List<ProcessInstance> queryByProcessDefineCodeAndStatus(Long processDefinitionCode, int[] states) {
         return processInstanceMapper.queryByProcessDefineCodeAndStatus(processDefinitionCode, states);
+    }
+
+    @Override
+    public List<ProcessInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                  int workflowDefinitionVersion, int[] states) {
+        return processInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
+                states);
     }
 
     /**

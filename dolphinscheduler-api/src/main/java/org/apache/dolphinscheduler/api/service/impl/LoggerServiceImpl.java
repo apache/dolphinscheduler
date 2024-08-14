@@ -188,6 +188,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         final String logPath = taskInstance.getLogPath();
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",
                 taskInstance.getId(), taskInstance.getName(), taskInstance.getHost(), logPath);
+        if (StringUtils.isBlank(logPath)) {
+            throw new ServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR,
+                    "TaskInstanceLogPath is empty, maybe the taskInstance doesn't be dispatched");
+        }
+
         StringBuilder sb = new StringBuilder();
         if (skipLineNum == 0) {
             String head = String.format(LOG_HEAD_FORMAT,
@@ -213,7 +218,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             }
             return sb.toString();
         } catch (Throwable ex) {
-            throw new ServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR, ex);
+            throw new ServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR, ex.getMessage(), ex);
         }
     }
 
@@ -232,7 +237,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
                 host,
                 Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
 
-        byte[] logBytes = new byte[0];
+        byte[] logBytes;
 
         ILogService iLogService =
                 SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(), ILogService.class);
@@ -246,6 +251,5 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
             throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
         }
-
     }
 }

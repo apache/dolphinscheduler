@@ -23,6 +23,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.REMOVE_TASK_INSTANCE_
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_SAVEPOINT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.TASK_STOP_ERROR;
 
+import org.apache.dolphinscheduler.api.audit.OperatorLog;
+import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.taskInstance.TaskInstanceRemoveCacheResponse;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
@@ -150,10 +152,12 @@ public class TaskInstanceController extends BaseController {
     @PostMapping(value = "/{id}/force-success")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(FORCE_TASK_SUCCESS_ERROR)
-    public Result forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
-                                   @PathVariable(value = "id") Integer id) {
-        return taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+    @OperatorLog(auditType = AuditType.TASK_INSTANCE_FORCE_SUCCESS)
+    public Result<Void> forceTaskSuccess(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @Schema(name = "projectCode", required = true) @PathVariable long projectCode,
+                                         @PathVariable(value = "id") Integer id) {
+        taskInstanceService.forceTaskSuccess(loginUser, projectCode, id);
+        return Result.success();
     }
 
     /**

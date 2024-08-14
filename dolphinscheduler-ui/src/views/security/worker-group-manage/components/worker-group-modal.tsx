@@ -137,6 +137,7 @@ const WorkerGroupModal = defineComponent({
                   <NSelect
                     class='select-worker-address'
                     multiple
+                    filterable
                     placeholder={t(
                       'security.worker_group.worker_addresses_tips'
                     )}

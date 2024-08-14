@@ -146,10 +146,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/sqoop.html',
                             },
                             {
-                                title: 'Pigeon',
-                                link: '/en-us/docs/dev/user_doc/guide/task/pigeon.html',
-                            },
-                            {
                                 title: 'Conditions',
                                 link: '/en-us/docs/dev/user_doc/guide/task/conditions.html',
                             },
@@ -269,6 +265,10 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/en-us/docs/dev/user_doc/guide/datasource/vertica.html',
+                            },
+                            {
+                                title: 'Remote Shell',
+                                link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
@@ -407,6 +407,9 @@ export default {
                             {
                                 title: 'Slack',
                                 link: '/en-us/docs/dev/user_doc/guide/alert/slack.html',
+                            },{
+                                title: 'Aliyun Voice',
+                                link: '/en-us/docs/dev/user_doc/guide/alert/aliyun-voice.html',
                             },
                         ],
                     },
@@ -424,10 +427,6 @@ export default {
                             {
                                 title: 'File Manage',
                                 link: '/en-us/docs/dev/user_doc/guide/resource/file-manage.html'
-                            },
-                            {
-                                title: 'UDF Manage',
-                                link: '/en-us/docs/dev/user_doc/guide/resource/udf-manage.html'
                             },
                             {
                                 title: 'Task Group Manage',
@@ -875,10 +874,6 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/sqoop.html',
                             },
                             {
-                                title: 'Pigeon',
-                                link: '/zh-cn/docs/dev/user_doc/guide/task/pigeon.html',
-                            },
-                            {
                                 title: 'Conditions',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/conditions.html',
                             },
@@ -965,6 +960,10 @@ export default {
                             {
                                 title: 'Vertica',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/vertica.html',
+                            },
+                            {
+                                title: 'Remote Shell',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
                         ],
                     },
@@ -1121,6 +1120,10 @@ export default {
                                 title: 'Slack告警',
                                 link: '/zh-cn/docs/dev/user_doc/guide/alert/slack.html',
                             },
+                            {
+                                title: '阿里云语音告警',
+                                link: '/zh-cn/docs/dev/user_doc/guide/alert/aliyun-voice.html',
+                            },
                         ],
                     },
                     {
@@ -1137,10 +1140,6 @@ export default {
                             {
                                 title: '文件管理',
                                 link: '/zh-cn/docs/dev/user_doc/guide/resource/file-manage.html'
-                            },
-                            {
-                                title: 'UDF 管理',
-                                link: '/zh-cn/docs/dev/user_doc/guide/resource/udf-manage.html'
                             },
                             {
                                 title: '任务组管理',

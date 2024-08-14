@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.Resource;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
@@ -46,13 +45,9 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ResourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UDFUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperate;
-import org.apache.dolphinscheduler.spi.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -100,9 +95,6 @@ public class UsersServiceTest {
     private TenantMapper tenantMapper;
 
     @Mock
-    private ResourceMapper resourceMapper;
-
-    @Mock
     private AlertGroupMapper alertGroupMapper;
 
     @Mock
@@ -112,13 +104,7 @@ public class UsersServiceTest {
     private ProjectUserMapper projectUserMapper;
 
     @Mock
-    private ResourceUserMapper resourceUserMapper;
-
-    @Mock
     private MetricsCleanUpService metricsCleanUpService;
-
-    @Mock
-    private UDFUserMapper udfUserMapper;
 
     @Mock
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -127,7 +113,7 @@ public class UsersServiceTest {
     private ProjectMapper projectMapper;
 
     @Mock
-    private StorageOperate storageOperate;
+    private StorageOperator storageOperator;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -407,6 +393,14 @@ public class UsersServiceTest {
         result = usersService.grantProject(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProject(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test
@@ -428,6 +422,14 @@ public class UsersServiceTest {
         result = usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        // ERROR: NO_CURRENT_OPERATING_PERMISSION
+        loginUser.setId(3);
+        loginUser.setUserType(UserType.GENERAL_USER);
+        when(userMapper.selectById(3)).thenReturn(loginUser);
+        result = this.usersService.grantProjectWithReadPerm(loginUser, userId, projectIds);
+        logger.info(result.toString());
+        Assertions.assertEquals(Status.NO_CURRENT_OPERATING_PERMISSION, result.get(Constants.STATUS));
     }
 
     @Test
@@ -527,44 +529,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testGrantResources() {
-        String resourceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantResources(loginUser, 2, resourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        // success
-        when(resourceMapper.selectById(Mockito.anyInt())).thenReturn(getResource());
-        when(resourceUserMapper.deleteResourceUser(1, 0)).thenReturn(1);
-        result = usersService.grantResources(loginUser, 1, resourceIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-    }
-
-    @Test
-    public void testGrantUDFFunction() {
-        String udfIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = usersService.grantUDFFunction(loginUser, 2, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NOT_EXIST, result.get(Constants.STATUS));
-        // success
-        when(udfUserMapper.deleteByUserId(1)).thenReturn(1);
-        result = usersService.grantUDFFunction(loginUser, 1, udfIds);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-    }
-
-    @Test
     public void testGrantNamespaces() {
         String namespaceIds = "100000,120000";
         when(userMapper.selectById(1)).thenReturn(getUser());
@@ -608,7 +572,7 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
     }
 
@@ -869,7 +833,6 @@ public class UsersServiceTest {
         project.setName("PJ-001");
         project.setPerm(7);
         project.setDefCount(0);
-        project.setInstRunningCount(0);
         return project;
     }
 
@@ -929,22 +892,6 @@ public class UsersServiceTest {
         Tenant tenant = new Tenant();
         tenant.setId(1);
         return tenant;
-    }
-
-    /**
-     * get resource
-     *
-     * @return resource
-     */
-    private Resource getResource() {
-        Resource resource = new Resource();
-        resource.setPid(-1);
-        resource.setUserId(1);
-        resource.setDescription("ResourcesServiceTest.jar");
-        resource.setAlias("ResourcesServiceTest.jar");
-        resource.setFullName("/ResourcesServiceTest.jar");
-        resource.setType(ResourceType.FILE);
-        return resource;
     }
 
     private List<AlertGroup> getAlertGroups() {

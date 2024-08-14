@@ -21,9 +21,12 @@ import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
-import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVo;
-import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVo;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -34,27 +37,27 @@ import java.util.Map;
  */
 public interface DataAnalysisService {
 
-    TaskInstanceCountVo getTaskInstanceStateCountByProject(User loginUser,
+    TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,
                                                            Long projectCode,
                                                            String startDate,
                                                            String endDate);
 
-    TaskInstanceCountVo getAllTaskInstanceStateCount(User loginUser,
+    TaskInstanceCountVO getAllTaskInstanceStateCount(User loginUser,
                                                      String startDate,
                                                      String endDate);
 
-    WorkflowInstanceCountVo getWorkflowInstanceStateCountByProject(User loginUser,
+    WorkflowInstanceCountVO getWorkflowInstanceStateCountByProject(User loginUser,
                                                                    Long projectCodes,
                                                                    String startDate,
                                                                    String endDate);
 
-    WorkflowInstanceCountVo getAllWorkflowInstanceStateCount(User loginUser,
+    WorkflowInstanceCountVO getAllWorkflowInstanceStateCount(User loginUser,
                                                              String startDate,
                                                              String endDate);
 
-    WorkflowDefinitionCountVo getWorkflowDefinitionCountByProject(User loginUser, Long projectCode);
+    WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode);
 
-    WorkflowDefinitionCountVo getAllWorkflowDefinitionCount(User loginUser);
+    WorkflowDefinitionCountVO getAllWorkflowDefinitionCount(User loginUser);
 
     /**
      * statistics the workflow quantities of certain user
@@ -117,4 +120,7 @@ public interface DataAnalysisService {
      */
     TaskCountDto countOneTaskStates(User loginUser, Long taskCode);
 
+    PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
+
+    PageInfo<ErrorCommand> listErrorCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
 }

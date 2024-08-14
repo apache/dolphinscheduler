@@ -29,6 +29,7 @@ import {
   queryListPaging,
   release
 } from '@/service/modules/process-definition'
+import { offline, online } from '@/service/modules/schedules'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
 import { NTag, NSpace, NIcon, NButton, NEllipsis, NTooltip } from 'naive-ui'
@@ -42,11 +43,14 @@ import {
 import type { IDefinitionParam } from './types'
 import type { Router } from 'vue-router'
 import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
+import { useDependencies } from '../../components/dependencies/use-dependencies'
 
 export function useTable() {
   const { t } = useI18n()
   const router: Router = useRouter()
   const { copy } = useTextCopy()
+  const { getDependentTaskLinks } = useDependencies()
+
   const variables = reactive({
     columns: [],
     tableWidth: DefaultTableWidth,
@@ -58,13 +62,22 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
+    timingType: ref('create'),
+    timingState: ref('OFFLINE'),
     showRef: ref(false),
     startShowRef: ref(false),
     timingShowRef: ref(false),
     versionShowRef: ref(false),
     copyShowRef: ref(false),
     loadingRef: ref(false),
-    setTimingDialogShowRef: ref(false)
+    setTimingDialogShowRef: ref(false),
+    dependenciesData: ref({
+      showRef: false,
+      taskLinks: ref([]),
+      required: ref(false),
+      tip: ref(''),
+      action: () => {}
+    })
   })
 
   const createColumns = (variables: any) => {
@@ -260,9 +273,9 @@ export function useTable() {
             onVersionWorkflow: () => versionWorkflow(row),
             onDeleteWorkflow: () => deleteWorkflow(row),
             onReleaseWorkflow: () => releaseWorkflow(row),
+            onReleaseScheduler: () => releaseScheduler(row),
             onCopyWorkflow: () => copyWorkflow(row),
             onExportWorkflow: () => exportWorkflow(row),
-            onGotoTimingManage: () => gotoTimingManage(row),
             onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
@@ -287,23 +300,18 @@ export function useTable() {
 
   const timingWorkflow = (row: any) => {
     variables.timingShowRef = true
-    variables.row = row
+    if (row?.schedule) {
+      variables.row = row.schedule
+      variables.timingType = 'update'
+      variables.timingState = row.scheduleReleaseState
+    } else {
+      variables.row = row
+    }
   }
 
   const versionWorkflow = (row: any) => {
     variables.versionShowRef = true
     variables.row = row
-  }
-
-  const deleteWorkflow = (row: any) => {
-    deleteByCode(variables.projectCode, row.code).then(() => {
-      window.$message.success(t('project.workflow.success'))
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
-      })
-    })
   }
 
   const batchDeleteWorkflow = () => {
@@ -345,6 +353,40 @@ export function useTable() {
 
   const batchCopyWorkflow = () => {}
 
+  const confirmToOfflineWorkflow = () => {
+    const row: any = variables.row
+    const data = {
+      name: row.name,
+      releaseState: (row.releaseState === 'ONLINE' ? 'OFFLINE' : 'ONLINE') as
+        | 'OFFLINE'
+        | 'ONLINE'
+    }
+    if (data.releaseState === 'OFFLINE') {
+      release(data, variables.projectCode, row.code).then(() => {
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
+        window.$message.success(t('project.workflow.success'))
+      })
+    }
+    variables.dependenciesData.showRef = false
+  }
+
+  const confirmToOfflineScheduler = () => {
+    const row: any = variables.row
+    offline(variables.projectCode, row.schedule.id).then(() => {
+      window.$message.success(t('project.workflow.success'))
+      getTableData({
+        pageSize: variables.pageSize,
+        pageNo: variables.page,
+        searchVal: variables.searchVal
+      })
+    })
+    variables.dependenciesData.showRef = false
+  }
+
   const releaseWorkflow = (row: any) => {
     const data = {
       name: row.name,
@@ -352,20 +394,109 @@ export function useTable() {
         | 'OFFLINE'
         | 'ONLINE'
     }
-
-    release(data, variables.projectCode, row.code).then(() => {
-      if (data.releaseState === 'ONLINE') {
+    variables.row = row
+    if (data.releaseState === 'ONLINE') {
+      release(data, variables.projectCode, row.code).then(() => {
         variables.setTimingDialogShowRef = true
-        variables.row = row
-      } else {
-        window.$message.success(t('project.workflow.success'))
-      }
-      getTableData({
-        pageSize: variables.pageSize,
-        pageNo: variables.page,
-        searchVal: variables.searchVal
+        if (row?.schedule) {
+          variables.row = row.schedule
+          variables.timingType = 'update'
+          variables.timingState = row.scheduleReleaseState
+        }
+        getTableData({
+          pageSize: variables.pageSize,
+          pageNo: variables.page,
+          searchVal: variables.searchVal
+        })
       })
+    } else {
+      getDependentTaskLinks(variables.projectCode, row.code).then(
+        (res: any) => {
+          if (res && res.length > 0) {
+            variables.dependenciesData = {
+              showRef: true,
+              taskLinks: res,
+              tip: t('project.workflow.warning_dependent_tasks_desc'),
+              required: false,
+              action: confirmToOfflineWorkflow
+            }
+          } else {
+            release(data, variables.projectCode, row.code).then(() => {
+              window.$message.success(t('project.workflow.success'))
+              getTableData({
+                pageSize: variables.pageSize,
+                pageNo: variables.page,
+                searchVal: variables.searchVal
+              })
+            })
+          }
+        }
+      )
+    }
+  }
+
+  const deleteWorkflow = (row: any) => {
+    getDependentTaskLinks(variables.projectCode, row.code).then((res: any) => {
+      if (res && res.length > 0) {
+        variables.dependenciesData = {
+          showRef: true,
+          taskLinks: res,
+          tip: t('project.workflow.delete_validate_dependent_tasks_desc'),
+          required: true,
+          action: () => {}
+        }
+      } else {
+        deleteByCode(variables.projectCode, row.code).then(() => {
+          window.$message.success(t('project.workflow.success'))
+          getTableData({
+            pageSize: variables.pageSize,
+            pageNo: variables.page,
+            searchVal: variables.searchVal
+          })
+        })
+      }
     })
+  }
+
+  const releaseScheduler = (row: any) => {
+    variables.row = row
+    if (row.schedule) {
+      if (row.schedule.releaseState === 'ONLINE') {
+        getDependentTaskLinks(variables.projectCode, row.code).then(
+          (res: any) => {
+            if (res && res.length > 0) {
+              variables.dependenciesData = {
+                showRef: true,
+                taskLinks: res,
+                tip: t(
+                  'project.workflow.warning_offline_scheduler_dependent_tasks_desc'
+                ),
+                required: false,
+                action: confirmToOfflineScheduler
+              }
+            } else {
+              offline(variables.projectCode, row.schedule.id).then(() => {
+                window.$message.success(t('project.workflow.success'))
+                getTableData({
+                  pageSize: variables.pageSize,
+                  pageNo: variables.page,
+                  searchVal: variables.searchVal
+                })
+              })
+            }
+          }
+        )
+      } else {
+        online(variables.projectCode, row.schedule.id).then(() => {
+          window.$message.success(t('project.workflow.success'))
+          getTableData({
+            pageSize: variables.pageSize,
+            pageNo: variables.page,
+            searchVal: variables.searchVal
+          })
+        })
+      }
+    }
   }
 
   const copyWorkflow = (row: any) => {
@@ -419,13 +550,6 @@ export function useTable() {
     })
   }
 
-  const gotoTimingManage = (row: any) => {
-    router.push({
-      name: 'workflow-definition-timing',
-      params: { projectCode: variables.projectCode, definitionCode: row.code }
-    })
-  }
-
   const gotoWorkflowTree = (row: any) => {
     router.push({
       name: 'workflow-definition-tree',
@@ -455,7 +579,6 @@ export function useTable() {
     getTableData,
     batchDeleteWorkflow,
     batchExportWorkflow,
-    batchCopyWorkflow,
-    gotoTimingManage
+    batchCopyWorkflow
   }
 }

@@ -17,11 +17,17 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
+
+import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -30,42 +36,51 @@ import org.junit.jupiter.api.Test;
 
 public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
-    private NettyRemotingServer nettyRemotingServer;
+    private SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery;
+
+    private String serverAddress;
 
     @BeforeEach
     public void setUp() {
-        nettyRemotingServer = new NettyRemotingServer(new NettyServerConfig(12345));
-        nettyRemotingServer.start();
-
-        new SpringServerMethodInvokerDiscovery(nettyRemotingServer)
-                .postProcessAfterInitialization(new IServiceImpl(), "iServiceImpl");
+        int listenPort = RandomUtils.nextInt(10000, 20000);
+        NettyServerConfig nettyServerConfig = NettyServerConfig.builder()
+                .serverName("ApiServer")
+                .listenPort(listenPort)
+                .build();
+        serverAddress = "localhost:" + listenPort;
+        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
+        springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new IServiceImpl());
+        springServerMethodInvokerDiscovery.start();
     }
 
     @Test
     public void getProxyClient() {
         IService proxyClient =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient("localhost:12345", IService.class);
+                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(serverAddress, IService.class);
         Assertions.assertNotNull(proxyClient);
     }
 
     @Test
     public void testPing() {
         IService proxyClient =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient("localhost:12345", IService.class);
-        String ping = proxyClient.ping("ping");
-        Assertions.assertEquals("pong", ping);
+                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(serverAddress, IService.class);
+        assertEquals("pong", proxyClient.ping("ping"));
+
+        MethodInvocationException methodInvocationException =
+                Assertions.assertThrows(MethodInvocationException.class, () -> proxyClient.ping(null));
+        assertEquals("ping: null is illegal", methodInvocationException.getMessage());
     }
 
     @Test
     public void testVoid() {
         IService proxyClient =
-                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient("localhost:12345", IService.class);
-        Assertions.assertDoesNotThrow(proxyClient::voidMethod);
+                SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(serverAddress, IService.class);
+        assertDoesNotThrow(proxyClient::voidMethod);
     }
 
     @AfterEach
     public void tearDown() {
-        nettyRemotingServer.close();
+        springServerMethodInvokerDiscovery.close();
     }
 
     @RpcService
@@ -82,6 +97,9 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
 
         @Override
         public String ping(String ping) {
+            if (StringUtils.isEmpty(ping)) {
+                throw new IllegalArgumentException("ping: " + ping + " is illegal");
+            }
             return "pong";
         }
 

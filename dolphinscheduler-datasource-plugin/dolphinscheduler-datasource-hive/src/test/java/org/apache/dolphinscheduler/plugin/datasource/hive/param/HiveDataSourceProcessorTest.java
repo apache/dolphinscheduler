@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -93,5 +94,24 @@ public class HiveDataSourceProcessorTest {
     public void testGetValidationQuery() {
         Assertions.assertEquals(DataSourceConstants.HIVE_VALIDATION_QUERY,
                 hiveDatasourceProcessor.getValidationQuery());
+    }
+
+    @Test
+    void splitAndRemoveComment() {
+        String sql = "create table if not exists test_ods.tb_test(\n" +
+                "  `id` bigint COMMENT 'id',   -- auto increment\n" +
+                "  `user_name` string COMMENT 'username',\n" +
+                "  `birthday` string COMMENT 'birthday',\n" +
+                "  `gender` int COMMENT '1 male 2 female'\n" +
+                ") COMMENT 'user information table' PARTITIONED BY (`date_id` string);\n" +
+                "\n" +
+                "-- insert\n" +
+                "insert\n" +
+                "  overwrite table test_ods.tb_test partition(date_id = '2024-03-28') -- partition\n" +
+                "values\n" +
+                "  (1, 'Magic', '1990-10-01', '1');";
+        List<String> list = hiveDatasourceProcessor.splitAndRemoveComment(sql);
+        Assertions.assertEquals(list.size(), 2);
+
     }
 }

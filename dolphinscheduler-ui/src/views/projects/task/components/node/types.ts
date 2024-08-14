@@ -287,6 +287,7 @@ interface ITaskParams {
   mainArgs?: string
   others?: string
   httpMethod?: string
+  httpBody?: string
   httpCheckCondition?: string
   httpParams?: []
   url?: string
@@ -349,6 +350,17 @@ interface ITaskParams {
   password?: string
   zeppelinProductionNoteDirectory?: string
   productionNoteDirectory?: string
+  regionId?: string
+  accessKeyId?: string
+  accessKeySecret?: string
+  workspaceId?: string
+  resourceQueueId?: string
+  codeType?: string
+  engineReleaseVersion?: string
+  entryPoint?: string
+  entryPointArguments?: string
+  sparkSubmitParameters?: string
+  isProduction?: boolean
   hiveCliOptions?: string
   hiveSqlScript?: string
   hiveCliTaskExecutionType?: string
@@ -369,7 +381,6 @@ interface ITaskParams {
     successNode?: number[]
     failedNode?: number[]
   }
-  udfs?: string
   connParams?: string
   targetJobName?: string
   cluster?: string
@@ -465,7 +476,6 @@ interface INodeData
       | 'dependence'
       | 'sparkParameters'
       | 'conditionResult'
-      | 'udfs'
       | 'customConfig'
     >,
     ISqoopTargetData,
@@ -506,7 +516,6 @@ interface INodeData
   definition?: object
   successBranch?: number
   failedBranch?: number
-  udfs?: string[]
   customConfig?: boolean
   mapping_columns?: object[]
   taskExecuteType?: TaskExecuteType

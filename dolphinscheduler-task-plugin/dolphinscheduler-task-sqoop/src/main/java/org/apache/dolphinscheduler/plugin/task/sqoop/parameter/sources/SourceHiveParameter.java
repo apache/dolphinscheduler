@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
 
+import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParameter;
+
 /**
  * source hive parameter
  */
-public class SourceHiveParameter {
+public class SourceHiveParameter extends SourceCommonParameter {
 
     /**
      * hive database

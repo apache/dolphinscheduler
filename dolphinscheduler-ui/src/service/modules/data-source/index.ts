@@ -134,7 +134,7 @@ export function getDatasourceDatabasesById(datasourceId: number): any {
     url: '/datasources/databases',
     method: 'get',
     params: {
-       datasourceId
+      datasourceId
     }
   })
 }

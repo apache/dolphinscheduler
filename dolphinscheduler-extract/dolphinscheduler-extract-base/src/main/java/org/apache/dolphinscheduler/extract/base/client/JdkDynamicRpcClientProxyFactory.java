@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClient;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import java.lang.reflect.Proxy;
@@ -34,7 +33,7 @@ import com.google.common.cache.LoadingCache;
 /**
  * This class is used to create a proxy client which will transform local method invocation to remove invocation.
  */
-public class JdkDynamicRpcClientProxyFactory implements IRpcClientProxyFactory {
+class JdkDynamicRpcClientProxyFactory implements IRpcClientProxyFactory {
 
     private final NettyRemotingClient nettyRemotingClient;
 
@@ -49,7 +48,7 @@ public class JdkDynamicRpcClientProxyFactory implements IRpcClientProxyFactory {
                 }
             });
 
-    public JdkDynamicRpcClientProxyFactory(NettyRemotingClient nettyRemotingClient) {
+    JdkDynamicRpcClientProxyFactory(NettyRemotingClient nettyRemotingClient) {
         this.nettyRemotingClient = nettyRemotingClient;
     }
 

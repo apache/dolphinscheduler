@@ -29,6 +29,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -81,11 +82,11 @@ public final class SlackSender {
             }
 
             HttpPost httpPost = new HttpPost(webHookUrl);
-            httpPost.setEntity(new StringEntity(JSONUtils.toJsonString(paramMap), "UTF-8"));
+            httpPost.setEntity(new StringEntity(JSONUtils.toJsonString(paramMap), StandardCharsets.UTF_8));
             CloseableHttpResponse response = httpClient.execute(httpPost);
 
             HttpEntity entity = response.getEntity();
-            return EntityUtils.toString(entity, "UTF-8");
+            return EntityUtils.toString(entity, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Send message to slack error.", e);
             return "System Exception";

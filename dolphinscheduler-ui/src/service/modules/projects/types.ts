@@ -60,11 +60,4 @@ interface ProjectRes {
   start: number
 }
 
-export {
-  ListReq,
-  ListIdReq,
-  ProjectsReq,
-  UserIdReq,
-  ProjectRes,
-  ProjectList
-}
+export { ListReq, ListIdReq, ProjectsReq, UserIdReq, ProjectRes, ProjectList }

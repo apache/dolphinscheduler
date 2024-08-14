@@ -49,7 +49,7 @@ const BarChart = defineComponent({
         trigger: 'axis',
         axisPointer: {
           type: 'shadow'
-        },
+        }
       },
       grid: {
         left: '3%',

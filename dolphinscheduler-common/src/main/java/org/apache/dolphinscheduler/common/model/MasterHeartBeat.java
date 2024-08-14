@@ -17,29 +17,11 @@
 
 package org.apache.dolphinscheduler.common.model;
 
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
-@AllArgsConstructor
-public class MasterHeartBeat implements HeartBeat {
+public class MasterHeartBeat extends BaseHeartBeat implements HeartBeat {
 
-    private long startupTime;
-    private long reportTime;
-    private double cpuUsage;
-    private double memoryUsage;
-    private double availablePhysicalMemorySize;
-    private double reservedMemory;
-    private double diskAvailable;
-    private int processId;
-    private ServerStatus serverStatus;
-
-    private String host;
-    private int port;
 }

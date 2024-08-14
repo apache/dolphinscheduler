@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContextCacheManager;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutor;
+import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorHolder;
 
 import java.util.List;
 
@@ -64,9 +64,13 @@ public class WorkerLogServiceImpl implements ILogService {
 
     @Override
     public GetAppIdResponse getAppId(GetAppIdRequest getAppIdRequest) {
-        TaskExecutionContext taskExecutionContext =
-                TaskExecutionContextCacheManager.getByTaskInstanceId(getAppIdRequest.getTaskInstanceId());
-        String appInfoPath = taskExecutionContext.getAppInfoPath();
+        String appInfoPath = null;
+        WorkerTaskExecutor workerTaskExecutor = WorkerTaskExecutorHolder.get(getAppIdRequest.getTaskInstanceId());
+        if (workerTaskExecutor != null) {
+            // todo: remove this kind of logic, and remove get appId method, the appId should be send by worker rather
+            // than query by master
+            appInfoPath = workerTaskExecutor.getTaskExecutionContext().getAppInfoPath();
+        }
         String logPath = getAppIdRequest.getLogPath();
         List<String> appIds = org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils.getAppIds(logPath, appInfoPath,
                 PropertyUtils.getString(APPID_COLLECT, DEFAULT_COLLECT_WAY));

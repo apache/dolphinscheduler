@@ -20,9 +20,12 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -55,17 +58,19 @@ public class MasterRegistryClient implements AutoCloseable {
     private MasterConfig masterConfig;
 
     @Autowired
+    private MetricsProvider metricsProvider;
+
+    @Autowired
     private MasterConnectStrategy masterConnectStrategy;
 
     private MasterHeartBeatTask masterHeartBeatTask;
 
     public void start() {
         try {
-            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, registryClient);
+            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, metricsProvider, registryClient);
             // master registry
             registry();
-            registryClient.addConnectionStateListener(
-                    new MasterConnectionStateListener(masterConfig, registryClient, masterConnectStrategy));
+            registryClient.addConnectionStateListener(new MasterConnectionStateListener(masterConnectStrategy));
             registryClient.subscribe(RegistryNodeType.ALL_SERVERS.getRegistryPath(), new MasterRegistryDataListener());
         } catch (Exception e) {
             throw new RegistryException("Master registry client start up error", e);
@@ -126,17 +131,20 @@ public class MasterRegistryClient implements AutoCloseable {
     public void removeWorkerNodePath(String path, RegistryNodeType nodeType, boolean failover) {
         log.info("{} node deleted : {}", nodeType, path);
         try {
-            String serverHost = null;
-            if (!StringUtils.isEmpty(path)) {
-                serverHost = registryClient.getHostByEventDataPath(path);
-                if (StringUtils.isEmpty(serverHost)) {
-                    log.error("server down error: unknown path: {}", path);
-                    return;
-                }
-                if (!registryClient.exists(path)) {
-                    log.info("path: {} not exists", path);
-                }
+            if (StringUtils.isEmpty(path)) {
+                log.error("server down error: node empty path: {}, nodeType:{}", path, nodeType);
+                return;
             }
+
+            String serverHost = registryClient.getHostByEventDataPath(path);
+            if (StringUtils.isEmpty(serverHost)) {
+                log.error("server down error: unknown path: {}", path);
+                return;
+            }
+            if (!registryClient.exists(path)) {
+                log.info("path: {} not exists", path);
+            }
+
             // failover server
             if (failover) {
                 failoverService.failoverServerWhenDown(serverHost, nodeType);
@@ -152,6 +160,13 @@ public class MasterRegistryClient implements AutoCloseable {
     void registry() {
         log.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
+
+        MasterHeartBeat heartBeat = masterHeartBeatTask.getHeartBeat();
+        while (ServerStatus.BUSY.equals(heartBeat.getServerStatus())) {
+            log.warn("Master node is BUSY: {}", heartBeat);
+            heartBeat = masterHeartBeatTask.getHeartBeat();
+            ThreadUtils.sleep(SLEEP_TIME_MILLIS);
+        }
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
@@ -183,4 +198,7 @@ public class MasterRegistryClient implements AutoCloseable {
         }
     }
 
+    public boolean isAvailable() {
+        return registryClient.isConnected();
+    }
 }

@@ -149,8 +149,9 @@ public class DependentExecute {
 
         DependResult result = DependResult.FAILED;
         for (DateInterval dateInterval : dateIntervals) {
-            ProcessInstance processInstance = findLastProcessInterval(dependentItem.getDefinitionCode(),
-                    dateInterval, testFlag);
+            ProcessInstance processInstance =
+                    findLastProcessInterval(dependentItem.getDefinitionCode(), dependentItem.getDepTaskCode(),
+                            dateInterval, testFlag);
             if (processInstance == null) {
                 return DependResult.WAITING;
             }
@@ -158,10 +159,9 @@ public class DependentExecute {
             if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_WORKFLOW_CODE) {
                 result = dependResultByProcessInstance(processInstance);
             } else if (dependentItem.getDepTaskCode() == Constants.DEPENDENT_ALL_TASK_CODE) {
-                result = dependResultByAllTaskOfProcessInstance(processInstance, dateInterval, testFlag);
+                result = dependResultByAllTaskOfProcessInstance(processInstance, testFlag);
             } else {
-                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), dateInterval,
-                        testFlag);
+                result = dependResultBySingleTaskInstance(processInstance, dependentItem.getDepTaskCode(), testFlag);
             }
             if (result != DependResult.SUCCESS) {
                 break;
@@ -194,8 +194,7 @@ public class DependentExecute {
      *
      * @return
      */
-    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance,
-                                                                DateInterval dateInterval, int testFlag) {
+    private DependResult dependResultByAllTaskOfProcessInstance(ProcessInstance processInstance, int testFlag) {
         if (!processInstance.getState().isFinished()) {
             log.info("Wait for the dependent workflow to complete, processCode: {}, processInstanceId: {}.",
                     processInstance.getProcessDefinitionCode(), processInstance.getId());
@@ -212,8 +211,8 @@ public class DependentExecute {
                             .collect(Collectors.toMap(TaskDefinitionLog::getCode, TaskDefinitionLog::getName));
 
             List<TaskInstance> taskInstanceList =
-                    taskInstanceDao.queryLastTaskInstanceListIntervalByTaskCodes(taskDefinitionCodeMap.keySet(),
-                            dateInterval, testFlag);
+                    taskInstanceDao.queryLastTaskInstanceListIntervalInProcessInstance(processInstance.getId(),
+                            taskDefinitionCodeMap.keySet(), testFlag);
             Map<Long, TaskExecutionStatus> taskExecutionStatusMap =
                     taskInstanceList.stream()
                             .filter(taskInstance -> taskInstance.getTaskExecuteType() != TaskExecuteType.STREAM)
@@ -245,14 +244,14 @@ public class DependentExecute {
      *
      * @param processInstance last process instance in the date interval
      * @param depTaskCode the dependent task code
-     * @param dateInterval date interval
      * @param testFlag test flag
      * @return depend result
      */
     private DependResult dependResultBySingleTaskInstance(ProcessInstance processInstance, long depTaskCode,
-                                                          DateInterval dateInterval, int testFlag) {
+                                                          int testFlag) {
         TaskInstance taskInstance =
-                taskInstanceDao.queryLastTaskInstanceIntervalByTaskCode(depTaskCode, dateInterval, testFlag);
+                taskInstanceDao.queryLastTaskInstanceIntervalInProcessInstance(processInstance.getId(),
+                        depTaskCode, testFlag);
 
         if (taskInstance == null) {
             TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(depTaskCode);
@@ -313,16 +312,18 @@ public class DependentExecute {
      * 2. schedule run and schedule time between the interval
      *
      * @param definitionCode definition code
+     * @param taskCode task code
      * @param dateInterval   date interval
      * @return ProcessInstance
      */
-    private ProcessInstance findLastProcessInterval(Long definitionCode, DateInterval dateInterval, int testFlag) {
+    private ProcessInstance findLastProcessInterval(Long definitionCode, Long taskCode, DateInterval dateInterval,
+                                                    int testFlag) {
 
         ProcessInstance lastSchedulerProcess =
-                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastSchedulerProcessInterval(definitionCode, taskCode, dateInterval, testFlag);
 
         ProcessInstance lastManualProcess =
-                processInstanceDao.queryLastManualProcessInterval(definitionCode, dateInterval, testFlag);
+                processInstanceDao.queryLastManualProcessInterval(definitionCode, taskCode, dateInterval, testFlag);
 
         if (lastManualProcess == null) {
             return lastSchedulerProcess;

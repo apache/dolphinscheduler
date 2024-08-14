@@ -80,12 +80,12 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     List<DataSource> listAllDataSourceByType(@Param("type") Integer type);
 
     /**
-     * list authorized UDF function
+     * list authorized datasource
      *
      * @param userId userId
      * @param dataSourceIds data source id array
      * @param <T> T
-     * @return UDF function list
+     * @return datasource list
      */
     <T> List<DataSource> listAuthorizedDataSource(@Param("userId") int userId,
                                                   @Param("dataSourceIds") T[] dataSourceIds);
@@ -102,8 +102,7 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
     /**
      * selectPagingByIds
      * @param dataSourcePage
-     * @param ids
-     * @param searchVal
+     * @param dataSourceIds
      * @return
      */
     IPage<DataSource> selectPagingByIds(Page<DataSource> dataSourcePage,

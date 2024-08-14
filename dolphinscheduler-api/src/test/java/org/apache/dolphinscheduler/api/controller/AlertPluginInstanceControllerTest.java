@@ -35,8 +35,10 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -49,6 +51,7 @@ import org.springframework.util.MultiValueMap;
  */
 public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
+    private static AlertPluginInstance alertPluginInstance = new AlertPluginInstance();
     private static final int pluginDefineId = 1;
     private static final String instanceName = "instanceName";
     private static final String pluginInstanceParams = "pluginInstanceParams";
@@ -59,6 +62,12 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
     @MockBean(name = "alertPluginInstanceServiceImpl")
     private AlertPluginInstanceService alertPluginInstanceService;
+
+    @BeforeAll
+    public static void initInstance() {
+        alertPluginInstance.setId(1);
+        alertPluginInstance.setInstanceName(instanceName);
+    }
 
     @Test
     public void testCreateAlertPluginInstance() throws Exception {
@@ -71,7 +80,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.create(any(User.class), eq(pluginDefineId), eq(instanceName),
-                eq(pluginInstanceType), eq(warningType), eq(pluginInstanceParams))).thenReturn(null);
+                eq(pluginInstanceParams))).thenReturn(alertPluginInstance);
 
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances")
@@ -122,7 +131,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
         when(alertPluginInstanceService.updateById(any(User.class), eq(pluginDefineId), eq(instanceName),
-                eq(warningType), eq(pluginInstanceParams))).thenReturn(null);
+                eq(pluginInstanceParams))).thenReturn(alertPluginInstance);
 
         // When
         final MvcResult mvcResult = mockMvc.perform(put("/alert-plugin-instances/{id}", pluginDefineId)

@@ -17,10 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.AuditModelType;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,24 +33,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Lists;
 
 public class AuditLogMapperTest extends BaseDaoTest {
 
     @Autowired
-    AuditLogMapper logMapper;
+    private AuditLogMapper logMapper;
 
-    /**
-     * insert
-     * @return
-     */
-    private void insertOne() {
+    @Autowired
+    private ProjectMapper projectMapper;
+
+    private void insertOne(AuditModelType objectType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);
-        auditLog.setTime(new Date());
-        auditLog.setResourceType(0);
-        auditLog.setOperation(0);
-        auditLog.setResourceId(0);
+        auditLog.setModelName("name");
+        auditLog.setDetail("detail");
+        auditLog.setLatency(1L);
+        auditLog.setCreateTime(new Date());
+        auditLog.setModelType(objectType.getName());
+        auditLog.setOperationType(AuditOperationType.CREATE.getName());
+        auditLog.setModelId(1L);
+        auditLog.setDescription("description");
         logMapper.insert(auditLog);
+    }
+
+    private Project insertProject() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(111);
+        project.setCode(1L);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+        return project;
     }
 
     /**
@@ -53,18 +73,14 @@ public class AuditLogMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQueryAuditLog() {
-        insertOne();
+        insertOne(AuditModelType.USER);
+        insertOne(AuditModelType.PROJECT);
         Page<AuditLog> page = new Page<>(1, 3);
-        int[] resourceType = new int[0];
-        int[] operationType = new int[0];
+        List<String> objectTypeList = new ArrayList<>();
+        List<String> operationTypeList = Lists.newArrayList(AuditOperationType.CREATE.getName());
 
-        IPage<AuditLog> logIPage = logMapper.queryAuditLog(page, resourceType, operationType, "", null, null);
+        IPage<AuditLog> logIPage =
+                logMapper.queryAuditLog(page, objectTypeList, operationTypeList, "", "", null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
-    }
-
-    @Test
-    public void testQueryResourceNameByType() {
-        String resourceName = logMapper.queryResourceNameByType("USER", 1);
-        Assertions.assertEquals("admin", resourceName);
     }
 }

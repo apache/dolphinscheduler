@@ -17,10 +17,10 @@
 
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import { queryWorkerGroupsByProjectCode } from '@/service/modules/projects-worker-group'
 import type { IJsonItem } from '../types'
 
-export function useWorkerGroup(): IJsonItem {
+export function useWorkerGroup(projectCode: number): IJsonItem {
   const { t } = useI18n()
 
   const options = ref([] as { label: string; value: string }[])
@@ -29,8 +29,12 @@ export function useWorkerGroup(): IJsonItem {
   const getWorkerGroups = async () => {
     if (loading.value) return
     loading.value = true
-    const res = await queryAllWorkerGroups()
-    options.value = res.map((item: string) => ({ label: item, value: item }))
+    await queryWorkerGroupsByProjectCode(projectCode).then((res: any) => {
+      options.value = res.data.map((item: any) => ({
+        label: item.workerGroup,
+        value: item.workerGroup
+      }))
+    })
     loading.value = false
   }
 

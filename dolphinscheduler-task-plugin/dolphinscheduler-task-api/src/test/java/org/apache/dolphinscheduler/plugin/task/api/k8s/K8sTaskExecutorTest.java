@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
@@ -26,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -90,7 +89,7 @@ public class K8sTaskExecutorTest {
         TaskResponse taskResponse = new TaskResponse();
         k8sTaskExecutor.setJob(job);
         k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse);
-        Assertions.assertEquals(0, Integer.compare(EXIT_CODE_KILL, taskResponse.getExitStatusCode()));
+        Assertions.assertEquals(0, taskResponse.getExitStatusCode());
     }
     @Test
     public void testWaitTimeoutNormal() {
@@ -99,6 +98,14 @@ public class K8sTaskExecutorTest {
         } catch (TaskException e) {
             Assertions.assertEquals(e.getMessage(), "K8sTask is timeout");
         }
+    }
+
+    @Test
+    public void testLoadYamlCorrectly() {
+        List<String> expectedCommands = Arrays.asList("perl", "-Mbignum=bpi", "-wle", "print bpi(2000)");
+        List<String> actualCommands =
+                k8sTaskExecutor.getJob().getSpec().getTemplate().getSpec().getContainers().get(0).getCommand();
+        Assertions.assertEquals(expectedCommands, actualCommands);
     }
 
 }

@@ -29,12 +29,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.text.MessageFormat;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Sets;
 
@@ -67,7 +69,8 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
      * @param host datasource host
      */
     protected void checkHost(String host) {
-        if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
+        if (com.google.common.net.InetAddresses.isInetAddress(host)) {
+        } else if (!IPV4_PATTERN.matcher(host).matches() || !IPV6_PATTERN.matcher(host).matches()) {
             throw new IllegalArgumentException("datasource host illegal");
         }
     }
@@ -92,12 +95,15 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
         if (MapUtils.isEmpty(other)) {
             return;
         }
+
         if (!Sets.intersection(other.keySet(), POSSIBLE_MALICIOUS_KEYS).isEmpty()) {
             throw new IllegalArgumentException("Other params include possible malicious keys.");
         }
-        boolean paramsCheck = other.entrySet().stream().allMatch(p -> PARAMS_PATTER.matcher(p.getValue()).matches());
-        if (!paramsCheck) {
-            throw new IllegalArgumentException("datasource other params illegal");
+
+        for (Map.Entry<String, String> entry : other.entrySet()) {
+            if (!PARAMS_PATTER.matcher(entry.getKey()).matches()) {
+                throw new IllegalArgumentException("datasource other params: " + entry.getKey() + " illegal");
+            }
         }
     }
 
@@ -112,7 +118,7 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         BaseConnectionParam baseConnectionParam = (BaseConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getUser(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(), baseConnectionParam.getUser(),
                 PasswordUtils.encodePassword(baseConnectionParam.getPassword()), baseConnectionParam.getJdbcUrl());
     }
 
@@ -124,5 +130,11 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
             log.error("Check datasource connectivity for: {} error", getDbType().name(), e);
             return false;
         }
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.other);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.other);
     }
 }

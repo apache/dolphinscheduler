@@ -52,6 +52,10 @@ public class ErrorCommand {
      */
     private long processDefinitionCode;
 
+    private int processDefinitionVersion;
+
+    private int processInstanceId;
+
     /**
      * executor id
      */
@@ -73,7 +77,7 @@ public class ErrorCommand {
     private FailureStrategy failureStrategy;
 
     /**
-     *  warning type
+     * warning type
      */
     private WarningType warningType;
 
@@ -135,21 +139,26 @@ public class ErrorCommand {
 
     public ErrorCommand() {
     }
+
     public ErrorCommand(Command command, String message) {
         this.id = command.getId();
         this.commandType = command.getCommandType();
         this.executorId = command.getExecutorId();
         this.processDefinitionCode = command.getProcessDefinitionCode();
+        this.processDefinitionVersion = command.getProcessDefinitionVersion();
+        this.processInstanceId = command.getProcessInstanceId();
         this.commandParam = command.getCommandParam();
+        this.taskDependType = command.getTaskDependType();
+        this.failureStrategy = command.getFailureStrategy();
         this.warningType = command.getWarningType();
         this.warningGroupId = command.getWarningGroupId();
         this.scheduleTime = command.getScheduleTime();
-        this.taskDependType = command.getTaskDependType();
-        this.failureStrategy = command.getFailureStrategy();
         this.startTime = command.getStartTime();
         this.updateTime = command.getUpdateTime();
-        this.environmentCode = command.getEnvironmentCode();
         this.processInstancePriority = command.getProcessInstancePriority();
+        this.workerGroup = command.getWorkerGroup();
+        this.tenantCode = command.getTenantCode();
+        this.environmentCode = command.getEnvironmentCode();
         this.message = message;
         this.dryRun = command.getDryRun();
         this.testFlag = command.getTestFlag();

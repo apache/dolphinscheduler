@@ -332,7 +332,7 @@ CREATE TABLE t_ds_process_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT 1,
   description text ,
   project_code bigint DEFAULT NULL ,
   release_state int DEFAULT NULL ,
@@ -360,7 +360,7 @@ CREATE TABLE t_ds_process_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   release_state int DEFAULT NULL ,
@@ -389,7 +389,7 @@ CREATE TABLE t_ds_task_definition (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
@@ -428,7 +428,7 @@ CREATE TABLE t_ds_task_definition_log (
   id int NOT NULL  ,
   code bigint NOT NULL,
   name varchar(255) DEFAULT NULL ,
-  version int NOT NULL ,
+  version int NOT NULL DEFAULT '1',
   description text ,
   project_code bigint DEFAULT NULL ,
   user_id int DEFAULT NULL ,
@@ -522,7 +522,7 @@ CREATE TABLE t_ds_process_instance (
   id int NOT NULL  ,
   name varchar(255) DEFAULT NULL ,
   process_definition_code bigint DEFAULT NULL ,
-  process_definition_version int DEFAULT NULL ,
+  process_definition_version int NOT NULL DEFAULT 1 ,
   project_code bigint DEFAULT NULL ,
   state int DEFAULT NULL ,
   state_history text,
@@ -595,9 +595,11 @@ CREATE TABLE t_ds_project_parameter (
   id int NOT NULL  ,
   param_name varchar(255) NOT NULL ,
   param_value text NOT NULL ,
+  param_data_type varchar(50) DEFAULT 'VARCHAR',
   code bigint NOT NULL,
   project_code bigint NOT NULL,
   user_id int DEFAULT NULL ,
+  operator int DEFAULT NULL ,
   create_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   update_time timestamp DEFAULT CURRENT_TIMESTAMP ,
   PRIMARY KEY (id)
@@ -695,7 +697,7 @@ create index relation_project_user_id_index on t_ds_relation_project_user (user_
 --
 -- Table structure for table t_ds_relation_resources_user
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_relation_resources_user;
 CREATE TABLE t_ds_relation_resources_user (
   id int NOT NULL ,
@@ -726,7 +728,7 @@ CREATE TABLE t_ds_relation_udfs_user (
 --
 -- Table structure for table t_ds_resources
 --
-
+-- Deprecated
 DROP TABLE IF EXISTS t_ds_resources;
 CREATE TABLE t_ds_resources (
   id int NOT NULL  ,
@@ -795,7 +797,7 @@ CREATE TABLE t_ds_task_instance (
   task_type varchar(50) DEFAULT NULL ,
   task_execute_type int DEFAULT '0',
   task_code bigint NOT NULL,
-  task_definition_version int DEFAULT NULL ,
+  task_definition_version int NOT NULL DEFAULT '1' ,
   process_instance_id int DEFAULT NULL ,
   process_instance_name varchar(255) DEFAULT NULL,
   project_code bigint DEFAULT NULL,
@@ -927,6 +929,21 @@ CREATE TABLE t_ds_worker_group (
   CONSTRAINT name_unique UNIQUE (name)
 ) ;
 
+--
+-- Table structure for table t_ds_relation_project_worker_group
+--
+
+DROP TABLE IF EXISTS t_ds_relation_project_worker_group;
+CREATE TABLE t_ds_relation_project_worker_group (
+    id int NOT NULL  ,
+    project_code bigint DEFAULT NULL ,
+    worker_group varchar(255) NOT NULL,
+    create_time timestamp DEFAULT NULL,
+    update_time timestamp DEFAULT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT t_ds_relation_project_worker_group_un UNIQUE (project_code, worker_group)
+);
+
 DROP SEQUENCE IF EXISTS t_ds_access_token_id_sequence;
 CREATE SEQUENCE  t_ds_access_token_id_sequence;
 ALTER TABLE t_ds_access_token ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_access_token_id_sequence');
@@ -1024,6 +1041,10 @@ DROP SEQUENCE IF EXISTS t_ds_project_preference_id_sequence;
 CREATE SEQUENCE t_ds_project_preference_id_sequence;
 ALTER TABLE t_ds_project_preference ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_project_preference_id_sequence');
 
+DROP SEQUENCE IF EXISTS t_ds_relation_project_worker_group_sequence;
+CREATE SEQUENCE  t_ds_relation_project_worker_group_sequence;
+ALTER TABLE t_ds_relation_project_worker_group ALTER COLUMN id SET DEFAULT NEXTVAL('t_ds_relation_project_worker_group_sequence');
+
 -- Records of t_ds_user?user : admin , password : dolphinscheduler123
 INSERT INTO t_ds_user(user_name, user_password, user_type, email, phone, tenant_id, state, create_time, update_time, time_zone)
 VALUES ('admin', '7ad2410b2f4c074479a8937a28a22b8f', '0', 'xxx@qq.com', '', '-1', 1, '2018-03-27 15:48:50', '2018-10-24 17:40:22', null);
@@ -1035,8 +1056,6 @@ VALUES (-1, 'default', 'default tenant', '1', '2018-03-27 15:48:50', '2018-10-24
 -- Records of t_ds_alertgroup, default admin warning group
 INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
 VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
-INSERT INTO t_ds_alertgroup(alert_instance_ids, create_user_id, group_name, description, create_time, update_time)
-VALUES (NULL, 1, 'global alert group', 'global alert group', '2018-11-29 10:20:39', '2018-11-29 10:20:39');
 
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
@@ -1073,8 +1092,6 @@ CREATE TABLE t_ds_alert_plugin_instance (
 	create_time timestamp NULL,
 	update_time timestamp NULL,
 	instance_name varchar(255) NULL,
-	instance_type int NOT NULL default '0',
-	warning_type int NOT NULL default '3',
 	CONSTRAINT t_ds_alert_plugin_instance_pk PRIMARY KEY (id)
 );
 
@@ -1946,6 +1963,8 @@ CREATE TABLE t_ds_task_group_queue (
    PRIMARY KEY (id)
 );
 
+create index idx_t_ds_task_group_queue_in_queue on t_ds_task_group_queue(in_queue);
+
 --
 -- Table structure for table t_ds_task_group
 --
@@ -1971,11 +1990,15 @@ CREATE TABLE t_ds_task_group (
 DROP TABLE IF EXISTS t_ds_audit_log;
 CREATE TABLE t_ds_audit_log (
     id serial NOT NULL,
-    user_id int NOT NULL,
-    resource_type int NOT NULL,
-    operation int NOT NULL,
-    time timestamp DEFAULT NULL ,
-    resource_id int NOT NULL,
+    user_id         int NOT NULL,
+    model_id        bigint NOT NULL,
+    model_name      VARCHAR(255) NOT NULL,
+    model_type      VARCHAR(255) NOT NULL,
+    operation_type  VARCHAR(255) NOT NULL,
+    description     VARCHAR(255) NOT NULL,
+    latency         int NOT NULL,
+    detail          VARCHAR(255) DEFAULT NULL,
+    create_time     timestamp DEFAULT NULL ,
     PRIMARY KEY (id)
 );
 
@@ -2102,23 +2125,73 @@ CREATE INDEX idx_parent_workflow_instance_id ON t_ds_relation_sub_workflow (pare
 CREATE INDEX idx_parent_task_code ON t_ds_relation_sub_workflow (parent_task_code);
 CREATE INDEX idx_sub_workflow_instance_id ON t_ds_relation_sub_workflow (sub_workflow_instance_id);
 
---
--- Table structure for table t_ds_alert
---
-
-DROP TABLE IF EXISTS t_ds_listener_event;
-CREATE TABLE t_ds_listener_event(
-    id          int         NOT NULL,
-    content     text,
-    sign        varchar(64) NOT NULL DEFAULT '',
-    post_status int         NOT NULL DEFAULT '0',
-    event_type  int         NOT NULL,
-    log         text,
-    create_time timestamp            DEFAULT NULL,
-    update_time timestamp            DEFAULT NULL,
+-- ----------------------------
+-- Table structure for t_ds_process_task_lineage
+-- ----------------------------
+DROP TABLE IF EXISTS t_ds_process_task_lineage;
+CREATE TABLE t_ds_process_task_lineage (
+    id int NOT NULL,
+    process_definition_code bigint NOT NULL DEFAULT 0,
+    process_definition_version int NOT NULL DEFAULT 0,
+    task_definition_code bigint NOT NULL DEFAULT 0,
+    task_definition_version int NOT NULL DEFAULT 0,
+    dept_project_code bigint NOT NULL DEFAULT 0,
+    dept_process_definition_code bigint NOT NULL DEFAULT 0,
+    dept_task_definition_code bigint NOT NULL DEFAULT 0,
+    create_time timestamp NOT NULL DEFAULT current_timestamp,
+    update_time timestamp NOT NULL DEFAULT current_timestamp,
     PRIMARY KEY (id)
 );
-comment on column t_ds_listener_event.sign is 'sign=sha1(content)';
 
-create index idx_listener_event_post_status on t_ds_listener_event (post_status);
-create index idx_listener_event_sign on t_ds_listener_event (sign);
+create index idx_process_code_version on t_ds_process_task_lineage (process_definition_code,process_definition_version);
+create index idx_task_code_version on t_ds_process_task_lineage (task_definition_code,task_definition_version);
+create index idx_dept_code on t_ds_process_task_lineage (dept_project_code,dept_process_definition_code,dept_task_definition_code);
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_data;
+create table t_ds_jdbc_registry_data
+(
+    id               bigserial not null,
+    data_key         varchar   not null,
+    data_value       text      not null,
+    data_type        varchar   not null,
+    client_id        bigint    not null,
+    create_time      timestamp not null default current_timestamp,
+    last_update_time timestamp not null default current_timestamp,
+    primary key (id)
+);
+create unique index uk_t_ds_jdbc_registry_dataKey on t_ds_jdbc_registry_data (data_key);
+
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_lock;
+create table t_ds_jdbc_registry_lock
+(
+    id          bigserial not null,
+    lock_key    varchar   not null,
+    lock_owner  varchar   not null,
+    client_id   bigint    not null,
+    create_time timestamp not null default current_timestamp,
+    primary key (id)
+);
+create unique index uk_t_ds_jdbc_registry_lockKey on t_ds_jdbc_registry_lock (lock_key);
+
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_client_heartbeat;
+create table t_ds_jdbc_registry_client_heartbeat
+(
+    id                  bigint    not null,
+    client_name         varchar   not null,
+    last_heartbeat_time bigint    not null,
+    connection_config   text      not null,
+    create_time         timestamp not null default current_timestamp,
+    primary key (id)
+);
+
+DROP TABLE IF EXISTS t_ds_jdbc_registry_data_change_event;
+create table t_ds_jdbc_registry_data_change_event
+(
+    id                 bigserial not null,
+    event_type         varchar   not null,
+    jdbc_registry_data text      not null,
+    create_time        timestamp not null default current_timestamp,
+    primary key (id)
+);
