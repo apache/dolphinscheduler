@@ -797,7 +797,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);
         schedule.setProcessInstancePriority(processInstancePriority);
-        schedule.setOperator(loginUser.getId());
+        schedule.setModifyUserId(loginUser.getId());
         scheduleMapper.updateById(schedule);
 
         processDefinition.setWarningGroupId(warningGroupId);
