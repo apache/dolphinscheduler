@@ -258,6 +258,7 @@ interface IRuleParameters {
   target_table?: string
   threshold?: string
   mapping_columns?: string
+  logic_operator?: string
 }
 
 interface ITaskParams {
