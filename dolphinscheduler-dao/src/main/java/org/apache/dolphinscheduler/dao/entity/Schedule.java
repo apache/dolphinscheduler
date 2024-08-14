@@ -114,9 +114,9 @@ public class Schedule {
     private int userId;
 
     /**
-     * operator user id
+     * modify user id
      */
-    private Integer operator;
+    private Integer modifyUserId;
 
     /**
      * created user
