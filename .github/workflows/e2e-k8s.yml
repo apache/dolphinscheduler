@@ -147,3 +147,20 @@ jobs:
               done
             done
           done
+  result:
+    name: E2E-K8S-Result
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ e2e-k8s, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip E2E-K8S!"
+            exit 0
+          fi
+          if [[ ${{ needs.e2e-k8s.result }} != 'success' ]]; then
+            echo "E2E-K8S Failed!"
+            exit -1
+          fi
