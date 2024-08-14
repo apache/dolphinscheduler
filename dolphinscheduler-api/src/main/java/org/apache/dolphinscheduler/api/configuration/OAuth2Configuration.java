@@ -16,6 +16,8 @@
  */
 package org.apache.dolphinscheduler.api.configuration;
 
+import org.apache.dolphinscheduler.oauth.OAuth2ClientProperties;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,19 +37,4 @@ public class OAuth2Configuration {
 
     private Map<String, OAuth2ClientProperties> provider = new HashMap<>();
 
-    @Getter
-    @Setter
-    public static class OAuth2ClientProperties {
-
-        private String authorizationUri;
-        private String clientId;
-        private String redirectUri;
-        private String clientSecret;
-        private String tokenUri;
-        private String userInfoUri;
-        private String callbackUrl;
-        private String iconUri;
-        private String provider;
-
-    }
 }

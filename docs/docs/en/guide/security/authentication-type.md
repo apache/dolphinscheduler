@@ -212,3 +212,69 @@ security:
 ### Step.3 Login With OAuth2
 
 ![login-with-oauth2](../../../../img/security/authentication/login-with-oauth2.png)
+
+### How to support more OAuth2 providers
+
+The oauth2 protocols of different companies may be different. In order to better support the oauth2 authentication center of each company, you can follow the steps below to expand the implementation of oauth2.
+
+First, create a new project and introduce the oauth plugin api.
+
+```xml
+<dependencies>
+   <dependency>
+      <groupId>org.apache.dolphinscheduler</groupId>
+      <artifactId>dolphinscheduler-oauth-api</artifactId>
+      <version>${project.version}</version>
+   </dependency>
+</dependencies>
+```
+
+Implement the org.apache.dolphinscheduler.oauth.AuthorizeCodeAuthService interface.
+
+```java
+package org.apache.dolphinscheduler.oauth;
+
+public interface AuthorizeCodeAuthService {
+
+    /**
+     * The user login with an authorization code and retrieves user information to generate a user in DS.
+     */
+    OAuthUserInfo getUserInfo(String authorizationCode);
+}
+```
+
+Implement the org.apache.dolphinscheduler.oauth.OAuthServiceFactory interface.
+
+```java
+public interface OAuthServiceFactory {
+    /**
+     * OAuth2 provider name
+     */
+    String provider();
+
+    /**
+     * Create authorizeCodeAuthService.
+     */
+    AuthorizeCodeAuthService getAuthorizeCodeAuthService(OAuth2ClientProperties oAuth2ClientProperties);
+}
+```
+
+Please note that the annotation of this interface needs to be added with the AutoService annotation to ensure that your implementation can be discovered by Spi.
+
+```java
+@AutoService(OAuthServiceFactory.class)
+public class GiteeAuthorizeCodeAuthServiceFactory implements OAuthServiceFactory {
+
+    @Override
+    public String provider() {
+        return GiteeOAuthProviderConstants.GITEE_OAUTH_PROVIDER_NAME;
+    }
+
+    @Override
+    public AuthorizeCodeAuthService getAuthorizeCodeAuthService(OAuth2ClientProperties oAuth2ClientProperties) {
+        return new GiteeAuthorizeCodeAuthService(oAuth2ClientProperties);
+    }
+}
+```
+
+Finally, compile your code and place the JAR file in the libs directory of the api-server.

@@ -208,3 +208,69 @@ security:
 ### 步骤3.使用oauth2登录
 
 ![login-with-oauth2](../../../../img/security/authentication/login-with-oauth2.png)
+
+### 附：支持更多的OAuth2 provider
+
+不同公司的oauth2协议可能有所不同，为了更好支持各公司的oauth2认证中心，你可以按照如下步骤拓展oauth2的实现。
+
+首先，新建项目，并引入ds的oauth plugin api。
+
+```xml
+<dependencies>
+   <dependency>
+      <groupId>org.apache.dolphinscheduler</groupId>
+      <artifactId>dolphinscheduler-oauth-api</artifactId>
+      <version>${project.version}</version>
+   </dependency>
+</dependencies>
+```
+
+实现org.apache.dolphinscheduler.oauth.AuthorizeCodeAuthService接口，该接口需要返回OAuthUserInfo。
+
+```java
+package org.apache.dolphinscheduler.oauth;
+
+public interface AuthorizeCodeAuthService {
+
+    /**
+     * The user login with an authorization code and retrieves user information to generate a user in DS.
+     */
+    OAuthUserInfo getUserInfo(String authorizationCode);
+}
+```
+
+实现org.apache.dolphinscheduler.oauth.OAuthServiceFactory接口。
+
+```java
+public interface OAuthServiceFactory {
+    /**
+     * OAuth2 provider name
+     */
+    String provider();
+
+    /**
+     * Create authorizeCodeAuthService.
+     */
+    AuthorizeCodeAuthService getAuthorizeCodeAuthService(OAuth2ClientProperties oAuth2ClientProperties);
+}
+```
+
+请注意，该接口的注解需要加上AutoService注解，以确保你的实现能被Spi发现。
+
+```java
+@AutoService(OAuthServiceFactory.class)
+public class GiteeAuthorizeCodeAuthServiceFactory implements OAuthServiceFactory {
+
+    @Override
+    public String provider() {
+        return GiteeOAuthProviderConstants.GITEE_OAUTH_PROVIDER_NAME;
+    }
+
+    @Override
+    public AuthorizeCodeAuthService getAuthorizeCodeAuthService(OAuth2ClientProperties oAuth2ClientProperties) {
+        return new GiteeAuthorizeCodeAuthService(oAuth2ClientProperties);
+    }
+}
+```
+
+最后，编译你的代码，并将jar放到api-server的libs目录下。
