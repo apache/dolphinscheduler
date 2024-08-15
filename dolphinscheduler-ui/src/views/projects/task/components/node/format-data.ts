@@ -302,7 +302,8 @@ export function formatParams(data: INodeData): {
       target_database: data.target_database,
       target_table: data.target_table,
       threshold: data.threshold,
-      mapping_columns: JSON.stringify(data.mapping_columns)
+      mapping_columns: JSON.stringify(data.mapping_columns),
+      logic_operator: data?.logic_operator
     }
     taskParams.sparkParameters = {
       deployMode: data.deployMode,
@@ -727,6 +728,8 @@ export function formatModel(data: ITaskData) {
       params.mapping_columns = JSON.parse(
         data.taskParams.ruleInputParameter.mapping_columns
       )
+    if (data.taskParams.ruleInputParameter.logic_operator)
+      params.logic_operator = data.taskParams.ruleInputParameter.logic_operator
   }
   if (data.taskParams?.sparkParameters) {
     params.deployMode = data.taskParams.sparkParameters.deployMode
