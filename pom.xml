@@ -637,15 +637,15 @@
                         <goals>
                             <goal>instrument</goal>
                         </goals>
+                        <configuration>
+                            <excludes>com/github/dreamhead/moco/*</excludes>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>default-restore-instrumented-classes</id>
                         <goals>
                             <goal>restore-instrumented-classes</goal>
                         </goals>
-                        <configuration>
-                            <excludes>com/github/dreamhead/moco/*</excludes>
-                        </configuration>
                     </execution>
                     <execution>
                         <id>default-report</id>
