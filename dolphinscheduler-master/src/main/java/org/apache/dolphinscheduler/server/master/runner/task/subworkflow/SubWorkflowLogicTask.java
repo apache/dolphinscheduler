@@ -134,7 +134,7 @@ public class SubWorkflowLogicTask extends BaseAsyncLogicTask<SubProcessParameter
                 SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
         final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
-                taskExecutionContext.getProcessInstanceId(),
+                subProcessInstance.getId(),
                 taskExecutionContext.getTaskInstanceId(),
                 subProcessInstance.getState(),
                 subProcessInstance.getId(),

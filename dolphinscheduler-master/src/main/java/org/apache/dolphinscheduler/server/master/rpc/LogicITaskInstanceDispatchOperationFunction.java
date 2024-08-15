@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutionContextHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutor;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorFactoryBuilder;
+import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorHolder;
 import org.apache.dolphinscheduler.server.master.runner.execute.MasterTaskExecutorThreadPoolManager;
 
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,7 @@ public class LogicITaskInstanceDispatchOperationFunction
                     .createMasterTaskExecutor(taskExecutionContext);
             if (masterTaskExecutorThreadPool.submitMasterTaskExecutor(masterTaskExecutor)) {
                 log.info("Submit LogicTask: {} to MasterTaskExecutorThreadPool success", taskInstanceName);
+                MasterTaskExecutorHolder.putMasterTaskExecuteRunnable(masterTaskExecutor);
                 return LogicTaskDispatchResponse.success(taskInstanceId);
             } else {
                 log.error("Submit LogicTask: {} to MasterTaskExecutorThreadPool failed", taskInstanceName);
