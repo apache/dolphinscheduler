@@ -77,7 +77,7 @@ public class MailUtilsTest {
         AlertResult alertResult = mailSender.sendMails(
                 "Mysql Exception",
                 content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
@@ -107,7 +107,7 @@ public class MailUtilsTest {
         emailConfig.put(MailParamsConstants.NAME_MAIL_PASSWD, "passwd");
         mailSender = new MailSender(emailConfig);
         AlertResult alertResult = mailSender.sendMails(title, content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     public String list2String() {
@@ -142,24 +142,24 @@ public class MailUtilsTest {
         emailConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE.getDescp());
         mailSender = new MailSender(emailConfig);
         AlertResult alertResult = mailSender.sendMails(title, content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
-    public void testAttachmentFile() throws Exception {
+    public void testAttachmentFile() {
         String content = list2String();
         emailConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.ATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);
         AlertResult alertResult = mailSender.sendMails("gaojing", content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
-    public void testTableAttachmentFile() throws Exception {
+    public void testTableAttachmentFile() {
         String content = list2String();
         emailConfig.put(AlertConstants.NAME_SHOW_TYPE, ShowType.TABLE_ATTACHMENT.getDescp());
         mailSender = new MailSender(emailConfig);
         AlertResult alertResult = mailSender.sendMails("gaojing", content);
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 }

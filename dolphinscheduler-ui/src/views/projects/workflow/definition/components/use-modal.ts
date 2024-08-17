@@ -27,7 +27,7 @@ import {
   queryProcessDefinitionByCode
 } from '@/service/modules/process-definition'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
-import { listNormalAlertGroupById } from '@/service/modules/alert-group'
+import { listAlertGroupById } from '@/service/modules/alert-group'
 import { startProcessInstance } from '@/service/modules/executors'
 import {
   createSchedule,
@@ -119,14 +119,8 @@ export function useModal(
         })
       }
 
-      const startParams = {} as any
-      for (const item of variables.startParamsList) {
-        if (item.value !== '') {
-          startParams[item.prop] = item.value
-        }
-      }
-      params.startParams = !_.isEmpty(startParams)
-        ? JSON.stringify(startParams)
+      params.startParams = !_.isEmpty(variables.startParamsList)
+        ? JSON.stringify(variables.startParamsList)
         : ''
       await startProcessInstance(params, variables.projectCode)
       window.$message.success(t('project.workflow.success'))
@@ -256,7 +250,7 @@ export function useModal(
   }
 
   const getAlertGroups = () => {
-    listNormalAlertGroupById().then((res: any) => {
+    listAlertGroupById().then((res: any) => {
       variables.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id

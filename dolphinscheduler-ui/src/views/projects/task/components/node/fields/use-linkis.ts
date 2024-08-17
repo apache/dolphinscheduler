@@ -23,7 +23,7 @@ export function useLinkis(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
   const configEditorSpan = computed(() => (model.useCustom ? 24 : 0))
-  const parmaEditorSpan = computed(() => (model.useCustom ? 0 : 24))
+  const paramEditorSpan = computed(() => (model.useCustom ? 0 : 24))
   computed(() => (model.useCustom ? 0 : 24))
   return [
     {
@@ -35,7 +35,7 @@ export function useLinkis(model: { [field: string]: any }): IJsonItem[] {
       type: 'custom-parameters',
       field: 'paramScript',
       name: t('project.node.option_parameters'),
-      span: parmaEditorSpan,
+      span: paramEditorSpan,
       children: [
         {
           type: 'input',

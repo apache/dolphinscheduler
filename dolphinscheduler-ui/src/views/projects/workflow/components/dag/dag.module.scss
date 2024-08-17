@@ -138,9 +138,6 @@ $bgLight: #ffffff;
     &.icon-datax {
       background-image: url('/images/task-icons/datax.png');
     }
-    &.icon-pigeon {
-      background-image: url('/images/task-icons/pigeon.png');
-    }
     &.icon-sqoop {
       background-image: url('/images/task-icons/sqoop.png');
     }
@@ -213,6 +210,9 @@ $bgLight: #ffffff;
     &.icon-remoteshell {
       background-image: url('/images/task-icons/remoteshell.png');
     }
+    &.icon-icon-aliyun_serverless_spark {
+      background-image: url('/images/task-icons/aliyun_serverless_spark.png');
+    }
   }
 
   &:hover {
@@ -253,9 +253,6 @@ $bgLight: #ffffff;
       }
       &.icon-datax {
         background-image: url('/images/task-icons/datax_hover.png');
-      }
-      &.icon-pigeon {
-        background-image: url('/images/task-icons/pigeon_hover.png');
       }
       &.icon-sqoop {
         background-image: url('/images/task-icons/sqoop_hover.png');
@@ -328,6 +325,9 @@ $bgLight: #ffffff;
       }
       &.icon-remoteshell {
         background-image: url('/images/task-icons/remoteshell_hover.png');
+      }
+      &.icon-aliyun_serverless_spark {
+        background-image: url('/images/task-icons/aliyun_serverless_spark_hover.png');
       }
     }
   }

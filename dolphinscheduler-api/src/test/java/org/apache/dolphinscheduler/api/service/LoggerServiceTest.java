@@ -40,9 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServer;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
-import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
@@ -92,7 +90,7 @@ public class LoggerServiceTest {
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
-    private NettyRemotingServer nettyRemotingServer;
+    private SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery;
 
     private int nettyServerPort = 18080;
 
@@ -104,12 +102,10 @@ public class LoggerServiceTest {
             return;
         }
 
-        nettyRemotingServer = new NettyRemotingServer(NettyServerConfig.builder().listenPort(nettyServerPort).build(),
-                new NettySslConfig());
-        nettyRemotingServer.start();
-        SpringServerMethodInvokerDiscovery springServerMethodInvokerDiscovery =
-                new SpringServerMethodInvokerDiscovery(nettyRemotingServer);
-        springServerMethodInvokerDiscovery.postProcessAfterInitialization(new ILogService() {
+        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(
+                NettyServerConfig.builder().serverName("TestLogServer").listenPort(nettyServerPort).build());
+        springServerMethodInvokerDiscovery.start();
+        springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new ILogService() {
 
             @Override
             public TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest) {
@@ -144,13 +140,14 @@ public class LoggerServiceTest {
             public void removeTaskInstanceLog(String taskInstanceLogAbsolutePath) {
 
             }
-        }, "iLogServiceImpl");
+        });
+        springServerMethodInvokerDiscovery.start();
     }
 
     @AfterEach
     public void tearDown() {
-        if (nettyRemotingServer != null) {
-            nettyRemotingServer.close();
+        if (springServerMethodInvokerDiscovery != null) {
+            springServerMethodInvokerDiscovery.close();
         }
     }
 

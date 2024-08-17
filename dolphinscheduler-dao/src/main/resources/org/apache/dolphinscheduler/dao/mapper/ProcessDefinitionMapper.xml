@@ -92,10 +92,10 @@
             <if test=" pd.projectCode != 0">
                 and project_code = #{pd.projectCode}
             </if>
-            <if test=" pd.name != null and pd.name != ''">
+            <if test="pd.name != null and pd.name != ''">
                 and name like concat('%', #{pd.name}, '%')
             </if>
-            <if test=" pd.releaseState != null and pd.releaseState != ''">
+            <if test="pd.releaseState != null and pd.releaseState != ''">
                 and release_state = #{pd.releaseState}
             </if>
         </where>
@@ -180,32 +180,30 @@
         AND pd.id = #{processDefineId}
     </select>
 
-    <select id="listResources" resultType="java.util.HashMap">
-        SELECT distinct pd.code, td.id as td_id, td.resource_ids
-        FROM t_ds_process_task_relation ptr
-        join t_ds_process_definition pd
-            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
-                and ptr.project_code=pd.project_code and  pd.release_state = 1
-        join t_ds_task_definition td
-            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
-        WHERE  td.resource_ids is not null and td.resource_ids != ''
-    </select>
-
-    <select id="listResourcesByUser" resultType="java.util.HashMap">
-        SELECT distinct pd.code, td.id as td_id, td.resource_ids
-        FROM t_ds_process_task_relation ptr
-        join t_ds_process_definition pd
-            on ptr.process_definition_code=pd.code and ptr.process_definition_version = pd.version
-                and ptr.project_code=pd.project_code and  pd.release_state = 1
-        join t_ds_task_definition td
-            on (ptr.pre_task_code=td.code and ptr.pre_task_version=td.version)
-                or  (ptr.post_task_code=td.code and ptr.post_task_version=td.version)
-        WHERE  td.resource_ids is not null and td.resource_ids != '' and  td.user_id = #{userId}
-    </select>
-
     <select id="listProjectIds" resultType="java.lang.Integer">
         SELECT DISTINCT(id) as project_id
         FROM t_ds_project
+    </select>
+
+    <select id="queryDefinitionCodeListByProjectCodes" resultType="java.lang.Long">
+        select
+        code
+        from t_ds_process_definition
+        where project_code in
+            <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+                #{i}
+            </foreach>
+    </select>
+
+    <select id="queryProjectProcessDefinitionCountByProjectCodes" resultType="org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount">
+        select
+            project_code as projectCode
+            ,count(*) as count
+        from t_ds_process_definition
+        where project_code in
+        <foreach collection="projectCodes" index="index" item="i" open="(" separator="," close=")">
+            #{i}
+        </foreach>
+        group by project_code
     </select>
 </mapper>

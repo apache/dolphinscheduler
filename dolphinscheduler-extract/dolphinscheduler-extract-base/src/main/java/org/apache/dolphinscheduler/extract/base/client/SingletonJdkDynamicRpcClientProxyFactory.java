@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingClientFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 

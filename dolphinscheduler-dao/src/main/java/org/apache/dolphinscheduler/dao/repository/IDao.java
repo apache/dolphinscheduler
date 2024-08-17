@@ -42,6 +42,11 @@ public interface IDao<Entity> {
     List<Entity> queryByIds(Collection<? extends Serializable> ids);
 
     /**
+     * Query all entities.
+     */
+    List<Entity> queryAll();
+
+    /**
      * Query the entity by condition.
      */
     List<Entity> queryByCondition(Entity queryCondition);

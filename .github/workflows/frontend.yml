@@ -20,7 +20,8 @@ name: Frontend
 on:
   push:
     branches:
-      - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
     paths:
       - '.github/workflows/frontend.yml'
       - 'dolphinscheduler-ui/**'
@@ -41,7 +42,7 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -58,7 +59,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - if: matrix.os == 'ubuntu-latest'
@@ -68,12 +69,19 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16
-      - name: Compile and Build on ${{ matrix.os }}
+      - name: Code Format Check
         run: |
           set -x
           npm install pnpm@7 -g
           pnpm install
           pnpm run lint
+          modified_files=$(git status | grep modified | wc -l)
+          if [ $modified_files -gt 0 ]; then
+            echo "Code format check failed! Please run \`pnpm run lint\` to format the code."
+            exit -1
+          fi
+      - name: Compile and Build on ${{ matrix.os }}
+        run: |
           pnpm run build:prod
   result:
     name: Frontend Build
@@ -82,7 +90,7 @@ jobs:
     needs: [ build, paths-filter ]
     if: always()
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Status
         run: |
           if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then

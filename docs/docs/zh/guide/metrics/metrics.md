@@ -91,6 +91,11 @@ metrics exporter端口`server.port`是在application.yaml里定义的: master: `
   - stop：停止的工作流实例数量
   - failover：容错的工作流实例数量
 
+### RPC相关指标
+
+- ds.rpc.client.sync.request.exception.count: (counter) 同步rpc请求异常数
+- ds.rpc.client.sync.request.duration.time: (histogram) 同步rpc请求耗时
+
 ### Master Server指标
 
 - ds.master.overload.count: (counter) master过载次数

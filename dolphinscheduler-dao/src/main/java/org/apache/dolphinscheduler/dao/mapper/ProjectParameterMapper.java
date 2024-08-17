@@ -38,7 +38,8 @@ public interface ProjectParameterMapper extends BaseMapper<ProjectParameter> {
     IPage<ProjectParameter> queryProjectParameterListPaging(IPage<ProjectParameter> page,
                                                             @Param("projectCode") long projectCode,
                                                             @Param("projectParameterIds") List<Integer> projectParameterIds,
-                                                            @Param("searchName") String searchName);
+                                                            @Param("searchName") String searchName,
+                                                            @Param("projectParameterDataType") String projectParameterDataType);
 
     List<ProjectParameter> queryByProjectCode(@Param("projectCode") long projectCode);
 }

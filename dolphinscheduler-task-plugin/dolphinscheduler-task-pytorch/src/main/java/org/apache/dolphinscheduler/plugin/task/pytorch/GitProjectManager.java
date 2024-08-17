@@ -33,12 +33,12 @@ import lombok.extern.slf4j.Slf4j;
 public class GitProjectManager {
 
     public static final String GIT_PATH_LOCAL = "GIT_PROJECT";
-    private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)");
+    private static final Pattern GIT_CHECK_PATTERN = Pattern.compile("^(git@|https?://)(?![&|])[^&|]+$");
     private String path;
     private String baseDir = ".";
 
     public static boolean isGitPath(String path) {
-        return GIT_CHECK_PATTERN.matcher(path).find();
+        return GIT_CHECK_PATTERN.matcher(path).matches();
     }
 
     public void prepareProject() throws Exception {

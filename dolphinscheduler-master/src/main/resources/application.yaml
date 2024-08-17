@@ -51,6 +51,7 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
+  cloud.discovery.client.composite-indicator.enabled: false
 
 # Mybatis-plus configuration, you don't need to change it
 mybatis-plus:
@@ -73,26 +74,20 @@ registry:
     namespace: dolphinscheduler
     connect-string: localhost:2181
     retry-policy:
-      base-sleep-time: 60ms
-      max-sleep: 300ms
+      base-sleep-time: 1s
+      max-sleep: 3s
       max-retries: 5
-    session-timeout: 30s
-    connection-timeout: 9s
-    block-until-connected: 600ms
+    session-timeout: 60s
+    connection-timeout: 15s
+    block-until-connected: 15s
     digest: ~
 
 master:
   listen-port: 5678
-  # master fetch command num
-  fetch-command-num: 10
   # master prepare execute thread number to limit handle commands in parallel
   pre-exec-threads: 10
   # master execute thread number to limit process instances in parallel
   exec-threads: 100
-  # master dispatch task number per batch, if all the tasks dispatch failed in a batch, will sleep 1s.
-  dispatch-task-number: 3
-  # master host selector to select a suitable worker, default value: LowerWeight. Optional values include random, round_robin, lower_weight
-  host-selector: lower_weight
   # master heartbeat interval
   max-heartbeat-interval: 10s
   # master commit task retry times
@@ -117,10 +112,23 @@ master:
   kill-application-when-task-failover: true
   registry-disconnect-strategy:
     # The disconnect strategy: stop, waiting
-    strategy: waiting
-    # The max waiting time to reconnect to registry if you set the strategy to waiting
-    max-waiting-time: 100s
+    strategy: stop
   worker-group-refresh-interval: 10s
+  command-fetch-strategy:
+    type: ID_SLOT_BASED
+    config:
+      # The incremental id step
+      id-step: 1
+      # master fetch command num
+      fetch-size: 10
+  worker-load-balancer-configuration-properties:
+    # RANDOM, ROUND_ROBIN, FIXED_WEIGHTED_ROUND_ROBIN, DYNAMIC_WEIGHTED_ROUND_ROBIN
+    type: DYNAMIC_WEIGHTED_ROUND_ROBIN
+    # dynamic-weight-config-properties only used in DYNAMIC_WEIGHTED_ROUND_ROBIN, the weight of memory-usage, cpu-usage, task-thread-pool-usage should sum to 100.
+    dynamic-weight-config-properties:
+      memory-usage-weight: 30
+      cpu-usage-weight: 30
+      task-thread-pool-usage-weight: 40
 
 server:
   port: 5679

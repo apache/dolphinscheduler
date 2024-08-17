@@ -20,6 +20,6 @@ package org.apache.dolphinscheduler.common.enums;
 public enum ServerStatus {
 
     NORMAL,
-    BUSY
+    BUSY,
 
 }

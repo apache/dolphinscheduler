@@ -25,15 +25,14 @@ import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import org.apache.http.client.methods.CloseableHttpResponse;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.http.client.methods.CloseableHttpResponse;
-
 
 @Slf4j
 @AllArgsConstructor
@@ -107,7 +106,8 @@ public class ProcessDefinitionPage {
         return requestClient.get(url, headers, params);
     }
 
-    public HttpResponse releaseProcessDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+    public HttpResponse releaseProcessDefinition(User loginUser, long projectCode, long code,
+                                                 ReleaseState releaseState) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("code", code);

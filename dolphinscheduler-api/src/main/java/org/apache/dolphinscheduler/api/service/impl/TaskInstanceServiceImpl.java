@@ -367,10 +367,15 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
             if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
-                ILogService iLogService =
-                        SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(),
-                                ILogService.class);
-                iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+                try {
+                    // Remove task instance log failed will not affect the deletion of task instance
+                    ILogService iLogService =
+                            SingletonJdkDynamicRpcClientProxyFactory.getProxyClient(taskInstance.getHost(),
+                                    ILogService.class);
+                    iLogService.removeTaskInstanceLog(taskInstance.getLogPath());
+                } catch (Exception ex) {
+                    log.error("Remove task instance log error", ex);
+                }
             }
         }
 

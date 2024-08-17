@@ -44,7 +44,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
         id: filter
         with:
@@ -63,11 +63,11 @@ jobs:
         java: [ '8', '11' ]
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
@@ -75,7 +75,7 @@ jobs:
         uses: ./.github/actions/sanity-check
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
@@ -91,7 +91,7 @@ jobs:
                  -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
       - name: Check dependency license
         run: tools/dependencies/check-LICENSE.sh
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: ${{ matrix.java == '8' }}
         name: Upload Binary Package
         with:
@@ -115,10 +115,14 @@ jobs:
           - name: cluster-test-postgresql-with-postgresql-registry
             script: .github/workflows/cluster-test/postgresql_with_postgresql_registry/start-job.sh
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: true
-      - uses: actions/download-artifact@v2
+      - name: Collect Workflow Telemetry
+        uses: ./.github/actions/workflow-telemetry-action
+        with:
+          comment_on_pr: false
+      - uses: actions/download-artifact@v4
         name: Download Binary Package
         with:
           # Only run cluster test on jdk8
@@ -153,10 +157,10 @@ jobs:
       fail-fast: false
       matrix:
         db: ["mysql", "postgresql"]
-        version: ["2.0.9", "3.0.6", "3.1.9", "3.2.0"]
+        version: ["3.1.9", "3.2.0"]
     steps:
       - name: Set up JDK 8
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
           java-version: 8
           distribution: 'adopt'
@@ -165,7 +169,7 @@ jobs:
           mkdir -p dolphinscheduler/dev dolphinscheduler/${{ matrix.version }}
           curl -sSf https://atlasgo.sh | sh
       - name: Download Tarball
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
           name: binary-package-8
           path: dolphinscheduler/dev

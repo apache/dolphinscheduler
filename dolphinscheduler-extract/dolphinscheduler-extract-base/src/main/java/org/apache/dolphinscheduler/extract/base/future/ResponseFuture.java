@@ -19,8 +19,6 @@ package org.apache.dolphinscheduler.extract.base.future;
 
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -34,16 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ResponseFuture {
 
-    private static final ConcurrentHashMap<Long, ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>(256);
+    private static final ConcurrentHashMap<Long, ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>();
 
     private final long opaque;
 
     // remove the timeout
     private final long timeoutMillis;
-
-    private final InvokeCallback invokeCallback;
-
-    private final ReleaseSemaphore releaseSemaphore;
 
     private final CountDownLatch latch = new CountDownLatch(1);
 
@@ -57,14 +51,9 @@ public class ResponseFuture {
 
     private Throwable cause;
 
-    public ResponseFuture(long opaque,
-                          long timeoutMillis,
-                          InvokeCallback invokeCallback,
-                          ReleaseSemaphore releaseSemaphore) {
+    public ResponseFuture(long opaque, long timeoutMillis) {
         this.opaque = opaque;
         this.timeoutMillis = timeoutMillis;
-        this.invokeCallback = invokeCallback;
-        this.releaseSemaphore = releaseSemaphore;
         FUTURE_TABLE.put(opaque, this);
     }
 
@@ -90,10 +79,6 @@ public class ResponseFuture {
         return FUTURE_TABLE.get(opaque);
     }
 
-    public void removeFuture() {
-        FUTURE_TABLE.remove(opaque);
-    }
-
     /**
      * whether timeout
      *
@@ -102,15 +87,6 @@ public class ResponseFuture {
     public boolean isTimeout() {
         long diff = System.currentTimeMillis() - this.beginTimestamp;
         return diff > this.timeoutMillis;
-    }
-
-    /**
-     * execute invoke callback
-     */
-    public void executeInvokeCallback() {
-        if (invokeCallback != null) {
-            invokeCallback.operationComplete(this);
-        }
     }
 
     public boolean isSendOK() {
@@ -127,54 +103,6 @@ public class ResponseFuture {
 
     public Throwable getCause() {
         return cause;
-    }
-
-    public long getOpaque() {
-        return opaque;
-    }
-
-    public long getTimeoutMillis() {
-        return timeoutMillis;
-    }
-
-    public long getBeginTimestamp() {
-        return beginTimestamp;
-    }
-
-    public InvokeCallback getInvokeCallback() {
-        return invokeCallback;
-    }
-
-    /**
-     * release
-     */
-    public void release() {
-        if (this.releaseSemaphore != null) {
-            this.releaseSemaphore.release();
-        }
-    }
-
-    /**
-     * scan future table
-     */
-    public static void scanFutureTable() {
-        Iterator<Map.Entry<Long, ResponseFuture>> it = FUTURE_TABLE.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Long, ResponseFuture> next = it.next();
-            ResponseFuture future = next.getValue();
-            if ((future.getBeginTimestamp() + future.getTimeoutMillis() + 1000) > System.currentTimeMillis()) {
-                continue;
-            }
-            try {
-                // todo: use thread pool to execute the async callback, otherwise will block the scan thread
-                future.release();
-                future.executeInvokeCallback();
-            } catch (Exception ex) {
-                log.error("ScanFutureTable, execute callback error, requestId: {}", future.getOpaque(), ex);
-            }
-            it.remove();
-            log.debug("Remove timeout request: {}", future);
-        }
     }
 
 }

@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
 
@@ -40,21 +41,25 @@ public class ParameterUtilsTest {
 
     @Test
     public void expandListParameter() {
+
         Map<Integer, Property> params = new HashMap<>();
         params.put(1,
-                new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1", "c2", "c3"))));
-        params.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
-        params.put(3, new Property(null, null, DataType.LIST,
+                new Property("col1", Direct.IN, DataType.LIST,
+                        JSONUtils.toJsonString(Lists.newArrayList("c1", "c2", "c3"))));
+        params.put(2, new Property("date", Direct.IN, DataType.DATE, "2020-06-30"));
+        params.put(3, new Property("col2", Direct.IN, DataType.LIST,
                 JSONUtils.toJsonString(Lists.newArrayList(3.1415, 2.44, 3.44))));
         String sql = ParameterUtils.expandListParameter(params,
-                "select * from test where col1 in (?) and date=? and col2 in (?)");
+                "select * from test where col1 in ('${col1}') and date='${date}' and col2 in ('${col2}')");
         Assertions.assertEquals("select * from test where col1 in (?,?,?) and date=? and col2 in (?,?,?)", sql);
         Assertions.assertEquals(7, params.size());
 
         Map<Integer, Property> params2 = new HashMap<>();
-        params2.put(1, new Property(null, null, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1"))));
-        params2.put(2, new Property(null, null, DataType.DATE, "2020-06-30"));
-        String sql2 = ParameterUtils.expandListParameter(params2, "select * from test where col1 in (?) and date=?");
+        params2.put(1,
+                new Property("col1", Direct.IN, DataType.LIST, JSONUtils.toJsonString(Lists.newArrayList("c1"))));
+        params2.put(2, new Property("date", Direct.IN, DataType.DATE, "2020-06-30"));
+        String sql2 = ParameterUtils.expandListParameter(params2,
+                "select * from test where col1 in ('${col}') and date='${date}'");
         Assertions.assertEquals("select * from test where col1 in (?) and date=?", sql2);
         Assertions.assertEquals(2, params2.size());
 
@@ -113,4 +118,5 @@ public class ParameterUtilsTest {
         Assertions.assertEquals("test Parameter", ParameterUtils.handleEscapes("test Parameter"));
         Assertions.assertEquals("////%test////%Parameter", ParameterUtils.handleEscapes("%test%Parameter"));
     }
+
 }

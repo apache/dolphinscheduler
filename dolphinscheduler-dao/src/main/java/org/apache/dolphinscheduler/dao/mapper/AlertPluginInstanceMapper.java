@@ -37,13 +37,6 @@ public interface AlertPluginInstanceMapper extends BaseMapper<AlertPluginInstanc
     List<AlertPluginInstance> queryAllAlertPluginInstanceList();
 
     /**
-     * query all global alert plugin instance
-     *
-     * @return global AlertPluginInstance list
-     */
-    List<AlertPluginInstance> queryAllGlobalAlertPluginInstanceList();
-
-    /**
      * query by alert group id
      *
      * @param ids

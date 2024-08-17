@@ -28,9 +28,9 @@ services:
     networks:
       - e2e
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
-      timeout: 300s
+      timeout: 5s
       retries: 120
     depends_on:
       postgres:

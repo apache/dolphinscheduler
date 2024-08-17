@@ -51,7 +51,6 @@ Create a default common labels.
 {{- define "dolphinscheduler.common.labels" -}}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/version: {{ .Chart.AppVersion }}
 {{- end -}}
 
 {{/*
@@ -146,6 +145,10 @@ Create a database environment variables.
   {{- else }}
   value: {{ .Values.externalDatabase.type | quote }}
   {{- end }}
+{{- if or .Values.mysql.enabled (eq .Values.externalDatabase.type "mysql") }}
+- name: SPRING_PROFILES_ACTIVE
+  value: mysql
+{{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
   value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
@@ -394,4 +397,17 @@ Create a ldap ssl volumeMount.
   name: jks-file
   subPath: jks-file
 {{- end -}}
+{{- end -}}
+
+{{/*
+Renders a value that contains template.
+Usage:
+{{ include "dolphinscheduler.tplvalues.render" ( dict "value" .Values.path.to.the.Value "context" $) }}
+*/}}
+{{- define "dolphinscheduler.tplvalues.render" -}}
+    {{- if typeIs "string" .value }}
+        {{- tpl .value .context }}
+    {{- else }}
+        {{- tpl (.value | toYaml) .context }}
+    {{- end }}
 {{- end -}}

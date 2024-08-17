@@ -33,6 +33,8 @@ public class EtcdRegistryProperties {
     private String namespace = "dolphinscheduler";
     private Duration connectionTimeout = Duration.ofSeconds(9);
 
+    private Duration ttl = Duration.ofSeconds(30);
+
     // auth
     private String user;
     private String password;

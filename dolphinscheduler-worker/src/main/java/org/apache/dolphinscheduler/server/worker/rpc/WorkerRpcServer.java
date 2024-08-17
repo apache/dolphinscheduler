@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServerFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
@@ -36,19 +35,6 @@ public class WorkerRpcServer extends SpringServerMethodInvokerDiscovery implemen
     public WorkerRpcServer(WorkerConfig workerConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
                 .serverName("WorkerRpcServer").listenPort(workerConfig.getListenPort()).build(), nettySslConfig));
-    }
-
-    public void start() {
-        log.info("WorkerRpcServer starting...");
-        nettyRemotingServer.start();
-        log.info("WorkerRpcServer started...");
-    }
-
-    @Override
-    public void close() {
-        log.info("WorkerRpcServer closing");
-        nettyRemotingServer.close();
-        log.info("WorkerRpcServer closed");
     }
 
 }

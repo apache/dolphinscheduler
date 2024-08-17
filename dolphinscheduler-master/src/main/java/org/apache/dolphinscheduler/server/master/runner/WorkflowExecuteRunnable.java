@@ -25,9 +25,9 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_WORKER_GROUP;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_BLOCKING;
+import static org.apache.dolphinscheduler.dao.utils.EnvironmentUtils.getEnvironmentCodeOrDefault;
+import static org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils.getWorkerGroupOrDefault;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -51,22 +51,22 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.TaskCacheUtils;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.base.client.SingletonJdkDynamicRpcClientProxyFactory;
 import org.apache.dolphinscheduler.extract.worker.ITaskInstanceOperator;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.UpdateWorkflowHostResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
-import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.event.StateEvent;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleError;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandleException;
-import org.apache.dolphinscheduler.server.master.event.StateEventHandleFailure;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandler;
 import org.apache.dolphinscheduler.server.master.event.StateEventHandlerManager;
 import org.apache.dolphinscheduler.server.master.event.TaskStateEvent;
@@ -75,9 +75,7 @@ import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
-import org.apache.dolphinscheduler.server.master.utils.TaskUtils;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
-import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -97,6 +95,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -218,8 +217,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     private final MasterConfig masterConfig;
 
-    private final ListenerEventAlertManager listenerEventAlertManager;
-
     private final TaskGroupCoordinator taskGroupCoordinator;
 
     public WorkflowExecuteRunnable(
@@ -233,7 +230,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                                    @NonNull CuringParamsService curingParamsService,
                                    @NonNull TaskInstanceDao taskInstanceDao,
                                    @NonNull DefaultTaskExecuteRunnableFactory defaultTaskExecuteRunnableFactory,
-                                   @NonNull ListenerEventAlertManager listenerEventAlertManager,
                                    @NonNull TaskGroupCoordinator taskGroupCoordinator) {
         this.processService = processService;
         this.commandService = commandService;
@@ -245,7 +241,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         this.curingParamsService = curingParamsService;
         this.taskInstanceDao = taskInstanceDao;
         this.defaultTaskExecuteRunnableFactory = defaultTaskExecuteRunnableFactory;
-        this.listenerEventAlertManager = listenerEventAlertManager;
         this.taskGroupCoordinator = taskGroupCoordinator;
         TaskMetrics.registerTaskPrepared(standByTaskInstancePriorityQueue::size);
     }
@@ -298,14 +293,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         stateEvent,
                         stateEventHandleException);
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } catch (StateEventHandleFailure stateEventHandleFailure) {
-                log.error("State event handle failed, will move event to the tail: {}",
-                        stateEvent,
-                        stateEventHandleFailure);
-                this.stateEvents.remove(stateEvent);
-                this.stateEvents.offer(stateEvent);
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 // we catch the exception here, since if the state event handle failed, the state event will still
                 // keep
                 // in the stateEvents queue.
@@ -336,18 +324,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         return this.stateEvents.size();
     }
 
-    public void processStart() {
-        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-        this.listenerEventAlertManager.publishProcessStartListenerEvent(workflowInstance, projectUser);
-    }
-
-    public void taskStart(TaskInstance taskInstance) {
-        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-        this.listenerEventAlertManager.publishTaskStartListenerEvent(workflowInstance, taskInstance, projectUser);
-    }
-
     public void processTimeout() {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         ProjectUser projectUser = processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
@@ -376,34 +352,31 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
             if (taskInstance.getState().isSuccess()) {
                 completeTaskSet.add(taskInstance.getTaskCode());
-                mergeTaskInstanceVarPool(taskInstance);
+                workflowInstance.setVarPool(VarPoolUtils.mergeVarPoolJsonString(
+                        Lists.newArrayList(workflowInstance.getVarPool(), taskInstance.getVarPool())));
                 processInstanceDao.upsertProcessInstance(workflowInstance);
-                ProjectUser projectUser =
-                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-                listenerEventAlertManager.publishTaskEndListenerEvent(workflowInstance, taskInstance, projectUser);
+
                 // save the cacheKey only if the task is defined as cache task and the task is success
                 if (taskInstance.getIsCache().equals(Flag.YES)) {
                     saveCacheTaskInstance(taskInstance);
                 }
-                if (!workflowInstance.isBlocked()) {
-                    submitPostNode(taskInstance.getTaskCode());
-                }
+                submitPostNode(taskInstance.getTaskCode());
             } else if (taskInstance.taskCanRetry() && !workflowInstance.getState().isReadyStop()) {
                 // retry task
                 log.info("Retry taskInstance taskInstance state: {}", taskInstance.getState());
                 retryTaskInstance(taskInstance);
-            } else if (taskInstance.getState().isFailure()) {
+            } else if (taskInstance.getState().isFailure() || taskInstance.getState().isKill()
+                    || taskInstance.getState().isStop()) {
                 completeTaskSet.add(taskInstance.getTaskCode());
-                ProjectUser projectUser =
-                        processService.queryProjectWithUserByProcessInstanceId(workflowInstance.getId());
-                listenerEventAlertManager.publishTaskFailListenerEvent(workflowInstance, taskInstance, projectUser);
+                if (isTaskNeedPutIntoErrorMap(taskInstance)) {
+                    errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
+                }
                 // There are child nodes and the failure policy is: CONTINUE
                 if (workflowInstance.getFailureStrategy() == FailureStrategy.CONTINUE && DagHelper.haveAllNodeAfterNode(
                         taskInstance.getTaskCode(),
                         workflowExecuteContext.getWorkflowGraph().getDag())) {
                     submitPostNode(taskInstance.getTaskCode());
                 } else {
-                    errorTaskMap.put(taskInstance.getTaskCode(), taskInstance.getId());
                     if (workflowInstance.getFailureStrategy() == FailureStrategy.END) {
                         killAllTasks();
                     }
@@ -441,7 +414,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     /**
      * crate new task instance to retry, different objects from the original
-     *
      */
     private void retryTaskInstance(TaskInstance taskInstance) throws StateEventHandleException {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
@@ -530,16 +502,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         if (!taskInstanceMap.containsKey(stateEvent.getTaskInstanceId())) {
             throw new StateEventHandleError("Cannot find the taskInstance from taskInstanceMap");
         }
-    }
-
-    /**
-     * check if task instance exist by id
-     */
-    public boolean checkTaskInstanceById(int taskInstanceId) {
-        if (taskInstanceMap.isEmpty()) {
-            return false;
-        }
-        return taskInstanceMap.containsKey(taskInstanceId);
     }
 
     /**
@@ -657,6 +619,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(workflowInstance.getProcessDefinitionVersion());
         command.setTestFlag(workflowInstance.getTestFlag());
+        command.setTenantCode(workflowInstance.getTenantCode());
         int create = commandService.createCommand(command);
         processService.saveCommandTrigger(command.getId(), workflowInstance.getId());
         return create;
@@ -687,7 +650,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
             }
             if (workflowRunnableStatus == WorkflowRunnableStatus.INITIALIZE_QUEUE) {
-                processStart();
                 submitPostNode(null);
                 workflowRunnableStatus = WorkflowRunnableStatus.STARTED;
                 log.info("workflowStatue changed to :{}", workflowRunnableStatus);
@@ -716,9 +678,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         processAlertManager.sendAlertProcessInstance(workflowInstance, getValidTaskList(), projectUser);
         if (workflowInstance.getState().isSuccess()) {
             processAlertManager.closeAlert(workflowInstance);
-            listenerEventAlertManager.publishProcessEndListenerEvent(workflowInstance, projectUser);
-        } else {
-            listenerEventAlertManager.publishProcessFailListenerEvent(workflowInstance, projectUser);
         }
         taskInstanceMap.forEach((id, taskInstance) -> {
             if (taskInstance != null && taskInstance.getTaskGroupId() > 0) {
@@ -822,10 +781,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         completeTaskSet.add(task.getTaskCode());
                         continue;
                     }
-                    if (task.isConditionsTask() || DagHelper.haveConditionsAfterNode(task.getTaskCode(),
-                            workflowExecuteContext.getWorkflowGraph().getDag())) {
-                        continue;
-                    }
+
                     if (task.taskCanRetry()) {
                         if (task.getState().isNeedFaultTolerance()) {
                             log.info("TaskInstance needs fault tolerance, will be added to standby list.");
@@ -841,7 +797,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         }
                         continue;
                     }
-                    if (task.getState().isFailure()) {
+                    if (isTaskNeedPutIntoErrorMap(task)) {
                         errorTaskMap.put(task.getTaskCode(), task.getId());
                     }
                 } finally {
@@ -966,16 +922,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         if (!taskInstance.getState().isFinished()) {
             taskExecuteRunnable.dispatch();
         } else {
-            if (workflowExecuteContext.getWorkflowInstance().isBlocked()) {
-                TaskStateEvent processBlockEvent = TaskStateEvent.builder()
-                        .processInstanceId(workflowExecuteContext.getWorkflowInstance().getId())
-                        .taskInstanceId(taskInstance.getId())
-                        .status(taskInstance.getState())
-                        .type(StateEventType.PROCESS_BLOCKED)
-                        .build();
-                this.stateEvents.add(processBlockEvent);
-            }
-
             TaskStateEvent taskStateChangeEvent = TaskStateEvent.builder()
                     .processInstanceId(workflowExecuteContext.getWorkflowInstance().getId())
                     .taskInstanceId(taskInstance.getId())
@@ -1070,7 +1016,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
      * new a taskInstance
      *
      * @param processInstance process instance
-     * @param taskNode task node
+     * @param taskNode        task node
      * @return task instance
      */
     public TaskInstance newTaskInstance(ProcessInstance processInstance, TaskNode taskNode) {
@@ -1112,7 +1058,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         taskInstance.setRetryInterval(taskNode.getRetryInterval());
 
         // set task param
-        taskInstance.setTaskParams(taskNode.getTaskParams());
+        taskInstance.setTaskParams(taskNode.getParams());
 
         // set task group and priority
         taskInstance.setTaskGroupId(taskNode.getTaskGroupId());
@@ -1131,25 +1077,22 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             taskInstance.setTaskInstancePriority(taskNode.getTaskInstancePriority());
         }
 
-        String processWorkerGroup = processInstance.getWorkerGroup();
-        processWorkerGroup = StringUtils.isBlank(processWorkerGroup) ? DEFAULT_WORKER_GROUP : processWorkerGroup;
-        String taskWorkerGroup =
-                StringUtils.isBlank(taskNode.getWorkerGroup()) ? processWorkerGroup : taskNode.getWorkerGroup();
+        String processWorkerGroup = getWorkerGroupOrDefault(processInstance.getWorkerGroup());
+        String taskWorkerGroup = getWorkerGroupOrDefault(taskNode.getWorkerGroup());
 
-        Long processEnvironmentCode =
-                Objects.isNull(processInstance.getEnvironmentCode()) ? -1 : processInstance.getEnvironmentCode();
-        Long taskEnvironmentCode =
-                Objects.isNull(taskNode.getEnvironmentCode()) ? processEnvironmentCode : taskNode.getEnvironmentCode();
+        Long processEnvironmentCode = getEnvironmentCodeOrDefault(processInstance.getEnvironmentCode());
+        Long taskEnvironmentCode = getEnvironmentCodeOrDefault(taskNode.getEnvironmentCode());
 
-        if (!processWorkerGroup.equals(DEFAULT_WORKER_GROUP) && taskWorkerGroup.equals(DEFAULT_WORKER_GROUP)) {
+        if (WorkerGroupUtils.isWorkerGroupEmpty(taskWorkerGroup)) {
+            // If the task workerGroup is empty, then use the workflow workerGroup/environment
             taskInstance.setWorkerGroup(processWorkerGroup);
-            taskInstance.setEnvironmentCode(processEnvironmentCode);
+            taskInstance.setEnvironmentCode(getEnvironmentCodeOrDefault(taskEnvironmentCode, processEnvironmentCode));
         } else {
             taskInstance.setWorkerGroup(taskWorkerGroup);
-            taskInstance.setEnvironmentCode(taskEnvironmentCode);
+            taskInstance.setEnvironmentCode(getEnvironmentCodeOrDefault(taskEnvironmentCode, processEnvironmentCode));
         }
 
-        if (!taskInstance.getEnvironmentCode().equals(-1L)) {
+        if (!EnvironmentUtils.isEnvironmentCodeEmpty(taskInstance.getEnvironmentCode())) {
             Environment environment = processService.findEnvironmentByCode(taskInstance.getEnvironmentCode());
             if (Objects.nonNull(environment) && StringUtils.isNotEmpty(environment.getConfig())) {
                 taskInstance.setEnvironmentConfig(environment.getConfig());
@@ -1161,78 +1104,30 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         return taskInstance;
     }
 
-    public void getPreVarPool(TaskInstance taskInstance, Set<Long> preTask) {
+    void initializeTaskInstanceVarPool(TaskInstance taskInstance) {
+        // get pre task ,get all the task varPool to this task
+        // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
+        String preTasks =
+                workflowExecuteContext.getWorkflowGraph().getTaskNodeByCode(taskInstance.getTaskCode()).getPreTasks();
+        Set<Long> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, Long.class));
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        Map<String, Property> allProperty = new HashMap<>();
-        Map<String, TaskInstance> allTaskInstance = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(preTask)) {
-            for (Long preTaskCode : preTask) {
-                Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(preTaskCode);
-                if (!existTaskInstanceOptional.isPresent()) {
-                    continue;
-                }
 
-                Integer taskId = existTaskInstanceOptional.get().getId();
-                if (taskId == null) {
-                    continue;
-                }
-                TaskInstance preTaskInstance = taskInstanceMap.get(taskId);
-                if (preTaskInstance == null) {
-                    continue;
-                }
-                String preVarPool = preTaskInstance.getVarPool();
-                if (StringUtils.isNotEmpty(preVarPool)) {
-                    List<Property> properties = JSONUtils.toList(preVarPool, Property.class);
-                    for (Property info : properties) {
-                        setVarPoolValue(allProperty, allTaskInstance, preTaskInstance, info);
-                    }
-                }
-            }
-            if (allProperty.size() > 0) {
-                taskInstance.setVarPool(JSONUtils.toJsonString(allProperty.values()));
-            }
-        } else {
-            if (StringUtils.isNotEmpty(workflowInstance.getVarPool())) {
-                taskInstance.setVarPool(workflowInstance.getVarPool());
-            }
+        if (CollectionUtils.isEmpty(preTaskList)) {
+            taskInstance.setVarPool(workflowInstance.getVarPool());
+            return;
         }
+        List<String> preTaskInstanceVarPools = preTaskList
+                .stream()
+                .map(taskCode -> getTaskInstance(taskCode).orElse(null))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(TaskInstance::getEndTime))
+                .map(TaskInstance::getVarPool)
+                .collect(Collectors.toList());
+        taskInstance.setVarPool(VarPoolUtils.mergeVarPoolJsonString(preTaskInstanceVarPools));
     }
 
     public Collection<TaskInstance> getAllTaskInstances() {
         return taskInstanceMap.values();
-    }
-
-    private void setVarPoolValue(Map<String, Property> allProperty,
-                                 Map<String, TaskInstance> allTaskInstance,
-                                 TaskInstance preTaskInstance, Property thisProperty) {
-        // for this taskInstance all the param in this part is IN.
-        thisProperty.setDirect(Direct.IN);
-        // get the pre taskInstance Property's name
-        String proName = thisProperty.getProp();
-        // if the Previous nodes have the Property of same name
-        if (allProperty.containsKey(proName)) {
-            // comparison the value of two Property
-            Property otherPro = allProperty.get(proName);
-            // if this property'value of loop is empty,use the other,whether the other's value is empty or not
-            if (StringUtils.isEmpty(thisProperty.getValue())) {
-                allProperty.put(proName, otherPro);
-                // if property'value of loop is not empty,and the other's value is not empty too, use the earlier value
-            } else if (StringUtils.isNotEmpty(otherPro.getValue())) {
-                TaskInstance otherTask = allTaskInstance.get(proName);
-                if (otherTask.getEndTime().getTime() > preTaskInstance.getEndTime().getTime()) {
-                    allProperty.put(proName, thisProperty);
-                    allTaskInstance.put(proName, preTaskInstance);
-                } else {
-                    allProperty.put(proName, otherPro);
-                }
-            } else {
-                allProperty.put(proName, thisProperty);
-                allTaskInstance.put(proName, preTaskInstance);
-            }
-        } else {
-            allProperty.put(proName, thisProperty);
-            allTaskInstance.put(proName, preTaskInstance);
-        }
     }
 
     /**
@@ -1284,12 +1179,12 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                         || state == TaskExecutionStatus.DISPATCH
                         || state == TaskExecutionStatus.SUBMITTED_SUCCESS
                         || state == TaskExecutionStatus.DELAY_EXECUTION) {
-                    // try to take over task instance
-                    if (state == TaskExecutionStatus.SUBMITTED_SUCCESS || state == TaskExecutionStatus.DELAY_EXECUTION
-                            || state == TaskExecutionStatus.DISPATCH) {
+                    if (state == TaskExecutionStatus.SUBMITTED_SUCCESS
+                            || state == TaskExecutionStatus.DELAY_EXECUTION) {
                         // The taskInstance is not in running, directly takeover it
                     } else if (tryToTakeOverTaskInstance(existTaskInstance)) {
-                        log.info("Success take over task {}", existTaskInstance.getName());
+                        // If the taskInstance has already dispatched to worker then will try to take-over it
+                        log.info("Success take over task {} -> status: {}", existTaskInstance.getName(), state);
                         continue;
                     } else {
                         // set the task instance state to fault tolerance
@@ -1311,45 +1206,10 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         }
         // the end node of the branch of the dag
         if (parentNodeCode != null && dag.getEndNode().contains(parentNodeCode)) {
-            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(parentNodeCode);
-            if (existTaskInstanceOptional.isPresent()) {
-                TaskInstance endTaskInstance = taskInstanceMap.get(existTaskInstanceOptional.get().getId());
-                String taskInstanceVarPool = endTaskInstance.getVarPool();
-                if (StringUtils.isNotEmpty(taskInstanceVarPool)) {
-                    Set<Property> taskProperties = new HashSet<>(JSONUtils.toList(taskInstanceVarPool, Property.class));
-                    String processInstanceVarPool = workflowInstance.getVarPool();
-                    List<Property> processGlobalParams =
-                            new ArrayList<>(JSONUtils.toList(workflowInstance.getGlobalParams(), Property.class));
-                    Map<String, Direct> oldProcessGlobalParamsMap = processGlobalParams.stream()
-                            .collect(Collectors.toMap(Property::getProp, Property::getDirect));
-                    Set<Property> processVarPoolOut = taskProperties.stream()
-                            .filter(property -> property.getDirect().equals(Direct.OUT)
-                                    && oldProcessGlobalParamsMap.containsKey(property.getProp())
-                                    && oldProcessGlobalParamsMap.get(property.getProp()).equals(Direct.OUT))
-                            .collect(Collectors.toSet());
-                    Set<Property> taskVarPoolIn =
-                            taskProperties.stream().filter(property -> property.getDirect().equals(Direct.IN))
-                                    .collect(Collectors.toSet());
-                    if (StringUtils.isNotEmpty(processInstanceVarPool)) {
-                        Set<Property> properties =
-                                new HashSet<>(JSONUtils.toList(processInstanceVarPool, Property.class));
-                        Set<String> newProcessVarPoolKeys =
-                                taskProperties.stream().map(Property::getProp).collect(Collectors.toSet());
-                        properties = properties.stream()
-                                .filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
-                                .collect(Collectors.toSet());
-                        properties.addAll(processVarPoolOut);
-                        properties.addAll(taskVarPoolIn);
+            getTaskInstance(parentNodeCode)
+                    .ifPresent(endTaskInstance -> workflowInstance.setVarPool(VarPoolUtils.mergeVarPoolJsonString(
+                            Lists.newArrayList(workflowInstance.getVarPool(), endTaskInstance.getVarPool()))));
 
-                        workflowInstance.setVarPool(JSONUtils.toJsonString(properties));
-                    } else {
-                        Set<Property> varPool = new HashSet<>();
-                        varPool.addAll(taskVarPoolIn);
-                        varPool.addAll(processVarPoolOut);
-                        workflowInstance.setVarPool(JSONUtils.toJsonString(varPool));
-                    }
-                }
-            }
         }
 
         // if previous node success , post node submit
@@ -1377,7 +1237,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
 
     private boolean tryToTakeOverTaskInstance(TaskInstance taskInstance) {
         ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        if (TaskUtils.isMasterTask(taskInstance.getTaskType())) {
+        if (TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
             return false;
         }
         try {
@@ -1443,13 +1303,14 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 if (depTaskState.isKill()) {
                     return DependResult.NON_EXEC;
                 }
-                // ignore task state if current task is block
-                if (taskNode.isBlockingTask()) {
+
+                // always return success if current task is condition
+                if (TaskTypeUtils.isConditionTask(taskNode.getType())) {
                     continue;
                 }
 
-                // always return success if current task is condition
-                if (taskNode.isConditionsTask()) {
+                // always return success if current task is switch
+                if (TaskTypeUtils.isSwitchTask(taskNode.getType())) {
                     continue;
                 }
 
@@ -1459,7 +1320,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             }
         }
         log.info("The dependTasks of task all success, currentTaskCode: {}, dependTaskCodes: {}",
-                taskCode, Arrays.toString(completeTaskSet.toArray()));
+                taskCode, Arrays.toString(indirectDepCodeList.toArray()));
         return DependResult.SUCCESS;
     }
 
@@ -1494,7 +1355,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
     private boolean dependTaskSuccess(Long dependNodeCode, Long nextNodeCode) {
         DAG<Long, TaskNode, TaskNodeRelation> dag = workflowExecuteContext.getWorkflowGraph().getDag();
         TaskNode dependentNode = dag.getNode(dependNodeCode);
-        if (dependentNode.isConditionsTask()) {
+        if (TaskTypeUtils.isConditionTask(dependentNode.getType())) {
             // condition task need check the branch to run
             List<Long> nextTaskList =
                     DagHelper.parseConditionTask(dependNodeCode, skipTaskNodeMap, dag, getCompleteTaskInstanceMap());
@@ -1506,12 +1367,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                 return false;
             }
             return true;
-        }
-        if (dependentNode.isSwitchTask()) {
-            TaskInstance dependentTaskInstance = taskInstanceMap.get(validTaskMap.get(dependentNode.getCode()));
-            SwitchParameters switchParameters = dependentTaskInstance.getSwitchDependency();
-            return switchParameters.getDependTaskList().get(switchParameters.getResultConditionLocation()).getNextNode()
-                    .contains(nextNodeCode);
         }
         Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(dependNodeCode);
         if (!existTaskInstanceOptional.isPresent()) {
@@ -1552,8 +1407,7 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
      */
     private WorkflowExecutionStatus runningState(WorkflowExecutionStatus state) {
         if (state == WorkflowExecutionStatus.READY_STOP || state == WorkflowExecutionStatus.READY_PAUSE
-                || state == WorkflowExecutionStatus.READY_BLOCK ||
-                state == WorkflowExecutionStatus.DELAY_EXECUTION) {
+                || state == WorkflowExecutionStatus.DELAY_EXECUTION) {
             // if the running task is not completed, the state remains unchanged
             return state;
         } else {
@@ -1612,36 +1466,12 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         }
 
         List<TaskInstance> pauseList = getCompleteTaskByState(TaskExecutionStatus.PAUSE);
-        if (CollectionUtils.isNotEmpty(pauseList) || workflowInstance.isBlocked() || !isComplementEnd()
+        if (CollectionUtils.isNotEmpty(pauseList) || !isComplementEnd()
                 || standByTaskInstancePriorityQueue.size() > 0) {
             return WorkflowExecutionStatus.PAUSE;
         } else {
             return WorkflowExecutionStatus.SUCCESS;
         }
-    }
-
-    /**
-     * prepare for block
-     * if process has tasks still running, pause them
-     * if readyToSubmitTaskQueue is not empty, kill them
-     * else return block status directly
-     *
-     * @return ExecutionStatus
-     */
-    private WorkflowExecutionStatus processReadyBlock() {
-        if (taskExecuteRunnableMap.size() > 0) {
-            for (DefaultTaskExecuteRunnable taskExecuteRunnable : taskExecuteRunnableMap.values()) {
-                if (!TASK_TYPE_BLOCKING.equals(taskExecuteRunnable.getTaskInstance().getTaskType())) {
-                    taskExecuteRunnable.pause();
-                }
-            }
-        }
-        if (standByTaskInstancePriorityQueue.size() > 0) {
-            for (Iterator<TaskInstance> iter = standByTaskInstancePriorityQueue.iterator(); iter.hasNext();) {
-                iter.next().setState(TaskExecutionStatus.PAUSE);
-            }
-        }
-        return WorkflowExecutionStatus.BLOCK;
     }
 
     /**
@@ -1656,13 +1486,6 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             // active task and retry task exists
             WorkflowExecutionStatus executionStatus = runningState(state);
             log.info("The workflowInstance has task running, the workflowInstance status is {}", executionStatus);
-            return executionStatus;
-        }
-
-        // block
-        if (state == WorkflowExecutionStatus.READY_BLOCK) {
-            WorkflowExecutionStatus executionStatus = processReadyBlock();
-            log.info("The workflowInstance is ready to block, the workflowInstance status is {}", executionStatus);
             return executionStatus;
         }
 
@@ -1907,14 +1730,8 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
                     continue;
                 }
             }
-            // init varPool only this task is the first time running
             if (task.isFirstRun()) {
-                // get pre task ,get all the task varPool to this task
-                // Do not use dag.getPreviousNodes because of the dag may be miss the upstream node
-                String preTasks = workflowExecuteContext.getWorkflowGraph()
-                        .getTaskNodeByCode(task.getTaskCode()).getPreTasks();
-                Set<Long> preTaskList = new HashSet<>(JSONUtils.toList(preTasks, Long.class));
-                getPreVarPool(task, preTaskList);
+                initializeTaskInstanceVarPool(task);
             }
             DependResult dependResult = getDependResultForTask(task);
             if (DependResult.SUCCESS == dependResult) {
@@ -2095,38 +1912,14 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
             taskInstanceDao.updateById(taskInstance);
         }
 
-        Set<String> removeSet = new HashSet<>();
-        for (TaskInstance taskInstance : removeTaskInstances) {
-            String taskVarPool = taskInstance.getVarPool();
-            if (StringUtils.isNotEmpty(taskVarPool)) {
-                List<Property> properties = JSONUtils.toList(taskVarPool, Property.class);
-                List<String> keys = properties.stream()
-                        .filter(property -> property.getDirect().equals(Direct.OUT))
-                        .map(property -> String.format("%s_%s", property.getProp(), property.getType()))
-                        .collect(Collectors.toList());
-                removeSet.addAll(keys);
-            }
-        }
-
-        // remove varPool data and update process instance
-        // TODO: we can remove this snippet if : we get varPool from pre taskInstance instead of process instance when
-        // task can not get pre task from incomplete dag
-        List<Property> processProperties = JSONUtils.toList(workflowInstance.getVarPool(), Property.class);
-        processProperties = processProperties.stream()
-                .filter(property -> !(property.getDirect().equals(Direct.IN)
-                        && removeSet.contains(String.format("%s_%s", property.getProp(), property.getType()))))
-                .collect(Collectors.toList());
-
-        workflowInstance.setVarPool(JSONUtils.toJsonString(processProperties));
+        workflowInstance.setVarPool(
+                VarPoolUtils.subtractVarPoolJson(workflowInstance.getVarPool(),
+                        removeTaskInstances.stream().map(TaskInstance::getVarPool).collect(Collectors.toList())));
         processInstanceDao.updateById(workflowInstance);
 
-        // remove task instance from taskInstanceMap, completeTaskSet, validTaskMap, errorTaskMap
-        // completeTaskSet remove dependency taskInstanceMap, so the sort can't change
-        completeTaskSet.removeIf(taskCode -> {
-            Optional<TaskInstance> existTaskInstanceOptional = getTaskInstance(taskCode);
-            return existTaskInstanceOptional
-                    .filter(taskInstance -> dag.containsNode(taskInstance.getTaskCode())).isPresent();
-        });
+        // remove task instance from taskInstanceMap,taskCodeInstanceMap , completeTaskSet, validTaskMap, errorTaskMap
+        completeTaskSet.removeIf(dag::containsNode);
+        taskCodeInstanceMap.entrySet().removeIf(entity -> dag.containsNode(entity.getValue().getTaskCode()));
         taskInstanceMap.entrySet().removeIf(entry -> dag.containsNode(entry.getValue().getTaskCode()));
         validTaskMap.entrySet().removeIf(entry -> dag.containsNode(entry.getKey()));
         errorTaskMap.entrySet().removeIf(entry -> dag.containsNode(entry.getKey()));
@@ -2145,6 +1938,24 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
         }
     }
 
+    /**
+     * Whether the task instance need to put into {@link #errorTaskMap}.
+     * Only the task instance is failed or killed, and it is parent of condition task.
+     * Then it should be put into {@link #errorTaskMap}.
+     * <p> Once a task instance is put into {@link #errorTaskMap}, it will be thought as failed and make the workflow be failed.
+     */
+    private boolean isTaskNeedPutIntoErrorMap(TaskInstance taskInstance) {
+        if (!taskInstance.getState().isFailure() && !taskInstance.getState().isStop()
+                && !taskInstance.getState().isKill()) {
+            return false;
+        }
+        TaskNode taskNode = workflowExecuteContext.getWorkflowGraph().getTaskNodeByCode(taskInstance.getTaskCode());
+        if (DagHelper.haveConditionsAfterNode(taskNode.getCode(), workflowExecuteContext.getWorkflowGraph().getDag())) {
+            return false;
+        }
+        return true;
+    }
+
     private enum WorkflowRunnableStatus {
         CREATED, INITIALIZE_QUEUE, STARTED,
         ;
@@ -2152,31 +1963,10 @@ public class WorkflowExecuteRunnable implements IWorkflowExecuteRunnable {
     }
 
     private void sendTaskLogOnMasterToRemoteIfNeeded(TaskInstance taskInstance) {
-        if (RemoteLogUtils.isRemoteLoggingEnable() && TaskUtils.isMasterTask(taskInstance.getTaskType())) {
+        if (RemoteLogUtils.isRemoteLoggingEnable() && TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
             RemoteLogUtils.sendRemoteLog(taskInstance.getLogPath());
             log.info("Master sends task log {} to remote storage asynchronously.", taskInstance.getLogPath());
         }
     }
 
-    private void mergeTaskInstanceVarPool(TaskInstance taskInstance) {
-        String taskVarPoolJson = taskInstance.getVarPool();
-        if (StringUtils.isEmpty(taskVarPoolJson)) {
-            return;
-        }
-        ProcessInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        String processVarPoolJson = workflowInstance.getVarPool();
-        if (StringUtils.isEmpty(processVarPoolJson)) {
-            workflowInstance.setVarPool(taskVarPoolJson);
-            return;
-        }
-        List<Property> processVarPool = new ArrayList<>(JSONUtils.toList(processVarPoolJson, Property.class));
-        List<Property> taskVarPool = JSONUtils.toList(taskVarPoolJson, Property.class);
-        Set<String> newProcessVarPoolKeys = taskVarPool.stream().map(Property::getProp).collect(Collectors.toSet());
-        processVarPool = processVarPool.stream().filter(property -> !newProcessVarPoolKeys.contains(property.getProp()))
-                .collect(Collectors.toList());
-
-        processVarPool.addAll(taskVarPool);
-
-        workflowInstance.setVarPool(JSONUtils.toJsonString(processVarPool));
-    }
 }

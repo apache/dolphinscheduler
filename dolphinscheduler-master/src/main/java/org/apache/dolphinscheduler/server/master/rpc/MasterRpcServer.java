@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
-import org.apache.dolphinscheduler.extract.base.NettyRemotingServerFactory;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
@@ -34,19 +33,6 @@ public class MasterRpcServer extends SpringServerMethodInvokerDiscovery implemen
     public MasterRpcServer(MasterConfig masterConfig, NettySslConfig nettySslConfig) {
         super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
                 .serverName("MasterRpcServer").listenPort(masterConfig.getListenPort()).build(), nettySslConfig));
-    }
-
-    public void start() {
-        log.info("Starting MasterRPCServer...");
-        nettyRemotingServer.start();
-        log.info("Started MasterRPCServer...");
-    }
-
-    @Override
-    public void close() {
-        log.info("Closing MasterRPCServer...");
-        nettyRemotingServer.close();
-        log.info("Closed MasterRPCServer...");
     }
 
 }

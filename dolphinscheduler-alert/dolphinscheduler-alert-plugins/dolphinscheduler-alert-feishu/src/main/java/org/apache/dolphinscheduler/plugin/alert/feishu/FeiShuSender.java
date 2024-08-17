@@ -80,7 +80,7 @@ public final class FeiShuSender {
 
     public static AlertResult checkSendFeiShuSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
-        alertResult.setStatus("false");
+        alertResult.setSuccess(false);
 
         if (org.apache.commons.lang3.StringUtils.isBlank(result)) {
             alertResult.setMessage("send fei shu msg error");
@@ -95,7 +95,7 @@ public final class FeiShuSender {
             return alertResult;
         }
         if (sendMsgResponse.statusCode == 0) {
-            alertResult.setStatus("true");
+            alertResult.setSuccess(true);
             alertResult.setMessage("send fei shu msg success");
             return alertResult;
         }
@@ -136,7 +136,7 @@ public final class FeiShuSender {
         } catch (Exception e) {
             log.info("send fei shu alert msg  exception : {}", e.getMessage());
             alertResult = new AlertResult();
-            alertResult.setStatus("false");
+            alertResult.setSuccess(false);
             alertResult.setMessage("send fei shu alert fail.");
         }
         return alertResult;

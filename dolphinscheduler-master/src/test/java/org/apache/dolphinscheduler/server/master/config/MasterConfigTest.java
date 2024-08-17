@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerType;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +37,6 @@ public class MasterConfigTest {
     private MasterConfig masterConfig;
 
     @Test
-    public void getMasterDispatchTaskNumber() {
-        int masterDispatchTaskNumber = masterConfig.getDispatchTaskNumber();
-        assertEquals(30, masterDispatchTaskNumber);
-    }
-
-    @Test
     public void getServerLoadProtection() {
         MasterServerLoadProtection serverLoadProtection = masterConfig.getServerLoadProtection();
         assertTrue(serverLoadProtection.isEnabled());
@@ -47,6 +45,31 @@ public class MasterConfigTest {
         assertEquals(0.77, serverLoadProtection.getMaxJvmCpuUsagePercentageThresholds());
         assertEquals(0.77, serverLoadProtection.getMaxSystemMemoryUsagePercentageThresholds());
         assertEquals(0.77, serverLoadProtection.getMaxDiskUsagePercentageThresholds());
+    }
 
+    @Test
+    public void getCommandFetchStrategy() {
+        CommandFetchStrategy commandFetchStrategy = masterConfig.getCommandFetchStrategy();
+        assertThat(commandFetchStrategy.getType())
+                .isEqualTo(CommandFetchStrategy.CommandFetchStrategyType.ID_SLOT_BASED);
+
+        CommandFetchStrategy.IdSlotBasedFetchConfig idSlotBasedFetchConfig =
+                (CommandFetchStrategy.IdSlotBasedFetchConfig) commandFetchStrategy.getConfig();
+        assertThat(idSlotBasedFetchConfig.getIdStep()).isEqualTo(3);
+        assertThat(idSlotBasedFetchConfig.getFetchSize()).isEqualTo(11);
+    }
+
+    @Test
+    public void getWorkerLoadBalancerConfigurationProperties() {
+        WorkerLoadBalancerConfigurationProperties workerLoadBalancerConfigurationProperties =
+                masterConfig.getWorkerLoadBalancerConfigurationProperties();
+        assertThat(workerLoadBalancerConfigurationProperties.getType())
+                .isEqualTo(WorkerLoadBalancerType.DYNAMIC_WEIGHTED_ROUND_ROBIN);
+
+        WorkerLoadBalancerConfigurationProperties.DynamicWeightConfigProperties dynamicWeightConfigProperties =
+                workerLoadBalancerConfigurationProperties.getDynamicWeightConfigProperties();
+        assertThat(dynamicWeightConfigProperties.getMemoryUsageWeight()).isEqualTo(40);
+        assertThat(dynamicWeightConfigProperties.getCpuUsageWeight()).isEqualTo(30);
+        assertThat(dynamicWeightConfigProperties.getTaskThreadPoolUsageWeight()).isEqualTo(30);
     }
 }

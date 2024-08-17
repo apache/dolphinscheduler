@@ -19,8 +19,10 @@ package org.apache.dolphinscheduler.meter.metrics;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import io.micrometer.core.instrument.MeterRegistry;
 
+@Slf4j
 public class DefaultMetricsProvider implements MetricsProvider {
 
     private final MeterRegistry meterRegistry;
@@ -33,6 +35,9 @@ public class DefaultMetricsProvider implements MetricsProvider {
 
     private long lastRefreshTime = 0;
 
+    private double lastSystemCpuUsage = 0.0d;
+    private double lastProcessCpuUsage = 0.0d;
+
     private static final long SYSTEM_METRICS_REFRESH_INTERVAL = 1_000L;
 
     @Override
@@ -42,7 +47,17 @@ public class DefaultMetricsProvider implements MetricsProvider {
         }
 
         double systemCpuUsage = meterRegistry.get("system.cpu.usage").gauge().value();
+        if (Double.compare(systemCpuUsage, Double.NaN) == 0) {
+            systemCpuUsage = lastSystemCpuUsage;
+        } else {
+            lastSystemCpuUsage = systemCpuUsage;
+        }
         double processCpuUsage = meterRegistry.get("process.cpu.usage").gauge().value();
+        if (Double.compare(processCpuUsage, Double.NaN) == 0) {
+            processCpuUsage = lastProcessCpuUsage;
+        } else {
+            lastProcessCpuUsage = processCpuUsage;
+        }
 
         double jvmMemoryUsed = meterRegistry.get("jvm.memory.used").meter().measure().iterator().next().getValue();
         double jvmMemoryMax = meterRegistry.get("jvm.memory.max").meter().measure().iterator().next().getValue();

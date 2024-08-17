@@ -21,7 +21,6 @@ services:
   dolphinscheduler:
     image: apache/dolphinscheduler-standalone-server:ci
     environment:
-      MASTER_MAX_CPU_LOAD_AVG: 100
       WORKER_TENANT_AUTO_CREATE: 'true'
     ports:
       - "12345:12345"
@@ -29,7 +28,7 @@ services:
       network:
         ipv4_address: 10.5.0.5
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
       timeout: 60s
       retries: 120

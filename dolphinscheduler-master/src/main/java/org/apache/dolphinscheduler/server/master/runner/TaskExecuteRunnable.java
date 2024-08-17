@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
  * This interface is used to define a task which is executing.
  * todo: split to MasterTaskExecuteRunnable and WorkerTaskExecuteRunnable
  */
-public interface TaskExecuteRunnable {
+public interface TaskExecuteRunnable extends Comparable<TaskExecuteRunnable> {
 
     void dispatch();
 
@@ -40,4 +40,5 @@ public interface TaskExecuteRunnable {
     TaskInstance getTaskInstance();
 
     TaskExecutionContext getTaskExecutionContext();
+
 }

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -174,9 +173,7 @@ class TaskGroupCoordinatorTest {
         when(taskGroupQueueDao.queryByTaskInstanceId(taskInstance.getId())).thenReturn(taskGroupQueues);
         taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
 
-        assertEquals(Flag.NO.getCode(), taskGroupQueue.getInQueue());
-        assertEquals(TaskGroupQueueStatus.RELEASE, taskGroupQueue.getStatus());
-        verify(taskGroupQueueDao, Mockito.times(1)).updateById(taskGroupQueue);
+        verify(taskGroupQueueDao, Mockito.times(1)).deleteById(taskGroupQueue);
 
     }
 }

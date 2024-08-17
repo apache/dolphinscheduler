@@ -52,7 +52,7 @@ public class DingTalkSenderTest {
         dingTalkConfig.put(DingTalkParamsConstants.NAME_DING_TALK_PROXY_ENABLE, "true");
         dingTalkSender = new DingTalkSender(dingTalkConfig);
         AlertResult alertResult = dingTalkSender.sendDingTalkMsg("title", "content test");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertEquals(false, alertResult.isSuccess());
     }
 
 }

@@ -26,21 +26,18 @@ import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.cache.ProcessInstanceExecCacheManager;
+import org.apache.dolphinscheduler.server.master.command.ICommandFetcher;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEvent;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventQueue;
 import org.apache.dolphinscheduler.server.master.event.WorkflowEventType;
-import org.apache.dolphinscheduler.server.master.exception.MasterException;
 import org.apache.dolphinscheduler.server.master.exception.WorkflowCreateException;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
-import org.apache.dolphinscheduler.server.master.metrics.ProcessInstanceMetrics;
-import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.service.command.CommandService;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +52,9 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCloseable {
+
+    @Autowired
+    private ICommandFetcher commandFetcher;
 
     @Autowired
     private CommandService commandService;
@@ -73,9 +73,6 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private WorkflowEventLooper workflowEventLooper;
-
-    @Autowired
-    private MasterSlotManager masterSlotManager;
 
     @Autowired
     private MasterTaskExecutorBootstrap masterTaskExecutorBootstrap;
@@ -125,7 +122,7 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
                     continue;
                 }
-                List<Command> commands = findCommands();
+                List<Command> commands = commandFetcher.fetchCommands();
                 if (CollectionUtils.isEmpty(commands)) {
                     // indicate that no command ,sleep for 1s
                     Thread.sleep(Constants.SLEEP_TIME_MILLIS);
@@ -167,31 +164,6 @@ public class MasterSchedulerBootstrap extends BaseDaemonThread implements AutoCl
                 // sleep for 1s here to avoid the database down cause the exception boom
                 ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS);
             }
-        }
-    }
-
-    private List<Command> findCommands() throws MasterException {
-        try {
-            long scheduleStartTime = System.currentTimeMillis();
-            int thisMasterSlot = masterSlotManager.getSlot();
-            int masterCount = masterSlotManager.getMasterSize();
-            if (masterCount <= 0) {
-                log.warn("Master count: {} is invalid, the current slot: {}", masterCount, thisMasterSlot);
-                return Collections.emptyList();
-            }
-            int pageSize = masterConfig.getFetchCommandNum();
-            final List<Command> result =
-                    commandService.findCommandPageBySlot(pageSize, masterCount, thisMasterSlot);
-            if (CollectionUtils.isNotEmpty(result)) {
-                long cost = System.currentTimeMillis() - scheduleStartTime;
-                log.info(
-                        "Master schedule bootstrap loop command success, fetch command size: {}, cost: {}ms, current slot: {}, total slot size: {}",
-                        result.size(), cost, thisMasterSlot, masterCount);
-                ProcessInstanceMetrics.recordCommandQueryTime(cost);
-            }
-            return result;
-        } catch (Exception ex) {
-            throw new MasterException("Master loop command from database error", ex);
         }
     }
 

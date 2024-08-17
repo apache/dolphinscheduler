@@ -57,6 +57,11 @@ public abstract class BaseDao<ENTITY, MYBATIS_MAPPER extends BaseMapper<ENTITY>>
     }
 
     @Override
+    public List<ENTITY> queryAll() {
+        return mybatisMapper.selectList(null);
+    }
+
+    @Override
     public List<ENTITY> queryByCondition(ENTITY queryCondition) {
         if (queryCondition == null) {
             throw new IllegalArgumentException("queryCondition can not be null");

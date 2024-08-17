@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.master.config;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.registry.api.ConnectStrategyProperties;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.server.master.dispatch.host.assign.HostSelector;
+import org.apache.dolphinscheduler.server.master.cluster.loadbalancer.WorkerLoadBalancerConfigurationProperties;
 import org.apache.dolphinscheduler.server.master.processor.queue.TaskExecuteRunnable;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteRunnable;
 
@@ -49,10 +49,6 @@ public class MasterConfig implements Validator {
      */
     private int listenPort = 5678;
     /**
-     * The max batch size used to fetch command from database.
-     */
-    private int fetchCommandNum = 10;
-    /**
      * The thread number used to prepare processInstance. This number shouldn't bigger than fetchCommandNum.
      */
     private int preExecThreads = 10;
@@ -67,14 +63,6 @@ public class MasterConfig implements Validator {
     private int masterSyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
 
     private int masterAsyncTaskExecutorThreadPoolSize = Runtime.getRuntime().availableProcessors();
-    /**
-     * The task dispatch thread pool size.
-     */
-    private int dispatchTaskNumber = 3;
-    /**
-     * Worker select strategy.
-     */
-    private HostSelector hostSelector = HostSelector.LOWER_WEIGHT;
     /**
      * Master heart beat task execute interval.
      */
@@ -98,10 +86,19 @@ public class MasterConfig implements Validator {
 
     private Duration workerGroupRefreshInterval = Duration.ofSeconds(10L);
 
-    // ip:listenPort
+    private CommandFetchStrategy commandFetchStrategy = new CommandFetchStrategy();
+
+    private WorkerLoadBalancerConfigurationProperties workerLoadBalancerConfigurationProperties =
+            new WorkerLoadBalancerConfigurationProperties();
+
+    /**
+     * The IP address and listening port of the master server in the format 'ip:listenPort'.
+     */
     private String masterAddress;
 
-    // /nodes/master/ip:listenPort
+    /**
+     * The registry path for the master server in the format '/nodes/master/ip:listenPort'.
+     */
     private String masterRegistryPath;
 
     @Override
@@ -115,17 +112,11 @@ public class MasterConfig implements Validator {
         if (masterConfig.getListenPort() <= 0) {
             errors.rejectValue("listen-port", null, "is invalidated");
         }
-        if (masterConfig.getFetchCommandNum() <= 0) {
-            errors.rejectValue("fetch-command-num", null, "should be a positive value");
-        }
         if (masterConfig.getPreExecThreads() <= 0) {
             errors.rejectValue("per-exec-threads", null, "should be a positive value");
         }
         if (masterConfig.getExecThreads() <= 0) {
             errors.rejectValue("exec-threads", null, "should be a positive value");
-        }
-        if (masterConfig.getDispatchTaskNumber() <= 0) {
-            errors.rejectValue("dispatch-task-number", null, "should be a positive value");
         }
         if (masterConfig.getMaxHeartbeatInterval().toMillis() < 0) {
             errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
@@ -149,6 +140,8 @@ public class MasterConfig implements Validator {
         if (StringUtils.isEmpty(masterConfig.getMasterAddress())) {
             masterConfig.setMasterAddress(NetUtils.getAddr(masterConfig.getListenPort()));
         }
+        commandFetchStrategy.validate(errors);
+        workerLoadBalancerConfigurationProperties.validate(errors);
 
         masterConfig.setMasterRegistryPath(
                 RegistryNodeType.MASTER.getRegistryPath() + "/" + masterConfig.getMasterAddress());
@@ -159,11 +152,8 @@ public class MasterConfig implements Validator {
         String config =
                 "\n****************************Master Configuration**************************************" +
                         "\n  listen-port -> " + listenPort +
-                        "\n  fetch-command-num -> " + fetchCommandNum +
                         "\n  pre-exec-threads -> " + preExecThreads +
                         "\n  exec-threads -> " + execThreads +
-                        "\n  dispatch-task-number -> " + dispatchTaskNumber +
-                        "\n  host-selector -> " + hostSelector +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  task-commit-retry-times -> " + taskCommitRetryTimes +
                         "\n  task-commit-interval -> " + taskCommitInterval +
@@ -175,6 +165,9 @@ public class MasterConfig implements Validator {
                         "\n  master-address -> " + masterAddress +
                         "\n  master-registry-path: " + masterRegistryPath +
                         "\n  worker-group-refresh-interval: " + workerGroupRefreshInterval +
+                        "\n  command-fetch-strategy: " + commandFetchStrategy +
+                        "\n  worker-load-balancer-configuration-properties: "
+                        + workerLoadBalancerConfigurationProperties +
                         "\n****************************Master Configuration**************************************";
         log.info(config);
     }

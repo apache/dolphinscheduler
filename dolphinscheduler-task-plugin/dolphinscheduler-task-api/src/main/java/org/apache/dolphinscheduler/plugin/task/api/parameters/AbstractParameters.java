@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -35,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.google.common.collect.Lists;
 
 @Getter
 @Slf4j
@@ -82,6 +85,7 @@ public abstract class AbstractParameters implements IParameters {
 
     /**
      * get input local parameters map if the param direct is IN
+     *
      * @return parameters map
      */
     public Map<String, Property> getInputLocalParametersMap() {
@@ -121,44 +125,30 @@ public abstract class AbstractParameters implements IParameters {
     }
 
     public void dealOutParam(Map<String, String> taskOutputParams) {
-        if (CollectionUtils.isEmpty(localParams)) {
-            return;
-        }
         List<Property> outProperty = getOutProperty(localParams);
         if (CollectionUtils.isEmpty(outProperty)) {
             return;
         }
-        if (MapUtils.isEmpty(taskOutputParams)) {
-            outProperty.forEach(this::addPropertyToValPool);
-            return;
+        if (CollectionUtils.isNotEmpty(outProperty) && MapUtils.isNotEmpty(taskOutputParams)) {
+            // Inject the value
+            for (Property info : outProperty) {
+                String value = taskOutputParams.get(info.getProp());
+                if (value != null) {
+                    info.setValue(value);
+                }
+            }
         }
 
-        for (Property info : outProperty) {
-            String propValue = taskOutputParams.get(info.getProp());
-            if (StringUtils.isNotEmpty(propValue)) {
-                info.setValue(propValue);
-                addPropertyToValPool(info);
-                continue;
-            }
-            addPropertyToValPool(info);
-            if (StringUtils.isEmpty(info.getValue())) {
-                log.warn("The output parameter {} value is empty and cannot find the out parameter from task output",
-                        info);
-            }
-        }
+        varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
     }
 
-    public List<Property> getOutProperty(List<Property> params) {
+    protected List<Property> getOutProperty(List<Property> params) {
         if (CollectionUtils.isEmpty(params)) {
             return new ArrayList<>();
         }
-        List<Property> result = new ArrayList<>();
-        for (Property info : params) {
-            if (info.getDirect() == Direct.OUT) {
-                result.add(info);
-            }
-        }
-        return result;
+        return params.stream()
+                .filter(info -> info.getDirect() == Direct.OUT)
+                .collect(Collectors.toList());
     }
 
     public List<Map<String, String>> getListMapByString(String json) {

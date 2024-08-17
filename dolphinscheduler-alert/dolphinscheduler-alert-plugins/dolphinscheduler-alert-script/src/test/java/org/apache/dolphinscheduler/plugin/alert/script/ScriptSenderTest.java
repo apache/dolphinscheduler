@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
 import java.util.HashMap;
@@ -48,9 +50,9 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertEquals("true", alertResult.getStatus());
+        Assertions.assertTrue(alertResult.isSuccess());
         alertResult = scriptSender.sendScriptAlert("error msg title", "test content");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
@@ -58,7 +60,7 @@ public class ScriptSenderTest {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "' ; calc.exe ; '");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
@@ -67,7 +69,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test user params NPE", "test content");
-        Assertions.assertEquals("true", alertResult.getStatus());
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     @Test
@@ -76,7 +78,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test path NPE", "test content");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
@@ -85,7 +87,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test path NPE", "test content");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        assertFalse(alertResult.isSuccess());
         Assertions.assertTrue(alertResult.getMessage().contains("shell script is invalid, only support .sh file"));
     }
 
@@ -95,7 +97,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test type is error", "test content");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        assertFalse(alertResult.isSuccess());
     }
 
 }

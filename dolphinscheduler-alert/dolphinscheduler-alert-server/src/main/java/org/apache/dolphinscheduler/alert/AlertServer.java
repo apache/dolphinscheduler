@@ -18,11 +18,7 @@
 package org.apache.dolphinscheduler.alert;
 
 import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
-import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
-import org.apache.dolphinscheduler.alert.registry.AlertRegistryClient;
-import org.apache.dolphinscheduler.alert.rpc.AlertRpcServer;
 import org.apache.dolphinscheduler.alert.service.AlertBootstrapService;
-import org.apache.dolphinscheduler.alert.service.ListenerEventPostService;
 import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
@@ -50,14 +46,6 @@ public class AlertServer {
 
     @Autowired
     private AlertBootstrapService alertBootstrapService;
-    @Autowired
-    private ListenerEventPostService listenerEventPostService;
-    @Autowired
-    private AlertRpcServer alertRpcServer;
-    @Autowired
-    private AlertPluginManager alertPluginManager;
-    @Autowired
-    private AlertRegistryClient alertRegistryClient;
 
     public static void main(String[] args) {
         AlertServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
@@ -68,27 +56,14 @@ public class AlertServer {
 
     @PostConstruct
     public void run() {
-        log.info("Alert server is staring ...");
-        alertPluginManager.start();
-        alertRegistryClient.start();
+        log.info("AlertServer is staring ...");
         alertBootstrapService.start();
-        listenerEventPostService.start();
-        alertRpcServer.start();
-        log.info("Alert server is started ...");
+        log.info("AlertServer is started ...");
     }
 
     @PreDestroy
     public void close() {
-        destroy("alert server destroy");
-    }
-
-    /**
-     * gracefully stop
-     *
-     * @param cause stop cause
-     */
-    public void destroy(String cause) {
-
+        String cause = "AlertServer destroy";
         try {
             // set stop signal is true
             // execute only once
@@ -96,19 +71,14 @@ public class AlertServer {
                 log.warn("AlterServer is already stopped");
                 return;
             }
-            log.info("Alert server is stopping, cause: {}", cause);
-            try (
-                    AlertRpcServer closedAlertRpcServer = alertRpcServer;
-                    AlertBootstrapService closedAlertBootstrapService = alertBootstrapService;
-                    ListenerEventPostService closedListenerEventPostService = listenerEventPostService;
-                    AlertRegistryClient closedAlertRegistryClient = alertRegistryClient) {
-                // close resource
-            }
+            log.info("AlertServer is stopping, cause: {}", cause);
+            alertBootstrapService.close();
             // thread sleep 3 seconds for thread quietly stop
             ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
-            log.info("Alter server stopped, cause: {}", cause);
+            log.info("AlertServer stopped, cause: {}", cause);
         } catch (Exception e) {
-            log.error("Alert server stop failed, cause: {}", cause, e);
+            log.error("AlertServer stop failed, cause: {}", cause, e);
         }
     }
+
 }

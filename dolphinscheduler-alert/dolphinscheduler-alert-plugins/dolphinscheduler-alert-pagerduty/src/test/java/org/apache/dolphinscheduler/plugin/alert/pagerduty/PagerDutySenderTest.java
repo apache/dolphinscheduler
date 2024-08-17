@@ -39,6 +39,6 @@ public class PagerDutySenderTest {
     public void testSend() {
         PagerDutySender pagerDutySender = new PagerDutySender(pagerDutyConfig);
         AlertResult alertResult = pagerDutySender.sendPagerDutyAlter("pagerduty test title", "pagerduty test content");
-        Assertions.assertEquals("false", alertResult.getStatus());
+        Assertions.assertFalse(alertResult.isSuccess());
     }
 }

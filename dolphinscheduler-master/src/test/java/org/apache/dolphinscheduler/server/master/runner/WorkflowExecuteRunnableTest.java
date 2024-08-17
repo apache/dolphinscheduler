@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.runner.execute.DefaultTaskExecuteRunnableFactory;
 import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
-import org.apache.dolphinscheduler.service.alert.ListenerEventAlertManager;
 import org.apache.dolphinscheduler.service.alert.ProcessAlertManager;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -71,6 +70,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.context.ApplicationContext;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 @ExtendWith(MockitoExtension.class)
@@ -102,9 +102,9 @@ public class WorkflowExecuteRunnableTest {
 
     private WorkflowExecuteContextFactory workflowExecuteContextFactory;
 
-    private ListenerEventAlertManager listenerEventAlertManager;
-
     private TaskGroupCoordinator taskGroupCoordinator;
+
+    private WorkflowExecuteContext workflowExecuteContext;
 
     @BeforeEach
     public void init() throws Exception {
@@ -121,7 +121,6 @@ public class WorkflowExecuteRunnableTest {
         taskDefinitionLogDao = Mockito.mock(TaskDefinitionLogDao.class);
         defaultTaskExecuteRunnableFactory = Mockito.mock(DefaultTaskExecuteRunnableFactory.class);
         workflowExecuteContextFactory = Mockito.mock(WorkflowExecuteContextFactory.class);
-        listenerEventAlertManager = Mockito.mock(ListenerEventAlertManager.class);
 
         Map<String, String> cmdParam = new HashMap<>();
         cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_START_DATE, "2020-01-01 00:00:00");
@@ -134,7 +133,7 @@ public class WorkflowExecuteRunnableTest {
         stateWheelExecuteThread = Mockito.mock(StateWheelExecuteThread.class);
         curingGlobalParamsService = Mockito.mock(CuringParamsService.class);
         ProcessAlertManager processAlertManager = Mockito.mock(ProcessAlertManager.class);
-        WorkflowExecuteContext workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
+        workflowExecuteContext = Mockito.mock(WorkflowExecuteContext.class);
         Mockito.when(workflowExecuteContext.getWorkflowInstance()).thenReturn(processInstance);
         IWorkflowGraph workflowGraph = Mockito.mock(IWorkflowGraph.class);
         Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
@@ -154,7 +153,6 @@ public class WorkflowExecuteRunnableTest {
                         curingGlobalParamsService,
                         taskInstanceDao,
                         defaultTaskExecuteRunnableFactory,
-                        listenerEventAlertManager,
                         taskGroupCoordinator));
     }
 
@@ -209,11 +207,13 @@ public class WorkflowExecuteRunnableTest {
     }
 
     @Test
-    public void testGetPreVarPool() {
+    public void testInitializeTaskInstanceVarPool() {
         try {
-            Set<Long> preTaskName = new HashSet<>();
-            preTaskName.add(1L);
-            preTaskName.add(2L);
+            IWorkflowGraph workflowGraph = Mockito.mock(IWorkflowGraph.class);
+            Mockito.when(workflowExecuteContext.getWorkflowGraph()).thenReturn(workflowGraph);
+            TaskNode taskNode = Mockito.mock(TaskNode.class);
+            Mockito.when(workflowGraph.getTaskNodeByCode(Mockito.anyLong())).thenReturn(taskNode);
+            Mockito.when(taskNode.getPreTasks()).thenReturn(JSONUtils.toJsonString(Lists.newArrayList(1L, 2L)));
 
             TaskInstance taskInstance = new TaskInstance();
 
@@ -255,7 +255,7 @@ public class WorkflowExecuteRunnableTest {
             taskCodeInstanceMapField.setAccessible(true);
             taskCodeInstanceMapField.set(workflowExecuteThread, taskCodeInstanceMap);
 
-            workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
+            workflowExecuteThread.initializeTaskInstanceVarPool(taskInstance);
             Assertions.assertNotNull(taskInstance.getVarPool());
 
             taskInstance2.setVarPool("[{\"direct\":\"OUT\",\"prop\":\"test1\",\"type\":\"VARCHAR\",\"value\":\"2\"}]");
@@ -266,7 +266,7 @@ public class WorkflowExecuteRunnableTest {
             taskInstanceMapField.setAccessible(true);
             taskInstanceMapField.set(workflowExecuteThread, taskInstanceMap);
 
-            workflowExecuteThread.getPreVarPool(taskInstance, preTaskName);
+            workflowExecuteThread.initializeTaskInstanceVarPool(taskInstance);
             Assertions.assertNotNull(taskInstance.getVarPool());
         } catch (Exception e) {
             Assertions.fail();
@@ -387,7 +387,6 @@ public class WorkflowExecuteRunnableTest {
         // task instance already finished, not dispatch
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setState(TaskExecutionStatus.PAUSE);
-        Mockito.when(processInstance.isBlocked()).thenReturn(true);
         TaskExecuteRunnable taskExecuteRunnable = Mockito.mock(TaskExecuteRunnable.class);
         workflowExecuteThread.tryToDispatchTaskInstance(taskInstance, taskExecuteRunnable);
         Mockito.verify(taskExecuteRunnable, Mockito.never()).dispatch();

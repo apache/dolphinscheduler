@@ -16,6 +16,12 @@
 
 ![worker](../../../img/new_ui/dev/monitor/worker.png)
 
+### Alert Server
+
+- Mainly related to alert server information.
+
+![alert-server](../../../img/new_ui/dev/monitor/alert-server.png)
+
 ### Database
 
 - Mainly the health status of the DB.
@@ -26,18 +32,17 @@
 
 ### Statistics
 
-![statistics](../../../img/new_ui/dev/monitor/statistics.png)
+![Command Statistics List](../../../img/new_ui/dev/monitor/command-list.png)
 
-|             **Parameter**              |                  **Description**                   |
-|----------------------------------------|----------------------------------------------------|
-| Number of commands wait to be executed | Statistics of the `t_ds_command` table data.       |
-| The number of failed commands          | Statistics of the `t_ds_error_command` table data. |
-| Number of tasks wait to run            | Count the data of `task_queue` in the ZooKeeper.   |
-| Number of tasks wait to be killed      | Count the data of `task_kill` in the ZooKeeper.    |
+Shows the command list in the system. Data is from the `t_ds_command` table.
+
+![Failure Command Statistics List](../../../img/new_ui/dev/monitor/failure-command-list.png)
+
+Shows the failure command list in the system. Data is from the `t_ds_error_command` table.
 
 ### Audit Log
 
 The audit log provides information about who accesses the system and the operations made to the system and record related
 time, which strengthen the security of the system and maintenance.
 
-![audit-log](../../../img/new_ui/dev/monitor/audit-log.jpg)
+![audit-log](../../../img/new_ui/dev/monitor/audit-log.png)

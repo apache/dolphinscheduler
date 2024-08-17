@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.datasource.k8s;
 
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannel;
 import org.apache.dolphinscheduler.spi.datasource.DataSourceChannelFactory;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import com.google.auto.service.AutoService;
 
@@ -32,7 +33,7 @@ public class K8sDataSourceChannelFactory implements DataSourceChannelFactory {
 
     @Override
     public String getName() {
-        return "k8s";
+        return DbType.K8S.getName();
     }
 
 }

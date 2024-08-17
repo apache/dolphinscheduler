@@ -6,7 +6,7 @@ Parameters are valid for all task nodes of the entire workflow. It can be config
 
 ## Usage
 
-Usage of startup parameters is: at the task launch page, click the '+' below the 'Startup Parameter' and fill in the key and value to save. The workflow will add them into global parameters.
+Usage of startup parameters is: at the task launch page, click the '+' below the 'Startup Parameter' and fill in the key and value, select the appropriate parameter value type then to save. The workflow will add them into global parameters.
 
 ## Example
 

@@ -48,7 +48,7 @@ public class WorkerGroupAuditOperatorImpl extends BaseAuditOperator {
     }
 
     @Override
-    public String getObjectNameFromReturnIdentity(Object identity) {
+    public String getObjectNameFromIdentity(Object identity) {
         Long objId = toLong(identity);
         if (objId == -1) {
             return "";

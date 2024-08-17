@@ -56,7 +56,7 @@ public class ZeppelinDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType) {
         ZeppelinConnectionParam baseConnectionParam = (ZeppelinConnectionParam) connectionParam;
-        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getDescp(), baseConnectionParam.getRestEndpoint(),
+        return MessageFormat.format("{0}@{1}@{2}@{3}", dbType.getName(), baseConnectionParam.getRestEndpoint(),
                 baseConnectionParam.getUsername(), PasswordUtils.encodePassword(baseConnectionParam.getPassword()));
     }
 

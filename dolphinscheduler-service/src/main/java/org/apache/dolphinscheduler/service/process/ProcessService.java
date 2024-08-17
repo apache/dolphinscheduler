@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.entity.DependentProcessDefinition;
 import org.apache.dolphinscheduler.dao.entity.DqComparisonType;
 import org.apache.dolphinscheduler.dao.entity.DqExecuteResult;
 import org.apache.dolphinscheduler.dao.entity.DqRule;
@@ -43,7 +42,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.entity.UdfFunc;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -109,8 +107,6 @@ public interface ProcessService {
 
     List<Schedule> queryReleaseSchedulerListByProcessDefinitionCode(long processDefinitionCode);
 
-    List<DependentProcessDefinition> queryDependentProcessDefinitionByProcessDefinitionCode(long processDefinitionCode);
-
     List<ProcessInstance> queryNeedFailoverProcessInstances(String host);
 
     List<String> queryNeedFailoverProcessInstanceHost();
@@ -119,8 +115,6 @@ public interface ProcessService {
     void processNeedFailoverProcessInstances(ProcessInstance processInstance);
 
     DataSource findDataSourceById(int id);
-
-    List<UdfFunc> queryUdfFunListByIds(Integer[] ids);
 
     ProjectUser queryProjectWithUserByProcessInstanceId(int processInstanceId);
 
@@ -175,8 +169,6 @@ public interface ProcessService {
     List<DqRuleExecuteSql> getDqExecuteSql(int ruleId);
 
     DqComparisonType getComparisonTypeById(int id);
-
-    void changeTaskGroupQueueStatus(int taskId, TaskGroupQueueStatus status);
 
     TaskGroupQueue insertIntoTaskGroupQueue(Integer taskId,
                                             String taskName,

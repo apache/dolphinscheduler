@@ -11,7 +11,7 @@ If you want to deploy DolphinScheduler in production, we recommend you follow [c
 
 ## Preparation
 
-- JDK：download [JDK][jdk] (1.8+), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
+- JDK：download [JDK][jdk] (1.8 or 11), install and configure environment variable `JAVA_HOME` and append `bin` dir (included in `JAVA_HOME`) to `PATH` variable. You can skip this step if it already exists in your environment.
 - Binary package: download the DolphinScheduler binary package at [download page](https://dolphinscheduler.apache.org/en-us/download/<version>).  <!-- markdown-link-check-disable-line -->
 
 ## Start DolphinScheduler Standalone Server
@@ -36,7 +36,7 @@ Access address `http://localhost:12345/dolphinscheduler/ui` and login DolphinSch
 
 ### Start or Stop Server
 
-The script `./bin/dolphinscheduler-daemon.sh`can be used not only quickly start standalone, but also to stop the service operation. The following are all the commands:
+The script `./bin/dolphinscheduler-daemon.sh` can be used not only quickly start standalone, but also to stop the service operation. The following are all the commands:
 
 ```shell
 # Start Standalone Server
@@ -57,3 +57,6 @@ bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 
 Standalone server use H2 database as its metadata store, it is easy and users do not need to start database before they set up server.
 But if user want to store metabase in other database like MySQL or PostgreSQL, they have to change some configuration. Follow the instructions in [datasource-setting](../howto/datasource-setting.md) `Standalone Switching Metadata Database Configuration` section to create and initialize database
+
+> Note: DS uses the /tmp/dolphinscheduler directory as the resource center by default. If you need to change the directory of the resource center, change the resource items in the conf/common.properties file
+

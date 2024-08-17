@@ -21,9 +21,12 @@ import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.dto.DefineUserDto;
 import org.apache.dolphinscheduler.api.dto.TaskCountDto;
 import org.apache.dolphinscheduler.api.dto.project.StatisticsStateRequest;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -117,4 +120,7 @@ public interface DataAnalysisService {
      */
     TaskCountDto countOneTaskStates(User loginUser, Long taskCode);
 
+    PageInfo<Command> listPendingCommands(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
+
+    PageInfo<ErrorCommand> listErrorCommand(User loginUser, Long projectCode, Integer pageNo, Integer pageSize);
 }

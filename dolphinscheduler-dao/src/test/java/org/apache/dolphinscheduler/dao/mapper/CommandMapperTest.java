@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -32,6 +31,7 @@ import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +42,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
 /**
@@ -62,6 +65,18 @@ public class CommandMapperTest extends BaseDaoTest {
     public void testInsert() {
         Command command = createCommand();
         Assertions.assertTrue(command.getId() > 0);
+    }
+
+    @Test
+    public void testQueryCommandPageByIds() {
+        Command expectedCommand = createCommand();
+        Page<Command> page = new Page<>(1, 10);
+        IPage<Command> commandIPage = commandMapper.queryCommandPageByIds(page,
+                Lists.newArrayList(expectedCommand.getProcessDefinitionCode()));
+        List<Command> commandList = commandIPage.getRecords();
+        assertThat(commandList).isNotEmpty();
+        assertThat(commandIPage.getTotal()).isEqualTo(1);
+        assertThat(commandList.get(0).getId()).isEqualTo(expectedCommand.getId());
     }
 
     /**
@@ -135,7 +150,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
         createCommand(CommandType.START_PROCESS, processDefinition.getCode());
 
-        List<Command> actualCommand = commandMapper.queryCommandPage(1, 0);
+        List<Command> actualCommand = commandMapper.selectList(new QueryWrapper<>());
 
         Assertions.assertNotNull(actualCommand);
     }
@@ -187,7 +202,7 @@ public class CommandMapperTest extends BaseDaoTest {
         Command command = createCommand();
         Integer id = command.getId();
         boolean hit = id % masterCount == thisMasterSlot;
-        List<Command> commandList = commandMapper.queryCommandPageBySlot(1, masterCount, thisMasterSlot);
+        List<Command> commandList = commandMapper.queryCommandByIdSlot(thisMasterSlot, masterCount, 1, 1);
         if (hit) {
             Assertions.assertEquals(id, commandList.get(0).getId());
         } else {
@@ -201,8 +216,9 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
-     * @param count map count
-     * @param commandType comman type
+     *
+     * @param count                 map count
+     * @param commandType           comman type
      * @param processDefinitionCode process definition code
      * @return command map
      */
@@ -223,7 +239,8 @@ public class CommandMapperTest extends BaseDaoTest {
     }
 
     /**
-     *  create process definition
+     * create process definition
+     *
      * @return process definition
      */
     private ProcessDefinition createProcessDefinition() {
@@ -243,6 +260,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command map
+     *
      * @param count map count
      * @return command map
      */
@@ -258,6 +276,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return
      */
     private Command createCommand() {
@@ -266,6 +285,7 @@ public class CommandMapperTest extends BaseDaoTest {
 
     /**
      * create command
+     *
      * @return Command
      */
     private Command createCommand(CommandType commandType, long processDefinitionCode) {
@@ -283,7 +303,7 @@ public class CommandMapperTest extends BaseDaoTest {
         command.setProcessInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
-        command.setWorkerGroup(Constants.DEFAULT_WORKER_GROUP);
+        command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         command.setProcessInstanceId(0);
         command.setProcessDefinitionVersion(0);
         commandMapper.insert(command);

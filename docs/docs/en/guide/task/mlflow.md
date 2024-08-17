@@ -148,7 +148,7 @@ After this, you can visit the MLflow service (`http://localhost:5000`) page to v
 
 ### Preset Algorithm Repository Configuration
 
-If you can't access github, you can modify the following fields in the `commom.properties` configuration file to replace the github address with an accessible address.
+If you can't access github, you can modify the following fields in the `common.properties` configuration file to replace the github address with an accessible address.
 
 ```yaml
 # mlflow task plugin preset repository

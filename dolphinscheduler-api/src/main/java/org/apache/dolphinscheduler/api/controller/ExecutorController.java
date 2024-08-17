@@ -44,6 +44,8 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecuteDto;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -163,10 +165,8 @@ public class ExecutorController extends BaseController {
         if (timeout == null) {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
-        Map<String, String> startParamMap = null;
-        if (startParams != null) {
-            startParamMap = JSONUtils.toMap(startParams);
-        }
+
+        List<Property> startParamList = PropertyUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             complementDependentMode = ComplementDependentMode.OFF_MODE;
@@ -175,7 +175,7 @@ public class ExecutorController extends BaseController {
         Map<String, Object> result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode,
                 scheduleTime, execType, failureStrategy,
                 startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                workerGroup, tenantCode, environmentCode, timeout, startParamList, expectedParallelismNumber, dryRun,
                 testFlag,
                 complementDependentMode, version, allLevelDependent, executionOrder);
         return returnDataList(result);
@@ -262,10 +262,7 @@ public class ExecutorController extends BaseController {
             timeout = Constants.MAX_TASK_TIMEOUT;
         }
 
-        Map<String, String> startParamMap = null;
-        if (startParams != null) {
-            startParamMap = JSONUtils.toMap(startParams);
-        }
+        List<Property> startParamList = PropertyUtils.startParamsTransformPropertyList(startParams);
 
         if (complementDependentMode == null) {
             log.debug("Parameter complementDependentMode set to {} due to null.", ComplementDependentMode.OFF_MODE);
@@ -283,7 +280,8 @@ public class ExecutorController extends BaseController {
             result = execService.execProcessInstance(loginUser, projectCode, processDefinitionCode, scheduleTime,
                     execType, failureStrategy,
                     startNodeList, taskDependType, warningType, warningGroupId, runMode, processInstancePriority,
-                    workerGroup, tenantCode, environmentCode, timeout, startParamMap, expectedParallelismNumber, dryRun,
+                    workerGroup, tenantCode, environmentCode, timeout, startParamList, expectedParallelismNumber,
+                    dryRun,
                     testFlag,
                     complementDependentMode, null, allLevelDependent, executionOrder);
 
