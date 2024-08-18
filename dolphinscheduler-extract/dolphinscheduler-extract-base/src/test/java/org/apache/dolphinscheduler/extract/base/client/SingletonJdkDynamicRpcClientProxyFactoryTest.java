@@ -49,7 +49,7 @@ public class SingletonJdkDynamicRpcClientProxyFactoryTest {
                 .listenPort(listenPort)
                 .build();
         serverAddress = "localhost:" + listenPort;
-        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
+        springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig,new NettySslConfig());
         springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new IServiceImpl());
         springServerMethodInvokerDiscovery.start();
     }

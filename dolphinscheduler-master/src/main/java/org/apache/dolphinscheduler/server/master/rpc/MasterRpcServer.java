@@ -31,8 +31,8 @@ import org.springframework.stereotype.Component;
 public class MasterRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
 
     public MasterRpcServer(MasterConfig masterConfig, NettySslConfig nettySslConfig) {
-        super(NettyRemotingServerFactory.buildNettyRemotingServer(NettyServerConfig.builder()
-                .serverName("MasterRpcServer").listenPort(masterConfig.getListenPort()).build(), nettySslConfig));
+        super(NettyServerConfig.builder().serverName("MasterRpcServer").listenPort(masterConfig.getListenPort())
+                .build(), nettySslConfig);
     }
 
 }

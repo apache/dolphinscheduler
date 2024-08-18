@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
 import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingException;
 import org.apache.dolphinscheduler.extract.base.exception.RemotingTimeoutException;
 import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
@@ -33,6 +36,7 @@ import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.base.utils.NettyUtils;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -54,6 +58,8 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 
+import javax.net.ssl.SSLException;
+
 @Slf4j
 public class NettyRemotingClient implements AutoCloseable {
 
@@ -67,11 +73,21 @@ public class NettyRemotingClient implements AutoCloseable {
     private final EventLoopGroup workerGroup;
 
     private final NettyClientConfig clientConfig;
+    private final NettySslConfig nettySslConfig;
 
     private final NettyClientHandler clientHandler;
+    private SslContext sslContext = null;
 
-    public NettyRemotingClient(final NettyClientConfig clientConfig) {
+    public NettyRemotingClient(final NettyClientConfig clientConfig, final NettySslConfig nettySslConfig) {
         this.clientConfig = clientConfig;
+        this.nettySslConfig = nettySslConfig;
+        if(nettySslConfig.isEnabled()){
+            try {
+                sslContext = SslContextBuilder.forClient().trustManager(new File(nettySslConfig.getCertFilePath())).build();
+            } catch (SSLException e) {
+                throw new IllegalArgumentException("Initialize SslContext error, please check the cert-file", e);
+            }
+        }
         ThreadFactory nettyClientThreadFactory = ThreadUtils.newDaemonThreadFactory("NettyClientThread-");
         if (Epoll.isAvailable()) {
             this.workerGroup = new EpollEventLoopGroup(clientConfig.getWorkerThreads(), nettyClientThreadFactory);
@@ -97,6 +113,9 @@ public class NettyRemotingClient implements AutoCloseable {
 
                     @Override
                     public void initChannel(SocketChannel ch) {
+                        if(nettySslConfig.isEnabled()){
+                            ch.pipeline().addLast(sslContext.newHandler(ch.alloc()));
+                        }
                         ch.pipeline()
                                 .addLast("client-idle-handler",
                                         new IdleStateHandler(

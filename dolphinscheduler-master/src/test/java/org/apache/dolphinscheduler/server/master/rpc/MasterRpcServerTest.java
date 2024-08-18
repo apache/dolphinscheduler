@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +25,7 @@ import org.junit.jupiter.api.Test;
 
 class MasterRpcServerTest {
 
-    private final MasterRpcServer masterRpcServer = new MasterRpcServer(new MasterConfig());
+    private final MasterRpcServer masterRpcServer = new MasterRpcServer(new MasterConfig(),new NettySslConfig());
 
     @Test
     void testStart() {

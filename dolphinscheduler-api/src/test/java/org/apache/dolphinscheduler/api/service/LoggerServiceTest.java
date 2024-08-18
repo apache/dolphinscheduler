@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettySslConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.transportor.GetAppIdRequest;
@@ -103,7 +104,7 @@ public class LoggerServiceTest {
         }
 
         springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(
-                NettyServerConfig.builder().serverName("TestLogServer").listenPort(nettyServerPort).build());
+                NettyServerConfig.builder().serverName("TestLogServer").listenPort(nettyServerPort).build(),new NettySslConfig());
         springServerMethodInvokerDiscovery.start();
         springServerMethodInvokerDiscovery.registerServerMethodInvokerProvider(new ILogService() {
 

@@ -60,7 +60,8 @@ import org.springframework.context.annotation.Import;
         ServiceConfiguration.class,
         CommonConfiguration.class,
         StorageConfiguration.class,
-        RegistryConfiguration.class})
+        RegistryConfiguration.class,
+        NettySslConfig.class})
 @SpringBootApplication
 public class MasterServer implements IStoppable {
 
