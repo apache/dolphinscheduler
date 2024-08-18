@@ -36,6 +36,7 @@ export function formatParams(data: INodeData): {
   const taskParams: ITaskParams = {}
   if (data.taskType === 'SUB_PROCESS' || data.taskType === 'DYNAMIC') {
     taskParams.processDefinitionCode = data.processDefinitionCode
+    taskParams.childNodeProjectCode = data.childNodeProjectCode || null
   }
 
   if (data.taskType === 'JAVA') {
