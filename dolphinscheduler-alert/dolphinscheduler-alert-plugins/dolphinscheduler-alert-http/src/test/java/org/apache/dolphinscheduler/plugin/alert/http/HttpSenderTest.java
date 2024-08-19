@@ -56,7 +56,7 @@ public class HttpSenderTest {
     }
 
     @Test
-    public void testHttpSenderGet() throws Exception {
+    void testHttpSenderGet() throws Exception {
         String msg = "msg_test";
         Map<String, String> headerParams = new HashMap<>();
         headerParams.put("msg", msg);
@@ -78,7 +78,7 @@ public class HttpSenderTest {
     }
 
     @Test
-    public void testHttpSenderPost() throws Exception {
+    void testHttpSenderPost() throws Exception {
         String msg = "msg_test";
         Map<String, String> bodyParams = new HashMap<>();
         bodyParams.put("msg", msg);
@@ -99,7 +99,7 @@ public class HttpSenderTest {
     }
 
     @Test
-    public void testHttpSenderPut() throws Exception {
+    void testHttpSenderPut() throws Exception {
         String msg = "msg_test";
         Map<String, String> bodyParams = new HashMap<>();
         bodyParams.put("msg", msg);

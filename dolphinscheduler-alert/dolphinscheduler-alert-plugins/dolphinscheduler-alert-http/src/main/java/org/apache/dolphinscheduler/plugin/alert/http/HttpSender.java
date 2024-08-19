@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.OkHttpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -102,7 +103,7 @@ public final class HttpSender {
 
         try {
             okHttpResponse = sendHttpRequest(msg);
-        } catch (MalformedURLException | URISyntaxException | RuntimeException e) {
+        } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
 
@@ -123,7 +124,7 @@ public final class HttpSender {
         }
     }
 
-    private OkHttpResponse sendHttpRequest(String msg) throws MalformedURLException, URISyntaxException {
+    private OkHttpResponse sendHttpRequest(String msg) throws RuntimeException {
         switch (requestType) {
             case POST:
                 setMsgInHeader(msg);
