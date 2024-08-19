@@ -15,24 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.spi.params.base;
+package org.apache.dolphinscheduler.plugin.alert.http;
 
-import lombok.Getter;
-
-/**
- * param datetype
- */
-@Getter
-public enum DataType {
-
-    STRING("string"),
-
-    NUMBER("number");
-
-    private String dataType;
-
-    DataType(String dataType) {
-        this.dataType = dataType;
-    }
-
+public enum HttpRequestMethod {
+    GET, POST, PUT
 }
