@@ -244,7 +244,7 @@ export default {
     requestType: 'Request Type',
     headerParams: 'Headers',
     bodyParams: 'Body',
-    contentField: 'Content Field',
+    contentType: 'Content Type',
     timeout: 'Timeout(s)',
     Keyword: 'Keyword',
     userParams: 'User Params',

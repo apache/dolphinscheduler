@@ -240,7 +240,7 @@ export default {
     requestType: '请求方式',
     headerParams: '请求头',
     bodyParams: '请求体',
-    contentField: '内容字段',
+    contentType: 'Content Type',
     timeout: '超时时间（秒）',
     Keyword: '关键词',
     userParams: '自定义参数',
