@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.registry.raft;
 
-import org.apache.dolphinscheduler.plugin.registry.raft.server.RaftRegisterServer;
+import org.apache.dolphinscheduler.plugin.registry.raft.server.RaftRegistryServer;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,21 +34,21 @@ import org.springframework.context.annotation.DependsOn;
 public class RaftRegistryAutoConfiguration {
 
     public RaftRegistryAutoConfiguration() {
-        log.info("Load RaftRegisterAutoConfiguration");
+        log.info("Load RaftRegistryAutoConfiguration");
     }
 
     @Bean
     @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "master")
-    public RaftRegisterServer raftRegisterServer(RaftRegistryProperties raftRegistryProperties) {
-        RaftRegisterServer raftRegisterServer = new RaftRegisterServer(raftRegistryProperties);
-        raftRegisterServer.start();
-        return raftRegisterServer;
+    public RaftRegistryServer raftRegistryServer(RaftRegistryProperties raftRegistryProperties) {
+        RaftRegistryServer raftRegistryServer = new RaftRegistryServer(raftRegistryProperties);
+        raftRegistryServer.start();
+        return raftRegistryServer;
     }
 
     @Bean
-    @DependsOn("raftRegisterServer")
+    @DependsOn("raftRegistryServer")
     @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "master")
-    public RaftRegistry masterRegisterClient(RaftRegistryProperties raftRegistryProperties) {
+    public RaftRegistry masterRaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
         RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
         raftRegistry.start();
         return raftRegistry;
@@ -56,7 +56,7 @@ public class RaftRegistryAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "worker")
-    public RaftRegistry workerRegisterClient(RaftRegistryProperties raftRegistryProperties) {
+    public RaftRegistry workerRaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
         RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
         raftRegistry.start();
         return raftRegistry;
@@ -64,7 +64,7 @@ public class RaftRegistryAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = "registry", name = "module", havingValue = "api")
-    public RaftRegistry apiRegisterClient(RaftRegistryProperties raftRegistryProperties) {
+    public RaftRegistry apiRaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
         RaftRegistry raftRegistry = new RaftRegistry(raftRegistryProperties);
         raftRegistry.start();
         return raftRegistry;

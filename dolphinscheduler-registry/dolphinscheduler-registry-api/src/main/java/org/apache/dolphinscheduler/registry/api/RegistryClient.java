@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -58,14 +60,22 @@ public class RegistryClient {
 
     public RegistryClient(Registry registry) {
         this.registry = registry;
-        if (!registry.exists(RegistryNodeType.MASTER.getRegistryPath())) {
-            registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
-        }
-        if (!registry.exists(RegistryNodeType.WORKER.getRegistryPath())) {
-            registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
-        }
-        if (!registry.exists(RegistryNodeType.ALERT_SERVER.getRegistryPath())) {
-            registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+    }
+
+    @PostConstruct
+    public void initializeRegistryPaths() {
+        try {
+            if (!registry.exists(RegistryNodeType.MASTER.getRegistryPath())) {
+                registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
+            }
+            if (!registry.exists(RegistryNodeType.WORKER.getRegistryPath())) {
+                registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
+            }
+            if (!registry.exists(RegistryNodeType.ALERT_SERVER.getRegistryPath())) {
+                registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+            }
+        } catch (Exception e) {
+            log.error("Failed to initialize registry paths", e);
         }
     }
 

@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.Collection;
 
-public interface IRaftRegisterClient extends AutoCloseable {
+public interface IRaftRegistryClient extends AutoCloseable {
 
     /**
      * Start the raft registry client. Once started, the client will connect to the raft registry server and then it can be used.

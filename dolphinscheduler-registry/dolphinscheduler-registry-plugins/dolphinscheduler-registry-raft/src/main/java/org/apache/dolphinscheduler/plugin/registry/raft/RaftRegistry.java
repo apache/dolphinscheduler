@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.plugin.registry.raft;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.plugin.registry.raft.client.IRaftRegisterClient;
-import org.apache.dolphinscheduler.plugin.registry.raft.client.RaftRegisterClient;
+import org.apache.dolphinscheduler.plugin.registry.raft.client.IRaftRegistryClient;
+import org.apache.dolphinscheduler.plugin.registry.raft.client.RaftRegistryClient;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -37,21 +37,19 @@ import lombok.extern.slf4j.Slf4j;
 public class RaftRegistry implements Registry {
 
     private static final long RECONNECT_WAIT_TIME_MS = 50L;
-    private final IRaftRegisterClient raftRegisterClient;
+    private final IRaftRegistryClient raftRegistryClient;
     public RaftRegistry(RaftRegistryProperties raftRegistryProperties) {
-        this.raftRegisterClient = new RaftRegisterClient(raftRegistryProperties);
+        this.raftRegistryClient = new RaftRegistryClient(raftRegistryProperties);
     }
 
     @Override
     public void start() {
-        log.info("starting raft registry...");
-        raftRegisterClient.start();
-        log.info("raft registry started successfully");
+        raftRegistryClient.start();
     }
 
     @Override
     public boolean isConnected() {
-        return raftRegisterClient.isConnectivity();
+        return raftRegistryClient.isConnectivity();
     }
 
     @Override
@@ -61,7 +59,7 @@ public class RaftRegistry implements Registry {
             long endTimeMillis = timeout.toMillis() > 0 ? startTimeMillis + timeout.toMillis() : Long.MAX_VALUE;
 
             while (System.currentTimeMillis() < endTimeMillis) {
-                if (raftRegisterClient.isConnectivity()) {
+                if (raftRegistryClient.isConnectivity()) {
                     return;
                 }
             }
@@ -75,68 +73,66 @@ public class RaftRegistry implements Registry {
     public void subscribe(String path, SubscribeListener listener) {
         checkNotNull(path);
         checkNotNull(listener);
-        raftRegisterClient.subscribeRaftRegistryDataChange(path, listener);
+        raftRegistryClient.subscribeRaftRegistryDataChange(path, listener);
     }
 
     @Override
     public void addConnectionStateListener(ConnectionListener listener) {
         checkNotNull(listener);
-        raftRegisterClient.subscribeConnectionStateChange(listener);
+        raftRegistryClient.subscribeConnectionStateChange(listener);
     }
 
     @Override
     public String get(String key) {
         checkNotNull(key);
-        return raftRegisterClient.getRegistryDataByKey(key);
+        return raftRegistryClient.getRegistryDataByKey(key);
     }
 
     @Override
     public void put(String key, String value, boolean deleteOnDisconnect) {
         checkNotNull(key);
-        raftRegisterClient.putRegistryData(key, value, deleteOnDisconnect);
+        raftRegistryClient.putRegistryData(key, value, deleteOnDisconnect);
     }
 
     @Override
     public void delete(String key) {
         checkNotNull(key);
-        raftRegisterClient.deleteRegistryDataByKey(key);
+        raftRegistryClient.deleteRegistryDataByKey(key);
     }
 
     @Override
     public Collection<String> children(String key) {
         checkNotNull(key);
-        return raftRegisterClient.getRegistryDataChildren(key);
+        return raftRegistryClient.getRegistryDataChildren(key);
     }
 
     @Override
     public boolean exists(String key) {
         checkNotNull(key);
-        return raftRegisterClient.existRaftRegistryDataKey(key);
+        return raftRegistryClient.existRaftRegistryDataKey(key);
     }
 
     @Override
     public boolean acquireLock(String key) {
         checkNotNull(key);
-        return raftRegisterClient.acquireRaftRegistryLock(key);
+        return raftRegistryClient.acquireRaftRegistryLock(key);
     }
 
     @Override
     public boolean acquireLock(String key, long timeout) {
         checkNotNull(key);
-        return raftRegisterClient.acquireRaftRegistryLock(key, timeout);
+        return raftRegistryClient.acquireRaftRegistryLock(key, timeout);
     }
 
     @Override
     public boolean releaseLock(String key) {
         checkNotNull(key);
-        return raftRegisterClient.releaseRaftRegistryLock(key);
+        return raftRegistryClient.releaseRaftRegistryLock(key);
     }
 
     @Override
     public void close() {
-        log.info("closing raft registry...");
-        raftRegisterClient.close();
-        log.info("raft registry closed");
+        raftRegistryClient.close();
     }
 
 }

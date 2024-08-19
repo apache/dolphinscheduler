@@ -33,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,21 +88,24 @@ public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
         public void run() {
             try {
                 final Map<String, NodeItem> newDataMap = getNodeDataMap();
-                if (dataSubScribeMap.isEmpty() || newDataMap.isEmpty()) {
+                if (dataSubScribeMap.isEmpty() || newDataMap == null || newDataMap.isEmpty()) {
                     return;
                 }
                 // find the different
                 final Map<String, String> addedData = new HashMap<>();
                 final Map<String, String> deletedData = new HashMap<>();
                 final Map<String, String> updatedData = new HashMap<>();
-                for (Map.Entry<String, NodeItem> entry : newDataMap.entrySet()) {
+
+                Iterator<Map.Entry<String, NodeItem>> iterator = newDataMap.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, NodeItem> entry = iterator.next();
                     final NodeItem oldData = oldDataMap.get(entry.getKey());
                     if (oldData == null) {
                         addedData.put(entry.getKey(), entry.getValue().getNodeValue());
                     } else if (NodeType.EPHEMERAL.getName().equals(entry.getValue().getNodeType())
                             && isUnHealthy(entry.getValue().getNodeValue())) {
                         kvStore.bDelete(entry.getKey());
-                        newDataMap.remove(entry.getKey(), entry.getValue());
+                        iterator.remove();
                     } else if (!oldData.getNodeValue().equals(entry.getValue().getNodeValue())) {
                         updatedData.put(entry.getKey(), entry.getValue().getNodeValue());
                     }
@@ -155,40 +159,35 @@ public class RaftSubscribeDataManager implements IRaftSubscribeDataManager {
         }
 
         private Map<String, NodeItem> getNodeDataMap() {
-            final Map<String, NodeItem> nodeItemMap = new HashMap<>();
-            final List<KVEntry> entryList = kvStore.bScan(RegistryNodeType.ALL_SERVERS.getRegistryPath(),
-                    RegistryNodeType.ALL_SERVERS.getRegistryPath() + Constants.SINGLE_SLASH + Constants.RAFT_END_KEY);
+            try {
+                final Map<String, NodeItem> nodeItemMap = new HashMap<>();
+                final List<KVEntry> entryList = kvStore.bScan(RegistryNodeType.ALL_SERVERS.getRegistryPath(),
+                        RegistryNodeType.ALL_SERVERS.getRegistryPath() + Constants.SINGLE_SLASH
+                                + Constants.RAFT_END_KEY);
 
-            for (KVEntry kvEntry : entryList) {
-                final String entryKey = readUtf8(kvEntry.getKey());
-                final String compositeValue = readUtf8(kvEntry.getValue());
+                for (KVEntry kvEntry : entryList) {
+                    final String entryKey = readUtf8(kvEntry.getKey());
+                    final String compositeValue = readUtf8(kvEntry.getValue());
 
-                if (StringUtils.isEmpty(compositeValue)
-                        || !entryKey.startsWith(RegistryNodeType.ALL_SERVERS.getRegistryPath())) {
-                    continue;
+                    if (StringUtils.isEmpty(compositeValue)
+                            || !entryKey.startsWith(RegistryNodeType.ALL_SERVERS.getRegistryPath())) {
+                        continue;
+                    }
+
+                    String[] nodeTypeAndValue = compositeValue.split(Constants.AT_SIGN);
+                    if (nodeTypeAndValue.length < 2) {
+                        continue;
+                    }
+                    String nodeType = nodeTypeAndValue[0];
+                    String nodeValue = nodeTypeAndValue[1];
+
+                    nodeItemMap.put(entryKey, NodeItem.builder().nodeValue(nodeValue).nodeType(nodeType).build());
                 }
-
-                String[] nodeTypeAndValue = parseCompositeValue(compositeValue);
-                if (nodeTypeAndValue.length < 2) {
-                    continue;
-                }
-                String nodeType = nodeTypeAndValue[0];
-                String nodeValue = nodeTypeAndValue[1];
-
-                nodeItemMap.put(entryKey, NodeItem.builder().nodeValue(nodeValue).nodeType(nodeType).build());
+                return nodeItemMap;
+            } catch (Exception ex) {
+                log.error("Fail to getNodeDataMap", ex);
+                return null;
             }
-            return nodeItemMap;
-        }
-
-        private String[] parseCompositeValue(String compositeValue) {
-            String[] nodeTypeAndValue = compositeValue.split(Constants.AT_SIGN);
-            if (nodeTypeAndValue.length < 2) {
-                log.error("Invalid compositeValue: {}", compositeValue);
-                return new String[]{};
-            }
-            String nodeType = nodeTypeAndValue[0];
-            String nodeValue = nodeTypeAndValue[1];
-            return new String[]{nodeType, nodeValue};
         }
 
         private void triggerListener(Map<String, String> nodeDataMap, String subscribeKey,

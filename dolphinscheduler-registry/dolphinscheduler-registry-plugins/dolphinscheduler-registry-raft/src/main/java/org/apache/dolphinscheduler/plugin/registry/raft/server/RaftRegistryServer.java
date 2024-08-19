@@ -33,12 +33,12 @@ import com.alipay.sofa.jraft.rhea.storage.StorageType;
 import com.alipay.sofa.jraft.util.Endpoint;
 
 @Slf4j
-public class RaftRegisterServer {
+public class RaftRegistryServer {
 
     private final RheaKVStore rheaKVStore;
     private final RheaKVStoreOptions options;
     private volatile boolean started;
-    public RaftRegisterServer(RaftRegistryProperties raftRegistryProperties) {
+    public RaftRegistryServer(RaftRegistryProperties raftRegistryProperties) {
         final PlacementDriverOptions pdOpts = PlacementDriverOptionsConfigured.newConfigured()
                 .withFake(true) // use a fake pd
                 .config();
@@ -59,21 +59,21 @@ public class RaftRegisterServer {
 
     public void start() {
         if (this.started) {
-            log.info("raft register server is already started");
+            log.info("raft registry server has already started");
             return;
         }
-        log.info("starting raft register server...");
+        log.info("starting raft registry server...");
         this.rheaKVStore.init(this.options);
-        log.info("raft register server started successfully");
+        log.info("raft registry server started successfully");
         this.started = true;
     }
 
     public void stop() {
-        log.info("stopping raft register server");
+        log.info("stopping raft registry server");
         if (this.rheaKVStore != null) {
             this.rheaKVStore.shutdown();
         }
         this.started = false;
-        log.info("raft register server stopped successfully");
+        log.info("raft registry server stopped successfully");
     }
 }

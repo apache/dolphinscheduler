@@ -52,7 +52,7 @@ import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigure
 import com.alipay.sofa.jraft.rhea.storage.KVEntry;
 
 @Slf4j
-public class RaftRegisterClient implements IRaftRegisterClient {
+public class RaftRegistryClient implements IRaftRegistryClient {
 
     private final RheaKVStore rheaKvStore;
     private final RaftRegistryProperties raftRegistryProperties;
@@ -61,7 +61,7 @@ public class RaftRegisterClient implements IRaftRegisterClient {
     private final IRaftLockManager raftLockManager;
     private volatile boolean started;
     private static final String MASTER_MODULE = "master";
-    public RaftRegisterClient(RaftRegistryProperties raftRegistryProperties) {
+    public RaftRegistryClient(RaftRegistryProperties raftRegistryProperties) {
         this.raftRegistryProperties = raftRegistryProperties;
         this.rheaKvStore = new DefaultRheaKVStore();
         this.raftConnectionStateManager = new RaftConnectionStateManager(raftRegistryProperties);
@@ -90,14 +90,16 @@ public class RaftRegisterClient implements IRaftRegisterClient {
     @Override
     public void start() {
         if (this.started) {
-            log.info("RaftRegisterClient is already started");
+            log.info("RaftRegistryClient is already started");
             return;
         }
+        log.info("starting raft client registry...");
         if (raftRegistryProperties.getModule().equals(MASTER_MODULE)) {
             raftSubscribeDataManager.start();
         }
         raftConnectionStateManager.start();
         this.started = true;
+        log.info("raft client registry started successfully");
     }
 
     @Override
@@ -154,7 +156,7 @@ public class RaftRegisterClient implements IRaftRegisterClient {
         }
         List<KVEntry> kvEntries = rheaKvStore.bScan(basePath + Constants.SINGLE_SLASH,
                 basePath + Constants.SINGLE_SLASH + Constants.RAFT_END_KEY);
-        return getRegisterList(kvEntries);
+        return getRegistryList(kvEntries);
     }
 
     @Override
@@ -162,17 +164,17 @@ public class RaftRegisterClient implements IRaftRegisterClient {
         return rheaKvStore.bContainsKey(key);
     }
 
-    private Collection<String> getRegisterList(List<KVEntry> kvEntries) {
+    private Collection<String> getRegistryList(List<KVEntry> kvEntries) {
         if (kvEntries == null || kvEntries.isEmpty()) {
             return new ArrayList<>();
         }
-        List<String> registerList = new ArrayList<>();
+        List<String> registryList = new ArrayList<>();
         for (KVEntry kvEntry : kvEntries) {
             String entryKey = readUtf8(kvEntry.getKey());
             String childKey = entryKey.substring(entryKey.lastIndexOf(Constants.SINGLE_SLASH) + 1);
-            registerList.add(childKey);
+            registryList.add(childKey);
         }
-        return registerList;
+        return registryList;
     }
 
     @Override
@@ -182,7 +184,7 @@ public class RaftRegisterClient implements IRaftRegisterClient {
         } catch (Exception ex) {
             log.error("acquire raft registry lock error", ex);
             raftLockManager.releaseLock(lockKey);
-            throw new RegistryException("acquire raft register lock error: " + lockKey, ex);
+            throw new RegistryException("acquire raft registry lock error: " + lockKey, ex);
         }
     }
 
@@ -193,7 +195,7 @@ public class RaftRegisterClient implements IRaftRegisterClient {
         } catch (Exception ex) {
             log.error("acquire raft registry lock error", ex);
             raftLockManager.releaseLock(lockKey);
-            throw new RegistryException("acquire raft register lock error: " + lockKey, ex);
+            throw new RegistryException("acquire raft registry lock error: " + lockKey, ex);
         }
     }
 
@@ -209,11 +211,11 @@ public class RaftRegisterClient implements IRaftRegisterClient {
 
     @Override
     public void close() {
-        log.info("start close raft register client");
+        log.info("ready to close raft registry client");
         if (rheaKvStore != null) {
             rheaKvStore.shutdown();
         }
         this.started = false;
-        log.info("closed raft register client");
+        log.info("closed raft registry client");
     }
 }
