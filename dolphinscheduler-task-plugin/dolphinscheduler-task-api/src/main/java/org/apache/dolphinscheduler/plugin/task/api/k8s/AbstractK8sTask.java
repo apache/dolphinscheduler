@@ -17,14 +17,18 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
+import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sYamlTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
 
 import java.util.Map;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +46,23 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
      */
     protected AbstractK8sTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.abstractK8sTaskExecutor = new K8sTaskExecutor(taskRequest);
+        String taskParams = taskRequest.getTaskParams();
+
+        K8sTaskParameters k8sTaskParameters;
+        try {
+            k8sTaskParameters = Objects.requireNonNull(
+                    JSONUtils.parseObject(taskParams, K8sTaskParameters.class));
+            // load k8s task executor according to k8s task type
+            if (k8sTaskParameters.getCustomConfig() == 0) {
+                // for low-code k8s Job, use `K8sTaskExecutor`
+                this.abstractK8sTaskExecutor = new K8sTaskExecutor(taskRequest);
+            } else {
+                // for user-customized k8s YAML task, use `K8sYamlTaskExecutor`
+                this.abstractK8sTaskExecutor = new K8sYamlTaskExecutor(taskRequest);
+            }
+        } catch (Exception e) {
+            throw new TaskException("Invalid k8s Task parameters");
+        }
     }
 
     // todo split handle to submit and track
@@ -75,7 +95,7 @@ public abstract class AbstractK8sTask extends AbstractRemoteTask {
     /**
      * cancel application
      *
-     * @throws Exception exception
+     * @throws TaskException exception may occur during canceling an app
      */
     @Override
     public void cancelApplication() throws TaskException {

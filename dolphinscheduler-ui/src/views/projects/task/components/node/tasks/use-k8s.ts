@@ -50,7 +50,9 @@ export function useK8s({
     displayRows: 10,
     timeoutNotifyStrategy: ['WARN'],
     kubeConfig: '',
-    namespace: ''
+    namespace: '',
+    customConfig: false,
+    yamlContent: ''
   } as INodeData)
 
   return {

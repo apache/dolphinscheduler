@@ -291,6 +291,15 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         collectPodLogExecutorService.shutdown();
     }
 
+    /**
+     * Executes a task based on the provided Kubernetes parameters.
+     *
+     * <p>This method processes the input parameter of type {@link K8sTaskMainParameters}.</p>
+     *
+     * @param k8sParameterStr a string of K8sTaskMainParameters::toString
+     * @return a {@link TaskResponse} object containing the result of the task execution.
+     * @throws Exception if an error occurs during task execution or while handling pod logs.
+     */
     @Override
     public TaskResponse run(String k8sParameterStr) throws Exception {
         TaskResponse result = new TaskResponse();

@@ -17,15 +17,84 @@
 import { useCustomParams, useCustomLabels, useNodeSelectors } from '.'
 import type { IJsonItem } from '../types'
 import { useI18n } from 'vue-i18n'
+import { onMounted, ref, watch } from 'vue'
 
 export function useK8s(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
 
+  // default width for
+  const yamlEditorSpan = ref(0)
+  const nodeSelectorSpan = ref(24)
+  const customLabelsSpan = ref(24)
+  const inputCommandSpan = ref(24)
+  const inputArgsSpan = ref(24)
+  const inputPullSecretSpan = ref(24)
+  const inputImageSpan = ref(17)
+  const selectImagePullPolicySpan = ref(7)
+  const inputNumberMinCpuCoresSpan = ref(12)
+  const inputNumberMinMemorySpace = ref(12)
+  const localParamsSpan = ref(24)
+
+  const initConstants = () => {
+    if (model.customConfig) {
+      // when user selects 'Custom Template' option, display yamlEditor and hide low-code fields
+      yamlEditorSpan.value = 24
+      nodeSelectorSpan.value = 0
+      customLabelsSpan.value = 0
+      inputCommandSpan.value = 0
+      inputArgsSpan.value = 0
+      inputPullSecretSpan.value = 0
+      inputImageSpan.value = 0
+      selectImagePullPolicySpan.value = 0
+      inputNumberMinCpuCoresSpan.value = 0
+      inputNumberMinMemorySpace.value = 0
+      localParamsSpan.value = 0
+    } else {
+      yamlEditorSpan.value = 0
+      nodeSelectorSpan.value = 24
+      customLabelsSpan.value = 24
+      inputCommandSpan.value = 24
+      inputArgsSpan.value = 24
+      inputPullSecretSpan.value = 24
+      inputImageSpan.value = 17
+      selectImagePullPolicySpan.value = 7
+      inputNumberMinCpuCoresSpan.value = 12
+      inputNumberMinMemorySpace.value = 12
+      localParamsSpan.value = 24
+    }
+  }
+
+  onMounted(() => {
+    initConstants()
+  })
+  watch(
+    () => model.customConfig,
+    () => {
+      initConstants()
+    }
+  )
+
   return [
+    {
+      type: 'switch',
+      field: 'customConfig',
+      name: t('project.node.k8s_custom_template')
+    },
+    {
+      type: 'editor',
+      field: 'yamlContent',
+      name: t('project.node.k8s_yaml_template'),
+      span: yamlEditorSpan,
+      validate: {
+        trigger: ['input', 'trigger'],
+        required: true,
+        message: t('project.node.k8s_yaml_empty_tips')
+      }
+    },
     {
       type: 'input-number',
       field: 'minCpuCores',
-      span: 12,
+      span: inputNumberMinCpuCoresSpan,
       props: {
         min: 0
       },
@@ -37,7 +106,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input-number',
       field: 'minMemorySpace',
-      span: 12,
+      span: inputNumberMinMemorySpace,
       props: {
         min: 0
       },
@@ -50,7 +119,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'image',
       name: t('project.node.image'),
-      span: 18,
+      span: inputImageSpan,
       props: {
         placeholder: t('project.node.image_tips')
       },
@@ -64,7 +133,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'select',
       field: 'imagePullPolicy',
       name: t('project.node.image_pull_policy'),
-      span: 6,
+      span: selectImagePullPolicySpan,
       options: IMAGE_PULL_POLICY_LIST,
       validate: {
         trigger: ['input', 'blur'],
@@ -77,6 +146,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'pullSecret',
       name: t('project.node.pull_secret'),
+      span: inputPullSecretSpan,
       props: {
         placeholder: t('project.node.pull_secret_tips')
       }
@@ -85,6 +155,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'command',
       name: t('project.node.command'),
+      span: inputCommandSpan,
       props: {
         placeholder: t('project.node.command_tips')
       }
@@ -93,6 +164,7 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'args',
       name: t('project.node.args'),
+      span: inputArgsSpan,
       props: {
         placeholder: t('project.node.args_tips')
       }
@@ -100,14 +172,21 @@ export function useK8s(model: { [field: string]: any }): IJsonItem[] {
     ...useCustomLabels({
       model,
       field: 'customizedLabels',
-      name: 'custom_labels'
+      name: 'custom_labels',
+      span: customLabelsSpan
     }),
     ...useNodeSelectors({
       model,
       field: 'nodeSelectors',
-      name: 'node_selectors'
+      name: 'node_selectors',
+      span: nodeSelectorSpan
     }),
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: false,
+      span: localParamsSpan
+    })
   ]
 }
 

@@ -80,4 +80,28 @@ public class K8sParametersTest {
         Assertions.assertEquals(nodeSelectorExpressions, k8sTaskParameters.getNodeSelectors());
     }
 
+    @Test
+    public void testCustomConfigCheckParameters() {
+        // by default, low-code mode for `k8sTaskParameters`: `customConfig` == 0 && `image` is not empty
+        Assertions.assertTrue(k8sTaskParameters.checkParameters());
+
+        // check for user-customized YAML mode
+        k8sTaskParameters.setCustomConfig(1);
+        k8sTaskParameters.setYamlContent(null);
+        Assertions.assertFalse(k8sTaskParameters.checkParameters());
+        k8sTaskParameters.setYamlContent("");
+        Assertions.assertFalse(k8sTaskParameters.checkParameters());
+        k8sTaskParameters.setYamlContent("    ");
+        Assertions.assertFalse(k8sTaskParameters.checkParameters());
+        k8sTaskParameters.setYamlContent("<some-mock-yaml>");
+        Assertions.assertTrue(k8sTaskParameters.checkParameters());
+
+        // check for invalid customConfig
+        k8sTaskParameters.setCustomConfig(3);
+        Assertions.assertFalse(k8sTaskParameters.checkParameters());
+
+        // restore the default low-code mode
+        k8sTaskParameters.setCustomConfig(0);
+    }
+
 }

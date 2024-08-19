@@ -48,6 +48,16 @@ public abstract class AbstractK8sTaskExecutor {
         return taskOutputParams;
     }
 
+    /**
+     * Executes a task based on the provided Kubernetes parameters.
+     *
+     * <p>This method processes the input parameter which can either be a custom configuration
+     * of type {@link K8sTaskMainParameters} or YAML content describing the Kubernetes job.</p>
+     *
+     * @param k8sParameterStr a string of either user-customized YAML or K8sTaskMainParameters
+     * @return a {@link TaskResponse} object containing the result of the task execution.
+     * @throws Exception if an error occurs during task execution or while handling pod logs.
+     */
     public abstract TaskResponse run(String k8sParameterStr) throws Exception;
 
     public abstract void cancelApplication(String k8sParameterStr);

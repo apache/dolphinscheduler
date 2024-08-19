@@ -18,6 +18,8 @@ K8S task type used to execute a batch task. In this task, the worker submits the
 
 |   **Parameter**   |                                                                                                                                        **Description**                                                                                                                                         |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| customConfig      | The switch enables user-customized Kubernetes YAML mode when the default low-code Kubernetes Job provided does not meet the requirements.                                                                                                                                                      |
+| yamlContent       | The YAML configuration file content for user-customized Kubernetes task.                                                                                                                                                                                                                       |
 | Namespace         | The namespace for running k8s task.                                                                                                                                                                                                                                                            |
 | Min CPU           | Minimum CPU requirement for running k8s task.                                                                                                                                                                                                                                                  |
 | Min Memory        | Minimum memory requirement for running k8s task.                                                                                                                                                                                                                                               |
@@ -40,6 +42,10 @@ If you are using the K8S task type in a production environment, the K8S cluster 
 Configure the required content according to the parameter descriptions above.
 
 ![K8S](../../../../img/tasks/demo/kubernetes-task-en.png)
+
+User-customized Kubernetes YAML mode can be turned on by switching to "Custom Template".
+
+![K8S-YAML](../../../../img/tasks/demo/kubernetes-yaml-task-en.png)
 
 ## Note
 

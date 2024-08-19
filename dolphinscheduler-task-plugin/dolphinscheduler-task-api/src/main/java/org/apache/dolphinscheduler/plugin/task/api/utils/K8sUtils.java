@@ -21,9 +21,14 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOG_LINE
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.ObjectMeta;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.Config;
@@ -33,9 +38,38 @@ import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
 
 @Slf4j
+@Data
 public class K8sUtils {
 
     private KubernetesClient client;
+
+    private static final String K8S_NAMESPACE_DEFAULT = "default";
+
+    /**
+     * get the original namespace, or default namespace defined in `K8sUtils.K8S_NAMESPACE_DEFAULT`
+     * @param namespace the namespace to be inspected
+     * @return the original namespace if it is valid; otherwise, return default namespace
+     */
+    public static String getOrDefaultNamespace(String namespace) {
+        return StringUtils.isBlank(namespace) ? K8S_NAMESPACE_DEFAULT : namespace;
+    }
+
+    /**
+     * get the original resource, or the one with default namespace
+     * @param resource the resource to be inspected
+     * @return the original resource, or the default namespaced one
+     * @throws TaskException if resource is null
+     */
+    public static HasMetadata getOrDefaultNamespacedResource(HasMetadata resource) throws TaskException {
+        if (resource == null)
+            throw new TaskException("failed to process k8s resource with null parameter");
+        ObjectMeta metadata = resource.getMetadata();
+        if (StringUtils.isBlank(metadata.getNamespace())) {
+            metadata.setNamespace(K8S_NAMESPACE_DEFAULT);
+            resource.setMetadata(metadata);
+        }
+        return resource;
+    }
 
     public void createJob(String namespace, Job job) {
         try {
@@ -104,13 +138,30 @@ public class K8sUtils {
         return null;
     }
 
-    public void buildClient(String configYaml) {
+    /**
+     * Builds a Kubernetes API client using a kubeConfig YAML string.
+     *
+     * @param configYaml a YAML string containing the Kubernetes configuration
+     * @throws TaskException if there is an error building the Kubernetes client
+     */
+    public void buildClient(String configYaml) throws TaskException {
         try {
             Config config = Config.fromKubeconfig(configYaml);
             client = new KubernetesClientBuilder().withConfig(config).build();
         } catch (Exception e) {
             throw new TaskException("fail to build k8s ApiClient", e);
         }
+    }
+
+    /**
+     * Retrieves the Kubernetes client instance.
+     *
+     * @return The current KubernetesClient instance.
+     */
+    public KubernetesClient getClient() {
+        if (client == null)
+            throw new TaskException("failed to get k8s ApiClient, since it has not yet been initialized");
+        return client;
     }
 
 }
