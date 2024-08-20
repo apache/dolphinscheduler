@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -79,6 +81,9 @@ class ZookeeperRegistryProperties implements Validator {
                 || zookeeper.getBlockUntilConnected().isNegative()) {
             errors.rejectValue("zookeeper.blockUntilConnected", "", "zookeeper.blockUntilConnected should be positive");
         }
+        if (zookeeper.getAuthorization() != null && zookeeper.getAuthorization().size() != 1) {
+            errors.rejectValue("zookeeper.authorization", "", "zookeeper.authorization should be unique");
+        }
         printConfig();
     }
 
@@ -88,10 +93,11 @@ class ZookeeperRegistryProperties implements Validator {
                         "\n  namespace -> " + zookeeper.getNamespace() +
                         "\n  connectString -> " + zookeeper.getConnectString() +
                         "\n  retryPolicy -> " + zookeeper.getRetryPolicy() +
-                        "\n  digest -> " + zookeeper.getDigest() +
+                        "\n  authorization -> " + zookeeper.getAuthorization() +
                         "\n  sessionTimeout -> " + zookeeper.getSessionTimeout() +
                         "\n  connectionTimeout -> " + zookeeper.getConnectionTimeout() +
                         "\n  blockUntilConnected -> " + zookeeper.getBlockUntilConnected() +
+                        "\n  authorization -> " + zookeeper.getAuthorization() +
                         "\n****************************ZookeeperRegistryProperties**************************************";
         log.info(config);
     }
@@ -102,7 +108,7 @@ class ZookeeperRegistryProperties implements Validator {
         private String namespace = "dolphinscheduler";
         private String connectString;
         private RetryPolicy retryPolicy = new RetryPolicy();
-        private String digest;
+        private Map<String, String> authorization = new HashMap<>();
         private Duration sessionTimeout = Duration.ofSeconds(60);
         private Duration connectionTimeout = Duration.ofSeconds(15);
         private Duration blockUntilConnected = Duration.ofSeconds(15);
