@@ -284,7 +284,7 @@ public class DependentExecute {
                 addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
                 return DependResult.SUCCESS;
             }
-            return getDependResultByStateAndRetry(processInstance, taskInstance);
+            return getDependResultOfTask(processInstance, taskInstance);
         }
     }
 
@@ -337,12 +337,13 @@ public class DependentExecute {
     }
 
     /**
-     * get dependent result by task/process instance state
+     * get dependent result by task/process instance
      *
+     * @param processInstance process instance
      * @param taskInstance task instance
      * @return DependResult
      */
-    private DependResult getDependResultByStateAndRetry(ProcessInstance processInstance, TaskInstance taskInstance) {
+    private DependResult getDependResultOfTask(ProcessInstance processInstance, TaskInstance taskInstance) {
 
         TaskExecutionStatus state = taskInstance.getState();
         if (!state.isFinished()) {
