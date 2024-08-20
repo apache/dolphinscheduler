@@ -284,7 +284,7 @@ public class DependentExecute {
                 addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
                 return DependResult.SUCCESS;
             }
-            return getDependResultByStateAndRetry(taskInstance);
+            return getDependResultByStateAndRetry(processInstance, taskInstance);
         }
     }
 
@@ -342,7 +342,7 @@ public class DependentExecute {
      * @param taskInstance task instance
      * @return DependResult
      */
-    private DependResult getDependResultByStateAndRetry(TaskInstance taskInstance) {
+    private DependResult getDependResultByStateAndRetry(ProcessInstance processInstance, TaskInstance taskInstance) {
 
         TaskExecutionStatus state = taskInstance.getState();
         if (!state.isFinished()) {
@@ -350,12 +350,9 @@ public class DependentExecute {
         } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
-            // Improvement the dependent result for workflow dependency tasks
-            // The reason is that within the maximum number of retries, the dependent task may start a new instance and run successfully
-            // If a failure result is returned directly, then the subsequent DAG of that dependent task node will not execute, and manual intervention in operations will be required
             log.info("Task code: {}, task name: {}, retryTimes: {}, maxRetryTimes: {}",
                     taskInstance.getTaskCode(), taskInstance.getName(), taskInstance.getRetryTimes(), taskInstance.getMaxRetryTimes());
-            if (taskInstance.getRetryTimes() < taskInstance.getMaxRetryTimes()) {
+            if (processInstance.getState().isRunning() && taskInstance.getRetryTimes() < taskInstance.getMaxRetryTimes()) {
                 return DependResult.WAITING;
             }
             log.warn(
