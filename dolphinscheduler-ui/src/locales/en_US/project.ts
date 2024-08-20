@@ -50,6 +50,7 @@ export default {
     create_workflow: 'Create Workflow',
     create_workflow_dynamic: 'Create Workflow (Dynamic)',
     import_workflow: 'Import Workflow',
+    import_sql_workflow: 'Import Sql Workflow',
     workflow_name: 'Workflow Name',
     workflow_instance_name: 'Workflow Instance Name',
     current_selection: 'Current Selection',

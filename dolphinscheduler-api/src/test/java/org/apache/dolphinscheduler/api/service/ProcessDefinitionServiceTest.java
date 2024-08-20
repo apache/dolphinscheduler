@@ -83,6 +83,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -107,6 +108,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 @ExtendWith(MockitoExtension.class)
 public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
@@ -826,8 +828,10 @@ public class ProcessDefinitionServiceTest extends BaseServiceTestTool {
         DataSource dataSource = Mockito.mock(DataSource.class);
         when(dataSource.getId()).thenReturn(1);
         when(dataSource.getType()).thenReturn(DbType.MYSQL);
+        when(dataSource.getName()).thenReturn("mysql_1");
 
-        when(dataSourceMapper.queryDataSourceByNameAndUserId(user.getId(), "mysql_1")).thenReturn(dataSource);
+        when(dataSourceMapper.queryDataSourceByNamesAndUserId(user.getId(), Sets.newHashSet("mysql_1")))
+                .thenReturn(Collections.singletonList(dataSource));
 
         Project project = getProject(projectCode);
         Map<String, Object> result = new HashMap<>();

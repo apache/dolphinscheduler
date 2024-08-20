@@ -58,6 +58,11 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
+import org.apache.dolphinscheduler.api.task.SqlTaskParseContext;
+import org.apache.dolphinscheduler.api.task.SqlTaskParsePlugin;
+import org.apache.dolphinscheduler.api.task.SqlTaskParsePluginLoader;
+import org.apache.dolphinscheduler.api.task.SqlTaskParseResult;
+import org.apache.dolphinscheduler.api.task.hint.HintEnum;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -68,6 +73,7 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProcessExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -123,6 +129,7 @@ import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedOutputStream;
@@ -1255,19 +1262,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         processDefinitionName = getNewName(processDefinitionName, IMPORT_SUFFIX);
 
         ProcessDefinition processDefinition;
-        List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
-        List<ProcessTaskRelationLog> processTaskRelationList = new ArrayList<>();
+        List<SqlTaskParseContext> contexts = new ArrayList<>();
 
         // for Zip Bomb Attack
         final int THRESHOLD_ENTRIES = 10000;
-        final int THRESHOLD_SIZE = 1000000000; // 1 GB
-        final double THRESHOLD_RATIO = 10;
+        final int THRESHOLD_SIZE = 1000000000;
+        final double THRESHOLD_RATIO = 20;
         int totalEntryArchive = 0;
         int totalSizeEntry = 0;
-        // In most cases, there will be only one data source
-        Map<String, DataSource> dataSourceCache = new HashMap<>(1);
-        Map<String, Long> taskNameToCode = new HashMap<>(16);
-        Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
         try (
                 ZipInputStream zIn = new ZipInputStream(file.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
@@ -1279,86 +1281,93 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
                     "[]", null,
                     0, loginUser.getId());
 
+            Map<String, Object> processProperties = new HashMap<>(16);
             ZipEntry entry;
             while ((entry = zIn.getNextEntry()) != null) {
                 totalEntryArchive++;
+                // Folders are not currently supported
+                if (entry.isDirectory()) {
+                    continue;
+                }
                 int totalSizeArchive = 0;
-                if (!entry.isDirectory()) {
-                    StringBuilder sql = new StringBuilder();
-                    String taskName = null;
-                    String datasourceName = null;
-                    List<String> upstreams = Collections.emptyList();
-                    String line;
+                String line;
+                if ("process.properties".equalsIgnoreCase(FilenameUtils.getName(entry.getName()))) {
                     while ((line = bufferedReader.readLine()) != null) {
                         int nBytes = line.getBytes(StandardCharsets.UTF_8).length;
                         totalSizeEntry += nBytes;
                         totalSizeArchive += nBytes;
-                        long compressionRatio = totalSizeEntry / entry.getCompressedSize();
+                        long compressionRatio = totalSizeArchive / entry.getCompressedSize();
                         if (compressionRatio > THRESHOLD_RATIO) {
                             throw new IllegalStateException(
                                     "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
                         }
-                        int commentIndex = line.indexOf("-- ");
-                        if (commentIndex >= 0) {
-                            int colonIndex = line.indexOf(":", commentIndex);
-                            if (colonIndex > 0) {
-                                String key = line.substring(commentIndex + 3, colonIndex).trim().toLowerCase();
-                                String value = line.substring(colonIndex + 1).trim();
-                                switch (key) {
-                                    case "name":
-                                        taskName = value;
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    case "upstream":
-                                        upstreams = Arrays.stream(value.split(",")).map(String::trim)
-                                                .filter(s -> !"".equals(s)).collect(Collectors.toList());
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    case "datasource":
-                                        datasourceName = value;
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    default:
-                                        break;
+
+                        int commentIndex = line.indexOf("##");
+                        if (commentIndex == 0) {
+                            continue;
+                        } else if (commentIndex > 0) {
+                            line = line.substring(0, commentIndex);
+                        }
+                        int equalIndex = line.indexOf("=");
+                        if (equalIndex > 0) {
+                            String key = line.substring(0, equalIndex).trim();
+                            String value = line.substring(equalIndex + 1).trim();
+                            if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
+                                HintEnum hintEnum = HintEnum.HINT_ENUM_MAP.get(key);
+                                if (hintEnum != null) {
+                                    processProperties.put(key, hintEnum.getConverter().apply(value));
                                 }
                             }
                         }
-                        if (!"".equals(line)) {
-                            sql.append(line).append("\n");
-                        }
                     }
-                    // import/sql1.sql -> sql1
-                    if (taskName == null) {
-                        taskName = entry.getName();
-                        index = taskName.indexOf("/");
-                        if (index > 0) {
-                            taskName = taskName.substring(index + 1);
-                        }
-                        index = taskName.lastIndexOf(".");
-                        if (index > 0) {
-                            taskName = taskName.substring(0, index);
-                        }
-                    }
-                    DataSource dataSource = dataSourceCache.get(datasourceName);
-                    if (dataSource == null) {
-                        dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
-                    }
-                    if (dataSource == null) {
-                        log.error("Datasource does not found, may be its name is illegal.");
-                        putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
-                        return result;
-                    }
-                    dataSourceCache.put(datasourceName, dataSource);
-
-                    TaskDefinitionLog taskDefinition =
-                            buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
-
-                    taskDefinitionList.add(taskDefinition);
-                    taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
-                    taskNameToUpstream.put(taskDefinition.getName(), upstreams);
+                    continue;
                 }
 
-                if (totalSizeArchive > THRESHOLD_SIZE) {
+                // Only supports sql files
+                if (!"sql".equalsIgnoreCase(FilenameUtils.getExtension(entry.getName()))) {
+                    continue;
+                }
+                SqlTaskParseContext context = new SqlTaskParseContext();
+                contexts.add(context);
+                context.setHints(new HashMap<>(16));
+                context.setProcessProperties(processProperties);
+                StringBuilder sql = new StringBuilder();
+                boolean hint = true;
+                while ((line = bufferedReader.readLine()) != null) {
+                    int nBytes = line.getBytes(StandardCharsets.UTF_8).length;
+                    totalSizeEntry += nBytes;
+                    totalSizeArchive += nBytes;
+                    long compressionRatio = totalSizeArchive / entry.getCompressedSize();
+                    if (compressionRatio > THRESHOLD_RATIO) {
+                        throw new IllegalStateException(
+                                "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
+                    }
+                    if (hint) {
+                        // eg: -- name: xxx
+                        int commentIndex = line.indexOf("-- ");
+                        if (commentIndex == 0) {
+                            int colonIndex = line.indexOf(":", commentIndex);
+                            if (colonIndex > 0) {
+                                String key = line.substring(commentIndex + 3, colonIndex).trim();
+                                String value = line.substring(colonIndex + 1).trim();
+                                if (StringUtils.isNotBlank(key) && StringUtils.isNotBlank(value)) {
+                                    HintEnum hintEnum = HintEnum.HINT_ENUM_MAP.get(key);
+                                    if (hintEnum != null) {
+                                        context.getHints().put(key, hintEnum.getConverter().apply(value));
+                                    }
+                                }
+                            }
+                        } else {
+                            hint = false;
+                        }
+                    }
+                    sql.append(line).append("\n");
+                }
+                context.setSql(sql.toString());
+                context.setTaskName(
+                        context.hintOrDefault(HintEnum.NAME.getKey(), FilenameUtils.getBaseName(entry.getName())));
+
+                if (totalSizeEntry > THRESHOLD_SIZE) {
                     throw new IllegalStateException(
                             "the uncompressed data size is too much for the application resource capacity");
                 }
@@ -1374,18 +1383,61 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
             return result;
         }
 
+        // datasource
+        Set<String> allDatasourceNames = new HashSet<>(1);
+        for (SqlTaskParseContext context : contexts) {
+            allDatasourceNames.add(context.hint(HintEnum.DATASOURCE.getKey()));
+        }
+        Map<String, DataSource> dataSources = queryDatasourceByNameAndUser(allDatasourceNames, loginUser)
+                .stream().collect(Collectors.toMap(DataSource::getName, Function.identity()));
+        // build task
+        List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>(contexts.size());
+        List<SqlTaskParseResult> parseResults = new ArrayList<>(contexts.size());
+        for (SqlTaskParseContext context : contexts) {
+            String datasource = context.hint(HintEnum.DATASOURCE.getKey());
+            context.setDataSource(dataSources.get(datasource));
+
+            SqlTaskParsePlugin plugin = context.hintOrDefault(HintEnum.PLUGIN.getKey(),
+                    SqlTaskParsePluginLoader.defaultSqlTaskParsePlugin());
+            SqlTaskParseResult parseResult = plugin.parse(context);
+            log.info("Sql task {}, upstream:{}, downstream:{}", context.getTaskName(), parseResult.getUpstreamSet(),
+                    parseResult.getDownstreamSet());
+            parseResults.add(parseResult);
+
+            taskDefinitionList.add(buildNormalSqlTaskDefinition(context));
+        }
         // build task relation
-        for (Map.Entry<String, Long> entry : taskNameToCode.entrySet()) {
-            List<String> upstreams = taskNameToUpstream.get(entry.getKey());
-            if (CollectionUtils.isEmpty(upstreams)
-                    || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
-                ProcessTaskRelationLog processTaskRelation = buildNormalTaskRelation(0, entry.getValue());
-                processTaskRelationList.add(processTaskRelation);
-                continue;
+        List<ProcessTaskRelationLog> processTaskRelationList = new ArrayList<>();
+        Map<String, List<Integer>> downstreamIndexMap = new HashMap<>();
+        for (int i = 0; i < parseResults.size(); i++) {
+            SqlTaskParseResult parseResult = parseResults.get(i);
+            for (String downstream : parseResult.getDownstreamSet()) {
+                List<Integer> indexes = downstreamIndexMap.computeIfAbsent(downstream, k -> new ArrayList<>());
+                indexes.add(i);
             }
-            for (String upstream : upstreams) {
+        }
+        for (int i = 0; i < parseResults.size(); i++) {
+            SqlTaskParseResult parseResult = parseResults.get(i);
+            Set<Integer> upstreamIndexSet = new HashSet<>();
+            Optional.ofNullable(parseResult.getUpstreamSet()).ifPresent(upstreamList -> {
+                for (String upstream : upstreamList) {
+                    Optional.ofNullable(downstreamIndexMap.get(upstream))
+                            .ifPresent(upstreamIndexSet::addAll);
+                }
+            });
+            upstreamIndexSet.remove(i);
+            if (CollectionUtils.isNotEmpty(upstreamIndexSet)) {
+                for (Integer upstreamIndex : upstreamIndexSet) {
+                    if (upstreamIndex.equals(i)) {
+                        continue;
+                    }
+                    ProcessTaskRelationLog processTaskRelation = buildNormalTaskRelation(
+                            taskDefinitionList.get(upstreamIndex).getCode(), taskDefinitionList.get(i).getCode());
+                    processTaskRelationList.add(processTaskRelation);
+                }
+            } else {
                 ProcessTaskRelationLog processTaskRelation =
-                        buildNormalTaskRelation(taskNameToCode.get(upstream), entry.getValue());
+                        buildNormalTaskRelation(0, taskDefinitionList.get(i).getCode());
                 processTaskRelationList.add(processTaskRelation);
             }
         }
@@ -1404,30 +1456,26 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         return processTaskRelation;
     }
 
-    private DataSource queryDatasourceByNameAndUser(String datasourceName, User loginUser) {
+    private List<DataSource> queryDatasourceByNameAndUser(Collection<String> datasourceNames, User loginUser) {
         if (isAdmin(loginUser)) {
-            List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(datasourceName);
-            if (CollectionUtils.isNotEmpty(dataSources)) {
-                return dataSources.get(0);
-            }
+            return dataSourceMapper.queryDataSourceByNames(datasourceNames);
         } else {
-            return dataSourceMapper.queryDataSourceByNameAndUserId(loginUser.getId(), datasourceName);
+            return dataSourceMapper.queryDataSourceByNamesAndUserId(loginUser.getId(), datasourceNames);
         }
-        return null;
     }
 
-    private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource,
-                                                           String sql) throws CodeGenerateException {
+    private TaskDefinitionLog buildNormalSqlTaskDefinition(SqlTaskParseContext context) throws CodeGenerateUtils.CodeGenerateException {
         TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
-        taskDefinition.setName(taskName);
+        taskDefinition.setName(context.getTaskName());
         taskDefinition.setFlag(Flag.YES);
         SqlParameters sqlParameters = new SqlParameters();
-        sqlParameters.setType(dataSource.getType().name());
-        sqlParameters.setDatasource(dataSource.getId());
-        sqlParameters.setSql(sql.substring(0, sql.length() - 1));
-        // it may be a query type, but it can only be determined by parsing SQL
-        sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
+        sqlParameters.setType(context.getDataSource().getType().name());
+        sqlParameters.setDatasource(context.getDataSource().getId());
+        sqlParameters.setSql(context.getSql());
+        sqlParameters.setSqlType(context.hintOrDefault(HintEnum.SQL_TYPE.getKey(), SqlType.NON_QUERY).ordinal());
         sqlParameters.setLocalParams(Collections.emptyList());
+        sqlParameters.setDisplayRows(10);
+        taskDefinition.setTaskPriority(context.hintOrDefault(HintEnum.TASK_PRIORITY.getKey(), Priority.MEDIUM));
         taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
         taskDefinition.setCode(CodeGenerateUtils.genCode());
         taskDefinition.setTaskType(SqlTaskChannelFactory.NAME);
@@ -1435,13 +1483,14 @@ public class ProcessDefinitionServiceImpl extends BaseServiceImpl implements Pro
         taskDefinition.setFailRetryInterval(0);
         taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
         taskDefinition.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-        taskDefinition.setTaskPriority(Priority.MEDIUM);
         taskDefinition.setEnvironmentCode(-1);
         taskDefinition.setTimeout(0);
         taskDefinition.setDelayTime(0);
         taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
         taskDefinition.setVersion(0);
         taskDefinition.setResourceIds("");
+        taskDefinition.setIsCache(Flag.NO);
+        taskDefinition.setTaskExecuteType(TaskExecuteType.BATCH);
         return taskDefinition;
     }
 

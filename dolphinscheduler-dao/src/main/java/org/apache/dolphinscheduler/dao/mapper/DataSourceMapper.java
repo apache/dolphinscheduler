@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -57,6 +58,13 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @return datasource list
      */
     List<DataSource> queryDataSourceByName(@Param("name") String name);
+
+    /**
+     * query datasource by names
+     * @param names names
+     * @return datasource list
+     */
+    List<DataSource> queryDataSourceByNames(@Param("names") Collection<String> names);
 
     /**
      * query authed datasource
@@ -98,6 +106,16 @@ public interface DataSourceMapper extends BaseMapper<DataSource> {
      * @return If the name does not exist or the user does not have permission, it will return null
      */
     DataSource queryDataSourceByNameAndUserId(@Param("userId") int userId, @Param("name") String name);
+
+    /**
+     * query datasource by name and user id
+     *
+     * @param userId userId
+     * @param names   datasource name
+     * @return If the name does not exist or the user does not have permission, it will return null
+     */
+    List<DataSource> queryDataSourceByNamesAndUserId(@Param("userId") int userId,
+                                                     @Param("names") Collection<String> names);
 
     /**
      * selectPagingByIds

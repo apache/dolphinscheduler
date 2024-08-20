@@ -65,6 +65,7 @@ export function useTable() {
     timingType: ref('create'),
     timingState: ref('OFFLINE'),
     showRef: ref(false),
+    showSqlRef: ref(false),
     startShowRef: ref(false),
     timingShowRef: ref(false),
     versionShowRef: ref(false),
