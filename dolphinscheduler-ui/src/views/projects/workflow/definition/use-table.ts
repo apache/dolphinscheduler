@@ -307,7 +307,7 @@ export function useTable() {
     } else {
       variables.row = row
       variables.timingType = 'create'
-      variables.timingState = null
+      variables.timingState = 'OFFLINE'
     }
   }
 
