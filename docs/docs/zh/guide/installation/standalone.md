@@ -45,6 +45,10 @@ bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 ```
 
+> **_注意_**: Python 网关服务默认不会随 api-server 一起启动，
+> 如果您想启动 Python 网关服务，请修改 YAML 配置文件，将 `python-gateway.enabled`
+> 设置为 `true`，配置文件路径为 `api-server/conf/application.yaml`
+
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 ## 配置数据库

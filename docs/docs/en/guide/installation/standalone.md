@@ -47,8 +47,8 @@ bash ./bin/dolphinscheduler-daemon.sh stop standalone-server
 bash ./bin/dolphinscheduler-daemon.sh status standalone-server
 ```
 
-> Note: Python gateway service is started along with the api-server, and if you do not want to start Python gateway
-> service please disabled it by changing the yaml config `python-gateway.enabled : false` in api-server's configuration
+> Note: Python gateway service is not started along with the api-server by default. If you want to start the Python gateway
+> service please enable it by changing the yaml config `python-gateway.enabled : true` in api-server's configuration
 > path `api-server/conf/application.yaml`
 
 [jdk]: https://www.oracle.com/technetwork/java/javase/downloads/index.html
