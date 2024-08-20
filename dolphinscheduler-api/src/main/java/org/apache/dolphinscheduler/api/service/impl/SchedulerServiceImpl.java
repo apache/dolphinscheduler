@@ -200,6 +200,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setCreateTime(now);
         scheduleObj.setUpdateTime(now);
         scheduleObj.setUserId(loginUser.getId());
+        scheduleObj.setModifyUserId(loginUser.getId());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setProcessInstancePriority(processInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
