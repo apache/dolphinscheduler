@@ -134,7 +134,7 @@ public final class FeiShuSender {
             String resp = sendMsg(alertData);
             return checkSendFeiShuSendMsgResult(resp);
         } catch (Exception e) {
-            log.info("send fei shu alert msg  exception : {}", e.getMessage());
+            log.info("send fei shu alert msg  exception : {}", e.toString());
             alertResult = new AlertResult();
             alertResult.setSuccess(false);
             alertResult.setMessage("send fei shu alert fail.");
