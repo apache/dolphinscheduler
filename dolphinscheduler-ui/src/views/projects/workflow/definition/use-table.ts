@@ -306,6 +306,8 @@ export function useTable() {
       variables.timingState = row.scheduleReleaseState
     } else {
       variables.row = row
+      variables.timingType = 'create'
+      variables.timingState = 'OFFLINE'
     }
   }
 
