@@ -22,11 +22,10 @@ import org.apache.commons.lang3.SystemUtils;
 import java.time.Duration;
 import java.util.regex.Pattern;
 
-public final class Constants {
+import lombok.experimental.UtilityClass;
 
-    private Constants() {
-        throw new UnsupportedOperationException("Construct Constants");
-    }
+@UtilityClass
+public final class Constants {
 
     public static final String AUTO_CLOSE_ALERT = "alert.auto-close";
 
@@ -482,11 +481,9 @@ public final class Constants {
 
     public static final String TOTAL = "total";
 
-    /**
-     * workflow
-     */
-    public static final String WORKFLOW_LIST = "workFlowList";
-    public static final String WORKFLOW_RELATION_LIST = "workFlowRelationList";
+    public static final long DEFAULT_PROJECT_CODE = 0;
+
+    public static final long DEPENDENT_ALL_TASK = 0;
 
     /**
      * session user

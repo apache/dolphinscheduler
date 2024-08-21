@@ -42,6 +42,8 @@ public class DataxUtils {
 
     public static final String DATAX_READER_PLUGIN_RDBMS = "rdbmsreader";
 
+    public static final String DATAX_READER_PLUGIN_OCEANBASE = "oceanbasev10reader";
+
     public static final String DATAX_WRITER_PLUGIN_MYSQL = "mysqlwriter";
 
     public static final String DATAX_WRITER_PLUGIN_POSTGRESQL = "postgresqlwriter";
@@ -55,6 +57,8 @@ public class DataxUtils {
 
     public static final String DATAX_WRITER_PLUGIN_RDBMS = "rdbmswriter";
 
+    public static final String DATAX_WRITER_PLUGIN_OCEANBASE = "oceanbasev10writer";
+
     public static String getReaderPluginName(DbType dbType) {
         switch (dbType) {
             case MYSQL:
@@ -67,6 +71,8 @@ public class DataxUtils {
                 return DATAX_READER_PLUGIN_SQLSERVER;
             case CLICKHOUSE:
                 return DATAX_READER_PLUGIN_CLICKHOUSE;
+            case OCEANBASE:
+                return DATAX_READER_PLUGIN_OCEANBASE;
             case HIVE:
             case PRESTO:
             default:
@@ -88,6 +94,8 @@ public class DataxUtils {
                 return DATAX_WRITER_PLUGIN_CLICKHOUSE;
             case DATABEND:
                 return DATAX_WRITER_PLUGIN_DATABEND;
+            case OCEANBASE:
+                return DATAX_WRITER_PLUGIN_OCEANBASE;
             case HIVE:
             case PRESTO:
             default:
@@ -114,6 +122,13 @@ public class DataxUtils {
             default:
                 return null;
         }
+    }
+
+    public static SQLStatementParser getSqlStatementParser(String compatibleMode, String sql) {
+        if (compatibleMode.toLowerCase().equals(DbType.ORACLE.getName())) {
+            return new OracleStatementParser(sql);
+        }
+        return new MySqlStatementParser(sql);
     }
 
     public static String[] convertKeywordsColumns(DbType dbType, String[] columns) {
@@ -151,6 +166,8 @@ public class DataxUtils {
             case CLICKHOUSE:
                 return String.format("`%s`", column);
             case DATABEND:
+                return String.format("`%s`", column);
+            case OCEANBASE:
                 return String.format("`%s`", column);
             default:
                 return column;

@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.enums;
 import java.util.Locale;
 import java.util.Optional;
 
+import lombok.Getter;
+
 import org.springframework.context.i18n.LocaleContextHolder;
 
 /**
@@ -238,7 +240,7 @@ public enum Status {
     QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
     DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL(10193, "delete process definition fail, cause used by other tasks: {0}",
             "删除工作流定时失败，被其他任务引用：{0}"),
-    DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, cause used by other tasks: {1}",
+    DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, the reason is that used by other tasks: {1}",
             "删除任务 {0} 失败，被其他任务引用：{1}"),
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
     TASK_SAVEPOINT_ERROR(10196, "task savepoint error", "任务实例savepoint错误"),
@@ -288,7 +290,7 @@ public enum Status {
     UPDATE_PROJECT_PREFERENCE_ERROR(10301, "update project preference error", "更新项目偏好设置错误"),
     QUERY_PROJECT_PREFERENCE_ERROR(10302, "query project preference error", "查询项目偏好设置错误"),
     UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
-
+    VERSION_INFO_STATE_ERROR(10304, "Failed to obtain project version and address", "获取版本信息错误"),
     RESOURCE_NOT_EXIST(20004, "resource not exist", "资源不存在"),
     RESOURCE_EXIST(20005, "resource already exists", "资源已存在"),
     RESOURCE_SUFFIX_NOT_SUPPORT_VIEW(20006, "resource suffix do not support online viewing", "资源文件后缀不支持查看"),
@@ -585,7 +587,12 @@ public enum Status {
     USED_WORKER_GROUP_EXISTS(1402004,
             "You can not reassign worker groups to the project, cause these worker groups {0} are already used.",
             "Worker组{0}被项目中任务或定时引用，无法重新分配"),
-            ;
+    CREATE_PROCESS_LINEAGE_ERROR(1403001, "create process lineage error", "创建工作流血缘错误"),
+    UPDATE_PROCESS_LINEAGE_ERROR(1403002, "update process lineage error", "更新工作流血缘错误"),
+    DELETE_PROCESS_LINEAGE_ERROR(1403003, "delete process lineage error", "删除工作流血缘错误"),
+    ;
+
+    @Getter
     private final int code;
     private final String enMsg;
     private final String zhMsg;
@@ -594,10 +601,6 @@ public enum Status {
         this.code = code;
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
-    }
-
-    public int getCode() {
-        return this.code;
     }
 
     public String getMsg() {

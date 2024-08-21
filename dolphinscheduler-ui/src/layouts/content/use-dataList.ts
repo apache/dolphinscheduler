@@ -26,6 +26,7 @@ import {
   DesktopOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
+  SelectOutlined,
   LogoutOutlined,
   FundProjectionScreenOutlined,
   PartitionOutlined,
@@ -155,11 +156,6 @@ export function useDataList() {
             key: 'task',
             icon: renderIcon(SettingOutlined),
             children: [
-              {
-                label: t('menu.task_definition'),
-                key: `/projects/${projectCode}/task/definitions`,
-                payload: { projectName: projectName }
-              },
               {
                 label: t('menu.task_instance'),
                 key: `/projects/${projectCode}/task/instances`,
@@ -359,6 +355,11 @@ export function useDataList() {
         key: 'password',
         icon: renderIcon(KeyOutlined),
         disabled: userStore.getSecurityConfigType !== 'PASSWORD'
+      },
+      {
+        label: t('user_dropdown.about'),
+        key: 'about',
+        icon: renderIcon(SelectOutlined)
       },
       {
         label: t('user_dropdown.logout'),

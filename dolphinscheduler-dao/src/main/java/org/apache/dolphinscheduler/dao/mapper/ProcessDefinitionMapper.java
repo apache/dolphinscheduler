@@ -19,14 +19,13 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProjectProcessDefinitionCount;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
-import org.apache.ibatis.annotations.MapKey;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -167,26 +166,13 @@ public interface ProcessDefinitionMapper extends BaseMapper<ProcessDefinition> {
                                                                      @Param("releaseState") Integer releaseState);
 
     /**
-     * list all resource ids
-     *
-     * @return resource ids list
-     */
-    @MapKey("id")
-    List<Map<String, Object>> listResources();
-
-    /**
-     * list all resource ids by user id
-     *
-     * @return resource ids list
-     */
-    @MapKey("id")
-    List<Map<String, Object>> listResourcesByUser(@Param("userId") Integer userId);
-
-    /**
      * list all project ids
      *
      * @return project ids list
      */
     List<Integer> listProjectIds();
+
     List<Long> queryDefinitionCodeListByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
+
+    List<ProjectProcessDefinitionCount> queryProjectProcessDefinitionCountByProjectCodes(@Param("projectCodes") List<Long> projectCodes);
 }

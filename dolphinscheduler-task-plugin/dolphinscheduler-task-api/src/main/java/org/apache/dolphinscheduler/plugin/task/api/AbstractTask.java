@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,10 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractTask {
-
-    private static String groupName1 = "paramName1";
-    private static String groupName2 = "paramName2";
-    public String rgex = String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", groupName1, groupName2);
 
     @Getter
     @Setter
@@ -173,24 +168,22 @@ public abstract class AbstractTask {
      * regular expressions match the contents between two specified strings
      *
      * @param content content
-     * @param rgex rgex
      * @param sqlParamsMap sql params map
      * @param paramsPropsMap params props map
      */
-    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
+    public void setSqlParamsMap(String content, Map<Integer, Property> sqlParamsMap,
                                 Map<String, Property> paramsPropsMap, int taskInstanceId) {
         if (paramsPropsMap == null) {
             return;
         }
 
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
+        Matcher m = TaskConstants.SQL_PARAMS_PATTERN.matcher(content);
         int index = 1;
         while (m.find()) {
 
-            String paramName = m.group(groupName1);
+            String paramName = m.group(TaskConstants.GROUP_NAME1);
             if (paramName == null) {
-                paramName = m.group(groupName2);
+                paramName = m.group(TaskConstants.GROUP_NAME2);
             }
 
             Property prop = paramsPropsMap.get(paramName);

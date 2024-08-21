@@ -39,6 +39,10 @@ public class ThreadUtils {
         return Executors.newSingleThreadScheduledExecutor(newDaemonThreadFactory(threadName));
     }
 
+    public static ScheduledExecutorService newDaemonScheduledExecutorService(String threadName, int threadsNum) {
+        return Executors.newScheduledThreadPool(threadsNum, newDaemonThreadFactory(threadName));
+    }
+
     public static ThreadFactory newDaemonThreadFactory(String threadName) {
         return new ThreadFactoryBuilder()
                 .setDaemon(true)

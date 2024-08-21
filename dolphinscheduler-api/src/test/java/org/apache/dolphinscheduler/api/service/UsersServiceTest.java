@@ -572,7 +572,7 @@ public class UsersServiceTest {
         loginUser.setUserType(UserType.GENERAL_USER);
         result = usersService.grantDataSource(loginUser, userId, datasourceIds);
         logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
 
     }
 
@@ -833,7 +833,6 @@ public class UsersServiceTest {
         project.setName("PJ-001");
         project.setPerm(7);
         project.setDefCount(0);
-        project.setInstRunningCount(0);
         return project;
     }
 

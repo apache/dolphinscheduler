@@ -197,8 +197,6 @@ export default {
     alarm_instance_name: '告警实例名称',
     alarm_instance_name_tips: '请输入告警实例名称',
     alarm_plugin_name: '告警插件名称',
-    alarm_instance_type: '告警实例类型',
-    is_global_instance: '是否全局告警实例',
     create_time: '创建时间',
     update_time: '更新时间',
     operation: '操作',
@@ -242,7 +240,7 @@ export default {
     requestType: '请求方式',
     headerParams: '请求头',
     bodyParams: '请求体',
-    contentField: '内容字段',
+    contentType: 'Content Type',
     timeout: '超时时间（秒）',
     Keyword: '关键词',
     userParams: '自定义参数',
@@ -264,7 +262,7 @@ export default {
     // eslint-disable-next-line quotes
     AtMobiles: "被{'@'}人的手机号",
     // eslint-disable-next-line quotes
-    AtUserIds: "被{'@'}人的用户ID",
+    AtDingtalkIds: "被{'@'}人的用户ID",
     MsgType: '消息类型',
     // eslint-disable-next-line quotes
     IsAtAll: "{'@'}所有人",

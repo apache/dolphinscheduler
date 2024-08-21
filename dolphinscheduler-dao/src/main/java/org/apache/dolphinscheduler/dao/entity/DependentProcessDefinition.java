@@ -25,20 +25,18 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameter
 
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * dependent process definition
  */
+@Data
 public class DependentProcessDefinition {
 
     /**
      * process definition code
      */
     private long processDefinitionCode;
-
-    /**
-     * process definition name
-     */
-    private String processDefinitionName;
 
     /**
      * process definition version
@@ -104,54 +102,6 @@ public class DependentProcessDefinition {
 
     public DependentParameters getDependentParameters() {
         return JSONUtils.parseObject(taskParams, DependentParameters.class);
-    }
-
-    public String getProcessDefinitionName() {
-        return this.processDefinitionName;
-    }
-
-    public void setProcessDefinitionName(String name) {
-        this.processDefinitionName = name;
-    }
-
-    public long getProcessDefinitionCode() {
-        return this.processDefinitionCode;
-    }
-
-    public void setProcessDefinitionCode(long code) {
-        this.processDefinitionCode = code;
-    }
-
-    public int getProcessDefinitionVersion() {
-        return processDefinitionVersion;
-    }
-
-    public void setProcessDefinitionVersion(int processDefinitionVersion) {
-        this.processDefinitionVersion = processDefinitionVersion;
-    }
-
-    public long getTaskDefinitionCode() {
-        return this.taskDefinitionCode;
-    }
-
-    public void setTaskDefinitionCode(long code) {
-        this.taskDefinitionCode = code;
-    }
-
-    public String getTaskParams() {
-        return this.taskParams;
-    }
-
-    public void setTaskParams(String taskParams) {
-        this.taskParams = taskParams;
-    }
-
-    public String getWorkerGroup() {
-        return this.workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
     }
 
 }

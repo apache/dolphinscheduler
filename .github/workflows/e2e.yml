@@ -61,7 +61,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache local Maven repository
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
@@ -128,6 +128,10 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.tasks.ShellTaskE2ETest
           - name: PythonTaskE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.tasks.PythonTaskE2ETest
+          - name: SqlServerDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
+          - name: HiveDataSource
+            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:
@@ -144,51 +148,7 @@ jobs:
         with:
           comment_on_pr: false
       - name: Cache local Maven repository
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
-          restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v4
-        name: Download Docker Images
-        with:
-          name: standalone-image
-          path: /tmp
-      - name: Load Docker Images
-        run: |
-          docker load -i /tmp/standalone-image.tar
-      - name: Run Test
-        run: |
-          ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
-            -DfailIfNoTests=false \
-            -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v4
-        if: always()
-        name: Upload Recording
-        with:
-          name: recording-${{ matrix.case.name }}
-          path: ${{ env.RECORDING_PATH }}
-          retention-days: 1
-  e2e-optional:
-    name: ${{ matrix.case.name }}
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        case:
-          - name: SqlServerDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.SqlServerDataSourceE2ETest
-          - name: HiveDataSource
-            class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
-    env:
-      RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-      - name: Cache local Maven repository
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e

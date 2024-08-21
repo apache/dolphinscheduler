@@ -53,6 +53,15 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 - 原 UDF 资源 `x/y.jar` 迁移至 `/dolphinscheduler/abc/udf/.migrate/x/y.jar`。
 - 更新 UDF 函数绑定资源信息。
 
+### 血缘升级
+
+执行脚本：`sh ./tools/bin/migrate-lineage.sh`。
+
+执行结果：
+
+- 原血缘数据迁移至新血缘表 `t_ds_process_task_lineage`。
+- 此脚本仅执行 upsert 操作，不执行删除操作，如果需要删除，您可以手动删除。
+
 ### 服务升级
 
 #### 修改 `bin/env/install_env.sh` 配置内容

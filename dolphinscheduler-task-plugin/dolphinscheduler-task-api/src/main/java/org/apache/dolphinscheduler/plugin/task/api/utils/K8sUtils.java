@@ -22,12 +22,10 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOG_LINE
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
-import io.fabric8.kubernetes.api.model.batch.v1.JobList;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
@@ -65,14 +63,9 @@ public class K8sUtils {
     }
 
     public Boolean jobExist(String jobName, String namespace) {
-        Optional<Job> result;
         try {
-            JobList jobList = client.batch().jobs().inNamespace(namespace).list();
-            List<Job> jobs = jobList.getItems();
-            result = jobs.stream()
-                    .filter(job -> job.getMetadata().getName().equals(jobName))
-                    .findFirst();
-            return result.isPresent();
+            Job job = client.batch().v1().jobs().inNamespace(namespace).withName(jobName).get();
+            return job != null;
         } catch (Exception e) {
             throw new TaskException("fail to check job: ", e);
         }
