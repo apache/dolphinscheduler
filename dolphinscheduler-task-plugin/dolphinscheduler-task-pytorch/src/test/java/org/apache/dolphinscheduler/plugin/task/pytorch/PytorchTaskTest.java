@@ -110,13 +110,13 @@ public class PytorchTaskTest {
                 "export PYTHONPATH=.\n" +
                         "${PYTHON_LAUNCHER} main.py --epochs=1 --dry-run");
 
-        parameters.setPythonCommand("");
+        parameters.setPythonLauncher("");
         PytorchTask task2 = initTask(parameters);
         Assertions.assertEquals(task2.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +
                         "${PYTHON_LAUNCHER} main.py --epochs=1 --dry-run");
 
-        parameters.setPythonCommand("/usr/bin/python");
+        parameters.setPythonLauncher("/usr/bin/python");
         PytorchTask task3 = initTask(parameters);
         Assertions.assertEquals(task3.buildPythonExecuteCommand(),
                 "export PYTHONPATH=.\n" +

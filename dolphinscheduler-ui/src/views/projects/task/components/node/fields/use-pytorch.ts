@@ -93,7 +93,7 @@ export function usePytorch(model: { [field: string]: any }): IJsonItem[] {
     },
     {
       type: 'input',
-      field: 'pythonCommand',
+      field: 'pythonLauncher',
       name: t('project.node.pytorch_python_command'),
       span: pythonCommandSpan,
       props: {
