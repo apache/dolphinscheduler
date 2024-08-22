@@ -284,7 +284,7 @@ public class DependentExecute {
                 addItemVarPool(taskInstance.getVarPool(), taskInstance.getEndTime().getTime());
                 return DependResult.SUCCESS;
             }
-            return getDependResultByState(taskInstance.getState());
+            return getDependResultOfTask(processInstance, taskInstance);
         }
     }
 
@@ -337,18 +337,27 @@ public class DependentExecute {
     }
 
     /**
-     * get dependent result by task/process instance state
+     * get dependent result by task/process instance
      *
-     * @param state state
+     * @param processInstance process instance
+     * @param taskInstance task instance
      * @return DependResult
      */
-    private DependResult getDependResultByState(TaskExecutionStatus state) {
+    private DependResult getDependResultOfTask(ProcessInstance processInstance, TaskInstance taskInstance) {
 
+        TaskExecutionStatus state = taskInstance.getState();
         if (!state.isFinished()) {
             return DependResult.WAITING;
         } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
+            if (processInstance.getState().isRunning()
+                    && taskInstance.getRetryTimes() < taskInstance.getMaxRetryTimes()) {
+                log.info("taskDefinitionCode: {}, taskDefinitionName: {}, retryTimes: {}, maxRetryTimes: {}",
+                        taskInstance.getTaskCode(), taskInstance.getName(), taskInstance.getRetryTimes(),
+                        taskInstance.getMaxRetryTimes());
+                return DependResult.WAITING;
+            }
             log.warn(
                     "The dependent task were not executed successfully, so return depend failed. Task code: {}, task name: {}.",
                     taskInstance.getTaskCode(), taskInstance.getName());
