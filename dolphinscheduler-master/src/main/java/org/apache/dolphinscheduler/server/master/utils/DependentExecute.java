@@ -351,11 +351,11 @@ public class DependentExecute {
         } else if (state.isSuccess()) {
             return DependResult.SUCCESS;
         } else {
-            log.info("Task code: {}, task name: {}, retryTimes: {}, maxRetryTimes: {}",
-                    taskInstance.getTaskCode(), taskInstance.getName(), taskInstance.getRetryTimes(),
-                    taskInstance.getMaxRetryTimes());
             if (processInstance.getState().isRunning()
                     && taskInstance.getRetryTimes() < taskInstance.getMaxRetryTimes()) {
+                log.info("taskDefinitionCode: {}, taskDefinitionName: {}, retryTimes: {}, maxRetryTimes: {}",
+                        taskInstance.getTaskCode(), taskInstance.getName(), taskInstance.getRetryTimes(),
+                        taskInstance.getMaxRetryTimes());
                 return DependResult.WAITING;
             }
             log.warn(
