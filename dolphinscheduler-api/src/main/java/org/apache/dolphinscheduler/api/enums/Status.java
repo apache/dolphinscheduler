@@ -239,7 +239,7 @@ public enum Status {
     TASK_INSTANCE_HOST_IS_NULL(10191, "task instance host is null", "任务实例host为空"),
     QUERY_EXECUTING_WORKFLOW_ERROR(10192, "query executing workflow error", "查询运行的工作流实例错误"),
     DELETE_PROCESS_DEFINITION_USE_BY_OTHER_FAIL(10193, "delete process definition fail, cause used by other tasks: {0}",
-            "删除工作流定时失败，被其他任务引用：{0}"),
+            "删除工作流定义失败，被其他任务引用：{0}"),
     DELETE_TASK_USE_BY_OTHER_FAIL(10194, "delete task {0} fail, the reason is that used by other tasks: {1}",
             "删除任务 {0} 失败，被其他任务引用：{1}"),
     TASK_WITH_DEPENDENT_ERROR(10195, "task used in other tasks", "删除被其他任务引用"),
