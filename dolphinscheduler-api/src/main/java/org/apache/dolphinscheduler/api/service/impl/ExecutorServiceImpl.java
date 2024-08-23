@@ -44,8 +44,8 @@ import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowRequestTransformer;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
+import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
-import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -171,7 +171,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TriggerWorkflowRequestTransformer triggerWorkflowRequestTransformer;
 
     @Autowired
-    private TriggerWorkflowRequestValidator triggerWorkflowRequestValidator;
+    private TriggerWorkflowDTOValidator triggerWorkflowDTOValidator;
 
     @Autowired
     private BackfillWorkflowRequestTransformer backfillWorkflowRequestTransformer;
@@ -187,7 +187,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public Long triggerWorkflowDefinition(final WorkflowTriggerRequest workflowTriggerRequest) {
         final TriggerWorkflowDTO triggerWorkflowDTO =
                 triggerWorkflowRequestTransformer.transform(workflowTriggerRequest);
-        triggerWorkflowRequestValidator.validate(triggerWorkflowDTO);
+        triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
         executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
         return triggerWorkflowDTO.getTriggerCode();
     }

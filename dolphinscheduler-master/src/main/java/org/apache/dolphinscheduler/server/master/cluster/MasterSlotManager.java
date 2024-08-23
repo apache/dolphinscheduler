@@ -102,6 +102,6 @@ public class MasterSlotManager implements IMasterSlotReBalancer {
         }
         totalSlots = normalMasterServers.size();
         currentSlot = tmpCurrentSlot;
-        log.info("DO rebalance success, current master slot: {}, total master slots: {}", currentSlot, totalSlots);
+        log.info("Do rebalance success, current master slot: {}, total master slots: {}", currentSlot, totalSlots);
     }
 }

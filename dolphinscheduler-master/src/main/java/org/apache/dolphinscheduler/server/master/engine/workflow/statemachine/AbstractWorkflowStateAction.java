@@ -23,9 +23,9 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.dao.repository.ProcessInstanceDao;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBusCoordinator;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.SuccessorFlowAdjuster;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskStartLifecycleEvent;
@@ -55,7 +55,7 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
     protected ProcessInstanceDao workflowInstanceDao;
 
     @Autowired
-    protected WorkflowRepository workflowRepository;
+    protected WorkflowCacheRepository workflowCacheRepository;
 
     @Autowired
     protected WorkflowEventBusCoordinator workflowEventBusCoordinator;
@@ -164,7 +164,7 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
     protected void finalizeEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
         log.info(WorkflowInstanceUtils.logWorkflowInstanceInDetails(workflowExecutionRunnable));
 
-        workflowRepository.remove(workflowExecutionRunnable.getId());
+        workflowCacheRepository.remove(workflowExecutionRunnable.getId());
         workflowEventBusCoordinator.unRegisterWorkflowEventBus(workflowExecutionRunnable);
 
         log.info("Successfully finalize WorkflowExecuteRunnable: {}", workflowExecutionRunnable.getName());

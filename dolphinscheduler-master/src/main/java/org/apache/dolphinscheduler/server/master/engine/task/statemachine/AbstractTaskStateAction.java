@@ -100,7 +100,9 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
      */
     protected void releaseTaskInstanceResourcesIfNeeded(final ITaskExecutionRunnable taskExecutionRunnable) {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
-        taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
+        if (taskGroupCoordinator.needToReleaseTaskGroupSlot(taskInstance)) {
+            taskGroupCoordinator.releaseTaskGroupSlot(taskInstance);
+        }
     }
 
     @Override

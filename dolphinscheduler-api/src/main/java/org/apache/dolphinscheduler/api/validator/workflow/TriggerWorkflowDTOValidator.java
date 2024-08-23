@@ -15,23 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.graph;
+package org.apache.dolphinscheduler.api.validator.workflow;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.api.validator.IValidator;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 
-public abstract class AbstractSuccessorParser implements ISuccessorParser {
+import lombok.extern.slf4j.Slf4j;
 
-    protected ISuccessorParser next;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDTO> {
 
     @Override
-    public Successors parseSuccessors(Long taskCode) {
-        return null;
+    public void validate(final TriggerWorkflowDTO triggerWorkflowDTO) {
+        if (triggerWorkflowDTO.getExecType() != CommandType.START_PROCESS) {
+            throw new IllegalArgumentException("The execType should be START_PROCESS");
+        }
+        if (triggerWorkflowDTO.getWorkflowDefinition() == null) {
+            throw new IllegalArgumentException("The workflowDefinition should not be null");
+        }
     }
-
-    public void setNext(ISuccessorParser next) {
-        this.next = next;
-    }
-
-    public abstract boolean canParse(TaskInstance taskInstance);
-
 }

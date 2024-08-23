@@ -136,7 +136,7 @@ public interface ProcessInstanceMapper extends BaseMapper<ProcessInstance> {
     int updateWorkflowInstanceState(
                                     @Param("workflowInstanceId") Integer workflowInstanceId,
                                     @Param("originState") WorkflowExecutionStatus originState,
-                                    @Param("destState") WorkflowExecutionStatus destState);
+                                    @Param("targetState") WorkflowExecutionStatus targetState);
 
     /**
      * update process instance by tenantCode

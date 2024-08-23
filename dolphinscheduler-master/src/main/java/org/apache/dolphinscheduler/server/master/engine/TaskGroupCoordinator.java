@@ -425,6 +425,7 @@ public class TaskGroupCoordinator extends BaseDaemonThread {
             throw new IllegalArgumentException("The TaskInstance is null");
         }
         if (taskInstance.getTaskGroupId() <= 0) {
+            log.warn("The task: {} is no need to release TaskGroupSlot", taskInstance.getName());
             return;
         }
         List<TaskGroupQueue> taskGroupQueues = taskGroupQueueDao.queryByTaskInstanceId(taskInstance.getId());

@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePa
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstancePauseResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.WorkflowInstanceStopResponse;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
@@ -39,13 +39,14 @@ import org.springframework.stereotype.Service;
 public class WorkflowInstanceControllerImpl implements IWorkflowInstanceController {
 
     @Autowired
-    private WorkflowRepository workflowRepository;
+    private WorkflowCacheRepository workflowCacheRepository;
 
     @Override
     public WorkflowInstancePauseResponse pauseWorkflowInstance(final WorkflowInstancePauseRequest workflowInstancePauseRequest) {
         try {
             final Integer workflowInstanceId = workflowInstancePauseRequest.getWorkflowInstanceId();
-            final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
+            final IWorkflowExecutionRunnable workflowExecutionRunnable =
+                    workflowCacheRepository.get(workflowInstanceId);
             if (workflowExecutionRunnable == null) {
                 return WorkflowInstancePauseResponse
                         .fail("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);
@@ -63,7 +64,8 @@ public class WorkflowInstanceControllerImpl implements IWorkflowInstanceControll
     public WorkflowInstanceStopResponse stopWorkflowInstance(final WorkflowInstanceStopRequest workflowInstanceStopRequest) {
         try {
             final Integer workflowInstanceId = workflowInstanceStopRequest.getWorkflowInstanceId();
-            final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
+            final IWorkflowExecutionRunnable workflowExecutionRunnable =
+                    workflowCacheRepository.get(workflowInstanceId);
             if (workflowExecutionRunnable == null) {
                 return WorkflowInstanceStopResponse
                         .fail("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);

@@ -156,7 +156,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
                 taskExecutionContext.setEndTime(System.currentTimeMillis());
                 WorkerTaskExecutorHolder.remove(taskExecutionContext.getTaskInstanceId());
                 workerMessageSender.sendMessageWithRetry(taskExecutionContext,
-                        ITaskExecutionEvent.TaskInstanceExecutionEventType.FINISH);
+                        ITaskExecutionEvent.TaskInstanceExecutionEventType.SUCCESS);
                 log.info(
                         "The current execute mode is dry run, will stop the subsequent process and set the taskInstance status to success");
                 return;

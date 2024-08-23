@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.collect.ImmutableList;
 
 @Component
-public class WorkflowRepository implements IWorkflowRepository {
+public class WorkflowCacheRepository implements IWorkflowRepository {
 
     private final Map<Integer, IWorkflowExecutionRunnable> workflowExecutionRunnableMap = new ConcurrentHashMap<>();
 

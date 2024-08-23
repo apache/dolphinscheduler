@@ -154,7 +154,7 @@
     </update>
     <update id="updateWorkflowInstanceState">
         update t_ds_process_instance
-        set state = #{destState}
+        set state = #{targetState}
         where id = #{workflowInstanceId} and state = #{originState}
     </update>
 

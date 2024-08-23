@@ -89,7 +89,7 @@ public class PauseWorkflowInstanceExecutorDelegate
                 log.info("WorkflowInstance: {} pause success", workflowInstance.getName());
             } else {
                 throw new ServiceException(
-                        "WorkflowInstance: " + workflowInstance.getName() + " stop failed: " + pauseResponse);
+                        "WorkflowInstance: " + workflowInstance.getName() + " pause failed: " + pauseResponse);
             }
         } catch (ServiceException e) {
             throw e;

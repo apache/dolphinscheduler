@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.master.transportor;
 
+// todo: add event source to distinguish the event is from executor or user operation
 public interface ITaskExecutionEvent {
 
     int getWorkflowInstanceId();
@@ -48,7 +49,6 @@ public interface ITaskExecutionEvent {
         KILLED,
         FAILED,
         SUCCESS,
-        FINISH,
     }
 
 }

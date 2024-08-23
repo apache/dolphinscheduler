@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.engine;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
@@ -120,6 +121,8 @@ public class WorkflowEventBusFireWorker {
                 // so that the event can be fired again when the database connection is recovered
                 if (ExceptionUtils.isDatabaseConnectedFailedException(ex)) {
                     workflowEventBus.publish(lifecycleEvent);
+                    ThreadUtils.sleep(5_000);
+                    return;
                 }
                 workflowEventBus.getWorkflowEventBusSummary().decreaseFireSuccessEventCount();
                 workflowEventBus.getWorkflowEventBusSummary().increaseFireFailedEventCount();

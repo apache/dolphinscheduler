@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.statemachine;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.WorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,7 +33,7 @@ public class WorkflowStateActionFactory {
     private final Map<WorkflowExecutionStatus, IWorkflowStateAction> workflowStateActionMap = new HashMap<>();
 
     public WorkflowStateActionFactory(List<IWorkflowStateAction> workflowStateActions,
-                                      WorkflowRepository workflowRepository) {
+                                      WorkflowCacheRepository workflowCacheRepository) {
         workflowStateActions.forEach(
                 workflowStateAction -> workflowStateActionMap.put(workflowStateAction.matchState(),
                         workflowStateAction));
