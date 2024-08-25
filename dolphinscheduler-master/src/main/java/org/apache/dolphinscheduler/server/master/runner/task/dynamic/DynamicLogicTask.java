@@ -338,7 +338,7 @@ public class DynamicLogicTask extends BaseAsyncLogicTask<DynamicParameters> {
                 SingletonJdkDynamicRpcClientProxyFactory
                         .getProxyClient(subProcessInstance.getHost(), ITaskInstanceExecutionEventListener.class);
         final WorkflowInstanceStateChangeEvent workflowInstanceStateChangeEvent = new WorkflowInstanceStateChangeEvent(
-                taskExecutionContext.getProcessInstanceId(),
+                subProcessInstance.getId(),
                 taskExecutionContext.getTaskInstanceId(),
                 subProcessInstance.getState(),
                 subProcessInstance.getId(),
