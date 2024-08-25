@@ -85,6 +85,12 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         if (!workflowExecuteThread.isStart() || workflowExecuteThread.eventSize() == 0) {
             return;
         }
+
+        if (isOverload()) {
+            log.warn("WorkflowExecuteThreadPool is overload, cannot submit new workflowExecuteThread");
+            return;
+        }
+
         IWorkflowExecuteContext workflowExecuteRunnableContext =
                 workflowExecuteThread.getWorkflowExecuteContext();
         Integer workflowInstanceId = workflowExecuteRunnableContext.getWorkflowInstance().getId();
@@ -131,4 +137,7 @@ public class WorkflowExecuteThreadPool extends ThreadPoolTaskExecutor {
         });
     }
 
+    public boolean isOverload() {
+        return this.getThreadPoolExecutor().getQueue().size() >= masterConfig.getExecThreads();
+    }
 }
