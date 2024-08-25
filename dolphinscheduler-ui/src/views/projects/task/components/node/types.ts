@@ -433,7 +433,7 @@ interface ITaskParams {
   scriptParams?: string
   pythonPath?: string
   isCreateEnvironment?: string
-  pythonCommand?: string
+  pythonLauncher?: string
   pythonEnvTool?: string
   requirements?: string
   condaPythonVersion?: string

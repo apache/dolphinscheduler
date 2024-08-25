@@ -420,7 +420,7 @@ export function formatParams(data: INodeData): {
     taskParams.scriptParams = data.scriptParams
     taskParams.pythonPath = data.pythonPath
     taskParams.isCreateEnvironment = data.isCreateEnvironment
-    taskParams.pythonCommand = data.pythonCommand
+    taskParams.pythonLauncher = data.pythonLauncher
     taskParams.pythonEnvTool = data.pythonEnvTool
     taskParams.requirements = data.requirements
     taskParams.condaPythonVersion = data.condaPythonVersion

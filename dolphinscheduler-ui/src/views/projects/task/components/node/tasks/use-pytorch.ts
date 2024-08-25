@@ -45,7 +45,7 @@ export function usePytorch({
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
     pythonEnvTool: 'conda',
-    pythonCommand: '${PYTHON_LAUNCHER}',
+    pythonLauncher: '${PYTHON_LAUNCHER}',
     condaPythonVersion: '3.7',
     requirements: 'requirements.txt',
     pythonPath: '.'
