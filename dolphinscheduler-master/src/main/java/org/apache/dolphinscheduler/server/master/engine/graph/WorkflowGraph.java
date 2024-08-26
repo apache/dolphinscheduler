@@ -104,6 +104,9 @@ public class WorkflowGraph implements IWorkflowGraph {
                 .stream()
                 .map(TaskDefinition::getName)
                 .forEach(taskDefinition -> {
+                    if (predecessors.containsKey(taskDefinition) || successors.containsKey(taskDefinition)) {
+                        throw new IllegalArgumentException("The task " + taskDefinition + " is already exists");
+                    }
                     predecessors.put(taskDefinition, new ArrayList<>());
                     successors.put(taskDefinition, new ArrayList<>());
                 });
@@ -123,10 +126,25 @@ public class WorkflowGraph implements IWorkflowGraph {
                 }
                 TaskDefinition preTask = checkNotNull(taskDefinitionCodeMap.get(pre), "Cannot find task: " + pre);
                 TaskDefinition postTask = checkNotNull(taskDefinitionCodeMap.get(post), "Cannot find task: " + pre);
-                predecessors.get(postTask.getName()).add(preTask.getName());
-                successors.get(preTask.getName()).add(postTask.getName());
+                List<String> predecessorsTasks = predecessors.get(postTask.getName());
+                if (predecessorsTasks.contains(preTask.getName())) {
+                    throw new IllegalArgumentException("The task relation from " + preTask.getName() + " to "
+                            + postTask.getName() + " is already exists");
+                }
+                predecessorsTasks.add(preTask.getName());
+
+                List<String> successTasks = successors.get(preTask.getName());
+                if (successTasks.contains(postTask.getName())) {
+                    throw new IllegalArgumentException("The task relation from " + preTask.getName() + " to "
+                            + postTask.getName() + " is already exists");
+                }
+                successTasks.add(postTask.getName());
             }
+
+            if (pre <= 0 && post <= 0) {
+                throw new IllegalArgumentException("The task relation from " + pre + " to " + post + " is invalid");
+            }
+
         }
     }
-
 }

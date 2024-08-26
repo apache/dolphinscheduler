@@ -19,6 +19,12 @@ package org.apache.dolphinscheduler.server.master.engine.task.client;
 
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
+/**
+ * The interface of task executor client delegator. It is used to send operation to task executor server.
+ *
+ * @see LogicTaskExecutorClientDelegator
+ * @see PhysicalTaskExecutorClientDelegator
+ */
 public interface ITaskExecutorClientDelegator {
 
     void dispatch(final ITaskExecutionRunnable taskExecutionRunnable);

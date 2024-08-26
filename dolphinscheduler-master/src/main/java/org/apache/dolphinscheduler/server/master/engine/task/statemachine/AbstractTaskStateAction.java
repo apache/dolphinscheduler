@@ -262,7 +262,7 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
                     .takeOverTask(takeOverTaskRequest);
             return takeOverTaskResponse.isSuccess();
         } catch (Exception ex) {
-            log.info("Take over task: {} failed", taskExecutionRunnable.getName(), ex);
+            log.warn("Take over task: {} failed", taskExecutionRunnable.getName(), ex);
             return false;
         }
     }
