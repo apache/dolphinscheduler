@@ -44,12 +44,16 @@ import java.util.UUID;
 
 import javax.activation.CommandMap;
 import javax.activation.MailcapCommandMap;
+import javax.mail.Address;
 import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
+import javax.mail.URLName;
+import javax.mail.event.TransportAdapter;
+import javax.mail.event.TransportEvent;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
@@ -351,8 +355,8 @@ public final class MailSender {
         partList.addBodyPart(part1);
         partList.addBodyPart(part2);
         msg.setContent(partList);
-        // 5. send Transport
-        Transport.send(msg);
+        // 5. send email
+        sendMail(msg, msg.getSession());
         // 6. delete saved file
         deleteFile(file);
     }
@@ -361,7 +365,7 @@ public final class MailSender {
      * the string object map
      */
     private AlertResult getStringObjectMap(String title, String content, AlertResult alertResult,
-                                           HtmlEmail email) throws EmailException {
+                                           HtmlEmail email) throws EmailException, MessagingException {
 
         /*
          * the subject of the message to be sent
@@ -378,11 +382,40 @@ public final class MailSender {
 
         // send
         email.setDebug(true);
-        email.send();
-
+        email.buildMimeMessage();
+        sendMail(email.getMimeMessage(), email.getMailSession());
         alertResult.setSuccess(true);
 
         return alertResult;
+    }
+
+    /**
+     * send mail with validAddresses retry
+     *
+     * @param mimeMessage the message
+     * @param session connectSession
+     */
+    private void sendMail(MimeMessage mimeMessage, Session session) throws MessagingException, AlertEmailException {
+        Transport transport = session.getTransport(new SMTPProvider());
+        transport.addTransportListener(new TransportAdapter() {
+            @Override
+            public void messageNotDelivered(TransportEvent event) {
+                Address[] validUnsentAddresses = event.getValidUnsentAddresses();
+                if (validUnsentAddresses == null || validUnsentAddresses.length < 1) {
+                    return;
+                }
+                try {
+                    transport.sendMessage(mimeMessage, validUnsentAddresses);
+                } catch (MessagingException e) {
+                    log.error("send mail with validAddresses failed:{}", e.getMessage());
+                    throw new AlertEmailException("send mail with validAddresses failed", e);
+                }
+            }
+        });
+        URLName urlName = transport.getURLName();
+        transport.connect(urlName.getHost(), urlName.getUsername(), urlName.getPassword());
+        transport.sendMessage(mimeMessage, mimeMessage.getAllRecipients());
+        transport.close();
     }
 
     /**
